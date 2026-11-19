@@ -134,6 +134,10 @@ L<Exports|/"Exports">
 
 L<The modules|/"The modules">
 
+=item *
+
+L<Index|/"Index">
+
 =back
 
 =head1 At a glance
@@ -4398,6 +4402,502 @@ Canned stages gathering values: C<batch>, C<collect>.
 Canned stages run for their side effects: C<peek>, C<count_into>, C<dump_to>, C<tee>.
 
 =back
+
+=head1 Index
+
+Every module, A to Z, and each of its functions and methods, A to Z,
+with what it does and how it's exported. Each ends with a link to
+where it's described.
+
+=head2 Ekorn::Pipeline
+
+Runs values through a list of stages. Its methods, and two functions
+exported on request.
+
+=head3 ending
+
+True while a flush runs, and while what it gave goes through the
+stages after it. Not exported: call it by its full name. See
+L<ending|/"ending">.
+
+=head3 feed
+
+A feed, one run, given values as they arrive. See L<feed|/"feed">.
+
+=head3 is_sink
+
+C<one> or C<many> if what it's given is a sink, or a pipeline ending in
+one; false otherwise. On request. See L<is_sink|/"is_sink">.
+
+=head3 is_stage
+
+True if what it's given can be used as a stage. On request. See
+L<is_stage|/"is_stage">.
+
+=head3 iterator
+
+An iterator, handing out the results one per call, pulling values from
+a source as they're needed. See L<iterator|/"iterator">.
+
+=head3 name
+
+The name the pipeline was first given, qualified by its package, or
+C<undef>. See L<name|/"name">.
+
+=head3 named
+
+Names a pipeline, and returns it; called on the class, it makes the
+pipeline first. See L<named|/"named">.
+
+=head3 new
+
+A pipeline of the stages given, in order, called with values to run
+them through. See L<new|/"new"> and L<Calling a
+pipeline|/"Calling a pipeline">.
+
+=head3 pipeline_in
+
+A new pipeline of stages and names of pipelines, the names looked up
+in the package given. See L<pipeline_in|/"pipeline_in">.
+
+=head3 run_context
+
+The context the run's source gave, if any. Not exported: call it by
+its full name. See L<run_context|/"run_context">.
+
+=head3 stages
+
+A copy of the pipeline's stages, in order; in scalar context, how many
+there are. See L<stages|/"stages">.
+
+=head2 Ekorn::Pipeline::Element
+
+What each of Ekorn's types called as code is. Exports nothing.
+
+=head3 call
+
+Does what calling it does. See L<Stages and
+elements|/"Stages and elements">.
+
+=head2 Ekorn::Pipeline::Errors
+
+Reports errors at the caller's line. Nothing by default.
+
+=head3 croakf
+
+Croaks with a message made by C<sprintf>, at the line that called the
+function that called it. On request. See L<croakf|/"croakf">.
+
+=head2 Ekorn::Pipeline::Factories
+
+The words that make Ekorn's types. Nothing by default; each on
+request, and in Tooling's C<:words>.
+
+=head3 generator
+
+A source giving what its block passes to C<yield>. See L<generator and
+yield|/"generator and yield">.
+
+=head3 pipeline
+
+A new pipeline of stages and names of pipelines, the names looked up
+in the caller's package; given one name alone, the pipeline it names.
+See L<pipeline|/"pipeline">.
+
+=head3 sink_many
+
+A sink, made for each run, giving a list. See L<sink_one and
+sink_many|/"sink_one and sink_many">.
+
+=head3 sink_one
+
+A sink, made for each run, giving one value. See L<sink_one and
+sink_many|/"sink_one and sink_many">.
+
+=head3 source
+
+A source, made for each run by its set-up. See L<source|/"source">.
+
+=head3 stage
+
+The block, kept as a stage. See L<stage|/"stage">.
+
+=head3 yield
+
+In a generator's block, gives values. See L<generator and
+yield|/"generator and yield">.
+
+=head2 Ekorn::Pipeline::Feed
+
+One run, given values as they arrive; made by C<feed>. Exports nothing.
+
+=head3 close
+
+Ends the input, and returns what the flushes give, and a sink's
+result. See L<Feeds: Ekorn::Pipeline::Feed|/"Feeds: Ekorn::Pipeline::Feed">.
+
+=head3 ended
+
+Nothing while the run is open; then C<done>, C<stopped> or C<died>. See
+L<Feeds: Ekorn::Pipeline::Feed|/"Feeds: Ekorn::Pipeline::Feed">.
+
+=head3 finish
+
+Ends the run now, as from outside, calling no flush. See L<Feeds:
+Ekorn::Pipeline::Feed|/"Feeds: Ekorn::Pipeline::Feed">.
+
+=head3 push
+
+Runs the values through the stages, and returns what came out of them.
+See L<Feeds: Ekorn::Pipeline::Feed|/"Feeds: Ekorn::Pipeline::Feed">.
+
+=head2 Ekorn::Pipeline::Gather
+
+A stage made afresh for each run, with a flush and an end. C<gather> by
+default.
+
+=head3 EKORN_STAGE
+
+Calls the block for a new run; a run calls it. See L<The
+protocols|/"The protocols">.
+
+=head3 gather
+
+A stage made afresh for each run by its block. By default. See
+L<gather|/"gather">.
+
+=head3 new
+
+Makes one, as C<gather> does. See L<gather|/"gather">.
+
+=head2 Ekorn::Pipeline::Iterator
+
+One run, handing out its values, each C<< $next->() >>; made by C<iterator>,
+and a source too. Exports nothing.
+
+=head3 all
+
+Every value still to come, reading the run to its end. See L<Iterators:
+Ekorn::Pipeline::Iterator|/"Iterators: Ekorn::Pipeline::Iterator">.
+
+=head3 ended
+
+Nothing until the iterator has given all it will; then C<done>,
+C<stopped> or C<died>. See L<Iterators:
+Ekorn::Pipeline::Iterator|/"Iterators: Ekorn::Pipeline::Iterator">.
+
+=head3 finish
+
+Ends the run now; nothing more is read. See L<Iterators:
+Ekorn::Pipeline::Iterator|/"Iterators: Ekorn::Pipeline::Iterator">.
+
+=head3 first
+
+The next value, or C<undef>; then the run ends. See L<Iterators:
+Ekorn::Pipeline::Iterator|/"Iterators: Ekorn::Pipeline::Iterator">.
+
+=head3 single
+
+The next value, or C<undef>, warning if there's another; then the run
+ends. See L<Iterators:
+Ekorn::Pipeline::Iterator|/"Iterators: Ekorn::Pipeline::Iterator">.
+
+=head2 Ekorn::Pipeline::JSON
+
+Reads and writes JSON and JSON Lines. Nothing by default; each on
+request, and in Tooling's C<:json>. Each takes the options C<file>, C<fh>
+and C<json>.
+
+=head3 from_json
+
+Given a C<file> or an C<fh>, a source of one document's values; given
+neither, a stage decoding each value. See L<JSON:
+Ekorn::Pipeline::JSON|/"JSON: Ekorn::Pipeline::JSON">.
+
+=head3 from_jsonl
+
+Given a C<file> or an C<fh>, a source of JSON Lines, a document a line;
+given neither, a stage decoding each line of each value. See L<JSON:
+Ekorn::Pipeline::JSON|/"JSON: Ekorn::Pipeline::JSON">.
+
+=head3 to_json
+
+Given a C<file> or an C<fh>, a sink writing every value as one array,
+giving how many; given neither, a stage passing on the array's text.
+See L<JSON: Ekorn::Pipeline::JSON|/"JSON: Ekorn::Pipeline::JSON">.
+
+=head3 to_jsonl
+
+Given a C<file> or an C<fh>, a sink writing each value as a line, giving
+how many; given neither, a stage passing on each value's line. See
+L<JSON: Ekorn::Pipeline::JSON|/"JSON: Ekorn::Pipeline::JSON">.
+
+=head2 Ekorn::Pipeline::Operators
+
+Loading it puts the operators in force, for the rest of the scope;
+C<no> takes them out. Nothing else by default.
+
+=head3 chain
+
+What C<|> calls, for your own class's C<use overload>. By its full name.
+See L<Your source, chained with C<E<verbar>>|/"Your source, chained with E<verbar>">.
+
+=head3 drain
+
+What C<@{}> calls, for your own class's C<use overload>. By its full
+name. See L<Your source, chained with C<E<verbar>>|/"Your source, chained with E<verbar>">.
+
+=head2 Ekorn::Pipeline::Pipes
+
+A parent class, giving its children two methods. Exports nothing.
+
+=head3 pipe
+
+Runs the object through the stages, and returns what comes out. See
+L<pipe|/"pipe">.
+
+=head3 tap
+
+Runs the object through the stages for their side effects, and returns
+the object. See L<tap|/"tap">.
+
+=head2 Ekorn::Pipeline::Sink
+
+A sink made afresh for each run. Exports nothing.
+
+=head3 EKORN_SINK_MANY
+
+Calls the set-up of a sink of many for a new run; a run calls it. See
+L<Sinks: Ekorn::Pipeline::Sink|/"Sinks: Ekorn::Pipeline::Sink">.
+
+=head3 EKORN_SINK_ONE
+
+Calls the set-up of a sink of one for a new run; a run calls it. See
+L<Sinks: Ekorn::Pipeline::Sink|/"Sinks: Ekorn::Pipeline::Sink">.
+
+=head3 new_sink_many
+
+A sink of many, giving a list. See L<Sinks:
+Ekorn::Pipeline::Sink|/"Sinks: Ekorn::Pipeline::Sink">.
+
+=head3 new_sink_one
+
+A sink of one, giving one value. See L<Sinks:
+Ekorn::Pipeline::Sink|/"Sinks: Ekorn::Pipeline::Sink">.
+
+=head2 Ekorn::Pipeline::Sinks
+
+Ready-made sinks. Nothing by default; each on request, and in
+Tooling's C<:sinks>.
+
+=head3 count_items
+
+How many items there were. See L<Sinks:
+Ekorn::Pipeline::Sinks|/"Sinks: Ekorn::Pipeline::Sinks">.
+
+=head3 keep
+
+The first items, as many as it's given, as a list. See L<Sinks:
+Ekorn::Pipeline::Sinks|/"Sinks: Ekorn::Pipeline::Sinks">.
+
+=head3 keep_all
+
+Every item, as a list. See L<Sinks:
+Ekorn::Pipeline::Sinks|/"Sinks: Ekorn::Pipeline::Sinks">.
+
+=head3 keep_first
+
+The first item, or C<undef>. See L<Sinks:
+Ekorn::Pipeline::Sinks|/"Sinks: Ekorn::Pipeline::Sinks">.
+
+=head3 keep_last
+
+The last item, or C<undef>. See L<Sinks:
+Ekorn::Pipeline::Sinks|/"Sinks: Ekorn::Pipeline::Sinks">.
+
+=head3 keep_single
+
+The one item, or C<undef>, warning at a second. See L<Sinks:
+Ekorn::Pipeline::Sinks|/"Sinks: Ekorn::Pipeline::Sinks">.
+
+=head3 to_fh
+
+Prints each item to your filehandle, and gives how many. See L<Sinks:
+Ekorn::Pipeline::Sinks|/"Sinks: Ekorn::Pipeline::Sinks">.
+
+=head3 to_file
+
+Writes each item to the file, and gives how many. See L<Sinks:
+Ekorn::Pipeline::Sinks|/"Sinks: Ekorn::Pipeline::Sinks">.
+
+=head2 Ekorn::Pipeline::Source
+
+A source made afresh for each run. Exports nothing.
+
+=head3 EKORN_SOURCE
+
+Calls the set-up for a new run; a run calls it. See L<Sources:
+Ekorn::Pipeline::Source|/"Sources: Ekorn::Pipeline::Source">.
+
+=head3 new
+
+A source made for each run by the set-up given. See L<Sources:
+Ekorn::Pipeline::Source|/"Sources: Ekorn::Pipeline::Source">.
+
+=head2 Ekorn::Pipeline::Sources
+
+Ready-made sources. Nothing by default; each on request, and in
+Tooling's C<:sources>.
+
+=head3 counter
+
+Numbers from a start, on by a step, without end. See L<Sources:
+Ekorn::Pipeline::Sources|/"Sources: Ekorn::Pipeline::Sources">.
+
+=head3 from_array
+
+The values given. See L<Sources:
+Ekorn::Pipeline::Sources|/"Sources: Ekorn::Pipeline::Sources">.
+
+=head3 from_fh
+
+A filehandle's records, its lines unless C<$/> is changed. See
+L<Sources: Ekorn::Pipeline::Sources|/"Sources: Ekorn::Pipeline::Sources">.
+
+=head3 from_file
+
+A file's records, closing it however the run ends. See L<Sources:
+Ekorn::Pipeline::Sources|/"Sources: Ekorn::Pipeline::Sources">.
+
+=head2 Ekorn::Pipeline::Stage
+
+A code reference kept as a stage. Exports nothing.
+
+=head3 code
+
+What the stage was made of. See L<Stages and
+elements|/"Stages and elements">.
+
+=head3 new
+
+A stage of a code reference, or an object called as one. See L<Stages
+and elements|/"Stages and elements">.
+
+=head2 Ekorn::Pipeline::Stages::Batch
+
+Canned stages gathering values. Both by default, and in Tooling's
+C<:batch>.
+
+=head3 batch
+
+Passes values on in array references of the size given, the last
+perhaps shorter. See L<batch|/"batch">.
+
+=head3 collect
+
+Holds every value, and passes on an array reference of them, or what
+the block makes of them. See L<collect|/"collect">.
+
+=head2 Ekorn::Pipeline::Stages::Flow
+
+Canned stages taking or dropping values. C<take> and C<drop> by default,
+the rest on request; all in Tooling's C<:flow>.
+
+=head3 drop
+
+Drops the first values, as many as it's given, and passes on the rest.
+By default. See L<drop|/"drop">.
+
+=head3 drop_if
+
+Drops each value the block is true for. See L<drop_if|/"drop_if">.
+
+=head3 drop_while
+
+Drops values while the block is true for them, then passes on the
+rest. See L<drop_while|/"drop_while">.
+
+=head3 take
+
+Passes on the first values, as many as it's given, then stops. By
+default. See L<take|/"take">.
+
+=head3 take_first
+
+Passes on the first value, then stops. See L<take_first|/"take_first">.
+
+=head3 take_if
+
+Passes on each value the block is true for. See L<take_if|/"take_if">.
+
+=head3 take_last
+
+Passes on the last value. See L<take_last|/"take_last">.
+
+=head3 take_single
+
+Passes on the one value, warning and stopping at a second. See
+L<take_single|/"take_single">.
+
+=head3 take_while
+
+Passes on values while the block is true for them, then stops. See
+L<take_while|/"take_while">.
+
+=head2 Ekorn::Pipeline::Stages::Taps
+
+Canned stages run for their side effects, passing each value on
+unchanged. C<peek> and C<count_into> by default, the rest on request;
+all in Tooling's C<:taps>.
+
+=head3 count_into
+
+Counts the values into the scalar it's given a reference to. By
+default. See L<count_into|/"count_into">.
+
+=head3 dump_to
+
+Writes each value to the filehandle given, or STDERR, with
+Data::Dumper. See L<dump_to|/"dump_to">.
+
+=head3 peek
+
+Calls the block with each value. By default. See L<peek|/"peek">.
+
+=head3 tee
+
+Runs each value through a branch of the stages given too. See
+L<tee|/"tee">.
+
+=head2 Ekorn::Pipeline::Stop
+
+Ends a pipeline early. C<Stop> by default.
+
+=head3 Stop
+
+Throws a stop carrying the values given. By default. See
+L<Stop|/"Stop">.
+
+=head3 throw
+
+Throws a stop of the class it's called on. See L<throw|/"throw">.
+
+=head2 Ekorn::Pipeline::Sugar
+
+Names pipelines as the program compiles. Exports nothing; C<use> gives
+the package a function of each name.
+
+=head3 import_into
+
+Does what C<use> does, for the package given. See L<Named at compile
+time:
+Ekorn::Pipeline::Sugar|/"Named at compile time: Ekorn::Pipeline::Sugar">.
+
+=head2 Ekorn::Pipeline::Tooling
+
+Exports what callers use to do work, from one place. Nothing by
+default; ask for the names above, or the tags that hold them (see
+L<Importing|/"Importing: Ekorn::Pipeline::Tooling">).
 
 =head1 SEE ALSO
 

@@ -23,7 +23,7 @@ my $ptk = Tk::MMutil::findpTk($tk);
 my $define = '-DLangIsPerl';
 if ($ENV{ETEXT_DATA_ARRAYS}) {
     $define .= ' -DTK_TEXT_DATA_ARRAYS=1';
-    print "Building representation B of the value containers (TK_TEXT_DATA_ARRAYS=1)\n";
+    print "Building value=C-array: the value containers as C arrays (TK_TEXT_DATA_ARRAYS=1)\n";
 }
 
 my @c = map { "$_.c" } qw(tkText tkTextBTree tkTextDisp tkTextIndex

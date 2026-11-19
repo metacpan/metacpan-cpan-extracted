@@ -17,11 +17,11 @@ use App::FileSync qw(conflict_name);
 use App::FileSync::Args qw(named);
 use App::FileSync::Constants qw(
 	$ROLE_CLIENT $ROLE_REPLICA @ROLES $TYPE_FILE $TYPE_DIR
-	$MAX_DELETES $MAX_DELETE_PERCENT $MTIME_TOLERANCE
+	$MAX_DELETES $MAX_DELETE_PERCENT $MAX_PERCENT $MTIME_TOLERANCE
 );
 use App::FileSync::I18N qw(message);
 
-use version; our $VERSION = version->declare('0.002.1');
+use version; our $VERSION = version->declare('0.002.2');
 
 # max_delete_percent is a percentage of the repo's size.
 Readonly::Scalar my $PERCENT => 100;
@@ -36,13 +36,11 @@ my $type = sub {
 	return ($entry && defined $entry->{t} && length $entry->{t}) ? $entry->{t} : $TYPE_FILE;
 };
 
-# Two entries describe the same content: both absent, both directories, or
-# both files with the same hash.
+# Two entries describe the same content: both directories, or both files with
+# the same hash.  Both must be present: every caller checks that first, so an
+# absent entry is never compared here.
 my $same = sub {
 	my ($left, $right) = @_;
-
-	return 1 unless $left || $right;
-	return 0 unless $left && $right;
 
 	my $left_type = $type->($left);
 	return 0 unless $left_type eq $type->($right);
@@ -236,12 +234,15 @@ Purpose: guard against a misconfigured client (or an empty mount) wiping the
 master.
 
 Args: C<deletions> (planned), C<base_size> (files known at the last sync),
-C<max_deletes> (default 200; 0 disables), C<max_delete_percent> (default 10;
-0 disables), C<force>.
+C<max_deletes> (default 200; 0 disables), C<max_delete_percent> (default 10,
+at most 100; 0 disables), C<force>.
 
 Returns: C<undef> when the plan is acceptable, or a translated sentence
-explaining the refusal.  At least one deletion is always allowed, so a small
-repo stays usable.
+explaining the refusal.  Both limits are inclusive: with C<max_deletes> 5, a
+plan may delete exactly 5 files and is refused at 6.  The percentage limit
+allows C<max_delete_percent> percent of C<base_size>, rounded down (10% of 25
+known files allows 2 deletions), but never fewer than one, so a small repo
+stays usable.  A plan that deletes nothing is always acceptable.
 
 Side Effects: none.
 
@@ -262,7 +263,7 @@ Usage:
 		deletions          => { type => 'integer', min => 0, optional => 1 },
 		base_size          => { type => 'integer', min => 0, optional => 1 },
 		max_deletes        => { type => 'integer', min => 0, optional => 1 },
-		max_delete_percent => { type => 'number', min => 0, optional => 1 },
+		max_delete_percent => { type => 'number', min => 0, max => 100, optional => 1 },
 		force              => { type => 'boolean', optional => 1 },
 	}
 
@@ -288,7 +289,7 @@ sub check_delete_limit {
 		deletions          => { type => 'integer', min => 0, optional => 1 },
 		base_size          => { type => 'integer', min => 0, optional => 1 },
 		max_deletes        => { type => 'integer', min => 0, optional => 1 },
-		max_delete_percent => { type => 'number', min => 0, optional => 1 },
+		max_delete_percent => { type => 'number', min => 0, max => $MAX_PERCENT, optional => 1 },
 		force              => { type => 'boolean', optional => 1 },
 	}, 'Merge::check_delete_limit');
 
@@ -303,8 +304,9 @@ sub check_delete_limit {
 	$allowed = 1 if $allowed < 1;
 
 	my %args = (count => $deletions, known => $known, max => $max, percent => $percent);
+	# No limit refuses zero deletions: $allowed is at least one.
 	my $refusal =
-		  ($deletions == 0 || $args->{force})       ? undef
+		  $args->{force}                            ? undef
 		: ($max && $deletions > $max)               ? message('merge.too_many', \%args)
 		: ($percent && $known > 0 && $deletions > $allowed) ? message('merge.too_many_percent', \%args)
 		: undef;

@@ -3,7 +3,53 @@ use warnings;
 use utf8;
 
 use HTML::Entities qw(_decode_entities);
-use Test::More tests => 9;
+use Test::More tests => 15;
+
+{
+    package EntityValueDeletesKey;
+    use overload '""' => sub {
+        delete $main::entity_table{foo};
+        return "\x{100}";
+    };
+}
+
+{
+    our %entity_table = (
+        foo   => bless({}, 'EntityValueDeletesKey'),
+        other => 'unused',
+    );
+    my $text = '&foo;';
+    _decode_entities($text, \%entity_table);
+    is($text, "\x{100}", 'entity value survives deletion during stringification');
+}
+
+{
+    our %entity_table = (
+        foo   => bless({}, 'EntityValueDeletesKey'),
+        other => 'unused',
+    );
+    my $text = '&foobar;';
+    _decode_entities($text, \%entity_table, 1);
+    is($text, "\x{100}bar;", 'prefix entity value survives deletion during stringification');
+}
+
+{
+    my %entity_table = (foo => undef);
+    my $warnings = 0;
+    local $SIG{__WARN__} = sub {
+        $warnings++;
+        delete $entity_table{foo};
+    };
+    my $text = '&foo;';
+    my $error = do { local $@; eval { _decode_entities($text, \%entity_table) }; $@ };
+    like("$error", qr/^Entity value is undefined/, 'undefined entity value is rejected');
+    is($warnings, 0, 'undefined value does not invoke a warning hook');
+
+    my $prefix = '&foobar;';
+    $error = do { local $@; eval { _decode_entities($prefix, \%entity_table, 1) }; $@ };
+    like("$error", qr/^Entity value is undefined/, 'undefined prefix value is rejected');
+    is($warnings, 0, 'undefined prefix does not invoke a warning hook');
+}
 
 {
     local $@;

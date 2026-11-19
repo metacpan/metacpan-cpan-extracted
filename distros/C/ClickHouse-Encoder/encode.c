@@ -28,6 +28,7 @@
  * Leaf types get a defined zero/empty SV (not &PL_sv_undef) so that the
  * encoder doesn't warn about uninit values when filling padding bytes. */
 static SV *make_null_placeholder(pTHX_ TypeInfo *t) {
+    if (t->code == T_NULLABLE) return &PL_sv_undef;
     if (t->code == T_ARRAY || t->code == T_MAP) {
         AV *empty = newAV();
         return sv_2mortal(newRV_noinc((SV*)empty));
@@ -46,13 +47,14 @@ static SV *make_null_placeholder(pTHX_ TypeInfo *t) {
     if (t->code == T_VARIANT || t->code == T_JSON || t->code == T_DYNAMIC)
         /* Variant's encoder treats undef as the NULL discriminator. */
         return &PL_sv_undef;
+    if (t->code == T_ENUM8 || t->code == T_ENUM16) return &PL_sv_undef;
     if (t->code == T_STRING || t->code == T_FIXEDSTRING)
         return sv_2mortal(newSVpvn("", 0));
     if (t->code == T_UUID || t->code == T_IPV6)
         return sv_2mortal(newSVpvn("\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0", 16));
     if (t->code == T_FLOAT32 || t->code == T_FLOAT64 || t->code == T_BFLOAT16)
         return sv_2mortal(newSVnv(0.0));
-    /* numeric / date / decimal / enum / bool / ipv4: a defined integer 0 is fine */
+    /* numeric / date / decimal / bool / ipv4: a defined integer 0 is fine */
     return sv_2mortal(newSViv(0));
 }
 
@@ -61,6 +63,73 @@ static int enum_lookup_name(pTHX_ TypeInfo *t, const char *s, STRLEN slen, int16
     if (!psv) return 0;
     *out = (int16_t)SvIV(*psv);
     return 1;
+}
+
+int nullable_is_null(SV *value, TypeInfo *t) {
+    return !SvOK(value) || (t->empty_as_null && SvPOK(value) && !SvCUR(value));
+}
+
+static int empty_container(SV *value) {
+    return !SvOK(value) || (!SvROK(value) && SvPOK(value) && !SvCUR(value));
+}
+
+static void check_string_reference(pTHX_ SV *value, TypeInfo *t) {
+    if (SvROK(value) && !(SvAMAGIC(value) && gv_handler(SvSTASH(SvRV(value)), string_amg)))
+        croak("%s cannot encode a reference without string overloading",
+              t->code == T_FIXEDSTRING ? "FixedString" : "String");
+}
+
+static int16_t enum_value(pTHX_ TypeInfo *t, SV *val) {
+    IV iv;
+    int16_t v;
+    int bits = t->code == T_ENUM8 ? 8 : 16;
+    unsigned index;
+    if (!SvOK(val)) {
+        /* The type's default, as on the server: the smallest declared code. */
+        int k;
+        v = t->enum_count ? t->enum_entries[0].value : 0;
+        for (k = 1; k < t->enum_count; k++)
+            if (t->enum_entries[k].value < v) v = t->enum_entries[k].value;
+        return v;
+    }
+    if (SvPOK(val) || t->enum_has_integer_labels) {
+        STRLEN len;
+        const char *s = SvPV(val, len);
+        if (enum_lookup_name(aTHX_ t, s, len, &v)) return v;
+        if (looks_like_int_str(s, len)) {
+            STRLEN i = (s[0] == '+' || s[0] == '-') ? 1 : 0;
+            unsigned magnitude = 0, limit = 1U << (bits - 1);
+            int negative = s[0] == '-';
+            if (!negative) limit--;
+            for (; i < len; i++) {
+                unsigned digit = s[i] - '0';
+                if (magnitude > (limit - digit) / 10)
+                    croak("Enum%d value %.*s out of range", bits, (int)len, s);
+                magnitude = magnitude * 10 + digit;
+            }
+            iv = negative ? -(IV)magnitude : (IV)magnitude;
+            goto validate;
+        }
+        if (!SvIOK(val) && !SvNOK(val))
+            croak("Unknown enum value: %.*s", (int)len, s);
+    }
+    if (SvIOK(val)) {
+        if (SvIsUV(val) && SvUV(val) > (UV)((1 << (bits - 1)) - 1))
+            croak("Enum%d value %" UVuf " out of range", bits, SvUV(val));
+        iv = SvIV(val);
+    } else {
+        NV nv = trunc(SvNV(val));
+        if (!isfinite(nv) || nv < -(1 << (bits - 1)) || nv > (1 << (bits - 1)) - 1)
+            croak("Enum%d value out of range", bits);
+        iv = (IV)nv;
+    }
+    if (iv < -(1 << (bits - 1)) || iv > (1 << (bits - 1)) - 1)
+        croak("Enum%d value %" IVdf " out of range", bits, iv);
+validate:
+    index = (unsigned)(iv + (1 << (bits - 1)));
+    if (!(t->enum_codes[index >> 3] & (1U << (index & 7))))
+        croak("Enum%d undeclared code: %" IVdf, bits, iv);
+    return (int16_t)iv;
 }
 
 static uint64_t checked_integer(pTHX_ SV *val, const char *type,
@@ -111,7 +180,13 @@ static uint64_t checked_integer(pTHX_ SV *val, const char *type,
     }
 }
 
-static void encode_scalar(pTHX_ Buffer *b, SV *val, TypeInfo *t) {
+static void check_decimal_int64(pTHX_ TypeInfo *t, int64_t v, int bits) {
+    uint64_t magnitude = v < 0 ? (uint64_t)0 - (uint64_t)v : (uint64_t)v;
+    if (t->precision > 0 && t->precision < 19 && magnitude >= pow10_u64[t->precision])
+        croak("Decimal%d overflow: value exceeds Decimal(%d, %d)", bits, t->precision, t->param);
+}
+
+void encode_scalar(pTHX_ Buffer *b, SV *val, TypeInfo *t) {
     switch (t->code) {
         case T_INT8:   buf_byte(aTHX_ b, (uint8_t)checked_integer(aTHX_ val, "Int8", 8, 0)); break;
         case T_INT16:  buf_le16(aTHX_ b, (uint16_t)checked_integer(aTHX_ val, "Int16", 16, 0)); break;
@@ -132,6 +207,7 @@ static void encode_scalar(pTHX_ Buffer *b, SV *val, TypeInfo *t) {
             break;
         }
         case T_STRING: {
+            check_string_reference(aTHX_ val, t);
             if (!SvOK(val)) {
                 buf_varint(aTHX_ b,0);
             } else {
@@ -142,6 +218,7 @@ static void encode_scalar(pTHX_ Buffer *b, SV *val, TypeInfo *t) {
             break;
         }
         case T_FIXEDSTRING: {
+            check_string_reference(aTHX_ val, t);
             buf_grow(aTHX_ b,t->param);
             if (!SvOK(val)) {
                 memset(b->ptr + b->len, 0, t->param);
@@ -161,38 +238,12 @@ static void encode_scalar(pTHX_ Buffer *b, SV *val, TypeInfo *t) {
             break;
         }
         case T_ENUM8: {
-            int16_t v = 0;
-            if (!SvOK(val)) {
-                /* zero */
-            } else if (SvIOK(val) || SvNOK(val)) {
-                IV iv = SvIV(val);
-                if (iv < -128 || iv > 127)
-                    croak("Enum8 value %" IVdf " out of range", iv);
-                v = (int16_t)iv;
-            } else {
-                STRLEN slen;
-                const char *s = SvPV(val, slen);
-                if (!enum_lookup_name(aTHX_ t, s, slen, &v))
-                    croak("Unknown enum value: %.*s", (int)slen, s);
-            }
+            int16_t v = enum_value(aTHX_ t, val);
             buf_byte(aTHX_ b,(uint8_t)(int8_t)v);
             break;
         }
         case T_ENUM16: {
-            int16_t v = 0;
-            if (!SvOK(val)) {
-                /* zero */
-            } else if (SvIOK(val) || SvNOK(val)) {
-                IV iv = SvIV(val);
-                if (iv < -32768 || iv > 32767)
-                    croak("Enum16 value %" IVdf " out of range", iv);
-                v = (int16_t)iv;
-            } else {
-                STRLEN slen;
-                const char *s = SvPV(val, slen);
-                if (!enum_lookup_name(aTHX_ t, s, slen, &v))
-                    croak("Unknown enum value: %.*s", (int)slen, s);
-            }
+            int16_t v = enum_value(aTHX_ t, val);
             buf_le16(aTHX_ b,(uint16_t)v);
             break;
         }
@@ -201,7 +252,7 @@ static void encode_scalar(pTHX_ Buffer *b, SV *val, TypeInfo *t) {
             if (looks_stringy(val)) {
                 STRLEN slen;
                 const char *s = SvPV(val, slen);
-                if (!parse_decimal_int64_str(s, slen, t->param, &v64))
+                if (!parse_decimal_int64_str(s, slen, t->param, t->precision, &v64))
                     croak("Invalid decimal string: %.*s", (int)slen, s);
             } else {
                 double d = SvNV(val) * decimal_pow10(t->param);
@@ -209,6 +260,7 @@ static void encode_scalar(pTHX_ Buffer *b, SV *val, TypeInfo *t) {
                     croak("Decimal32 overflow");
                 v64 = (int64_t)llround(d);
             }
+            check_decimal_int64(aTHX_ t, v64, 32);
             if (v64 < INT32_MIN || v64 > INT32_MAX)
                 croak("Decimal32 overflow");
             buf_le32(aTHX_ b,(uint32_t)(int32_t)v64);
@@ -219,7 +271,7 @@ static void encode_scalar(pTHX_ Buffer *b, SV *val, TypeInfo *t) {
             if (looks_stringy(val)) {
                 STRLEN slen;
                 const char *s = SvPV(val, slen);
-                if (!parse_decimal_int64_str(s, slen, t->param, &v))
+                if (!parse_decimal_int64_str(s, slen, t->param, t->precision, &v))
                     croak("Invalid decimal string: %.*s", (int)slen, s);
             } else {
                 double d = SvNV(val) * decimal_pow10(t->param);
@@ -230,6 +282,7 @@ static void encode_scalar(pTHX_ Buffer *b, SV *val, TypeInfo *t) {
                     croak("Decimal64 overflow (or non-finite value)");
                 v = (int64_t)llround(d);
             }
+            check_decimal_int64(aTHX_ t, v, 64);
             buf_le64(aTHX_ b,(uint64_t)v);
             break;
         }
@@ -238,7 +291,7 @@ static void encode_scalar(pTHX_ Buffer *b, SV *val, TypeInfo *t) {
             if (looks_stringy(val)) {
                 STRLEN slen;
                 const char *s = SvPV(val, slen);
-                if (!parse_decimal256_str(s, slen, t->param, limbs))
+                if (!parse_decimal256_str(s, slen, t->param, t->precision, limbs))
                     croak("Invalid decimal string: %.*s", (int)slen, s);
             } else {
                 /* Float path through long double; lossy past ~18 digits. */
@@ -266,6 +319,8 @@ static void encode_scalar(pTHX_ Buffer *b, SV *val, TypeInfo *t) {
                     add_digit_256(limbs, 1);
                 }
             }
+            if (t->precision > 0 && !decimal256_within_precision(limbs, t->precision))
+                croak("Decimal256 overflow: value exceeds Decimal(%d, %d)", t->precision, t->param);
             buf_le64(aTHX_ b, limbs[0]);
             buf_le64(aTHX_ b, limbs[1]);
             buf_le64(aTHX_ b, limbs[2]);
@@ -277,7 +332,7 @@ static void encode_scalar(pTHX_ Buffer *b, SV *val, TypeInfo *t) {
             if (looks_stringy(val)) {
                 STRLEN slen;
                 const char *s = SvPV(val, slen);
-                if (!parse_decimal128_str(s, slen, t->param, &hi, &lo))
+                if (!parse_decimal128_str(s, slen, t->param, t->precision, &hi, &lo))
                     croak("Invalid decimal string: %.*s", (int)slen, s);
             } else {
                 long double d = (long double)SvNV(val) * decimal_pow10l(t->param);
@@ -297,6 +352,8 @@ static void encode_scalar(pTHX_ Buffer *b, SV *val, TypeInfo *t) {
                     hi = ~hi + (lo == 0 ? 1 : 0);
                 }
             }
+            if (t->precision > 0 && !decimal128_within_precision(hi, lo, t->precision))
+                croak("Decimal128 overflow: value exceeds Decimal(%d, %d)", t->precision, t->param);
             buf_le64(aTHX_ b,lo);
             buf_le64(aTHX_ b,hi);
             break;
@@ -358,7 +415,7 @@ static void encode_scalar(pTHX_ Buffer *b, SV *val, TypeInfo *t) {
                 STRLEN slen;
                 const char *s = SvPV(val, slen);
                 if (looks_like_int_str(s, slen)) v = (uint32_t)SvUV(val);
-                else v = parse_datetime_string(aTHX_ s, slen);
+                else v = parse_datetime_string(aTHX_ s, slen, t);
             }
             buf_le32(aTHX_ b,v);
             break;
@@ -376,7 +433,7 @@ static void encode_scalar(pTHX_ Buffer *b, SV *val, TypeInfo *t) {
                 else if (looks_like_number_str(s, slen))
                     v = dt64_double_to_int64(aTHX_ SvNV(val), t->param);
                 else
-                    v = parse_datetime64_string(aTHX_ s, slen, t->param);
+                    v = parse_datetime64_string(aTHX_ s, slen, t->param, t);
             }
             buf_le64(aTHX_ b,(uint64_t)v);
             break;
@@ -474,7 +531,12 @@ static void encode_scalar(pTHX_ Buffer *b, SV *val, TypeInfo *t) {
                     memcpy(tmp, s, slen);
                     tmp[slen] = 0;
                     if (inet_pton(AF_INET6, tmp, out) != 1) {
-                        if (slen == 16) memcpy(out, s, 16);
+                        struct in_addr v4;
+                        if (inet_pton(AF_INET, tmp, &v4) == 1) {
+                            memset(out, 0, 10);
+                            out[10] = out[11] = 255;
+                            memcpy(out + 12, &v4, 4);
+                        } else if (slen == 16) memcpy(out, s, 16);
                         else croak("Invalid IPv6 address: %s", tmp);
                     }
                 }
@@ -487,7 +549,7 @@ static void encode_scalar(pTHX_ Buffer *b, SV *val, TypeInfo *t) {
     }
 }
 
-static void encode_null_scalar(pTHX_ Buffer *b, TypeInfo *t) {
+void encode_null_scalar(pTHX_ Buffer *b, TypeInfo *t) {
     switch (t->code) {
         case T_INT8: case T_UINT8: case T_ENUM8: case T_BOOL:
             buf_byte(aTHX_ b,0); break;
@@ -517,7 +579,7 @@ static void encode_null_scalar(pTHX_ Buffer *b, TypeInfo *t) {
     }
 }
 
-static int is_simple_type(TypeInfo *t) {
+int is_simple_type(TypeInfo *t) {
     return t->code != T_ARRAY && t->code != T_TUPLE && t->code != T_NULLABLE
         && t->code != T_MAP && t->code != T_LOWCARDINALITY
         && t->code != T_VARIANT && t->code != T_JSON
@@ -822,6 +884,10 @@ static void encode_column_data(pTHX_ Buffer *b, Buffer *prefix,
 
             for (r = 0; r < num_rows; r++) {
                 SV *val = values[r];
+                if (empty_container(val)) {
+                    buf_le64(aTHX_ b, offset);
+                    continue;
+                }
                 if (!SvROK(val) || SvTYPE(SvRV(val)) != SVt_PVAV)
                     croak("Expected arrayref for Array type");
                 AV *av = (AV*)SvRV(val);
@@ -835,6 +901,7 @@ static void encode_column_data(pTHX_ Buffer *b, Buffer *prefix,
                 SV **all_elems = alloc_sv_array(aTHX_ total_elems);
                 SSize_t idx = 0;
                 for (r = 0; r < num_rows; r++) {
+                    if (empty_container(values[r])) continue;
                     AV *av = (AV*)SvRV(values[r]);
                     SSize_t n = av_len(av) + 1;
                     SSize_t i;
@@ -887,18 +954,18 @@ static void encode_column_data(pTHX_ Buffer *b, Buffer *prefix,
 
         case T_NULLABLE: {
             for (r = 0; r < num_rows; r++) {
-                buf_byte(aTHX_ b,!SvOK(values[r]) ? 1 : 0);
+                buf_byte(aTHX_ b, nullable_is_null(values[r], t) ? 1 : 0);
             }
 
             if (is_simple_type(t->inner)) {
                 for (r = 0; r < num_rows; r++) {
-                    if (!SvOK(values[r])) encode_null_scalar(aTHX_ b, t->inner);
+                    if (nullable_is_null(values[r], t)) encode_null_scalar(aTHX_ b, t->inner);
                     else encode_scalar(aTHX_ b,values[r], t->inner);
                 }
             } else {
                 SV **inner_values = alloc_sv_array(aTHX_ num_rows);
                 for (r = 0; r < num_rows; r++) {
-                    if (!SvOK(values[r]))
+                    if (nullable_is_null(values[r], t))
                         inner_values[r] = make_null_placeholder(aTHX_ t->inner);
                     else
                         inner_values[r] = values[r];
@@ -915,6 +982,10 @@ static void encode_column_data(pTHX_ Buffer *b, Buffer *prefix,
             SV **norm = alloc_sv_array(aTHX_ num_rows);
             for (r = 0; r < num_rows; r++) {
                 SV *val = values[r];
+                if (empty_container(val)) {
+                    norm[r] = sv_2mortal(newRV_noinc((SV *)newAV()));
+                    continue;
+                }
                 if (!SvROK(val))
                     croak("Expected hashref or arrayref for Map type");
                 SV *rv = SvRV(val);
@@ -1056,6 +1127,9 @@ static void encode_column_data(pTHX_ Buffer *b, Buffer *prefix,
             TypeInfo *inner = t->inner;
             int is_null = (inner->code == T_NULLABLE);
             TypeInfo *leaf = is_null ? inner->inner : inner;
+            int numeric = leaf->code != T_STRING && leaf->code != T_FIXEDSTRING;
+            Buffer key_buf;
+            if (numeric) buf_init(aTHX_ &key_buf);
 
             HV *seen     = (HV *)sv_2mortal((SV *)newHV());
             AV *dict_av  = (AV *)sv_2mortal((SV *)newAV());
@@ -1074,9 +1148,13 @@ static void encode_column_data(pTHX_ Buffer *b, Buffer *prefix,
             /* Reserve dict slot 0. For Nullable inner this slot is the NULL
              * sentinel and must not be reused for the literal default value;
              * for non-Nullable it IS the default (empty / N-zero-bytes). */
-            av_push(dict_av, newSVpvn("", 0));
+            av_push(dict_av, numeric ? newSVsv(make_null_placeholder(aTHX_ leaf))
+                                    : newSVpvn("", 0));
             if (!is_null) {
-                if (fixed_n > 0) {
+                if (numeric) {
+                    encode_scalar(aTHX_ &key_buf, *av_fetch(dict_av, 0, 0), leaf);
+                    hv_store(seen, key_buf.ptr, key_buf.len, newSViv(0), 0);
+                } else if (fixed_n > 0) {
                     char *cz = SvPVX(canon_holder);
                     memset(cz, 0, fixed_n);
                     hv_store(seen, cz, fixed_n, newSViv(0), 0);
@@ -1094,19 +1172,29 @@ static void encode_column_data(pTHX_ Buffer *b, Buffer *prefix,
 
             for (r = 0; r < num_rows; r++) {
                 SV *val = values[r];
+                if (is_null && nullable_is_null(val, inner)) {
+                    indices[r] = 0;
+                    continue;
+                }
                 if (!SvOK(val)) {
                     /* Nullable: slot 0 is the NULL sentinel. Non-nullable:
                      * coerce undef to empty string (matches plain String
                      * behaviour) without invoking SvPV on undef, which
                      * would emit a "Use of uninitialized value" warning. */
                     if (is_null) { indices[r] = 0; continue; }
-                    val = sv_2mortal(newSVpvn("", 0));
+                    val = make_null_placeholder(aTHX_ leaf);
                 }
-                STRLEN slen;
-                const char *s = SvPV(val, slen);
+                if (!numeric) check_string_reference(aTHX_ val, leaf);
+                STRLEN slen = 0;
+                const char *s = numeric ? NULL : SvPV(val, slen);
                 const char *key;
                 STRLEN klen;
-                if (fixed_n > 0) {
+                if (numeric) {
+                    key_buf.len = 0;
+                    encode_scalar(aTHX_ &key_buf, val, leaf);
+                    key = key_buf.ptr;
+                    klen = key_buf.len;
+                } else if (fixed_n > 0) {
                     /* Canonicalize to exactly N bytes: truncate or zero-pad. */
                     char *cz = SvPVX(canon_holder);
                     if (slen >= (STRLEN)fixed_n) {
@@ -1126,7 +1214,7 @@ static void encode_column_data(pTHX_ Buffer *b, Buffer *prefix,
                     indices[r] = (uint64_t)SvUV(*slot_sv);
                 } else {
                     UV pos = (UV)(av_len(dict_av) + 1);
-                    av_push(dict_av, newSVpvn(key, klen));
+                    av_push(dict_av, numeric ? newSVsv(val) : newSVpvn(key, klen));
                     hv_store(seen, key, klen, newSVuv(pos), 0);
                     indices[r] = (uint64_t)pos;
                 }

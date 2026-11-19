@@ -25,7 +25,7 @@ use Time::HiRes ();
 use App::FileSync::Constants qw($MODE_MASK $TEMP_PREFIX $STAT_MODE $STAT_MTIME $SHA_BITS);
 use App::FileSync::I18N qw(throw os_error strip_location);
 
-use version; our $VERSION = version->declare('0.002.1');
+use version; our $VERSION = version->declare('0.002.2');
 
 our @EXPORT_OK = qw(
 	read_text open_file temp_file write_atomic install_file clear_target

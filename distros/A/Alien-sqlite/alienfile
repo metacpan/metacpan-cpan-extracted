@@ -75,18 +75,7 @@ share {
   #$build_static = '' if $ENV{FORCE_DYNAMIC};
   
   
-  if ($^O =~ /bsd/) {
-    plugin 'Build::Make' => 'gmake';
-    if (-d '/usr/local') {
-        $with_local = ' --with-local=/usr/local ';
-    }
-  }
-  elsif ($^O =~ /dragonfly/) {
-    #  might need to be combined with bsd check above
-    #  but not sure if /usr/local is needed yet
-    plugin 'Build::Make' => 'gmake';
-  }
-  elsif ($on_windows) {
+  if ($^O =~ /bsd$|dragonfly/ or $on_windows) {
     plugin 'Build::Make' => 'gmake';
   }
 

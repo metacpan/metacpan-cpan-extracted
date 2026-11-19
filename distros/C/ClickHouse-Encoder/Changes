@@ -1,5 +1,15 @@
 Revision history for ClickHouse-Encoder
 
+0.05  2026-11-18
+    - Add defaults and empty_as_default: empty values get client-side defaults in C.
+    - Add from_columns to build an encoder from system.columns rows without I/O.
+    - Array/Map take undef or '' as empty; refs croak in String; short rows read undef.
+
+0.04  2026-11-18
+    - Fix wall-time strings read as UTC in DateTime('tz') columns; add timezone option.
+    - Add empty_as_null and positions; accept string enum codes, exponent decimals, IPv4 in IPv6.
+    - Reject undeclared enum codes and out-of-precision decimals; row input encodes 3x faster.
+
 0.03  2026-10-16
     - Fix Native framing, schema parsing and decoded values.
     - Preserve failed bulk batches and improve transport retries.

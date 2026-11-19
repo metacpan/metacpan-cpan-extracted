@@ -133,6 +133,9 @@ static void start_connect(ev_clickhouse_t *self) {
     /* Arm connect_timeout on both paths: an immediately-connected
      * socket still stalls in the TLS handshake / ServerHello phases. */
     if (self->connect_timeout > 0) {
+        /* ev_timer_set on an active watcher corrupts libev's heap. */
+        if (self->timing) ev_timer_stop(self->loop, &self->timer);
+        ev_now_update(self->loop);
         ev_timer_set(&self->timer, (ev_tstamp)self->connect_timeout, 0.0);
         ev_timer_start(self->loop, &self->timer);
         self->timing = 1;
@@ -538,7 +541,7 @@ static void timer_cb(EV_P_ ev_timer *w, int revents) {
         CLEAR_SV(self->native_totals);
         CLEAR_SV(self->native_extremes);
         lc_free_dicts(self);
-        CLEAR_INSERT(self);
+        CLEAR_INSERT(self); free_insert_default_state(self);
         CLEAR_STR(self->insert_err);
         self->native_state = NATIVE_IDLE;
         if (self->send_count > 0) self->send_count--;
@@ -594,6 +597,7 @@ static void ka_timer_cb(EV_P_ ev_timer *w, int revents) {
 
 static void start_keepalive(ev_clickhouse_t *self) {
     if (self->keepalive > 0 && !self->ka_timing && self->connected) {
+        ev_now_update(self->loop);
         ev_timer_init(&self->ka_timer, ka_timer_cb, self->keepalive, self->keepalive);
         ev_timer_start(self->loop, &self->ka_timer);
         self->ka_timing = 1;
@@ -659,6 +663,7 @@ static void schedule_reconnect(ev_clickhouse_t *self) {
         ev_timer_stop(self->loop, &self->reconnect_timer);
         self->reconnect_timing = 0;
     }
+    ev_now_update(self->loop);
     ev_timer_init(&self->reconnect_timer, reconnect_timer_cb, delay, 0);
     ev_timer_start(self->loop, &self->reconnect_timer);
     self->reconnect_timing = 1;
@@ -867,6 +872,10 @@ static int pipeline_advance(ev_clickhouse_t *self) {
         /* Track query_id + dispatch start time (used by on_query_complete). */
         CLEAR_STR(self->last_query_id);
         if (send->query_id) { self->last_query_id = send->query_id; send->query_id = NULL; }
+        CLEAR_STR(self->query_session_tz);
+        self->query_session_tz = send->session_tz;
+        send->session_tz = NULL;
+        ev_now_update(self->loop);
         self->query_start_time = ev_now(self->loop);
         self->dispatch_seq++;
 
@@ -950,11 +959,18 @@ static int pipeline_advance(ev_clickhouse_t *self) {
         if (send->insert_data) {
             self->insert_data = send->insert_data;
             self->insert_data_len = send->insert_data_len;
+            self->insert_native_body = send->insert_native_body;
             send->insert_data = NULL;
         }
         if (send->insert_av) {
             self->insert_av = send->insert_av;
             send->insert_av = NULL;
+        }
+        if (send->insert_empty_as_default)
+            self->insert_empty_as_default = 1;
+        if (send->insert_defaults) {
+            self->insert_defaults = send->insert_defaults;
+            send->insert_defaults = NULL;
         }
 
         Safefree(send->data);

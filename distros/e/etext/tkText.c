@@ -872,6 +872,15 @@ TextWidgetCmd(clientData, interp, argc, args)
 	    goto done;
 	}
 	if (TkTextIndexCmp(&index1, &index2) >= 0) {
+	    /*
+	     * As Tk::Text: an empty range gives an empty string, a
+	     * reversed one no result (undef in Perl).  Both gave no
+	     * result.
+	     */
+
+	    if (TkTextIndexCmp(&index1, &index2) == 0) {
+		Tcl_SetObjResult(interp, Tcl_NewStringObj("", 0));
+	    }
 	    goto done;
 	}
 	linePtr = index1.linePtr;
@@ -2019,7 +2028,7 @@ VcFinish(textPtr)
  *
  * DataSlotCmd --
  *
- *	A hook for the tests of representation B (t/data-slots.t), not
+ *	A hook for the tests of value=C-array (t/data-slots.t), not
  *	an interface: it exists only in a widget built with
  *	TK_TEXT_DATA_ARRAYS, and is not documented in the manual.  It
  *	reads and sets the TK_TEXT_DATA_INT slot of the data of a node,
@@ -4383,7 +4392,7 @@ TkTextBlockCmd(textPtr, interp, argc, args)
 			    TkBTreeLineIndex(start.linePtr), start.byteIndex),
 		    &segPtr->body.itree.data,
 		    LangNull(args[4]) ? (Arg) NULL : args[4])) {
-		/* Inside an edit step: the old value is in the step. */
+		/* Recorded (-undo on): the old value is in the undo step. */
 	    } else if (TkTextVcOn(textPtr)
 		    && (TkTextDataGetLang(segPtr->body.itree.data) != NULL)) {
 		TkTextIndex head;
@@ -4720,7 +4729,7 @@ TkTextBlockCmd(textPtr, interp, argc, args)
 	    if (TkTextRecordSet(textPtr, TK_TEXT_VC_NODE,
 		    TkBTreeVcNodePlace(textPtr, &index1, args[4]), dataPtr,
 		    args[5])) {
-		/* Inside an edit step: the old value is in the step. */
+		/* Recorded (-undo on): the old value is in the undo step. */
 	    } else if (TkTextVcOn(textPtr)
 		    && (TkTextDataGetLang(*dataPtr) != NULL)) {
 		TkTextVcPredict(textPtr, *dataPtr, TK_TEXT_VC_DROP,
@@ -6640,8 +6649,23 @@ EditOther(textPtr, atomPtr, revert)
 	    hPtr = Tcl_FindHashEntry(&textPtr->markTable,
 		    Tcl_GetString(ev[0]));
 	    if (hPtr != NULL) {
-		dataPtr = &((TkTextSegment *) Tcl_GetHashValue(hPtr))
-			->body.mark.value;
+		TkTextSegment *markPtr = (TkTextSegment *) Tcl_GetHashValue(hPtr);
+		TkTextIndex at;
+		Tcl_Obj *place;
+
+		dataPtr = &markPtr->body.mark.value;
+
+		/*
+		 * The mark may have moved since the value was set ("mark
+		 * set" is not recorded, so the undo does not put it
+		 * back): the place told is where it is now.  (Nodes and
+		 * runs are where they were: the later steps are undone.)
+		 */
+
+		TkTextMarkSegToIndex(textPtr, markPtr, &at);
+		place = TkTextVcMarkPlace(textPtr, Tcl_GetString(ev[0]), &at);
+		Tcl_DecrRefCount(atomPtr->list);
+		atomPtr->list = place;
 	    }
 	    break;
 	case TK_TEXT_VC_BLOCK:
@@ -6822,7 +6846,14 @@ EditOther(textPtr, atomPtr, revert)
 	Tcl_ResetResult(interp);
 	return;
     }
-    UpdateDirtyFlag(textPtr);
+    if (atomPtr->type != TK_TEXT_UNDO_SETVALUE) {
+	/*
+	 * A value set does not make the widget modified ("edit
+	 * modified" is about the text), nor do its undo and redo.
+	 */
+
+	UpdateDirtyFlag(textPtr);
+    }
     EditFinish(textPtr, mark);
 }
 
@@ -6938,12 +6969,20 @@ PushEdit(textPtr, mode, type, index1, index2, string)
  * TkTextRecordSet --
  *
  *      The commands that set a value (block nodedata, tag data, mark
- *      data, block data) call this before they do.  Inside an edit step
- *      ("edit step begin"), with -undo on, the Lang part the place has
- *      leaves it for a new undo atom (TK_TEXT_UNDO_SETVALUE; told to
- *      -valuecommand as "stash", where the unrecorded set tells
- *      "drop"), so that the undo of the step gives it back.  A set that
- *      changes nothing (no value there, none given) is not recorded.
+ *      data, block data) call this before they do.  With -undo on, the
+ *      Lang part the place has leaves it for a new undo atom
+ *      (TK_TEXT_UNDO_SETVALUE; told to -valuecommand as "stash", where
+ *      the unrecorded set, with -undo off, tells "drop"), so that the
+ *      undo gives it back.  A set that changes nothing (no value there,
+ *      none given) is not recorded.
+ *
+ *      With -autoseparators, a set joins the undo step that is open (the
+ *      edit just made, which a program may be giving values to), and
+ *      does not change the kind of the last edit: insertions around it
+ *      stay one step.  Where no step is open (after undo, redo, edit
+ *      reset, the end of an edit step, a block command: the last edit
+ *      is "other"), it starts one, which the next settings join and the
+ *      next edit closes.
  *
  * Results:
  *      1 if the set is recorded: the place has no Lang part now, and
@@ -6966,7 +7005,7 @@ TkTextRecordSet(textPtr, kind, where, dataPtr, value)
     TkTextUndoAtom *atomPtr;
     Arg old;
 
-    if (!textPtr->undo || (textPtr->stepDepth == 0) || (where == NULL)
+    if (!textPtr->undo || (where == NULL)
 	    || ((TkTextDataGetLang(*dataPtr) == NULL)
 		&& ((value == NULL) || !SvOK((SV *) value)))) {
 	if (where != NULL) {
@@ -6981,7 +7020,11 @@ TkTextRecordSet(textPtr, kind, where, dataPtr, value)
 	TkTextVcNotify(textPtr);
 	TkTextVcSeen(textPtr, *dataPtr, TK_TEXT_VC_STASH);
     }
-    textPtr->lastEditMode = TK_TEXT_EDIT_SETVALUE;
+    if (AUTO_SEPARATORS(textPtr)
+	    && (textPtr->lastEditMode == TK_TEXT_EDIT_OTHER)) {
+	TkTextUndoInsertUndoSeparator(textPtr->undoStack);
+	textPtr->lastEditMode = TK_TEXT_EDIT_SETVALUE;
+    }
     atomPtr = TkTextUndoPushAction(textPtr->undoStack, TK_TEXT_UNDO_SETVALUE,
 	    "1.0", "1.0", (Tcl_Obj *) NULL, where, (char *) NULL, 0);
     atomPtr->added = kind;

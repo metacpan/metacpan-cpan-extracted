@@ -63,6 +63,21 @@ subtest 'pluck, from row objects' => sub {
         'by position';
 };
 
+subtest 'pluck, given no column, the only one' => sub {
+    my $one   = 'SELECT name FROM artist ORDER BY id';
+    my @names = qw(Abba Blur Cream);
+    is [$dbh->iterate($one, pluck())->all], \@names, 'from arrays';
+    is [$dbh->iterate($one, {ekorn_slice => {}}, pluck())->all], \@names,
+        'from hashes';
+    is [$dbh->results($one, pluck())->all], \@names, 'from row objects';
+    is [$class->new(pluck())->([1], {a => 2})], [1, 2],
+        'counted from each row, with no iterator';
+    is [$dbh->iterate($one, pluck, sub { lc })->all], [qw(abba blur cream)],
+        'written bare, before another stage';
+    is [$dbh->iterate($one, sub ($row) { $row }, pluck)->all], \@names,
+        'and last';
+};
+
 subtest 'pluck finds the column afresh on each run' => sub {
     my $name = pluck('name');
     is [$dbh->iterate('SELECT id, name FROM artist WHERE id = 1', $name)->all],
@@ -101,13 +116,76 @@ subtest 'as_hash' => sub {
         'keyed as FetchHashKeyName says';
 };
 
+subtest 'as_hash, given column names' => sub {
+    my @names = map { {name => $_} } qw(Abba Blur Cream);
+    is [$dbh->iterate($all, as_hash('name'))->all], \@names, 'from arrays';
+    is [$dbh->iterate($all, as_hash('NAME'))->all], \@names,
+        'found in any case, keyed as fetchrow_hashref keys them';
+    is [$dbh->iterate($all, as_hash('id', 'name'))->all], fetched_hashes($all),
+        'every column named, as without names';
+    is [$dbh->iterate($all, {ekorn_slice => {}}, as_hash('Name'))->all],
+        \@names,
+        'from hashes';
+    is [$dbh->results($all, as_hash('name'))->all], \@names, 'from row objects';
+
+    my $row = {a => 1, b => 2};
+    my($hash) = $class->new(as_hash('A'))->($row);
+    is $hash, {a => 1}, 'a hash row, with no iterator';
+    ref_is_not $hash, $row, 'made anew';
+    ref_is [$class->new(as_hash)->($row)]->[0], $row,
+        'but passed on without names';
+
+    is [$dbh->iterate('SELECT 1 AS a, 2 AS a', as_hash('a'))->all], [{a => 2}],
+        'of two columns of the name, the last';
+    is [$dbh->iterate('SELECT 1 AS a, 2 AS a', as_hash)->all], [{a => 2}],
+        '(as without names)';
+
+    local $dbh->{FetchHashKeyName} = 'NAME_uc';
+    is [
+        $dbh->iterate('SELECT name FROM artist WHERE id = 2', as_hash('name'))->all
+        ],
+        [{NAME => 'Blur'}], 'keyed as FetchHashKeyName says';
+};
+
 subtest 'mistakes' => sub {
+    for my $bad (undef, '') {
+        my $line = __LINE__ + 1;
+        is dies { as_hash('id', $bad) },
+            "Expected a column name at ${\ __FILE__ } line $line.\n",
+            'as_hash with an undefined or empty name';
+    }
+    like dies { $dbh->iterate($all, as_hash('age'))->all },
+        qr( Expected\ a\ column\ of\ the\ row\ \(age\) )x,
+        'as_hash with a name the row has not';
+    like dies { $class->new(as_hash('c'))->({a => 1}) },
+        qr( Expected\ a\ column\ of\ the\ row\ \(c\) )x, 'or a hash row';
+
     for my $bad (undef, '') {
         my $line = __LINE__ + 1;
         is dies { pluck($bad) },
             "Expected a column, by name or position at ${\ __FILE__ } line $line.\n",
-            'pluck without a column';
+            'pluck with an undefined or empty column';
     }
+    like dies { pluck('id', 'name') },
+        qr( \A Too\ many\ arguments\ for\ subroutine )x,
+        'pluck with two columns';
+
+    my $at   = __LINE__ + 1;
+    my $only = dies { $dbh->iterate($all, pluck)->all };
+    like $only,
+        qr( \A Pipeline\ stage\ \#1\ failed\ at\ \Q${\ __FILE__ }\E\ line\ $at: )x,
+        'pluck with no column, of rows of two, reported at the line that asked';
+    like $only, qr( \n\ {4}Expected\ one\ column\ to\ pluck,\ not\ 2\ at\ )x,
+        'saying how many';
+    like dies { $dbh->iterate($all, {ekorn_slice => {}}, pluck)->all },
+        qr( Expected\ one\ column\ to\ pluck,\ not\ 2 )x, 'of hashes';
+    like dies { $dbh->results($all, pluck)->all },
+        qr( Expected\ one\ column\ to\ pluck,\ not\ 2 )x, 'of row objects';
+    like dies { $class->new(pluck)->([]) },
+        qr( Expected\ one\ column\ to\ pluck,\ not\ 0 )x, 'or of none';
+    like dies { $class->new(pluck)->('x') },
+        qr( Expected\ a\ row:\ an\ array,\ a\ hash\ or\ a\ row\ object )x,
+        'pluck with no column, given something else';
 
     my $line = __LINE__ + 1;
     my $err  = dies { $dbh->iterate($all, pluck('age'))->all };

@@ -1,3 +1,10 @@
+0.002     2026-11-18 14:03:19-08:00 America/Los_Angeles
+
+    - A section's diff no longer splits where only blank lines separate its parts, so documentation next to its code shows in one diff.
+    - Merge resolutions no longer crash on git 2.36 to 2.46.
+    - Require Cpanel::JSON::XS 4.42; exports failed with older versions.
+    - Perls that cannot fork, such as native Windows perl, are not supported; Cygwin's perl is.
+
 0.001     2026-11-12 13:34:14-08:00 America/Los_Angeles
 
     - Initial release.

@@ -40,6 +40,7 @@ t/cli.t
 t/delta.t
 t/forced.t
 t/ignore.t
+t/io.t
 t/join.t
 t/json.t
 t/journal.t
@@ -47,6 +48,7 @@ t/lib/TestSync.pm
 t/locales.t
 t/log.t
 t/merge.t
+t/mutation.t
 t/mtime.t
 t/paths.t
 t/regressions.t
@@ -59,6 +61,7 @@ t/snapshot.t
 t/ssh.t
 t/sync.t
 t/timing.t
+t/transport.t
 t/trash.t
 t/verify.t
 website/css/site.css

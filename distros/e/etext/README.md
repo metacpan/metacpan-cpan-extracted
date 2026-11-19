@@ -16,7 +16,7 @@ tk4.0b3 text widget and the Perl/Tk b9 glue.  The first commit of the Git
 repository (https://github.com/ilyaz-ai/etext) is that release, untouched.
 Everything after it is the modernization described below.
 
-## Status (version 2.09, 2026)
+## Status (version 2.10, 2026)
 
 * **The Perl extension `Tk::eText` builds and works with Perl 5.38 and
   Perl/Tk 804.036**, as a standalone module.  The widget is the
@@ -54,6 +54,10 @@ Everything after it is the modernization described below.
   manual's "Cut and paste with structure", "Several changes as one undo
   step" and "Split lines and frames", and `BUGS` 36 for what is
   provisional.
+* **Since 2.10** the setting of values is
+  recorded for undo whenever `-undo` is on, split lines and frames
+  take room, and two old bugs are fixed (a refused layout result, `get`
+  of an empty range).  See `Changes`.
 * The Tcl/Tk flavour (in the Git repository only: `eText/pTk/mTk/`,
   `Makefile.etext`, `demo/etext.tcl`) is kept for reference: it replaces
   core files of tk4.0b3 and cannot be built against a current Tcl/Tk.
@@ -75,18 +79,19 @@ optional (the leak test skips part of itself without it).
 The values the widget keeps for Perl (`block nodedata`, `mark data`,
 `tag data`, `block data`) live in *data containers* (`tkTextData.h`),
 which have two representations chosen when the module is built.  The
-default, A, is the Perl value itself, as before.  The other, B, is a
-small block of typed slots of which the Perl value is one; it is for
-the development of the slots (switches that will control, say, how the
-data of two merged tag runs is combined), and the widget behaves the
-same from Perl.  To build B:
+default, value=Perl, is the Perl value itself, as before.  The other,
+value=C-array, is a small block of typed slots (C arrays) of which the
+Perl value is one; it is for the development of the slots (switches
+that will control, say, how the data of two merged tag runs is
+combined), and the widget behaves the same from Perl.  (Before 2.10
+the two were called representation A and B.)  To build value=C-array:
 
     ETEXT_DATA_ARRAYS=1 perl Makefile.PL     # adds -DTK_TEXT_DATA_ARRAYS=1
     make
-    make test            # t/data-slots.t runs only with B
+    make test            # t/data-slots.t runs only with value=C-array
 
-A plain `perl Makefile.PL` (or `ETEXT_DATA_ARRAYS=0`) builds A; run `make
-clean` when switching, as the Makefile records the choice.
+A plain `perl Makefile.PL` (or `ETEXT_DATA_ARRAYS=0`) builds value=Perl;
+run `make clean` when switching, as the Makefile records the choice.
 
 Windows: built and tested only under Wine so far, with Strawberry Perl
 5.38.2.2 (`gmake` instead of `make`).  Perl/Tk 804.036 itself needs

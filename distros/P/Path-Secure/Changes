@@ -1,0 +1,7 @@
+Revision history for Path-Secure
+
+0.001 2026-11-18 TEODESIAN
+    - Initial release.  exposed says why an account other than you or
+      root could change a path, a directory above it, or a symbolic link
+      on the way to it.  secure changes the modes that it may, up to a
+      directory that the caller names, so that exposed finds nothing.

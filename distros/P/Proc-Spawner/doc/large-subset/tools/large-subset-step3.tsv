@@ -3,7 +3,7 @@
 # they only pass through the shell; split: the same, some split and globbed into a program's words; both are almost
 # strict in large-subset-provenance.tsv, assumptions passthrough and splitglob; control: it depends on the environment
 # only through what the run can set; affects-shell: a value from the environment affects what the shell itself does; AI-...: a
-# sample of those two classified by reading, large-subset-ai-classes.tsv, with -ai); what keeps it from pass (the
+# sample of those two classified by Claude reading them, large-subset-ai-classes.tsv, with -ai); what keeps it from pass (the
 # codes, or "a value into BUILTIN", "set -e", "set -u", "arithmetic on a value", "a value as a pattern"); what the run
 # controls (CODE:PROGRAM for a program's answer, /tmp, /dev/urandom, the tree; ruling:A5, G2, program for a switch whose
 # other state the named ruling covers); the undecided codes; the text.  large-subset-environment.md, section 12.

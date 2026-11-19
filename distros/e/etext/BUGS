@@ -178,9 +178,9 @@ values are records instead): when the undo step is discarded (edit
 reset, a new change clearing the redo stack, -maxundo), FreeAtom
 releases the list at once, so the DESTROY method of such instance
 data runs inside the widget command, not deferred, and the stopgap of
-17 does not apply.  For the same reason, with the representation B of
-2.05 the slots other than the Perl value of such instance data do
-not come back with the undo (tkTextData.h).  (* 2.05: fixed; the
+17 does not apply.  For the same reason, with value=C-array (then
+"representation B") of 2.05 the slots other than the Perl value of
+such instance data do not come back with the undo (tkTextData.h).  (* 2.05: fixed; the
 undo's block list leaves the instance data out, as it does node, run
 and mark values, and the undo step keeps the whole container as a
 record addressed by the block's head; the undo gives it back to the
@@ -453,7 +453,7 @@ STRICTURES.md, sections 8 and 9, on the branch strictures-design):
 - -valuecommand: "block paste" tells nothing: the leaves and nodes it
   makes are not told "new", and the values it sets are not told (as
   for "block nodedata").
-- Representation B: the lists carry the Lang parts of the values only
+- value=C-array: the lists carry the Lang parts of the values only
   (as "block list" always did); the other slots of a container do not
   travel through a list.
 - "block level" to a lower depth joins nodes by the rule of "delete"
@@ -465,7 +465,7 @@ STRICTURES.md, sections 8 and 9, on the branch strictures-design):
   tree does not have adds levels below the root; a defect the place
   does not allow is left out; the values of a separator pasted outside
   blocks are not used.
-37) (2.09) The frames of split lines are drawn outside the box of
+37)* (2.09) The frames of split lines are drawn outside the box of
 their stack and take no room, so they are clipped as all ornaments of
 blocks are: to the display line and to the text area.  Seen under Xvfb
 with a block {qq} in the default layout and the default font: the top
@@ -481,6 +481,11 @@ are on the top rows of the lower leaf, under its text, so letters that
 reach the top of their line cross them (lines for depths of 8 and more
 take 3 rows and more); the placement of dashes on the right, bottom
 and left sides of a frame depends on the X server.
+(* 2.10: the frames take room, as the owner asked: the block (default
+layout) or the box the callback gives a child (reported bigger) holds
+them, so they are not clipped; the frame of a nested block no longer
+falls on the frame around it.  The split lines take room too, between
+the leaves, so letters no longer cross them. *)
 38)* (all versions) Found while adding the stacks to the loop over the
 result of a layout callback (2.09): a count that is negative was not
 refused.  A list of one element with a negative count ("hide -1
@@ -494,7 +499,7 @@ was enough.  (* 2.09: fixed; both are refused with a background error,
 default layout.  t/regress.t.  A list of 7 or 13 elements with a
 negative count while leaves are left still describes all the remaining
 leaves, which no document says: not changed. *)
-39) (all versions) Found the same way: when an element of the result of
+39)* (all versions) Found the same way: when an element of the result of
 a layout callback is refused, the elements before it have already been
 applied and stay.  The manual says that the block is then laid out as
 if it had no callback, but a leaf that an earlier element moved stays
@@ -504,4 +509,29 @@ yy\n", "block insert P 1.3 3.2" and a callback returning
 ([0,0,0,90,90,80,20], [1,30,30,40,40,19,14], [1,2,3]): one background
 error, the block's bbox is the default one (25 4 14 42), and the first
 leaf is drawn at (55,38), over the next line of the text.  The split
-lines of such a block follow the display lines as they are.  Not fixed.
+lines of such a block follow the display lines as they are.  (* 2.10:
+fixed; the layout of the leaves is saved before the callback and given
+back when an element is refused, and the lines stolen before it are
+dropped: the block is laid out as without a callback.  t/regress.t. *)
+40)* (all versions) "get" of an empty range (the same index twice, or
+from "end") returned no result, which Perl gets as undef; Tk::Text
+gives an empty string.  Found by a probe that compared snapshots of the
+text.  (* 2.10: fixed; an empty string, and still no result for a
+reversed range, as Tk::Text.  t/regress.t. *)
+41)* (2.09) Reported by another session: values of leaves not kept by
+undo and redo.  Measured on 2.09 (the scripts are in
+doc-design/tools/leafvalues/ on the branch strictures-design): with
+values on every leaf and node, random edits
+(insert, delete, block insert, split, trim, sprout, flatten, level, cut,
+paste; nested blocks) and a snapshot of "block nodedata" at every index
+and level after each, undo back to the start and redo to the end gave
+every snapshot again: 200 runs of 40 edits with explicit separators,
+200 with -autoseparators, in value=Perl and in value=C-array; 26 single edits each undone
+and redone twice.  The values that do not come back are those set with
+"block nodedata" (also "tag data", "mark data", "block data") outside
+an edit step: a setting is not undoable (the manual's "Undo and redo"
+in "Values"), so the value it replaces is freed, and an undo of an
+earlier edit leaves the new value in place.  Inside "edit step" (2.09)
+the setting is recorded, and undo and redo give both values back.
+(* 2.10: the owner decided that every setting is recorded with -undo
+on; the value replaced waits in the undo step.  See Changes. *)

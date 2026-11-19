@@ -1,5 +1,81 @@
 Revision history for Stats-LikeR
 
+0.3425 2026-11-18 CST (Claude Opus 5.5 helped)
+
+ [Data frames]
+
+ - The row-by-row work of eleven frame functions moved from perl loops
+   into C, and they take less time and, mostly, less memory: agg()'s
+   combine step (each group's reducers, the group sort and the output
+   rows), pivot_table()'s split and combine, melt(), the copy and fill of
+   fillna(), ffill(), bfill() and interpolate() (whose arithmetic was
+   already C), each variable's pass over the rows in summary() and
+   table_one(), aoh2hoh(), and dropna()'s row test. colnames() and the
+   column checks of select_cols(), drop_cols() and rename_cols() now use
+   the key union drop_duplicates() already did in C. summary() reads one
+   variable at a time, and only those it shows, where it copied every
+   variable whole and held them all at once. A plain row hash is read
+   through its buckets, so it no longer gains the 120-byte iterator that
+   perl's keys() and %$row leave on every hash they walk.
+ - The results are unchanged apart from the three changes below. Besides
+   the test suite, 598 calls covering every frame shape, output type and
+   option of these functions, tied frames and rows among them, were run
+   against 0.3424, and every result matched, down to which of a scalar's
+   string and number slots are filled; no call leaks.
+ - Times are the fastest of five processes, each making one call on
+   perl 5.44.0 to a 200,000-row frame of 8 columns, an AoH unless
+   named; memory is the median of the five rises in peak resident size
+   during the call. Perl reuses the memory it freed while building the
+   frame, so a call can allocate more than its rise. agg() over 50
+   groups is the fastest of ten processes each, taken in turn: its time
+   is the split, which was C already, and the two are within the
+   noise.
+
+     call                               before          after
+     agg(), 200,000 groups, mean        0.789 s  215 MB  0.190 s  133 MB
+     agg(), 200,000 groups, 3 reducers  1.039 s  215 MB  0.231 s  141 MB
+     agg(), 50 groups, 3 reducers       0.034 s  6.6 MB  0.035 s  6.8 MB
+     pivot_table(), 50 x 7 cells        0.374 s   65 MB  0.065 s  7.7 MB
+     pivot_table(), 200,000 x 7 cells   2.067 s  528 MB  0.319 s  253 MB
+     melt(), 2 id, 3 value columns      0.542 s  317 MB  0.234 s  260 MB
+     melt(), the same to a hoa          0.300 s  195 MB  0.156 s  126 MB
+     fillna(), every column             0.310 s  151 MB  0.179 s  130 MB
+     fillna(), every column, HoA        0.114 s   14 MB  0.034 s   10 MB
+     ffill(), 2 columns                 0.344 s  169 MB  0.135 s  129 MB
+     bfill(), 2 columns, HoH            1.175 s  181 MB  0.432 s  136 MB
+     interpolate(), 2 columns           0.356 s  178 MB  0.195 s  157 MB
+     summary()                          0.458 s  103 MB  0.120 s  4.7 MB
+     summary(), HoA                     0.204 s   14 MB  0.049 s  0.4 MB
+     table_one(), 5 variables           0.510 s   82 MB  0.234 s   42 MB
+     aoh2hoh()                          0.223 s  171 MB  0.161 s  148 MB
+     dropna(), 2 columns                0.179 s   34 MB  0.034 s  2.2 MB
+     dropna(), 2 columns, HoA           0.061 s  8.7 MB  0.030 s  9.0 MB
+     colnames()                         0.114 s   30 MB  0.023 s  0.7 MB
+     select_cols(), 2 columns           0.141 s   56 MB  0.054 s   33 MB
+
+ [pivot_table()]
+
+ - Two index tuples, or two columns tuples, whose values read the same
+   when joined are no longer taken for one. The key was each value
+   prefixed with "v" and joined with "\x1e", so ("p\x1evq", "r") and
+   ("p", "q\x1evr") were one row, summed together under the first; the
+   tuples are now keyed as agg() has keyed its groups since 0.3213.
+
+ [dropna()]
+
+ - An undef column of a HoA is read as all undef and left undef in the
+   caller's frame. dropna() autovivified it into [] there, in the frame
+   it promises not to change. A HoA value that is neither an array nor
+   undef now dies naming its column, "dropna: column 'B' is not an ARRAY
+   reference", instead of with perl's "Can't use string ("x") as an
+   ARRAY ref".
+
+ [melt(), pivot_table()]
+
+ - A row that is not a hash (an array, for an AoA) dies naming it, as
+   in "melt: row 1 is not a HASH reference", instead of with perl's
+   "Not a HASH reference" from a line of LikeR.pm.
+
 0.3424 2026-11-16 CST (Claude Opus 5.5 helped)
 
  [read_table()]

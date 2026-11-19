@@ -218,6 +218,7 @@ server_command   /usr/local/bin/filesync-server  /home/foo/.conf/app-filesync.js
 			<tr><td><code>repos.NAME.host_key_checking</code></td><td><code>yes</code> or <code>no</code>; repo only, default <code>yes</code>.</td></tr>
 			<tr><td><code>repos.NAME.server_command</code></td><td>The server program for this repo, such as the wrapper that adds <code>--root</code>.</td></tr>
 			<tr><td><code>repos.NAME.snapshot_mode</code></td><td><code>hardlink</code> or <code>copy</code>.</td></tr>
+			<tr><td><code>repos.NAME.local_trash_days</code></td><td>How many days the local trash keeps deleted files; default 30, and 0 keeps them forever.</td></tr>
 			<tr><td><code>repos.NAME.snapshot_keep</code></td><td>How many snapshots to keep; default 14.</td></tr>
 		</tbody>
 	</table>
@@ -259,9 +260,9 @@ server_command   /usr/local/bin/filesync-server  /home/foo/.conf/app-filesync.js
 			<tr><th>Key</th><th>Default</th><th>Meaning</th></tr>
 		</thead>
 		<tbody>
-			<tr><td><code>trash_days</code></td><td>30</td><td>How long the server keeps deleted files.</td></tr>
-			<tr><td><code>max_deletes</code></td><td>200</td><td>Most files one session may delete.</td></tr>
-			<tr><td><code>max_delete_percent</code></td><td>10</td><td>Largest fraction of known files one session may delete.</td></tr>
+			<tr><td><code>trash_days</code></td><td>30</td><td>How many days the server keeps deleted files; 0 keeps them forever.</td></tr>
+			<tr><td><code>max_deletes</code></td><td>200</td><td>Most files one session may delete (exactly this many is allowed); 0 switches this limit off.</td></tr>
+			<tr><td><code>max_delete_percent</code></td><td>10</td><td>Largest percentage of known files one session may delete, from 0 to 100, rounded down but never below one file; 0 switches this limit off.</td></tr>
 			<tr><td><code>conflicts</code></td><td><code>inline</code></td><td>Keep the losing version beside the winner.</td></tr>
 			<tr><td><code>preserve_mode</code></td><td><code>true</code></td><td>Carry permission bits between POSIX systems.</td></tr>
 			<tr><td><code>allow_symlinks</code></td><td><code>false</code></td><td>Whether the tree may contain symlinks.</td></tr>
@@ -300,7 +301,7 @@ server_command   /usr/local/bin/filesync-server  /home/foo/.conf/app-filesync.js
 
 <footer class="site-footer">
 	<div class="wrap">
-		<p>App::FileSync 0.002.0 &middot; Copyright 2026 Nigel Horne &middot; GPL-2.0</p>
+		<p>App::FileSync 0.002.2 &middot; Copyright 2026 Nigel Horne &middot; GPL-2.0</p>
 		<p><a href="https://metacpan.org/dist/App-FileSync">CPAN</a> &middot;
 		<a href="https://github.com/nigelhorne/App-FileSync">GitHub</a> &middot;
 		<a href="https://github.com/nigelhorne/App-FileSync/issues">Issues</a> &middot;

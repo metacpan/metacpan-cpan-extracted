@@ -2,11 +2,11 @@
    "abstract" : "Manage your datebase schema via checksums",
    "author" : [
       "Thomas Klausner <domm@plix.at>",
-      "Maro\u0161 Koll\u00e1r <maros@cpan.org>",
-      "Klaus Ita <koki@worstofall.com>"
+      "Maro\u0161 Koll\u00e1r <cpan@k-1.com>",
+      "Klaus Ita"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -71,35 +71,35 @@
    "provides" : {
       "DBIx::SchemaChecksum" : {
          "file" : "lib/DBIx/SchemaChecksum.pm",
-         "version" : "1.104"
+         "version" : "1.106"
       },
       "DBIx::SchemaChecksum::App" : {
          "file" : "lib/DBIx/SchemaChecksum/App.pm",
-         "version" : "1.104"
+         "version" : "1.106"
       },
       "DBIx::SchemaChecksum::App::ApplyChanges" : {
          "file" : "lib/DBIx/SchemaChecksum/App/ApplyChanges.pm",
-         "version" : "1.104"
+         "version" : "1.106"
       },
       "DBIx::SchemaChecksum::App::Checksum" : {
          "file" : "lib/DBIx/SchemaChecksum/App/Checksum.pm",
-         "version" : "1.104"
+         "version" : "1.106"
       },
       "DBIx::SchemaChecksum::App::NewChangesFile" : {
          "file" : "lib/DBIx/SchemaChecksum/App/NewChangesFile.pm",
-         "version" : "1.104"
+         "version" : "1.106"
       },
       "DBIx::SchemaChecksum::App::ShowUpdatePath" : {
          "file" : "lib/DBIx/SchemaChecksum/App/ShowUpdatePath.pm",
-         "version" : "1.104"
+         "version" : "1.106"
       },
       "DBIx::SchemaChecksum::Driver::Pg" : {
          "file" : "lib/DBIx/SchemaChecksum/Driver/Pg.pm",
-         "version" : "1.104"
+         "version" : "1.106"
       },
       "DBIx::SchemaChecksum::Driver::SQLite" : {
          "file" : "lib/DBIx/SchemaChecksum/Driver/SQLite.pm",
-         "version" : "1.104"
+         "version" : "1.106"
       }
    },
    "release_status" : "stable",
@@ -114,9 +114,9 @@
          "web" : "https://github.com/domm/DBIx-SchemaChecksum"
       }
    },
-   "version" : "1.104",
-   "x_generated_by_perl" : "v5.32.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "version" : "1.106",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

@@ -672,4 +672,49 @@ subtest 'extract_installed_modules() handles v-prefix on version' => sub {
 	is($result->{'MyModule'}, '1.2.3', 'v-prefix stripped from version');
 };
 
+# ==================================================================
+# compile_skipped: mutants that did not compile
+# ==================================================================
+
+# Unlike the copies above, these subs are taken from the script itself, so
+# the test follows the real code.
+{
+	my $script = File::Spec->catfile(dirname(abs_path(__FILE__)), '..', 'bin', 'test-generator-index');
+	open my $fh, '<', $script or die "Cannot read $script: $!";
+	my $source = do { local $/; <$fh> };
+	close $fh;
+	for my $name (qw(_group_by_file _skipped_cell)) {
+		my ($code) = $source =~ /^(sub \Q$name\E \{\n.*?^\}\n)/ms or die "No sub $name in $script";
+		eval "package Index; $code; 1" or die "Cannot compile $name: $@";
+	}
+}
+
+subtest '_group_by_file() carries compile_skipped through to each file' => sub {
+	my $files = Index::_group_by_file({
+		killed          => [ { file => 'lib/A.pm', id => 'k1' } ],
+		survived        => [],
+		skipped         => { 'lib/A.pm' => 2 },
+		compile_skipped => { 'lib/A.pm' => 3, 'lib/B.pm' => 4 },
+	});
+	is($files->{'lib/A.pm'}{compile_skipped}, 3, 'a file with run mutants gets its count');
+	is($files->{'lib/A.pm'}{skipped}, 2, 'next to its MUTANT_SKIP count');
+	is_deeply($files->{'lib/B.pm'}, { compile_skipped => 4 },
+		'a file whose mutants all failed to compile still gets an entry');
+
+	my $old = Index::_group_by_file({ killed => [ { file => 'lib/A.pm' } ] });
+	ok(!exists $old->{'lib/A.pm'}{compile_skipped}, 'a JSON report without the key adds nothing');
+};
+
+subtest '_skipped_cell() shows the compile count after the MUTANT_SKIP count' => sub {
+	is(Index::_skipped_cell(2, undef), '2', 'no compile count: just the skipped lines');
+	is(Index::_skipped_cell(2, 0), '2', 'a zero compile count adds nothing');
+	is(Index::_skipped_cell(undef, undef), '0', 'nothing at all is 0');
+
+	my $cell = Index::_skipped_cell(0, 3);
+	like($cell, qr/\A0 /, 'the cell still starts with the MUTANT_SKIP count, so the column sorts on it');
+	like($cell, qr/\(\+3 not compiled\)/, 'then the compile count');
+	like($cell, qr/title="3 mutant\(s\) did not compile and were not run"/, 'with an explanation');
+};
+
+
 done_testing();

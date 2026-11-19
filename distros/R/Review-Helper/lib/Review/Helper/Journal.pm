@@ -1,12 +1,13 @@
 package Review::Helper::Journal;
 use v5.36;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Carp qw/croak/;
 use Fcntl qw/:flock O_RDWR O_CREAT/;
 use File::Basename qw/dirname/;
 use File::Path qw/make_path/;
+use Path::Tiny();
 
 use Review::Helper::Util qw/json_encode json_decode gen_uuid now/;
 
@@ -23,7 +24,7 @@ my @OPTIONAL = qw/flag unit snippet detail/;
 sub init($self) {
     return if $self->{+PATH};
     croak "Either 'repo' or 'path' is required" unless $self->{+REPO};
-    $self->{+PATH} = $self->{+REPO}->state_dir . '/journal.jsonl';
+    $self->{+PATH} = Path::Tiny::path($self->{+REPO}->state_dir)->child('journal.jsonl')->stringify;
 }
 
 sub add($self, %note) {

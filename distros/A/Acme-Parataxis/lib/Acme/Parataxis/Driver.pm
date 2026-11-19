@@ -1,7 +1,7 @@
 use v5.40;
 no warnings qw[experimental::class recursion];
 use feature 'class';
-class Acme::Parataxis::Driver v0.1.3 {
+class Acme::Parataxis::Driver v0.1.4 {
     use Carp qw[croak];
     use builtin qw[blessed];
 

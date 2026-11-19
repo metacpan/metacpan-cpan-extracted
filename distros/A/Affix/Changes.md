@@ -5,6 +5,13 @@ All notable changes to Affix.pm will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.4.1] - 2026-11-18
+
+### Fixed
+
+- `t/027_thread_safety.t` no longer SEGVs on OmniOS/illumos ithreads builds (I hope). After a C-created thread called into Perl and exited, the next `strtod()` (which perl uses to parse `use 5.008;` while `require`ing `threads.pm`) faulted inside libc's `localeconv()`. `threads` is loaded up front now, before any foreign-thread callback. It took me a month of this being in the back of my mind to figure this one failure out. It has not been worth it.
+- GNU Hurd is considered compatible by infix. Let's see if that's true...
+
 ## [v1.4.0] - 2026-10-31
 
 ### Fixed
@@ -453,7 +460,8 @@ Based on infix v0.1.3
 
   - Affix.pm is born
 
-[Unreleased]: https://github.com/sanko/Affix.pm/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/sanko/Affix.pm/compare/v1.4.1...HEAD
+[v1.4.1]: https://github.com/sanko/Affix.pm/compare/v1.4.0...v1.4.1
 [v1.4.0]: https://github.com/sanko/Affix.pm/compare/v1.3.0...v1.4.0
 [v1.3.0]: https://github.com/sanko/Affix.pm/compare/v1.2.9...v1.3.0
 [v1.2.9]: https://github.com/sanko/Affix.pm/compare/v1.2.8...v1.2.9

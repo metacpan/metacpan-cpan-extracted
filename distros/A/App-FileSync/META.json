@@ -3,7 +3,7 @@
    "author" : [
       "Nigel Horne (njh@nigelhorne.com)"
    ],
-   "dynamic_config" : 0,
+   "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
    "license" : [
       "gpl_2"
@@ -81,7 +81,9 @@
             "File::Temp" : "0",
             "Test::Exception" : "0",
             "Test::Mockingbird::TimeTravel" : "0.14",
-            "Test::Most" : "0"
+            "Test::Most" : "0",
+            "Test::Permissions" : "0",
+            "Tie::Hash" : "0"
          }
       }
    },
@@ -96,6 +98,6 @@
          "web" : "https://github.com/nigelhorne/App-FileSync"
       }
    },
-   "version" : "0.002.1",
+   "version" : "0.002.2",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

@@ -1,8 +1,8 @@
 package    #
-    Test2::Tools::Affix v1.4.0 {
+    Test2::Tools::Affix v1.4.1 {
     use v5.40;
     use blib;
-    use Affix;
+    use Affix qw[:all];
     use Affix::Build;
     use Test2::API              qw[context run_subtest];
     use Test2::Tools::Basic     qw[ok plan skip_all done_testing diag note pass fail];
@@ -12,9 +12,9 @@ package    #
     use Test2::Tools::Warnings  qw[warns];
     use Test2::Plugin::UTF8;
     use Test2::IPC;
-    use Path::Tiny qw[path tempfile];
-    use Exporter 'import';
-    use Capture::Tiny ':all';
+    use Path::Tiny    qw[path tempfile];
+    use Exporter      qw[import];
+    use Capture::Tiny qw[:all];
     our @CARP_NOT;
     our @EXPORT      = qw[compile_ok affix_ok leaks];
     our %EXPORT_TAGS = ( all => \@EXPORT );
@@ -132,7 +132,7 @@ package    #
     use strict;
     use warnings;
     use lib %s;
-    use Affix;
+    use Affix qw[:all];
     no Test2::Plugin::ExitSummary;
     use Test2::V0;
     pass "generate valgrind suppressions";
@@ -306,7 +306,7 @@ no Test2::Plugin::ExitSummary; # I wish
 use Test2::Tools::Affix;
 # Test2::API::test2_stack()->top->{count} = %d;
 $|++;
-my $exit = sub {use Affix; Affix::set_destruct_level(3); %s;}->();
+my $exit = sub {use Affix qw[:all]; Affix::set_destruct_level(3); %s;}->();
 # Test2::API::test2_stack()->top->{count}++;
 done_testing;
 exit !$exit;

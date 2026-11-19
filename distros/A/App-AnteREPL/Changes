@@ -1,0 +1,73 @@
+0.01 2026-11-16
+     - initial App::AnteREPL release, with the anterepl executable
+     - added scrolling screen editing, numbered source, RUN, LIST ranges,
+       slow/pause controls, undo, local EDITOR support, dump, and peek
+     - LOAD accepts ordinary Perl and numbered PERL ANTE REPL files; SAVE
+       preserves the loaded format and writes plain source to .pl files
+     - added AUTO entry with a default increment of 5; AUTO OFF or Ctrl-C
+       ends entry without losing stored lines
+     - added environment inspection, literal SET/UNSET, EDIT ENV using
+       VAR=value files, SAVE/LOAD/RELOAD, and startup environment RESET
+     - completed built-in HELP, linked the user wiki, and added a Dist::Zilla
+       configuration with an explicit list of files for the CPAN release
+     - implemented the terminal integration checks in Perl using IO::Pty
+     - added CLS to clear the display while retaining the stored program,
+       live Perl workspace, environment, AUTO settings, and source undo
+     - fixed Ctrl-C during LIST on Unix with Term::ReadKey installed
+     - made AUTO entry quiet by default, with AUTO ECHO ON/OFF control;
+       documented multiline immediate execution and shared subroutines
+     - made Ctrl-D end AUTO without exiting, restricted the EVAL command
+       to uppercase, and added Shift-Enter/Ctrl-N for inserting a newline
+       into the current screen entry without submitting it
+     - clarified that EVAL leaves AUTO active and function definitions are
+       silent; tested session-only functions without storing their source
+     - removed the experimental STORE command and pending EVAL source state
+     - added FUNCTIONS to list defined workspace functions, including imports;
+       documented redefinition warnings and one-time EVAL setup statements
+     - made screen editing insert by default; Insert still toggles overwrite
+     - rerunning an earlier screen entry replaces its previous output directly
+       below it, removes stale result rows, and retains later entries
+     - removed the extra blank spacer before later commands after a rerun;
+       preserved deliberate blank output and the following entry's text
+     - made Left at the start of a screen row move to the previous row's end,
+       stopping at the first retained row
+     - renamed the banner, HELP, diagnostics, and native-file header to
+       PERL ANTE REPL; LOAD still accepts legacy BASIC PERL V0.1 files
+     - require uppercase REPL commands and subcommands, including DUMP and
+       PEEK; lowercase/mixed-case input follows ordinary Perl and AUTO rules
+     - print a newline when QUIT/EXIT exits, including their forced forms;
+       screen mode writes it after restoring the original terminal display
+     - bound active screen memory to terminal rows and columns, with wrapped
+       lines and no off-screen history; clipped entries cannot run partially
+     - warn when a resize crops the screen and keep one inactive copy;
+       growing adds blank space, while RECOVER explicitly restores that copy
+     - make CLS forget the resize copy and HELP pause by screenful; document
+       the screen, numbered source, and live workspace as separate state
+     - replace command-like bareword errors with uppercase spelling hints;
+       preserve valid Perl keywords, user functions, and prototype behavior
+     - add CD and CHDIR for persistent directory changes; lowercase chdir
+       retains ordinary Perl semantics
+     - show exit instructions after Ctrl-C and use parenthesis-free function
+       calls where appropriate in user examples and human QA/QC exercises
+     - phrase uppercase hints as try, "COMMAND", avoiding Perl's use keyword
+     - add explicit single-letter/digit shortcuts for all command operations
+     - add immediate function/container shorthand and a bounded implicit-word
+       list grammar; retain literal EVAL and normal Perl in stored source
+     - confirm destructive shortcuts by default; ! explicitly bypasses the
+       question, including shorthand redefinitions and file overwrites
+     - restore direct E s/E a/E ar/E h/E hr and bare named-list shorthand;
+       retain EVAL for literal Perl and native quote operators in list values
+     - fix automatic completion of subroutine prototypes such as ($) and (@),
+       which swallowed later commands; test human QA step 5 through terminal
+       input in screen and plain modes, including CLS after a definition
+     - install confirmation interrupt handling before displaying the prompt,
+       so an immediate Ctrl-C cannot terminate the plain-input REPL
+     - frame editable VRAM in white with two fixed command legend rows;
+       reserve their space during wrapping, scrolling, resizing, and recovery
+     - request blinking insert/overwrite cursors and restore the default on exit
+     - print the requested farewell on interactive exit in screen and plain modes
+     - cover Q/Q! and all full exit spellings in both terminal input modes;
+       document how to identify an older loaded module when aliases are missing
+     - compact the command legend to one line, giving 78x21 VRAM at 80x24
+     - blink the cursor through timed visibility changes in the input loop,
+       so blinking does not depend on the terminal honoring a style request

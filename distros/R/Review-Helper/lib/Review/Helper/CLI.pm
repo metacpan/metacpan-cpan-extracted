@@ -1,7 +1,7 @@
 package Review::Helper::CLI;
 use v5.36;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Encode qw/decode FB_CROAK LEAVE_SRC/;
 

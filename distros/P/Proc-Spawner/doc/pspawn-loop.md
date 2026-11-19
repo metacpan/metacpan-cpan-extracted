@@ -5,7 +5,7 @@ One event loop per process, with one interface on POSIX and on Windows. The inte
 Decision W5: the user, 2026-11-08 ("Use the Windows' way"), 2026-11-09 ("in a separate module, with an \"elegant\" API
 which may be shared between your POSIX approach and Win32"; "Can a handler for Ctrl-C report to the loop instead?").
 
-## 1. The interface, in short
+## <a id="my-section-1"></a>1. The interface, in short
 
 ```perl
 my $loop = Proc::Spawner::Loop->new;                       # always the same object
@@ -20,11 +20,11 @@ my ($r, $wr) = $loop->pipe(overlapped => 'r');            # Windows: those ends 
 ```
 
 `Proc::Spawner`'s `on_read`, `on_write`, `defer`, `wait_until` and `poll` are the same calls under their old names.
-The rules are those of the page "Child Exit Wake-up" (in [`pspawn-spawner.md`](pspawn-spawner.md), section 1): every
+The rules are those of the page "Child Exit Wake-up" (in [`pspawn-spawner.md`](pspawn-spawner.md#my-section-1), section 1): every
 callback runs from the queue, one at a time, never inside a signal or another callback (R1); a callback never waits
 (D2); process-wide state (SIGCHLD, the console handler) is taken only while `wait_until` runs (D3).
 
-## 2. How it works
+## <a id="my-section-2"></a>2. How it works
 
 The front end ([`Loop.pm`](../lib/Proc/Spawner/Loop.pm)) keeps the queue, the timers and the watches; a backend waits.
 
@@ -50,13 +50,13 @@ completion port receives every event.
 - `$loop->pipe(overlapped => ...)` makes a named pipe of its own with those ends overlapped; give such an end to no
   child (a child does synchronous I/O on it).
 
-## 3. What was checked
+## <a id="my-section-3"></a>3. What was checked
 
 | Where | What | Result |
 |---|---|---|
 | Linux | the whole suite, also without posix_spawn, through Run (`RUN_AS_WIN32=1` too), with `/proc` hidden | pass |
-| Linux | the snippet library, ours alone against the table of section 7 of [`large-subset-state.md`](large-subset/large-subset-state.md) | no change from W5 |
-| Wine | the snippet library | could not run on 2026-11-09 before the shell layer's port ([`pspawn-spawner.md`](pspawn-spawner.md), section 8; ported later that day: [`pspawn-shell-windows.md`](pspawn-shell-windows.md)), and not run there since; the parser alone over all 45,501 extracted samples gives the same trees as on Linux |
+| Linux | the snippet library, ours alone against the table of section 7 of [`large-subset-state.md`](large-subset/large-subset-state.md#my-section-7) | no change from W5 |
+| Wine | the snippet library | could not run on 2026-11-09 before the shell layer's port ([`pspawn-spawner.md`](pspawn-spawner.md#my-section-8), section 8; ported later that day: [`pspawn-shell-windows.md`](pspawn-shell-windows.md)), and not run there since; the parser alone over all 45,501 extracted samples gives the same trees as on Linux |
 | Wine, Strawberry Perl 5.38.2 | [`t/loop.t`](../t/loop.t): every pipe kind with 300,000 bytes each way, EPIPE, cancelled reads on both kinds of handle, timers, 80 children at once, a child writing into a pipe the loop reads | 17 pass, through both primitives (`system1`: 60 children, Perl's own table stops at 64) |
 | Wine, with a console | Ctrl-C sent 0.5 s into a wait that nothing else could end before 3.5 s | `%SIG{INT}` handler ran at 0.54 s; without our handler only at the next event, 3.54 s |
 | Wine | `alarm 1` during a wait | `%SIG{ALRM}` handler at 1.02 s |
@@ -70,7 +70,7 @@ Wine has a console only on a terminal: these runs used a pseudo-terminal (`scrip
 **Not checked:** real Windows. Wine calls console handlers as Windows documents (each event on a thread of its own,
 the newest handler first), but only Wine was seen.
 
-## 4. Known limits
+## <a id="my-section-4"></a>4. Known limits
 
 - A read on a synchronous handle that is cancelled just as its helper thread enters `ReadFile` can stay blocked until
   data or end of file arrives (the window is between the thread's check of the flag and the call).

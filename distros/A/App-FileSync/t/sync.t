@@ -8,6 +8,9 @@ use File::Spec;
 
 use lib 't/lib';
 use TestSync;
+use App::FileSync::Admin;
+use App::FileSync::Store;
+use App::FileSync::Trash;
 
 my $T0 = 1_700_000_000;
 
@@ -194,9 +197,28 @@ my $T0 = 1_700_000_000;
 	like($error, qr/refusing to delete 6/, 'the refusal names the count');
 	ok($env->exists_in('server', 'file1.txt'), 'the master was not touched');
 
+	my $dry_error;
+	eval { $env->sync(dry_run => 1); 1 } or $dry_error = $@;
+	like($dry_error, qr/refusing to delete 6/, 'a dry run reports the refusal too');
+
 	my $forced = $env->sync(force => 1);
 	is($forced->{summary}{deleted}, 6, '--force performs the deletions');
 	ok(!$env->exists_in('server', 'file1.txt'), 'files are gone after --force');
+}
+
+# The limit is inclusive: deleting exactly max_deletes files goes ahead.
+{
+	my $env = TestSync->new_env(max_deletes => 5);
+	my $policy = App::FileSync::Config::load_repo($env->{server}, 'docs');
+	$policy->{max_delete_percent} = 0;
+	App::FileSync::Config::save_repo($env->{server}, 'docs', $policy);
+
+	$env->write_file('client', "file$_.txt", "content $_\n", $T0 + $_) for 1 .. 10;
+	$env->sync();
+	unlink $env->client_path("file$_.txt") for 1 .. 5;
+
+	is($env->sync()->{summary}{deleted}, 5, 'deleting exactly max_deletes files is allowed');
+	ok(!$env->exists_in('server', 'file5.txt'), 'and the files are gone from the master');
 }
 
 # The percentage guard is not replica-only: a normal client with a surviving
@@ -235,6 +257,31 @@ my $T0 = 1_700_000_000;
 	is($stable->{summary}{deleted}, 0, 'the allowed deletion is not repeated');
 	is($stable->{summary}{pushed}, 0, 'nothing is left to push');
 	is($stable->{summary}{pulled}, 0, 'and nothing is left to pull');
+}
+
+# A limit of 0 switches that limit off; the other one still applies.  Ten of
+# twenty files is over both defaults (and over a max_deletes of 5).
+for my $case (
+	{ name => 'both limits 0', policy => { max_deletes => 0, max_delete_percent => 0 }, refused => undef },
+	{ name => 'max_deletes 0', policy => { max_deletes => 0 }, refused => qr/known files/ },
+	{ name => 'max_delete_percent 0', policy => { max_deletes => 5, max_delete_percent => 0 }, refused => qr/limit is 5\b/ },
+) {
+	my $env = TestSync->new_env();
+	my $policy = App::FileSync::Config::load_repo($env->{server}, 'docs');
+	@{$policy}{ keys %{ $case->{policy} } } = values %{ $case->{policy} };
+	App::FileSync::Config::save_repo($env->{server}, 'docs', $policy);
+
+	$env->write_file('client', sprintf('file%02d.txt', $_), "content $_\n", $T0 + $_) for 1 .. 20;
+	$env->sync();
+	unlink $env->client_path(sprintf 'file%02d.txt', $_) for 1 .. 10;
+
+	if ($case->{refused}) {
+		throws_ok { $env->sync() } $case->{refused}, "$case->{name}: the other limit still refuses";
+		ok($env->exists_in('server', 'file01.txt'), "$case->{name}: the master was not touched");
+	} else {
+		is($env->sync()->{summary}{deleted}, 10, "$case->{name}: the deletions proceed without --force");
+		ok(!$env->exists_in('server', 'file01.txt'), "$case->{name}: and reach the master");
+	}
 }
 
 # One more local deletion than the allowance is refused before the master is
@@ -459,6 +506,114 @@ my $T0 = 1_700_000_000;
 
 	is(length($copied), length($big), 'large file size matches');
 	is($copied, $big, 'large file content matches across chunks');
+}
+
+
+# ------------------------------------------------- stale temporaries are swept
+# Each sync removes stale .filesync-tmp-* files from the client tree and the
+# server's master before scanning; a young one may be another run's.
+{
+	my $env = TestSync->new_env();
+	$env->write_file('client', 'a.txt', "alpha\n", $T0);
+	$env->sync();
+
+	my $stale = time - 2 * 3_600;
+	for my $side (qw(client server)) {
+		$env->write_file($side, 'sub/.filesync-tmp-stale', "partial\n", $stale);
+		$env->write_file($side, '.filesync-tmp-young', "in progress\n", time);
+	}
+
+	my $result = $env->sync();
+	is($result->{summary}{pushed} + $result->{summary}{pulled}, 0, 'temporaries are never synced');
+	for my $side (qw(client server)) {
+		ok(!$env->exists_in($side, 'sub/.filesync-tmp-stale'), "$side: the stale temporary is removed");
+		ok($env->exists_in($side, '.filesync-tmp-young'), "$side: a young one is left alone");
+	}
+	is($env->read_file('server', 'a.txt'), "alpha\n", 'real files are untouched');
+}
+
+
+# ----------------------------------------------------------------- type changes
+# A path can change between file and directory on either side.  Each case is
+# one sync on top of an agreed tree, then a sync that must find nothing to do.
+{
+	my $kind = sub { my $p = shift; -l $p ? 'link' : -f $p ? 'file' : -d $p ? 'dir' : 'none' };
+	my $settled = sub {
+		my ($env, $name) = @_;
+		my $again = $env->sync();
+		is($again->{summary}{pushed} + $again->{summary}{pulled} + $again->{summary}{deleted}, 0, "$name: the next sync has nothing to do");
+	};
+
+	# An empty directory on the client becomes a file: clear_target removes it.
+	{
+		my $env = TestSync->new_env();
+		make_path($env->client_path('x'));
+		$env->write_file('client', 'keep.txt', "keep\n", $T0);
+		$env->sync();
+		is($kind->($env->server_path('x')), 'dir', 'empty dir -> file: the master first has the directory');
+		rmdir $env->client_path('x') or die $!;
+		$env->write_file('client', 'x', "a file\n", $T0 + 5);
+		is($env->sync()->{summary}{pushed}, 1, 'empty dir -> file: the file is pushed');
+		is($env->read_file('server', 'x'), "a file\n", 'empty dir -> file: the master has the file');
+		$settled->($env, 'empty dir -> file');
+	}
+
+	# A directory with files on the client becomes a file: the files are
+	# deleted (into the trash) before the file replaces the emptied directory.
+	{
+		my $env = TestSync->new_env();
+		$env->write_file('client', 'x/y', "inside\n", $T0);
+		$env->sync();
+		File::Path::remove_tree($env->client_path('x'));
+		$env->write_file('client', 'x', "a file\n", $T0 + 5);
+		my $result = $env->sync();
+		is_deeply([ @{ $result->{summary} }{qw(deleted pushed)} ], [ 1, 1 ], 'dir -> file: x/y deleted, x pushed');
+		is($kind->($env->server_path('x')), 'file', 'dir -> file: the master has a file');
+		$settled->($env, 'dir -> file');
+	}
+
+	# A file on the client becomes a directory.
+	{
+		my $env = TestSync->new_env();
+		$env->write_file('client', 'x', "a file\n", $T0);
+		$env->sync();
+		unlink $env->client_path('x') or die $!;
+		$env->write_file('client', 'x/y', "inside\n", $T0 + 5);
+		my $result = $env->sync();
+		is_deeply([ @{ $result->{summary} }{qw(deleted pushed)} ], [ 1, 1 ], 'file -> dir: x deleted, x/y pushed');
+		is($env->read_file('server', 'x/y'), "inside\n", 'file -> dir: the master has the directory');
+		$settled->($env, 'file -> dir');
+	}
+
+	# The master's directory becomes a file (as another client would leave
+	# it): the client takes the change.
+	{
+		my $env = TestSync->new_env();
+		$env->write_file('client', 'x/y', "inside\n", $T0);
+		$env->sync();
+		File::Path::remove_tree($env->server_path('x'));
+		$env->write_file('server', 'x', "a file\n", $T0 + 5);
+		App::FileSync::Admin->new(root => $env->{server})->reindex(repo => 'docs');
+		my $result = $env->sync();
+		is_deeply([ @{ $result->{summary} }{qw(deleted pulled)} ], [ 1, 1 ], 'master dir -> file: x/y deleted, x pulled');
+		is($env->read_file('client', 'x'), "a file\n", 'master dir -> file: the client has the file');
+		$settled->($env, 'master dir -> file');
+	}
+
+	# An empty directory the client deletes goes into the server trash whole.
+	{
+		my $env = TestSync->new_env();
+		make_path($env->client_path('e'));
+		$env->write_file('client', 'keep.txt', "keep\n", $T0);
+		$env->sync();
+		rmdir $env->client_path('e') or die $!;
+		is($env->sync()->{summary}{deleted}, 1, 'deleted empty dir: one deletion');
+		ok(!-e $env->server_path('e'), 'deleted empty dir: gone from the master');
+		my $store = App::FileSync::Store->new(root => $env->{server}, repo => 'docs');
+		my ($trashed) = @{ App::FileSync::Trash::versions(root => $store->trash_dir(), rel => 'e') };
+		ok($trashed && -d $trashed, 'deleted empty dir: a directory in the server trash');
+		$settled->($env, 'deleted empty dir');
+	}
 }
 
 done_testing();

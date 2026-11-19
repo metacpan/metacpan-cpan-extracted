@@ -15,7 +15,7 @@ use EV::ClickHouse;
 my $host    = $ENV{TEST_CLICKHOUSE_HOST}        || '127.0.0.1';
 my $hport   = $ENV{TEST_CLICKHOUSE_PORT}        || 8123;
 my $nport   = $ENV{TEST_CLICKHOUSE_NATIVE_PORT} || 9000;
-my $oldport = $ENV{TEST_CLICKHOUSE_22_PORT}     || 19001;
+my $oldport = $ENV{TEST_CLICKHOUSE_22_PORT};
 
 my $nat_ok = !!IO::Socket::INET->new(PeerAddr => $host, PeerPort => $nport, Timeout => 2);
 plan skip_all => 'no ClickHouse native at $host:$nport' unless $nat_ok;
@@ -118,9 +118,10 @@ with_ch(cb => sub {
     $c->finish if $c->is_connected;
 }
 {
-    my $old_ok = !!IO::Socket::INET->new(PeerAddr => $host, PeerPort => $oldport, Timeout => 2);
+    my $old_ok = $oldport
+        && !!IO::Socket::INET->new(PeerAddr => $host, PeerPort => $oldport, Timeout => 2);
     SKIP: {
-        skip "no 22.x server at \$host:$oldport (TEST_CLICKHOUSE_22_PORT)", 3 unless $old_ok;
+        skip 'set TEST_CLICKHOUSE_22_PORT to a 22.1-22.7 server', 3 unless $old_ok;
         my ($v, $pe, $c2);
         my $c = EV::ClickHouse->new(host => $host, port => $oldport, protocol => 'native',
             query_timeout => 8, on_error => sub {});

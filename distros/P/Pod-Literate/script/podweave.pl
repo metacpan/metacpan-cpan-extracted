@@ -3,6 +3,10 @@ use strict;
 use warnings;
 my ($title);
 while(<>) {
+	while(/\bC<\s*D<([^>]+)>/) {
+		my $name=$1; $name=~s/^\s*//; $name=~s/\s*$//;
+		s/\bC<\s*D<[^>]+>\s*(=\s*)?/C<E<lt> $name E<gt>=/;
+	}
 	if(0) { 1 }
 	elsif(/^=for +literate:command +target=/)  { 1 }
 	elsif(/^=for +literate +target:/)          { 1 } # deprecated

@@ -130,6 +130,17 @@ throws_ok { melt([ { A => 1, v => 2 } ], id_vars => 'A', var_name => 'x', value_
 	qr/must differ/, 'var_name == value_name dies';
 throws_ok { melt([ { A => 1, v => 2 } ], id_vars => 'A', var_name => 'A') }
 	qr/collides/, 'var_name colliding with id_vars dies';
+# A row of the wrong kind is named.  Up to 0.3424 it died with perl's own
+# "Not a HASH reference", from a line of LikeR.pm.
+throws_ok { melt([ { A => 1, v => 2 }, [1], { A => 3 } ], id_vars => 'A') }
+	qr/^melt: row 1 is not a HASH reference/, 'an AoH row that is not a hash is named';
+throws_ok { melt([ [1, 2], { A => 3 } ], id_vars => 0) }
+	qr/^melt: row 1 is not an ARRAY reference/, 'an AoA row that is not an array is named';
+throws_ok { melt({ r1 => { A => 1 }, r2 => 5 }, id_vars => 'A') }
+	qr/^melt: row 'r2' is not a HASH reference/, 'a HoH row that is not a hash is named';
+no_leaks_ok {
+	eval { melt([ { A => 1, v => 2 }, [1] ], id_vars => 'A') };
+} 'melt: no memory leaks (a bad row)' unless $INC{'Devel/Cover.pm'};
 
 # memory
 # A call-form error prints melt's argparse-style help screen (from

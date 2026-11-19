@@ -2,7 +2,7 @@
 # MIT License
 
 class IO::Socket::SSL extends IO::Socket::IP {
-  version "0.025";
+  version "0.026";
   
   use IO::Socket::SSL::Callback::BeforeConnectSSL;
   use IO::Socket::SSL::Callback::BeforeAcceptSSL;
@@ -379,8 +379,6 @@ class IO::Socket::SSL extends IO::Socket::IP {
     }
     
     while (1) {
-      $context = $self->get_context_with_deadline($context, 1);
-      
       eval { $ssl->connect; }
       
       if ($@) {
@@ -418,8 +416,6 @@ class IO::Socket::SSL extends IO::Socket::IP {
     }
     
     while (1) {
-      $context = $self->get_context_with_deadline($context, 0);
-      
       eval { $ssl->accept; }
       
       if ($@) {
@@ -466,8 +462,6 @@ class IO::Socket::SSL extends IO::Socket::IP {
     my $read_length = -1;
     
     while (1) {
-      $context = $self->get_context_with_deadline($context, 0);
-      
       eval { $read_length = $ssl->read($buffer, $length, $offset); }
       
       if ($@) {
@@ -499,8 +493,6 @@ class IO::Socket::SSL extends IO::Socket::IP {
     my $write_length = -1;
     
     while (1) {
-      $context = $self->get_context_with_deadline($context, 1);
-      
       eval { $write_length = $ssl->write($buffer, $length, $offset); }
       
       if ($@) {
@@ -533,8 +525,6 @@ class IO::Socket::SSL extends IO::Socket::IP {
     
     my $status = -1;
     while (1) {
-      $context = $self->get_context_with_deadline($context, 1);
-      
       eval { $status = $ssl->shutdown; }
       
       if ($@) {
@@ -694,7 +684,7 @@ class IO::Socket::SSL extends IO::Socket::IP {
       my $ssl = $self->{ssl};
       
       if ($ssl) {
-        $self->shutdown_SSL(Go->bg);
+        eval { $self->shutdown_SSL(Go->bg); }
       }
       
       $self->close;

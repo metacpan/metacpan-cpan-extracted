@@ -48,25 +48,8 @@ if ($ssl_libs) {
 # zlib
 push @libs, '-lz';
 
-# lz4 (for native protocol compression)
-my $lz4_cflags = `pkg-config --cflags liblz4 2>/dev/null`;
-my $lz4_libs   = `pkg-config --libs liblz4 2>/dev/null`;
-chomp $lz4_cflags;
-chomp $lz4_libs;
-
-if ($lz4_libs) {
-    $extra_inc .= " $lz4_cflags -DHAVE_LZ4";
-    push @libs, $lz4_libs;
-} else {
-    my $test = `echo '#include <lz4.h>' | $Config{cc} -xc -fsyntax-only - 2>/dev/null; echo \$?`;
-    chomp $test;
-    if ($test eq '0') {
-        push @libs, '-llz4';
-        $extra_inc .= ' -DHAVE_LZ4';
-    } else {
-        warn "liblz4 not found, building without native protocol compression\n";
-    }
-}
+# LZ4 is bundled: xs/lz4.c, built by lz4_unit.c with hidden symbols.
+$extra_inc .= ' -DHAVE_LZ4';
 
 WriteMakefile(
     NAME          => 'EV::ClickHouse',
@@ -79,7 +62,7 @@ WriteMakefile(
     XS            => { 'ClickHouse.xs' => 'ClickHouse.c' },
     INC           => "$ev{INC} $extra_inc",
     LIBS          => [join(' ', @libs)],
-    OBJECT        => 'ClickHouse$(OBJ_EXT)',
+    OBJECT        => 'ClickHouse$(OBJ_EXT) lz4_unit$(OBJ_EXT)',
     ($optimize ? (OPTIMIZE => $optimize) : ()),
     # The xs/*.c sources are #include'd into ClickHouse.xs (one TU), so the
     # object file must be rebuilt when any of them changes — MakeMaker does
@@ -87,8 +70,9 @@ WriteMakefile(
     depend        => {
         'ClickHouse$(OBJ_EXT)' => join(' ',
             qw(xs/codecs.c xs/io.c xs/proto_http.c xs/proto_native_build.c
-               xs/proto_native_parse.c xs/queues.c xs/types.c
-               xs/macros.h cityhash.h ngx_queue.h)),
+               xs/proto_native_parse.c xs/queues.c xs/types.c xs/tzif.c
+               xs/lz4.h xs/macros.h cityhash.h ngx_queue.h)),
+        'lz4_unit$(OBJ_EXT)' => 'xs/lz4.c xs/lz4.h',
     },
     CONFIGURE_REQUIRES => {
         'EV::MakeMaker'       => 0,

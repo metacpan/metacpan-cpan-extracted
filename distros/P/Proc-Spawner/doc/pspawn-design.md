@@ -1,16 +1,18 @@
 # ShellSpawn: running ShellSubset parse trees with posix_spawn (2026-11-01)
 
-Code: `claude/pspawn-tree.tar.gz-base64.txt` (`base64 -d`, `tar xzf`): `PosixSpawn/` (XS binding), `lib/ShellSpawn.pm` (the executor), [`try.pl`](../t/try.pl), `compare.pl`, [`battery.txt`](../t/batteries/battery.txt), [`fdbattery.txt`](../t/batteries/fdbattery.txt), `fds`, `hyg.pl`, `traces.txt`; since 2026-11-02 the executor runs on [`lib/Proc/Spawner.pm`](../lib/Proc/Spawner.pm) (starting children, the event loop) and [`lib/Proc/Spawner/Graph.pm`](../lib/Proc/Spawner/Graph.pm) (the executable spawn graph), both EXPERIMENTAL and described in [`pspawn-spawner.md`](pspawn-spawner.md); hand-written graphs: `sgraph/`, described in [`pspawn-graph.md`](pspawn-graph.md); tests of the two modules: [`t/spawner.t`](../t/spawner.t); the large subset and the extension points (EXPERIMENTAL): `lib/ShellSpawn/Large.pm`, described in [`pspawn-extensions.md`](pspawn-extensions.md). The executor alone: `claude/pspawn-ShellSpawn.pm`. Build: `cd PosixSpawn && perl Makefile.PL && make`. Run: `TRACE=1 perl try.pl 'COMMAND'`.
+Status: written 2026-11-01; sections 2, 7, 8 and 9 describe the state of that day ([section 6](#my-section-6) is kept current). The current state is in [`pspawn-spawner.md`](pspawn-spawner.md) and in the modules' POD.
 
-## 1. The scenario
+Code (today's files): the executor [`lib/Proc/ShellSpawn.pm`](../lib/Proc/ShellSpawn.pm), the large subset and the extension points (EXPERIMENTAL) [`lib/Proc/ShellSpawn/Large.pm`](../lib/Proc/ShellSpawn/Large.pm), described in [`pspawn-extensions.md`](pspawn-extensions.md); the posix_spawn binding [`Spawner.xs`](../Spawner.xs), part of [`lib/Proc/Spawner.pm`](../lib/Proc/Spawner.pm) (starting children; the event loop is [`lib/Proc/Spawner/Loop.pm`](../lib/Proc/Spawner/Loop.pm) since W5) and [`lib/Proc/Spawner/Graph.pm`](../lib/Proc/Spawner/Graph.pm) (the executable spawn graph), both EXPERIMENTAL and described in [`pspawn-spawner.md`](pspawn-spawner.md); [`t/try.pl`](../t/try.pl); [`t/dash.t`](../t/dash.t) compares with dash (in place of the old `compare.pl`) on [`battery.txt`](../t/batteries/battery.txt), [`fdbattery.txt`](../t/batteries/fdbattery.txt) and the other batteries, with the helper [`t/fds`](../t/fds); hand-written graphs: [`t/sgraph/`](../t/sgraph), described in [`pspawn-graph.md`](pspawn-graph.md); tests of the two modules: [`t/spawner.t`](../t/spawner.t). Build: `perl Makefile.PL && make`. Run: `TRACE=1 perl t/try.pl 'COMMAND'`. (On 2026-11-01 these were files of the old Project: an XS binding `PosixSpawn`, `lib/ShellSpawn.pm`, `compare.pl`, `hyg.pl`.)
+
+## <a id="my-section-1"></a>1. The scenario
 
 As decided on 2026-11-01: this module is the only code that starts children of the process; it may set `SIGCHLD` as it likes; posix_spawn is available. So: no `fork` in Perl, no wraparound, `waitpid(-1, WNOHANG)` is allowed (every child is ours).
 
-## 2. The posix_spawn binding
+## <a id="my-section-2"></a>2. The posix_spawn binding
 
 Neither CPAN module exposes file actions: Proc::FastSpawn has `spawn`, `spawnp` and `fd_inherit`; POSIX::RT::Spawn has one `spawn` like `system LIST`. Hence `PosixSpawn` (XS, ~150 lines):
 
-`PosixSpawn::spawn(FILE, \@ARGV, \@ENV_OR_UNDEF, \@ACTIONS, \%ATTR)` returns the pid, or the empty list with `$!`. Actions in order: `[dup2 => FROM, TO]`, `[close => FD]`, `[open => FD, PATH, FLAGS, MODE]`, `[chdir => DIR]`, `[fchdir => FD]`, `[closefrom => FD]` (the last three are glibc extensions). `[tcsetpgrp => FD]` (glibc). Attributes: `search` (posix_spawnp), `sigdefault => [SIGNUMS]`, `sigmask => [SIGNUMS]`, `pgroup => PGID`, `setsid => 1`, `resetids => 1`, `sched => [POLICY, PRIORITY]`, `cgroup => FD` (glibc), `pidfd => 1`. With `pidfd`, glibc 2.39's `pidfd_spawn` is used and `spawn` returns `(PID, PIDFD)`.
+`PosixSpawn::spawn(FILE, \@ARGV, \@ENV_OR_UNDEF, \@ACTIONS, \%ATTR)` (today `Proc::Spawner::spawn`; the full list of its attributes is in [`lib/Proc/Spawner.pm`](../lib/Proc/Spawner.pm)'s POD) returns the pid, or the empty list with `$!`. Actions in order: `[dup2 => FROM, TO]`, `[close => FD]`, `[open => FD, PATH, FLAGS, MODE]`, `[chdir => DIR]`, `[fchdir => FD]`, `[closefrom => FD]` (the last three are glibc extensions). `[tcsetpgrp => FD]` (glibc). Attributes: `search` (posix_spawnp), `sigdefault => [SIGNUMS]`, `sigmask => [SIGNUMS]`, `pgroup => PGID`, `setsid => 1`, `resetids => 1`, `sched => [POLICY, PRIORITY]`, `cgroup => FD` (glibc), `pidfd => 1`. With `pidfd`, glibc 2.39's `pidfd_spawn` is used and `spawn` returns `(PID, PIDFD)`.
 
 `PosixSpawn::fpe_at_exec()` says what Perl's own `exec` would give a child for SIGFPE: 1 ignored, 0 default, -1 this Perl leaves SIGFPE alone. Perl ignores SIGFPE for itself at startup (`PERL_FPU_INIT`) and, around `exec`, restores the disposition it found then (`PERL_FPU_PRE_EXEC`, the global `PL_sigfpe_saved`).
 
@@ -18,12 +20,12 @@ Facts checked on glibc 2.39 (Linux):
 
 - A child gets only fds 0–2 by default, because Perl's own handles above `$^F` are close-on-exec.
 - `dup2` from an fd onto the same number clears close-on-exec (the child got fd 4 with `[dup2 => 4, 4]`).
-- Failures are reported synchronously as errno: a bad `dup2` source (EBADF), a failing `open` action, a missing program (ENOENT), a non-executable file (EACCES). A failing `open` action cannot be told apart from a failing exec, so the executor opens files itself (section 4).
+- Failures are reported synchronously as errno: a bad `dup2` source (EBADF), a failing `open` action, a missing program (ENOENT), a non-executable file (EACCES). A failing `open` action cannot be told apart from a failing exec, so the executor opens files itself ([section 4](#my-section-4)).
 - `close` of an fd that is not open is ignored.
 - `posix_spawnp` searches the `PATH` of the calling process, not the one in the child's environment; so the executor searches `PATH` itself, with the command's own `PATH=` setting.
 - A signal ignored in the parent stays ignored in the child unless listed in `sigdefault`.
 
-## 3. Objects
+## <a id="my-section-3"></a>3. Objects
 
 - **End**: an fd the parent keeps open for its children: a pipe end or an opened file, always close-on-exec, with a **hold count**. A new end starts with one hold owned by its creator. When the count reaches 0, the parent closes it ("forgets" the end). The parent's own fds 0–2 are ends that are never closed.
 - **Context**: a map from child fd numbers to ends (or `undef` for "closed"), plus the shell state (variables, exported names, the virtual current directory, `$?`, `$!`). A context made with a new map holds every end in it, once per entry, and releases them once.
@@ -31,7 +33,7 @@ Facts checked on glibc 2.39 (Linux):
 - **Loop scope**: one per loop iteration, so that `break` and `continue` release the contexts of the iterations they leave.
 - **Graph nodes** (EXPERIMENTAL, since 2026-11-01): every end is also an end node of the spawn graph, and every start makes a process node with its final fd table; with `TRACE=dot` the executor writes one Graphviz picture per event. The closing rule is unchanged (hold counts). See [`pspawn-graph.md`](pspawn-graph.md).
 
-## 4. From a command to posix_spawn
+## <a id="my-section-4"></a>4. From a command to posix_spawn
 
 For a simple command:
 
@@ -43,7 +45,7 @@ For a simple command:
 
 Example from `traces.txt`: `echo $x 3>&1 1>&2 2>&3 >/dev/null` gives the map {1: '/dev/null' at parent fd 3, 2: our fd 1, 3: our fd 1}. Both parent fds 3 and 1 are targets with other ends, so: `dup2 3->10, dup2 1->11, dup2 10->1, dup2 11->2, dup2 11->3, close 10, close 11`.
 
-## 5. When the parent forgets an end
+## <a id="my-section-5"></a>5. When the parent forgets an end
 
 Every construct is run as `x_*(context, node, $tail, $k)`: `$k` is the continuation that gets the status; `$tail` lists the contexts to release **right after the last process the construct can start has started**. That is the rule of 2026-10-30: forget an end once all processes that could use it have started.
 
@@ -54,13 +56,15 @@ Every construct is run as `x_*(context, node, $tail, $k)`: `$k` is the continuat
 
 Example (`traces.txt`), `{ false || cat /etc/hostname; } | wc -l >/dev/null`: the read end is closed right after `wc` starts; the write end stays open while `false` runs (because `cat` may follow) and is closed right after `cat` starts.
 
-## 6. The loop
+## <a id="my-section-6"></a>6. The loop
 
-One loop, `loop_until(DONE)` (since 2026-11-02 `Proc::Spawner::wait_until`): runs queued continuations; reaps with `waitpid(PID, WNOHANG)` for each of its own children (until 2026-11-01 `waitpid(-1, WNOHANG)`, which took other code's statuses); then `select`s on a self-pipe written by the `SIGCHLD` handler (installed with `SA_RESTART` while the loop runs, the previous handler restored after) and on the fds being read for `$( … )` and `read`. Since 2026-11-01 the byte is written by a C handler in the binding (`PosixSpawn::chld_to_fd`; decision D1, EXPERIMENTAL, awaiting approval, [`pspawn-extensions.md`](pspawn-extensions.md)), so `select` waits without limit. The fallback, used only without that function, is a deferred Perl handler with `select` waking every 50 ms (`$Proc::Spawner::TICK`): an immediate handler corrupted Perl's heap, and a deferred one can miss a child that ends just before `select` starts waiting (known issue X14; [`perl-signals-findings.md`](perl-signals-findings.md), S1–S3). The final fix is decision D1 on the page "Child Exit Wake-up". Every continuation is queued, never called from another one, so a loop of builtins (`while :; do :; done`) runs in constant memory. Each `on_read` is one read; the callback asks again. `read` reads one byte at a time, so later commands get the rest of the input, as in sh.
+One loop, `loop_until(DONE)` (since 2026-11-02 `Proc::Spawner::wait_until`; since W5 the loop is the module `Proc::Spawner::Loop`, [`pspawn-loop.md`](pspawn-loop.md)): runs queued continuations; reaps with `waitpid(PID, WNOHANG)` for each of its own children (until 2026-11-01 `waitpid(-1, WNOHANG)`, which took other code's statuses); then `select`s on a self-pipe written by the `SIGCHLD` handler (installed with `SA_RESTART` while the loop runs, the previous handler restored after) and on the fds being read for `$( … )` and `read`. Since 2026-11-01 the byte is written by a C handler in the binding (`Proc::Spawner::chld_to_fd`, until 2026-11-02 `PosixSpawn::chld_to_fd`; decision D1, endorsed experimentally by the user on 2026-11-02, [`pspawn-extensions.md`](pspawn-extensions.md)), so `select` waits without limit. The fallback, used only without that function, is a deferred Perl handler with `select` waking every 50 ms (`$Proc::Spawner::Loop::POSIX::TICK`): an immediate handler corrupted Perl's heap, and a deferred one can miss a child that ends just before `select` starts waiting (known issue [X14](pspawn-known-issues.md#my-x14); [`perl-signals-findings.md`](perl-signals-findings.md), S1–S3). The final fix is decision D1 on the page "Child Exit Wake-up". Every continuation is queued, never called from another one, so a loop of builtins (`while :; do :; done`) runs in constant memory. Each `on_read` is one read; the callback asks again. `read` reads one byte at a time, so later commands get the rest of the input, as in sh.
 
-`run(STRING)` returns when the foreground commands have finished. A background chain started by it goes on at once, also between `run` calls (since post-0.04, the user's choice B of question K3, 2026-11-03): while background jobs remain, `Proc::ShellSpawn` keeps a deferred SIGCHLD handler installed, which calls `Proc::Spawner::poll()` (what is ready now, without waiting) when a child ends; it keeps the program's `$?` and `$!` as they were (X55). The costs, documented: **while such jobs remain, the program's own `sleep` and `select` return early whenever a child ends** (they are interrupted by the signal; [`doc/perl-signals-findings.md`](perl-signals-findings.md), the consequence of item L5); a program's own `$SIG{CHLD}` code is called after ours, and a `$SIG{CHLD}` set later replaces ours (the jobs then go on only in later `run` calls). A chain that waits for Perl to read a pipe (`$( )`, `read`) may still stall if the writing child fills the pipe and so never ends. An `END` block finishes the jobs before Perl exits. Until 0.04 the chains went on only inside `run` and at exit (known issue X1).
+`run(STRING)` returns when the foreground commands have finished. A background chain started by it goes on at once, also between `run` calls (since post-0.04, the user's choice B of question K3, 2026-11-03): while background jobs remain, `Proc::ShellSpawn` keeps a deferred SIGCHLD handler installed, which calls `Proc::Spawner::poll()` (what is ready now, without waiting) when a child ends; it keeps the program's `$?` and `$!` as they were (X55). The costs, documented: **while such jobs remain, the program's own `sleep` and `select` return early whenever a child ends** (they are interrupted by the signal; [`doc/perl-signals-findings.md`](perl-signals-findings.md), the consequence of item L5); a program's own `$SIG{CHLD}` code is called after ours, and a `$SIG{CHLD}` set later replaces ours (the jobs then go on only in later `run` calls). A chain that waits for Perl to read a pipe (`$( )`, `read`) may still stall if the writing child fills the pipe and so never ends. At exit (since post-0.12, **K5**, the user, 2026-11-15: "as shell") an `END` block waits only while ours has something left to do for a job: a command still to start (ours starts each command of a job itself, without fork: the next one when the one before ends), a read or write of its own, a call queued; then Perl exits and the job's running processes go on, as the shells leave theirs. Until post-0.12 it waited for every job to end. `PROC_SHELLSPAWN_END` (or `$Proc::ShellSpawn::END_WAIT` at run time; a stopgap until such choices are arguments of the API) is `MODE[:SECONDS]`: `shell` (the default), `all` (wait for every job to end, as before), `none` (exit at once: a job's commands not yet started never start); `SECONDS` caps the wait. What remains unlike the shells: they exit at once and leave a copy of themselves to start the rest of a job, so ours exits later by as long as a job needs before its last command starts (`(sleep 60; reboot) &`: 60 s), and a job that never runs out of commands to start (`while :; do date; sleep 60; done &`) keeps ours from exiting unless `SECONDS` is set. Without fork ours cannot leave a copy of itself; [`t/at-exit.t`](../t/at-exit.t) tests the modes; over the library's 44 samples with a background job, `all` came no closer to the shells than `shell` in any, and worse in one (section 7 of [`large-subset/large-subset-state.md`](large-subset/large-subset-state.md#my-section-7), "Ours at exit"). Until 0.04 the chains went on only inside `run` and at exit (known issue [X1](pspawn-known-issues.md#my-x1)).
 
-## 7. Tested (2026-11-01)
+## <a id="my-section-7"></a>7. Tested (2026-11-01)
+
+Sections 7 and 8 are of 2026-11-01. The current tests: [`t/dash.t`](../t/dash.t) (with the known differences in [`t/dash-known.txt`](../t/dash-known.txt)), [`t/memory.t`](../t/memory.t) and the other files of `t/`; what did not pass at each level of the spawn primitive: [`test-results/`](test-results).
 
 - `compare.pl battery.txt`: 43 command lines (pipelines, and-or, groups, subshells, loops, `case`, `read`, `$( )`, `$(( ))`, `${x:-w}` forms, globbing, errors with their messages and statuses). 41 give the same output, messages and status as dash. The other 2 are outside the subset (`wait`, a bracket expression with an expansion).
 - `compare.pl fdbattery.txt`: 14 command lines run the `fds` helper (as `./fds`; run `compare.pl` in the bundle's top directory), which prints the child's open fds and what they are. All 14 agree with dash, including scratch-fd swaps.
@@ -84,31 +88,31 @@ One loop, `loop_until(DONE)` (since 2026-11-02 `Proc::Spawner::wait_until`): run
   - commands outside the subset;
   - arithmetic error messages worded differently;
   - dash crashing on an integer overflow;
-  - `: & echo $!`, where no process was started (section 8);
+  - `: & echo $!`, where no process was started ([section 8](#my-section-8));
   - the order of two stderr lines from parallel pipeline elements, which varies in dash too.
 - Found by these tests in the parser: item P1 of [`pspawn-known-issues.md`](pspawn-known-issues.md), fixed in the project's parser on 2026-11-01.
-- `compare.pl sigenv.txt`: signal dispositions, environment and identity of children (section 9).
-- Rerun on 2026-11-01 (pre-0.01) after the graph objects went in: the same counts (battery 41/43 in 21 of 22 runs, see X13), `hyg.pl` clean, `mem.pl` and `xs.pl` flat. Hand-written graphs: [`sgraph/run-graph.pl`](../t/sgraph/run-graph.pl), 17 of 17 processes as drawn ([`pspawn-graph.md`](pspawn-graph.md), section 5).
+- `compare.pl sigenv.txt`: signal dispositions, environment and identity of children ([section 9](#my-section-9)).
+- Rerun on 2026-11-01 (pre-0.01) after the graph objects went in: the same counts (battery 41/43 in 21 of 22 runs, see X13), `hyg.pl` clean, `mem.pl` and `xs.pl` flat. Hand-written graphs: [`sgraph/run-graph.pl`](../t/sgraph/run-graph.pl), 17 of 17 processes as drawn ([`pspawn-graph.md`](pspawn-graph.md#my-section-5), section 5).
 
-## 8. Not done, or different (the current list: [`pspawn-known-issues.md`](pspawn-known-issues.md))
+## <a id="my-section-8"></a>8. Not done, or different (the current list: [`pspawn-known-issues.md`](pspawn-known-issues.md))
 
 - Brace expansion (`brace` option) is not implemented; it dies.
 - `redir_strict` (Q1's option) is not implemented: the default (dash's) behaviour only.
 - `$!` is the pid of the background chain's first process (K4 option A); empty if that process had not started when the `&` returned (for example after a `$( )`).
-- `exec cmd` runs as an ordinary command (the parser accepts it only where nothing can follow).
+- `exec cmd` runs as an ordinary command (the parser accepts it only where nothing can follow). Since then the large subset lets `exec cmd` stand anywhere: it runs cmd and ends the shell, or the subshell it is in, with cmd's status ([`large-subset/large-subset-spec.md`](large-subset/large-subset-spec.md), B3 and V19).
 - `read`: field splitting with non-blank IFS characters is approximate.
 - Error messages follow dash's wording for the cases tested; the prefix is `sh:` and there is no line number.
-- Portability: `addchdir_np`, `addfchdir_np` and `addclosefrom_np` are glibc extensions (`chdir` is needed only after `cd` in a subshell). Only Linux with glibc 2.39 was tested.
+- Portability: `addchdir_np`, `addfchdir_np` and `addclosefrom_np` are glibc extensions (`chdir` is needed only after `cd` in a subshell). Only Linux with glibc 2.39 was tested. Since 0.07 what the libc lacks is done around the call; where it was tested since: known issue [X10](pspawn-known-issues.md#my-x10) ([`pspawn-known-issues.md`](pspawn-known-issues.md)) and "Our tests" in [`README.md`](../README.md).
 
-## 9. posix_spawn's features: what is used (2026-11-01)
+## <a id="my-section-9"></a>9. posix_spawn's features: what is used (2026-11-01)
 
 | Feature | Used | Why, or why not |
 |---|---|---|
-| `adddup2` | yes | every pipe end and redirection; scratch fds for conflicts (section 4) |
+| `adddup2` | yes | every pipe end and redirection; scratch fds for conflicts ([section 4](#my-section-4)) |
 | `addclose` | yes | `n>&-`, and the scratch fds |
 | `addopen` | no | the parent opens files itself: it can then say which redirection failed, and the commands of a group share one open file |
 | `addchdir_np` | yes | when the virtual current directory (after `cd` in a subshell) is not the real one |
-| `addfchdir_np` | no | would survive a renamed or removed directory (known issue X9) |
+| `addfchdir_np` | no | would survive a renamed or removed directory (known issue [X9](pspawn-known-issues.md#my-x9)) |
 | `addclosefrom_np` | no | sh passes fds it inherited without close-on-exec, and so do we |
 | `addtcsetpgrp_np` | no (bound) | job control only; fails with ENOTTY without a terminal |
 | `setsigmask` | yes | always empty |

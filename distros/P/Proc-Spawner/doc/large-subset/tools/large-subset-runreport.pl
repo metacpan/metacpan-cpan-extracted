@@ -16,6 +16,9 @@
 #   with its header if missing), in the columns of large-subset-env-variants.tsv: VARIANT, id, base class, class, what
 #   changed, noisy (1 if the sample's result also changed between BASEDIR and BASE2DIR, a second run of the base), text.
 #   -c FILE: every sample's class, one line each (id, class).
+#   -known FILE (post-0.12, the user, 2026-11-18): large-subset-match-known.tsv; a sample of class OURS that it names
+#   chance for the base run (ENV * or base, RULE starting with "chance") is counted in the class chance instead: dash and
+#   bash agreed in this run, but they are known to give other results in other runs (races, inode numbers, timing).
 #   -ours-from DIR (post-0.10): take ours' results from DIR (large-subset-runcompare.pl -shells ours, best with
 #   -workers-from OUTDIR and the same -env), for the samples DIR has; dash's and bash's stay OUTDIR's.  So after a change
 #   of ours only ours runs again.  Join runs of the same day: ls -l shows the date of what -env mtime does not fix.
@@ -33,13 +36,18 @@
 #                     differ: ours are worded as dash's, as bash's, or as neither (dash and bash word many alike
 #                     messages differently: "not found" / "command not found")
 #           OURS      dash and bash agree, ours differs, beyond the messages (the work list for accepted samples)
+#           chance    (with -known) as OURS, but the sample is named chance: in other runs the shells differ too
 #           =dash, =bash, neither: dash and bash differ beyond the messages; ours agrees with dash, with bash, or
 #                     with neither (messages ignored here)
 #           timeout   a shell ran out of time (5 s); not compared
 use strict; use warnings; use JSON::PP; use Encode (); use Getopt::Long; binmode STDOUT, ':utf8';
-my ($LIST, $QD, $X, $BD, $CF, $OF, $OV, $BL, $TAG, $NOISE); GetOptions('l=s' => \$LIST, 'q=s' => \$QD, 'x' => \$X, 'b=s' => \$BD, 'c=s' => \$CF,
-  'ours-from=s' => \$OF, 'ours-vs=s' => \$OV, 'bl=s' => \$BL, 'tag=s' => \$TAG, 'noise=s' => \$NOISE) && @ARGV == 1 && (!$BL || $BD && $TAG)
-  or die "usage: $0 [-l LIST.tsv] [-q QDIR] [-x] [-b BASEDIR [-bl LIST.tsv -tag VARIANT [-noise BASE2DIR]]] [-c CLASSES.tsv] [-ours-from DIR] [-ours-vs DIR] OUTDIR\n";
+my ($LIST, $QD, $X, $BD, $CF, $OF, $OV, $BL, $TAG, $NOISE, $KNOWN); GetOptions('l=s' => \$LIST, 'q=s' => \$QD, 'x' => \$X, 'b=s' => \$BD, 'c=s' => \$CF,
+  'ours-from=s' => \$OF, 'ours-vs=s' => \$OV, 'bl=s' => \$BL, 'tag=s' => \$TAG, 'noise=s' => \$NOISE, 'known=s' => \$KNOWN) && @ARGV == 1 && (!$BL || $BD && $TAG)
+  or die "usage: $0 [-l LIST.tsv] [-q QDIR] [-x] [-b BASEDIR [-bl LIST.tsv -tag VARIANT [-noise BASE2DIR]]] [-c CLASSES.tsv] [-ours-from DIR] [-ours-vs DIR] [-known MATCH-KNOWN.tsv] OUTDIR\n";
+my %CHANCE;   # -known: sample id => 1 if named chance for the base run
+if ($KNOWN) { open my $k, '<:utf8', $KNOWN or die "$KNOWN: $!\n";
+  while (<$k>) { next if /^#/; chomp; my ($who, $env, $rule) = split /\t/; next unless defined $rule;
+    $CHANCE{$who} = 1 if $who !~ /^(?:dep|does):/ && ($env eq '*' || $env eq 'base') && $rule =~ /^chance\b/ } }
 my %OURS;   # -ours-from: sample id => ours' result from that run
 if ($OF) { for my $f (glob "$OF/run-*.jsonl") { open my $in, '<', $f or die;
     while (<$in>) { my $s = eval { decode_json($_) } or next; $OURS{$s->{id}} = $s->{ours} if $s->{ours} } }
@@ -51,7 +59,7 @@ my %INV;   # sample id => 1 if a coreutils tool is involved
 if ($QD) { for my $f (glob "$QD/run-*.jsonl") { open my $in, '<', $f or die;
   while (<$in>) { my $s = eval { decode_json($_) } or next;
     for (split /\n/, $s->{ours}{rec} // '') { my $who = s/^([^\035\037]*)\035// ? $1 : 'perl';   # the caller (-q logs it)
-      $INV{$s->{id}} = 1 if $who =~ /^perl/ && $TOOL{(split /\037/)[0] // ''} } } } }
+      $INV{$s->{id}} = 1 if $who =~ /^perl/ && $TOOL{(split /[\036\037]/)[0] // ''} } } } }
 my @P = qw(status out rec files);   # the messages (err) separately
 my %PFX = (dash => qr/(?:\S*\/)?dash: \d+: /, bash => qr/(?:\S*\/)?bash: (?:line \d+: )?/, ours => qr/(?:^|(?<=\n))sh: /);
 sub norm { my ($r, $sh) = @_; my %n = %$r;
@@ -67,7 +75,7 @@ sub classify { my $s = shift;   # the class of one sample, and the parts that di
   elsif (!$diff->($d, $b) && !$diff->($d, $o)) {
     $cls = $d->{err} eq $b->{err} && $d->{err} eq $o->{err} ? 'same' : $o->{err} eq $d->{err} ? 'msg=dash'
          : $o->{err} eq $b->{err} ? 'msg=bash' : 'msg-own' }
-  elsif (!$diff->($d, $b)) { @dp = $diff->($d, $o); $cls = 'OURS' }
+  elsif (!$diff->($d, $b)) { @dp = $diff->($d, $o); $cls = $CHANCE{$s->{id}} ? 'chance' : 'OURS' }
   else { $cls = !$diff->($o, $d) ? '=dash' : !$diff->($o, $b) ? '=bash' : 'neither'; @dp = $diff->($d, $b) }
   ($cls, @dp) }
 my (%t, %parts, %srcs, @list, $total, %cls, %res);
@@ -78,24 +86,24 @@ for my $f (glob "$ARGV[0]/run-*.jsonl") {
     my ($cls, @dp) = classify($s); $cls{$s->{id}} = $cls; $res{$s->{id}} = $s if $BD;
     $t{$s->{src}}{$cls}++; $t{ALL}{$cls}++; $srcs{$s->{src}} = 1;
     if ($QD) { my $g = $INV{$s->{id}} || ($s->{text} // '') =~ $CMD ? 'coreutils involved' : 'no coreutils'; $t{"$g:$s->{src}"}{$cls}++; $t{"$g:ALL"}{$cls}++ }
-    if ($cls =~ /^(?:OURS|neither|msg-own)\z/) {
+    if ($cls =~ /^(?:OURS|chance|neither|msg-own)\z/) {
       $parts{$cls}{join '+', @dp}++;
       (my $x = $s->{text} // '') =~ s/\s+/ /g;
       push @list, join "\t", $s->{id}, $cls, join('+', @dp), $s->{verdict} // '', substr($x, 0, 120) } } }
 die "no results in $ARGV[0]\n" unless $total;
-my @C = qw(same msg=dash msg=bash msg-own OURS =dash =bash neither timeout);
+my @C = (qw(same msg=dash msg=bash msg-own OURS), $KNOWN ? 'chance' : (), qw(=dash =bash neither timeout));
 for my $g ('', $QD ? ('coreutils involved:', 'no coreutils:') : ()) {
   print "\n", $g =~ s/:$//r, ":\n" if $g;
   printf "%-20s %7s %s\n", 'source', 'n', join ' ', map sprintf('%8s', $_), @C;
   for my $src (sort(keys %srcs), 'ALL') { my $n = 0; $n += $_ for values %{$t{"$g$src"} // {}}; next unless $n;
     printf "%-20s %7d %s\n", $src, $n, join ' ', map sprintf('%8d', $t{"$g$src"}{$_} // 0), @C } }
-for my $c (qw(OURS neither)) { print "\n$c, by the parts that differ", $c eq 'OURS' ? " (ours against both shells)" : " (dash against bash)", ":\n";
+for my $c ('OURS', $KNOWN ? 'chance' : (), 'neither') { print "\n$c, by the parts that differ", $c ne 'neither' ? " (ours against both shells)" : " (dash against bash)", ":\n";
   printf "  %6d  %s\n", $parts{$c}{$_}, $_ for sort { $parts{$c}{$b} <=> $parts{$c}{$a} } keys %{$parts{$c} // {}} }
 if ($X) {   # the external calls (not the coreutils ones), as the main table: by sample, in the same classes, with their calls
   my %Q = map +($_ => 1), qw(echo printf test [ kill pwd true false); my (%n, %calls, @odd);
   for my $f (glob "$ARGV[0]/run-*.jsonl") { open my $in, '<', $f or die;
     while (<$in>) { my $s = sample($_) or next;
-      my %L = map { my $sh = $_; ($sh => [sort grep { length && !$Q{(split /\037/)[0]} } split /\n/, $s->{$sh}{rec} // '']) } qw(dash bash ours);
+      my %L = map { my $sh = $_; ($sh => [sort grep { length && !$Q{(split /[\036\037]/)[0]} } split /\n/, $s->{$sh}{rec} // '']) } qw(dash bash ours);
       next unless grep @{$L{$_}}, qw(dash bash ours);
       my ($d, $b, $o) = map "@{$L{$_}}", qw(dash bash ours);
       my $cls = (grep { $s->{$_}{status} =~ /^(?:124|137)\z/ } qw(dash bash ours)) ? 'timeout'
@@ -103,8 +111,8 @@ if ($X) {   # the external calls (not the coreutils ones), as the main table: by
       my $g = $QD ? ($INV{$s->{id}} || ($s->{text} // '') =~ $CMD ? 'coreutils involved' : 'no coreutils') : 'all';
       $n{$g}{$cls}++; $n{'all '}{$cls}++ if $QD; $calls{$cls} += @{$L{dash}};
       if ($cls eq 'OURS') { my (%c, %oo); $c{$_}++ for @{$L{dash}}; $oo{$_}++ for @{$L{ours}};
-        for my $l (sort keys %c) { push @odd, "missing\t$s->{id}\t" . ($l =~ s/\037/ /gr) for 1 .. $c{$l} - ($oo{$l} // 0) }
-        for my $l (sort keys %oo) { push @odd, "extra\t$s->{id}\t" . ($l =~ s/\037/ /gr) for 1 .. $oo{$l} - ($c{$l} // 0) } } } }
+        for my $l (sort keys %c) { push @odd, "missing\t$s->{id}\t" . ($l =~ tr/\037\036/ </r) for 1 .. $c{$l} - ($oo{$l} // 0) }
+        for my $l (sort keys %oo) { push @odd, "extra\t$s->{id}\t" . ($l =~ tr/\037\036/ </r) for 1 .. $oo{$l} - ($c{$l} // 0) } } } }
   my @X = qw(same OURS =dash =bash neither timeout);
   print "\nExternal calls (programs other than echo, printf, test, [, kill, pwd, true, false), by sample, compared as sorted\n",
     "lists of the calls with their arguments:\n"; printf "%-20s %7s %s\n", '', 'samples', join ' ', map sprintf('%8s', $_), @X;

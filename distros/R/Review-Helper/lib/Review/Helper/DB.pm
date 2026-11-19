@@ -1,7 +1,7 @@
 package Review::Helper::DB;
 use v5.36;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Carp qw/croak/;
 use DBI();

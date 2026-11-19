@@ -1,5 +1,5 @@
-# large-subset-ai-classes.tsv (X27, step 3; post-0.11, 2026-11-13): undecided samples classified by reading, by Claude
-# (AI-), not by large-subset-blocks.pl's rules nor by a ruling of the user: the 93 that step 3's setups left out
+# large-subset-ai-classes.tsv (X27, step 3; post-0.11, 2026-11-13): undecided samples classified by Claude (an AI)
+# reading them (AI-), not by large-subset-blocks.pl's rules nor by a ruling of the user: the 93 that step 3's setups left out
 # (large-subset-environment.md, section 12).  The user's categories (2026-11-13): AI- and the name of a category used
 # before (AI-strict: one run is enough, the sample depends only on an unmovable stone or on a device working as
 # expected; AI-values passed on unchanged, AI-values passed on split, AI-names with an expansion, AI-A5, AI-glob,

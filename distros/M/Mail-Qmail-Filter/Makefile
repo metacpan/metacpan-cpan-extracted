@@ -1,7 +1,7 @@
 # This Makefile is for the Mail::Qmail::Filter extension to perl.
 #
 # It was generated automatically by MakeMaker version
-# 7.24 (Revision: 72400) from the contents of
+# 7.70 (Revision: 77000) from the contents of
 # Makefile.PL. Don't edit this file, edit Makefile.PL instead.
 #
 #       ANY CHANGES MADE HERE WILL BE LOST!
@@ -11,18 +11,19 @@
 
 #   MakeMaker Parameters:
 
-#     AUTHOR => [q[Martin Sluka <fany@cpan.org>]]
+#     AUTHOR => [q[Martin Sluka <perl@sluka.de>]]
 #     BUILD_REQUIRES => { Test::More=>q[0] }
 #     CONFIGURE_REQUIRES => { ExtUtils::MakeMaker=>q[0] }
+#     EXE_FILES => [q[bin/qmail-deliverable]]
 #     LICENSE => q[artistic_2]
 #     META_MERGE => { resources=>{ homepage=>q[https://github.com/fany/Mail-Qmail-Filter], repository=>q[https://github.com/fany/Mail-Qmail-Filter.git] } }
-#     MIN_PERL_VERSION => q[5.014]
+#     MIN_PERL_VERSION => q[5.036]
 #     NAME => q[Mail::Qmail::Filter]
 #     PERM_DIR => q[755]
 #     PL_FILES => {  }
-#     PREREQ_PM => { Capture::Tiny=>q[0], Email::Valid=>q[0], File::Scan::ClamAV=>q[0], Mail::Address=>q[0], Mail::DKIM::Verifier=>q[0], Mail::DMARC::PurePerl=>q[0], Mail::Header=>q[0], Mail::Qmail::Queue::Message=>q[0], Mail::SPF=>q[0], Mail::SpamAssassin=>q[0], Mo=>q[0], Path::Tiny=>q[0], Qmail::Deliverable=>q[0], Test::More=>q[0], namespace::clean=>q[0] }
+#     PREREQ_PM => { Capture::Tiny=>q[0], Email::Valid=>q[0], File::Scan::ClamAV=>q[0], Mail::Address=>q[0], Mail::DKIM::Verifier=>q[0], Mail::DMARC::PurePerl=>q[0], Mail::Header=>q[0], Mail::Qmail::Queue::Message=>q[0], Mail::SPF=>q[0], Mail::SpamAssassin=>q[0], Mo=>q[0], Net::DNS::Resolver=>q[0], Net::Domain=>q[0], Net::IP::Match::Trie=>q[1], Net::SMTP=>q[0], Path::Tiny=>q[0], Qmail::Deliverable=>q[0], Test::More=>q[0], namespace::clean=>q[0] }
 #     TEST_REQUIRES => {  }
-#     VERSION_FROM => q[lib/Mail/Qmail/Filter.pm]
+#     VERSION => q[2.01]
 #     clean => { FILES=>q[Mail-Qmail-Filter-*] }
 #     dist => { COMPRESS=>q[gzip -9f], SUFFIX=>q[gz] }
 
@@ -31,30 +32,31 @@
 
 # --- MakeMaker const_config section:
 
-# These definitions are from config.sh (via /usr/lib/perl5/5.26.1/x86_64-linux-thread-multi/Config.pm).
+# These definitions are from config.sh (via /usr/lib/x86_64-linux-gnu/perl-base/Config.pm).
 # They may have been overridden via Makefile.PL or on the command line.
 AR = ar
-CC = cc
+CC = x86_64-linux-gnu-gcc
 CCCDLFLAGS = -fPIC
-CCDLFLAGS = -Wl,-E -Wl,-rpath,/usr/lib/perl5/5.26.1/x86_64-linux-thread-multi/CORE
+CCDLFLAGS = -Wl,-E
+CPPRUN = x86_64-linux-gnu-gcc  -E
 DLEXT = so
 DLSRC = dl_dlopen.xs
 EXE_EXT = 
 FULL_AR = /usr/bin/ar
-LD = cc
-LDDLFLAGS = -shared -L/usr/local/lib64 -fstack-protector-strong
-LDFLAGS =  -L/usr/local/lib64 -fstack-protector-strong
-LIBC = /lib64/libc-2.31.so
+LD = x86_64-linux-gnu-gcc
+LDDLFLAGS = -shared -L/usr/local/lib -fstack-protector-strong
+LDFLAGS =  -fstack-protector-strong -L/usr/local/lib
+LIBC = /lib/x86_64-linux-gnu/libc.so.6
 LIB_EXT = .a
 OBJ_EXT = .o
 OSNAME = linux
-OSVERS = 5.3.18-150300.59.90-default
+OSVERS = 6.1.0
 RANLIB = :
-SITELIBEXP = /usr/lib/perl5/site_perl/5.26.1
-SITEARCHEXP = /usr/lib/perl5/site_perl/5.26.1/x86_64-linux-thread-multi
+SITELIBEXP = /usr/local/share/perl/5.40.1
+SITEARCHEXP = /usr/local/lib/x86_64-linux-gnu/perl/5.40.1
 SO = so
-VENDORARCHEXP = /usr/lib/perl5/vendor_perl/5.26.1/x86_64-linux-thread-multi
-VENDORLIBEXP = /usr/lib/perl5/vendor_perl/5.26.1
+VENDORARCHEXP = /usr/lib/x86_64-linux-gnu/perl5/5.40
+VENDORLIBEXP = /usr/share/perl5
 
 
 # --- MakeMaker constants section:
@@ -63,11 +65,11 @@ DIRFILESEP = /
 DFSEP = $(DIRFILESEP)
 NAME = Mail::Qmail::Filter
 NAME_SYM = Mail_Qmail_Filter
-VERSION = 1.31
+VERSION = 2.01
 VERSION_MACRO = VERSION
-VERSION_SYM = 1_31
+VERSION_SYM = 2_01
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
-XS_VERSION = 1.31
+XS_VERSION = 2.01
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
 INST_ARCHLIB = blib/arch
@@ -76,60 +78,62 @@ INST_BIN = blib/bin
 INST_LIB = blib/lib
 INST_MAN1DIR = blib/man1
 INST_MAN3DIR = blib/man3
-MAN1EXT = 1
+MAN1EXT = 1p
 MAN3EXT = 3pm
+MAN1SECTION = 1
+MAN3SECTION = 3
 INSTALLDIRS = site
 DESTDIR = 
 PREFIX = $(SITEPREFIX)
 PERLPREFIX = /usr
-SITEPREFIX = /usr
+SITEPREFIX = /usr/local
 VENDORPREFIX = /usr
-INSTALLPRIVLIB = /usr/lib/perl5/5.26.1
+INSTALLPRIVLIB = /usr/share/perl/5.40
 DESTINSTALLPRIVLIB = $(DESTDIR)$(INSTALLPRIVLIB)
-INSTALLSITELIB = /usr/lib/perl5/site_perl/5.26.1
+INSTALLSITELIB = /usr/local/share/perl/5.40.1
 DESTINSTALLSITELIB = $(DESTDIR)$(INSTALLSITELIB)
-INSTALLVENDORLIB = /usr/lib/perl5/vendor_perl/5.26.1
+INSTALLVENDORLIB = /usr/share/perl5
 DESTINSTALLVENDORLIB = $(DESTDIR)$(INSTALLVENDORLIB)
-INSTALLARCHLIB = /usr/lib/perl5/5.26.1/x86_64-linux-thread-multi
+INSTALLARCHLIB = /usr/lib/x86_64-linux-gnu/perl/5.40
 DESTINSTALLARCHLIB = $(DESTDIR)$(INSTALLARCHLIB)
-INSTALLSITEARCH = /usr/lib/perl5/site_perl/5.26.1/x86_64-linux-thread-multi
+INSTALLSITEARCH = /usr/local/lib/x86_64-linux-gnu/perl/5.40.1
 DESTINSTALLSITEARCH = $(DESTDIR)$(INSTALLSITEARCH)
-INSTALLVENDORARCH = /usr/lib/perl5/vendor_perl/5.26.1/x86_64-linux-thread-multi
+INSTALLVENDORARCH = /usr/lib/x86_64-linux-gnu/perl5/5.40
 DESTINSTALLVENDORARCH = $(DESTDIR)$(INSTALLVENDORARCH)
 INSTALLBIN = /usr/bin
 DESTINSTALLBIN = $(DESTDIR)$(INSTALLBIN)
-INSTALLSITEBIN = /usr/bin
+INSTALLSITEBIN = /usr/local/bin
 DESTINSTALLSITEBIN = $(DESTDIR)$(INSTALLSITEBIN)
 INSTALLVENDORBIN = /usr/bin
 DESTINSTALLVENDORBIN = $(DESTDIR)$(INSTALLVENDORBIN)
 INSTALLSCRIPT = /usr/bin
 DESTINSTALLSCRIPT = $(DESTDIR)$(INSTALLSCRIPT)
-INSTALLSITESCRIPT = /usr/bin
+INSTALLSITESCRIPT = /usr/local/bin
 DESTINSTALLSITESCRIPT = $(DESTDIR)$(INSTALLSITESCRIPT)
 INSTALLVENDORSCRIPT = /usr/bin
 DESTINSTALLVENDORSCRIPT = $(DESTDIR)$(INSTALLVENDORSCRIPT)
 INSTALLMAN1DIR = /usr/share/man/man1
 DESTINSTALLMAN1DIR = $(DESTDIR)$(INSTALLMAN1DIR)
-INSTALLSITEMAN1DIR = /usr/share/man/man1
+INSTALLSITEMAN1DIR = /usr/local/man/man1
 DESTINSTALLSITEMAN1DIR = $(DESTDIR)$(INSTALLSITEMAN1DIR)
 INSTALLVENDORMAN1DIR = /usr/share/man/man1
 DESTINSTALLVENDORMAN1DIR = $(DESTDIR)$(INSTALLVENDORMAN1DIR)
 INSTALLMAN3DIR = /usr/share/man/man3
 DESTINSTALLMAN3DIR = $(DESTDIR)$(INSTALLMAN3DIR)
-INSTALLSITEMAN3DIR = /usr/share/man/man3
+INSTALLSITEMAN3DIR = /usr/local/man/man3
 DESTINSTALLSITEMAN3DIR = $(DESTDIR)$(INSTALLSITEMAN3DIR)
 INSTALLVENDORMAN3DIR = /usr/share/man/man3
 DESTINSTALLVENDORMAN3DIR = $(DESTDIR)$(INSTALLVENDORMAN3DIR)
-PERL_LIB = /usr/lib/perl5/5.26.1
-PERL_ARCHLIB = /usr/lib/perl5/5.26.1/x86_64-linux-thread-multi
-PERL_ARCHLIBDEP = /usr/lib/perl5/5.26.1/x86_64-linux-thread-multi
+PERL_LIB = /usr/share/perl/5.40
+PERL_ARCHLIB = /usr/lib/x86_64-linux-gnu/perl/5.40
+PERL_ARCHLIBDEP = /usr/lib/x86_64-linux-gnu/perl/5.40
 LIBPERL_A = libperl.a
 FIRST_MAKEFILE = Makefile
 MAKEFILE_OLD = Makefile.old
 MAKE_APERL_FILE = Makefile.aperl
 PERLMAINCC = $(CC)
-PERL_INC = /usr/lib/perl5/5.26.1/x86_64-linux-thread-multi/CORE
-PERL_INCDEP = /usr/lib/perl5/5.26.1/x86_64-linux-thread-multi/CORE
+PERL_INC = /usr/lib/x86_64-linux-gnu/perl/5.40/CORE
+PERL_INCDEP = /usr/lib/x86_64-linux-gnu/perl/5.40/CORE
 PERL = "/usr/bin/perl"
 FULLPERL = "/usr/bin/perl"
 ABSPERL = $(PERL)
@@ -144,9 +148,9 @@ PERM_DIR = 755
 PERM_RW = 644
 PERM_RWX = 755
 
-MAKEMAKER   = /usr/lib/perl5/5.26.1/ExtUtils/MakeMaker.pm
-MM_VERSION  = 7.24
-MM_REVISION = 72400
+MAKEMAKER   = /usr/share/perl/5.40/ExtUtils/MakeMaker.pm
+MM_VERSION  = 7.70
+MM_REVISION = 77000
 
 # FULLEXT = Pathname for extension directory (eg Foo/Bar/Oracle).
 # BASEEXT = Basename part of FULLEXT. May be just equal FULLEXT. (eg Oracle)
@@ -157,7 +161,7 @@ FULLEXT = Mail/Qmail/Filter
 BASEEXT = Filter
 PARENT_NAME = Mail::Qmail
 DLBASE = $(BASEEXT)
-VERSION_FROM = lib/Mail/Qmail/Filter.pm
+VERSION_FROM = 
 OBJECT = 
 LDFROM = $(OBJECT)
 LINKTYPE = dynamic
@@ -168,14 +172,17 @@ XS_FILES =
 C_FILES  = 
 O_FILES  = 
 H_FILES  = 
-MAN1PODS = 
+MAN1PODS = bin/qmail-deliverable
 MAN3PODS = lib/Mail/Qmail/Filter.pm \
+	lib/Mail/Qmail/Filter/Base/CalloutVerify.pm \
 	lib/Mail/Qmail/Filter/CheckDeliverability.pm \
 	lib/Mail/Qmail/Filter/ClamAV.pm \
 	lib/Mail/Qmail/Filter/DMARC.pm \
 	lib/Mail/Qmail/Filter/Dump.pm \
+	lib/Mail/Qmail/Filter/Graylist.pm \
 	lib/Mail/Qmail/Filter/LogEnvelope.pm \
 	lib/Mail/Qmail/Filter/Queue.pm \
+	lib/Mail/Qmail/Filter/RDNS.pm \
 	lib/Mail/Qmail/Filter/RequireFrom.pm \
 	lib/Mail/Qmail/Filter/RewriteFrom.pm \
 	lib/Mail/Qmail/Filter/RewriteSender.pm \
@@ -184,6 +191,8 @@ MAN3PODS = lib/Mail/Qmail/Filter.pm \
 	lib/Mail/Qmail/Filter/Util.pm \
 	lib/Mail/Qmail/Filter/ValidateFrom.pm \
 	lib/Mail/Qmail/Filter/ValidateSender.pm \
+	lib/Mail/Qmail/Filter/VerifyFrom.pm \
+	lib/Mail/Qmail/Filter/VerifySender.pm \
 	lib/MailX/Qmail/Queue/Message.pm
 
 # Where is the Config information that we are using/depend on
@@ -208,12 +217,15 @@ PERL_ARCHIVE_AFTER =
 
 
 TO_INST_PM = lib/Mail/Qmail/Filter.pm \
+	lib/Mail/Qmail/Filter/Base/CalloutVerify.pm \
 	lib/Mail/Qmail/Filter/CheckDeliverability.pm \
 	lib/Mail/Qmail/Filter/ClamAV.pm \
 	lib/Mail/Qmail/Filter/DMARC.pm \
 	lib/Mail/Qmail/Filter/Dump.pm \
+	lib/Mail/Qmail/Filter/Graylist.pm \
 	lib/Mail/Qmail/Filter/LogEnvelope.pm \
 	lib/Mail/Qmail/Filter/Queue.pm \
+	lib/Mail/Qmail/Filter/RDNS.pm \
 	lib/Mail/Qmail/Filter/RequireFrom.pm \
 	lib/Mail/Qmail/Filter/RewriteFrom.pm \
 	lib/Mail/Qmail/Filter/RewriteSender.pm \
@@ -222,11 +234,13 @@ TO_INST_PM = lib/Mail/Qmail/Filter.pm \
 	lib/Mail/Qmail/Filter/Util.pm \
 	lib/Mail/Qmail/Filter/ValidateFrom.pm \
 	lib/Mail/Qmail/Filter/ValidateSender.pm \
+	lib/Mail/Qmail/Filter/VerifyFrom.pm \
+	lib/Mail/Qmail/Filter/VerifySender.pm \
 	lib/MailX/Qmail/Queue/Message.pm
 
 
 # --- MakeMaker platform_constants section:
-MM_Unix_VERSION = 7.24
+MM_Unix_VERSION = 7.70
 PERL_MALLOC_DEF = -DPERL_EXTMALLOC_DEF -Dmalloc=Perl_malloc -Dfree=Perl_mfree -Drealloc=Perl_realloc -Dcalloc=Perl_calloc
 
 
@@ -292,7 +306,7 @@ RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
 DISTNAME = Mail-Qmail-Filter
-DISTVNAME = Mail-Qmail-Filter-1.31
+DISTVNAME = Mail-Qmail-Filter-2.01
 
 
 # --- MakeMaker macro section:
@@ -317,6 +331,7 @@ DISTVNAME = Mail-Qmail-Filter-1.31
 
 PASTHRU = LIBPERL_A="$(LIBPERL_A)"\
 	LINKTYPE="$(LINKTYPE)"\
+	LD="$(LD)"\
 	PREFIX="$(PREFIX)"\
 	PASTHRU_DEFINE='$(DEFINE) $(PASTHRU_DEFINE)'\
 	PASTHRU_INC='$(INC) $(PASTHRU_INC)'
@@ -343,8 +358,6 @@ all :: pure_all manifypods
 	$(NOECHO) $(NOOP)
 
 pure_all :: config pm_to_blib subdirs linkext
-	$(NOECHO) $(NOOP)
-
 	$(NOECHO) $(NOOP)
 
 subdirs :: $(MYEXTLIB)
@@ -448,13 +461,17 @@ POD2MAN = $(POD2MAN_EXE)
 
 
 manifypods : pure_all config  \
+	bin/qmail-deliverable \
 	lib/Mail/Qmail/Filter.pm \
+	lib/Mail/Qmail/Filter/Base/CalloutVerify.pm \
 	lib/Mail/Qmail/Filter/CheckDeliverability.pm \
 	lib/Mail/Qmail/Filter/ClamAV.pm \
 	lib/Mail/Qmail/Filter/DMARC.pm \
 	lib/Mail/Qmail/Filter/Dump.pm \
+	lib/Mail/Qmail/Filter/Graylist.pm \
 	lib/Mail/Qmail/Filter/LogEnvelope.pm \
 	lib/Mail/Qmail/Filter/Queue.pm \
+	lib/Mail/Qmail/Filter/RDNS.pm \
 	lib/Mail/Qmail/Filter/RequireFrom.pm \
 	lib/Mail/Qmail/Filter/RewriteFrom.pm \
 	lib/Mail/Qmail/Filter/RewriteSender.pm \
@@ -463,15 +480,22 @@ manifypods : pure_all config  \
 	lib/Mail/Qmail/Filter/Util.pm \
 	lib/Mail/Qmail/Filter/ValidateFrom.pm \
 	lib/Mail/Qmail/Filter/ValidateSender.pm \
+	lib/Mail/Qmail/Filter/VerifyFrom.pm \
+	lib/Mail/Qmail/Filter/VerifySender.pm \
 	lib/MailX/Qmail/Queue/Message.pm
-	$(NOECHO) $(POD2MAN) --section=3 --perm_rw=$(PERM_RW) -u \
+	$(NOECHO) $(POD2MAN) --section=$(MAN1EXT) --perm_rw=$(PERM_RW) -u \
+	  bin/qmail-deliverable $(INST_MAN1DIR)/qmail-deliverable.$(MAN1EXT) 
+	$(NOECHO) $(POD2MAN) --section=$(MAN3EXT) --perm_rw=$(PERM_RW) -u \
 	  lib/Mail/Qmail/Filter.pm $(INST_MAN3DIR)/Mail::Qmail::Filter.$(MAN3EXT) \
+	  lib/Mail/Qmail/Filter/Base/CalloutVerify.pm $(INST_MAN3DIR)/Mail::Qmail::Filter::Base::CalloutVerify.$(MAN3EXT) \
 	  lib/Mail/Qmail/Filter/CheckDeliverability.pm $(INST_MAN3DIR)/Mail::Qmail::Filter::CheckDeliverability.$(MAN3EXT) \
 	  lib/Mail/Qmail/Filter/ClamAV.pm $(INST_MAN3DIR)/Mail::Qmail::Filter::ClamAV.$(MAN3EXT) \
 	  lib/Mail/Qmail/Filter/DMARC.pm $(INST_MAN3DIR)/Mail::Qmail::Filter::DMARC.$(MAN3EXT) \
 	  lib/Mail/Qmail/Filter/Dump.pm $(INST_MAN3DIR)/Mail::Qmail::Filter::Dump.$(MAN3EXT) \
+	  lib/Mail/Qmail/Filter/Graylist.pm $(INST_MAN3DIR)/Mail::Qmail::Filter::Graylist.$(MAN3EXT) \
 	  lib/Mail/Qmail/Filter/LogEnvelope.pm $(INST_MAN3DIR)/Mail::Qmail::Filter::LogEnvelope.$(MAN3EXT) \
 	  lib/Mail/Qmail/Filter/Queue.pm $(INST_MAN3DIR)/Mail::Qmail::Filter::Queue.$(MAN3EXT) \
+	  lib/Mail/Qmail/Filter/RDNS.pm $(INST_MAN3DIR)/Mail::Qmail::Filter::RDNS.$(MAN3EXT) \
 	  lib/Mail/Qmail/Filter/RequireFrom.pm $(INST_MAN3DIR)/Mail::Qmail::Filter::RequireFrom.$(MAN3EXT) \
 	  lib/Mail/Qmail/Filter/RewriteFrom.pm $(INST_MAN3DIR)/Mail::Qmail::Filter::RewriteFrom.$(MAN3EXT) \
 	  lib/Mail/Qmail/Filter/RewriteSender.pm $(INST_MAN3DIR)/Mail::Qmail::Filter::RewriteSender.$(MAN3EXT) \
@@ -480,6 +504,8 @@ manifypods : pure_all config  \
 	  lib/Mail/Qmail/Filter/Util.pm $(INST_MAN3DIR)/Mail::Qmail::Filter::Util.$(MAN3EXT) \
 	  lib/Mail/Qmail/Filter/ValidateFrom.pm $(INST_MAN3DIR)/Mail::Qmail::Filter::ValidateFrom.$(MAN3EXT) \
 	  lib/Mail/Qmail/Filter/ValidateSender.pm $(INST_MAN3DIR)/Mail::Qmail::Filter::ValidateSender.$(MAN3EXT) \
+	  lib/Mail/Qmail/Filter/VerifyFrom.pm $(INST_MAN3DIR)/Mail::Qmail::Filter::VerifyFrom.$(MAN3EXT) \
+	  lib/Mail/Qmail/Filter/VerifySender.pm $(INST_MAN3DIR)/Mail::Qmail::Filter::VerifySender.$(MAN3EXT) \
 	  lib/MailX/Qmail/Queue/Message.pm $(INST_MAN3DIR)/MailX::Qmail::Queue::Message.$(MAN3EXT) 
 
 
@@ -489,6 +515,22 @@ manifypods : pure_all config  \
 
 
 # --- MakeMaker installbin section:
+
+EXE_FILES = bin/qmail-deliverable
+
+pure_all :: $(INST_SCRIPT)/qmail-deliverable
+	$(NOECHO) $(NOOP)
+
+realclean ::
+	$(RM_F) \
+	  $(INST_SCRIPT)/qmail-deliverable 
+
+$(INST_SCRIPT)/qmail-deliverable : bin/qmail-deliverable $(FIRST_MAKEFILE) $(INST_SCRIPT)$(DFSEP).exists $(INST_BIN)$(DFSEP).exists
+	$(NOECHO) $(RM_F) $(INST_SCRIPT)/qmail-deliverable
+	$(CP) bin/qmail-deliverable $(INST_SCRIPT)/qmail-deliverable
+	$(FIXIN) $(INST_SCRIPT)/qmail-deliverable
+	-$(NOECHO) $(CHMOD) $(PERM_RWX) $(INST_SCRIPT)/qmail-deliverable
+
 
 
 # --- MakeMaker subdirs section:
@@ -550,13 +592,13 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '---' > META_new.yml
 	$(NOECHO) $(ECHO) 'abstract: unknown' >> META_new.yml
 	$(NOECHO) $(ECHO) 'author:' >> META_new.yml
-	$(NOECHO) $(ECHO) '  - '\''Martin Sluka <fany@cpan.org>'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) '  - '\''Martin Sluka <perl@sluka.de>'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'build_requires:' >> META_new.yml
 	$(NOECHO) $(ECHO) '  Test::More: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'configure_requires:' >> META_new.yml
 	$(NOECHO) $(ECHO) '  ExtUtils::MakeMaker: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'dynamic_config: 1' >> META_new.yml
-	$(NOECHO) $(ECHO) 'generated_by: '\''ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) 'generated_by: '\''ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'license: artistic_2' >> META_new.yml
 	$(NOECHO) $(ECHO) 'meta-spec:' >> META_new.yml
 	$(NOECHO) $(ECHO) '  url: http://module-build.sourceforge.net/META-spec-v1.4.html' >> META_new.yml
@@ -578,30 +620,34 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '  Mail::SPF: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  Mail::SpamAssassin: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  Mo: '\''0'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) '  Net::DNS::Resolver: '\''0'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) '  Net::Domain: '\''0'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) '  Net::IP::Match::Trie: '\''1'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) '  Net::SMTP: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  Path::Tiny: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  Qmail::Deliverable: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  namespace::clean: '\''0'\''' >> META_new.yml
-	$(NOECHO) $(ECHO) '  perl: '\''5.014'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) '  perl: '\''5.036'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'resources:' >> META_new.yml
 	$(NOECHO) $(ECHO) '  homepage: https://github.com/fany/Mail-Qmail-Filter' >> META_new.yml
 	$(NOECHO) $(ECHO) '  repository: https://github.com/fany/Mail-Qmail-Filter.git' >> META_new.yml
-	$(NOECHO) $(ECHO) 'version: '\''1.31'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) 'version: '\''2.01'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'x_serialization_backend: '\''CPAN::Meta::YAML version 0.018'\''' >> META_new.yml
 	-$(NOECHO) $(MV) META_new.yml $(DISTVNAME)/META.yml
 	$(NOECHO) $(ECHO) Generating META.json
 	$(NOECHO) $(ECHO) '{' > META_new.json
 	$(NOECHO) $(ECHO) '   "abstract" : "unknown",' >> META_new.json
 	$(NOECHO) $(ECHO) '   "author" : [' >> META_new.json
-	$(NOECHO) $(ECHO) '      "Martin Sluka <fany@cpan.org>"' >> META_new.json
+	$(NOECHO) $(ECHO) '      "Martin Sluka <perl@sluka.de>"' >> META_new.json
 	$(NOECHO) $(ECHO) '   ],' >> META_new.json
 	$(NOECHO) $(ECHO) '   "dynamic_config" : 1,' >> META_new.json
-	$(NOECHO) $(ECHO) '   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",' >> META_new.json
+	$(NOECHO) $(ECHO) '   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",' >> META_new.json
 	$(NOECHO) $(ECHO) '   "license" : [' >> META_new.json
 	$(NOECHO) $(ECHO) '      "artistic_2"' >> META_new.json
 	$(NOECHO) $(ECHO) '   ],' >> META_new.json
 	$(NOECHO) $(ECHO) '   "meta-spec" : {' >> META_new.json
 	$(NOECHO) $(ECHO) '      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",' >> META_new.json
-	$(NOECHO) $(ECHO) '      "version" : "2"' >> META_new.json
+	$(NOECHO) $(ECHO) '      "version" : 2' >> META_new.json
 	$(NOECHO) $(ECHO) '   },' >> META_new.json
 	$(NOECHO) $(ECHO) '   "name" : "Mail-Qmail-Filter",' >> META_new.json
 	$(NOECHO) $(ECHO) '   "no_index" : {' >> META_new.json
@@ -634,10 +680,14 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '            "Mail::SPF" : "0",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "Mail::SpamAssassin" : "0",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "Mo" : "0",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Net::DNS::Resolver" : "0",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Net::Domain" : "0",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Net::IP::Match::Trie" : "1",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Net::SMTP" : "0",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "Path::Tiny" : "0",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "Qmail::Deliverable" : "0",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "namespace::clean" : "0",' >> META_new.json
-	$(NOECHO) $(ECHO) '            "perl" : "5.014"' >> META_new.json
+	$(NOECHO) $(ECHO) '            "perl" : "5.036"' >> META_new.json
 	$(NOECHO) $(ECHO) '         }' >> META_new.json
 	$(NOECHO) $(ECHO) '      }' >> META_new.json
 	$(NOECHO) $(ECHO) '   },' >> META_new.json
@@ -648,8 +698,8 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '         "url" : "https://github.com/fany/Mail-Qmail-Filter.git"' >> META_new.json
 	$(NOECHO) $(ECHO) '      }' >> META_new.json
 	$(NOECHO) $(ECHO) '   },' >> META_new.json
-	$(NOECHO) $(ECHO) '   "version" : "1.31",' >> META_new.json
-	$(NOECHO) $(ECHO) '   "x_serialization_backend" : "JSON::PP version 2.27400_02"' >> META_new.json
+	$(NOECHO) $(ECHO) '   "version" : "2.01",' >> META_new.json
+	$(NOECHO) $(ECHO) '   "x_serialization_backend" : "JSON::PP version 4.16"' >> META_new.json
 	$(NOECHO) $(ECHO) '}' >> META_new.json
 	-$(NOECHO) $(MV) META_new.json $(DISTVNAME)/META.json
 
@@ -792,9 +842,7 @@ doc__install : doc_site_install
 	$(NOECHO) $(ECHO) INSTALLDIRS not defined, defaulting to INSTALLDIRS=site
 
 pure_perl_install :: all
-	$(NOECHO) $(MOD_INSTALL) \
-		read "$(PERL_ARCHLIB)/auto/$(FULLEXT)/.packlist" \
-		write "$(DESTINSTALLARCHLIB)/auto/$(FULLEXT)/.packlist" \
+	$(NOECHO) umask 022; $(MOD_INSTALL) \
 		"$(INST_LIB)" "$(DESTINSTALLPRIVLIB)" \
 		"$(INST_ARCHLIB)" "$(DESTINSTALLARCHLIB)" \
 		"$(INST_BIN)" "$(DESTINSTALLBIN)" \
@@ -806,7 +854,7 @@ pure_perl_install :: all
 
 
 pure_site_install :: all
-	$(NOECHO) $(MOD_INSTALL) \
+	$(NOECHO) umask 02; $(MOD_INSTALL) \
 		read "$(SITEARCHEXP)/auto/$(FULLEXT)/.packlist" \
 		write "$(DESTINSTALLSITEARCH)/auto/$(FULLEXT)/.packlist" \
 		"$(INST_LIB)" "$(DESTINSTALLSITELIB)" \
@@ -819,9 +867,7 @@ pure_site_install :: all
 		"$(PERL_ARCHLIB)/auto/$(FULLEXT)"
 
 pure_vendor_install :: all
-	$(NOECHO) $(MOD_INSTALL) \
-		read "$(VENDORARCHEXP)/auto/$(FULLEXT)/.packlist" \
-		write "$(DESTINSTALLVENDORARCH)/auto/$(FULLEXT)/.packlist" \
+	$(NOECHO) umask 022; $(MOD_INSTALL) \
 		"$(INST_LIB)" "$(DESTINSTALLVENDORLIB)" \
 		"$(INST_ARCHLIB)" "$(DESTINSTALLVENDORARCH)" \
 		"$(INST_BIN)" "$(DESTINSTALLVENDORBIN)" \
@@ -831,50 +877,30 @@ pure_vendor_install :: all
 
 
 doc_perl_install :: all
-	$(NOECHO) $(ECHO) Appending installation info to "$(DESTINSTALLARCHLIB)/perllocal.pod"
-	-$(NOECHO) $(MKPATH) "$(DESTINSTALLARCHLIB)"
-	-$(NOECHO) $(DOC_INSTALL) \
-		"Module" "$(NAME)" \
-		"installed into" "$(INSTALLPRIVLIB)" \
-		LINKTYPE "$(LINKTYPE)" \
-		VERSION "$(VERSION)" \
-		EXE_FILES "$(EXE_FILES)" \
-		>> "$(DESTINSTALLARCHLIB)/perllocal.pod"
 
 doc_site_install :: all
-	$(NOECHO) $(ECHO) Appending installation info to "$(DESTINSTALLARCHLIB)/perllocal.pod"
-	-$(NOECHO) $(MKPATH) "$(DESTINSTALLARCHLIB)"
-	-$(NOECHO) $(DOC_INSTALL) \
+	$(NOECHO) $(ECHO) Appending installation info to "$(DESTINSTALLSITEARCH)/perllocal.pod"
+	-$(NOECHO) umask 02; $(MKPATH) "$(DESTINSTALLSITEARCH)"
+	-$(NOECHO) umask 02; $(DOC_INSTALL) \
 		"Module" "$(NAME)" \
 		"installed into" "$(INSTALLSITELIB)" \
 		LINKTYPE "$(LINKTYPE)" \
 		VERSION "$(VERSION)" \
 		EXE_FILES "$(EXE_FILES)" \
-		>> "$(DESTINSTALLARCHLIB)/perllocal.pod"
+		>> "$(DESTINSTALLSITEARCH)/perllocal.pod"
 
 doc_vendor_install :: all
-	$(NOECHO) $(ECHO) Appending installation info to "$(DESTINSTALLARCHLIB)/perllocal.pod"
-	-$(NOECHO) $(MKPATH) "$(DESTINSTALLARCHLIB)"
-	-$(NOECHO) $(DOC_INSTALL) \
-		"Module" "$(NAME)" \
-		"installed into" "$(INSTALLVENDORLIB)" \
-		LINKTYPE "$(LINKTYPE)" \
-		VERSION "$(VERSION)" \
-		EXE_FILES "$(EXE_FILES)" \
-		>> "$(DESTINSTALLARCHLIB)/perllocal.pod"
 
 
 uninstall :: uninstall_from_$(INSTALLDIRS)dirs
 	$(NOECHO) $(NOOP)
 
 uninstall_from_perldirs ::
-	$(NOECHO) $(UNINSTALL) "$(PERL_ARCHLIB)/auto/$(FULLEXT)/.packlist"
 
 uninstall_from_sitedirs ::
 	$(NOECHO) $(UNINSTALL) "$(SITEARCHEXP)/auto/$(FULLEXT)/.packlist"
 
 uninstall_from_vendordirs ::
-	$(NOECHO) $(UNINSTALL) "$(VENDORARCHEXP)/auto/$(FULLEXT)/.packlist"
 
 
 # --- MakeMaker force section:
@@ -907,7 +933,7 @@ $(FIRST_MAKEFILE) : Makefile.PL $(CONFIGDEP)
 # --- MakeMaker makeaperl section ---
 MAP_TARGET    = perl
 FULLPERL      = "/usr/bin/perl"
-MAP_PERLINC   = "-Iblib/arch" "-Iblib/lib" "-I/usr/lib/perl5/5.26.1/x86_64-linux-thread-multi" "-I/usr/lib/perl5/5.26.1"
+MAP_PERLINC   = "-Iblib/arch" "-Iblib/lib" "-I/usr/lib/x86_64-linux-gnu/perl/5.40" "-I/usr/share/perl/5.40"
 
 $(MAP_TARGET) :: $(MAKE_APERL_FILE)
 	$(MAKE) $(USEMAKEFILE) $(MAKE_APERL_FILE) $@
@@ -958,11 +984,11 @@ testdb_static :: static pure_all
 # --- MakeMaker ppd section:
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd :
-	$(NOECHO) $(ECHO) '<SOFTPKG NAME="Mail-Qmail-Filter" VERSION="1.31">' > Mail-Qmail-Filter.ppd
+	$(NOECHO) $(ECHO) '<SOFTPKG NAME="Mail-Qmail-Filter" VERSION="2.01">' > Mail-Qmail-Filter.ppd
 	$(NOECHO) $(ECHO) '    <ABSTRACT></ABSTRACT>' >> Mail-Qmail-Filter.ppd
-	$(NOECHO) $(ECHO) '    <AUTHOR>Martin Sluka &lt;fany@cpan.org&gt;</AUTHOR>' >> Mail-Qmail-Filter.ppd
+	$(NOECHO) $(ECHO) '    <AUTHOR>Martin Sluka &lt;perl@sluka.de&gt;</AUTHOR>' >> Mail-Qmail-Filter.ppd
 	$(NOECHO) $(ECHO) '    <IMPLEMENTATION>' >> Mail-Qmail-Filter.ppd
-	$(NOECHO) $(ECHO) '        <PERLCORE VERSION="5,014,0,0" />' >> Mail-Qmail-Filter.ppd
+	$(NOECHO) $(ECHO) '        <PERLCORE VERSION="5,036,0,0" />' >> Mail-Qmail-Filter.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Capture::Tiny" />' >> Mail-Qmail-Filter.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Email::Valid" />' >> Mail-Qmail-Filter.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="File::Scan::ClamAV" />' >> Mail-Qmail-Filter.ppd
@@ -974,10 +1000,14 @@ ppd :
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Mail::SPF" />' >> Mail-Qmail-Filter.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Mail::SpamAssassin" />' >> Mail-Qmail-Filter.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Mo::" />' >> Mail-Qmail-Filter.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Net::DNS::Resolver" />' >> Mail-Qmail-Filter.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Net::Domain" />' >> Mail-Qmail-Filter.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Net::IP::Match::Trie" VERSION="1" />' >> Mail-Qmail-Filter.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Net::SMTP" />' >> Mail-Qmail-Filter.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Path::Tiny" />' >> Mail-Qmail-Filter.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Qmail::Deliverable" />' >> Mail-Qmail-Filter.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="namespace::clean" />' >> Mail-Qmail-Filter.ppd
-	$(NOECHO) $(ECHO) '        <ARCHITECTURE NAME="x86_64-linux-thread-multi-5.26" />' >> Mail-Qmail-Filter.ppd
+	$(NOECHO) $(ECHO) '        <ARCHITECTURE NAME="x86_64-linux-gnu-thread-multi-5.40" />' >> Mail-Qmail-Filter.ppd
 	$(NOECHO) $(ECHO) '        <CODEBASE HREF="" />' >> Mail-Qmail-Filter.ppd
 	$(NOECHO) $(ECHO) '    </IMPLEMENTATION>' >> Mail-Qmail-Filter.ppd
 	$(NOECHO) $(ECHO) '</SOFTPKG>' >> Mail-Qmail-Filter.ppd
@@ -988,12 +1018,15 @@ ppd :
 pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
 	$(NOECHO) $(ABSPERLRUN) -MExtUtils::Install -e 'pm_to_blib({@ARGV}, '\''$(INST_LIB)/auto'\'', q[$(PM_FILTER)], '\''$(PERM_DIR)'\'')' -- \
 	  'lib/Mail/Qmail/Filter.pm' 'blib/lib/Mail/Qmail/Filter.pm' \
+	  'lib/Mail/Qmail/Filter/Base/CalloutVerify.pm' 'blib/lib/Mail/Qmail/Filter/Base/CalloutVerify.pm' \
 	  'lib/Mail/Qmail/Filter/CheckDeliverability.pm' 'blib/lib/Mail/Qmail/Filter/CheckDeliverability.pm' \
 	  'lib/Mail/Qmail/Filter/ClamAV.pm' 'blib/lib/Mail/Qmail/Filter/ClamAV.pm' \
 	  'lib/Mail/Qmail/Filter/DMARC.pm' 'blib/lib/Mail/Qmail/Filter/DMARC.pm' \
 	  'lib/Mail/Qmail/Filter/Dump.pm' 'blib/lib/Mail/Qmail/Filter/Dump.pm' \
+	  'lib/Mail/Qmail/Filter/Graylist.pm' 'blib/lib/Mail/Qmail/Filter/Graylist.pm' \
 	  'lib/Mail/Qmail/Filter/LogEnvelope.pm' 'blib/lib/Mail/Qmail/Filter/LogEnvelope.pm' \
 	  'lib/Mail/Qmail/Filter/Queue.pm' 'blib/lib/Mail/Qmail/Filter/Queue.pm' \
+	  'lib/Mail/Qmail/Filter/RDNS.pm' 'blib/lib/Mail/Qmail/Filter/RDNS.pm' \
 	  'lib/Mail/Qmail/Filter/RequireFrom.pm' 'blib/lib/Mail/Qmail/Filter/RequireFrom.pm' \
 	  'lib/Mail/Qmail/Filter/RewriteFrom.pm' 'blib/lib/Mail/Qmail/Filter/RewriteFrom.pm' \
 	  'lib/Mail/Qmail/Filter/RewriteSender.pm' 'blib/lib/Mail/Qmail/Filter/RewriteSender.pm' \
@@ -1002,6 +1035,8 @@ pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
 	  'lib/Mail/Qmail/Filter/Util.pm' 'blib/lib/Mail/Qmail/Filter/Util.pm' \
 	  'lib/Mail/Qmail/Filter/ValidateFrom.pm' 'blib/lib/Mail/Qmail/Filter/ValidateFrom.pm' \
 	  'lib/Mail/Qmail/Filter/ValidateSender.pm' 'blib/lib/Mail/Qmail/Filter/ValidateSender.pm' \
+	  'lib/Mail/Qmail/Filter/VerifyFrom.pm' 'blib/lib/Mail/Qmail/Filter/VerifyFrom.pm' \
+	  'lib/Mail/Qmail/Filter/VerifySender.pm' 'blib/lib/Mail/Qmail/Filter/VerifySender.pm' \
 	  'lib/MailX/Qmail/Queue/Message.pm' 'blib/lib/MailX/Qmail/Queue/Message.pm' 
 	$(NOECHO) $(TOUCH) pm_to_blib
 

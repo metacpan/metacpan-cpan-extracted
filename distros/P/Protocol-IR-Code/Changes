@@ -1,6 +1,26 @@
 Revision history for Protocol::IR::Code
 
-1.2 2026-09-25T20:00:43Z
+1.3 2026-11-19T01:29:30Z
+
+    - Repeat count for JSON dump imports now comes from the device's
+      timing.pressMinRepeats (the Harmony hub's source, defaulting to 3)
+      instead of the keycode's trailing ":N", which is a constant on 99.95%
+      of keycodes and is not a repeat count. A device document's timing rides
+      send_count on every command in its code set.
+    - New protocol handlers: Sony SIRC (SONY12/15/20), Philips RC5, Philips RC6
+      mode 0, Denon (plus DENON-K and DENON{1}), Aiwa, G.I.Cable, Dish_Network,
+      Pioneer, Mitsubishi, Sharp.
+    - Sorted protocol imports; registration order documented (decode tries
+      protocols in registration order, so more specific/longer frames must
+      come first).
+
+
+    - Relicense the distribution as the GNU General Public License, version 2
+      or later, replacing the LGPL 2.1 it was published under through 1.2. The
+      SAMSUNG, SAMSUNG20 and SAMSUNG36 protocols are ported from
+      IRremoteESP8266's GPLv2 code, so GPLv2 or later is the grant those
+      derived files can carry; versions already on CPAN stay under the LGPL
+      2.1 they shipped with.
 
 1.2 2026-09-25T19:59:15Z
 

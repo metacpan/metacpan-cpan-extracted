@@ -1,4 +1,4 @@
-package Affix::Build v1.4.0 {
+package Affix::Build v1.4.1 {
     use v5.40;
     use experimental qw[class try];
     use Config;
@@ -55,9 +55,10 @@ package Affix::Build v1.4.0 {
                 ( $self->_can_run(qw[g++ clang++ c++ icpx]) || $self->_can_run(qw[cc gcc clang icx cl]) || 'c++' );
 
             # Parse global flags...
-            @cflags   = map { chomp; $_ } grep { defined && length } Text::ParseWords::parse_line( q/ /, 1, $flags->{cflags}   // '' );
-            @cxxflags = map { chomp; $_ } grep { defined && length } Text::ParseWords::parse_line( q/ /, 1, $flags->{cxxflags} // '' );
-            @ldflags  = map { chomp; $_ } grep { defined && length } Text::ParseWords::parse_line( q/ /, 1, $flags->{ldflags}  // '' );
+            my $keep = $^O eq 'MSWin32' ? 1 : 0;
+            @cflags   = map { chomp; $_ } grep { defined && length } Text::ParseWords::parse_line( q/ /, $keep, $flags->{cflags}   // '' );
+            @cxxflags = map { chomp; $_ } grep { defined && length } Text::ParseWords::parse_line( q/ /, $keep, $flags->{cxxflags} // '' );
+            @ldflags  = map { chomp; $_ } grep { defined && length } Text::ParseWords::parse_line( q/ /, $keep, $flags->{ldflags}  // '' );
         }
 
         method add ( $input, %args ) {

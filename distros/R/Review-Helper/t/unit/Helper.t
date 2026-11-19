@@ -4,6 +4,6 @@ use Test2::V0;
 
 use Review::Helper;
 
-is($Review::Helper::VERSION, '0.001', 'version');
+like($Review::Helper::VERSION, qr{\A[0-9]+\.[0-9]{3}\z}, 'has a version');
 
 done_testing;

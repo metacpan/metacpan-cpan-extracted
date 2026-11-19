@@ -18,7 +18,7 @@ use Ekorn::Pipeline::Stage    qw();
 
 use namespace::clean -except => 'import';
 
-our $VERSION = 'v0.3.6';
+our $VERSION = 'v0.3.7';
 
 our @EXPORT_OK = qw(is_sink is_stage);
 

@@ -38,7 +38,7 @@ requires:
 resources:
   bugtracker: https://github.com/shawnlaffan/perl-alien-sqlite/issues/
   repository: https://github.com/shawnlaffan/perl-alien-sqlite
-version: '1.08'
+version: '1.09'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 2.84'
   requires:

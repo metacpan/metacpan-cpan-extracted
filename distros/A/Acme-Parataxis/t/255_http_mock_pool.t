@@ -131,14 +131,12 @@ Acme::Parataxis::run(
         $_->await for @workers;
 
         # Verify results
-        todo "Shared CVs with yielding cause pad collisions" => sub {
-            is scalar @results, 10, 'Received 10 results';
-            for my $i ( 0 .. $#results ) {
-                my $res = $results[$i];
-                is $res->{status},  200,  'Request ' . ( $i + 1 ) . ' status is 200';
-                is $res->{content}, 'HI', 'Request ' . ( $i + 1 ) . ' content is correct';
-            }
-        };
+        is scalar @results, 10, 'Received 10 results';
+        for my $i ( 0 .. $#results ) {
+            my $res = $results[$i];
+            is $res->{status},  200,  'Request ' . ( $i + 1 ) . ' status is 200';
+            is $res->{content}, 'HI', 'Request ' . ( $i + 1 ) . ' content is correct';
+        }
         $listener->close();
         Acme::Parataxis::stop();
     }

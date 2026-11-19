@@ -1,7 +1,7 @@
 package Review::Helper::CLI::Close;
 use v5.36;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Review::Helper::DB;
 use Review::Helper::Registry;

@@ -2,7 +2,6 @@ id	class	parts	verdict	text
 BC:ch15/using_phases	neither	out	-	# cookbook filename: using_phases # Main loop until [ "$phase" = "Finished." ]; do case $phase in phase0 ) ThisPhase=0 N
 BC:ch17/ff-sessions	neither	out	X	#!/usr/bin/env bash # cookbook filename: ff-sessions # Save/Restore FF sessions # Run from cron like: # 45 03,15 * * * o
 NB:11817	msg-own		X	bind -l | grep /
-NB:11864	msg-own		X	bind -P | grep --fixed-strings ' can be found on ' | perl -pe 's/((?<!\\)(?:\\\\)*)\\C/\1Ctrl/g;s/((?<!\\)(?:\\\\)*)\\e/
 NB:11872	neither	status+out	X	bind -P
 NB:11884	msg-own		X	bind -P | grep '\\e\\C-k'
 NB:119	neither	status	X	history -r .cwdhist
@@ -38,6 +37,7 @@ NB:4624	neither	rec	-	ps | grep `echo $$` | awk '{ print $4 }'
 NB:4727	neither	status+out	-	cd -
 NB:4774	neither	rec	-	ps -o pid= --ppid $PPID | xargs kill -9
 NB:5137	neither	out	-	env | sed 's/;/\\;/g'
+NB:5152	chance	out	-	find . -print | xargs ls -gilds
 NB:5293	neither	out	-	ls -l /proc/self/fd/
 NB:5298	neither	status	X	bind -f ~/.inputrc
 NB:552	neither	rec	-	pstree --show-parents -p $$ | head -n 1 | sed 's/\(.*\)+.*/\1/' | wc -l
@@ -45,7 +45,6 @@ NB:557	msg-own		-	kill -0 1
 NB:562	msg-own		-	[ $(find your/dir -prune -empty) = your/dir ]
 NB:571	neither	rec	-	pstree --show-parents -p $$ | head -n 1 | sed 's/\(.*\)+.*/\1/' | grep screen | wc -l
 NB:5763	msg-own		-	cat somedata.txt | "$outfile"
-NB:5776	OURS	files	-	{ echo foo; cat bar; } | tee bar > /dev/null
 NB:5939	neither	out	-	seq 2000 65000 | sort -R | head -n 1
 NB:6081	neither	rec	-	ps -ef | grep $$ | grep -v grep
 NB:6082	neither	rec	-	ps -p $$
@@ -64,9 +63,10 @@ NB:6758	neither	rec	-	$(dirname $0)
 NB:6759	neither	rec	-	`dirname $0`
 NB:6765	neither	rec	-	echo "dirname: `dirname "$0"`"
 NB:6766	neither	rec	-	echo "dirname: `dirname $0`"
-NB:6799	OURS	out	-	ls -l -- "$dir/$file"
+NB:6795	chance	out+files	-	ls -a | tee output.file
+NB:6799	neither	out	-	ls -l -- "$dir/$file"
 NB:6800	neither	out+rec	-	ls -l ${0}
-NB:6818	neither	files	-	ls -lR / | tee -a output.file
+NB:6818	neither	out+files	-	ls -lR / | tee -a output.file
 NB:6819	neither	out+files	-	ls -lR / | tee output.file
 NB:6820	neither	out+rec	-	echo "The script you are running has basename `basename $0`, dirname `dirname $0`"
 NB:6821	neither	out+rec	-	ls -l /proc/$$/exe | sed 's%.*/%%'
@@ -75,6 +75,7 @@ NB:6843	neither	rec	-	pstree -sp $$
 NB:6844	neither	rec	-	pstree --show-parents -p $$ | head -n 1 | sed 's/\(.*\)+.*/\1/' | less
 NB:6847	neither	rec	-	pstree -p $$
 NB:6848	neither	rec	-	pstree -s $$
+NB:685	chance	out	-	yes 123456789 | grep --line-buffered . | { head -n 1; head -n 1; }
 NB:6855	neither	rec	-	$(readlink -f $(dirname "$0"))
 NB:6912	neither	rec	-	MY_DIR=$(dirname $(readlink -f $0))
 NB:6920	neither	status+out	X	bind -q complete
@@ -96,6 +97,7 @@ NB:8207	neither	status+rec+files	X	(time ls) > ls_results 2> time_results
 NB:8208	neither	rec+files	X	{ time ls; } 2>&1 | cat > time.txt
 NB:8214	neither	status+rec+files	X	(time ls) > outfile 2>&1
 NB:8235	neither	out	-	set `cal $month $year`
+NB:86	neither	rec	-	v=5 env|less
 NB:9033	msg-own		-	kill -9 16085
 NB:9034	msg-own		-	kill -9 18581 18582 18583
 NB:9162	neither	rec	-	me=`basename -- "$0"`
@@ -183,18 +185,14 @@ SC:Checks/ShellSupport.hs:prop_checkBashisms6c	msg-own		X	[ foo =~ bar ]
 SC:Checks/ShellSupport.hs:prop_checkBashisms6d	msg-own		X	test foo =~ bar
 TL:common/[.md:18	msg-own		-	[ "$variable" -eq|ne|gt|lt|ge|le integer ]
 TL:common/arthas.md:17	msg-own		X	exit|quit|logout|q
-TL:common/az-disk.md:21	msg-own		-	az disk grant-access -g resource_group -n disk_name --access Read|Write --duration-in-seconds seconds
 TL:common/bind.md:12	neither	status	X	bind -q command
 TL:common/bind.md:24	neither	status+out	X	help bind
 TL:common/bind.md:8	msg-own		X	bind -p|-P
-TL:common/boxes.md:32	msg-own		-	echo "string" | boxes -a jl|c|rvt
-TL:common/boxxy.md:20	msg-own		-	boxxy -r path/to/file_or_directory:path/to/redirection:file|directory program
 TL:common/case.md:24	neither	status+out	X	help case
 TL:common/cd.md:24	neither	status+out	-	cd -
 TL:common/compopt.md:10	neither	status	X	compopt command
 TL:common/compopt.md:14	msg-own		X	compopt -o|+o option1 -o|+o option2 command
 TL:common/compopt.md:18	neither	status	X	compopt
-TL:common/conda-export.md:16	msg-own		-	conda export --format environment-json|environment-yaml|explicit|json|reqs|requirements|txt|yaml|yml
 TL:common/cppcheck.md:9	neither	files	-	cppcheck . 2>cppcheck.log
 TL:common/dmd.md:20	msg-own		X	dmd -check=h|help|?
 TL:common/enable.md:24	neither	status+out	X	help enable
@@ -203,6 +201,7 @@ TL:common/exec.md:8	OURS	status	-	exec command -with -flags
 TL:common/fc.md:33	neither	status	X	fc -s string1=string2
 TL:common/fc.md:37	neither	status+out	X	fc --help
 TL:common/function.md:21	neither	status+out	X	help function
+TL:common/gst-play-1.0.md:8	msg-own		-	gst-play-1.0 file1|directory1|uri1 file2|directory2|uri2
 TL:common/help.md:12	neither	status+out	X	help while
 TL:common/help.md:16	neither	status+out	X	help for
 TL:common/help.md:20	neither	status+out	X	help [[
@@ -213,23 +212,21 @@ TL:common/history.md:16	msg-own		X	history -d|f|i|E
 TL:common/history.md:24	neither	status+files	X	history -w
 TL:common/history.md:28	neither	status	X	history -d offset
 TL:common/kill.md:13	neither	out	-	kill -l
+TL:common/kubectl-run.md:17	msg-own		-	kubectl run nginx-dev --image nginx --dry-run=none|server|client
 TL:common/logout.md:12	neither	status	X	logout exit_code
 TL:common/logout.md:8	neither	status	X	logout
-TL:common/phive.md:28	msg-own		-	phive remove alias|url
+TL:common/mh_metric.md:24	msg-own		-	mh_metric --html|json path/to/output_file
+TL:common/piactl.md:20	msg-own		-	piactl background enable|disable
 TL:common/printenv.md:8	neither	out	-	printenv
 TL:common/printf.md:29	neither	status	X	printf -v myvar "This is %s = %d\n" "a year" 2016
 TL:common/readarray.md:32	neither	status+out	X	help mapfile
 TL:common/shopt.md:25	neither	status+out	X	help shopt
 TL:common/test.md:34	neither	status+out	X	help test
-TL:common/texconfig.md:13	msg-own		-	texconfig paper a4|letter|...
 TL:common/times.md:10	neither	out	-	times
+TL:common/tsc.md:16	msg-own		-	tsc -t ES5|ES2015|ES2016|ES2017|ES2018|ESNEXT|... path/to/file.ts
 TL:common/ulimit.md:29	neither	status+out	X	help ulimit
 TL:common/volta.md:28	neither	status+out	X	volta help fetch|install|uninstall|pin|list|completions|which|setup|run|help
-TL:common/zoxide.md:29	msg-own		-	zoxide init bash|elvish|fish|nushell|posix|powershell|tcsh|xonsh|zsh
+TL:common/zeroclaw-channel.md:20	msg-own		-	zeroclaw channel add telegram|discord|whatsapp|slack|webhook|... 'json_config'
 TL:linux/dialog.md:13	neither	files	-	dialog --inputbox "Enter text:" 8 40 2>output.txt
-TL:linux/hwinfo.md:13	msg-own		-	hwinfo --cpu|memory|disk|gfxcard|network|usb|pci|keyboard|mouse|monitor|sound|fingerprint|...
-TL:linux/rmpc.md:29	msg-own		-	rmpc next|prev|stop|consume|togglerepeat|pause|unpause
-TL:linux/screenkey.md:20	msg-own		-	screenkey -p top|center|bottom|fixed
-TL:linux/sio.md:24	msg-own		-	sio cpu|gpu|memory|storage|network|pci|pcie|audio|usb|battery|board
 TL:linux/trap.md:36	neither	status+out	X	help trap
 TL:linux/zenity.md:25	OURS	rec	-	(echo "#1"; sleep 1; echo "50"; echo "#2"; sleep 1; echo "100") | zenity --progress

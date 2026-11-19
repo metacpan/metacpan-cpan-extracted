@@ -1,5 +1,13 @@
 Revision history for Perl extension Mojo-Feed
 
+0.22 2026-11-18T13:54:32Z
+
+    - Follow 303, 307 and 308 redirects and resolve relative locations.
+    - Preserve XML tag case in feeds without an XML declaration.
+    - Handle empty responses and missing Content-Type without warnings.
+    - Include URLs, transport causes and HTTP status codes in fetch errors.
+    - Add offline real-world feed regression coverage.
+
 0.21 2021-05-12T21:26:08Z
 
     - Remove *guid* attribute

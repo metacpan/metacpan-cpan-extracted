@@ -18,12 +18,12 @@
  *
  *	Two representations, chosen at compile time:
  *
- *	TK_TEXT_DATA_ARRAYS 0 (the default), representation A: the
+ *	TK_TEXT_DATA_ARRAYS 0 (the default), value=Perl: the
  *	    container IS the Lang value (an Arg, NULL for none).  The
  *	    other types of slots are never present.  The operations
  *	    compile to what the code did on bare Args before.
  *
- *	TK_TEXT_DATA_ARRAYS 1, representation B: the container is one
+ *	TK_TEXT_DATA_ARRAYS 1, value=C-array: the container is one
  *	    pointer (NULL for an empty container) to a single malloc-ed
  *	    block holding a size, a capacity, an array of slots (a union
  *	    of an Arg, a pointer and a long) and a parallel array of
@@ -171,7 +171,7 @@ typedef union TkTextDataSlot {
 #if !TK_TEXT_DATA_ARRAYS
 
 /*
- * Representation A: the container is the Lang value.
+ * value=Perl: the container is the Lang value.
  */
 
 typedef Arg TkTextData;
@@ -183,7 +183,7 @@ typedef Arg TkTextData;
 #else /* TK_TEXT_DATA_ARRAYS */
 
 /*
- * Representation B: one pointer to a block of parallel arrays.
+ * value=C-array: one pointer to a block of parallel arrays.
  */
 
 typedef struct TkTextDataBlock {

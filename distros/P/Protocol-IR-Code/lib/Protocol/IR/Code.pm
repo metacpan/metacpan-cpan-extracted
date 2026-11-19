@@ -2,7 +2,7 @@ package Protocol::IR::Code;
 use strict;
 use warnings;
 
-our $VERSION = '1.2';
+our $VERSION = '1.3';
 
 sub new {
     my ($class, %args) = @_;
@@ -91,7 +91,7 @@ Protocol::IR::Code - Intermediate representation of an IR remote control code
 
 =head1 VERSION
 
-version 1.2
+version 1.3
 
 =head1 SYNOPSIS
 
@@ -163,9 +163,9 @@ Number of repeat ("ditto") frames a wig should send after the first.
 =item send_count
 
 How many times the whole signal transmits per press (the wig's C<send_count>,
-the repeat hint a JSON dump's keycode carries).  Zero means the source carried
-no repeat count, so a wig export omits C<send_count> and the default single
-press is assumed.
+the device's C<timing.pressMinRepeats> for a JSON dump import).  Zero means
+the source carried no repeat count, so a wig export omits C<send_count> and
+the default single press is assumed.
 
 =item bypass_protocol
 
@@ -262,8 +262,9 @@ Brett T. Warden <bwarden@cpan.org>
 Copyright (c) 2026 Brett T. Warden
 
 This library is free software; you can redistribute it and/or modify it
-under the terms of the GNU Lesser General Public License version 2.1 as
-published by the Free Software Foundation.
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 2 of the License, or (at your
+option) any later version.
 
 =head1 TRADEMARK NOTICE
 

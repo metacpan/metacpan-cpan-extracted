@@ -1,0 +1,99 @@
+0.1.13  2026-11-15
+     - captured and checked expected CLI diagnostics to keep test output clean
+     - kept real-pipe coverage on old native Windows Perls using a Perl argv
+       helper where list-form pipe opens are unavailable
+
+0.1.12  2026-11-15 (unreleased CI candidate)
+     - replaced Python PTY, pipe, wiki and CPAN archive tools with Perl equivalents
+     - kept all 22 terminal scenarios, real OS-pipe coverage, wiki publishing guards
+       and archive audits; IO::Pty is a POSIX author-test dependency only
+     - updated CI, author prerequisites and docs; no Python scripts or dependency
+       remain in the repository and editor runtime requirements are unchanged
+
+0.1.11  2026-11-15
+     - rewrote POD, App::Pvim's CPAN description, README and wiki around the goal
+       of a capable Vim replacement for restricted accounts where Perl exists
+       but Vim, install privileges, gcc or make may be unavailable
+     - led installation docs with the standalone route and clarified the standard
+       library, terminal, disk and account requirements versus CPAN build tools
+     - refreshed portability evidence and kept current feature limits explicit
+
+0.1.10  2026-11-15
+     - replaced the hanging native-Windows IPC::Open3 test harness with real
+       descriptor redirection and independent subprocess pipe integration tests
+     - made PTY waits drain output and account for Darwin session revocation;
+       verified pipeline tty restoration from a surviving shell
+     - bounded CI steps and cancel superseded runs to catch future test stalls
+
+0.1.9  2026-11-15 (unreleased CI candidate)
+     - added streaming stdin import via pvim - and user-confirmed automatic
+       detection for interactive piped/redirected input without a filename
+     - read keystrokes from the controlling terminal, mark imports unnamed and
+       unsaved, skip splash, and support explicit stdin import in batch mode
+     - added pipe/PTY/streaming tests and documentation, including empty input,
+       mixed endings, unsaved guards and no-terminal behavior
+     - restricted CPAN archive gathering and added manifest/metadata/POD audits
+
+0.1.8  2026-11-14
+     - changed the versionless opening title to pvim - portable vim clone
+     - audited portability against completed CI and documented interactive,
+       batch-only and unverified platforms plus the limited Vim-like feature set
+
+0.1.7  2026-11-14
+     - simplified the centered splash by removing quick-control, environment
+       and provisional donation text; added Support Us at PerlCommunity.org
+
+0.1.6  2026-11-14
+     - added -v as a user-confirmed version shortcut alongside --version
+     - centered opening splash text horizontally and vertically, with live
+       resize/resume positioning and bounded layouts for small terminals
+     - updated POD, help, README and wiki to show pvim as an executable utility
+
+0.1.5  2026-11-14
+     - removed syntax highlighting and its display-path lexer for now
+     - removed syntax toggles/options; retained yellow line numbers and status styling
+     - updated POD, wiki and tests to make highlighting explicitly deferred
+
+0.1.4  2026-11-14
+     - prepared the App::Pvim CPAN distribution with dist.ini and an author
+       build plugin generating the metadata module and installed script from
+       the one maintained standalone source and version
+     - added CPAN build, distribution tests and user-local install checks to CI
+     - included the CPAN-format tarball in GitHub release assets and checksums
+     - documented future CPAN publication; no PAUSE upload has been performed
+
+0.1.3  2026-11-14
+     - added proper Ctrl-Z / SIGTSTP suspend and fg resume with tty restoration,
+       full redraw and preservation of unsaved text and current editing mode
+     - made handled interactive exits emit a trailing newline
+     - turned line numbers off by default; added yellow three-column number
+       fields that widen for larger line numbers
+     - added Vim-style :! execution, ranged ! filters, normal-mode !! prompts,
+       and :r ! / :0r ! command output insertion with undo and failure guards
+     - documented Perl highlighting/tooling, visual-selection status, and a
+       prioritized shortlist of missing advanced-beginner Vim features
+     - established Vim behavior as the default; deviations require confirmation
+
+0.1.2  2026-11-14
+     - added clearly named pvim-standalone.pl release asset, identical to pvim
+     - added comprehensive wiki sources, generated POD command/manual pages,
+       local-link validation and guarded wiki publishing tooling
+     - added CI wiki validation and relocated standalone-asset verification
+     - documented ongoing wiki maintenance and hourly master synchronization
+
+0.1.1  2026-11-14
+     - fixed repeated zero-width line-end searches remaining on the current line
+     - added forward, wrapping and reverse line-end search regression tests
+
+0.1.0  2026-11-14
+     - initial human-testing prerelease: a single-file Perl-centric vi-style editor
+     - targets Perl 5.10+ with core-only runtime dependencies and no privileged install
+     - added disk-backed line index, edit pieces, bounded cache and streaming saves
+     - added normal/insert/replace modes, counts, navigation, paging and line numbers
+     - added line/character yank and put, delete/change, joins, undo and redo
+     - added forward/backward Perl-regex search and ranged s/// with g/i and captures
+     - added approximate Perl syntax colors and optional undoable perltidy -l 500
+     - added POD, CLI help/manual, batch commands and provisional startup splash
+     - added guarded atomic saves and byte/newline preservation
+     - added model-based, command, CLI, optional tidy and real PTY integration tests
+     - added cross-platform/version CI, benchmarks and gated prerelease packaging

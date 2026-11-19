@@ -1,8 +1,8 @@
 class	samples	call	dash	bash	program	examples
-all three differ	1	printf %(%s%s)T -1	2 |printf: %(: invalid directive\n	0 17945457731794545773|	1 |printf: %(: invalid conversion specification\n	SC:Checks/Commands.hs:prop_checkPrintfVar11
-all three differ	1	printf %(%s)T	2 |printf: %(: invalid directive\n	0 1794545773|	1 |printf: %(: invalid conversion specification\n	SC:Checks/Commands.hs:prop_checkPrintfVar19
-all three differ	1	printf %d %(%s)T	2 0 |printf: %(: invalid directive\n	0 0 1794545774|	1 0 |printf: %(: invalid conversion specification\n	SC:Checks/Commands.hs:prop_checkPrintfVar21
-all three differ	1	printf %d %(%s)T 42	2 42 |printf: %(: invalid directive\n	0 42 1794545774|	1 42 |printf: %(: invalid conversion specification\n	SC:Checks/Commands.hs:prop_checkPrintfVar20
+all three differ	1	printf %(%s%s)T -1	2 |printf: %(: invalid directive\n	0 17949172461794917246|	1 |printf: %(: invalid conversion specification\n	SC:Checks/Commands.hs:prop_checkPrintfVar11
+all three differ	1	printf %(%s)T	2 |printf: %(: invalid directive\n	0 1794917246|	1 |printf: %(: invalid conversion specification\n	SC:Checks/Commands.hs:prop_checkPrintfVar19
+all three differ	1	printf %d %(%s)T	2 0 |printf: %(: invalid directive\n	0 0 1794917246|	1 0 |printf: %(: invalid conversion specification\n	SC:Checks/Commands.hs:prop_checkPrintfVar21
+all three differ	1	printf %d %(%s)T 42	2 42 |printf: %(: invalid directive\n	0 42 1794917246|	1 42 |printf: %(: invalid conversion specification\n	SC:Checks/Commands.hs:prop_checkPrintfVar20
 all three differ	1	printf -v foo bar	2 |printf: Illegal option -v\n	0 |	0 -v|printf: warning: ignoring excess arguments, starting with 'foo'\n	SC:Analytics.hs:prop_checkUnassignedReferences20
 all three differ	1	printf -v myvar This is %s = %d\n a year 2016	2 |printf: Illegal option -v\n	0 |	0 -v|printf: warning: ignoring excess arguments, starting with 'myvar'	TL:common/printf.md:29
 all three differ	1	printf -vTODAY %(%Y)T	2 |printf: Illegal option -v\n	0 |	0 -vTODAY|printf: warning: ignoring excess arguments, starting with '%	SC:Checks/Commands.hs:prop_checkPrintfVar23

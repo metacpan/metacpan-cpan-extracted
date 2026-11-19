@@ -13,7 +13,7 @@ use DBIx::SchemaChecksum::App::Checksum;
         dsn => MakeTmpDb->dsn,
     );
     trap { $sc->run };
-    like($trap->stdout,qr/660d1e9b6aec2ac84c2ff6b1acb5fe3450fdd013/,'got checksum');
+    like($trap->stdout,qr/ee3a4db19fc06296306738ee6d4cdfd1204adf8c/,'got checksum');
 }
 
 {
@@ -22,7 +22,7 @@ use DBIx::SchemaChecksum::App::Checksum;
         show_dump=>1
     );
     trap { $sc2->run };
-    like($trap->stdout,qr/660d1e9b6aec2ac84c2ff6b1acb5fe3450fdd013/,'got checksum');
+    like($trap->stdout,qr/ee3a4db19fc06296306738ee6d4cdfd1204adf8c/,'got checksum');
     like($trap->stdout,qr/main\.first_table/,'got DBI data');
 }
 

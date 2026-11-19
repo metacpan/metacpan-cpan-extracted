@@ -25,6 +25,7 @@ use File::Spec;
 use FindBin ();
 use lib File::Spec->catdir($FindBin::Bin, 'lib'); # t/lib: CaptureStd, the tests' capture {}
 use CaptureStd 'capture';
+use Platform qw(modes_ignored children_cpu_unreported); # t/lib: what the platform gives the tests
 use NoDoubleQuote 'refuse_double_quotes'; # t/lib: what MSWin32 would garble in a list cmd
 use File::Temp 'tempdir';
 use JSON::PP ();
@@ -179,7 +180,10 @@ subtest 'a skipped step leaves its stdout_file alone' => sub {
 
 # --- protect ------------------------------------------------------------------
 SKIP: {
-	skip 'root can write to a read-only file, so protect proves nothing', 3 if $> == 0;
+	# until 0.196 this skipped for uid 0 alone, and failed for a Windows
+	# administrator under Cygwin, who can write a read-only file too
+	my $why = modes_ignored(0444);
+	skip $why, 3 if $why ne '';
 	subtest 'protect: a successful output is made read-only' => sub {
 		my $out = fresh_path();
 		my ($t) = run_task(cmd => [$^X, '-e', $WRITE, $out], 'output_file' => $out,
@@ -272,6 +276,10 @@ subtest 'output_dir: stale looks at what is inside the directory' => sub {
 SKIP: {
 	skip 'the children\'s CPU times from times() are not known to be filled in on MSWin32', 1
 		if $^O eq 'MSWin32';
+	# until 0.196 this assumed every other platform counts a child's CPU time,
+	# and failed on GNU/Hurd, where times() may not
+	my $why = children_cpu_unreported();
+	skip $why, 1 if $why ne '';
 	subtest 'cpu.user and cpu.system are the command\'s CPU time' => sub {
 		# spins until its own user time reaches 0.3 s, so the figure does not
 		# depend on how loaded the machine is

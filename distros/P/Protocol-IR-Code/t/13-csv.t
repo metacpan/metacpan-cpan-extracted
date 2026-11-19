@@ -35,7 +35,7 @@ is($raw_codes->[0]->data, 0x10EF00FF, 'raw hex data imported');
 my $mixed_csv = <<'CSV';
 functionname,protocol,device,subdevice,function
 KEY_POWER,NEC1,4,0,8
-KEY_SONY,Sony12,1,0,2
+KEY_PROTON,PROTON,1,0,2
 KEY_ON,NECX2,25,-1,8
 KEY_MUTE2,NEC2,26,232,5
 KEY_PLAY,JVC,3,-1,12

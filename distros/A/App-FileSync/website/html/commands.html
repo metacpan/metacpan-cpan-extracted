@@ -131,7 +131,7 @@ filesync version</code></pre>
 		<tbody>
 			<tr><td><code>--repo NAME</code></td><td>Sync this repo; repeatable to sync several. Default: every repo in the client configuration.</td></tr>
 			<tr><td><code>--dry-run</code></td><td>Print the planned actions without changing either side.</td></tr>
-			<tr><td><code>--force</code></td><td>Proceed despite the deletion limits that normally stop a suspicious run.</td></tr>
+			<tr><td><code>--force</code></td><td>Proceed despite the deletion limits that normally stop a suspicious run. The limits are set per repo on the server, and a limit of 0 is switched off (see <a href="#admin"><code>repo create</code></a>).</td></tr>
 			<tr><td><code>--no-prune</code></td><td>Do not prune this repo's local trash during the run.</td></tr>
 			<tr><td><code>--no-delta</code></td><td>Send whole files instead of block deltas.</td></tr>
 			<tr><td><code>--verbose</code></td><td>Raise the log level to <code>debug</code> for this run.</td></tr>
@@ -271,7 +271,7 @@ filesync snapshot restore 2026-10-20 notes --repo offsite</code></pre>
 			<tr><th>Command</th><th>What it does</th></tr>
 		</thead>
 		<tbody>
-			<tr><td><code>repo create</code></td><td>Creates the master tree, the metadata directory, the policy and an empty index. <code>--trash-days</code> sets retention, <code>--max-deletes</code> and <code>--max-delete-percent</code> the per-session deletion limits, and <code>--ignore</code> replaces the default ignore list.</td></tr>
+			<tr><td><code>repo create</code></td><td>Creates the master tree, the metadata directory, the policy and an empty index. Its options are described below the table.</td></tr>
 			<tr><td><code>repo list</code></td><td>Lists the repos under the root.</td></tr>
 			<tr><td><code>repo show</code></td><td>Prints one repo's policy.</td></tr>
 			<tr><td><code>client allow</code></td><td>Admits a client id to a repo, as <code>client</code> or <code>replica</code>. A repo with no listed clients admits every client.</td></tr>
@@ -284,6 +284,26 @@ filesync snapshot restore 2026-10-20 notes --repo offsite</code></pre>
 		</tbody>
 	</table>
 	</div>
+
+	<p>The <code>repo create</code> options set the repo's policy:</p>
+
+	<div class="table-wrap">
+	<table>
+		<thead>
+			<tr><th>Option</th><th>Default</th><th>Meaning</th></tr>
+		</thead>
+		<tbody>
+			<tr><td><code>--trash-days N</code></td><td>30</td><td>How many days the server keeps deleted files. 0 keeps them forever.</td></tr>
+			<tr><td><code>--max-deletes N</code></td><td>200</td><td>The most files one sync may delete: a sync may delete exactly N, and is stopped at N + 1. 0 switches this limit off.</td></tr>
+			<tr><td><code>--max-delete-percent N</code></td><td>10</td><td>The most deletions in one sync, as a percentage (0 to 100) of the files the client last synced, rounded down: 10% of 25 files allows 2. A sync may always delete at least one file. 0 switches this limit off.</td></tr>
+			<tr><td><code>--ignore PATTERN</code></td><td>the default list</td><td>Replaces the default ignore list; repeat it for several patterns.</td></tr>
+		</tbody>
+	</table>
+	</div>
+
+	<p>A sync stops at whichever deletion limit it reaches first. With one limit
+	set to 0 the other still applies; with both at 0 a sync may delete any number
+	of files without <code>--force</code>.</p>
 
 	<p>If the server root cannot be written, <code>repo create</code> names the
 	directory that blocks it and says to chown it to the running account or to use
@@ -324,7 +344,7 @@ filesync snapshot restore 2026-10-20 notes --repo offsite</code></pre>
 
 <footer class="site-footer">
 	<div class="wrap">
-		<p>App::FileSync 0.002.0 &middot; Copyright 2026 Nigel Horne &middot; GPL-2.0</p>
+		<p>App::FileSync 0.002.2 &middot; Copyright 2026 Nigel Horne &middot; GPL-2.0</p>
 		<p><a href="https://metacpan.org/dist/App-FileSync">CPAN</a> &middot;
 		<a href="https://github.com/nigelhorne/App-FileSync">GitHub</a> &middot;
 		<a href="https://github.com/nigelhorne/App-FileSync/issues">Issues</a> &middot;

@@ -1,5 +1,5 @@
--- preSHA1sum: b1387d808800a5969f0aa9bcae2d89a0d0b4620b
--- postSHA1sum: 55df89fd956a03d637b52d13281bc252896f602f
+-- preSHA1sum: b96b98d2a80eb1c812a4f1d29a43e40eb4928078
+-- postSHA1sum: dc7198bc9b458194fd6584a090e219d38d9ef6a7
 
 create table nochntest (foo text);
 

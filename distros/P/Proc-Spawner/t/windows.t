@@ -27,7 +27,7 @@ sub run {   # (status, output) of a child with its fd 1 in a file; or (undef, $!
   my $t = do { local $/; <$f> } // ''; close $f; $t =~ s/\r//g; chomp $t; ($st >> 8, $t) }
 diag "primitive: $Proc::Spawner::PRIMITIVE";
 my @args = ('a b', 'q"x', 'c\\\\', '', 'x "y" z', 'tail\\', 'd\\"e', '%PATH%', 'a&b');
-TODO: { local $TODO = $s1 ? "Perl's system LIST does not quote arguments as the C runtime parses them back (❰BUG❱ in Perl, reported)" : undef;
+TODO: { local $TODO = $s1 ? "Perl's system LIST does not quote arguments as the C runtime parses them back (❰BUG❱ in Perl, drafted in doc/perl-win32-system-bugs.md, not yet filed)" : undef;
   is_deeply [run([$perl, $ARGS, @args])], [3, join '|', map "[$_]", @args], 'argv arrives exactly; the status' }
 is_deeply [run([$perl, $ARGS, 'plain'])], [3, '[plain]'], 'a plain argument; the status';
 is_deeply [run([$perl, $CWD], chdir => $sub)], [0, Cwd::abs_path($sub)], 'chdir';
@@ -50,5 +50,38 @@ is_deeply [run([$perl, $RAN], sigignore => ['INT', 'PIPE'])], [0, 'ran'], 'sigig
 is_deeply [run([$perl, $RAN], sigignore => ['HUP'])], [undef, POSIX::ENOTSUP()], 'sigignore of HUP: unsupported';
 TODO: { local $TODO = $s1 ? "Perl quotes a batch file's line as a whole; Wine's cmd.exe does not strip those quotes (real Windows unchecked)" : undef;
   is_deeply [run(['b.bat', 'x1', 'y-2'], file => "$dir/b.bat")], [4, 'bat:[x1][y-2]'], 'a batch file' }
+# X58 (post-0.12): a name given twice in envp: the first, as getenv finds it (the sort put either first; system1's %ENV
+# kept the last); a name differing only in case is the same name on Windows
+is_deeply [run([$perl, $ENVP], envp => ['FOO=first', 'Foo=second', 'FOO=third', map "$_=$ENV{$_}", grep /^(?:PATH|SYSTEMROOT|WINDIR|TEMP|TMP)\z/i, keys %ENV])],
+  [0, 'first'], 'envp with a name twice: the first (X58)';
+# X57 (post-0.12): in a pseudo-process (Perl's fork emulation) the program is looked up with its own PATH, and a
+# relative name from its own directory, not the process's.  The program: a copy of whoami.exe, a name nothing else has
+SKIP: { my $who = "$ENV{SystemRoot}\\system32\\whoami.exe"; skip 'no whoami.exe', 2 unless -f $who;
+  mkdir "$dir/x57" or die; my $prog = "$dir/x57/x57prog.exe";
+  { open my $i, '<:raw', $who or die; open my $o, '>:raw', $prog or die; local $/; print {$o} readline($i); close $o or die }
+  for (['through PATH', sub { $ENV{PATH} = "$dir\\x57;$ENV{PATH}"; 'x57prog' }],
+       ['a relative name with a directory', sub { chdir $dir or die; 'x57\\x57prog' }]) {
+    my ($what, $setup) = @$_; my $out = "$dir/x57.txt"; unlink $out;
+    my $kid = fork; defined $kid or die "fork: $!";
+    if (!$kid) {   # the pseudo-process: no test output here, only the exit code
+      my $name = $setup->(); my ($pid) = Proc::Spawner::spawn($name, [$name], undef, [['open', 1, $out, $W, 0644]], { search => 1 });
+      $pid or exit 2; waitpid $pid, 0; Proc::Spawner::reaped($pid); exit($? ? 3 : 0) }
+    waitpid $kid, 0;
+    is $? >> 8, 0, "in a pseudo-process, search: $what (X57)" } }
+# W6 (the user, 2026-11-14): kill_with_parent off by default, so a child outlives a parent that exits; on, Windows ends it
+# with the parent (through Perl's own spawn, system1, there is no job: the child outlives it either way)
+for my $kill (0, 1) {
+  SKIP: { skip "kill_with_parent: Perl's own spawn makes no job", 2 if $kill && $s1;
+    my $mark = "$dir/w6-$kill.txt"; unlink $mark;
+    my $child = script("w6child-$kill.pl", 'sleep 3; open my $f, ">", ' . "'$mark'" . ' or die; print $f "ran"; close $f;');
+    my $parent = script("w6parent-$kill.pl", 'use Proc::Spawner; use POSIX (); '
+      . ($kill ? '$Proc::Spawner::WINDOWS{kill_with_parent} = 1; ' : '')
+      . 'my ($pid) = Proc::Spawner::spawn($^X, [$^X, ' . "'$child'" . '], undef, '
+      . '[map [open => $_, "/dev/null", $_ ? POSIX::O_WRONLY() : POSIX::O_RDONLY()], 0, 1, 2], {}); exit($pid ? 0 : 1);');
+    system $perl, (map "-I$_", grep !ref, @INC), $parent;
+    is $? >> 8, 0, "W6: the parent started its child, kill_with_parent $kill";
+    my $t = time; sleep 1 until -e $mark || time - $t > ($kill ? 6 : 10);   # (the child writes after 3 s)
+    ok $kill ? !-e $mark : -e $mark, $kill ? 'kill_with_parent 1: the child ended with its parent'
+                                           : 'kill_with_parent off (the default): the child outlived its parent' } }
 print "# ours still on stdout\n"; ok 1, 'our stdout after the calls';
 done_testing;

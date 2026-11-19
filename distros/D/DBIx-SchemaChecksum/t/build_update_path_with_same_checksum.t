@@ -14,19 +14,19 @@ my $sc = DBIx::SchemaChecksum->new(
 my $update = $sc->_update_path;
 is( int keys %$update, 3, '3 updates' );
 is(
-    $update->{'660d1e9b6aec2ac84c2ff6b1acb5fe3450fdd013'}->[1],
-    'e63a31c18566148984a317006dad897b75d8bdbe',
+    $update->{'ee3a4db19fc06296306738ee6d4cdfd1204adf8c'}->[1],
+    '8f6643a8fc8b4e47caa30c70da5635f366075ea1',
     'first sum link'
 );
 is(
-    $update->{'e63a31c18566148984a317006dad897b75d8bdbe'}->[0],
+    $update->{'8f6643a8fc8b4e47caa30c70da5635f366075ea1'}->[0],
     'SAME_CHECKSUM','same_checksum');
 is(
-    $update->{'e63a31c18566148984a317006dad897b75d8bdbe'}->[2],'e63a31c18566148984a317006dad897b75d8bdbe','has same checksum');
+    $update->{'8f6643a8fc8b4e47caa30c70da5635f366075ea1'}->[2],'8f6643a8fc8b4e47caa30c70da5635f366075ea1','has same checksum');
 is(
-    $update->{'e63a31c18566148984a317006dad897b75d8bdbe'}->[4],'b1387d808800a5969f0aa9bcae2d89a0d0b4620b','second sum link'
+    $update->{'8f6643a8fc8b4e47caa30c70da5635f366075ea1'}->[4],'b96b98d2a80eb1c812a4f1d29a43e40eb4928078','second sum link'
 );
-is( $update->{'55df89fd956a03d637b52d13281bc252896f602f'},
+is( $update->{'dc7198bc9b458194fd6584a090e219d38d9ef6a7'},
     undef, 'end of chain' );
 
 

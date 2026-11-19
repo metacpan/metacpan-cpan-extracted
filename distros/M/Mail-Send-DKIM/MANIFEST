@@ -1,0 +1,24 @@
+.pod2github-header.md
+.pod2github.yml
+bin/dmarc-check-mail.pl
+bin/dmarc-report.pl
+bin/dmarc-weekly.sh
+bin/mail-dkim
+Changes
+cpanfile
+lib/Mail/Send/DKIM.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README.md
+t/dmarc-check-mail.t
+t/dmarc-report.t
+t/dmarc-weekly.t
+t/mail-dkim.t
+t/pod-code.t
+t/pod-coverage.t
+t/pod-links.t
+t/readme.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

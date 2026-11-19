@@ -1,14 +1,12 @@
 package Review::Helper::Builder;
 use v5.36;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Carp qw/croak/;
 use Cpanel::JSON::XS();
-use Cwd qw/abs_path/;
 use Encode qw/decode FB_DEFAULT/;
-use File::Basename qw/basename dirname/;
-use File::Spec();
+use Path::Tiny qw/path/;
 
 use Review::Helper::DB;
 use Review::Helper::Diff qw/parse_diff count_lines attribute map_lines move_ranges/;
@@ -672,9 +670,9 @@ sub default_file($self, $rev, $revision) {
     my $dir  = $self->{+REPO}->state_dir;
     my $name = $self->default_name($rev, $revision);
 
-    my ($file, $n) = ("$dir/$name.sqlite", 1);
-    $file = "$dir/$name-" . ++$n . '.sqlite' while -e $file;
-    return $file;
+    my ($file, $n) = (path($dir)->child("$name.sqlite"), 1);
+    $file = path($dir)->child("$name-" . ++$n . '.sqlite') while -e $file;
+    return "$file";
 }
 
 # The head's branch or tag name when it has one, else its short id.
@@ -688,9 +686,8 @@ sub default_name($self, $rev, $revision) {
 }
 
 sub resolve_file($self, $file) {
-    $file = File::Spec->rel2abs($file);
-    my $dir = dirname($file);
-    return -d $dir ? abs_path($dir) . '/' . basename($file) : $file;
+    my $abs = path($file)->absolute;
+    return -d $abs->parent ? $abs->parent->realpath->child($abs->basename)->stringify : "$abs";
 }
 
 # Review files belong in the VCS's own directories or the worktree.
@@ -699,7 +696,7 @@ sub check_location($self, $file) {
     return if $repo->is_internal_path($file);
 
     my $root = $repo->root;
-    croak "Review file '$file' is not inside the worktree '$root'" unless index($file, "$root/") == 0;
+    croak "Review file '$file' is not inside the worktree '$root'" unless path($root)->subsumes($file) && path($root) ne path($file);
 
     return;
 }

@@ -4,7 +4,7 @@
       "The McGrail Foundation & Kevin A. McGrail <kevin.mcgrail-netvalidmx@mcgrail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
    "license" : [
       "artistic_1"
    ],
@@ -48,6 +48,6 @@
          "web" : "https://github.com/The-McGrail-Foundation/Net-validMX"
       }
    },
-   "version" : "v2.5.2",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "v2.6.1",
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

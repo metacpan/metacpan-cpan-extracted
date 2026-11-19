@@ -4,6 +4,7 @@
 #include "spvm_native.h"
 
 #include <assert.h>
+#include <signal.h>
 
 #include <iostream>
 #include <thread>
@@ -68,7 +69,28 @@ int32_t SPVM__Thread__create(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t caller_line = env->get_field_int_by_name(env, stack, obj_caller_info, "line", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) return error_id;
   
-  *nt_thread = std::thread(thread_handler, env, obj_self, obj_task, caller_method_abs_name, caller_file, caller_line);
+  #ifndef _WIN32
+  // Block all maskable signals before spawning thread
+  sigset_t block_set;
+  sigset_t old_set;
+  sigfillset(&block_set);
+  int mask_rc = pthread_sigmask(SIG_BLOCK, &block_set, &old_set);
+#endif
+  
+  try {
+    // Spawn native thread with inherited signal mask
+    *nt_thread = std::thread(thread_handler, env, obj_self, obj_task, caller_method_abs_name, caller_file, caller_line);
+  }
+  catch (const std::exception& e) {
+    return env->die(env, stack, "Failed to create thread: %s", __func__, FILE_NAME, __LINE__, e.what());
+  }
+  
+#ifndef _WIN32
+  // Restore original signal mask after thread creation
+  if (mask_rc == 0) {
+    pthread_sigmask(SIG_SETMASK, &old_set, nullptr);
+  }
+#endif
   
   env->set_pointer(env, stack, obj_self, nt_thread);
   

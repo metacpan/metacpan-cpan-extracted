@@ -12,7 +12,7 @@ my $sc = DBIx::SchemaChecksum::App::ApplyChanges->new(
     no_prompt=>1, sqlsnippetdir=> 't/dbs/snippets');
 
 my $pre_checksum = $sc->checksum;
-is ($pre_checksum,'660d1e9b6aec2ac84c2ff6b1acb5fe3450fdd013','checksum after two changes ok');
+is ($pre_checksum,'ee3a4db19fc06296306738ee6d4cdfd1204adf8c','checksum after two changes ok');
 
 trap { $sc->run };
 
@@ -23,7 +23,7 @@ like($trap->stdout,qr/post checksum OK/,'Output: post checksum OK');
 like($trap->stdout,qr/No more changes/,'Output: end of tree');
 
 my $post_checksum = $sc->checksum;
-is ($post_checksum,'b1387d808800a5969f0aa9bcae2d89a0d0b4620b','checksum after two changes ok');
+is ($post_checksum,'b96b98d2a80eb1c812a4f1d29a43e40eb4928078','checksum after two changes ok');
 
 done_testing();
 

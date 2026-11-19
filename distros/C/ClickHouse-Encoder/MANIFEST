@@ -1,7 +1,9 @@
 bench/benchmark.pl
 bench/complex_insert_benchmark.pl
+bench/defaults.pl
 bench/insert_benchmark.pl
 bench/local_insert_benchmark.pl
+bench/row_gather.pl
 bench/run_insert_bench.sh
 bench/run_wide_bench.sh
 bench/wide_table_benchmark.pl
@@ -89,6 +91,15 @@ t/boundary.t
 t/buffer-grow.t
 t/bulk-inserter-summary.t
 t/bulk-inserter.t
+t/che-coercions.t
+t/che-defaults-live.t
+t/che-defaults.t
+t/che-enum-contract.t
+t/che-from-columns.t
+t/che-live.t
+t/che-projection.t
+t/che-row-major.t
+t/che-timezone.t
 t/clean-warnings.t
 t/coerce-datetimes-tz.t
 t/coerce-datetimes.t

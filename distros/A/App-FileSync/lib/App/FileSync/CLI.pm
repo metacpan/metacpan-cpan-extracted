@@ -20,11 +20,13 @@ use Sys::Hostname ();
 
 use App::FileSync qw(json_encode format_utc validate_repo_name validate_client_id parse_since parse_until write_atomic);
 use App::FileSync::Admin;
+use App::FileSync::Args qw(with_options);
 use App::FileSync::Client;
 use App::FileSync::Config;
 use App::FileSync::Constants qw(
 	$EXIT_OK $EXIT_FATAL $EXIT_LOCKED $EXIT_WARNINGS $EXIT_DRIFT $EXIT_MAX
 	$DEFAULT_SERVER_ROOT $PROTOCOL_VERSION $ROLE_CLIENT @ROLES $ROOT_MARKER $MAX_ID_LENGTH $TYPE_FILE
+	$TRASH_DAYS $MAX_DELETES $MAX_DELETE_PERCENT
 );
 use App::FileSync::I18N qw(message throw strip_location);
 use App::FileSync::IO qw(ensure_dir);
@@ -33,7 +35,7 @@ use App::FileSync::Server;
 use App::FileSync::Settings;
 use App::FileSync::Transport::SSH;
 
-use version; our $VERSION = version->declare('0.002.1');
+use version; our $VERSION = version->declare('0.002.2');
 
 # What the marker file says to anyone who finds it.  File content, not a
 # message: it must not change with the reader's language.
@@ -109,7 +111,10 @@ and line numbers.  Text output goes to standard output; C<--json> prints one
 JSON document instead.
 
 Client exit codes: 0 ok, 1 fatal, 2 another run holds the lock, 3 completed
-with warnings, 4 verification found drift.  Admin: 0, 1 and 4.
+with warnings, 4 verification found drift.  Admin: 0, 1 and 4.  Server: 0
+after a session that finished, 1 after any other (a bad argument, a refused
+forced command, a protocol error, or another session holding the repo lock;
+the journal records a lock refusal as exit 2, but the process exits 1).
 
 =head1 FUNCTIONS
 
@@ -1177,21 +1182,21 @@ sub _admin_dispatch :Private {
 sub _admin_repo_create :Private {
 	my ($admin, @args) = @_;
 
+	my @limits = qw(trash-days max-deletes max-delete-percent);
 	my (%opt, @ignore);
 	_options(\@args, {
-		(map { ("$_=i" => \$opt{$_}) } qw(trash-days max-deletes max-delete-percent)),
+		(map { ("$_=i" => \$opt{$_}) } @limits),
 		'ignore=s' => \@ignore,
 	}, 'repo_create');
 	my $name = _require(shift @args, 'repo create', 'NAME');
 	_no_more(\@args, 'repo create');
 
-	my $result = $admin->repo_create(
-		name               => $name,
-		trash_days         => $opt{'trash-days'},
-		max_deletes        => $opt{'max-deletes'},
-		max_delete_percent => $opt{'max-delete-percent'},
-		ignore             => \@ignore,
-	);
+	# Each limit option is its parameter with "-" for "_"; a bad value is
+	# reported by the option the user typed.
+	my %option = map { (my $key = $_) =~ tr/-/_/; $key => $_ } @limits;
+	my $result = with_options({ map { $_ => "--$option{$_}" } keys %option }, sub {
+		$admin->repo_create(name => $name, (map { $_ => $opt{ $option{$_} } } keys %option), ignore => \@ignore);
+	});
 
 	_say("cli.repo.created.$_", { %{$result}, repo => $result->{name} }) for qw(name master config);
 	return $EXIT_OK;
@@ -1215,8 +1220,22 @@ sub _admin_repo_show :Private {
 
 	my $info = $admin->repo_show(_require(shift @args, 'repo show', 'NAME'));
 	my $config = $info->{config};
+	# A missing setting means its default, as in Store::prune_trash and
+	# Merge::check_delete_limit; 0 keeps the trash forever or switches a
+	# deletion limit off.
+	my $days    = $config->{trash_days} // $TRASH_DAYS;
+	my $files   = $config->{max_deletes} // $MAX_DELETES;
+	my $percent = $config->{max_delete_percent} // $MAX_DELETE_PERCENT;
+	my $limits = ($files || $percent)
+		? message('cli.repo.limits', {
+			files   => $files ? message('cli.repo.limit_files', { count => $files }) : message('cli.repo.limit_files_off'),
+			percent => $percent ? message('cli.repo.limit_percent', { percent => $percent }) : message('cli.repo.limit_percent_off'),
+		})
+		: message('cli.repo.limits_off');
 	_say('cli.repo.show', {
 		%{$config},
+		trash   => $days ? message('cli.repo.trash_days', { count => $days }) : message('cli.repo.trash_forever'),
+		limits  => $limits,
 		master  => $info->{master},
 		meta    => $info->{meta},
 		clients => @{ $info->{clients} } ? join(', ', @{ $info->{clients} }) : message('cli.repo.no_clients'),

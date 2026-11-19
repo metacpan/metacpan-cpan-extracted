@@ -11,7 +11,7 @@ This specification describes
 
 
 	< Literate Version >=
-	our $VERSION='0.0.4';
+	our $VERSION='0.0.5';
 
 
 =head1 DESCRIPTION
@@ -117,6 +117,66 @@ The C<for> paragraph behaves slightly differently from begin/end.  In the case o
 	my $s=$collected; $s=~s/^\+//; $s=~s/\n$//s;
 	$self->targetSet($s);
 	$self->initCollection();
+
+
+=head2 Inline definitions
+
+An inline definition is a code block containing a declared name.  It has the following form:
+
+	C<E<lt> name E<gt>=some code>
+
+Notice that the equal sign is not strictly required, but any sequence of leading spaces and a I<single> equal sign, C</\s*=/>, will be removed from the code during tangling.  No other spaces or equal signs will be removed, so the code C<==5> must be written as
+
+	C<E<lt> name E<gt>===5>   becomes ==5
+	C<E<lt> name E<gt>===5>  becomes ==5
+	C<E<lt> name E<gt>===5>  becomes " ==5"
+	C<E<lt> name E<gt>==5>    becomes =5
+	C<E<lt> name E<gt>==5>   becomes =5
+
+The existing syntax elements of the form C<*E<lt>...E<gt>> are "Formatting codes" in POD.  The closest existing code that is always silent in POD is the C<XE<lt>...E<gt>> code, which is reserved for indexing operations.  Here the letter 'D' has been chosen to represent "declare name" or "define name".
+
+During a tangle operation, the new formatting code must be accepted:
+
+
+	< Accept inline declarations >=
+	$parser->accept_codes('D');
+
+
+During document parsing, formatting codes are handled as balanced start/end elements, starting with the 'D' element with no additional attributes:
+
+
+	< Start inline declaration >=
+	if($element eq 'D') {
+		$$self{$cache}{mode}='declare';
+		$self->clearCollection()->initCollection();
+		return;
+	}
+
+
+The contents of the 'D' element are captured as normal 'text', so the same mechanism that captures begin/end/for text will collect the text of the declaration.
+
+When the declaration closes, it emits a balanced end event.
+
+
+	< Handle declaration elements >=
+	elsif(($element eq 'D')&&('declare' eq $$self{$cache}{mode})) {
+		my $s=$$self{$cache}{collector}; $s=~s/^\s*\+?//; $s=~s/\s*\n*$//;
+		$self->targetSet($s);
+		$self->initCollection();
+	}
+
+
+After the name is declared, the code section continues until the code's balanced end event is encountered.
+
+
+	< Handle declaration elements >=
+	elsif(($element eq 'C')&&('declare' eq $$self{$cache}{mode})) {
+		my $collected=$self->collected();
+		$collected=~s/^\s*=//;
+		$self->sectionAppend($self->target(),$collected);
+		$self->clearCollection();
+		$$self{$cache}{mode}='';
+	}
 
 
 =head2 Section names
@@ -311,6 +371,7 @@ A subclass of L<Pod::Simple> must implement handlers for the start and end of co
 		my ($self,$element,$attribute)=@_;
 		my $target=$$attribute{target}//'';
 		#< Fail for non-data paragraphs >#
+		#< Start inline declaration >#
 		if($target!~/^literate(?::command)?$/) { return }
 		#< Handle a start element >#
 	}
@@ -321,7 +382,9 @@ A subclass of L<Pod::Simple> must implement handlers for the start and end of co
 			my ($mode,$collected)=@{$$self{$cache}}{qw/mode collector/};
 			#< Handle tangle target  >#
 			#< Handle an end element >#
+			$$self{$cache}{mode}='';
 		}
+		#< Handle declaration elements >#
 		elsif($element eq 'Document') {
 			#< Tangle the document >#
 		}
@@ -617,6 +680,7 @@ As L<Pod::Literate> extends L<Pod::Simple>, it is straightforward to declare acc
 	< Tangle from file >=
 	my $parser=Pod::Literate->new();
 	$parser->accept_targets('literate','literate:command');
+	#< Accept inline declarations >#
 	$parser->expand_verbatim_tabs(0);
 	$parser->parse_from_file(shift(@ARGV));
 
@@ -631,6 +695,7 @@ A more complex C<weave> command may be provided in the future.  At this time, ho
 	#< Perl script header >#
 	my ($title);
 	while(<>) {
+		#< Weave handles inline declarations >#
 		if(0) { 1 }
 		#< Weave ignores target commands >#
 		#< Weave ignores ending commands >#
@@ -653,6 +718,16 @@ If a section name has been declared and a code line is encountered, the title is
 
 	< Weave appends section names >=
 	elsif($title&&/^(\h*)\S/) { print "$1< $title >=\n$_"; undef($title) }
+
+
+In similar fashion, if a name is declared within a code block, the name is appended inline for the rendered POD:
+
+
+	< Weave handles inline declarations >=
+	while(/\bC<\s*D<([^>]+)>/) {
+		my $name=$1; $name=~s/^\s*//; $name=~s/\s*$//;
+		s/\bC<\s*D<[^>]+>\s*(=\s*)?/C<E<lt> $name E<gt>=/;
+	}
 
 
 Any target commands can be removed.
@@ -711,9 +786,9 @@ The C<target=filename> may be called multiple times to specify separate output f
 
 A reference within a line is handled correctly.  C<if(#E<lt> ref E<gt>#)> expands properly if C<ref> is a single line, with no additional spaces.  If ref is a multiline, it's still inserted at that spot, with its inner newlines, but with no terminal newline.
 
-=item todo Inline declaration
+=item done Inline declaration
 
-Support for C<XE<lt>nameE<gt>code> to declare single lines of code within a paragraph.
+Support for C<DE<lt>nameE<gt>code> to declare single lines of code within a paragraph.
 
 =item todo Detect/reject invalid sequences like begin/for, begin/begin, for title/for title
 

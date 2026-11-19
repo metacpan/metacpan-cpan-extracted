@@ -21,7 +21,7 @@ use Time::HiRes ();
 use App::FileSync::Args qw(named);
 use App::FileSync::I18N qw(throw);
 
-use version; our $VERSION = version->declare('0.002.1');
+use version; our $VERSION = version->declare('0.002.2');
 
 # How long reap() waits for a child to exit by itself before stopping it.
 # The server needs a moment after end of file to discard a half-received

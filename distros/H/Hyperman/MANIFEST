@@ -111,6 +111,7 @@ t/72-tls-edges.t
 t/73-h2-edges.t
 t/74-supervisor-edges.t
 t/75-trailers.t
+t/76-body-temps.t
 t/lib/HMTest.pm
 t/manifest.t
 t/pod-coverage.t

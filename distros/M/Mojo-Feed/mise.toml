@@ -1,0 +1,15 @@
+[tools]
+perl = "5.44.0.0"
+
+[tasks.deps]
+description = "Install Perl dependencies with cpanm"
+run = '''
+# Net::SSLeay 1.96 needs OpenSSL 3, not Homebrew's default OpenSSL 4.
+if command -v brew >/dev/null 2>&1; then
+  openssl_prefix="$(brew --prefix openssl@3)"
+  if [ -d "$openssl_prefix" ]; then
+    export OPENSSL_PREFIX="$openssl_prefix"
+  fi
+fi
+cpanm --mirror https://cpan.metacpan.org --mirror-only --installdeps .
+'''

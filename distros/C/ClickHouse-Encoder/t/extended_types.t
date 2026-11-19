@@ -145,9 +145,9 @@ use TestCH qw(skip_header read_varint);
     is($dict_count, 2, "expected dict count = 2 (null sentinel + '')");
 }
 {
-    eval { ClickHouse::Encoder->new(columns => [['v','LowCardinality(Int32)']]) };
+    eval { ClickHouse::Encoder->new(columns => [['v','LowCardinality(Array(Int32))']]) };
     like($@, qr/LowCardinality.*supports/i,
-         'LowCardinality non-string inner rejected');
+         'LowCardinality non-scalar inner rejected');
 }
 {
     # Regression: LowCardinality(FixedString(N)) dedup must canonicalize to

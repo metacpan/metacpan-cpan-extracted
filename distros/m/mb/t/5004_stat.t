@@ -69,6 +69,9 @@ BEGIN {
 # 41
     sub { open(FILE,"5004.A");  @_ = mb::_stat(\*FILE); close(FILE); scalar(@_) == 13 },
     sub { open(FILE,"5004.A");  @_ = mb::_stat \*FILE;  close(FILE); scalar(@_) == 13 },
+# open(my $fh, ...) in the next 2 tests is an intentional exception to the
+# bareword filehandle rule: they test mb::_stat() with a lexical filehandle
+# (SKIP on perl older than 5.006)
     sub { return 'SKIP' if $] < 5.006; open(my $fh,"5004.A");  @_ = mb::_stat($fh); close($fh); scalar(@_) == 13 },
     sub { return 'SKIP' if $] < 5.006; open(my $fh,"5004.A");  @_ = mb::_stat $fh;  close($fh); scalar(@_) == 13 },
     sub {1},

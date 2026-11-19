@@ -2,21 +2,32 @@ package Protocol::IR::Converter;
 use strict;
 use warnings;
 
-our $VERSION = '1.2';
+our $VERSION = '1.3';
 
 use Protocol::IR::Code;
+use Protocol::IR::Proto::Aiwa;
+use Protocol::IR::Proto::GICable;
+use Protocol::IR::Proto::Mitsubishi;
+use Protocol::IR::Proto::Dish;
+use Protocol::IR::Proto::Pioneer;
+use Protocol::IR::Proto::Denon;
+use Protocol::IR::Proto::Sharp;
+use Protocol::IR::Proto::JVC;
+use Protocol::IR::Proto::JVC48;
+use Protocol::IR::Proto::MWM;
 use Protocol::IR::Proto::NEC;
 use Protocol::IR::Proto::NEC2;
 use Protocol::IR::Proto::NEC48;
 use Protocol::IR::Proto::NEC482;
-use Protocol::IR::Proto::JVC;
-use Protocol::IR::Proto::JVC48;
+use Protocol::IR::Proto::NECX1;
+use Protocol::IR::Proto::NECX2;
+use Protocol::IR::Proto::Panasonic;
+use Protocol::IR::Proto::RC5;
+use Protocol::IR::Proto::RC6;
 use Protocol::IR::Proto::SAMSUNG;
 use Protocol::IR::Proto::SAMSUNG20;
 use Protocol::IR::Proto::SAMSUNG36;
-use Protocol::IR::Proto::NECX1;
-use Protocol::IR::Proto::NECX2;
-use Protocol::IR::Proto::MWM;
+use Protocol::IR::Proto::Sony;
 use Protocol::IR::Format::Pronto;
 use Protocol::IR::Format::CSV;
 use Protocol::IR::Format::Wig;
@@ -75,6 +86,12 @@ sub new {
     #   MWM last - MWM frames have no header at all (a 417 µs start mark),
     #   so every other decoder's header check rejects them first, and MWM's
     #   strict tick matching rejects any header-bearing frame in turn.
+    # DECODE ORDER MATTERS: protocols are tried in registration order;
+    # a later protocol whose timing is a subset of an earlier one never matches.
+    # Register more specific / longer frames first (Pioneer before NEC,
+    # Mitsubishi before Denon, Denon before Sharp). Derivative protocols that
+    # share a timing signature (NECX1/NECX2 -> SAMSUNG) rely on this ordering.
+    $self->register_protocol('PIONEER', 'Protocol::IR::Proto::Pioneer');
     $self->register_protocol('NEC',       'Protocol::IR::Proto::NEC');
     $self->register_protocol('NEC2',      'Protocol::IR::Proto::NEC2');
     $self->register_protocol('48-NEC1',   'Protocol::IR::Proto::NEC48');
@@ -82,12 +99,25 @@ sub new {
     $self->register_protocol('JVC',       'Protocol::IR::Proto::JVC');
     $self->register_protocol('JVC-48',    'Protocol::IR::Proto::JVC48');
     $self->register_protocol('PANASONIC', 'Protocol::IR::Proto::Panasonic');
+    $self->register_protocol('SONY20',     'Protocol::IR::Proto::Sony20');
+    $self->register_protocol('SONY15',     'Protocol::IR::Proto::Sony15');
+    $self->register_protocol('SONY12',     'Protocol::IR::Proto::Sony12');
     $self->register_protocol('SAMSUNG',   'Protocol::IR::Proto::SAMSUNG');
     $self->register_protocol('SAMSUNG36', 'Protocol::IR::Proto::SAMSUNG36');
     $self->register_protocol('SAMSUNG20', 'Protocol::IR::Proto::SAMSUNG20');
     $self->register_protocol('NECX1',     'Protocol::IR::Proto::NECX1');
     $self->register_protocol('NECX2',     'Protocol::IR::Proto::NECX2');
     $self->register_protocol('MWM',       'Protocol::IR::Proto::MWM');
+    $self->register_protocol('RC5',      'Protocol::IR::Proto::RC5');
+    $self->register_protocol('RC6',      'Protocol::IR::Proto::RC6');
+    $self->register_protocol('MITSUBISHI', 'Protocol::IR::Proto::Mitsubishi');
+    $self->register_protocol('DENON',   'Protocol::IR::Proto::Denon');
+    $self->register_protocol('SHARP',    'Protocol::IR::Proto::Sharp');
+    $self->register_protocol('AIWA',     'Protocol::IR::Proto::Aiwa');
+    $self->register_protocol('G.I.CABLE', 'Protocol::IR::Proto::GICable');
+    $self->register_protocol('DISH_NETWORK', 'Protocol::IR::Proto::Dish');
+    $self->register_protocol('DENON-K', 'Protocol::IR::Proto::DenonK');
+    $self->register_protocol('DENON{1}','Protocol::IR::Proto::Denon1');
 
     # Formats
     $self->register_format('Pronto', 'Protocol::IR::Format::Pronto');
@@ -237,7 +267,7 @@ Protocol::IR::Converter - Registry and manager for IR code protocols and formats
 
 =head1 VERSION
 
-version 1.2
+version 1.3
 
 =head1 SYNOPSIS
 
@@ -411,6 +441,14 @@ unregistered format.
 =head2 register_protocol
 
     $converter->register_protocol('RC5', 'Protocol::IR::RC5');
+    $self->register_protocol('RC6',      'Protocol::IR::Proto::RC6');
+    $self->register_protocol('MITSUBISHI', 'Protocol::IR::Proto::Mitsubishi');
+    $self->register_protocol('DENON',   'Protocol::IR::Proto::Denon');
+    $self->register_protocol('AIWA',     'Protocol::IR::Proto::Aiwa');
+    $self->register_protocol('G.I.CABLE', 'Protocol::IR::Proto::GICable');
+    $self->register_protocol('DISH_NETWORK', 'Protocol::IR::Proto::Dish');
+    $self->register_protocol('DENON-K', 'Protocol::IR::Proto::DenonK');
+    $self->register_protocol('DENON{1}','Protocol::IR::Proto::Denon1');
 
 Registers a protocol handler class under a name. See L</"EXTENDING THE
 FRAMEWORK">.
@@ -497,6 +535,14 @@ into a Pronto Hex string.
 Register it in C<Protocol::IR::Converter::new()>:
 
     $self->register_protocol('RC5', 'Protocol::IR::RC5');
+    $self->register_protocol('RC6',      'Protocol::IR::Proto::RC6');
+    $self->register_protocol('MITSUBISHI', 'Protocol::IR::Proto::Mitsubishi');
+    $self->register_protocol('DENON',   'Protocol::IR::Proto::Denon');
+    $self->register_protocol('AIWA',     'Protocol::IR::Proto::Aiwa');
+    $self->register_protocol('G.I.CABLE', 'Protocol::IR::Proto::GICable');
+    $self->register_protocol('DISH_NETWORK', 'Protocol::IR::Proto::Dish');
+    $self->register_protocol('DENON-K', 'Protocol::IR::Proto::DenonK');
+    $self->register_protocol('DENON{1}','Protocol::IR::Proto::Denon1');
 
 =head2 Adding a new format (Protocol::IR::Format::NAME)
 
@@ -532,5 +578,6 @@ Brett T. Warden <bwarden@cpan.org>
 Copyright (c) 2026 Brett T. Warden
 
 This library is free software; you can redistribute it and/or modify it
-under the terms of the GNU Lesser General Public License version 2.1 as
-published by the Free Software Foundation.
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 2 of the License, or (at your
+option) any later version.

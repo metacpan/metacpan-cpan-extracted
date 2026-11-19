@@ -1,5 +1,12 @@
 Revision history for Mail-Qmail-Filter
 
+2.01    2027-11-18 17:13
+        several new filters, bugfixes and maybe new bugs
+
+1.32    2023-05-18 16:02
+        catch exception thrown by Mail::DMARC::PurePerl for invalid
+        recipient domains in Mail::Qmail::Filter::DMARC
+
 1.31    2022-04-18 16:49
         * implemented ->skip_if
         * removed unnecessary code

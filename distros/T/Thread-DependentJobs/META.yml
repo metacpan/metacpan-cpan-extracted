@@ -1,0 +1,70 @@
+---
+abstract: 'Run interdependent jobs using a pool of worker threads'
+author:
+  - 'Jim Avera <jim.avera@gmail.com>'
+build_requires:
+  Capture::Tiny: '0'
+  Carp::Always: '0'
+  Cwd: '0'
+  Data::Dumper: '0'
+  Data::Dumper::Interp: '7.012'
+  Encode: '0'
+  English: '0'
+  Env: '0'
+  Exporter: '0'
+  File::Path: '0'
+  File::Spec: '0'
+  File::Spec::Functions: '0'
+  File::Temp: '0.23'
+  FindBin: '0'
+  Getopt::Long: '0'
+  Import::Into: '0'
+  JSON: '0'
+  List::AllUtils: '0'
+  POSIX: '0'
+  Path::Tiny: '0.146'
+  Test2::Plugin::BailOnFail: '0'
+  Test2::V0: '1.302214'
+  Thread::Semaphore: '0'
+  Time::HiRes: '0'
+  autovivification: '0'
+  indirect: '0'
+  lib: '0'
+  multidimensional: '0'
+  parent: '0'
+  perl: '5.018'
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150013'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Thread-DependentJobs
+provides:
+  Thread::DependentJobs:
+    file: lib/Thread/DependentJobs.pm
+    version: '1.3'
+requires:
+  Carp: '0'
+  Data::Dumper::Interp: '7.012'
+  File::Basename: '0'
+  Guard: '0'
+  List::MoreUtils: '0'
+  List::Util: '0'
+  Scalar::Util: '1.10'
+  Spreadsheet::Edit::Log: '0'
+  Thread::Queue: '0'
+  constant: '0'
+  feature: '0'
+  overload: '0'
+  strict: '0'
+  threads: '0'
+  threads::shared: '0'
+  warnings: '0'
+version: '1.3'
+x_generated_by_perl: v5.40.1
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: CC0-1.0

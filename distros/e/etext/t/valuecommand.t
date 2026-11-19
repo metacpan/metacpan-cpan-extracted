@@ -365,8 +365,8 @@ sub runs {
      'num restore [2.1 0] undo', 'and is told when the undo gives it back');
   @calls = ();
   $t->blockNodedata('2.1', 0, undef);
-  is(join(' ', map { "$_->[0] $_->[2] $_->[5]" } @calls), 'num drop set',
-     'and when it is dropped');
+  is(join(' ', map { "$_->[0] $_->[2] $_->[5]" } @calls), 'num stash set',
+     'and when a setting replaces it (recorded: -undo on)');
   @calls = ();
   $t->blockNodedata('2.1', 0, D->new('again'));
   $t->destroy;

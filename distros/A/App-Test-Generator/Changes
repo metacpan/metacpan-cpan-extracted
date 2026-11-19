@@ -1,5 +1,23 @@
 Revision history for App-Test-Generator
 
+0.51	Wed Nov 18 09:42:50 PM EST 2026
+	[Bug fixes]
+	- test-generator-mutate compiles each mutant against the project's own lib/
+	  rather than whatever copies of its modules are installed.  A module
+	  that used a newer or uninstalled module of the same project failed
+	  that check, so all its mutants were silently skipped and the file
+	  scored a vacuous 100% with Total: 0
+
+	[Enhancements]
+	- test-generator-mutate reports mutants that do not compile.  They are
+	  still not run or scored, but the summary prints "Skipped (compile): N"
+	  and the --json report has a compile_skipped count for each file, so a
+	  file whose mutants were all dropped no longer looks like a clean 100%
+	- test-generator-index shows those counts: a "Skipped (compile)" line in
+	  the mutation summary, "(+N not compiled)" in each file's Skipped cell,
+	  and a note on the file's mutation page.  A file whose mutants all
+	  failed to compile now gets a row instead of being left out
+
 0.50	Tue Nov 17 08:48:54 PM EST 2026
 	[Enhancements]
 	- extract-schemas no longer dies with "More than one package declaration

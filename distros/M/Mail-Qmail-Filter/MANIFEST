@@ -1,12 +1,16 @@
+bin/qmail-deliverable
 bin/qmail-dmarc
 Changes
 lib/Mail/Qmail/Filter.pm
+lib/Mail/Qmail/Filter/Base/CalloutVerify.pm
 lib/Mail/Qmail/Filter/CheckDeliverability.pm
 lib/Mail/Qmail/Filter/ClamAV.pm
 lib/Mail/Qmail/Filter/DMARC.pm
 lib/Mail/Qmail/Filter/Dump.pm
+lib/Mail/Qmail/Filter/Graylist.pm
 lib/Mail/Qmail/Filter/LogEnvelope.pm
 lib/Mail/Qmail/Filter/Queue.pm
+lib/Mail/Qmail/Filter/RDNS.pm
 lib/Mail/Qmail/Filter/RequireFrom.pm
 lib/Mail/Qmail/Filter/RewriteFrom.pm
 lib/Mail/Qmail/Filter/RewriteSender.pm
@@ -15,6 +19,8 @@ lib/Mail/Qmail/Filter/SpamAssassin.pm
 lib/Mail/Qmail/Filter/Util.pm
 lib/Mail/Qmail/Filter/ValidateFrom.pm
 lib/Mail/Qmail/Filter/ValidateSender.pm
+lib/Mail/Qmail/Filter/VerifyFrom.pm
+lib/Mail/Qmail/Filter/VerifySender.pm
 lib/MailX/Qmail/Queue/Message.pm
 Makefile
 Makefile.PL

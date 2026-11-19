@@ -28,10 +28,14 @@ my $u = $mw->eText(-undo => 1)->pack;
 my $path = $u->PathName;
 sub refused { qr/^cannot modify \Q$path\E while its values are being freed, $_[0] changes deep/ }
 sub text { $u->get('1.0', 'end -1c') // '' }
+sub unrecorded { $u->configure(-undo => 0); $_[0]->(); $u->configure(-undo => 1) }
 
 # A chain: the value numbered $k, freed in round $k, inserts "$k," at
 # the end of the text and drops a new value $k+1 (set on the mark p,
-# then unset) as long as $k <= $N.  So $N changes are wanted, the k-th
+# then unset) as long as $k <= $N.  The values are set and unset with
+# -undo off, so that the value unset is freed in the next round (since
+# 2.10 a setting with -undo on keeps it in the undo step); the insert is
+# made with -undo on, to be undone below.  So $N changes are wanted, the k-th
 # in round k.  The package of the values decides what DESTROYmult does.
 our ($N, @chain, @asks, @errors, %freed);
 {
@@ -43,9 +47,9 @@ our ($N, @chain, @asks, @errors, %freed);
     return if !$self->{n} || $self->{n} > $N;
     my $next = (ref $self)->new($self->{n} + 1);
     if (eval {
+      $u->configure(-undo => 1);
       $u->insert('end -1c', "$self->{n},");
-      $u->markData('p', $next);
-      $u->markData('p', undef);
+      main::unrecorded(sub { $u->markData('p', $next); $u->markData('p', undef) });
       1 }) {
       push @chain, $self->{n};
     } else {
@@ -78,8 +82,10 @@ sub run_chain {
   $u->delete('1.0', 'end');
   $u->markSet('p', '1.0');
   $u->editReset;
-  $u->markData('p', $class->new(1));
-  $u->markData('p', undef);		# the pass starts here
+  unrecorded(sub {
+    $u->markData('p', $class->new(1));
+    $u->markData('p', undef);		# the pass starts here
+  });
   $mw->update;				# the background errors
 }
 
@@ -241,8 +247,7 @@ unlike($u->get('1.0'), qr/X/, 'and not made');
     my ($class, $n) = @_;
     $n == 10 ? [Inner->new(10)] : bless { n => $n }, $class;
   };
-  $u->markData('p', Chain::None->new(1));
-  $u->markData('p', undef);
+  unrecorded(sub { $u->markData('p', Chain::None->new(1)); $u->markData('p', undef) });
   is_deeply(\@chain, [1 .. 12], 'a value held by an unblessed array: the chain goes on');
   is_deeply(\@asks, [['inner', 1, 10]], 'the object whose DESTROY changes the widget is asked');
   freed_once(13, 'a value held by an unblessed array');
@@ -255,8 +260,7 @@ unlike($u->get('1.0'), qr/X/, 'and not made');
     my ($class, $n) = @_;
     $n == 10 ? Outer->new(10) : bless { n => $n }, $class;
   };
-  $u->markData('p', Chain::None->new(1));
-  $u->markData('p', undef);
+  unrecorded(sub { $u->markData('p', Chain::None->new(1)); $u->markData('p', undef) });
   is_deeply(\@asks, [['inner', 1, 10]],
 	    'an object freed by the DESTROY of the value: the innermost is asked');
   is_deeply(\@chain, [1 .. 12], 'and its answer counts');

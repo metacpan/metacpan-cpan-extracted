@@ -976,7 +976,7 @@ as its argument, and in C<$_>, so write whichever reads best:
     # Parklife (1994)
     # The Great Escape (1995)
 
-    my @names = $dbh->iterate('SELECT name FROM artist ORDER BY id', sub { $_->[0] })->all;
+    my @names = $dbh->iterate('SELECT name FROM artist ORDER BY id', pluck)->all;
     say "@names";    # Abba Blur Cream
 
 =head2 Leave rows out
@@ -1184,7 +1184,7 @@ so no more rows are fetched:
 
     my @page = $dbh->iterate(
         'SELECT name FROM track ORDER BY id',
-        sub { $_->[0] },
+        pluck,
         sub { m( \s )x ? $_ : () },    # names of more than one word
         drop(1),                       # the second and third of them
         take(2),
@@ -1351,7 +1351,7 @@ through the stages after, as if a stage had returned it:
 
     my @lines = $dbh->iterate(
         'SELECT name FROM artist ORDER BY name',
-        sub { $_->[0] },
+        pluck,
         and_count,
     )->all;
     say "@lines";    # Abba Blur Cream (3)
@@ -1932,7 +1932,7 @@ it gives an iterator, or a sink's result:
     my $sth = music 'SELECT name FROM artist WHERE id = ?', 1;
     say $sth->fetchrow_arrayref->[0];    # Abba
 
-    my @names = music 'SELECT name FROM artist ORDER BY id', sub { $_->[0] }, keep_all;
+    my @names = music 'SELECT name FROM artist ORDER BY id', pluck, keep_all;
     say "@names";    # Abba Blur Cream
 
 =head2 Name a statement, with stages of its own
@@ -1942,7 +1942,7 @@ always has. Called, it takes values, then any stages for that call
 only:
 
     use DBIx::Squirrel::Sugar statement => {
-        titles_by => [music => 'SELECT title FROM album WHERE artist_id = :artist ORDER BY year', sub { $_->[0] }],
+        titles_by => [music => 'SELECT title FROM album WHERE artist_id = :artist ORDER BY year', pluck],
         album     => [music => 'SELECT * FROM album WHERE id = ?'],
     };
 
@@ -1972,7 +1972,7 @@ runs, from configuration, say:
     use DBIx::Squirrel::Sugar qw(database statement);
 
     database(archive => 'dbi:SQLite:dbname=music.db', '', '', {RaiseError => 1});
-    statement(artist_count => archive => 'SELECT COUNT(*) FROM artist', sub { $_->[0] });
+    statement(artist_count => archive => 'SELECT COUNT(*) FROM artist', pluck);
 
     say artist_count(keep_single);    # 3
     say ref database('archive');      # DBIx::Squirrel::db
@@ -2022,11 +2022,11 @@ way through the cached handle, it's left alone, and a new handle takes
 its place:
 
     my $sql   = 'SELECT name FROM artist ORDER BY id';
-    my $first = $dbh->prepare_cached($sql)->iterate(sub { $_->[0] });
+    my $first = $dbh->prepare_cached($sql)->iterate(pluck);
     my($name) = $first->next;
     say $name;    # Abba
 
-    my $second = $dbh->prepare_cached($sql)->iterate(sub { $_->[0] });
+    my $second = $dbh->prepare_cached($sql)->iterate(pluck);
     say join ' ', $second->all;    # Abba Blur Cream
     say join ' ', $first->all;     # Blur Cream
 
@@ -2186,7 +2186,7 @@ in a C<gather> block, so it starts afresh on each run:
 
     my $chart = $dbh->iterate(
         'SELECT name FROM artist ORDER BY id',
-        sub { $_->[0] },
+        pluck,
         My::Stages::numbered_from(1),
     );
     say join ', ', $chart->all;           # 1. Abba, 2. Blur, 3. Cream
@@ -2511,7 +2511,7 @@ run ended, can follow it.
 =back
 
     use DBIx::Squirrel::Sugar statement => {
-        every_artist => [music => 'SELECT name FROM artist ORDER BY id', sub { $_->[0] }],
+        every_artist => [music => 'SELECT name FROM artist ORDER BY id', pluck],
     };
 
     my @names = every_artist(keep_all);         # version 2: every_artist()
@@ -2550,7 +2550,7 @@ any case.
     say artist('Blur')->single->Id;
 
     use DBIx::Squirrel::Sugar statement => {
-        artist_id => [music => 'SELECT id FROM artist WHERE name = ? LIMIT 1', sub { $_->[0] }],
+        artist_id => [music => 'SELECT id FROM artist WHERE name = ? LIMIT 1', pluck],
     };
 
     say artist_id('Blur', keep_single);    # 2

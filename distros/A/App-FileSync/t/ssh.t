@@ -332,4 +332,26 @@ SETTINGS
 	close $reset;
 }
 
+
+# --- ssh.extra_args from the client configuration ---------------------------
+{
+	my $config = use_ssh();
+	$config->{ssh}{extra_args} = [ '-o', 'Compression=yes', '-v' ];
+	App::FileSync::Config::save_client($config, $env->{config_path});
+
+	$env->write_file('client', 'notes/extra.txt', "extra\n", 1_700_000_800);
+	is($env->sync()->{exit}, 0, 'a sync with ssh.extra_args succeeds');
+	my @argv = last_argv();
+	my ($host) = grep { $argv[$_] eq 'filesync@example.test' } 0 .. $#argv;
+	is_deeply([ @argv[ $host - 3 .. $host - 1 ] ], [ '-o', 'Compression=yes', '-v' ],
+		'the extra arguments reach ssh, just before the host');
+
+	$config->{ssh}{extra_args} = [ "-v\n-oProxyCommand=evil" ];
+	App::FileSync::Config::save_client($config, $env->{config_path});
+	throws_ok { $env->sync() } qr/bad extra_args/, 'an extra argument with a newline stops the sync';
+
+	$config->{ssh}{extra_args} = [];
+	App::FileSync::Config::save_client($config, $env->{config_path});
+}
+
 done_testing();

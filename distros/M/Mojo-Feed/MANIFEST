@@ -1,5 +1,7 @@
+AGENTS.md
 Build.PL
 Changes
+DEVELOP.md
 LICENSE
 META.json
 README.md
@@ -13,6 +15,7 @@ lib/Mojo/Feed/Item/Enclosure.pm
 lib/Mojo/Feed/Reader.pm
 lib/Mojolicious/Plugin/FeedReader.pm
 minil.toml
+mise.toml
 t/00_compile.t
 t/01-parse.t
 t/02-no-reader.t
@@ -24,6 +27,7 @@ t/06-atom10.t
 t/09-enclosures.t
 t/10-feed_types.t
 t/11-mutation.t
+t/12-real-world-regressions.t
 t/24-plugin.t
 t/samples/atom-enclosure.xml
 t/samples/atom-full.xml

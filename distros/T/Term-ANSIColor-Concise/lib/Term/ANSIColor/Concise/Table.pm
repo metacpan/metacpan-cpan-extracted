@@ -2,7 +2,7 @@
 
 package Term::ANSIColor::Concise::Table;
 
-our $VERSION = "3.04";
+our $VERSION = "3.05";
 
 use v5.14;
 use utf8;

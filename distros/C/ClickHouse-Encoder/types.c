@@ -9,6 +9,7 @@
 #include <stdint.h>
 
 #include "types.h"
+#include "scalar_kind.h"
 
 /* Cap on type-expression nesting. parse_type recurses once per level, as
  * do free_typeinfo / encode_column / decode_column over the tree it
@@ -86,6 +87,8 @@ void free_typeinfo(pTHX_ TypeInfo *t) {
         Safefree(t->enum_entries);
     }
     if (t->enum_lookup) SvREFCNT_dec((SV*)t->enum_lookup);
+    if (t->enum_codes) Safefree(t->enum_codes);
+    if (t->timezone) Safefree(t->timezone);
     if (t->variant_decl_to_wire) Safefree(t->variant_decl_to_wire);
     if (t->variant_wire_to_decl) Safefree(t->variant_wire_to_decl);
     if (t->tuple_names) {
@@ -104,6 +107,7 @@ static void parse_enum_entries(pTHX_ TypeInfo *t, const char *s, STRLEN len, int
     t->enum_entries = NULL;
     t->enum_count = 0;
     t->enum_lookup = newHV();
+    Newxz(t->enum_codes, code == T_ENUM8 ? 32 : 8192, unsigned char);
 
     STRLEN i = 0;
     while (i < len) {
@@ -183,6 +187,11 @@ static void parse_enum_entries(pTHX_ TypeInfo *t, const char *s, STRLEN len, int
         t->enum_count++;
 
         hv_store(t->enum_lookup, name_buf, name_len, newSViv(val), 0);
+        if (looks_like_int_str(name_buf, name_len)) t->enum_has_integer_labels = 1;
+        {
+            unsigned index = (unsigned)(val - min_val);
+            t->enum_codes[index >> 3] |= 1U << (index & 7);
+        }
     }
 }
 
@@ -626,21 +635,25 @@ static TypeInfo* parse_type_at(pTHX_ const char *type, STRLEN len, int depth) {
         parse_enum_entries(aTHX_ t, type + 7, len - 8, T_ENUM16);
     } else if (len > 10 && strncmp(type, "Decimal32(", 10) == 0) {
         t->code = T_DECIMAL32;
+        t->precision = 9;
         t->param = parse_int_param(type + 10, len - 10, 0);
         if (t->param < 0 || t->param > 9)
             croak("Decimal32 scale must be 0..9, got %d", t->param);
     } else if (len > 10 && strncmp(type, "Decimal64(", 10) == 0) {
         t->code = T_DECIMAL64;
+        t->precision = 18;
         t->param = parse_int_param(type + 10, len - 10, 0);
         if (t->param < 0 || t->param > 18)
             croak("Decimal64 scale must be 0..18, got %d", t->param);
     } else if (len > 11 && strncmp(type, "Decimal128(", 11) == 0) {
         t->code = T_DECIMAL128;
+        t->precision = 38;
         t->param = parse_int_param(type + 11, len - 11, 0);
         if (t->param < 0 || t->param > 38)
             croak("Decimal128 scale must be 0..38, got %d", t->param);
     } else if (len > 11 && strncmp(type, "Decimal256(", 11) == 0) {
         t->code = T_DECIMAL256;
+        t->precision = 76;
         t->param = parse_int_param(type + 11, len - 11, 0);
         if (t->param < 0 || t->param > 76)
             croak("Decimal256 scale must be 0..76, got %d", t->param);
@@ -654,6 +667,7 @@ static TypeInfo* parse_type_at(pTHX_ const char *type, STRLEN len, int depth) {
         if (scale < 0 || scale > precision)
             croak("Decimal scale must be 0..precision, got %d", scale);
         t->param = scale;
+        t->precision = precision;
         if (precision <= 9) t->code = T_DECIMAL32;
         else if (precision <= 18) t->code = T_DECIMAL64;
         else if (precision <= 38) t->code = T_DECIMAL128;
@@ -830,15 +844,29 @@ static TypeInfo* parse_type_at(pTHX_ const char *type, STRLEN len, int depth) {
     } else if (len > 15 && strncmp(type, "LowCardinality(", 15) == 0) {
         t->code = T_LOWCARDINALITY;
         t->inner = parse_type_at(aTHX_ type + 15, len - 16, depth);
-        if (t->inner->code != T_STRING && t->inner->code != T_FIXEDSTRING
-                && (t->inner->code != T_NULLABLE
-                    || (t->inner->inner->code != T_STRING
-                        && t->inner->inner->code != T_FIXEDSTRING)))
-            croak("LowCardinality(T) currently supports T = String / FixedString / Nullable(String) / Nullable(FixedString)");
+        TypeInfo *leaf = t->inner->code == T_NULLABLE ? t->inner->inner : t->inner;
+        if (leaf->code > T_IPV6 || leaf->code == T_ARRAY
+                || leaf->code == T_TUPLE || leaf->code == T_NULLABLE)
+            croak("LowCardinality(T) supports scalar inner types");
     } else {
         croak("Unknown type: %.*s", (int)len, type);
     }
 
+    if ((t->code == T_DATETIME || t->code == T_DATETIME64) && !t->timezone) {
+        const char *quote = memchr(type, '\'', len);
+        if (quote) {
+            STRLEN pos = quote - type;
+            STRLEN end = skip_type_quote(aTHX_ type, len, pos);
+            STRLEN j, used = 0;
+            Newx(t->timezone, end - pos, char);
+            for (j = pos + 1; j < end - 1; j++) {
+                if (type[j] == '\\' && j + 1 < end - 1) j++;
+                t->timezone[used++] = type[j];
+            }
+            t->timezone[used] = 0;
+            if (!used || memchr(t->timezone, 0, used)) croak("Invalid timezone name");
+        }
+    }
     t->has_prefix = t->code == T_LOWCARDINALITY || t->code == T_VARIANT
                  || t->code == T_JSON || t->code == T_DYNAMIC;
     if (t->inner && t->inner->has_prefix) t->split_prefix = 1;

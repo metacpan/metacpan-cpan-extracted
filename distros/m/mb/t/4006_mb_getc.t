@@ -62,6 +62,9 @@ END   { unlink("@{[__FILE__]}.txt") }
     sub {1},
     sub {1},
 # 41
+# open(my $fh, ...) in 41-43 and 51-53 is an intentional exception to the
+# bareword filehandle rule: they test mb::getc() with a lexical filehandle
+# (SKIP on perl older than 5.006)
     sub { return 'SKIP' if $] < 5.006; open(my $fh,"@{[__FILE__]}.txt"); my $r=mb::getc($fh);                                           close($fh); $r eq 'A'  },
     sub { return 'SKIP' if $] < 5.006; open(my $fh,"@{[__FILE__]}.txt"); my $a=mb::getc($fh); my $r=mb::getc($fh);                      close($fh); $r eq 'ƒ¿' },
     sub { return 'SKIP' if $] < 5.006; open(my $fh,"@{[__FILE__]}.txt"); my $a=mb::getc($fh); my $b=mb::getc($fh); my $r=mb::getc($fh); close($fh); $r eq '‚ ' },

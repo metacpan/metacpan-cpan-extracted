@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 3.3.2 are described by their release commits.
 
+## 3.16.1 - 2026-11-19
+
+### Fixes
+
+- Re-pin the spec to 2026.11.18: a key over plain HTTP is refused ([`ef736d3`](https://github.com/vpndetection-io/sdk-perl/commit/ef736d33cf789ce0b27dd52c0ef52aca2e8b8793))
+
 ## 3.16.0 - 2026-11-18
 
 ### Features

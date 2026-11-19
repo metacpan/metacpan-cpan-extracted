@@ -46,8 +46,11 @@ TL:common/cd.md:24	*	open: cd - with OLDPWD unset (dash prints the directory; ou
 SC:Checks/Commands.hs:prop_checkPrintfVar3	*	Q2 (choice B): printf -v stays with the program
 SC:Checks/ShellSupport.hs:prop_checkBashisms30	*	Q2 (choice B): printf -v stays with the program
 does:glob (?:\S*/)?\.[^/\s]*[*?\[]\S*: \+	*	rule E (harm): a pattern never matches . or .., as bash (G2)
+NB:6795	base	chance: tee creates output.file while ls reads the directory; whether ls lists it depends on timing (by hand, 50 runs each: dash 31, bash 33, ours 2 list it; ours starts tee later after ls than the shells, by the Perl work between two spawns: strace, dash 1.4 ms, ours 4.7 ms; large-subset-state.md, section 7; kept so: K6, the user, 2026-11-15)
 NB:685	*	chance: two commands read one pipe in turn; how much the first takes depends on timing (10 runs each: dash, bash and ours all give both results)
 NB:5776	base	chance: tee truncates bar while cat reads it; how much is copied depends on timing (by hand, 200 runs each: dash and bash give both sizes, ours one of them)
 NB:6259	base	chance: xargs -P4 runs four echo at once; the order of their lines depends on timing (20 runs each: 17, 16 and 20 different orders; large-subset-env-races.tsv)
+NB:4904	*	chance: file times (xargs ls -lhrt) of files the run writes meanwhile, which the assumption program does not cover (the sample changes so between two base runs too: large-subset-env-variants.tsv, sigpipe, noisy; post-0.12, 2026-11-16)
+NB:6406	*	chance: cat reads the files tee -a appends to; how much it reads depends on timing (by hand, 20 runs each in one directory: dash read some in 6, bash in 1, ours in none of 40; large-subset-environment.md, section 10)
 TL:common/exec.md:8	*	open: X56 (ours): exec with a builtin's name runs the builtin; dash and bash look for a program (not found, 127); ours' status 248 is not A4 here (known issues, TODO)
 TL:linux/zenity.md:25	*	open: persistent, not a race (20 runs, post-0.11: ours' own result in every one): the shells' echo dies of SIGPIPE and ends the subshell, ours' fails alone and the subshell goes on (TODO A17)

@@ -3,7 +3,7 @@ use warnings;
 
 package MailX::Qmail::Queue::Message;
 
-our $VERSION = '1.0';
+our $VERSION = '1.41';
 
 use base 'Mail::Qmail::Queue::Message';
 
@@ -12,6 +12,13 @@ use Mail::Header;
 
 # Use inside-out attributes to avoid interference with base class:
 my ( %header, %body );
+
+sub add_header {
+    my $self = shift;
+    ${ $self->body_ref } = join "\n", @_, $self->body;
+    delete $header{$self};
+    $self;
+}
 
 sub header {
     my $self = shift;
@@ -31,7 +38,7 @@ sub header_from {
 }
 
 sub helo {
-    my $header = shift->header;
+    my $header   = shift->header;
     my $received = $header->get('Received') or return;
     $received =~ /^from .*? \(HELO (.*?)\) /
       or $received =~ /^from (\S+) \(/
@@ -39,11 +46,34 @@ sub helo {
     $1;
 }
 
-sub add_header {
+sub identity {
     my $self = shift;
-    ${ $self->body_ref } = join "\n", @_, $self->body;
-    delete $header{$self};
-    $self;
+    require Digest::SHA1;
+    my $digest = Digest::SHA1->new;
+    $digest->add( map "$_\n", $self->from, sort $self->to );
+    {
+        # We only take some header lines for the hash, because tests showed
+        # that others (e.g. Received, DKIM-Signatures etc.) _do_ change
+        # between several delivery attempts of the same message.
+        my $header = $self->header;
+
+        # I observed cases in the wild where the Date header line changed
+        # between delivery attempts; therefore we do not include it in the
+        # hash. And e.g. for AOL.com, even the Message-ID might change.
+        for my $name (qw(From To Subject)) {
+            $digest->add( map "$name: $_", $header->get($name) );
+        }
+    }
+    $digest->add( "\n", $body{$self} );
+    $digest->hexdigest;
+}
+
+sub remote_host {
+    $ENV{TCPREMOTEHOST};
+}
+
+sub remote_ip {
+    $ENV{TCPREMOTEIP};
 }
 
 sub replace_header {
@@ -75,33 +105,59 @@ This class extends L<Mail::Qmail::Queue::Message>.
 
 =head1 METHODS
 
-=over 4
-
-=item ->header
-
-get the header of the incoming message as L<Mail::Header> object
-
-=item ->header_from
-
-get the C<From:> header field of the incoming message as L<Mail::Address> object
-
-=item ->helo
-
-get the C<HELO>/C<EHLO> string used by the client
-
-=item ->add_header
+=head2 ->add_header
 
 Add header fields to the message.
 Expects C<Field: Value> as argument, without newlines at the end.
 
-=item ->replace_header($header)
+=head2 ->header
+
+get the header of the incoming message as L<Mail::Header> object
+
+=head2 ->header_from
+
+get the C<From:> header field of the incoming message as L<Mail::Address> object
+
+=head2 ->helo
+
+get the C<HELO>/C<EHLO> string used by the client
+
+=head2 ->identity
+
+Gives back a string that tries to uniquely identify this e-mail message,
+that is:
+
+=over 4
+
+=item *
+
+It is supposed to remain constant over several delivery attempts
+of the same message, e.g. after deferrals.
+
+=item *
+
+But it should be different for other messages.
+
+=item *
+
+It can be safely used as (part of) a filename.
+
+=back
+
+=head2 ->remote_host
+
+get the name of the host the message comes from (from its reverse lookup)
+
+=head2 ->remote_ip
+
+get the IP address the message comes from
+
+=head2 ->replace_header($header)
 
 Replace the whole header of the message.
 C<$header> should either be a properly formatted e-mail header
 or an object with an C<as_string> method which produces such a string,
 e.g. a L<Mail::Header> object.
-
-=back
 
 =head1 BUGS
 

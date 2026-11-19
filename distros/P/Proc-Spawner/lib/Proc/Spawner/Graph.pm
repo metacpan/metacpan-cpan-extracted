@@ -1,5 +1,5 @@
 package Proc::Spawner::Graph;
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 # EXPERIMENTAL.  The companion of Proc::Spawner: the spawn graph, which is what gets executed.  It says,
 # for the current moment, which of our children and which of our own reads and writes use which open
 # file, and carries on each process what to do when it ends.  That reaction may start new processes,
@@ -67,8 +67,9 @@ sub fifo_pipe {   # (read handle, write handle, Perl's own non-blocking write ha
   fcntl($nb, F_SETFD, FD_CLOEXEC); ($r, $w, $nb) }
 sub new_pipe {   # (read end, write end)
   my $g = shift; my ($r, $w, $nb); my $n = ++$g->{pipes};
-  if ($REOPEN || $Proc::Spawner::WIN) { pipe $r, $w or return } else { ($r, $w, $nb) = fifo_pipe() or return }   # (Windows: the loop
-                                                     # writes without a non-blocking flag, W5; Wine's /proc is Linux's, not Windows')
+  if ($REOPEN || $Proc::Spawner::WIN) { pipe $r, $w or return } else { ($r, $w, $nb) = fifo_pipe() or return }   # (Windows:
+                                                     # the loop writes without a non-blocking flag, W5;
+                                                     # Wine's /proc is Linux's, not Windows')
   my @e = peers(map +{ kind => $_, pipe => $n }, qw(r w));
   adopt($g, $e[0], $r, "pipe $n read end"); adopt($g, $e[1], $w, "pipe $n write end"); $e[1]{nbw} = $nb if $nb;
   tr_("pipe $n: read end fd $e[0]{fd}, write end fd $e[1]{fd}"); @e }
@@ -131,7 +132,8 @@ sub perl_write {   # to a pipe or FIFO through an open file of our own, made non
   # Windows: the fd as it is (the loop writes a synchronous handle from a helper thread, W5).
   my ($to, $chunk) = $Proc::Spawner::WIN || !S_ISFIFO((POSIX::fstat($e->{fd}))[2] // 0) ? $e->{fd} : $e->{nbw} ? $e->{nbw}
     : sysopen($nb, "/proc/self/fd/$e->{fd}", O_WRONLY|O_NONBLOCK) ? $nb : ($e->{fd}, POSIX::PIPE_BUF());
-  $id = Proc::Spawner::on_write($to, $bytes, sub { my $err = shift; undef $nb; delete $g->{io}{$id}; local $! = $err // 0; call($h, $g) }, $chunk);
+  $id = Proc::Spawner::on_write($to, $bytes, sub { my $err = shift;
+    undef $nb; delete $g->{io}{$id}; local $! = $err // 0; call($h, $g) }, $chunk);
   $g->{io}{$id} = [$e, '>']; $id }
 
 # An ended process stays while it shares an end, or a pipe, with a process still to run or with one of
@@ -183,7 +185,8 @@ sub parse {
       push @procs, $p }
     else { $bad->("cannot read '$_'") } }
   my %byname = map +($_->{name} => $_), @procs;
-  for (@after) { $_->[0]{after} = [$byname{$_->[1]} // die("after: no process $_->[1]\n"), $_->[2] || 'then']; weaken($_->[0]{after}[0]) }
+  for (@after) { $_->[0]{after} = [$byname{$_->[1]} // die("after: no process $_->[1]\n"), $_->[2] || 'then'];
+    weaken($_->[0]{after}[0]) }
   bless { procs => \@procs, ends => \%end, io => {}, own => {}, pipes => 0, pics => 0 } }
 
 # ------------------------------------------------------------------ running a hand-written graph
@@ -199,14 +202,17 @@ sub run {
   my %ends = map +(refaddr $_->[2] => $_->[2]), map @{$_->{edges}}, @procs, $perl // ();
   for my $e (grep $_->{kind} ne 'parent', values %ends) {
     next if $e->{fh};
-    if ($e->{kind} eq 'file') { sysopen my $fh, $e->{path}, $OPEN{$e->{mode}}, 0666 or die "$e->{path}: $!\n"; adopt($g, $e, $fh, "file $e->{path}") }
+    if ($e->{kind} eq 'file') { sysopen my $fh, $e->{path}, $OPEN{$e->{mode}}, 0666 or die "$e->{path}: $!\n";
+                                adopt($g, $e, $fh, "file $e->{path}") }
     else { my ($r, $w) = $e->{kind} eq 'r' ? ($e, $e->{peer}) : ($e->{peer}, $e);
-           pipe my $rh, my $wh or die "pipe: $!\n"; adopt($g, $r, $rh, "pipe $r->{pipe} read end"); adopt($g, $w, $wh, "pipe $w->{pipe} write end") } }
+           pipe my $rh, my $wh or die "pipe: $!\n"; adopt($g, $r, $rh, "pipe $r->{pipe} read end");
+           adopt($g, $w, $wh, "pipe $w->{pipe} write end") } }
   hold($_->[2]) for map @{$_->{edges}}, @procs, $perl // ();   # each user holds its ends; the creator lets go
   my %all = map +(refaddr $_ => $_), map +($_, $_->{peer} // ()), values %ends;
   release($_) for grep $_->{kind} ne 'parent', values %all;
   my %got;
-  for my $e (map $_->[2], @{$perl ? $perl->{edges} : []}) { $got{refaddr $e} = ''; $g->perl_read($e, 65536, [__PACKAGE__ . '::collect', $e, \%got]) }
+  for my $e (map $_->[2], @{$perl ? $perl->{edges} : []}) { $got{refaddr $e} = '';
+    $g->perl_read($e, 65536, [__PACKAGE__ . '::collect', $e, \%got]) }
   launch($g, $_, $o{bin}) for grep !$_->{after}, @procs;
   Proc::Spawner::wait_until(sub { !grep($_->{st} eq 'running', @procs) && !%{$g->{io}} });
   my %res = map +($_->{name} => ($_->{wait} >> 8 || $_->{wait} & 127)), grep defined $_->{wait}, @procs;
@@ -243,7 +249,8 @@ sub to_dot {   # Graphviz source for $g; $caption under the picture
     for (@e) { $end{refaddr $_->[2]} = $_->[2]; $first{refaddr $_->[2]} = $i if $RD{$_->[1]} } }
   for my $e (values %end) { push @{$pipe{$e->{pipe}}}, $e if defined $e->{pipe} }
   my $dotted = sub { $_[0]{forgotten} ? 'dotted' : 'solid' };
-  my @L = ('digraph G {', ' rankdir=' . ($ENV{RANKDIR} || 'LR') . '; nodesep=0.25; ranksep=0.45; bgcolor="transparent"; fontname="Helvetica";',
+  my @L = ('digraph G {',
+    ' rankdir=' . ($ENV{RANKDIR} || 'LR') . '; nodesep=0.25; ranksep=0.45; bgcolor="transparent"; fontname="Helvetica";',
     ' node [fontname="Helvetica", fontsize=11, color="black", fontcolor="black"];',
     ' edge [fontname="Helvetica", fontsize=10, color="black", fontcolor="black", arrowsize=0.7];',
     defined $caption ? (sprintf ' label="%s"; labelloc=b; fontsize=10;', q_($caption)) : ());
@@ -254,20 +261,25 @@ sub to_dot {   # Graphviz source for $g; $caption under the picture
     my %h = map +($_->{kind} => $_), map +($_, $_->{peer} // ()), @{$pipe{$n}};
     my ($r, $w) = map $h{$_} // { kind => $_, forgotten => 1 }, qw(r w);   # a half nobody holds any more
     my $cid = $n =~ s/\W/_/gr;
-    push @L, " subgraph cluster_$cid {", qq(  label="pipe $n"; style="rounded,dashed"; color="#888888"; fontcolor="#888888"; fontsize=10;);
-    push @L, sprintf '  %s [shape=circle, width=0.32, fixedsize=true, label="%s", style=%s];', id($_), $_->{kind}, $dotted->($_) for $w, $r;
+    push @L, " subgraph cluster_$cid {",
+      qq(  label="pipe $n"; style="rounded,dashed"; color="#888888"; fontcolor="#888888"; fontsize=10;);
+    push @L, sprintf '  %s [shape=circle, width=0.32, fixedsize=true, label="%s", style=%s];', id($_), $_->{kind}, $dotted->($_)
+      for $w, $r;
     push @L, sprintf('  %s -> %s [penwidth=2.2, arrowhead=none];', id($w), id($r)), ' }' }
   for my $i (0 .. $#edges) {
     my ($p, @e) = @{$edges[$i]}; my $pn = 'P_' . ($p->{name} =~ s/\W/_/gr); my $st = $p->{st} // 'pending';
-    if ($p->{name} eq 'Perl') { push @L, sprintf ' %s [shape=box, style="rounded,filled", fillcolor="#88888822", label="Perl: %s"];', $pn, q_($p->{argv}) }
+    if ($p->{name} eq 'Perl') {
+      push @L, sprintf ' %s [shape=box, style="rounded,filled", fillcolor="#88888822", label="Perl: %s"];', $pn, q_($p->{argv}) }
     else {
       my @in = grep $RD{$_->[1]} && !$WR{$_->[1]}, @e; my @o = grep $WR{$_->[1]}, @e;
       my $rows = (@in > @o ? @in : @o) || 1;
-      my $cell = sub { my ($side, $x) = @_; $x ? qq{<TD PORT="$side$x->[0]" BORDER="1" CELLPADDING="2">$x->[0]</TD>} : '<TD></TD>' };
+      my $cell = sub { my ($side, $x) = @_;
+        $x ? qq{<TD PORT="$side$x->[0]" BORDER="1" CELLPADDING="2">$x->[0]</TD>} : '<TD></TD>' };
       my $ended = $st !~ /^(pending|running|never)/;
       my $mid = q_($p->{argv}) . ($st ne 'pending' ? '<BR/><FONT POINT-SIZE="9">' . q_($st) . '</FONT>' : '');
       my $html = '<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0"' . ($ended ? ' BGCOLOR="#88888833"' : '') . '>';
-      $html .= '<TR>' . $cell->(i => $in[$_]) . ($_ ? '' : qq{<TD ROWSPAN="$rows" CELLPADDING="5">$mid</TD>}) . $cell->(o => $o[$_]) . '</TR>' for 0 .. $rows - 1;
+      $html .= '<TR>' . $cell->(i => $in[$_]) . ($_ ? '' : qq{<TD ROWSPAN="$rows" CELLPADDING="5">$mid</TD>})
+        . $cell->(o => $o[$_]) . '</TR>' for 0 .. $rows - 1;
       push @L, sprintf ' %s [shape=box, style=%s, margin=0, label=<%s</TABLE>>];', $pn,
         { pending => 'dashed', never => 'dashed', running => 'bold' }->{$st} // 'solid', $html }
     for (@e) {

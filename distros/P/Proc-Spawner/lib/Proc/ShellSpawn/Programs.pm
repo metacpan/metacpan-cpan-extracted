@@ -13,7 +13,7 @@ package Proc::ShellSpawn::Programs;
 # Integers go through Perl's own sprintf, so a perl with 64-bit integers is assumed (ivsize 8: Strawberry, Linux).
 use strict; use warnings;
 use POSIX (); use File::Spec (); use Math::BigInt ();
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 my $IMAX = Math::BigInt->new('9223372036854775807'); my $IMIN = -$IMAX - 1;
 my $UMAX = Math::BigInt->new('18446744073709551615');
@@ -25,12 +25,18 @@ sub is_utf8 { utf8_locale(@_) =~ /utf-?8/i }
 sub printable { my ($c, $u) = @_;   # a character (one byte, or a valid UTF-8 sequence in a UTF-8 locale)
   return $c =~ /\A[\x20-\x7e]\z/ if length $c == 1; return 0 unless $u; utf8::decode($c); $c =~ /\A\p{Print}\z/ }
 sub chars { my ($s, $u) = @_; $u ? $s =~ /$UTF8|./gs : split //, $s }
+sub c_esc { my ($s, $t) = @_;   # bytes that cannot be printed: each as C's escape from the table %$t, else in octal
+  join '', map $t->{$_} ? "\\$t->{$_}" : sprintf('\\%03o', ord), split //, $s }
+
+# "The same file?" is Proc::ShellSpawn's files_eq (the user, 2026-11-14: who uses whom decides the place), loaded only
+# when test -ef or pwd -L asks: everything else here runs without that module
+sub files_eq { require Proc::ShellSpawn; Proc::ShellSpawn::files_eq(@_) }
 
 sub q_ { my ($env, $s) = @_;   # coreutils' quote(): 'x' in the C locale, curly quotes in a UTF-8 one; inside, a backslash
   # doubled, control characters as C escapes, what the locale cannot print in octal, and (C locale) \' for '
   my $u = is_utf8($env, 'LC_MESSAGES');
-  my $t = join '', map { printable($_, $u) ? ($_ eq '\\' ? '\\\\' : $_ eq "'" && !$u ? "\\'" : $_)
-                                           : join '', map $CESC{$_} ? "\\$CESC{$_}" : sprintf('\\%03o', ord), split // } chars($s, $u);
+  my $t = join '',
+    map { printable($_, $u) ? ($_ eq '\\' ? '\\\\' : $_ eq "'" && !$u ? "\\'" : $_) : c_esc($_, \%CESC) } chars($s, $u);
   $u ? "\xe2\x80\x98$t\xe2\x80\x99" : "'$t'" }
 
 # ------------------------------------------------------------------ echo
@@ -44,13 +50,15 @@ sub echo {
   my @a = @$argv[1 .. $#$argv];
   my ($nl, $esc, $mode) = (1, 0, $style eq 'coreutils' ? 'echo' : $style);
   if ($style eq 'dash') { $esc = 1; if (@a && $a[0] eq '-n') { shift @a; $nl = 0 } }
-  elsif ($style eq 'bash') { while (@a && $a[0] =~ /^-([eEn]+)\z/) { shift @a; for (split //, $1) { $_ eq 'n' ? ($nl = 0) : ($esc = $_ eq 'e') } } }
+  elsif ($style eq 'bash') { while (@a && $a[0] =~ /^-([eEn]+)\z/) { shift @a;
+    for (split //, $1) { $_ eq 'n' ? ($nl = 0) : ($esc = $_ eq 'e') } } }
   elsif ($style eq 'coreutils') {
     my $posix = defined $env->{POSIXLY_CORRECT};
     $esc = $posix;   # POSIXLY_CORRECT: escapes always, options only for a first -n
     if (!$posix || (@a && $a[0] eq '-n')) {
-      return ($1 eq 'help' ? help('echo') : version('echo'), '', 0) if @a == 1 && $a[0] =~ /^--(help|version)\z/;
-      while (@a && $a[0] =~ /^-([eEn]+)\z/) { shift @a; for (split //, $1) { $_ eq 'n' ? ($nl = 0) : ($esc = $_ eq 'e' || $posix) } } } }
+      if (my @i = info('echo', @a)) { return @i }
+      while (@a && $a[0] =~ /^-([eEn]+)\z/) { shift @a;
+        for (split //, $1) { $_ eq 'n' ? ($nl = 0) : ($esc = $_ eq 'e' || $posix) } } } }
   else { die "PROC_SHELLSPAWN_ECHO: '$style' is none of @ECHO\n" }
   my $out = join ' ', @a;
   if ($esc) { ($out, my $stop) = esc($out, $mode, $env); return ($out, '', 0) if $stop }   # \c: nothing more, not the newline
@@ -88,9 +96,7 @@ sub bash_unichar {   # bash 5.2's \u and \U in echo -e (u32cconv): ASCII as it i
   my ($v, $env) = @_;
   return '' if $v > 0x7fffffff; return chr $v if $v < 0x80;
   return sprintf($v <= 0xffff ? '\\u%04X' : '\\U%08X', $v) unless is_utf8($env, 'LC_CTYPE');
-  my ($n, $lead) = $v < 0x800 ? (2, 0xc0) : $v < 0x10000 ? (3, 0xe0) : $v < 0x200000 ? (4, 0xf0) : $v < 0x4000000 ? (5, 0xf8) : (6, 0xfc);
-  my @b; for (2 .. $n) { unshift @b, 0x80 | ($v & 0x3f); $v >>= 6 }
-  pack 'C*', $lead | $v, @b }
+  my $c = chr $v; utf8::encode($c); $c }   # (Perl's own encoder writes that old form; utf8::encode is built in: no module)
 
 sub unichar {   # gnulib's print_unicode_char, as coreutils 9.4's printf uses it (X37): ASCII as it is; another character
   # encoded where the locale can (here: a UTF-8 locale), else (the C locale) the escape \uXXXX or \UXXXXXXXX, as above
@@ -107,7 +113,7 @@ my %NOT = ("'" => 'aAceEosxX', I => 'aAceEosxX', '#' => 'cdisu', 0 => 'cs');
 sub printf {
   my ($argv, $env) = @_; $env //= {};
   my ($name, @a) = @$argv;
-  return ($1 eq 'help' ? help('printf') : version('printf'), '', 0) if @a == 1 && $a[0] =~ /^--(help|version)\z/;
+  if (my @i = info('printf', @a)) { return @i }
   shift @a if @a && $a[0] eq '--';
   return ('', "$name: missing operand\nTry '$name --help' for more information.\n", 1) unless @a;
   my $fmt = shift @a;
@@ -147,7 +153,8 @@ sub printf {
         if ($error) { $msg->($error); return $done->(1) }
         return $done->() if $stop; next }
       $cv = $bq, $fl = $w = '' if defined $bq;
-      if (!defined $bq && ($cv !~ /^[aAcdeEfFgGiosuxX]\z/ || grep(index($NOT{$_} // "", $cv) >= 0, split //, $fl) || defined $p && $cv eq 'c')) {
+      if (!defined $bq && ($cv !~ /^[aAcdeEfFgGiosuxX]\z/ || grep(index($NOT{$_} // "", $cv) >= 0, split //, $fl)
+          || defined $p && $cv eq 'c')) {
         $msg->(substr($fmt, $from, pos($fmt) - $from) . ": invalid conversion specification"); return $done->(1) }   # (as written)
       $used = 1;
       if ($w eq '*') { $w = 0 + $num->(shift(@a), 'i'); $took++; $fl .= '-', $w = -$w if $w < 0 }
@@ -195,7 +202,7 @@ sub shell_quote {
   return qq{"$w"} if $plain && $w =~ /'/ && $w !~ /[\\?!"\$&()*;<=>\[^`|{}]|.[#~]/s;
   my ($q, $dollar) = ("'", 0);
   for (@c) {
-    if (!printable($_, $u)) { $q .= q{'$'} unless $dollar; $dollar = 1; $q .= join '', map $QESC{$_} ? "\\$QESC{$_}" : sprintf('\\%03o', ord), split // }
+    if (!printable($_, $u)) { $q .= q{'$'} unless $dollar; $dollar = 1; $q .= c_esc($_, \%QESC) }
     elsif ($_ eq "'") { $q .= q{'\''}; $dollar = 0 }
     else { $q .= "''" if $dollar; $dollar = 0; $q .= $_ } }
   "$q'" }
@@ -206,18 +213,18 @@ sub shell_quote {
 # end, where coreutils' messages still see it ("')' expected, found ']'").
 my %UNARY = map +($_ => 1), qw(-b -c -d -e -f -g -G -h -k -L -N -O -p -r -s -S -t -u -w -x -z -n);
 my %BINARY = map +($_ => 1), qw(= == != -eq -ne -lt -le -gt -ge -nt -ot -ef);
-our (@W, $LAST, $BEYOND, $ENV, $OPT);
+our (@W, $LAST, $BEYOND, $CMDENV, $OPT);
 sub test {
   my ($argv, $env, $opt) = @_;
   my ($name, @a) = @$argv; my $br = $name =~ m{(?:^|/)\[\z};
   if ($br) {
-    return ($1 eq 'help' ? help('[') : version('['), '', 0) if @a == 1 && $a[0] =~ /^--(help|version)\z/;
+    if (my @i = info('[', @a)) { return @i }
     return ('', "$name: missing " . q_($env // {}, ']') . "\n", 2) unless @a && pop(@a) eq ']' }
-  local (@W, $LAST, $BEYOND, $ENV, $OPT) = (@a); ($LAST, $BEYOND, $ENV, $OPT) = ($a[-1], $br ? ']' : undef, $env // {}, $opt // {});
-  my $r = eval { my $v = @W ? posix(scalar @W) : 0; die "extra argument " . q_($ENV, $W[0]) . "\n" if @W; $v ? 1 : 0 };
+  local (@W, $LAST, $BEYOND, $CMDENV, $OPT) = (@a); ($LAST, $BEYOND, $CMDENV, $OPT) = ($a[-1], $br ? ']' : undef, $env // {}, $opt // {});
+  my $r = eval { my $v = @W ? posix(scalar @W) : 0; die "extra argument " . q_($CMDENV, $W[0]) . "\n" if @W; $v ? 1 : 0 };
   defined $r ? ('', '', $r ? 0 : 1) : ('', "$name: " . $@, 2) }
 
-sub beyond { die "missing argument after " . q_($ENV, $LAST) . "\n" }
+sub beyond { die "missing argument after " . q_($CMDENV, $LAST) . "\n" }
 sub next_word { shift @W; beyond() unless @W; 1 }   # coreutils' advance(true)
 sub dash1 { defined $_[0] && $_[0] =~ /^-.\z/s }
 sub posix {
@@ -226,13 +233,13 @@ sub posix {
   if ($n == 2) {
     return !posix(1) if $W[0] eq '!' && shift @W;
     return unary_op() if $UNARY{$W[0]};
-    dash1($W[0]) ? die q_($ENV, $W[0]) . ": unary operator expected\n" : beyond() }
+    dash1($W[0]) ? die q_($CMDENV, $W[0]) . ": unary operator expected\n" : beyond() }
   if ($n == 3) {
     return binary_op(0) if $BINARY{$W[1]};
     return next_word() && !posix(2) if $W[0] eq '!';
     return (shift @W, posix(1), shift @W)[1] if $W[0] eq '(' && $W[2] eq ')';
     return expr() if $W[1] =~ /^-[ao]\z/;
-    die q_($ENV, $W[1]) . ": binary operator expected\n" }
+    die q_($CMDENV, $W[1]) . ": binary operator expected\n" }
   if ($n == 4) {
     return next_word() && !posix(3) if $W[0] eq '!';
     return (shift @W, posix(2), shift @W)[1] if $W[0] eq '(' && $W[3] eq ')' }
@@ -249,11 +256,11 @@ sub term {
     my ($close) = grep $W[$_] eq ')', 1 .. ($#W < 4 ? $#W : 4);   # the POSIX rules up to a ')' at most 4 words on
     $v = posix($close // scalar @W);
     my $at = @W ? $W[0] : $BEYOND;
-    die q_($ENV, ')') . " expected" . (defined $at ? ", found " . q_($ENV, $at) : '') . "\n" unless defined $at && $at eq ')';
+    die q_($CMDENV, ')') . " expected" . (defined $at ? ", found " . q_($CMDENV, $at) : '') . "\n" unless defined $at && $at eq ')';
     shift @W }
   elsif (@W >= 4 && $W[0] eq '-l' && $BINARY{$W[2]}) { shift @W; $v = binary_op(1) }
   elsif (@W >= 3 && $BINARY{$W[1]}) { $v = binary_op(0) }
-  elsif (dash1($W[0])) { die q_($ENV, $W[0]) . ": unary operator expected\n" unless $UNARY{$W[0]}; $v = unary_op() }
+  elsif (dash1($W[0])) { die q_($CMDENV, $W[0]) . ": unary operator expected\n" unless $UNARY{$W[0]}; $v = unary_op() }
   else { $v = length shift @W }
   $neg ? !$v : $v }
 sub unary_op { my $op = shift @W; beyond() unless @W; unary($op, shift @W) }
@@ -265,7 +272,7 @@ sub binary_op {   # L: -l STRING before (already taken); -l STRING after counts 
   binary($x, $op, $y) }
 
 sub int_of { my $s = shift;   # an integer of test: blanks around, a sign, digits (any length)
-  $s =~ /^[ \t]*([-+]?[0-9]+)[ \t]*\z/ ? Math::BigInt->new($1) : die "invalid integer " . q_($ENV, $s) . "\n" }
+  $s =~ /^[ \t]*([-+]?[0-9]+)[ \t]*\z/ ? Math::BigInt->new($1) : die "invalid integer " . q_($CMDENV, $s) . "\n" }
 sub path { my $f = shift; defined $OPT->{cwd} && length $f && !File::Spec->file_name_is_absolute($f) ? "$OPT->{cwd}/$f" : $f }
 sub mtime { my @s = eval { require Time::HiRes; Time::HiRes::stat($_[0]) }; @s = stat $_[0] unless @s; @s ? $s[9] : undef }
 my %CMP = (eq => sub { $_[0] == 0 }, ne => sub { $_[0] != 0 }, lt => sub { $_[0] < 0 }, le => sub { $_[0] <= 0 },
@@ -276,7 +283,7 @@ sub binary {
   return $x ne $y if $op eq '!=';
   return $CMP{$1}->(int_of($x) <=> int_of($y)) if $op =~ /^-(eq|ne|lt|le|gt|ge)\z/;
   ($x, $y) = (path($x), path($y));
-  if ($op eq '-ef') { my @a = stat $x; my @b = stat $y; return @a && @b && $a[0] == $b[0] && $a[1] == $b[1] }
+  return files_eq($x, $y) if $op eq '-ef';
   my ($new, $old) = map mtime($_), $op eq '-nt' ? ($x, $y) : ($y, $x);
   defined $new && (!defined $old || $new > $old) }
 sub unary {
@@ -311,7 +318,7 @@ sub pwd {
       @m == 1 or return ('', "$name: unrecognized option '$w'\n$try", 1);
       return ('', "$name: option '--$m[0]' doesn't allow an argument\n$try", 1) if $arg;
       my $o = $PWDLONG{$m[0]};
-      return ($o eq 'help' ? help('pwd') : version('pwd'), '', 0) if length $o > 1;
+      return info('pwd', "--$o") if length $o > 1;
       $logical = $o eq 'L'; next }
     if ($w =~ /^-(.+)/s) {
       for my $l (split //, $1) {
@@ -322,11 +329,15 @@ sub pwd {
   my $dir = $opt->{cwd} // '.';
   my $wd = $env->{PWD};
   my $ok = $logical && defined $wd && File::Spec->file_name_is_absolute($wd)
-    && ($^O eq 'MSWin32' ? $wd =~ s{^[/\\]{2}[^/\\]+}{}r : $wd) !~ m{[/\\]\.\.?(?:[/\\]|\z)}   # (a UNC server, as '.', is no . or ..)
-    && do { my @a = stat $wd; my @b = stat $dir; @a && @b && $a[0] == $b[0] && $a[1] == $b[1] };
+    && ($^O eq 'MSWin32' ? $wd =~ s{^[/\\]{2}[^/\\]+}{}r : $wd) !~ m{[/\\]\.\.?(?:[/\\]|\z)}   # (a UNC server, as '.',
+      # is no . or ..)
+    && files_eq($wd, $dir);
   require Cwd;
   (($ok ? $wd : Cwd::abs_path($dir)) . "\n", $err // '', 0) }
 
+sub info {   # NAME's result when --help or --version is its only argument: (TEXT, '', 0); else nothing
+  my ($n, @a) = @_; @a == 1 && $a[0] =~ /^--(help|version)\z/ or return;
+  ($1 eq 'help' ? help($n) : version($n), '', 0) }
 sub help { my $n = shift; "Usage: $n ...\n(in the Perl process: Proc::ShellSpawn::Programs, after GNU coreutils 9.4's $n)\n" }
 sub version { my $n = shift; "$n (Proc::ShellSpawn::Programs $VERSION, after GNU coreutils 9.4)\n" }
 sub true { ('', '', 0) }
@@ -359,7 +370,7 @@ bash 5.2.21 do them, which do not).
 
 L<Proc::ShellSpawn> runs them in place of the programs (by default; see
 C<PROC_SHELLSPAWN_INPROC> there; C<PROC_SHELLSPAWN_ECHO> gives C<OPT>'s
-C<echo>, and C<> holds it).  The known differences from coreutils 9.4
+C<echo>, and C<$Proc::ShellSpawn::ECHO> holds it).  The known differences from coreutils 9.4
 are listed as X21 in F<doc/pspawn-known-issues.md>.
 
 =cut

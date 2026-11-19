@@ -32,6 +32,18 @@ $mw->geometry('+10+10');
 my @events;
 my $t = $mw->eText(-undo => 1, -autoseparators => 1, -width => 40,
 		   -height => 8)->pack;
+
+# A value set with -undo off: not recorded.  (With -undo on, since 2.10,
+# a setting joins the undo step of the edit before it, and its undo
+# comes first; these tests are about a value the undo of an edit finds
+# set after it.)
+sub unrecorded {
+  my ($code) = @_;
+  my $undo = $t->cget('-undo');
+  $t->configure(-undo => 0);
+  $code->();
+  $t->configure(-undo => $undo);
+}
 $t->blockConfigure('F');
 $t->blockConfigure('G');
 $t->debug(1);
@@ -433,7 +445,7 @@ $t->editUndo;
 $t->blockNodedata('2.4', 1, undef);
 $t->editReset;
 $t->delete('2.2', '2.5');
-$t->blockNodedata('2.1', 1, 'W');
+unrecorded(sub { $t->blockNodedata('2.1', 1, 'W') });
 @events = ();
 $t->editUndo;
 is_deeply([at(), @events], [[2, [2, 1]], 'restore node [2.4 0] X undo',

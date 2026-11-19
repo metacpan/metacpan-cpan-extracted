@@ -95,6 +95,33 @@ win_childenv(pTHX)   /* Perl's environment for a child (PerlEnv_get_childenv, as
     v[n] = NULL; PerlEnv_free_childenv(b);
     return v;
 }
+/* win_spawn.h's hooks (post-0.12): Perl's own idea of the environment and the directory, which in a pseudo-process (a
+   child of Perl's fork emulation) differ from the process's, as Perl's own spawn takes them (PerlEnv_getenv,
+   PerlEnv_get_childenv, PerlEnv_get_childdir); each a mortal UTF-8 string, alive until the call's FREETMPS */
+static const char *
+win_hook_var(void *ctx, const char *name)
+{
+    dTHXa(ctx); const char *v = PerlEnv_getenv(name); char *u; SV *m;
+    PERL_UNUSED_ARG(ctx);
+    if (!v || !(u = win_acp_to_utf8(v))) return v;
+    m = sv_2mortal(newSVpv(u, 0)); win_free(u);
+    return SvPVX(m);
+}
+static char *const *
+win_hook_env(void *ctx)
+{
+    dTHXa(ctx); PERL_UNUSED_ARG(ctx);
+    return win_childenv(aTHX);
+}
+static const char *
+win_hook_cwd(void *ctx)
+{
+    dTHXa(ctx); char *d = PerlEnv_get_childdir(), *u; SV *m;
+    PERL_UNUSED_ARG(ctx);
+    if (!d) return NULL;
+    u = win_acp_to_utf8(d); m = sv_2mortal(newSVpv(u ? u : d, 0)); win_free(u); PerlEnv_free_childdir(d);
+    return SvPVX(m);
+}
 #else
 #  define SPAWN_STR(sv) SvPV_nolen(sv)
 #endif
@@ -355,12 +382,18 @@ __posix_spawn(file_sv, argv, envp, actions, attr, unsupported = &PL_sv_undef)
     ps_sigset_t set;
     const char *file;
     around_t ar;
+#ifdef _WIN32
+    win_spawn_hooks_t hooks;
+#endif
   PPCODE:
+#ifdef _WIN32
+    memset(&hooks, 0, sizeof hooks);
+#endif
     ENTER; SAVETMPS;
     file = SPAWN_STR(file_sv);
     av = strv(aTHX_ argv, "argv");
 #ifdef _WIN32
-    ev = SvOK(envp) ? strv(aTHX_ envp, "envp") : win_childenv(aTHX);   /* NULL: CreateProcessW gives the child ours */
+    ev = SvOK(envp) ? strv(aTHX_ envp, "envp") : NULL;   /* NULL: Perl's environment (the hook env) */
 #else
     ev = SvOK(envp) ? strv(aTHX_ envp, "envp") : environ;
 #endif
@@ -384,21 +417,28 @@ __posix_spawn(file_sv, argv, envp, actions, attr, unsupported = &PL_sv_undef)
     posix_spawn_file_actions_init(&fa);
     posix_spawnattr_init(&sa);
 #ifdef _WIN32
-    {   /* the caller's choices: %Proc::Spawner::WINDOWS (win_spawn.h, WIN_OPT_*) */
-        HV *w = get_hv("Proc::Spawner::WINDOWS", 0); SV **o;
+    {   /* the caller's choices, in this call's attributes (post-0.12; before, win_spawn.h's process-wide variables):
+           %Proc::Spawner::WINDOWS over the defaults (win_spawn.h, WIN_OPT_*) */
+        HV *w = get_hv("Proc::Spawner::WINDOWS", 0); SV **o; int opts = sa.options, k;
         static const struct { const char *k; I32 l; int bit; } opt[] = {
             { "new_group", 9, WIN_OPT_NEW_GROUP }, { "kill_with_parent", 16, WIN_OPT_KILL_WITH_PARENT }, { "new_console", 11, WIN_OPT_NEW_CONSOLE } };
-        int k;
         for (k = 0; w && k < 3; k++)
-            if ((o = hv_fetch(w, opt[k].k, opt[k].l, 0)))
-                win_spawn_options = SvTRUE(*o) ? (win_spawn_options | opt[k].bit) : (win_spawn_options & ~opt[k].bit);
+            if ((o = hv_fetch(w, opt[k].k, opt[k].l, 0)) && !(SvPOK(*o) && strEQ(SvPVX(*o), "auto")))   /* (new_group 'auto':
+                Proc::Spawner::spawn decides, win_new_group below; called directly, the default: a new group) */
+                opts = SvTRUE(*o) ? (opts | opt[k].bit) : (opts & ~opt[k].bit);
+        win_attr_setoptions(&sa, opts);
     }
-    win_spawn_showwindow = w32_use_showwindow ? (int)w32_showwindow : -1;   /* Win32::SetChildShowWindow (post-0.09) */
-    {   /* Perl's own idea of the directory (PerlEnv_get_childdir, as Perl's spawn; with pseudo-forks it can differ from
-           the process's): first, so that the caller's chdir actions start from it */
-        char *d = PerlEnv_get_childdir();
-        if (d) { char *u = win_acp_to_utf8(d); if (!rc) rc = posix_spawn_file_actions_addchdir_np(&fa, u ? u : d); win_free(u); PerlEnv_free_childdir(d); }
-    }
+    win_attr_setshowwindow(&sa, w32_use_showwindow ? (int)w32_showwindow : -1);   /* Win32::SetChildShowWindow (post-0.09) */
+    /* Perl's own idea of the environment and the directory (as Perl's spawn; with pseudo-forks they can differ from the
+       process's): the directory is the child's until a chdir action, and the base of relative names; PATH and PATHEXT
+       are Perl's (post-0.12, X57: they were the process's) */
+#  ifdef PERL_IMPLICIT_CONTEXT
+    hooks.ctx = (void *)aTHX;
+#  else
+    hooks.ctx = NULL;
+#  endif
+    hooks.var = win_hook_var; hooks.env = win_hook_env; hooks.cwd = win_hook_cwd;
+    win_attr_sethooks(&sa, &hooks);
 #endif
     for (i = 0; !rc && i < av_count(acts); i++) {
         SV **e = av_fetch(acts, i, 0);
@@ -498,6 +538,9 @@ __posix_spawn(file_sv, argv, envp, actions, attr, unsupported = &PL_sv_undef)
             rc = missing(aTHX_ unsupported, "pidfd");   /* dropped: only the pid is returned */
 #endif
 #ifdef _WIN32
+        if ((v = hv_fetchs(at, "win_new_group", 0)) && SvOK(*v))   /* W7 (post-0.12): Proc::Spawner::spawn's choice of a
+            process group of the child's own, by its SIGINT (win_new_group) */
+            win_attr_setoptions(&sa, SvTRUE(*v) ? (sa.options | WIN_OPT_NEW_GROUP) : (sa.options & ~WIN_OPT_NEW_GROUP));
         if (!rc && (v = hv_fetchs(at, "win_priority", 0)) && SvOK(*v)) {   /* W4: a priority class, exact */
             static const struct { const char *n; DWORD f; } pc[] = { { "idle", IDLE_PRIORITY_CLASS },
                 { "below_normal", BELOW_NORMAL_PRIORITY_CLASS }, { "normal", NORMAL_PRIORITY_CLASS },
@@ -980,6 +1023,77 @@ __win_priority_class()
     }
   OUTPUT:
     RETVAL
+
+SV *
+__win_same_file(a, b)
+    SV *a
+    SV *b
+  CODE:
+    /* files_eq on Windows (post-0.12, the user, 2026-11-16): whether two names are one file, as Microsoft documents it:
+       each opened (no data access, every sharing, FILE_FLAG_BACKUP_SEMANTICS for directories), then the volume's serial
+       number and the 128-bit file ID compared (GetFileInformationByHandleEx, FileIdInfo: Windows 8 / Server 2012 and
+       later, and what ReFS needs, whose 64-bit IDs are not unique); where that class is not there (older Windows, a
+       file system without it), the serial number and the 64-bit file index of GetFileInformationByHandle (Windows XP
+       and later).  GetFileInformationByHandleEx is looked up at run time (absent before Vista: linking it would keep
+       the DLL from loading there).  An ID or index of all zeros identifies nothing: then that way cannot tell.  1 or
+       0; undef if either name cannot be opened or no way can tell (the caller falls back; never "different" for "not
+       supported").  The names in the ANSI code page, as Perl's own file functions take them. */
+    {
+        const char *n[2]; HANDLE h[2]; int i, r = -1;
+        n[0] = SvPV_nolen(a); n[1] = SvPV_nolen(b);
+        for (i = 0; i < 2; i++) {
+            wchar_t w[32768];
+            h[i] = INVALID_HANDLE_VALUE;
+            if (!MultiByteToWideChar(CP_ACP, 0, n[i], -1, w, 32768)) continue;
+            h[i] = CreateFileW(w, 0, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, OPEN_EXISTING,
+                               FILE_FLAG_BACKUP_SEMANTICS, NULL);
+        }
+        if (h[0] != INVALID_HANDLE_VALUE && h[1] != INVALID_HANDLE_VALUE) {
+            typedef BOOL (WINAPI *info_ex_t)(HANDLE, int, LPVOID, DWORD);
+            static info_ex_t info_ex; static int looked;
+            struct { ULONGLONG vol; BYTE id[16]; } x[2];   /* FILE_ID_INFO, class FileIdInfo (18) */
+            static const BYTE zero[16];
+            BY_HANDLE_FILE_INFORMATION y[2];
+            if (!looked) {
+                HMODULE k = GetModuleHandleW(L"kernel32.dll");
+                info_ex = k ? (info_ex_t)(void (*)(void))GetProcAddress(k, "GetFileInformationByHandleEx") : NULL;
+                looked = 1;
+            }
+            if (info_ex && info_ex(h[0], 18, &x[0], sizeof x[0]) && info_ex(h[1], 18, &x[1], sizeof x[1])
+                && memcmp(x[0].id, zero, 16) && memcmp(x[1].id, zero, 16))
+                r = x[0].vol == x[1].vol && memcmp(x[0].id, x[1].id, sizeof x[0].id) == 0;
+            else if (GetFileInformationByHandle(h[0], &y[0]) && GetFileInformationByHandle(h[1], &y[1])
+                     && (y[0].nFileIndexHigh || y[0].nFileIndexLow) && (y[1].nFileIndexHigh || y[1].nFileIndexLow))
+                r = y[0].dwVolumeSerialNumber == y[1].dwVolumeSerialNumber
+                    && y[0].nFileIndexHigh == y[1].nFileIndexHigh && y[0].nFileIndexLow == y[1].nFileIndexLow;
+        }
+        for (i = 0; i < 2; i++) if (h[i] != INVALID_HANDLE_VALUE) CloseHandle(h[i]);
+        RETVAL = r < 0 ? &PL_sv_undef : newSViv(r);
+    }
+  OUTPUT:
+    RETVAL
+
+void
+__win_env_names()
+  PPCODE:
+    /* X65 (post-0.12, the user, 2026-11-15, A22 (a)): the names of this process's environment as its block spells them
+       (Perl's %ENV gives them in upper case on Windows); names that start with '=' (the drives' directories) and names
+       that are not ASCII are left out (their %ENV keys stay as they are) */
+    {
+        wchar_t *b = GetEnvironmentStringsW(), *p;
+        if (b) {
+            for (p = b; *p; p += wcslen(p) + 1) {
+                wchar_t *eq = wcschr(p + 1, L'=');
+                size_t n = eq ? (size_t)(eq - p) : 0, i;
+                char name[256];
+                if (!n || *p == L'=' || n >= sizeof name) continue;
+                for (i = 0; i < n && p[i] < 128; i++) name[i] = (char)p[i];
+                if (i < n) continue;
+                mXPUSHp(name, n);
+            }
+            FreeEnvironmentStringsW(b);
+        }
+    }
 
 #else
 

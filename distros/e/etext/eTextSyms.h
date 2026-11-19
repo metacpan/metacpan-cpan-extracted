@@ -169,6 +169,7 @@
 #define TkTextOrnLayoutItem              eText_TkTextOrnLayoutItem
 #define TkTextOrnLayoutSplits            eText_TkTextOrnLayoutSplits
 #define TkTextOrnLayoutTemplates         eText_TkTextOrnLayoutTemplates
+#define TkTextOrnSplitRoom               eText_TkTextOrnSplitRoom
 #define TkTextOrnTemplatesParse          eText_TkTextOrnTemplatesParse
 #define TkTextOrnTemplatesRelease        eText_TkTextOrnTemplatesRelease
 #define TkTextOrnTouches                 eText_TkTextOrnTouches

@@ -19,9 +19,9 @@ if (scalar(@ARGV) > 0) {
   foreach $ARGV (@ARGV) {
     if ($ARGV =~ /\@/) {
       Net::validMX::set_debug($debug);
-      ($rv, $reason, $sanitized_email) = Net::validMX::check_email_and_mx($ARGV);
+      ($rv, $reason, $sanitized_email) = Net::validMX::check_email_and_mx(email => $ARGV);
 
-      print Net::validMX::get_output_result($sanitized_email, $rv, $reason) if $verbose;
+      print Net::validMX::get_output_result(email => $sanitized_email, rv => $rv, reason => $reason) if $verbose;
       if (scalar(@ARGV) == 1) {
         exit($rv != 1);
       }

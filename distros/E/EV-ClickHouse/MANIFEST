@@ -59,6 +59,7 @@ eg/uri.pl
 eg/with_totals.pl
 lib/EV/ClickHouse.pm
 LICENSE
+lz4_unit.c
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
@@ -129,12 +130,28 @@ t/61_review_loop_r3.t
 t/62_review_loop_r4.t
 t/63_review_loop_r5.t
 t/64_review_loop_r7.t
+t/66_coercions.t
+t/67_lowcard_nested.t
+t/68_session_tz_timers.t
+t/69_data_format.t
+t/70_insert_defaults.t
+t/71_insert_projection.t
+t/72_insert_error_context.t
+t/73_review_fixes.t
+t/74_data_block.t
+t/75_lz4_features.t
+t/76_defaults_per_value.t
+t/77_tzif_numbers.t
+t/78_param_escapes.t
 typemap
 xs/codecs.c
 xs/io.c
+xs/lz4.c
+xs/lz4.h
 xs/macros.h
 xs/proto_http.c
 xs/proto_native_build.c
 xs/proto_native_parse.c
 xs/queues.c
 xs/types.c
+xs/tzif.c

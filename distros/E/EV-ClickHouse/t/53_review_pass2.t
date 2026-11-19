@@ -542,8 +542,8 @@ SKIP: {
         host => $host, port => $nport, protocol => 'native',
         on_connect => sub {
             $ch->query(
-                "create table $tbl (d Date, dt DateTime, d32 Date32,"
-              . " dt64 DateTime64(3)) engine=Memory",
+                "create table $tbl (d Date, dt DateTime('UTC'), d32 Date32,"
+              . " dt64 DateTime64(3, 'UTC')) engine=Memory",
                 sub {
                     my (undef, $e) = @_;
                     if ($e) { fail("setup: $e"); EV::break; return; }

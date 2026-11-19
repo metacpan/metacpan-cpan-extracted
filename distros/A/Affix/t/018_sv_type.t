@@ -28,7 +28,9 @@ eval {
     }
     else {
         if ( $Config{useshrplib} && $Config{useshrplib} ne 'false' ) {
-            $ldflags .= '-L"' . $Config{archlib} . '/CORE" -l' . ( $Config{libperl} =~ s/^(?:lib)?([^.]+).*$/$1/r );
+            my $core = $Config{archlib} . '/CORE';
+            diag 'Linking embedded perl against ' . $core . '/' . $Config{libperl};
+            $ldflags .= '-L' . $core . ' -l' . ( $Config{libperl} =~ s/^(?:lib)?([^.]+).*$/$1/r );
         }
     }
     diag $cflags;

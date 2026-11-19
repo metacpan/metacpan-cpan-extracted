@@ -34,7 +34,7 @@ package Proc::Spawner;
 #                                              first (finding C2)
 #   spawn(FILE, ARGV, ENVP, ACTIONS, ATTR, UNSUPPORTED)  the raw call, see the POD at the end.  Meant to
 #        have one interface on POSIX and on Windows: it wraps the XSUB __posix_spawn (on Windows: win_spawn.h's
-#        posix_spawn on CreateProcessW) and does what that lacks around the call ($MISSING, below).  UNSUPPORTED
+#        posix_spawn on CreateProcessW) and does what that lacks around the call (%MISSING, below).  UNSUPPORTED
 #        (optional): { OPTION => 'drop' | 'fail' }, what a port lacking an option (Windows) does with it;
 #        options not listed there take %UNSUPPORTED's value, and '*' there covers the rest.  It applies here
 #        too, to the posix_spawn extensions this build's libc lacks (chdir, fchdir, closefrom, tcsetpgrp,
@@ -54,12 +54,13 @@ use strict; use warnings;
 use POSIX (); use File::Spec ();
 use Fcntl qw(F_SETFD FD_CLOEXEC F_GETFL F_SETFL O_NONBLOCK);
 use Config;
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 require XSLoader; XSLoader::load(__PACKAGE__, $VERSION);   # __posix_spawn, fpe_at_exec, chld_to_fd, chld_restore
 our %UNSUPPORTED = ('*' => 'fail');   # the defaults for spawn's UNSUPPORTED (EXPERIMENTAL: '*' => 'fail')
 
 # ------------------------------------------------------------------ settings the spawn primitive lacks (EXPERIMENTAL, post-0.06)
-# $MISSING: a bitmap of the settings the primitive (posix_spawn here; CreateProcessW in a Windows port) does not do itself:
+# %MISSING: the settings, as its keys, that the primitive (posix_spawn here; CreateProcessW in a Windows port) does not do itself
+# (JC3, post-0.12: a hash; until then a bitmap, $MISSING, with the table %BIT and the function missing()):
 # what this build's libc lacks, plus $ENV{PROC_SPAWNER_MISSING} (names, for tests: the suite runs "as if").  spawn
 # does the missing ones in this process, around the call, and undoes them after (bullet-proof only with one thread):
 #   chdir, fchdir            this process changes directory, then comes back
@@ -85,35 +86,44 @@ our %UNSUPPORTED = ('*' => 'fail');   # the defaults for spawn's UNSUPPORTED (EX
 # redirections are delegated to Run (0.07; the user, 2026-11-07), whose start() applies them around Perl's own spawn,
 # system { FILE } 1, ARGV (P_NOWAIT; on Unix Run emulates it by fork and exec) and puts our fds back; chdir and fchdir
 # are done here.  Everything but rlimit, sigignore and nice (fork only) is then missing, and done around the call as
-# above.  On Windows Perl's spawn passes the child fds 0-2 only, as its standard handles, always in a new process group;
-# the arguments go to Perl as they are (its command line does not quote them as the C runtime parses them back:
-# ❰BUG❱ in Perl, reported; the tests of exact argv there are TODO until Perl is fixed).
-our @FEATURES = qw(chdir fchdir dup2 close open closefrom tcsetpgrp sigmask sigdefault pgroup setsid resetids sched cgroup pidfd search rlimit sigignore nice);
-our %BIT; @BIT{@FEATURES} = map 1 << $_, 0 .. $#FEATURES;
+# above.  On Windows Perl's spawn passes the child fds 0-2 only, as its standard handles, in a new process group (as
+# every child Perl does not wait for: system 1, ...); the arguments go to Perl as they are (its command line does not
+# quote them as the C runtime parses them back:
+# ❰BUG❱ in Perl, drafted in doc/perl-win32-system-bugs.md, not yet filed; the tests of exact argv there are TODO until Perl is fixed).
+our @FEATURES = qw(chdir fchdir dup2 close open closefrom tcsetpgrp sigmask sigdefault pgroup setsid resetids sched cgroup pidfd
+                   search rlimit sigignore nice);
 our %NATIVE = map +($_ => 1), __native();
 our %EMULABLE = map +($_ => 1), qw(chdir fchdir dup2 close open closefrom sigmask sigdefault pgroup resetids search pidfd);
 my @ASKED = grep length, split /[\s,]+/, $ENV{PROC_SPAWNER_MISSING} // '';
 our $FALLBACK = !$NATIVE{posix_spawn} || grep /^(?:posix_spawn|fork)\z/, @ASKED;   # no posix_spawn: __spawn_nowait or system1
 my $NOFORK = grep $_ eq 'fork', @ASKED;
 our %WINDOWS = (   # Windows only (EXPERIMENTAL, post-0.07): how every child is started (win_spawn.h, WIN_OPT_*)
-  new_group => 1,          # in a process group of its own: Ctrl-C at the console reaches the parent, not the children
-  kill_with_parent => 1,   # in a job object that Windows ends when this process ends, however it ends
+  new_group => 'auto',     # a process group of its own, where Windows turns Ctrl-C off: 'auto' (post-0.12, the user's
+                           # W7): for a child that would have SIGINT ignored (win_new_group); 1 always; 0 never
+  kill_with_parent => 0,   # 1: in a job object that Windows ends when this process ends, however it ends (off since
+                           # post-0.12, the user's W6: as Perl's own spawn; the POD says what that costs)
   new_console => 1);       # a child with none of fds 0-2 gets a console of its own (as Perl's own spawn does)
 our $WIN = $^O eq 'MSWin32';   # EXPERIMENTAL (post-0.07): no SIGCHLD, no fcntl; the loop's Windows backend (W5, post-0.10):
                                # Proc::Spawner::Loop::Win32
-my %SIGNUM; @SIGNUM{split ' ', $Config{sig_name}} = split ' ', $Config{sig_num};
+our (%SIGNUM, %SIGNAME);   # signal names => numbers, and numbers => names (of several names for one number, the last in
+@SIGNUM{split ' ', $Config{sig_name}} = split ' ', $Config{sig_num};    # %Config's list); Proc::ShellSpawn::Large uses
+@SIGNAME{split ' ', $Config{sig_num}} = split ' ', $Config{sig_name};   # both (JH3, part e)
 our $DOSISH = $^O =~ /^(?:MSWin32|os2|VMS)\z/;
 our $PRIMITIVE = !$FALLBACK ? 'posix_spawn' : defined &__spawn_nowait && !$DOSISH && !$NOFORK ? 'fork' : 'system1';
 %NATIVE = $PRIMITIVE eq 'fork' ? (map +($_ => 1), grep $NATIVE{$_}, qw(rlimit sigignore nice)) : () if $FALLBACK;
-our $MISSING = 0; $MISSING |= $BIT{$_} for grep !$NATIVE{$_}, @FEATURES;
-for (grep !/^(?:posix_spawn|fork)\z/, @ASKED) {
-  exists $BIT{$_} or die "Proc::Spawner: PROC_SPAWNER_MISSING: unknown setting '$_' (known: posix_spawn fork @FEATURES)\n";
-  $MISSING |= $BIT{$_} }
-sub missing { my $m = @_ ? shift : $MISSING; grep $m & $BIT{$_}, @FEATURES }   # the names in a bitmap
+our %MISSING = map +($_ => 1), grep !$NATIVE{$_}, @FEATURES;
+for my $s (grep !/^(?:posix_spawn|fork)\z/, @ASKED) {
+  grep $_ eq $s, @FEATURES or die "Proc::Spawner: PROC_SPAWNER_MISSING: unknown setting '$s' (known: posix_spawn fork @FEATURES)\n";
+  $MISSING{$s} = 1 }
 
 our %WINJOB = (AS => 'ProcessMemoryLimit', DATA => 'ProcessMemoryLimit', CPU => 'PerProcessUserTimeLimit',
                NPROC => 'ActiveProcessLimit');   # W4's mapping of rlimit (approximate: see the POD)
-my %CLASS_NICE = (idle => 19, below_normal => 5, normal => 0, above_normal => -5, high => -10, realtime => -20);
+# Windows' priority classes and nice values, both ways, as Cygwin maps them (winsup/cygwin/miscfuncs.cc, winprio_to_nice
+# and nice_to_winprio; post-0.12, the user, 2026-11-15): a class's nice value, and the class of the nice values 12..19,
+# 4..11, -4..3, -12..-5, -19..-13, -20
+our %CLASS_NICE = (idle => 16, below_normal => 8, normal => 0, above_normal => -8, high => -16, realtime => -20);
+sub class_of_nice { my $n = shift; $n >= 12 ? 'idle' : $n >= 4 ? 'below_normal' : $n >= -4 ? 'normal' : $n >= -12 ? 'above_normal'
+  : $n > -20 ? 'high' : 'realtime' }
 sub win_job_for_rlimit {   # W4: rlimit entries as win_job limits (approximate); also the resources with no counterpart
   my (%job, @none);
   for (@{+shift}) {
@@ -125,25 +135,84 @@ sub win_job_for_rlimit {   # W4: rlimit entries as win_job limits (approximate);
     $job{$w} = defined $job{$w} && $job{$w} < $lim ? $job{$w} : $lim }
   (\%job, @none) }
 sub win_class_for_nice {   # W4: a nice increment as a priority class, from ours (approximate; never realtime)
-  my $n = ($CLASS_NICE{defined &__win_priority_class ? __win_priority_class() : 'normal'} // 0) + shift;
-  $n >= 10 ? 'idle' : $n >= 1 ? 'below_normal' : $n == 0 ? 'normal' : $n > -10 ? 'above_normal' : 'high' }
+  my $c = class_of_nice(($CLASS_NICE{defined &__win_priority_class ? __win_priority_class() : 'normal'} // 0) + shift);
+  $c eq 'realtime' ? 'high' : $c }
+sub nice_for_win_class {   # (post-0.12) a priority class elsewhere: the nice increment from ours to the class's value
+  my $c = shift; defined $c && exists $CLASS_NICE{$c} or return;
+  $CLASS_NICE{$c} - getpriority(0, 0) }
 
-sub spawn {   # the raw call: the primitive (__posix_spawn, or __spawn_nowait), with what it lacks done around it
+sub spawn {   # the raw call: the primitive (__posix_spawn, or __spawn_nowait), with what it lacks done around it.  In five
+  # steps (JH5 b, post-0.12): the arguments checked, Windows' settings mapped, what is not supported refused or dropped, the
+  # file actions sorted into those done here and those left to the primitive, then the call with the changes around it
   my ($file, $argv, $envp, $acts, $attr, $uns) = @_;
+  return __posix_spawn(@_) if spawn_args(@_);
+  my %m = %MISSING;   # (a copy: below, one missing fd action makes the other fd actions missing too)
+  my %at = %{$attr // {}}; my @acts = @$acts;
+  my $refuse = sub {   # an unsupported setting: true (and $! = ENOTSUP) to fail, false to drop it
+    my $n = shift; my $v = ($uns && $uns->{$n}) // $UNSUPPORTED{$n} // $UNSUPPORTED{'*'} // 'fail';
+    $v eq 'drop' ? 0 : do { $! = POSIX::ENOTSUP(); 1 } };
+  spawn_windows(\%at, $refuse) && spawn_unsupported(\%at, \@acts, \%m, $refuse) or return;
+  my ($here, $there) = spawn_sort_actions(\@acts, \%m) or return; my @here = @$here; my @there = @$there;
+  my $sigmask = $m{sigmask} ? delete $at{sigmask} : undef;
+  my $sigdef = $m{sigdefault} ? delete $at{sigdefault} : undef;
+  my $pg = $m{pgroup} && defined $at{pgroup} ? delete $at{pgroup} : undef;
+  my $reset = $m{resetids} && delete $at{resetids};
+  my $pidfd = $m{pidfd} && delete $at{pidfd};
+  my $search = $m{search} && delete $at{search};
+  if ($search && $WIN && $PRIMITIVE ne 'system1') {   # X64: posix_spawnp's lookup on Windows, as system1 does it
+    $file = win_find($file, 1) // do { $! = -e $file && !-d _ ? POSIX::EACCES() : POSIX::ENOENT(); return } }
+  elsif ($search && !$WIN and $file !~ m{/}) {
+    my ($p) = grep -x && !-d, map +(length ? $_ : '.') . "/$file", path_split($ENV{PATH});
+    defined $p or do { $! = POSIX::ENOENT(); return }; $file = $p }
+  my @undo; my $err; my @r;
+  my $ok = eval {
+    if (!$WIN && !$m{sigmask} && (@here || $sigdef || defined $pg || $reset)) {   # no handler of ours while this process is changed (X64: not on Windows)
+      my ($all, $old) = (POSIX::SigSet->new, POSIX::SigSet->new); $all->fillset;
+      POSIX::sigprocmask(POSIX::SIG_BLOCK(), $all, $old); unshift @undo, sub { POSIX::sigprocmask(POSIX::SIG_SETMASK(), $old) } }
+    if ($sigmask) {
+      my ($set, $old) = (POSIX::SigSet->new(signums($sigmask)), POSIX::SigSet->new);
+      POSIX::sigprocmask(POSIX::SIG_SETMASK(), $set, $old) or die $!;
+      unshift @undo, sub { POSIX::sigprocmask(POSIX::SIG_SETMASK(), $old) } }
+    for my $sig ($sigdef ? signums($sigdef) : ()) {
+      my $old = POSIX::SigAction->new; POSIX::sigaction($sig, undef, $old);
+      next unless ($old->{HANDLER} // '') eq 'IGNORE';   # a caught signal is reset by exec anyway
+      POSIX::sigaction($sig, POSIX::SigAction->new('DEFAULT')) or die $!; unshift @undo, sub { POSIX::sigaction($sig, $old) } }
+    if (defined $pg) { my $old = getpgrp; POSIX::setpgid(0, $pg) or die $!; unshift @undo, sub { POSIX::setpgid(0, $old) } }
+    if ($reset) {
+      if ($> != $<) { my $e = $>; $> = $<; $> == $< or die $!; unshift @undo, sub { $> = $e } }
+      my ($eg, $rg) = ((split ' ', $))[0], (split ' ', $()[0]);
+      if ($eg != $rg) { my $o = $); $) = $rg; unshift @undo, sub { $) = $o } } }
+    my $redirs = $PRIMITIVE eq 'system1' ? run_redirs(\@here, \@undo) : do { emulate_actions(\@here, \@undo) if @here; undef };
+    @r = $PRIMITIVE eq 'posix_spawn' ? __posix_spawn($file, $argv, $envp, \@there, \%at, $uns)
+       : $PRIMITIVE eq 'fork'
+         ? __spawn_nowait($file, $argv, $envp, { map +($_ => $at{$_}), grep exists $at{$_}, qw(rlimit sigignore nice) }, $uns)
+       : system1($file, $argv, $envp, $search, $redirs);
+    $err = $!;
+    if (@r && $pidfd) { my $fd = __pidfd_open($r[0]); push @r, $fd >= 0 ? $fd : undef }
+    1 };
+  my $died = !$ok && $@ !~ /^Proc::Spawner: errno (\d+)/ && $@;   # not ours (Run missing, ...): passed on, after the undo
+  $err = $@ =~ /^Proc::Spawner: errno (\d+)/ ? $1 : ($! + 0 || POSIX::EINVAL()) unless $ok;
+  $_->() for @undo;
+  die $died if $died;
+  $! = $err; $ok && @r or return; wantarray ? @r : $r[0] }   # (scalar context: the pid, as the XSUB gives it)
+
+sub spawn_args {   # spawn, step 1: true where __posix_spawn is to be called as it is (nothing to do around it, or arguments
+  # it rejects with its own errors); in the fallback, where there is no __posix_spawn, its errors are raised here
+  my (undef, undef, undef, $acts, $attr, $uns) = @_;
   if (!$FALLBACK) {
-    my $winonly = !$WIN && ref $attr eq 'HASH' && grep defined $attr->{$_}, qw(win_priority win_job);   # (W4: refused here)
-    return __posix_spawn(@_) unless ($MISSING || $winonly) && (!defined $uns || ref $uns eq 'HASH');   # (its errors)
-    ref $acts eq 'ARRAY' && (!defined $attr || ref $attr eq 'HASH') or return __posix_spawn(@_) }   # its errors
+    my $winonly = !$WIN && ref $attr eq 'HASH' && grep defined $attr->{$_}, qw(win_priority win_job);   # (W4: mapped or refused here)
+    return 1 unless (%MISSING || $winonly || $WIN) && (!defined $uns || ref $uns eq 'HASH');   # (its
+      # errors; Windows: win_new_group below)
+    ref $acts eq 'ARRAY' && (!defined $attr || ref $attr eq 'HASH') or return 1 }   # its errors
   else {   # the same errors as __posix_spawn's
     !defined $uns || ref $uns eq 'HASH' or die "Proc::Spawner::spawn: unsupported must be a hash reference\n";
     ref $acts eq 'ARRAY' or die "Proc::Spawner::spawn: actions must be an array reference\n";
     !defined $attr || ref $attr eq 'HASH' or die "Proc::Spawner::spawn: attr must be a hash reference\n";
     ref eq 'ARRAY' or die "Proc::Spawner::spawn: an action is not an array reference\n" for @$acts }
-  my %m = map +($_ => 1), missing();
-  my %at = %{$attr // {}}; my @acts = @$acts;
-  my $refuse = sub {   # an unsupported setting: true (and $! = ENOTSUP) to fail, false to drop it
-    my $n = shift; my $v = ($uns && $uns->{$n}) // $UNSUPPORTED{$n} // $UNSUPPORTED{'*'} // 'fail';
-    $v eq 'drop' ? 0 : do { $! = POSIX::ENOTSUP(); 1 } };
+  0 }
+
+sub spawn_windows {   # spawn, step 2: Windows' settings (%$at changed); false, with $!, to fail
+  my ($atr, $refuse) = @_; my %at = %$atr;   # (a copy, put back at the end: the lines below as they were in spawn)
   if ($WIN) {   # W4 (the user, 2026-11-08: "(c) and (b); (c) beats (b) if present"): nice and rlimit mapped to what Windows
     # has per child, approximately; win_priority and win_job, Windows' own settings, exact, win over the mapping
     if ($at{nice}) { $at{win_priority} //= win_class_for_nice($at{nice}) } delete $at{nice};
@@ -152,18 +221,32 @@ sub spawn {   # the raw call: the primitive (__posix_spawn, or __spawn_nowait), 
       for (@none) { return if $refuse->('rlimit') }   # (no Windows counterpart; drop: the rest still mapped)
       $at{win_job} = { %$job, %{$at{win_job} // {}} } if %$job }
     delete $at{rlimit} }
-  elsif (grep defined $at{$_}, qw(win_priority win_job)) {   # Windows' own settings elsewhere
-    for (qw(win_priority win_job)) { next unless defined $at{$_}; return if $refuse->($_); delete $at{$_} } }
+  elsif (grep defined $at{$_}, qw(win_priority win_job)) {   # Windows' own settings elsewhere: a priority class is mapped
+    if (defined(my $c = delete $at{win_priority})) {         # to its nice value where nice is not given (post-0.12, the
+      my $inc = nice_for_win_class($c);                      # user, 2026-11-15); nice, the native setting, wins
+      defined $inc or return do { $! = POSIX::EINVAL(); undef };
+      $at{nice} //= $inc }
+    if (defined $at{win_job}) { return if $refuse->('win_job'); delete $at{win_job} } }
+  $at{win_new_group} = win_new_group(\%at) if $WIN && $PRIMITIVE ne 'system1';   # (W7; read by the XSUB)
   if ($WIN && ref $at{sigignore} eq 'ARRAY') {   # what a Windows child does anyway (post-0.08): there is no SIGPIPE, and
     # Ctrl-C is off in a new process group (Perl's kill INT, GenerateConsoleCtrlEvent, does not reach it either)
-    my $group = $PRIMITIVE eq 'system1' || $WINDOWS{new_group} || defined $at{pgroup} && !$at{pgroup};
+    my $group = $PRIMITIVE eq 'system1' || $at{win_new_group} || defined $at{pgroup} && !$at{pgroup};
     $at{sigignore} = [grep !($_ == $SIGNUM{PIPE} || $group && $_ == $SIGNUM{INT}), @{$at{sigignore}}] }
-  if ($PRIMITIVE eq 'system1' && $WIN) {   # Perl's own spawn on Windows: what it does anyway, and what it cannot
-    delete @at{qw(sigdefault resetids)};   # nothing is inherited, no set-user-id
-    delete $at{sigmask} if ref $at{sigmask} eq 'ARRAY' && !@{$at{sigmask}};
-    delete $at{pgroup} if defined $at{pgroup} && !$at{pgroup};   # always a new group
-    for my $n (qw(sigmask pgroup pidfd)) { next unless defined $at{$n} && $at{$n}; return if $refuse->($n); delete $at{$n} }
-    my @k;   # the child sees fds 0-2 only
+  %$atr = %at; 1 }
+
+sub spawn_unsupported {   # spawn, step 3: the settings and file actions the primitive lacks, refused or dropped (%$at, @$acts
+  # and the copy %$m of %MISSING changed); false, with $!, to fail
+  my ($atr, $actsr, $mr, $refuse) = @_; my %at = %$atr; my @acts = @$actsr; my %m = %$mr;   # (copies, put back at the end)
+  if ($WIN) {   # Windows, where the primitive lacks a setting (system1, Perl's own spawn; or a posix_spawn doing less than
+    # win_spawn.h, X64): what Windows does anyway, and what it cannot; nothing of POSIX's signal calls (Perl has none here)
+    my $sys1 = $PRIMITIVE eq 'system1'; my $lacks = sub { $sys1 || $m{$_[0]} };
+    delete $at{$_} for grep $lacks->($_), qw(sigdefault resetids);   # nothing is inherited, no set-user-id
+    delete $at{sigmask} if $lacks->('sigmask') && ref $at{sigmask} eq 'ARRAY' && !@{$at{sigmask}};
+    if ($lacks->('pgroup') && defined $at{pgroup} && !$at{pgroup}) {   # a group of its own: system1 always makes one,
+      $at{win_new_group} = 1 unless $sys1; delete $at{pgroup} }       # posix_spawn by the XSUB's win_new_group
+    for my $n (grep $lacks->($_), qw(sigmask pgroup pidfd)) { next unless defined $at{$n} && $at{$n}; return if $refuse->($n); delete $at{$n} } }
+  if ($PRIMITIVE eq 'system1' && $WIN) {   # Perl's own spawn on Windows: the child sees fds 0-2 only
+    my @k;
     for my $x (@acts) {
       my ($op, @a) = @$x;
       if ($op eq 'close' && $a[0] >= 3) { next }
@@ -182,55 +265,35 @@ sub spawn {   # the raw call: the primitive (__posix_spawn, or __spawn_nowait), 
   if ($m{pgroup} && defined $at{pgroup} && !$at{pgroup}) { return if $refuse->('pgroup'); delete $at{pgroup} }
   if ($m{tcsetpgrp} && grep ref eq 'ARRAY' && ($_->[0] // '') eq 'tcsetpgrp', @acts) {
     return if $refuse->('tcsetpgrp'); @acts = grep !(ref eq 'ARRAY' && ($_->[0] // '') eq 'tcsetpgrp'), @acts }
+  %$atr = %at; @$actsr = @acts; %$mr = %m; 1 }
+
+sub spawn_sort_actions {   # spawn, step 4: the file actions done here (in order) and those left to the primitive, as two
+  # array references; empty, with $!, to fail
+  my ($actsr, $mr) = @_; my @acts = @$actsr; my %m = %$mr;
   my %kind = (chdir => 'dir', fchdir => 'dir', dup2 => 'fd', close => 'fd', open => 'fd', closefrom => 'fd');
   my (@here, @there);   # actions done here (in order), and those left to the primitive
-  for my $x (@acts) { my $k = ref $x eq 'ARRAY' ? $x->[0] // '' : ''; if ($m{$k} && $kind{$k}) { push @here, $x } else { push @there, $x } }
+  for my $x (@acts) { my $k = ref $x eq 'ARRAY' ? $x->[0] // '' : '';
+    if ($m{$k} && $kind{$k}) { push @here, $x } else { push @there, $x } }
   if (@here && @there) {   # what is done here happens first: so no action done there may come before one done here
     my %pos; @pos{map 0 + $_, @acts} = 0 .. $#acts;
     my $first_there = (sort { $a <=> $b } map $pos{0 + $_}, @there)[0];
     my $last_here = (sort { $b <=> $a } map $pos{0 + $_}, @here)[0];
     if ($first_there < $last_here) { $! = POSIX::EINVAL(); return } }   # (start() puts chdir first)
   if ($FALLBACK && @there) { $! = POSIX::EINVAL(); return }   # (an action the emulation does not know)
-  my $sigmask = $m{sigmask} ? delete $at{sigmask} : undef;
-  my $sigdef = $m{sigdefault} ? delete $at{sigdefault} : undef;
-  my $pg = $m{pgroup} && defined $at{pgroup} ? delete $at{pgroup} : undef;
-  my $reset = $m{resetids} && delete $at{resetids};
-  my $pidfd = $m{pidfd} && delete $at{pidfd};
-  my $search = $m{search} && delete $at{search};
-  if ($search && !$WIN and $file !~ m{/}) {
-    my ($p) = grep -x && !-d, map +(length ? $_ : '.') . "/$file", path_split($ENV{PATH});
-    defined $p or do { $! = POSIX::ENOENT(); return }; $file = $p }
-  my @undo; my $err; my @r;
-  my $ok = eval {
-    if (!$m{sigmask} && (@here || $sigdef || defined $pg || $reset)) {   # no handler of ours while this process is changed
-      my ($all, $old) = (POSIX::SigSet->new, POSIX::SigSet->new); $all->fillset;
-      POSIX::sigprocmask(POSIX::SIG_BLOCK(), $all, $old); unshift @undo, sub { POSIX::sigprocmask(POSIX::SIG_SETMASK(), $old) } }
-    if ($sigmask) {
-      my ($set, $old) = (POSIX::SigSet->new(signums($sigmask)), POSIX::SigSet->new);
-      POSIX::sigprocmask(POSIX::SIG_SETMASK(), $set, $old) or die $!; unshift @undo, sub { POSIX::sigprocmask(POSIX::SIG_SETMASK(), $old) } }
-    for my $sig ($sigdef ? signums($sigdef) : ()) {
-      my $old = POSIX::SigAction->new; POSIX::sigaction($sig, undef, $old);
-      next unless ($old->{HANDLER} // '') eq 'IGNORE';   # a caught signal is reset by exec anyway
-      POSIX::sigaction($sig, POSIX::SigAction->new('DEFAULT')) or die $!; unshift @undo, sub { POSIX::sigaction($sig, $old) } }
-    if (defined $pg) { my $old = getpgrp; POSIX::setpgid(0, $pg) or die $!; unshift @undo, sub { POSIX::setpgid(0, $old) } }
-    if ($reset) {
-      if ($> != $<) { my $e = $>; $> = $<; $> == $< or die $!; unshift @undo, sub { $> = $e } }
-      my ($eg, $rg) = ((split ' ', $))[0], (split ' ', $()[0]);
-      if ($eg != $rg) { my $o = $); $) = $rg; unshift @undo, sub { $) = $o } } }
-    my $redirs = $PRIMITIVE eq 'system1' ? run_redirs(\@here, \@undo) : do { emulate_actions(\@here, \@undo) if @here; undef };
-    @r = $PRIMITIVE eq 'posix_spawn' ? __posix_spawn($file, $argv, $envp, \@there, \%at, $uns)
-       : $PRIMITIVE eq 'fork' ? __spawn_nowait($file, $argv, $envp, { map +($_ => $at{$_}), grep exists $at{$_}, qw(rlimit sigignore nice) }, $uns)
-       : system1($file, $argv, $envp, $search, $redirs);
-    $err = $!;
-    if (@r && $pidfd) { my $fd = __pidfd_open($r[0]); push @r, $fd >= 0 ? $fd : undef }
-    1 };
-  my $died = !$ok && $@ !~ /^Proc::Spawner: errno (\d+)/ && $@;   # not ours (Run missing, ...): passed on, after the undo
-  $err = $@ =~ /^Proc::Spawner: errno (\d+)/ ? $1 : ($! + 0 || POSIX::EINVAL()) unless $ok;
-  $_->() for @undo;
-  die $died if $died;
-  $! = $err; $ok && @r or return; wantarray ? @r : $r[0] }   # (scalar context: the pid, as the XSUB gives it)
+  (\@here, \@there) }
 
 our $PATH_SEP = $Config{path_sep};
+sub win_new_group {   # Windows: is the child to be in a process group of its own?  %WINDOWS{new_group}: 1 always, 0 never,
+  # 'auto' (the default; post-0.12, the user's W7) when the child would have SIGINT ignored on POSIX: sigignore has it, or
+  # ours is ignored and sigdefault does not set it back.  Windows turns Ctrl-C off in a new group, as SIGINT ignored; a
+  # child that gets SIGINT at its default stays in our group and gets a Ctrl-C at the console itself, as on POSIX (and as
+  # with Perl's own system: a new group only for a child it does not wait for, system 1, ...)
+  my $at = shift; my $ng = $WINDOWS{new_group} // 'auto';
+  return $ng ? 1 : 0 if $ng ne 'auto';
+  my $int = $SIGNUM{INT} // 2; my $has = sub { my $l = $at->{$_[0]}; ref $l eq 'ARRAY' && grep $_ == $int, @$l };
+  return 1 if $has->('sigignore');
+  ($SIG{INT} // '') eq 'IGNORE' && !$has->('sigdefault') ? 1 : 0 }
+
 sub path_split {   # a PATH value's entries, split at $PATH_SEP (post-0.10: $Config{path_sep}, ';' on Windows).  POSIX: an empty
   # entry is the current directory.  Windows (as Perl's own win32.c reads PATH): a "quoted" part is taken whole, its quotes
   # dropped (an unclosed one runs to the end); empty entries are dropped
@@ -239,11 +302,13 @@ sub path_split {   # a PATH value's entries, split at $PATH_SEP (post-0.10: $Con
 
 sub win_find {   # posix_spawnp's lookup on Windows, as win_spawn.h's: a name with no directory through PATH (path_split),
   # PATHEXT's extensions before the bare name; a path as it is (relative: to the directory now)
-  my ($file, $search) = @_;
+  # (post-0.12, X57: relative to Perl's directory, Cwd::getcwd; rel2abs alone takes the process's, in a pseudo-process
+  # another one)
+  my ($file, $search) = @_; my $here; require Cwd;
   my @ext = ((grep length, split /;/, $ENV{PATHEXT} // '.COM;.EXE;.BAT;.CMD'), '');   # (PATHEXT: Windows' own, always ';')
   my @dirs = $search && $file !~ m{[/\\:]} ? path_split($ENV{PATH}) : ('');
   for my $d (@dirs) { for my $e (@ext) {
-    my $p = length $d ? "$d\\$file$e" : "$file$e"; return File::Spec->rel2abs($p) if -f $p && -x _ } }
+    my $p = length $d ? "$d\\$file$e" : "$file$e"; return File::Spec->rel2abs($p, $here //= Cwd::getcwd()) if -f $p && -x _ } }
   return }
 
 sub system1 {   # the primitive without posix_spawn and fork (M2): Run::start around Perl's own spawn; the pid, or empty with $!
@@ -252,7 +317,9 @@ sub system1 {   # the primitive without posix_spawn and fork (M2): Run::start ar
   local $Run::Forkless = 1;
   if ($WIN) {   # posix_spawn's meaning of FILE (with search: PATH and PATHEXT), not Perl's
     $file = win_find($file, $search) // do { $! = -e $file && !-d _ ? POSIX::EACCES() : POSIX::ENOENT(); return } }
-  local %ENV = map { /^([^=]+)=(.*)\z/s ? ($1, $2) : () } @$envp if $envp;
+  # a name given twice: the first, as getenv finds it and win_spawn.h passes it (post-0.12, X58: %ENV kept the last);
+  # on Windows names are the same in any case
+  my %seen; local %ENV = map { /^([^=]+)=(.*)\z/s && !$seen{$WIN ? uc $1 : $1}++ ? ($1, $2) : () } @$envp if $envp;
   # X38 (post-0.10): Perl's spawn on Windows passes the child every inheritable handle, and Perl makes its handles
   # inheritable (no close-on-exec by $^F there): our fds from 3 up are made not inheritable for the call, then put back,
   # as POSIX has it.  Not thread-safe: another thread's spawn meanwhile does not pass these fds either.
@@ -261,6 +328,14 @@ sub system1 {   # the primitive without posix_spawn and fork (M2): Run::start ar
   __set_cloexec($_, 0) for @off; die $died if $died; $! = $err;
   $pid or return; $pid }
 
+sub dir_change {   # JH5 (a, post-0.12): chdir or fchdir in this process; the first time, this process's directory is kept
+  my ($op, $to, $here, $die) = @_;   # in $$here (an fd of it, close-on-exec; Windows: its path), for dir_back
+  $$here //= $WIN ? do { require Cwd; Cwd::getcwd() // $die->() }
+                  : do { my $h = POSIX::open('.', POSIX::O_RDONLY()); defined $h or $die->(); __set_cloexec($h, 1); $h };
+  ($op eq 'chdir' ? chdir $to : __fchdir($to)) or $die->() }
+sub dir_back { my $here = shift; return unless defined $here;   # back to the directory dir_change kept
+  if ($WIN) { chdir $here } else { __fchdir($here); POSIX::close($here) } }
+
 sub run_redirs {   # system1 (M2): the fd actions as Run's redirections (Run::start applies them around the call and puts
   # our fds back); chdir and fchdir done here, in order, so that an open's relative path is taken from the directory then;
   # the way back pushed on @$undo
@@ -268,14 +343,10 @@ sub run_redirs {   # system1 (M2): the fd actions as Run's redirections (Run::st
   my (@r, $here, @opened);
   my $die = sub { die "Proc::Spawner: errno " . (0 + $!) . "\n" };
   unshift @$undo, sub {
-    close $_ for @opened;
-    if (defined $here) { if ($WIN) { chdir $here } else { __fchdir($here); POSIX::close($here) } } };
+    close $_ for @opened; dir_back($here) };
   for my $x (@$acts) {
     my ($op, @a) = @$x;
-    if ($op eq 'chdir' || $op eq 'fchdir') {
-      $here //= $WIN ? do { require Cwd; Cwd::getcwd() // $die->() }
-              : do { my $h = POSIX::open('.', POSIX::O_RDONLY()); defined $h or $die->(); __set_cloexec($h, 1); $h };
-      ($op eq 'chdir' ? chdir $a[0] : __fchdir($a[0])) or $die->() }
+    if ($op eq 'chdir' || $op eq 'fchdir') { dir_change($op, $a[0], \$here, $die) }
     elsif ($op eq 'dup2') { push @r, $a[1] => { fd => $a[0] } }
     elsif ($op eq 'close') { push @r, $a[0] => { close => 1 } }
     elsif ($op eq 'open') {
@@ -298,27 +369,27 @@ sub emulate_actions {   # the file actions, done on this process's own fds in or
   unshift @$undo, sub {   # contents first, then the flags, then the directory
     for my $fd (keys %save) { my $c = $save{$fd}; defined $c ? (POSIX::dup2($c, $fd), POSIX::close($c)) : POSIX::close($fd) }
     for my $fd (keys %flag) { __set_cloexec($fd, $flag{$fd}) if $flag{$fd} >= 0 }
-    if ($WIN) { chdir $here if defined $here }   # (no directory fds there)
-    elsif ($here) { __fchdir($here); POSIX::close($here) } };
+    dir_back($here) };
   for my $x (@$acts) {
     my ($op, @a) = @$x;
-    if ($op eq 'chdir' || $op eq 'fchdir') {
-      $here //= $WIN ? do { require Cwd; Cwd::getcwd() // $die->() }
-              : do { my $h = POSIX::open('.', POSIX::O_RDONLY()); defined $h or $die->(); __set_cloexec($h, 1); $ours{$h} = 1; $h };
-      ($op eq 'chdir' ? chdir $a[0] : __fchdir($a[0])) or $die->() }
+    if ($op eq 'chdir' || $op eq 'fchdir') { dir_change($op, $a[0], \$here, $die); $ours{$here} = 1 unless $WIN }
     elsif ($op eq 'dup2') {
       my ($from, $to) = @a;
-      if ($from == $to) { __fd_cloexec($from) >= 0 or do { $! = POSIX::EBADF(); $die->() }; $flag_touch->($to); __set_cloexec($to, 0) }
-      else { __fd_cloexec($from) >= 0 or do { $! = POSIX::EBADF(); $die->() }; $content_touch->($to); defined POSIX::dup2($from, $to) or $die->() } }
+      if ($from == $to) { __fd_cloexec($from) >= 0 or do { $! = POSIX::EBADF(); $die->() };
+        $flag_touch->($to); __set_cloexec($to, 0) }
+      else { __fd_cloexec($from) >= 0 or do { $! = POSIX::EBADF(); $die->() };
+        $content_touch->($to); defined POSIX::dup2($from, $to) or $die->() } }
     elsif ($op eq 'close' && $WIN) { $content_touch->($a[0]); POSIX::close($a[0]) if defined $save{$a[0]} }   # (fds 0-2: Perl's
                                                                        # spawn passes the standard handles, inheritable or not)
     elsif ($op eq 'close') { $flag_touch->($a[0]); __set_cloexec($a[0], 1) if __fd_cloexec($a[0]) >= 0 }
     elsif ($op eq 'closefrom') {
-      for my $fd ($a[0] .. __fd_limit() - 1) { next if $ours{$fd} || __fd_cloexec($fd) < 0; $flag_touch->($fd); __set_cloexec($fd, 1) } }
+      for my $fd ($a[0] .. __fd_limit() - 1) { next if $ours{$fd} || __fd_cloexec($fd) < 0;
+        $flag_touch->($fd); __set_cloexec($fd, 1) } }
     elsif ($op eq 'open') {
       my ($fd, $path, $fl, $mode) = @a; $content_touch->($fd);
       my $o = POSIX::open($path, $fl, $mode // 0666); defined $o or $die->();
-      if ($o == $fd) { __set_cloexec($fd, 0) } else { my $r = POSIX::dup2($o, $fd); my $e = $!; POSIX::close($o); defined $r or do { $! = $e; $die->() } } }
+      if ($o == $fd) { __set_cloexec($fd, 0) }
+      else { my $r = POSIX::dup2($o, $fd); my $e = $!; POSIX::close($o); defined $r or do { $! = $e; $die->() } } }
     else { $! = POSIX::EINVAL(); $die->() } } }
 
 # The loop is Proc::Spawner::Loop (W5, post-0.10); these are its variables, and the functions below its old names.
@@ -347,14 +418,16 @@ my %RLIMIT = defined &__rlimits ? __rlimits() : ();
 sub rlimits {   # { NAME => SOFT | [SOFT, HARD] } as spawn's [[RESOURCE, SOFT, HARD], ...]; NAME: NOFILE, RLIMIT_NOFILE or a number
   my $h = shift;
   map { my ($n, $v) = ($_, $h->{$_}); (my $k = uc $n) =~ s/^RLIMIT_//;
-        my $r = $WIN ? $k : $RLIMIT{$k} // ($n =~ /^[0-9]+\z/ ? $n : die "Proc::Spawner: unknown resource '$n'\n");   # (Windows: the name, W4)
+        my $r = $WIN ? $k : $RLIMIT{$k} // ($n =~ /^[0-9]+\z/ ? $n : die "Proc::Spawner: unknown resource '$n'\n");   # (Windows:
+          # the name, W4)
         [$r, ref $v ? @$v[0, 1] : ($v, undef)] } sort keys %$h }
 sub start {
   my ($path, $argv, $envp, $fds, %o) = @_;
   my @a = ((map [$_ => $o{$_}], grep defined $o{$_}, qw(chdir fchdir)), actions($fds),
            defined $o{tcsetpgrp} ? [tcsetpgrp => $o{tcsetpgrp}] : ());
   my %attr = (sigmask => [signums($o{sigmask})], sigdefault => [signums($o{sigdefault})],
-              map +($_ => $o{$_}), grep exists $o{$_}, qw(pgroup setsid resetids sched cgroup search pidfd nice win_priority win_job));
+              map +($_ => $o{$_}), grep exists $o{$_},
+                qw(pgroup setsid resetids sched cgroup search pidfd nice win_priority win_job));
   $attr{sigignore} = [signums($o{sigignore})] if $o{sigignore};
   $attr{rlimit} = [rlimits($o{rlimit})] if $o{rlimit};
   my $um = defined $o{umask} && umask $o{umask};
@@ -364,10 +437,14 @@ sub start {
   $pid or return tr_("spawn failed: @$argv: $!"), undef;
   tr_("spawn $pid: $path [@$argv]", @a ? "; $how" : '');
   my $cb = $o{on_exit};   # (Windows: the kept process handle is released once the status is taken, post-0.08)
-  loop()->child($pid, sub { __win_spawn_forget($pid) if $WIN; $cb->(@_) if $cb });
+  loop()->child($pid, sub { reaped($pid); $cb->(@_) if $cb });
   $o{pidfd} && wantarray ? ($pid, $pidfd) : $pid }
 
 # ------------------------------------------------------------------ the loop: Proc::Spawner::Loop under its old names
+sub reaped {   # after waiting for a child of spawn: on Windows the kept process handle is released (post-0.08); else nothing.
+  # (post-0.12, X59: gone with W5, post-0.10, though documented: a caller who waited itself could not release it)
+  __win_spawn_forget($_[0]) if $WIN && defined &__win_spawn_forget }
+
 sub loop { Proc::Spawner::Loop->new }
 sub defer { loop()->defer(@_) }
 sub wait_until { loop()->wait_until(@_) }
@@ -441,16 +518,21 @@ C<< win_priority => 'idle' | 'below_normal' | 'normal' | 'above_normal' |
 PerProcessUserTimeLimit => TICKS, PerJobUserTimeLimit => TICKS,
 ActiveProcessLimit => N } >> (limits of a job of the child's own, by
 Windows' names and units: committed memory, user time in 100-ns ticks;
-nested in the job of C<kill_with_parent>, which needs Windows 8).
+with C<kill_with_parent> on, nested in its job, which needs Windows 8).
 C<nice> and C<rlimit> are mapped to them, approximately: C<nice> from this
-process's class to the class whose nice value is nearest (10 and up
-C<idle>, 1 to 9 C<below_normal>, -1 to -9 C<above_normal>, -10 and below
-C<high>, never C<realtime>); C<rlimit> C<AS> and C<DATA> to
+process's class to a class as Cygwin maps nice values (12 and up C<idle>,
+4 to 11 C<below_normal>, -4 to 3 C<normal>, -5 to -12 C<above_normal>, -13
+and below C<high>, never C<realtime>; a class's own nice value: 16, 8, 0,
+-8, -16, -20); C<rlimit> C<AS> and C<DATA> to
 C<ProcessMemoryLimit>, C<CPU> to C<PerProcessUserTimeLimit>, C<NPROC> to
 C<ActiveProcessLimit> (the soft value if set, else the hard one: Windows has
 one limit, and ends the child at it); the other resources have no
 counterpart and are unsupported.  Where both are given, C<win_priority> and
-C<win_job> win.  Elsewhere C<win_priority> and C<win_job> are unsupported.
+C<win_job> win.  Elsewhere C<win_job> is unsupported, and C<win_priority>
+(post-0.12) is mapped to C<nice>: the increment from this process's nice
+value to the class's (above), so C<< win_priority => 'idle' >> from nice 0
+is C<< nice => 16 >>, with C<nice>'s limits; C<nice>, if given, wins; an
+unknown class fails with C<EINVAL>.
 
 Without posix_spawn (F<Makefile.PL> found none, or
 C<PROC_SPAWNER_MISSING=posix_spawn>), C<spawn> forks and execs, in C, with
@@ -463,6 +545,96 @@ arguments go to Perl as they are (on Windows Perl's command line does not
 yet quote them as the child parses them back); the child sees fds 0-2 only
 there; at most 64 children at once (C<$Proc::Spawner::PRIMITIVE> says which
 primitive is used).
+
+C<%Proc::Spawner::WINDOWS> (Windows only, EXPERIMENTAL) says how every
+child is started there; it is read at each call, so C<local> changes it for
+one call:
+
+=over
+
+=item C<< new_group => 'auto' >> (the default since post-0.12)
+
+Whether the child is in a process group of its own, where Windows turns
+Ctrl-C off.  C<'auto'>: only a child that would have SIGINT ignored on POSIX
+(C<sigignore> has C<INT>, or C<$SIG{INT}> is C<'IGNORE'> here and
+C<sigdefault> does not have C<INT>; so L<Proc::ShellSpawn>'s background
+jobs, not its foreground commands); C<1>: every child (the default until
+0.12); C<0>: none.  C<< pgroup => 0 >> gives a child a group of its own as
+well.  A child in this process's group gets a Ctrl-C at the console itself,
+as a POSIX child in the foreground process group gets SIGINT, and handles it
+or dies of it; one in a group of its own does not (unless it turns Ctrl-C
+back on for itself, as F<perl.exe> does by its source).  Perl's own spawn
+does the same: C<system LIST>'s child stays in Perl's group, C<system 1,
+...>'s gets one of its own.
+
+=item C<< kill_with_parent => 0 >> (default off since post-0.12)
+
+On: the child is in a job object whose only handle is this process's, and
+Windows ends everything in the job (the child, and whatever it starts) when
+this process ends, however it ends: nothing started here outlives this
+process, and the children end by C<TerminateProcess>, with no chance to
+clean up (also right after a Ctrl-C they got themselves).  Off (as Perl's
+own spawn, which makes no job, and as on POSIX): a child still running when
+this process ends keeps running.
+
+=item C<< new_console => 1 >> (default on)
+
+A child with none of fds 0-2 gets a console of its own, as with Perl's own
+spawn; off: it shares this process's, with no standard handles.
+
+=back
+
+Through Perl's own spawn (C<$Proc::Spawner::PRIMITIVE> C<system1>) none of
+them applies: Perl's own choices hold there (every child in a group of its
+own, no job).
+
+What the defaults cost, on Windows (none of it tried with a real Ctrl-C:
+under Wine it was checked that each child gets the process group it should,
+as Windows records it, and that a child outlives its parent):
+
+=over
+
+=item *
+
+A child still running when this process ends keeps running: after this
+process is killed or crashes, after a Ctrl-C that ends it (Perl runs no
+C<END> blocks then), and after it exits without waiting for children of
+C<spawn> or C<start> (L<Proc::ShellSpawn> waits for its background jobs at
+exit).  So it is on POSIX; on Windows, moreover, a file such a child keeps
+open cannot be deleted (a temporary directory may not be removed), and it
+may go on writing to the console and reading keys meant for the next
+program.
+
+=item *
+
+Ctrl-C reaches only processes on this console: a child with a console of
+its own (C<new_console>), a GUI program, or a detached one does not
+get it, and goes on after this process has ended.  On POSIX a child in the
+foreground process group gets SIGINT whatever it is.
+
+=item *
+
+Perl's C<kill> sends C<TERM> and C<BREAK> as a Ctrl-Break event to the
+process group whose id is the pid, so they reach only a child in a group of
+its own; C<INT> is a Ctrl-C event, which a child in a group of its own has
+off.  A child in this process's group (since post-0.12, every child that
+does not ignore SIGINT; until then none) can be ended only by C<kill KILL>
+(C<TerminateProcess>), unless it is given a group of its own
+(C<< pgroup => 0 >>, or C<< new_group => 1 >>).  What Windows does with such
+an event for a pid that leads no group was not checked.
+
+=item *
+
+Through Perl's own spawn (C<system1>) every child is in a group of its own:
+Ctrl-C reaches none of them, and none is killed, so after a Ctrl-C they all
+go on, the command this process was waiting for too.
+
+=back
+
+Not a cost of these settings, as no setting changes it: Ctrl-Break at the
+console reaches every process on it, also one in a group of its own
+(Windows turns only Ctrl-C off there), so it ends the background jobs too
+(by Windows' documentation; not tried).
 
 C<reaped(PID)>: after waiting yourself for a child of C<spawn>.  On Windows
 it releases the process handle kept for the exit code; elsewhere it does

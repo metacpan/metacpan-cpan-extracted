@@ -343,6 +343,10 @@ subtest 'highlight' => sub {
     }
     local $ENV{PERL5LIB} = join ':', "$dir/lib", $ENV{PERL5LIB} // ();
 
+    like run('-Mup --highlight=pandoc:breezedark --no-pager -- ansicolumn FILE')->stdout,
+        qr/\A\[--highlight=pandoc:breezedark\]/, 'a style after the name';
+    unlike run("-Mup '--highlight=a b' --no-pager -- ansicolumn FILE")->stdout,
+        qr/highlight/, 'not a name';
     like run('-Mup --highlight=pandoc --no-pager -- ansicolumn FILE -w 100')->stdout,
         qr/\A\[--highlight=pandoc\]\[--bs=.*\[FILE\]\[-w\]\[100\]\z/,
         'ansicolumn gets --highlight';

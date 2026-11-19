@@ -29,9 +29,17 @@ SH
     return $file;
 }
 
-# Run the dispatcher with only @dirs on PATH; return (stdout, exit, stderr).
+# Some shells (OpenBSD's) have no printf of their own, so the dispatcher
+# needs one on PATH; this directory holds only a link to it.
+my $tools = tempdir(CLEANUP => 1);
+if (my ($printf) = grep { -x } map { File::Spec->catfile($_, 'printf') } File::Spec->path) {
+    symlink($printf, "$tools/printf") or die "Could not link $printf: $!";
+}
+
+# Run the dispatcher with only @dirs (and $tools, last) on PATH; return
+# (stdout, exit, stderr).
 sub run_with($impl, $dirs, @args) {
-    local $ENV{PATH} = join ':' => @$dirs;
+    local $ENV{PATH} = join ':' => @$dirs, $tools;
     delete local $ENV{REVIEW_HELPER_IMPL};
     $ENV{REVIEW_HELPER_IMPL} = $impl if defined $impl;
     my ($out, $err, $status) = capture { system($sh, $script, @args) };
@@ -84,7 +92,9 @@ subtest 'odd PATH entries' => sub {
     chmod(0000, $locked) or die "Could not chmod: $!";
     my $missing = "$empty/no-such-dir";
 
-    is([run_with(undef, ['', $missing, $locked, $late], 'list')], [$< == 0 ? "locked\nlist\n" : "go\nlist\n", 3, ''], 'empty, missing and unreadable directories are skipped');
+    # Root, or an administrator on Cygwin, still reads it.
+    my $readable = opendir(my $dh, $locked);
+    is([run_with(undef, ['', $missing, $locked, $late], 'list')], [$readable ? "locked\nlist\n" : "go\nlist\n", 3, ''], 'empty, missing and unreadable directories are skipped');
     chmod(0700, $locked);
 
     # '.' is the directory the dispatcher runs in.

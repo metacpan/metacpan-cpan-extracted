@@ -4,7 +4,7 @@ DBIx::SchemaChecksum - Manage your datebase schema via checksums
 
 # VERSION
 
-version 1.104
+version 1.106
 
 # SYNOPSIS
 
@@ -568,12 +568,12 @@ writing proper docs.
 # AUTHORS
 
 - Thomas Klausner <domm@plix.at>
-- Maroš Kollár <maros@cpan.org>
-- Klaus Ita <koki@worstofall.com>
+- Maroš Kollár <cpan@k-1.com>
+- Klaus Ita
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 - 2021 by Thomas Klausner, Maroš Kollár, Klaus Ita.
+This software is copyright (c) 2012 - 2026 by Thomas Klausner, Maroš Kollár, Klaus Ita.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

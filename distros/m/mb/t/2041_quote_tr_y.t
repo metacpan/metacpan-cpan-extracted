@@ -12,11 +12,12 @@ use vars qw(@test);
 @test = ();
 for my $op (qw( tr y )) {
 
-    for my $delim (qw( # )) {
+    for my $delim ('#') {
         push @test, sub { mb::eval(sprintf(q{$_='1'; %s%s1%s2%s;   $_ eq '2'}, $op, ($delim) x 3)) };
     }
 
-    for my $delim (')', qw( ! " $ % & ' * + , - . / : ; = > ? @ \ ] ^ ` | ~ )) {
+    # split instead of qw(), which warns of "#" and "," under -w
+    for my $delim (')', split(' ', q{ ! " $ % & ' * + , - . / : ; = > ? @ \ ] ^ ` | ~ })) {
         push @test, sub { mb::eval(sprintf(q{$_='1'; %s%s1%s2%s;   $_ eq '2'}, $op, ($delim) x 3)) };
 
         push @test, sub { mb::eval(sprintf(q{$_='1'; %s(1)%s2%s;   $_ eq '2'}, $op, ($delim) x 2)) };

@@ -2,7 +2,7 @@
 
 package Term::ANSIColor::Concise;
 
-our $VERSION = "3.04";
+our $VERSION = "3.05";
 
 use v5.14;
 use warnings;
@@ -157,6 +157,7 @@ my %numbers = (
     M => 35, m => 95,   # M : Magenta
     C => 36, c => 96,   # C : Cyan 
     W => 37, w => 97,   # W : White
+    T => 39, t => 39,   # T : Terminal (default color)
     );
 
 my $colorspec_re = qr{
@@ -178,7 +179,7 @@ my $colorspec_re = qr{
     # Basic 256/16 colors
     | (?<c256>   [0-5][0-5][0-5]         # 216 (6x6x6) colors
              | L([01][0-9]|[2][0-5]) )   # 24 gray levels + B/W
-    | (?<c16>  [KRGYBMCW] )              # 16 colors
+    | (?<c16>  [KRGYBMCWT] )             # 16 colors, and the default
     # Effects and controls
     | (?<efct>   ~[DPIUFQSHX]            # ~effect
              | [DPIUFQSHX]:[\d:]*        # effect:style
@@ -507,7 +508,7 @@ Term::ANSIColor::Concise - Produce ANSI terminal sequence by concise notation
 
 =head1 VERSION
 
-Version 3.04
+Version 3.05
 
 
 =head1 DESCRIPTION
@@ -631,6 +632,13 @@ Single uppercase character representing 8 colors, and alternative
     K  k  Black
     W  w  White
 
+C<T> stands for the default color of the Terminal: C<T> sets the
+foreground to the default (SGR 39), and C</T> sets the background to
+the default (SGR 49).  It has no brighter variant; C<t> is the same
+as C<T>.
+
+    T  t  Terminal (default color)
+
 =head2 6x6x6 216 COLORS
 
 Combination of 0..5 for 216 RGB values:
@@ -734,6 +742,9 @@ indicate SGR (Select Graphic Rendition) parameter values:
     /    Toggle foreground/background
     ^    Reset to foreground
     ~    Cancel following effect
+
+C<Z> resets everything.  To reset the color alone, use C<T> (see
+L</BASIC 8+8>).
 
 Tilde (C<~>) negates the following effect; C<~S> resets the effect of
 C<S>.  The negation of C<D> is discussed in the Wikipedia page in

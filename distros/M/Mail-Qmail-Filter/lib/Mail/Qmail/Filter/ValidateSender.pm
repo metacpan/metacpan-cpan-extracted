@@ -3,7 +3,7 @@ use warnings;
 
 package Mail::Qmail::Filter::ValidateSender;
 
-our $VERSION = '1.0';
+our $VERSION = '1.01';
 
 use Mo qw(coerce default);
 extends 'Mail::Qmail::Filter';
@@ -26,7 +26,7 @@ __END__
 
 =head1 NAME
 
-Mail::Qmail::Filter::ValidateFrom -
+Mail::Qmail::Filter::ValidateSender -
 check syntax of RFC5321.MailFrom address
 
 =head1 SYNOPSIS

@@ -33,6 +33,14 @@ my $content = file2string($path);
 is( $content, "line1\nline2\nno-final-newline-either",
 	'slurps the entire file including embedded newlines' );
 
+# No layer translates line endings: on Windows the default layers include
+# :crlf, which up to 0.0242 turned "\r\n" into "\n".
+my ($cfh, $cpath) = tempfile( UNLINK => 1 );
+binmode $cfh;
+print $cfh "a\r\nb\r\n\x{ff}";
+close $cfh;
+is( file2string($cpath), "a\r\nb\r\n\x{ff}", 'bytes come back exactly, "\r\n" included' );
+
 # Empty file slurps to an empty string.
 my ($efh, $epath) = tempfile( UNLINK => 1 );
 close $efh;

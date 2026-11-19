@@ -176,10 +176,22 @@ SKIP: { skip 'Windows: the POSIX settings (t/windows.t has what Windows has)', 1
                                                         [NPROC => 'unlimited', 3], [NOFILE => 10, 10]]);
   is_deeply $j, { ProcessMemoryLimit => 5e7, PerProcessUserTimeLimit => 1e8, ActiveProcessLimit => 3 }, 'W4: rlimit as job limits';
   is_deeply \@none, ['NOFILE'], 'W4: a resource with no Windows counterpart';
-  is join(' ', map Proc::Spawner::win_class_for_nice($_), -20, -9, 0, 1, 9, 10), 'high above_normal normal below_normal below_normal idle',
-    'W4: nice as a priority class (from normal)';
-  SKIP: { skip 'Windows: its own settings are used there', 2 if $^O eq 'MSWin32';
-    ok !Proc::Spawner::spawn(@TRUE, undef, [], { win_priority => 'high' }) && $! == POSIX::ENOTSUP(), 'win_priority elsewhere: unsupported';
+  is join(' ', map Proc::Spawner::win_class_for_nice($_), -20, -13, -12, -5, -4, 3, 4, 11, 12, 19),
+    'high high above_normal above_normal normal normal below_normal below_normal idle idle',
+    'W4: nice as a priority class (from normal; as Cygwin, never realtime)';
+  is join(' ', map $Proc::Spawner::CLASS_NICE{$_}, qw(idle below_normal normal above_normal high realtime)), '16 8 0 -8 -16 -20',
+    'a priority class as a nice value (as Cygwin)';
+  SKIP: { skip 'Windows: its own settings are used there', 6 if $^O eq 'MSWin32';
+    ok !Proc::Spawner::spawn(@TRUE, undef, [], { win_priority => 'bogus' }) && $! == POSIX::EINVAL(), 'win_priority elsewhere: an unknown class, EINVAL';
+    my $ours = getpriority(0, 0);
+    is Proc::Spawner::nice_for_win_class('idle'), 16 - $ours, 'win_priority elsewhere: the increment to the class\'s nice value';
+    SKIP: { skip 'nice: not done by this spawn, or not undone without privilege here', 2
+              unless Proc::Spawner::spawn(@TRUE, undef, [], { nice => 3 }, undef) && (wait, 1);
+      my $nice_of = sub { my $p = Proc::Spawner::spawn($PERL, [$PERL, '-e', 'exit getpriority(0, 0)'], undef, [], shift) or return "fail: $!";
+        waitpid $p, 0; $? >> 8 };
+      skip "nice: ours is $ours, above below_normal's 8", 2 if $ours > 8;
+      is $nice_of->({ win_priority => 'below_normal' }), 8, 'win_priority elsewhere: the child at the class\'s nice value';
+      is $nice_of->({ win_priority => 'idle', nice => 1 }), $ours + 1, 'win_priority elsewhere: nice, if given, wins' }
     my $p = Proc::Spawner::spawn(@TRUE, undef, [], { win_job => { ActiveProcessLimit => 2 } }, { win_job => 'drop' });
     ok $p, 'win_job elsewhere: dropped on request'; waitpid $p, 0 if $p } }
 { # post-0.10: PATH split at $Config{path_sep} (Proc::Spawner::path_split; the shell's lookups use it too)
@@ -194,4 +206,7 @@ SKIP: { skip 'Windows: the POSIX settings (t/windows.t has what Windows has)', 1
     local $ENV{PATH} = join $Config::Config{path_sep}, '/nonexistent-dir', dirname $PERL;
     my $p = Proc::Spawner::spawn($name, pe('exit 4'), undef, [], { search => 1 });
     ok $p && waitpid($p, 0) == $p && $? >> 8 == 4, 'search through a PATH of two entries' } }
+# X59 (post-0.12): reaped(PID), documented for a caller of spawn who waits itself, was gone since W5 (post-0.10)
+{ my ($pid) = Proc::Spawner::spawn($^X, [$^X, '-e', 'exit 5'], undef, [], {}); waitpid $pid, 0;
+  is $? >> 8, 5, 'a child of spawn, waited for here'; ok eval { Proc::Spawner::reaped($pid); 1 }, 'reaped(PID) then (X59)' }
 done_testing;

@@ -84,7 +84,7 @@ SYNOPSIS
     and Other Systems
 
   Supported perl versions:
-    perl version 5.005_03 to perl 5.42
+    perl version 5.005_03 to perl 5.44
 
 DESCRIPTION
 
@@ -213,6 +213,28 @@ PERL 5.42 AND source::encoding
 
   This block is harmless on Perl 5.005_03 through 5.41, where the pragma
   does not exist.
+
+PERL 5.44 SYNTAX
+
+  mb handles the following syntax of Perl 5.44:
+
+    sub f ($x, $y, :$alpha, :$beta = undef) { ... }   # named parameters
+    foreach my ($key, \@items) (%hash) { ... }        # multi-variable refalias
+    use v5.44;                                        # use VERSION
+
+    use feature 'enhanced_xx';
+    $string =~ m/ [ a b   # comment ]
+                    c \# ] /xx;
+
+  Under use feature 'enhanced_xx', mb removes comments and vertical space
+  in a codepoint class of /xx by itself.  "#" and white space in a
+  codepoint class are written as \xHH in the generated regular expression,
+  so it means the same on every Perl, with or without enhanced_xx.
+
+  As Perl does, "use VERSION" of any version (use v5.44, use 5.36.0,
+  use v5.8, ...) disables enhanced_xx.  Since mb removes the comments,
+  mb gives the comment warnings of Perl 5.44 ("Did you mean this to be a
+  comment?" etc.) at transpile time, under use warnings or -w.
 
 CHEATSHEET
 

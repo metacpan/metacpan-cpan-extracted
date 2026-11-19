@@ -2,7 +2,7 @@ package Protocol::IR::Format::JSON;
 use strict;
 use warnings;
 
-our $VERSION = '1.2';
+our $VERSION = '1.3';
 
 use JSON::PP;
 use File::Spec;
@@ -38,11 +38,18 @@ sub decode {
     my ($text, $path) = _read_input($input);
     my $data = _decode_json($text);
 
+    # The repeat count is a property of the device (timing.pressMinRepeats),
+    # not of an individual command or its keycode.  Capture it from the
+    # document we were handed before we possibly follow a code-set pointer.
+    my $repeat_count = _device_repeat_count($data);
+
     # A device document: follow its pointer to the shared command set.
     if (ref $data->{commands} ne 'ARRAY' && defined $data->{codeset}) {
         my $set = _find_codeset($data->{codeset}, $path);
         die "Cannot find the code set '$data->{codeset}'\n" unless defined $set;
         $data = _decode_json(_read_input($set));
+        # A code set reached through a device keeps that device's timing.
+        $repeat_count //= _device_repeat_count($data);
     }
 
     die "JSON requires a commands list\n"
@@ -62,25 +69,25 @@ sub decode {
             if $@ || !defined $code;
 
         $code->alias($cmd->{name});
-        $code->send_count(_repeat_hint($cmd));
+        # pressMinRepeats is the repeat count for a single press; the keycode's
+        # trailing ":N" is not a repeat count and is deliberately ignored.
+        $code->send_count($repeat_count) if defined $repeat_count;
         push @decoded_codes, $code;
     }
 
     return \@decoded_codes;
 }
 
-# How many times one press of a command transmits.  A keycode ends with a
-# repeat hint after its last colon -- e.g. "G:JVC 16 Bit:(Start)(0xC004)():3"
-# -- which is a property of the command rather than of its waveform.  Most
-# commands hint the same value, but it does vary (1, 4, 33 and 0 all occur),
-# so it is read per command.  0 means the keycode carries no usable hint, so
-# the code keeps the single-press default.
-sub _repeat_hint {
-    my ($cmd) = @_;
-    my ($hint) = defined $cmd->{keycode}
-        ? $cmd->{keycode} =~ /:(\d{1,3})$/
-        : ();
-    return $hint && $hint >= 1 ? $hint : 0;
+# The repeat count for a single press is the device's timing.pressMinRepeats
+# (the Harmony hub reads it, defaulting to 3).  It is a property of the
+# device, not of an individual command or its keycode; the keycode's trailing
+# ":N" is a constant on 99.95% of keycodes and is not a repeat count.
+sub _device_repeat_count {
+    my ($data) = @_;
+    return undef unless ref $data eq 'HASH' && ref $data->{timing} eq 'HASH';
+    my $timing = $data->{timing};
+    return $timing->{pressMinRepeats} if exists $timing->{pressMinRepeats};
+    return 3; # Harmony hub default when the field is absent
 }
 
 sub _decode_json {
@@ -138,7 +145,7 @@ Protocol::IR::Format::JSON - proprietary JSON IR database dump import
 
 =head1 VERSION
 
-version 1.2
+version 1.3
 
 =head1 SYNOPSIS
 
@@ -185,8 +192,8 @@ the format is never exported.
 
 Parses a file path or JSON string and returns an arrayref of
 L<Protocol::IR::Code> objects, one per command with a Pronto payload, with
-C<alias> set from the command C<name> and C<send_count> set from the repeat
-hint the keycode carries after its last colon.
+C<alias> set from the command C<name> and C<send_count> set from the
+ device's C<timing.pressMinRepeats> when a device document is imported.
 
 =head1 SUPPORT
 
@@ -203,7 +210,8 @@ Brett T. Warden <bwarden@cpan.org>
 Copyright (c) 2026 Brett T. Warden
 
 This library is free software; you can redistribute it and/or modify it
-under the terms of the GNU Lesser General Public License version 2.1 as
-published by the Free Software Foundation.
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 2 of the License, or (at your
+option) any later version.
 
 =cut

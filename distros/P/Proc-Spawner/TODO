@@ -94,7 +94,7 @@ A. WAITING FOR THE USER'S DECISION
     user, 2026-11-12): the runner waits for them too, up to 5 s (-after).
     Then 27 the same in every run, 6 races (chance); X55 found and fixed.  Partially decided now
     3,508 of the 3,601 undecided; the other 93, which the setups left out,
-    are classified by reading (item 19).
+    are classified by Claude reading them (item 19).
  3. P2 and P4 (large-subset-state.md, sections 4-5): ${...} forms both
     shells refuse; messages with our name and line, and $-.
  5. X2: $! of a background job that starts no process (design question K4).
@@ -162,8 +162,9 @@ A. WAITING FOR THE USER'S DECISION
 17. X27, step 3: persistent results (the same in every run, which the
     environment does not change), found in the class affects-shell,
     that no ruling covers yet (section 12): the
-    environment env and printenv list (4 snippets: bash adds SHLVL and
-    _; ours as dash); /proc/$$/cmdline (1: each shell's own command line,
+    environment env and printenv list (5 snippets, since IN1 with v=5 env |
+    less: bash adds SHLVL and _; dash and ours list the same variables,
+    in another order); /proc/$$/cmdline (1: each shell's own command line,
     ours a Perl one); times (1: ours, Perl, has used CPU time where dash
     shows 0); and, found post-0.11 (20 runs: ours' own result in each, so
     not a race), (echo ...; sleep 1; echo ...) | zenity with zenity
@@ -173,7 +174,7 @@ A. WAITING FOR THE USER'S DECISION
     (they are built into the shells and into ours; the environment does
     not change them).
 19. X27, step 3: the 93 undecided samples the setups left out, classified
-    by reading (2026-11-13; the user's categories: AI- and a category used
+    by Claude (an AI) reading them (2026-11-13; the user's categories: AI- and a category used
     before, and AI-PATH-twister; large-subset-environment.md, section 12;
     record doc/large-subset/tools/large-subset-ai-classes.tsv): AI-strict
     27 (an unmovable stone 18, a device working as expected 9), AI-names
@@ -181,15 +182,105 @@ A. WAITING FOR THE USER'S DECISION
     on split 7, AI-tilde 6, AI-A5 5, AI-glob 4, AI-shells' own variables 4,
     AI-PATH-twister 4, AI-noise 3.  Act: accept each category, or move a
     sample (the work each takes: B).
+20. win_spawn.h for Perl's core (post-0.12; another session, prhx, is
+    drafting a patch that takes a copy of it into Perl as its posix_spawn
+    on Windows; doc/pspawn-spawner.md, section 8, "Done post-0.12").
+    Taken from that patch, with changes: the options WIN_OPT_CMD_RAW,
+    WIN_OPT_ARGV_RAW, WIN_OPT_KEEP_QUOTED, which Proc::Spawner does not
+    set.  Act: keep them, or leave them to Perl's copy.
+    Also, a batch file: cmd.exe takes the first word of its command line
+    both as what it runs and as %0, so posix_spawn's two names (FILE, what
+    runs; argv[0], what the program is called) cannot both reach a batch
+    file.  With system { 'rm' } 'swissarmy', 'foo' and rm.cmd found as
+    C:\bin\rm.cmd, that first word can be: (1) the path found,
+    "C:\bin\rm.cmd" (now; %0 shows the path); (2) FILE as written, rm
+    (cmd.exe looks it up again, in the current directory first, then PATH:
+    another file may run than the one found and checked); (3) argv[0],
+    swissarmy (cmd.exe runs whatever swissarmy names, not FILE at all).
+    Perl's own spawn: (3), as far as Claude knows (its command line starts
+    with argv[0], and Windows hands a batch file's command line to cmd.exe
+    as it is; not checked on real Windows, and under Wine Perl's batch
+    files fail); its t/win32/system.t, which expects %0 as written, has
+    FILE and argv[0] the same, where (2) and (3) agree.  Act: (1), (2), or
+    (2) as an option (Perl's copy, for its old %0).  Claude's view
+    (2026-11-14): (1), (2) only as an option, never (3).
+
+21. X61's rest: `read` with backslashes in the line, where dash and bash
+    differ from each other (found 2026-11-13 with X61's random cases):
+    for the user to decide case by case (pspawn-known-issues.md, X61).
 
 B. WORK (no decision needed)
+
+ - FIRST IN THE NEXT CYCLE (the user, 2026-11-18: after the release, which
+   is made in the configuration as tested; all found reading the code, none
+   of it run):
+   1. X67 (ours): Proc::Spawner::spawn_unsupported (Spawner.pm, the line
+      "if (grep $m{$_}, qw(dup2 close open closefrom))"): where the libc
+      lacks one fd action, every fd action of every spawn is done in Perl's
+      own process around the call, even when the call asks for none of the
+      missing kind.  Hit: a libc without addclosefrom (glibc before 2.34,
+      musl), and t/flavors.pl's level 2, which so tests posix_spawn with
+      every fd action done in the parent, not "the redirections only".
+      Fix: decide per call (only an action of a missing kind asked for).
+   2. A test of closefrom: no test file calls it, and nothing in the
+      distribution uses it (only Proc::Spawner's interface).
+   3. Where closefrom alone is missing, a wrapper around posix_spawn: the
+      closefrom replaced by a close for each fd from N up open in the child
+      at that point (Perl's inheritable fds, and the earlier dup2 and open
+      targets, minus the earlier closes), as system1 does already
+      (run_redirs); the fds from /proc/self/fd where present, not one fcntl
+      per fd up to the open-files limit (which may be 1,048,576).  Low
+      value until something uses closefrom.
+   4. F1, the user's decision: the fork primitive (__spawn_nowait, M2) does
+      nothing between fork and exec but the signal mask, as a plain spawn
+      would, so setsid, pgroup => 0, tcsetpgrp, sched and cgroup are
+      refused, and rlimit, sigignore, nice are flipped in the parent around
+      the call (not thread-safe), though the child could do them all
+      itself.  (a) keep it; (b) every setting in the child, between fork
+      and exec, errors through the exec pipe; (c) (b), and a test-only
+      level keeping today's plain spawn (Claude's view).  Only the fork
+      level reaches __spawn_nowait; its other paths (emulate_actions, the
+      settings around the call) are reached by level 2 and the matrix too.
+   5. system1 on Linux refuses rlimit, sigignore and nice, which fork does
+      (found 2026-11-18 by t/flavors-outcomes.pl: 6 tests skipped, and 2
+      of win_priority): their wrappers in C (M1, around_begin and
+      around_end in Spawner.xs) are called around posix_spawn and fork,
+      not around Run's start.  Calling them there too would make system1
+      as capable (not thread-safe, as for the other two).
+
+ - W6 and W7 (post-0.12; doc/pspawn-spawner.md, section 8): try them with a
+   real Ctrl-C and Ctrl-Break (under Wine with a pseudo-terminal, as the
+   tricks topic on Wine says, or on Windows): the foreground child gets the
+   Ctrl-C, a background job does not; and what Perl's kill TERM does to a
+   child in Perl's group (it leads no process group).
+
+ - win_spawn.h and Perl (post-0.12; A20): once the patch to Perl exists,
+   use Perl's posix_spawn where Perl has it (by its %Config entry) and keep
+   win_spawn.h for older Perls; section 5 of doc/perl-win32-system-bugs.md
+   then becomes per Perl version.  Where Perl has system(1, LIST) without
+   fork, M2's fallback (system1, through Run) can use it.  Until then,
+   after any change to win_spawn.h tell the user, so that Perl's copy
+   follows (the interface and names there are not settled).
 
  - The parser's work list (large-subset-state.md, section 4, 44 samples):
    the real gaps alias :=, export ${foo?}, command -, unset -f ls /bin/ls.
  - cd - with OLDPWD unset (dash prints the directory; ours prints nothing);
    exec foo's message lacks "exec: " (X5's kind).
  - X30: $LINENO makes parsing quadratic (count the lines once).
- - X1: a background job still running at the end (tail -F x | tee -a y &).
+ - X1's rest (K5, post-0.12: at exit ours waits only while it has
+   something left to start for a job, then leaves the running processes,
+   as the shells do; PROC_SHELLSPAWN_END): a job whose next command ours
+   still has to start keeps ours from exiting until then (the shells leave
+   a copy of themselves for it).  To exit at once as they do, ours would
+   run such a job in a Perl process of its own from the start (sh as Perl,
+   SH1), handing it the state it needs (variables, functions, $1..., the
+   options, the open descriptors); on Linux only the parent gets a child's
+   status, so taking a job over at exit is not possible; on Windows a
+   helper could take over the job's process handles (DuplicateHandle).
+ - The choices now set by environment variables (PROC_SHELLSPAWN_END,
+   _ECHO, _SH, _BIN, _INPROC, _ENVNAMES; PROC_SPAWNER_MISSING): a stopgap (the user,
+   2026-11-15); eventually each is an argument of the API, with no action
+   at a distance.
  - X3 brace expansion; X4 redir_strict; X6 no default PATH; X9 the virtual
    directory passed as a path; X15 reference cycles left in the shell layer;
    X17 messages inside eval; X24 a trap that re-sends its own signal.
@@ -215,14 +306,14 @@ B. WORK (no decision needed)
    block if a child fills the pipe between select and the write (possible,
    not observed; no test yet).
  - Messages: section 11 of large-subset-environment.md counts them nowhere
-   (post-0.11), section 7 of large-subset-state.md and README's run table
+   (post-0.11), section 7 of large-subset-state.md and README.md's run table
    still count a message on standard output or in a file as a difference.
    Bring section 7 in line: large-subset-runreport.pl as matchreport.pl
    (drop the shells' message lines from standard output; files by
    files_nomsg, which needs a new full run); then make docs-check.
  - X56: exec with a builtin's name runs ours' builtin, where dash and bash
    look only for a program (not found, 127).  Fix in the base grammar
-   (refuse after exec what the large one refuses); the parse figures are
+   (refuse after exec what the large one refuses); the parse results are
    then measured again.
  - large-subset-difffuzz.pl, what is left after seed 3 (-j 4, two hours,
    315,187 strings, 285,676 accepted; it found X50 and X51): of the 826
@@ -233,7 +324,7 @@ B. WORK (no decision needed)
    return || shift, A13); a background job that sends a signal to $$
    ends with the main shell in ours, while in the shells it is another
    process and goes on (X2's kind).  Not looked at: the 456 where all three differ.
- - X27, step 3, the 93 classified by reading (A19), what each category
+ - X27, step 3, the 93 classified by Claude reading them (A19), what each category
    takes in the setups (large-subset-setups.pl): AI-names with an
    expansion, a value the text itself sets (a for or read variable, an
    assignment: for f in */; do cd "$f"; find | while read d; do cd "$d";
@@ -254,3 +345,28 @@ C. WATCH (seen once, not reproduced)
    dash says "Permission denied" for a command found nowhere, ours "not
    found" (seen 2026-11-10, branch x27-step2; not from its changes).
  - X8, X13, X20.
+
+D. REMINDERS (the user, 2026-11-17: "should we keep these as they are?";
+   mention them now and then, do not insist)
+
+ - JK1 to JK3, the decision page "Executor Idiom Review": its last three
+   items (JK1: its text is on the page only).
+ - JK2 (the user, 2026-11-15): the
+   shell layer counts by hand who still needs each open file (hold,
+   release, release_all, and $tail: the tables to release once the last
+   process has started; 42 calls).  The page said this cannot be left to
+   Perl, since the rule of 2026-10-30 (pspawn-design.md, section 5) is to
+   forget an open file once every process that could use it has started,
+   which comes before the last Perl reference goes (the code waiting for
+   the child still refers to the table).  The user thinks it might be,
+   with weak references: to investigate whether the waiting code could
+   hold the tables weakly, so that the last strong reference goes when
+   the last process has started, and what commands would then see a pipe
+   closed at another moment ({ false || cat /etc/hostname; } | wc -l is
+   the document's example); also X15, the reference cycles left there.
+ - JK3 (the user, 2026-11-15): whether to rewrite test and [ in
+   a Perlish way (Proc::ShellSpawn::Programs).  Today their eight
+   functions mirror coreutils 9.4's test.c one for one (posixtest, expr,
+   and, term, unary_operator, binary_operator, advance, beyond), which
+   keeps the messages (')' expected, found ']') and oddities (-l STRING)
+   the same; a rewrite must keep them, checked against the program.

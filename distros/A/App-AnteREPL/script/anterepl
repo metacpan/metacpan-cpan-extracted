@@ -1,0 +1,74 @@
+#!/usr/bin/env perl
+use 5.016;
+use strict;
+use warnings;
+use App::AnteREPL ();
+
+my $status = eval { App::AnteREPL::main(@ARGV) };
+if ($@) { print STDERR $@; exit 1; }
+exit $status;
+
+__END__
+
+=head1 NAME
+
+anterepl - edit and run Perl in a scrolling BASIC-style screen
+
+=head1 SYNOPSIS
+
+    anterepl
+    anterepl program.pl
+    anterepl --plain program.bperl
+    anterepl --help
+
+=head1 DESCRIPTION
+
+Starts L<App::AnteREPL>. All REPL commands and subcommands must be uppercase,
+including C<LIST>, C<AUTO OFF>, C<DUMP>, and C<PEEK>. Lowercase/mixed-case input
+is ordinary Perl, executed immediately or stored during AUTO.
+Type HELP for commands. LOAD reads ordinary Perl or
+numbered programs; AUTO stores unnumbered input with an increment of 5.
+AUTO OFF or Ctrl-C returns to immediate mode. EDIT opens the in-memory
+program in your local editor, and EDIT ENV edits the current environment.
+QUIT or EXIT returns to the shell on a fresh line; append C<!> to discard
+unsaved source. Q asks for confirmation and Q! skips it, also in C<--plain>.
+Interactive exits print C<Thank, we hope something good happens to you today!>.
+
+The white border encloses the whole working screen ("VRAM"); a single-line command
+legend stays below it. Type a label and Enter; these are not Ctrl-key bindings.
+An 80x24 terminal gives 78x21 editable cells. The input loop blinks the cursor every half second; insert requests a bar
+and overwrite a block. C<--plain> leaves cursor
+appearance to the terminal and has no frame or legend. Shrinking crops
+rows and columns, warns, and keeps one inactive copy. Growing adds empty cells.
+Enlarge to the size in the warning and use RECOVER to restore the copy;
+restoration is never automatic. CLS clears the screen and its recovery copy.
+The numbered program and live Perl values are unaffected by screen resizing.
+
+CD and CHDIR change the session directory; lowercase C<chdir> remains Perl.
+A mistaken C<cls> bareword receives an uppercase spelling hint. Valid keywords
+and function calls retain Perl semantics, including C<say triple 14> and
+prototype-based calls. Ctrl-C cancels or interrupts, then explains how to
+leave with QUIT, QUIT!, or Ctrl-D.
+
+Every command also has a one-letter or letter/digit shortcut; H shows the table.
+Destructive shortcuts ask C<Continue? [y/N]>; append C<!> to bypass confirmation.
+E accepts definitions such as C<E s triple return 3 * shift>.
+Bare lists such as C<a one, two> define persistent arrays with quoted words;
+Perl keywords and existing functions take priority. E reserves five spaced
+definition tags; EVAL and stored source retain ordinary Perl syntax. Native quotes
+work inside shorthand lists too. C<E! a colors green> forces a destination
+replacement. See the module's
+SHORTCUTS AND SHORTHAND section for the complete value grammar and precedence.
+
+See L<App::AnteREPL> for the full command reference and screen controls.
+
+=head1 AUTHOR
+
+Brett Estrade
+
+=head1 LICENSE
+
+This software is free software; you may redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

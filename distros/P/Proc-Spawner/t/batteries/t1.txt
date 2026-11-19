@@ -12,6 +12,8 @@ printf 'a\\\\\nb\n' | { read x; echo "[$x]"; }
 printf 'a : b\n' | { IFS=': ' read x y z; echo "[$x][$y][$z]"; }
 printf 'x:y:\n' | { IFS=: read a b; echo "[$a][$b]"; }
 printf 'x:y:z\n' | { IFS=: read a b; echo "[$a][$b]"; }
+echo "a :" | { IFS=" :" read x; echo "[$x]"; }
+printf 'a b :  \n' | { IFS=" :" read -r x; echo "[$x]"; }
 printf '  a  b  \n' | { read a; echo "[$a]"; }
 printf 'a\n' | { IFS= read -r a b; echo "[$a][$b]"; }
 case a in [[:alpha:]]) echo y;; *) echo n;; esac

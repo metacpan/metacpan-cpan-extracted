@@ -11,25 +11,25 @@ my $sc = DBIx::SchemaChecksum->new( dbh => MakeTmpDb->dbh, sqlsnippetdir=>'t/dbs
 my $update = $sc->_update_path;
 is( int keys %$update, 2, '2 updates' );
 is(
-    $update->{'660d1e9b6aec2ac84c2ff6b1acb5fe3450fdd013'}->[1],
-    'e63a31c18566148984a317006dad897b75d8bdbe',
+    $update->{'ee3a4db19fc06296306738ee6d4cdfd1204adf8c'}->[1],
+    '8f6643a8fc8b4e47caa30c70da5635f366075ea1',
     'first sum link'
 );
 is(
-    $update->{'e63a31c18566148984a317006dad897b75d8bdbe'}->[1],
-    'b1387d808800a5969f0aa9bcae2d89a0d0b4620b',
+    $update->{'8f6643a8fc8b4e47caa30c70da5635f366075ea1'}->[1],
+    'b96b98d2a80eb1c812a4f1d29a43e40eb4928078',
     'second sum link'
 );
-is( $update->{'b1387d808800a5969f0aa9bcae2d89a0d0b4620b'},
+is( $update->{'b96b98d2a80eb1c812a4f1d29a43e40eb4928078'},
     undef, 'end of chain' );
 
 cmp_deeply(
-    [File::Spec->splitdir($update->{'660d1e9b6aec2ac84c2ff6b1acb5fe3450fdd013'}->[0])],
+    [File::Spec->splitdir($update->{'ee3a4db19fc06296306738ee6d4cdfd1204adf8c'}->[0])],
     [qw(t dbs snippets first_change.sql)],
     'first snippet'
 );
 cmp_deeply(
-    [File::Spec->splitdir($update->{'e63a31c18566148984a317006dad897b75d8bdbe'}->[0])],
+    [File::Spec->splitdir($update->{'8f6643a8fc8b4e47caa30c70da5635f366075ea1'}->[0])],
     [qw(t dbs snippets another_change.sql)],
     'second snippet'
 );

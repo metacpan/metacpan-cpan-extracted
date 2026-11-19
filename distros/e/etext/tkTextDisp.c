@@ -5605,6 +5605,40 @@ IBTreeBboxProc(chunkPtr, index, y, lineHeight, baseline, xPtr, yPtr,
 }
 
 /*
+ * The -layoutdepth of the block whose tree TkIBTreePrint describes to
+ * its layout callback, when the block has split lines (-1 otherwise):
+ * TkTextPrintDLines reports a group of leaves that will have frames
+ * with the room the frames take.  Set only around TkIBTreePrint, which
+ * runs no Perl code and lays nothing out.
+ */
+
+static int printStackDepth = -1;
+
+/*
+ * LinesRoom --
+ *
+ *	The rows that the split lines between two leaves take (see
+ *	LayoutSplits): s is the depth of the separator, defect and
+ *	nextDefect the defects of the two leaves; the room of the
+ *	larger of the two halves (TkTextOrnSplitRoom), 0 if no line is
+ *	drawn.
+ */
+
+static int
+LinesRoom(s, defect, nextDefect)
+    int s, defect, nextDefect;
+{
+    int a, b;
+
+    if (s <= 0) {
+	return 0;
+    }
+    a = TkTextOrnSplitRoom(s - defect);
+    b = TkTextOrnSplitRoom(s - nextDefect);
+    return (a > b) ? a : b;
+}
+
+/*
  *--------------------------------------------------------------
  *
  * LayoutSplits --
@@ -5663,7 +5697,7 @@ LayoutSplits(textPtr, segPtr, chunkX, infoPtr, stacks, numStacks, depth)
     TkTextLine *linePtr = TkBTreeFindLine(segPtr->body.itree.tree, 0);
     DLine *dlPtr;
     int line = 0, i, k, first, count;
-    int x0, y0, x1, y1, s, defect, nextDefect, half, n;
+    int x0, y0, x1, y1, s, defect, nextDefect, half, n, gap;
 
     /*
      * At most a picture of frames for each stack, and two of lines (the
@@ -5728,12 +5762,20 @@ LayoutSplits(textPtr, segPtr, chunkX, infoPtr, stacks, numStacks, depth)
 	    if (s <= 0) {
 		continue;
 	    }
+
+	    /*
+	     * The lines take room: the layout left the rows of the room
+	     * between the two leaves (see TkTextIBTreeLayoutProc), and
+	     * the lines start on the first of them.
+	     */
+
+	    gap = LinesRoom(s, defect, nextDefect);
 	    half = (defect == nextDefect) ? x1 - x0 : (x1 - x0) / 2;
 	    if ((s > defect) && (half > 0)) {
 		sPtr->frame = 0;
 		sPtr->value = s - defect;
 		sPtr->x = x0;
-		sPtr->y = infoPtr->lines[k]->y;
+		sPtr->y = infoPtr->lines[k]->y - gap;
 		sPtr->width = half;
 		sPtr->height = 0;
 		sPtr++;
@@ -5743,7 +5785,7 @@ LayoutSplits(textPtr, segPtr, chunkX, infoPtr, stacks, numStacks, depth)
 		sPtr->frame = 0;
 		sPtr->value = s - nextDefect;
 		sPtr->x = x0 + half;
-		sPtr->y = infoPtr->lines[k]->y;
+		sPtr->y = infoPtr->lines[k]->y - gap;
 		sPtr->width = x1 - x0 - half;
 		sPtr->height = 0;
 		sPtr++;
@@ -5823,6 +5865,66 @@ TkTextBlockOrnsAt(textPtr, segPtr)
 /*
  *--------------------------------------------------------------
  *
+ * LeafLayout --
+ *
+ *	Saves the layout of the leaves of a block (the place, size
+ *	and flags of each of their display lines) into an array, or
+ *	gives it back from the array.
+ *
+ * Results:
+ *	The number of display lines of the leaves.
+ *
+ * Side effects:
+ *	With restore non-zero, the display lines of the leaves get
+ *	the layout saved before.  With saved NULL, nothing is done.
+ *
+ *--------------------------------------------------------------
+ */
+
+#define LEAF_LAYOUT_INTS 7
+
+static int
+LeafLayout(infoPtr, saved, restore)
+    IBTreeInfo *infoPtr;	/* The block's lines. */
+    int *saved;			/* LEAF_LAYOUT_INTS per display line, or
+				 * NULL to count the lines only. */
+    int restore;		/* Non-zero: give the layout back. */
+{
+    int line, count = 0;
+    DLine *dlPtr;
+
+    for (line = 0; line < infoPtr->numLines; line++) {
+      for (dlPtr = infoPtr->lines[line]; dlPtr != NULL;
+	   dlPtr = dlPtr->nextPtr, count++) {
+	if (saved == NULL) {
+	  continue;
+	}
+	if (restore) {
+	  dlPtr->x = saved[0];
+	  dlPtr->y = saved[1];
+	  dlPtr->length = saved[2];
+	  dlPtr->maxX = saved[3];
+	  dlPtr->height = saved[4];
+	  dlPtr->baseline = saved[5];
+	  dlPtr->flags = saved[6];
+	} else {
+	  saved[0] = dlPtr->x;
+	  saved[1] = dlPtr->y;
+	  saved[2] = dlPtr->length;
+	  saved[3] = dlPtr->maxX;
+	  saved[4] = dlPtr->height;
+	  saved[5] = dlPtr->baseline;
+	  saved[6] = dlPtr->flags;
+	}
+	saved += LEAF_LAYOUT_INTS;
+      }
+    }
+    return count;
+}
+
+/*
+ *--------------------------------------------------------------
+ *
  * TkTextIBTreeLayoutProc --
  *
  *	This procedure is the "layoutProc" for IBTree segments.
@@ -5879,6 +5981,13 @@ TkTextIBTreeLayoutProc(textPtr, indexPtr, segPtr, offset, maxX, maxChars,
     int stackDepth = blockPtr->layoutCmd ? blockPtr->depth : 0;
 				/* The distance from the root of the nodes
 				 * that the stacks are expected to be. */
+    TkTextLine **leafLines = NULL;
+				/* The leaves, for the frames of stacks
+				 * (with split lines only). */
+    int room;			/* The room of the frames of a stack. */
+    int *saved = NULL;		/* The default layout of the leaves while
+				 * the result of the callback is applied
+				 * (LeafLayout). */
 
     if (segPtr->body.itree.tree) {
       linePtr = TkBTreeFindLine(segPtr->body.itree.tree, 0);
@@ -5901,6 +6010,8 @@ TkTextIBTreeLayoutProc(textPtr, indexPtr, segPtr, offset, maxX, maxChars,
     infoPtr->segPtr = segPtr;
     if (blockPtr->splitLines && (infoPtr->numLines > 0)) {
       stacks = (int *) ckalloc(2 * infoPtr->numLines * sizeof(int));
+      leafLines = (TkTextLine **) ckalloc(infoPtr->numLines
+					  * sizeof(TkTextLine *));
     }
 
     index.tree = segPtr->body.itree.tree;
@@ -5912,6 +6023,22 @@ TkTextIBTreeLayoutProc(textPtr, indexPtr, segPtr, offset, maxX, maxChars,
       index.byteIndex = 0;
       index.linePtr = linePtr;
       infoPtr->lines[line] = NULL;
+      if (leafLines != NULL) {
+	leafLines[line] = linePtr;
+	if (line > 0) {
+	  int defect, nextDefect, s;
+
+	  /*
+	   * The split lines between this leaf and the one before take
+	   * room: a stack keeps the leaves that far apart (the default
+	   * layout, and a group a callback places, which moves as a
+	   * whole).
+	   */
+
+	  s = TkIBTreeLeafSplit(leafLines[line - 1], &defect, &nextDefect);
+	  y += LinesRoom(s, defect, nextDefect);
+	}
+      }
       l = 0;
       do {
 	dlPtr = LayoutDLine(textPtr, &index, 
@@ -5950,6 +6077,19 @@ TkTextIBTreeLayoutProc(textPtr, indexPtr, segPtr, offset, maxX, maxChars,
       DLine **addDlPtrs, *addDlPtr;
       LangFreeProc *freeProc = NULL, *freeProc1 = NULL;
 
+      /*
+       * Keep the default layout of the leaves: when an element of the
+       * result is refused, the elements before it have already moved or
+       * hidden leaves, and the block is to be laid out as if it had no
+       * callback (BUGS 39).
+       */
+
+      count = LeafLayout(infoPtr, NULL, 0);
+      if (count > 0) {
+	saved = (int *) ckalloc(count * LEAF_LAYOUT_INTS * sizeof(int));
+	LeafLayout(infoPtr, saved, 0);
+      }
+
       ListFactoryInit(listFactoryPtr);
       arg = LangCallbackArg(blockPtr->layoutCmd);
       if (LangIsList(arg)) {
@@ -5974,7 +6114,9 @@ TkTextIBTreeLayoutProc(textPtr, indexPtr, segPtr, offset, maxX, maxChars,
       LangSetInt(&arg, chunkPtr->x);
       ListFactoryAppendCopy(listFactoryPtr, arg);
       LangFreeArg(arg, LANG_DYNAMIC);
+      printStackDepth = (stacks != NULL) ? stackDepth : -1;
       TkIBTreePrint(segPtr, listFactoryPtr, (void**) infoPtr->lines);
+      printStackDepth = -1;
       ListFactoryFinish(listFactoryPtr);
       result = LangArgEval(textPtr->interp, ListFactoryArg(listFactoryPtr));
       ListFactoryFree(listFactoryPtr);
@@ -6100,22 +6242,40 @@ TkTextIBTreeLayoutProc(textPtr, indexPtr, segPtr, offset, maxX, maxChars,
 	} else if (count != 0
 		   && count <= infoPtr->numLines - line) {
 	  /* If it is 0, ignore it! */
-	  int vshift = LangInt(args1[2]) - infoPtr->lines[line]->y;
-	  int singleLine = (count == 1) 
+	  int vshift, singleLine = (count == 1) 
 	    && (infoPtr->lines[line]->nextPtr == NULL);
 	  DLine *intLine;
 	  int firstLine = line;
 
+	  /*
+	   * A stack with frames: its leaves go inside the box the
+	   * callback gave, the room of the frames in from each side
+	   * (TkTextPrintDLines reported the group that much bigger).
+	   */
+
+	  room = 0;
+	  if ((leafLines != NULL) && (stackDepth >= 0)) {
+	    room = TkTextOrnSplitRoom(TkIBTreeStackChain(leafLines[line],
+		    (count <= infoPtr->numLines - line)
+			? count : infoPtr->numLines - line, stackDepth));
+	  }
+	  vshift = LangInt(args1[2]) + room - infoPtr->lines[line]->y;
 	  while (count-- && line < infoPtr->numLines) {
 	    intLine = infoPtr->lines[line];
 	    while (intLine) {
-	      intLine->x = LangInt(args1[1]) + chunkPtr->x;
+	      intLine->x = LangInt(args1[1]) + chunkPtr->x + room;
 	      intLine->y += vshift;
-	      intLine->length = LangInt(args1[3]);
-	      intLine->maxX = LangInt(args1[4]);
+	      intLine->length = LangInt(args1[3]) - 2 * room;
+	      intLine->maxX = LangInt(args1[4]) - 2 * room;
+	      if (intLine->length < 0) {
+		intLine->length = 0;
+	      }
+	      if (intLine->maxX < 0) {
+		intLine->maxX = 0;
+	      }
 	      if (singleLine) {
-		intLine->height = LangInt(args1[5]);
-		intLine->baseline = LangInt(args1[6]);
+		intLine->height = LangInt(args1[5]) - 2 * room;
+		intLine->baseline = LangInt(args1[6]) - room;
 	      }
 	      intLine = intLine->nextPtr;
 	    }
@@ -6156,31 +6316,65 @@ TkTextIBTreeLayoutProc(textPtr, indexPtr, segPtr, offset, maxX, maxChars,
       infoPtr->ornsPtr = NULL;
 
       /*
+       * A refused result: the leaves get back the layout they had before
+       * the callback, and the lines it stole are dropped (BUGS 39).
+       */
+
+      if (saved != NULL) {
+	LeafLayout(infoPtr, saved, 1);
+      }
+      while (infoPtr->numAddLines > 0) {
+	ckfree((char *) infoPtr->addDlPtrs[--infoPtr->numAddLines]);
+      }
+      if (infoPtr->addDlPtrs != NULL) {
+	ckfree((char *) infoPtr->addDlPtrs);
+	infoPtr->addDlPtrs = NULL;
+      }
+
+      /*
        * The default layout: all the leaves are one stack, and the node
        * it is expected to be is the root.
        */
 
       numStacks = 0;
       stackDepth = 0;
+      room = 0;
       if (stacks != NULL) {
 	stacks[0] = 0;
 	stacks[1] = infoPtr->numLines;
 	numStacks = 1;
+
+	/*
+	 * The frames around the stack (all the leaves) take room: the
+	 * leaves move in by it, and the block is that much bigger on
+	 * each side.
+	 */
+
+	room = TkTextOrnSplitRoom(TkIBTreeStackChain(leafLines[0],
+		infoPtr->numLines, 0));
       }
       for (line=0; line < infoPtr->numLines; line++) {
 	DLine *dlPtr = infoPtr->lines[line];
 	while (dlPtr) {
 	  dlPtr->maxX = ll;
+	  dlPtr->x += room;
+	  dlPtr->y += room;
 	  dlPtr = dlPtr->nextPtr;
 	}
       }
       Tk_GetFontMetrics(textPtr->tkfont, &fm);
-      chunkPtr->minAscent = (fm.ascent + y)/2;
-      chunkPtr->minDescent = y - chunkPtr->minAscent;
+      chunkPtr->minAscent = (fm.ascent + y)/2 + room;
+      chunkPtr->minDescent = y - (fm.ascent + y)/2 + room;
       chunkPtr->minHeight = 0;
-      chunkPtr->width = ll;
+      chunkPtr->width = ll + 2 * room;
     }
     if (resultArg)  LangFreeArg(resultArg, LANG_DYNAMIC);
+    if (saved != NULL) {
+      ckfree((char *) saved);
+    }
+    if (leafLines != NULL) {
+      ckfree((char *) leafLines);
+    }
 
     /*
      * The ornaments of the block type, from the boxes of the block and
@@ -6280,9 +6474,19 @@ TkTextPrintDLines(listFactoryPtr, dlPtrs, count)
      int count;				/* How many lines to report. */
 {
   DLine *nextPtr;
-  int h = 0, des = 0, n = 0, w = 0, ww = 0;
+  int h = 0, des = 0, n = 0, w = 0, ww = 0, room = 0;
   Arg arg = NULL;
 
+  /*
+   * A group that will be a stack with frames (see LayoutSplits) is
+   * reported with the room of its frames on each side: the callback
+   * that places it leaves that room, and the leaves go inside it.
+   */
+
+  if ((printStackDepth >= 0) && (count > 0)) {
+    room = TkTextOrnSplitRoom(TkIBTreeStackChain(dlPtrs[0]->index.linePtr,
+						 count, printStackDepth));
+  }
   LangSetInt(&arg, count);
   ListFactoryAppendCopy(listFactoryPtr, arg);
   LangSetInt(&arg, count ? dlPtrs[0]->y : 
@@ -6290,8 +6494,15 @@ TkTextPrintDLines(listFactoryPtr, dlPtrs, count)
   ListFactoryAppendCopy(listFactoryPtr, arg);
   nextPtr = dlPtrs[0];
   if (count) {
+    int top = nextPtr->y;
+
+    /*
+     * The height is from the top of the first line to the bottom of the
+     * last: the room of the split lines between the leaves included.
+     */
+
     while (nextPtr) {
-      h += nextPtr->height;
+      h = nextPtr->y + nextPtr->height - top;
       des = nextPtr->height - nextPtr->baseline;
       if (w < nextPtr->length) {
 	w = nextPtr->length;
@@ -6305,6 +6516,12 @@ TkTextPrintDLines(listFactoryPtr, dlPtrs, count)
 	nextPtr = *(++dlPtrs);
       }
     }
+  }
+  if (room > 0) {
+    w += 2 * room;
+    ww += 2 * room;
+    h += 2 * room;
+    des += room;
   }
   LangSetInt(&arg, w);
   ListFactoryAppendCopy(listFactoryPtr, arg);

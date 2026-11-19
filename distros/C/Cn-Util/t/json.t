@@ -70,6 +70,41 @@ ok( !defined $ref->{x}[1], 'a bare NaN after the strings is still rewritten' );
 ok( exists $ref->{'k:NaN,'} && !defined $ref->{'k:NaN,'},
 	'a key holding ":NaN," is left alone, and its -Infinity value is rewritten' );
 
+# A bare NaN or -Infinity as the whole document, as Python's
+# json.dumps(float('nan')) writes it.  Up to 0.0242 it reached decode_json
+# unchanged and died.  A backend that refuses a top-level scalar refuses the
+# null it becomes, too, so the test skips there.
+SKIP: {
+	require JSON::MaybeXS;
+	skip 'this JSON backend refuses a top-level scalar', 2
+		unless eval { JSON::MaybeXS::decode_json('null'); 1 };
+	for my $text ("NaN", " -Infinity\n") {
+		my $top = File::Spec->catfile($dir, 'top.json');
+		open my $tfh, '>', $top or die $!;
+		print $tfh $text;
+		close $tfh;
+		my $got = eval { json_file_to_ref($top) };
+		(my $shown = $text) =~ s/\s+//g;
+		ok( !$@ && !defined $got, "a document of only $shown, whitespace around it or not, is read as undef" );
+	}
+}
+
+# A structure encode_json refuses dies before the file is opened, so the file
+# keeps what it held.  Up to 0.0242 it was opened, and so emptied, first.
+{
+	my $keep = File::Spec->catfile($dir, 'keep.json');
+	capture { ref_to_json_file({ kept => 1 }, $keep) };
+	my $size = -s $keep;
+	my $loop = [];
+	push @$loop, $loop;
+	for my $bad ([ 'a reference to itself', $loop ], [ 'a code reference', { f => sub { 1 } } ]) {
+		my ($what, $ref) = @$bad;
+		dies_ok { capture { ref_to_json_file($ref, $keep) } } "a structure holding $what dies";
+		is( -s $keep, $size, "...and the existing file is untouched" );
+	}
+	is_deeply( json_file_to_ref($keep), { kept => 1 }, 'the file still decodes to what it held' );
+}
+
 # --- error handling ---
 throws_ok { json_file_to_ref(File::Spec->catfile($dir, 'missing.json')) }
 	qr/doesn't exist/, 'missing file is rejected';

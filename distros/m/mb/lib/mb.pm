@@ -13,7 +13,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.66';
+$VERSION = '0.67';
 $VERSION = $VERSION;
 
 # internal use
@@ -546,8 +546,19 @@ sub mb::dosglob (;$) {
 sub mb::eval (;$) {
     local $_ = @_ ? $_[0] : $_;
 
+    # Perl 5.44 feature 'enhanced_xx' enabled at the caller is inherited by
+    # the string, as CORE::eval does (perl 5.10 and later have the hint hash
+    # at (caller(0))[10]; it is undef on older perl)
+    my $parsed;
+    {
+        my $hinthash = (caller(0))[10];
+        local $mb::_enhanced_xx_inherited =
+            ((ref($hinthash) eq 'HASH') and $hinthash->{'feature_enhanced_xx'}) ? 1 : 0;
+        $parsed = mb::parse();
+    }
+
     # run as Perl script in caller package
-    return CORE::eval sprintf(<<'END', (caller)[0,2,1], mb::parse());
+    return CORE::eval sprintf(<<'END', (caller)[0,2,1], $parsed);
 package %s;
 #line %s "%s"
 %s
@@ -1496,7 +1507,9 @@ sub mb::_ignore_space ($) {
                 @{mb::_dot}
             ) /xmsgc) {
                 my $element = $1;
-                if ($element !~ /\A[$bare_s]\z/) {
+                # perlre: /xx ignores unescaped tabs and space characters
+                # within bracketed character classes (not vertical space)
+                if ($element !~ /\A[\t\x20]\z/) {
                     $has_no_space .= $element;
                 }
             }
@@ -2167,6 +2180,32 @@ sub detect_system_encoding {
 
 my @here_document_delimiter = ();
 
+# Perl 5.44 experimental feature 'enhanced_xx' (see "Perl 5.44 Syntax" in POD)
+# 1 while 'use feature "enhanced_xx"' is seen in the script being parsed
+$mb::_enhanced_xx = 0;
+
+# 1 if the running Perl has feature 'enhanced_xx' (Perl 5.44 and later);
+# decides "use if COND, feature => 'enhanced_xx';" whose COND is not
+# evaluated at transpile time
+$mb::_perl_has_enhanced_xx = ($] >= 5.044) ? 1 : 0;
+
+# warnings of category 'regexp' in the script being parsed: 1 after
+# "use warnings" (or 'regexp', or use v5.35 and later), 0 after
+# "no warnings", undef when the script says nothing ($^W decides then);
+# used for the warnings of a comment under 'enhanced_xx', which mb gives
+# at transpile time because it removes the comment
+$mb::_warn_regexp = undef;
+
+# initial value of $mb::_enhanced_xx for mb::parse(); set by mb::eval
+# when the caller enables 'enhanced_xx'
+$mb::_enhanced_xx_inherited = 0;
+
+# number of 'x' in modifiers of the regular expression being parsed (looked ahead),
+# and its delimiters
+$mb::_re_x     = 0;
+$mb::_re_open  = '';
+$mb::_re_close = '';
+
 #---------------------------------------------------------------------
 # parse script
 sub parse {
@@ -2176,6 +2215,8 @@ sub parse {
     study $_; # acts between perl 5.005 to perl 5.014
 
     @here_document_delimiter = ();
+    local $mb::_enhanced_xx = $mb::_enhanced_xx_inherited ? 1 : 0;
+    local $mb::_warn_regexp = undef;
 
     # transpile JPerl script to Perl script
     my $parsed_script = '';
@@ -2311,6 +2352,23 @@ sub parse_expr {
     # "\x3B" [;] SEMICOLON (U+003B)
     elsif (/\G ( ; ) /xmsgc) {
         $parsed .= $1;
+    }
+
+    # use feature 'enhanced_xx'; no feature 'enhanced_xx'; (Perl 5.44)
+    # keyword is passed through as-is; only the feature state is tracked
+    elsif (/\G ( use | no ) (?= \s ) /xmsgc) {
+        my $keyword = $1;
+        $parsed .= $keyword;
+        mb::_track_feature($keyword);
+
+        # use VERSION; no VERSION; use Module VERSION ...;
+        # (e.g. "use v5.44;") VERSION is a version, not a string of codepoints
+        if (/\G (
+            \s+ (?: [A-Za-z_][A-Za-z_0-9]* (?: :: [A-Za-z_0-9]+ )* \s+ )?
+            (?: v [0-9]+ (?: \. [0-9]+ )* | [0-9]+ (?: \. [0-9_]+ )* )
+        ) (?! [0-9._A-Za-z] ) (?! \s* (?: , | => ) ) /xmsgc) {
+            $parsed .= $1;
+        }
     }
 
     # balanced brackets
@@ -3309,6 +3367,14 @@ sub parse_expr {
     # CORE::require, mb::require, require
     elsif (/\G ( (?: CORE:: | mb:: )? require ) /xmsgc) {
         $parsed .= $1;
+
+        # require VERSION; (e.g. "require v5.6.1;") VERSION is a version,
+        # not a string of codepoints
+        if (/\G (
+            \s+ (?: v [0-9]+ (?: \. [0-9]+ )* | [0-9]+ (?: \. [0-9_]+ )* )
+        ) (?! [0-9._A-Za-z] ) /xmsgc) {
+            $parsed .= $1;
+        }
         $parsed .= parse_ambiguous_char();
     }
 
@@ -3645,6 +3711,13 @@ sub parse_expr_balanced {
     my $close_bracket = {qw| ( ) { } [ ] < > |}->{$open_bracket} || die;
     my $parsed = $open_bracket;
     my $nest_bracket = 1;
+
+    # "use feature 'enhanced_xx'" and "no feature 'enhanced_xx'" in a block
+    # are effective to the end of the block (lexically scoped), and so are
+    # "use warnings" and "no warnings"
+    local $mb::_enhanced_xx = $mb::_enhanced_xx;
+    local $mb::_warn_regexp = $mb::_warn_regexp;
+
     while (1) {
 
         # open bracket
@@ -4182,6 +4255,15 @@ sub parse_qq_like {
     elsif (/\G ( \\x\{ (.*?) \} ) /xmsgc) {
         $parsed_as_q  .= $1;
         $parsed_as_qq .= escape_to_hex(mb::chr(hex $2), $closewith);
+    }
+
+    # $\ (output record separator) is interpolated, and the next character
+    # is a literal character: "a$\b" is "a".$\."b", "a\Q$\E" is
+    # "a".quotemeta($\."E") (an escaped close delimiter is not $\)
+    elsif ((CORE::substr($_, pos($_), 2) eq '$\\') and (CORE::substr($_, pos($_) + 2, 1) ne $closewith)) {
+        pos($_) += 2;
+        $parsed_as_q  .= '$\\';
+        $parsed_as_qq .= '@{[$\\ ]}';
     }
 
     # \any
@@ -5599,21 +5681,34 @@ sub parse_re_codepoint_class {
 
         # \any
         elsif ($classmate =~ /\G (\\) ($x) /xmsgc) {
-            if (CORE::length($2) == 1) {
-                push @sbcs, ($1 . $2);
+            my($backslash, $escapee) = ($1, $2);
+            if ($escapee =~ /\A [\x23\t\n\x0B\f\r\x20] \z/xms) {
+                push @sbcs, sprintf('\x%02X', CORE::ord($escapee));
+            }
+            elsif (CORE::length($escapee) == 1) {
+                push @sbcs, ($backslash . $escapee);
             }
             else {
-                push @xbcs, '(?:' . $1 . escape_to_hex($2, ']') . ')';
+                push @xbcs, '(?:' . $backslash . escape_to_hex($escapee, ']') . ')';
             }
         }
 
         # any
         elsif ($classmate =~ /\G ($x) /xmsgc) {
-            if (CORE::length($1) == 1) {
-                push @sbcs, $1;
+            my $octets = $1;
+
+            # "#" and white space are written in hex, so that the generated
+            # codepoint class means the same under /x, /xx, and /xx with
+            # feature 'enhanced_xx' of Perl 5.44 (and makes no deprecation
+            # warning of Perl 5.44)
+            if ($octets =~ /\A [\x23\t\n\x0B\f\r\x20] \z/xms) {
+                push @sbcs, sprintf('\x%02X', CORE::ord($octets));
+            }
+            elsif (CORE::length($octets) == 1) {
+                push @sbcs, $octets;
             }
             else {
-                push @xbcs, '(?:' . escape_to_hex($1, ']') . ')';
+                push @xbcs, '(?:' . escape_to_hex($octets, ']') . ')';
             }
         }
 
@@ -5642,6 +5737,10 @@ END
 sub parse_re_as_q_endswith {
     my($operator, $endswith) = @_;
     my $parsed = $endswith;
+    local $mb::_re_x     = _peek_re_x($operator, $endswith, $endswith);
+    local $mb::_re_open  = $endswith;
+    local $mb::_re_close = $endswith;
+    my $enhanced_xx = ($mb::_enhanced_xx and ($mb::_re_x >= 2));
     while (1) {
         if (/\G (\Q$endswith\E) /xmsgc) {
             $parsed .= $1;
@@ -5651,10 +5750,41 @@ sub parse_re_as_q_endswith {
         # get codepoint class
         elsif (/\G \[ /xmsgc) {
             my $classmate = '';
+            my $check_delimiter = ($enhanced_xx and ($mb::_re_close ne ']'));
             while (1) {
                 if (/\G \] /xmsgc) {
                     last;
                 }
+
+                # use feature 'enhanced_xx'; m'[ ... ]'xx (Perl 5.44)
+                # the close delimiter ends the regular expression even in a
+                # codepoint class, as Perl tokenizer finds it first
+                elsif ($check_delimiter and /\G (\\ \Q$mb::_re_close\E) /xmsgc) {
+                    $classmate .= $1;
+                }
+                elsif ($check_delimiter and /\G \Q$mb::_re_close\E /xmsgc) {
+                    _die_unmatched_class(pos($_) - 1);
+                }
+
+                # vertical space is ignored, and "#" starts a comment
+                elsif ($enhanced_xx and /\G [\n\x0B\f\r]+ /xmsgc) {
+                }
+                elsif ($enhanced_xx and /\G \# /xmsgc) {
+                    _skip_re_comment(1);
+                }
+
+                # /xx ignores unescaped tab and space in codepoint class
+                elsif (($mb::_re_x >= 2) and /\G [\t\x20]+ /xmsgc) {
+                }
+
+                # \\, \#, "\ ", and "\<tab>" are kept as escaped
+                elsif (/\G (\\\\) /xmsgc) {
+                    $classmate .= $1;
+                }
+                elsif (/\G (\\ [#\t\x20]) /xmsgc) {
+                    $classmate .= $1;
+                }
+
                 elsif (/\G (\[:\^[a-z]*:\]) /xmsgc) {
                     $classmate .= $1;
                 }
@@ -5663,6 +5793,11 @@ sub parse_re_as_q_endswith {
                 }
                 elsif (/\G ($x) /xmsgc) {
                     $classmate .= $1;
+                }
+
+                # end of script in a codepoint class
+                elsif (/\G \z /xmsgc) {
+                    _die_unmatched_class(pos($_));
                 }
 
                 # something wrong happened
@@ -5765,6 +5900,10 @@ sub parse_re_balanced {
     my $parsed = $open_bracket;
     my $nest_bracket = 1;
     my $nest_escape = 0;
+    local $mb::_re_x     = _peek_re_x($operator, $open_bracket, $close_bracket);
+    local $mb::_re_open  = $open_bracket;
+    my $in_quotemeta = 0;
+    local $mb::_re_close = $close_bracket;
     while (1) {
         if (/\G (\Q$open_bracket\E) /xmsgc) {
             $parsed .= $1;
@@ -5825,12 +5964,41 @@ sub parse_re_balanced {
         elsif (/\G \\Q /xmsgc) {
             $parsed .= '@{[quotemeta(qq<';
             $nest_escape++;
+            $in_quotemeta = 1;
         }
 
         # \E
         elsif (/\G \\E /xmsgc) {
             $parsed .= ('>)]}' x $nest_escape);
             $nest_escape = 0;
+            $in_quotemeta = 0;
+        }
+
+        # \Q...\E quotes a string, not a regular expression: "." and "["
+        # in it are literal characters (mb 0.66 and older transpiled them
+        # as a regular expression, then quoted the result)
+        #
+        # under /x, Perl tokenizer copies "#" up to the end of line as-is
+        # (even "\E" in it is not recognized), and the copy is quoted
+        elsif ($in_quotemeta and ($mb::_re_x >= 1) and /\G \# /xmsgc) {
+            $parsed .= '#' . _quote_re_comment_as_qq();
+        }
+        # in \Q...\E of a regular expression, a backslash and the next
+        # character are both literal (qr/\Q\n\E/ is qr/\\n/), except an
+        # escaped delimiter of non-bracket, which is the delimiter itself
+        elsif ($in_quotemeta and /\G (\\) ($x) /xmsgc) {
+            my $escapee = $2;
+            if (($mb::_re_open eq $mb::_re_close) and ($escapee eq $mb::_re_close)) {
+                $parsed .= _qq_literal($escapee);
+            }
+            else {
+                $parsed .= '\\\\' . _qq_literal($escapee);
+            }
+        }
+        elsif ($in_quotemeta) {
+            my($as_qq) = parse_qq_like($close_bracket);
+
+            $parsed .= $as_qq;
         }
 
         else {
@@ -5846,6 +6014,10 @@ sub parse_re_endswith {
     my($operator, $endswith) = @_;
     my $parsed = $endswith;
     my $nest_escape = 0;
+    local $mb::_re_x     = _peek_re_x($operator, $endswith, $endswith);
+    local $mb::_re_open  = $endswith;
+    my $in_quotemeta = 0;
+    local $mb::_re_close = $endswith;
     while (1) {
         if (/\G (\Q$endswith\E) /xmsgc) {
             $parsed .= ('>)]}' x $nest_escape);
@@ -5897,12 +6069,41 @@ sub parse_re_endswith {
         elsif (/\G \\Q /xmsgc) {
             $parsed .= '@{[quotemeta(qq<';
             $nest_escape++;
+            $in_quotemeta = 1;
         }
 
         # \E
         elsif (/\G \\E /xmsgc) {
             $parsed .= ('>)]}' x $nest_escape);
             $nest_escape = 0;
+            $in_quotemeta = 0;
+        }
+
+        # \Q...\E quotes a string, not a regular expression: "." and "["
+        # in it are literal characters (mb 0.66 and older transpiled them
+        # as a regular expression, then quoted the result)
+        #
+        # under /x, Perl tokenizer copies "#" up to the end of line as-is
+        # (even "\E" in it is not recognized), and the copy is quoted
+        elsif ($in_quotemeta and ($mb::_re_x >= 1) and /\G \# /xmsgc) {
+            $parsed .= '#' . _quote_re_comment_as_qq();
+        }
+        # in \Q...\E of a regular expression, a backslash and the next
+        # character are both literal (qr/\Q\n\E/ is qr/\\n/), except an
+        # escaped delimiter of non-bracket, which is the delimiter itself
+        elsif ($in_quotemeta and /\G (\\) ($x) /xmsgc) {
+            my $escapee = $2;
+            if (($mb::_re_open eq $mb::_re_close) and ($escapee eq $mb::_re_close)) {
+                $parsed .= _qq_literal($escapee);
+            }
+            else {
+                $parsed .= '\\\\' . _qq_literal($escapee);
+            }
+        }
+        elsif ($in_quotemeta) {
+            my($as_qq) = parse_qq_like($endswith);
+
+            $parsed .= $as_qq;
         }
 
         else {
@@ -5921,10 +6122,74 @@ sub parse_re {
     # codepoint class
     if (/\G \[ /xmsgc) {
         my $classmate = '';
+        my $enhanced_xx = ($mb::_enhanced_xx and ($mb::_re_x >= 2));
+        my $check_delimiter = ($enhanced_xx and ($mb::_re_close ne ']'));
+        my $nest_delimiter = 0;
         while (1) {
             if (/\G \] /xmsgc) {
                 last;
             }
+
+            # an escaped delimiter (\/ of m/.../, \} of m{...}, \# of m#...#)
+            # is written as \\\x2F (etc.): qq[...] still gives "\/" to
+            # mb::_cc, and the transpiled script has no delimiter octet
+            # there to close the transpiled qr/.../ (mb 0.67 before this fix
+            # wrote \\/, and the transpiled script of m/[^\/]/ was broken).
+            # It is not written as \\\/ either: the transpiled qr{...} is
+            # nested in m{...}, and Perl 5.005_03 removes the backslash of
+            # \} at the outer level, so the inner qr{...} was closed early;
+            # \[ and \] are written below
+            elsif (($mb::_re_close ne '') and ($mb::_re_close ne ']') and /\G \\ (\Q$mb::_re_open\E|\Q$mb::_re_close\E) /xmsgc) {
+                $classmate .= "\\\\" . CORE::sprintf('\\x%02X', CORE::ord($1));
+            }
+
+            # use feature 'enhanced_xx'; m/[ ... ]/xx (Perl 5.44)
+            # the close delimiter ends the regular expression even in a
+            # codepoint class, as Perl tokenizer finds it first (balanced
+            # brackets nest); typically a comment absorbed the "]"
+            elsif ($check_delimiter and ($mb::_re_open ne $mb::_re_close) and /\G (\Q$mb::_re_open\E) /xmsgc) {
+                $nest_delimiter++;
+                $classmate .= escape_qq($1, ']');
+            }
+            elsif ($check_delimiter and /\G (\Q$mb::_re_close\E) /xmsgc) {
+                if ($nest_delimiter <= 0) {
+                    _die_unmatched_class(pos($_) - 1);
+                }
+                $nest_delimiter--;
+                $classmate .= escape_qq($1, ']');
+            }
+
+            # vertical space is ignored, and "#" starts a comment
+            elsif ($enhanced_xx and /\G [\n\x0B\f\r]+ /xmsgc) {
+            }
+            elsif ($enhanced_xx and /\G \# /xmsgc) {
+                _skip_re_comment(1);
+            }
+
+            # /xx ignores unescaped tab and space in codepoint class
+            elsif (($mb::_re_x >= 2) and /\G [\t\x20]+ /xmsgc) {
+            }
+
+            # \\ and \# (an escaped "#" never starts a comment)
+            elsif (/\G \\\\ /xmsgc) {
+                $classmate .= "\\\\\\\\";
+            }
+            elsif (/\G \\\# /xmsgc) {
+                $classmate .= "\\\\#";
+            }
+
+            # \] and \[ (an escaped "]" never closes the class; they are
+            # written as \\\] and \\\[ to keep qq[...] balanced)
+            elsif (/\G \\ ([\[\]]) /xmsgc) {
+                $classmate .= "\\\\\\$1";
+            }
+
+            # "\ " and "\<tab>" --> \x{20} and \x{09}, so that /xx never
+            # removes them later
+            elsif (/\G \\ ([\t\x20]) /xmsgc) {
+                $classmate .= sprintf('\\\\x{%02X}', CORE::ord($1));
+            }
+
             elsif (/\G (\\) /xmsgc) {
                 $classmate .= "\\$1";
             }
@@ -5936,6 +6201,11 @@ sub parse_re {
             }
             elsif (/\G ($x) /xmsgc) {
                 $classmate .= escape_qq($1, ']');
+            }
+
+            # end of script in a codepoint class
+            elsif (/\G \z /xmsgc) {
+                _die_unmatched_class(pos($_));
             }
 
             # something wrong happened
@@ -5955,6 +6225,47 @@ END
         # [ABC]{3} --> (?:@{[mb::_cc(qq[ABC])]}){3} # ok
 
         $parsed .= "(?:\@{[mb::_cc(qq[$classmate])]})";
+    }
+
+    # (?#comment) (dropped)
+    # the comment ends at the first ")"; the close delimiter of the
+    # regular expression is not skipped
+    elsif (/\G \( \? \# /xmsgc) {
+        while (1) {
+            my $pos = pos($_);
+            last if $pos >= CORE::length($_);
+            my $octet = CORE::substr($_, $pos, 1);
+            if ($octet eq ')') {
+                pos($_) = $pos + 1;
+                last;
+            }
+            last if ($octet eq $mb::_re_close) and ($mb::_re_open eq $mb::_re_close);
+            last if not /\G ($x) /xmsgc;
+        }
+    }
+
+    # \c# , \c[ , ... control character (never starts a comment nor a class)
+    elsif (/\G ( \\c [\x00-\x7F] ) /xmsgc) {
+        $parsed .= $1;
+    }
+
+    # $#array, $#{expr}, $#$aref (never starts a comment)
+    elsif (/\G ( \$\# ) (?= [\{\$A-Za-z_:] ) /xmsgc) {
+        $parsed .= $1;
+    }
+
+    # $\ (output record separator) is interpolated also in a regular
+    # expression, and the next character is a literal character:
+    # /a$\b/ is "a".$\."b", not "a" and \b (an escaped close delimiter
+    # is not $\)
+    elsif ((CORE::substr($_, pos($_), 2) eq '$\\') and (CORE::substr($_, pos($_) + 2, 1) ne $mb::_re_close)) {
+        pos($_) += 2;
+        $parsed .= '@{[$\\ ]}';
+    }
+
+    # comment of /x, /xx (dropped; the end of line is kept)
+    elsif (($mb::_re_x >= 1) and /\G \# /xmsgc) {
+        _skip_re_comment();
     }
 
     # /./ or \any
@@ -6106,6 +6417,370 @@ $0(@{[__LINE__]}): something wrong happened in script at pos=%s
 END
     }
     return $parsed;
+}
+
+#---------------------------------------------------------------------
+# track "use feature" / "no feature" for 'enhanced_xx' (Perl 5.44)
+# called just after "use" or "no" keyword; pos($_) is not moved
+sub mb::_track_feature {
+    my($keyword) = @_;
+    my $pos = pos($_);
+    my $statement = '';
+    if (/\G ([^;]*) /xmsgc) {
+        $statement = $1;
+    }
+    pos($_) = $pos;
+
+    # use feature ...; no feature ...; use experimental ...; no experimental ...;
+    if ($statement =~ /\A \s+ (?: feature | experimental ) \b (.*) \z/xms) {
+        my $list = $1;
+        if ($keyword eq 'use') {
+            if ($list =~ /\b enhanced_xx \b/xms) {
+                $mb::_enhanced_xx = 1;
+            }
+            elsif ($list =~ /:all \b/xms) {
+                $mb::_enhanced_xx = 1;
+            }
+        }
+        else {
+            if ($list =~ /\b enhanced_xx \b/xms) {
+                $mb::_enhanced_xx = 0;
+            }
+            elsif ($list =~ /:all \b/xms) {
+                $mb::_enhanced_xx = 0;
+            }
+            elsif ($list =~ /\A \s* \z/xms) {
+                $mb::_enhanced_xx = 0;
+            }
+        }
+    }
+
+    # use if COND, feature => 'enhanced_xx';  (also experimental, and no if)
+    # COND is not evaluated at transpile time. 'enhanced_xx' exists only on
+    # Perl 5.44 and later, so a script can enable it only when COND is
+    # true there; mb follows the statement when it runs on Perl 5.44 and
+    # later, and ignores it on older Perl, where COND must be false.
+    elsif ($statement =~ /\A \s+ if \b (.*) \z/xms) {
+        my $rest = $1;
+        if (($mb::_perl_has_enhanced_xx) and ($rest =~ /[,] \s* (?: (['"]?) (?: feature | experimental ) \1 ) \s* (?: => | , ) (.*) \z/xms)) {
+            my $list = $2;
+            if ($list =~ /\b enhanced_xx \b/xms) {
+                $mb::_enhanced_xx = ($keyword eq 'use') ? 1 : 0;
+            }
+            elsif ($list =~ /:all \b/xms) {
+                $mb::_enhanced_xx = ($keyword eq 'use') ? 1 : 0;
+            }
+        }
+    }
+
+    # "use VERSION" of any version (use v5.44; use 5.010; use 5.36.0;
+    # use v5.8; use 5.006) lexically replaces the features with the
+    # feature bundle of that version (perlfunc "use VERSION"), and no
+    # bundle contains 'enhanced_xx'; "no VERSION" does not touch features
+    # "use VERSION" of v5.35 and later also enables warnings
+    elsif ($keyword eq 'use') {
+        if ($statement =~ /\A \s+ (?: v [0-9]+ (?: \. [0-9]+ )* | [0-9]+ (?: \. [0-9_]+ )* ) \s* \z/xms) {
+            $mb::_enhanced_xx = 0;
+            my $minor = 0;
+            if ($statement =~ /\A \s+ v? 5 \. ([0-9]+) \. /xms) {
+                $minor = $1;
+            }
+            elsif ($statement =~ /\A \s+ v 5 \. ([0-9]+) /xms) {
+                $minor = $1;
+            }
+            elsif ($statement =~ /\A \s+ 5 \. ([0-9]{1,3}) /xms) {
+                $minor = $1 . ('0' x (3 - CORE::length($1)));
+            }
+            if ($minor >= 35) {
+                $mb::_warn_regexp = 1;
+            }
+        }
+    }
+
+    # use warnings; no warnings; (all or 'regexp') decide whether the
+    # warnings of a comment under 'enhanced_xx' are given at transpile time
+    if ($statement =~ /\A \s+ warnings \b (.*) \z/xms) {
+        my $list = $1;
+        if (($list =~ /\A \s* \z/xms) or ($list =~ /\b (?: all | regexp ) \b/xms)) {
+            $mb::_warn_regexp = ($keyword eq 'use') ? 1 : 0;
+        }
+    }
+}
+
+#---------------------------------------------------------------------
+# skip a quoted part like Perl tokenizer, from pos($_) to its close
+# delimiter; returns 1 if the close delimiter was found
+#
+# written with CORE::substr() and /\G ($x)/ only: on perl 5.005_03, a
+# pattern that interpolates the qr// object $x without parentheses (as
+# /\G $x/ or /\G \\ $x/) does not match, and then no modifier was looked
+# ahead at all
+sub _peek_skip_quoted {
+    my($open, $close) = @_;
+    my $nest = 1;
+    while (1) {
+        my $pos = pos($_);
+        return 0 if $pos >= CORE::length($_);
+        my $octet = CORE::substr($_, $pos, 1);
+        if ($octet eq '\\') {
+            pos($_) = $pos + 1;
+            return 0 if not /\G ($x) /xmsgc;
+        }
+        elsif (($open ne $close) and ($octet eq $open)) {
+            pos($_) = $pos + 1;
+            $nest++;
+        }
+        elsif ($octet eq $close) {
+            pos($_) = $pos + 1;
+            if (--$nest <= 0) {
+                return 1;
+            }
+        }
+        elsif (not /\G ($x) /xmsgc) {
+            return 0;
+        }
+    }
+}
+
+#---------------------------------------------------------------------
+# look ahead the modifiers of m/here/, qr/here/, s/here/.../ and returns
+# the number of 'x' in them; pos($_) is not moved
+# (comments of /x and comments in codepoint class of /xx with feature
+# 'enhanced_xx' must be known before parsing the regular expression)
+sub _peek_re_x {
+    my($operator, $open, $close) = @_;
+    my $pos = pos($_);
+    my $count = 0;
+    my $found = _peek_skip_quoted($open, $close);
+    if ($found and ($operator eq 's')) {
+        if ($open eq $close) {
+            $found = _peek_skip_quoted($open, $close);
+        }
+        else {
+            while (/\G (?: \s+ | \# [^\n]* ) /xmsgc) {
+            }
+            if (/\G ([\(\{\[\<]) /xmsgc) {
+                $found = _peek_skip_quoted($1, {qw| ( ) { } [ ] < > |}->{$1});
+            }
+            elsif (/\G ([\S]) /xmsgc) {
+                $found = _peek_skip_quoted($1, $1);
+            }
+            else {
+                $found = 0;
+            }
+        }
+    }
+    if ($found and /\G ([a-z]*) /xmsgc) {
+        my $modifier = $1;
+        $count = ($modifier =~ tr/x//);
+    }
+    pos($_) = $pos;
+    return $count;
+}
+
+#---------------------------------------------------------------------
+# die for a codepoint class "[" that has no "]" before the end of the
+# regular expression (or of the script); under feature 'enhanced_xx' the
+# usual cause is a "#" in the class that started a comment and absorbed
+# the "]", as Perl 5.44 does ("Unmatched [ in regex")
+sub _die_unmatched_class {
+    my($pos) = @_;
+    my $hint = '';
+    if ($mb::_enhanced_xx and ($mb::_re_x >= 2)) {
+        $hint = qq{(under use feature 'enhanced_xx', "#" in a codepoint class of /xx starts a comment up to the end of line, and the comment absorbs "]"; write \\# for a literal "#")\n};
+    }
+    die sprintf(<<END, _script_line($pos), $pos, $hint, CORE::substr($_, $pos));
+$0: Unmatched [ in regex (codepoint class is not closed) at line %d (pos=%s)
+%s------------------------------------------------------------------------------
+%s
+------------------------------------------------------------------------------
+END
+}
+
+#---------------------------------------------------------------------
+# line number of the position in the script being parsed
+sub _script_line {
+    my($pos) = @_;
+    my $before = CORE::substr($_, 0, $pos);
+    return 1 + ($before =~ tr/\n//);
+}
+
+#---------------------------------------------------------------------
+# give the warnings of Perl 5.44 for a comment of /x under feature
+# 'enhanced_xx' (category 'regexp'), at transpile time: mb removes the
+# comment, so Perl never sees it and cannot warn.  As S_reg_skipcomment()
+# of regcomp.c of Perl 5.44:
+#   - a single "#" not surrounded by tab or space warns
+#     "Did you mean this to be a comment?"
+#   - an unescaped, unquoted "#" in the comment warns
+#     "Did you mean to have a second '#' in your comment?"
+#   - in a codepoint class, an unescaped, unquoted "]" in the comment warns
+#     "Did you mean to have a ']' in your comment?"
+# A character just after a quote (' or ") or after an odd number of
+# backslashes is "escaped".  At most one warning is given per comment.
+# called with pos($_) just after the first "#"; pos($_) is not moved
+sub _warn_re_comment {
+    my($in_class) = @_;
+    my $enabled = defined($mb::_warn_regexp) ? $mb::_warn_regexp : $^W;
+    return if not $enabled;
+
+    my $save = pos($_);
+    my $hash = $save - 1;
+    my $length = CORE::length($_);
+
+    # some people like to string multiple "#"s together
+    my $p = $save;
+    while (($p < $length) and (CORE::substr($_, $p, 1) eq '#')) {
+        $p++;
+    }
+    if ($p == $save) {
+        my $after  = ($p < $length) ? CORE::substr($_, $p, 1) : '';
+        my $before = ($hash > 0) ? CORE::substr($_, $hash - 1, 1) : '';
+        if (
+            (($after ne '') and ($after ne "\n") and ($after ne $mb::_re_close) and ($after ne "\t") and ($after ne ' '))
+            or
+            (($before ne '') and ($before ne $mb::_re_open) and ($before ne "\t") and ($before ne ' '))
+        ) {
+            _warn_re(q{Did you mean this to be a comment? If so, to silence this message add blanks like so: " # "}, $hash);
+            return;
+        }
+    }
+
+    my $quoted = 0;
+    my $backslash = 0;
+    my $nest = 0;
+    pos($_) = $p;
+    while (1) {
+        my $q = pos($_);
+        last if $q >= $length;
+        my $octet = CORE::substr($_, $q, 1);
+        last if $octet eq "\n";
+        if (($octet eq $mb::_re_close) and (($backslash % 2) == 0)) {
+            last if $nest <= 0;
+            $nest--;
+        }
+        elsif (($mb::_re_open ne $mb::_re_close) and ($octet eq $mb::_re_open) and (($backslash % 2) == 0)) {
+            $nest++;
+        }
+        if ($octet eq '\\') {
+            $backslash++;
+            $quoted = 0;
+            pos($_) = $q + 1;
+            next;
+        }
+        if (($octet eq '"') or ($octet eq "'")) {
+            $quoted = (($backslash % 2) == 0) ? 1 : 0;
+            $backslash = 0;
+            pos($_) = $q + 1;
+            next;
+        }
+        my $escaped = ((($backslash % 2) == 1) or $quoted) ? 1 : 0;
+        $backslash = 0;
+        $quoted = 0;
+        if (not $escaped) {
+            if ($octet eq '#') {
+                _warn_re(q{Did you mean to have a second '#' in your comment? If so, escape with '\\' or quote with " or ' to silence this message}, $q);
+                last;
+            }
+            elsif ($in_class and ($octet eq ']')) {
+                _warn_re(q{Did you mean to have a ']' in your comment? If so, escape with '\\' or quote with " or ' to silence this message}, $q);
+                last;
+            }
+        }
+        last if not /\G ($x) /xmsgc;
+    }
+    pos($_) = $save;
+}
+
+# warn at the position in the script being parsed
+sub _warn_re {
+    my($message, $pos) = @_;
+    warn sprintf("%s in regex at line %d of the script (found by mb at transpile time, under use feature 'enhanced_xx')\n", $message, _script_line($pos));
+}
+
+#---------------------------------------------------------------------
+# skip a comment of /x, or a comment in codepoint class of /xx with
+# feature 'enhanced_xx', from "#" to before the end of line.
+# the close delimiter of the regular expression is not skipped, because
+# Perl tokenizer finds it before the regular expression compiler sees
+# the comment.
+# $in_class is true for a comment in a codepoint class (for warnings).
+sub _skip_re_comment {
+    my($in_class) = @_;
+    if ($mb::_enhanced_xx) {
+        _warn_re_comment($in_class);
+    }
+    my $nest = 0;
+    while (1) {
+        my $pos = pos($_);
+        last if $pos >= CORE::length($_);
+        my $octet = CORE::substr($_, $pos, 1);
+        last if $octet eq "\n";
+        if ($octet eq $mb::_re_close) {
+            last if $nest <= 0;
+            $nest--;
+            pos($_) = $pos + 1;
+        }
+        elsif (($mb::_re_open ne $mb::_re_close) and ($octet eq $mb::_re_open)) {
+            $nest++;
+            pos($_) = $pos + 1;
+        }
+        elsif ($octet eq '\\') {
+            pos($_) = $pos + 1;
+            last if CORE::substr($_, $pos + 1, 1) eq "\n";
+            last if not /\G ($x) /xmsgc;
+        }
+        elsif (not /\G ($x) /xmsgc) {
+            last;
+        }
+    }
+}
+
+#---------------------------------------------------------------------
+# under /x, "#" in \Q...\E of a regular expression: Perl tokenizer copies
+# it up to before the end of line (or the close delimiter) as-is, without
+# interpolation and without recognizing "\E", and the copy is quoted by
+# quotemeta.  returns the copy written for the inside of qq<...>
+sub _quote_re_comment_as_qq {
+    my $parsed = '';
+    my $nest = 0;
+    while (1) {
+        my $pos = pos($_);
+        last if $pos >= CORE::length($_);
+        my $octet = CORE::substr($_, $pos, 1);
+        last if $octet eq "\n";
+        if ($octet eq $mb::_re_close) {
+            last if $nest <= 0;
+            $nest--;
+        }
+        elsif (($mb::_re_open ne $mb::_re_close) and ($octet eq $mb::_re_open)) {
+            $nest++;
+        }
+        if (/\G ($x) /xmsgc) {
+            $parsed .= _qq_literal($1);
+        }
+        else {
+            last;
+        }
+    }
+    return $parsed;
+}
+
+#---------------------------------------------------------------------
+# a character written as a literal character in the inside of qq<...>
+sub _qq_literal {
+    my($char) = @_;
+    # the delimiter of the regular expression (the transpiled script uses
+    # the same delimiter around qq<...>)
+    if (($char eq $mb::_re_open) or ($char eq $mb::_re_close)) {
+        return sprintf('\\x%02X', CORE::ord($char));
+    }
+    elsif ($char =~ /\A [\\\$\@<>] \z/xms) {
+        return "\\$char";
+    }
+    else {
+        return escape_qq($char, '>');
+    }
 }
 
 #---------------------------------------------------------------------
@@ -6407,7 +7082,7 @@ mb - Can easy script in Big5, Big5-HKSCS, GBK, Sjis(also CP932), UHC, UTF-8, ...
     and Other Systems
 
   Supported perl versions:
-    perl version 5.005_03 to perl 5.42
+    perl version 5.005_03 to perl 5.44
 
 =head1 INSTALLATION BY MAKE-COMMAND
 
@@ -6585,6 +7260,164 @@ transpiled C<.oo.*> file. This suppresses C<source::encoding> checking
 without introducing extra lines, so that line numbers in error
 messages are not shifted between the original and the transpiled
 script.
+
+=head1 Perl 5.44 Syntax
+
+mb handles the following syntax of Perl 5.44.
+
+=over 2
+
+=item * Named parameters in signatures
+
+  sub f ($x, $y, :$alpha, :$beta = undef) { ... }
+
+They are passed through as-is (default value expressions are
+transpiled as usual).
+
+=item * Multi-variable C<foreach> with reference aliases
+
+  foreach my ($key, \@items) (%hash) { ... }
+
+It is passed through as-is.
+
+=item * C<use VERSION> with a version string
+
+C<use v5.44;>, C<no v5.10;>, C<use Module v1.2.3;> and
+C<require v5.6.1;> are passed through as-is. (mb 0.66 and older
+wrongly transpiled the version string into a string of codepoints.)
+A version string in other places, such as C<my $s = v65.66;>, is
+transpiled into a string of codepoints as before.
+
+Each number of such a version string is given to C<mb::chr()>, which
+returns the octets of the number in big-endian order (the codepoint of
+mb is the octet sequence of the MBCS character, not a Unicode
+codepoint), so a number of 256 or more becomes two or more octets, and
+C<sprintf("%vd", ...)> shows the octets:
+
+  # mb::chr(1).mb::chr(22).mb::chr(333) (333 is 0x014D)
+  printf "%vd\n", v1.22.333;   # prints "1.22.1.77" (Perl prints "1.22.333")
+
+This is not new in mb 0.67.
+
+=item * C<use feature 'enhanced_xx'>
+
+With this experimental feature, a codepoint class C<[...]> of a regular
+expression with C</xx> may extend over multiple lines, and C<#> in it
+starts a comment.
+
+  use feature 'enhanced_xx';
+  if ($string =~ m/ [ a b   # comment ]
+                      c \# ] /xx) {
+      ...
+  }
+
+mb looks ahead the modifiers before parsing the regular expression,
+and when C</xx> is given while C<enhanced_xx> is enabled, mb removes
+the comments and the vertical spaces in the codepoint class by itself.
+Without C<enhanced_xx>, C<#> and vertical space in a codepoint class
+are literal, as before.
+
+mb enables C<enhanced_xx> at C<use feature> (or C<use experimental>)
+naming C<enhanced_xx> or C<:all>, and disables it at C<no feature>
+naming C<enhanced_xx> or C<:all>, at bare C<no feature;>, and at
+C<use VERSION> of any version and spelling (C<use v5.44;>,
+C<use 5.010;>, C<use 5.36.0;>, C<use v5.8;>, C<use 5.006;>), because
+C<use VERSION> disables any feature not in the feature bundle of that
+version (perlfunc), and no bundle contains C<enhanced_xx>. C<no VERSION>
+and C<use Module VERSION> do not change it. As Perl does, the change is
+effective to the end of the enclosing block (C<{ ... }>).
+
+C<use if COND, feature =E<gt> 'enhanced_xx';> (also C<experimental>, and
+C<no if>) is followed when mb runs on Perl 5.44 and later, and ignored
+on older Perl. COND is not evaluated at transpile time; since
+C<enhanced_xx> exists only on Perl 5.44 and later, COND can be true only
+there.
+
+Under C<enhanced_xx>, a C<#> in a codepoint class starts a comment up to
+the end of line, and the comment absorbs C<]>. So C</[a#]/xx> has no
+C<]>, and mb dies with "Unmatched [ in regex", as Perl 5.44 does. Write
+C<\#> for a literal C<#>.
+
+Perl 5.44 warns of a suspicious comment under C<enhanced_xx> (category
+C<regexp>). Since mb removes the comment, Perl never sees it, so mb
+gives the same warnings at transpile time:
+"Did you mean this to be a comment?" (a single C<#> not surrounded by
+tab or space), "Did you mean to have a second '#' in your comment?",
+and "Did you mean to have a ']' in your comment?" (in a codepoint
+class). They are given when the script says C<use warnings> (or names
+C<all> or C<regexp>, or says C<use v5.35> or later) in the scope, or,
+when the script says nothing about warnings, when C<$^W> is true (C<-w>).
+C<no warnings> stops them to the end of the block.
+
+C<mb::eval> inherits C<enhanced_xx> enabled at its caller, as
+C<CORE::eval> does (on Perl 5.10 and later, where the hint hash is
+available). A script loaded by C<mb::do> or C<mb::require> starts
+without it.
+
+=back
+
+The following are also changed for regular expressions, on all
+versions of Perl.
+
+=over 2
+
+=item * Comments of C</x> are removed
+
+Since mb looks ahead the modifiers, comments of C</x> and C</xx>
+outside of a codepoint class are removed (the end of line is kept, so
+line numbers are not shifted). A C<[> in such a comment no longer
+breaks the transpile. C<(?#comment)> is also removed. C<$#array>,
+C<$#{expr}> and C<\c#> never start a comment.
+
+=item * C<\Q...\E> quotes a string
+
+C<\Q...\E> in a regular expression quotes a string, not a regular
+expression, so C</a\Q.\Eb/> matches C<a.b> only and C</a\Q[\Eb/>
+matches C<a[b>. (mb 0.66 and older transpiled the inside as a regular
+expression and then quoted the result.) As Perl does, a backslash and
+the next character in it are both literal (C</\Q\n\E/> matches a
+backslash and C<n>), except an escaped delimiter of non-bracket, which
+is the delimiter itself. Under C</x>, C<#> in C<\Q...\E> is quoted up
+to the end of line, including C<\E> in it, as Perl tokenizer does.
+
+=item * C<$\> is interpolated
+
+As Perl does, C<$\> (output record separator) in a double-quoted
+string and in a regular expression is interpolated, and the next
+character is a literal character: C<"a$\b"> is C<"a".$\."b">,
+C<"a\Q$\E"> is C<"a".quotemeta($\."E")>, and C</a$\b/> matches
+C<"a".$\."b">. (mb 0.66 and older transpiled C</a$\b/> into C<a>, an
+end of line anchor and C<\b>, and C<"a\Q$\E"> into a broken script.)
+
+=item * C</xx> keeps vertical space in a codepoint class
+
+As described in perlre, C</xx> ignores only unescaped tab and space
+characters in a codepoint class. mb 0.66 and older also removed
+newline, form feed, and carriage return.
+
+=item * Escaped tab and space in a codepoint class of C</xx>
+
+C<[\ ]> and C<[\E<lt>tabE<gt>]> match a space and a tab under C</xx>.
+
+=item * Generated codepoint classes never contain C<#> or white space
+
+C<#>, tab, newline, vertical tab, form feed, carriage return, and
+space in a codepoint class are written as C<\xHH> in the regular
+expression generated by mb. So the generated regular expression means
+the same under C</x>, C</xx>, and C</xx> with C<enhanced_xx>, and
+it causes no deprecation warning of Perl 5.44:
+
+  Use of unescaped '#' in [] is deprecated under /xx
+  Use of literal vertical space in [] is deprecated under /xx
+
+=item * Escaped delimiter in a codepoint class
+
+C<m/[^\/]/>, C<m{[\}]}>, C<s/[\/]/-/>, C<split /[\/]/> and the like
+work with every delimiter. (Before this fix, mb wrote the escaped
+delimiter unescaped into the transpiled regular expression, and the
+transpiled script was broken.)
+
+=back
 
 =head1 TERMINOLOGY
 

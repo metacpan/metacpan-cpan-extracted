@@ -1,0 +1,42 @@
+---
+abstract: 'Sign mail with DKIM, and summarise DMARC reports'
+author:
+  - 'Nigel Horne <njh@nigehorne.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Temp: '0'
+  Net::DNS: '0'
+  Pod::Github: '0'
+  Test::DescribeMe: '0'
+  Test::Most: '0'
+  Time::HiRes: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mail-Send-DKIM
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  IO::Compress::Gzip: '0'
+  IO::Compress::Zip: '0'
+  IO::Uncompress::Gunzip: '0'
+  IO::Uncompress::Unzip: '0'
+  Mail::DKIM: '0'
+  Object::Configure: '0'
+  Params::Get: '0'
+  Readonly: '0'
+  XML::PP: '0'
+  perl: '5.016'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Mail-Send-DKIM
+  homepage: https://metacpan.org/pod/Mail::Send::DKIM
+  repository: git://github.com/nigelhorne/Mail-Send-DKIM.git
+version: 0.001.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

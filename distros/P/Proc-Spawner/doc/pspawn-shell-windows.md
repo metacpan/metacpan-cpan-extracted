@@ -1,14 +1,14 @@
 # The shell layer on Windows (post-0.10)
 
 `Proc::ShellSpawn` runs on Windows since post-0.10 (the user, 2026-11-09: "Proceed with the shell layer on
-Windows"). It stands on the Windows primitive of `Proc::Spawner` ([`pspawn-spawner.md`](pspawn-spawner.md), section 8),
+Windows"). It stands on the Windows primitive of `Proc::Spawner` ([`pspawn-spawner.md`](pspawn-spawner.md#my-section-8), section 8),
 the loop's completion port ([`pspawn-loop.md`](pspawn-loop.md), W5) and the programs done inside Perl (X21, decision
 IP1; [`pspawn-known-issues.md`](pspawn-known-issues.md)). This page says what differs from POSIX, what was checked,
 and what is still missing.
 
-## 1. What the shell does differently there
+## <a id="my-section-1"></a>1. What the shell does differently there
 
-Each of these was chosen while porting; the user confirmed them on 2026-11-09 (decision **WS1**: "The remaining issues (including `pwd`) are fine"), with follow-ups in `TODO` (section B: PATH's separator from `%Config`, `~user`, `sh -c`, programs from `%ENV`).
+Each of these was chosen while porting; the user confirmed them on 2026-11-09 (decision **WS1**: "The remaining issues (including `pwd`) are fine"), with follow-ups (PATH's separator from `%Config`, `~user`, `sh -c`, programs from `%ENV`); the first three are done (the table below), and one remains in `TODO` (section B): what replaces BIN1, the temporary workaround for `cat`, `sort`, `grep` and the like.
 
 | Where | POSIX | Windows |
 |---|---|---|
@@ -19,6 +19,8 @@ Each of these was chosen while porting; the user confirmed them on 2026-11-09 (d
 | a script without `#!` | run by `/bin/sh` | not found (there is no `sh`) |
 | `umask` | set in the child | not set (Windows has none); the `umask` builtin still keeps the shell's value, which starts at Perl's (0) |
 | `~` without `HOME`, `~user` | the password file | `USERPROFILE`; `~user` (post-0.10, the user's follow-up to WS1: "`%USERPROFILE%/../user`"): `USERPROFILE` for one's own name (`USERNAME`), else the sibling of `USERPROFILE` of that name if it is a directory, else as written (no user database; profiles are usually siblings, but a domain profile may be `user.DOMAIN`, and the registry's ProfileList has the real paths) |
+| the names of inherited variables | as the environment spells them | (post-0.12, X65, the user's A22 (a), 2026-11-15) as the environment block spells them (a small XSUB, `GetEnvironmentStringsW`; the values from `%ENV`), but `PATH`, which Windows spells `Path`, as `PATH` (as Cygwin does); before, upper case, as Perl's `%ENV` gives them there, so `export z=3; sh -c 'echo $z'` printed nothing. `PROC_SHELLSPAWN_ENVNAMES=upper` (or `$Proc::ShellSpawn::ENV_NAMES = 'upper'` before `run`) takes them as `%ENV` gives them (A22 (b)): then only an upper-case name reaches a shell of ours |
+| `test -ef`, `pwd -L`: the same file | the same device and inode numbers | (post-0.12, the user, 2026-11-16) the same volume serial number and 128-bit file ID of the two names opened (`GetFileInformationByHandleEx`, `FileIdInfo`, Windows 8 / Server 2012 and later, which ReFS needs; else the 64-bit file index of `GetFileInformationByHandle`, Windows XP and later; an ID of all zeros means "cannot tell", and then the older ways decide), as Microsoft documents it; two hard links are one file. Checked under Wine only; not on Windows before 8, ReFS or FAT |
 | `$PPID` | `getppid` | the parent's process ID from `NtQueryInformationProcess` (Perl's `getppid` is unimplemented there) |
 | a pattern from an expansion with `\` | `\` quotes the next character | File::Glob's rule there: `\` quotes only before a glob character or another `\`; elsewhere it separates directories |
 | `trap` on a signal Perl lacks there (`USR1`, ...) | – | recorded; only `kill ... $$` sends it; a signal number Windows does not have is outside the subset (the parser takes Perl's signal table) |
@@ -31,7 +33,7 @@ Each of these was chosen while porting; the user confirmed them on 2026-11-09 (d
 The programs inside Perl (`echo`, `printf`, `test`, `[`, `true`, `false`, and since post-0.10 `pwd`: IP1 extended, the user confirmed it on 2026-11-09) are the same
 code on both platforms; `pwd` runs as `pwd -L` with the shell's directory (X23), so it prints `C:/...` there.
 
-## 2. What was checked
+## <a id="my-section-2"></a>2. What was checked
 
 | How | Result |
 |---|---|
@@ -44,7 +46,7 @@ code on both platforms; `pwd` runs as `pwd -L` with the shell's directory (X23),
 Not checked: real Windows; a command through `PATHEXT`'s `.bat`, `.cmd` (Wine's `cmd.exe` quotes differently, see
 [`perl-win32-system-bugs.md`](perl-win32-system-bugs.md)); Ctrl-C reaching children while the shell waits.
 
-## 3. Still missing there
+## <a id="my-section-3"></a>3. Still missing there
 
 - `kill` of another process and `time`: programs on POSIX (X21's rest), not found on Windows.
 - `ulimit`.

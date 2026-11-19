@@ -7,7 +7,7 @@ use Params::Get qw(get_params);
 use Readonly;
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '0.50';
+our $VERSION = '0.51';
 
 Readonly my %TYPE_DEFAULTS => (
 	number  => 42,
@@ -33,7 +33,7 @@ App::Test::Generator::BenchmarkGenerator - Generate Benchmark harnesses from ATG
 
 =head1 VERSION
 
-Version 0.50
+Version 0.51
 
 =head1 SYNOPSIS
 

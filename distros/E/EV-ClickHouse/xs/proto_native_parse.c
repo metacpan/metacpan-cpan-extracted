@@ -537,6 +537,9 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
                         goto meta_cleanup;
                     }
                     ctypes[c] = parse_col_type(ctypes_str[c], ctype_lens[c]);
+                    col_type_default_tz(ctypes[c],
+                        effective_tz(self, self->query_session_tz),
+                        &self->zones);
 
                     /* custom serialization flag (revision >= 54446) */
                     if (dpos >= dlen) {
@@ -570,6 +573,7 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
                     Safefree(cnames); Safefree(cname_lens);
                     Safefree(ctypes_str); Safefree(ctype_lens);
                     Safefree(ctypes);
+                    free_insert_default_state(self);
                     if (decompressed) Safefree(decompressed);
                     else pos = dpos;
                     recv_consume(self, pos);
@@ -583,27 +587,62 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
                 }
 
                 /* Build binary data block from stored data */
-                char ibuf[256];
+                char ibuf[640];
+                col_default_t *cdefs = NULL;
+                /* Resolving defaults and the AV build stringify user SVs,
+                 * so overload/tie runs arbitrary Perl that may destroy/
+                 * reset/finish this very connection. Pin the rows
+                 * (teardown would free them) and hold depth (DESTROY then
+                 * defers Safefree); re-validate below before touching
+                 * self. */
+                SV *av_pin = self->insert_av;
+                int gen0 = self->connect_gen;
                 ibuf[0] = '\0';
-                if (self->insert_av) {
-                    /* The AV build stringifies user SVs, so overload/tie
-                     * runs arbitrary Perl that may destroy/reset/finish
-                     * this very connection. Pin the rows (teardown would
-                     * free them) and hold depth (DESTROY then defers
-                     * Safefree); re-validate below before touching self. */
-                    SV *av_pin = self->insert_av;
-                    int gen0 = self->connect_gen;
-                    SvREFCNT_inc(av_pin);
-                    self->callback_depth++;
-                    data_pkt = build_native_insert_data_from_av(aTHX_ self,
-                        (AV *)SvRV(self->insert_av),
-                        cnames, cname_lens, ctypes_str, ctype_lens,
-                        ctypes, (int)num_cols, &data_pkt_len,
+                if (av_pin) SvREFCNT_inc(av_pin);
+                self->callback_depth++;
+                if (self->insert_empty_as_default || self->insert_defaults) {
+                    cdefs = resolve_insert_defaults_guarded(aTHX_ self,
+                        cnames, cname_lens, ctypes,
+                        ctypes_str, ctype_lens,
+                        (int)num_cols, ibuf, sizeof(ibuf));
+                    if (!cdefs && !ibuf[0])
+                        snprintf(ibuf, sizeof(ibuf),
+                                 "failed to resolve column defaults");
+                }
+                if (self->magic != EV_CH_MAGIC || self->connect_gen != gen0
+                    || !self->connected) {
+                    data_pkt = NULL;
+                    data_pkt_len = 0;
+                } else if (!cdefs && (self->insert_empty_as_default
+                                      || self->insert_defaults)) {
+                    data_pkt = NULL;
+                    data_pkt_len = (size_t)-1;
+                } else if (self->insert_native_body) {
+                    data_pkt = build_native_body_packet(self, self->insert_data,
+                        self->insert_data_len, cnames, cname_lens,
+                        ctypes_str, ctype_lens, (int)num_cols, &data_pkt_len,
                         ibuf, sizeof(ibuf));
-                    /* Drop the pin BEFORE depth--: a cell holding the last
-                     * $ch ref must DESTROY into depth>0 (cf. on_data). */
-                    SvREFCNT_dec(av_pin);
-                    self->callback_depth--;
+                } else if (self->insert_av) {
+                    data_pkt = build_native_insert_data_from_av_guarded(aTHX_ self,
+                        self->insert_av,
+                        cnames, cname_lens, ctypes_str, ctype_lens,
+                        ctypes, (int)num_cols, cdefs, &data_pkt_len,
+                        ibuf, sizeof(ibuf));
+                } else {
+                    data_pkt = build_native_insert_data(self,
+                        self->insert_data, self->insert_data_len,
+                        cnames, cname_lens, ctypes_str, ctype_lens,
+                        ctypes, (int)num_cols, cdefs, &data_pkt_len,
+                        ibuf, sizeof(ibuf));
+                }
+                /* Defaults may hold user SVs: drop them and the pin BEFORE
+                 * depth--, so a value holding the last $ch ref DESTROYs
+                 * into depth>0 (cf. on_data). */
+                free_col_defaults(cdefs, (int)num_cols);
+                cdefs = NULL;
+                if (av_pin) SvREFCNT_dec(av_pin);
+                self->callback_depth--;
+                {
                     if (self->magic != EV_CH_MAGIC) {
                         if (data_pkt) Safefree(data_pkt);
                         for (c = 0; c < num_cols; c++)
@@ -621,6 +660,8 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
                          * built block instead of sending it into the
                          * new/closed connection. */
                         if (data_pkt) Safefree(data_pkt);
+                        free_col_defaults(cdefs, (int)num_cols);
+                        free_insert_default_state(self);
                         for (c = 0; c < num_cols; c++)
                             free_col_type(ctypes[c]);
                         Safefree(cnames); Safefree(cname_lens);
@@ -630,12 +671,6 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
                         /* recv is already empty (teardown zeroes it). */
                         return 0;
                     }
-                } else {
-                    data_pkt = build_native_insert_data(self,
-                        self->insert_data, self->insert_data_len,
-                        cnames, cname_lens, ctypes_str, ctype_lens,
-                        ctypes, (int)num_cols, &data_pkt_len,
-                        ibuf, sizeof(ibuf));
                 }
 
                 for (c = 0; c < num_cols; c++)
@@ -643,6 +678,8 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
                 Safefree(cnames); Safefree(cname_lens);
                 Safefree(ctypes_str); Safefree(ctype_lens);
                 Safefree(ctypes);
+                free_col_defaults(cdefs, (int)num_cols);
+                free_insert_default_state(self);
 
                 {
                 /* Check encode-failure sentinel before freeing insert data */
@@ -663,7 +700,7 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
                     data_pkt = fallback.data;
                     data_pkt_len = fallback.len;
                     if (encode_failed) {
-                        char fbuf[320];
+                        char fbuf[700];
                         if (ibuf[0])
                             snprintf(fbuf, sizeof(fbuf), "native INSERT encoding "
                                      "failed (%s)", ibuf);
@@ -697,6 +734,7 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
                 native_buf_t fallback;
 
                 CLEAR_INSERT(self);
+                free_insert_default_state(self);
 
                 if (decompressed) Safefree(decompressed);
                 else pos = dpos;
@@ -824,6 +862,9 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
                 if (rc < 0) { *errmsg = safe_strdup("malformed ctype"); goto data_error; }
 
                 col_types[c] = parse_col_type(ctype, ctype_len);
+                col_type_default_tz(col_types[c],
+                    effective_tz(self, self->query_session_tz),
+                    &self->zones);
                 av_push(self->native_col_types, newSVpvn(ctype, ctype_len));
 
                 /* custom serialization flag (revision >= 54446) */
@@ -846,7 +887,16 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
                     columns[c] = decode_column_ex(dbuf, dlen, &dpos, num_rows, col_types[c], &col_err, self->decode_flags, self, (int)c);
                     if (!columns[c]) {
                         if (col_err) {
-                            *errmsg = safe_strdup("decode_column failed");
+                            const char *bad_tz = col_type_zone_error(col_types[c]);
+                            if (bad_tz) {
+                                char zbuf[160];
+                                snprintf(zbuf, sizeof(zbuf), "unknown timezone "
+                                         "'%.60s' or missing timezone database",
+                                         bad_tz);
+                                *errmsg = safe_strdup(zbuf);
+                            } else {
+                                *errmsg = safe_strdup("decode_column failed");
+                            }
                             goto data_error;
                         }
                         goto data_need_more;
@@ -1082,8 +1132,37 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
     }
 
     case SERVER_TABLE_COLUMNS: {
-        /* Format: string(table_name) + string(column_description) */
+        /* Format: string(table_name) + string(column_description).
+         * The description carries each column's DEFAULT/MATERIALIZED/
+         * ALIAS kind and expression; keep it only when the pending
+         * INSERT asked for empty_as_default or defaults. */
         int i;
+        if ((self->insert_data || self->insert_av)
+            && (self->insert_empty_as_default || self->insert_defaults)) {
+            char *desc = NULL;
+            size_t p0 = pos;
+            rc = skip_native_string(buf, len, &p0);
+            if (rc == 0) return 0;
+            if (rc < 0) { *errmsg = safe_strdup("malformed table_columns packet"); return -1; }
+            rc = read_native_string_alloc(buf, len, &p0, &desc, NULL);
+            if (rc == 0) {
+                Safefree(desc);
+                return 0;
+            }
+            if (rc < 0) {
+                Safefree(desc);
+                *errmsg = safe_strdup("malformed table_columns packet");
+                return -1;
+            }
+            free_insert_tc(self);
+            if (desc) {
+                self->insert_tc = parse_table_columns_desc(desc, strlen(desc));
+                Safefree(desc);
+            }
+            pos = p0;
+            recv_consume(self, pos);
+            return 1;
+        }
         for (i = 0; i < 2; i++) {
             rc = skip_native_string(buf, len, &pos);
             if (rc == 0) return 0;
@@ -1224,6 +1303,7 @@ static void process_native_response(ev_clickhouse_t *self) {
 
             CLEAR_SV(self->native_rows);
             CLEAR_INSERT(self);
+            free_insert_default_state(self);
             CLEAR_STR(self->insert_err);
             self->native_state = NATIVE_IDLE;
             self->cancel_after_meta = 0;
@@ -1246,6 +1326,7 @@ static void process_native_response(ev_clickhouse_t *self) {
             self->native_state = NATIVE_IDLE;
             self->cancel_after_meta = 0;
             CLEAR_INSERT(self);
+            free_insert_default_state(self);
             if (self->send_count > 0) self->send_count--;
             lc_free_dicts(self);
 

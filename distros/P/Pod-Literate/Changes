@@ -1,5 +1,8 @@
 Revision history for Pod::Literate
 
+0.0.5 - 2026-11-18
+	- Inline declarations
+
 0.0.4 - 2026-11-13
 	- Multiple output target support
 	- Established/fixed spacing behavior of begin/for

@@ -3,7 +3,7 @@ MANIFEST
 META.json                                Module JSON meta-data (added by MakeMaker)
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 Makefile.PL
-README
+README.md
 Spawner.xs
 TODO
 doc/README.md
@@ -25,12 +25,15 @@ doc/large-subset/large-subset-spec.md
 doc/large-subset/large-subset-state.md
 doc/large-subset/large-subset-state.md.html
 doc/large-subset/tools/large-subset-ai-classes.tsv
+doc/large-subset/tools/large-subset-bgjobs.pl
 doc/large-subset/tools/large-subset-blocks.pl
 doc/large-subset/tools/large-subset-builtins-differences.tsv
 doc/large-subset/tools/large-subset-builtins.pl
+doc/large-subset/tools/large-subset-calls.pl
 doc/large-subset/tools/large-subset-corpora.pl
 doc/large-subset/tools/large-subset-difffuzz.pl
 doc/large-subset/tools/large-subset-drops.pl
+doc/large-subset/tools/large-subset-endmodes.tsv
 doc/large-subset/tools/large-subset-env-affects-shell-calls.jsonl
 doc/large-subset/tools/large-subset-env-affects-shell.tsv
 doc/large-subset/tools/large-subset-env-control-calls.jsonl
@@ -46,6 +49,7 @@ doc/large-subset/tools/large-subset-match-known.tsv
 doc/large-subset/tools/large-subset-match.tsv
 doc/large-subset/tools/large-subset-matchreport.pl
 doc/large-subset/tools/large-subset-noise.txt
+doc/large-subset/tools/large-subset-programs.txt
 doc/large-subset/tools/large-subset-remeasure.pl
 doc/large-subset/tools/large-subset-reparse.pl
 doc/large-subset/tools/large-subset-repeat.pl
@@ -88,6 +92,12 @@ doc/pspawn-loop.md
 doc/pspawn-shell-windows.md
 doc/pspawn-spawner.md
 doc/test-pools.md
+doc/test-results/linux-flavors-by-test.txt
+doc/test-results/linux-flavors.txt
+doc/test-results/linux-missing-matrix.txt
+doc/test-results/wine-flavors-by-test.txt
+doc/test-results/wine-flavors.txt
+doc/test-results/wine-missing-matrix.txt
 lib/Proc/ShellSpawn.pm
 lib/Proc/ShellSpawn/Builtins.pm
 lib/Proc/ShellSpawn/Large.pm
@@ -101,6 +111,7 @@ lib/Proc/Spawner/Graph.pm
 lib/Proc/Spawner/Loop.pm
 lib/Proc/Spawner/Loop/POSIX.pm
 lib/Proc/Spawner/Loop/Win32.pm
+t/at-exit.t
 t/batteries/battery.txt
 t/batteries/echo.txt
 t/batteries/fdbattery.txt
@@ -122,7 +133,11 @@ t/dash.t
 t/docs-sync.t
 t/echo-shells.txt
 t/fds
+t/flavors-compare.pl
+t/flavors-outcomes.pl
+t/flavors.pl
 t/graph.t
+t/long-lists.t
 t/loop.t
 t/memory.t
 t/missing-matrix.pl
@@ -136,6 +151,7 @@ t/parsers.t
 t/portable.t
 t/programs.t
 t/programs.txt
+t/recorder.t
 t/sgraph/ex1.sg
 t/sgraph/ex2.sg
 t/sgraph/ex3.sg
@@ -148,6 +164,9 @@ t/sgraph/run-graph.pl
 t/spawner.t
 t/stress.t
 t/try.pl
+t/win/clchild.c
+t/win/thooks.c
+t/win_spawn.t
 t/windows.t
 win_loop.h
 win_spawn.h

@@ -485,6 +485,34 @@ subtest 'connect_cached returns the cached handle' => sub {
     ref_is_not cached(ekorn_finish_active => 0), $dbh, 'but not with others';
 };
 
+subtest 'connect_cached takes its arguments as connect does' => sub {
+    my sub shortcut (%ekorn) {
+        return DBIx::Squirrel->connect_cached(
+            $source[0],
+            {%{ $source[3] }, %ekorn},
+        );
+    }
+    ref_is shortcut(), shortcut(),
+        'the attributes straight after the data source';
+
+    # The shortcut leaves out the username and password, as connect does,
+    # so it's the same handle as given them undefined. The DBI keys its
+    # cache on them, so empty strings are another handle.
+    ref_is shortcut(),
+        DBIx::Squirrel->connect_cached($source[0], undef, undef, $source[3]),
+        'the same handle as given the username and password undefined';
+
+    my $dbh = shortcut(ekorn_slice => {});
+    ref_is shortcut(ekorn_slice => {}), $dbh, 'and with ekorn_ attributes';
+    is $dbh->{private_ekorn}{Options}{ekorn_slice}, {}, 'which it keeps';
+    ref_is_not shortcut(), $dbh, 'but not without them';
+
+    # A handle given in place of a data source goes to the DBI as it is,
+    # which clones it as it was made: a cached handle gives itself.
+    ref_is DBIx::Squirrel->connect_cached($dbh, {RaiseError => 1}), $dbh,
+        'a cached handle in place of a data source';
+};
+
 subtest 'connect takes ekorn_ attributes as defaults' => sub {
     my $dbh = DBIx::Squirrel->connect(
         @source[0 .. 2], {

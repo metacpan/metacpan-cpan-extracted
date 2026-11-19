@@ -3,7 +3,7 @@
 require 5.010001;
 use strict;
 package Stats::LikeR;
-our $VERSION = '0.3424';	# quoted: a bare version ending in 0, such as 0.320, is the number 0.32, which the dist would be named
+our $VERSION = '0.3425';	# quoted: a bare version ending in 0, such as 0.320, is the number 0.32, which the dist would be named
 require XSLoader;
 use warnings FATAL => 'all';
 use Exporter 'import';
@@ -97,11 +97,20 @@ my %HELP_ALIAS = (
 	_interp_column_xs => 'interpolate',
 	_parse_csv_file   => 'read_table',
 	_impute_prop      => 'fillna',
-	_fill_seq         => 'fillna',
 	_render_grid      => 'view',
 	_view_size        => 'view',
 	_view_size_fmt    => 'view',
 	_df_shape         => 'agg',
+	_agg_combine      => 'agg',
+	_agg_mode         => 'agg',
+	_pivot_split      => 'pivot_table',
+	_group_order      => 'pivot_table',
+	_melt_xs          => 'melt',
+	_impute_xs        => 'fillna',
+	_numeric_cells    => 'summary',
+	_t1_col           => 'table_one',
+	_aoh2hoh_xs       => 'aoh2hoh',
+	_dropna_xs        => 'dropna',
 	_xtab             => 'cramers_v',
 	# The eight R distribution functions share one section, since what is
 	# worth saying about tails, log_p and accuracy is the same for all of
@@ -793,23 +802,11 @@ sub colnames {
 	} elsif ($shape eq 'HoA') {                  # keys ARE the columns
 		@cols = sort keys %$df;
 	} else {                                     # AoH / HoH: union of row keys
-		# `for my $row (@$df)` walks the array in place; `my @rows = @$df`
-		# flattens a copy of every row reference in the frame first, which on a
-		# million-row AoH is eight megabytes of list that is read once and
-		# thrown away.  Two loops, no copy.
-		my %seen;
-		if ($shape eq 'AoH') {
-			for my $row (@$df) {
-				next unless ref $row eq 'HASH';
-				$seen{$_} = 1 for keys %$row;
-			}
-		} else {
-			for my $row (values %$df) {
-				next unless ref $row eq 'HASH';
-				$seen{$_} = 1 for keys %$row;
-			}
-		}
-		@cols = sort keys %seen;
+		# The union is _aoh_key_union (LikeR.xs), which up to 0.3424 was a
+		# perl loop over every key of every row, and on a 200,000 x 8 AoH took
+		# 0.10 s of the 0.12 s colnames() did.  A HoH's rows go to it as a
+		# list of their references.
+		@cols = sort @{ _aoh_key_union($shape eq 'AoH' ? $df : [ values %$df ]) };
 	}
 	return wantarray ? @cols : scalar @cols;
 }
@@ -922,14 +919,9 @@ sub _aoa_int_cols { # validate integer positions in range
 	return $w;
 }
 
-sub _present_keys { # union of keys over AoH/HoH rows
+sub _present_keys { # union of keys over AoH/HoH rows, as a set
 	my ($df, $shape) = @_;
-	my %seen;                                   # no whole-frame list copy: see colnames
-	if ($shape eq 'AoH') {
-		for my $r (@$df)        { next unless ref $r eq 'HASH'; $seen{$_} = 1 for keys %$r }
-	} else {
-		for my $r (values %$df) { next unless ref $r eq 'HASH'; $seen{$_} = 1 for keys %$r }
-	}
+	my %seen = map { $_ => 1 } @{ _aoh_key_union($shape eq 'AoH' ? $df : [ values %$df ]) };
 	return \%seen;
 }
 
@@ -1068,18 +1060,8 @@ sub aoh2hoh {
 	_usage_error('aoh2hoh', 'first argument must be an arrayref of hashrefs')
 	  unless ref($aoh) eq 'ARRAY';
 	_usage_error('aoh2hoh', 'a row key must be defined') unless defined $key;
-	my %out;
-	my $i = 0;
-	for my $row (@$aoh) {
-		die "aoh2hoh: index $i is not a hash" unless ref($row) eq 'HASH';
-		die "aoh2hoh: index $i has no key \"$key\"" unless defined $row->{$key};
-		my $rk = $row->{$key};
-		die "aoh2hoh: duplicate key '$rk' has >= 2 occurrences"
-			if exists $out{$rk};
-		$out{$rk} = { %$row }; # shallow copy of the row
-		$i++;
-	}
-	return \%out;
+	# each row copied as { %$row } under its key, in XS; up to 0.3424 a perl loop
+	return _aoh2hoh_xs($aoh, $key);
 }
 
 # h2aoh / df2h  --  the flat hash as a two-column frame
@@ -1401,7 +1383,7 @@ sub _untied {
 #           last always ignore this flag.
 #   sort => 0|1                   default 1.  Sort output groups by key, each
 #           by column numerically if all its values look like numbers, else as
-#           strings, undef last (see _sort_group_keys); 0 keeps first-seen order.
+#           strings, undef last (see go_order() in LikeR.xs); 0 keeps first-seen order.
 #   'output_type' => aoa|aoh|hoa|hoh    default: same family as $df.
 #
 # OUTPUT COLUMN ORDER is deterministic: the `by` columns in the given order,
@@ -1416,8 +1398,9 @@ sub _untied {
 #
 # Numeric aggregators need enough defined cells or the cell is undef: mean /
 # median / sum / min / max need >= 1, sd / var need >= 2.  Ungrouped, a frame with
-# no rows is still one row.  The original $df is never modified.  The split itself
-# is the XS _agg_split(); see the comment above ag_set in LikeR.xs.
+# no rows is still one row.  The original $df is never modified.  The split
+# is the XS _agg_split() (see the comment above ag_set in LikeR.xs), and the
+# combine the XS _agg_combine().
 {
 	my %AGG_MIN = (          # minimum defined count for the XS numeric reducers
 		mean => 1, median => 1, sum => 1, min => 1, max => 1,
@@ -1429,14 +1412,6 @@ sub _untied {
 	# reducers that stringify their cells: a cell they read is copied, not shared
 	# with the caller's frame, because stringifying caches a PV on the SV
 	my %AGG_STRINGIFY = ( mode => 1, nunique => 1 );
-
-	sub _agg_reduce {
-		my ($func, $raw, $def, $skipna) = @_;   # $raw, $def: arrayrefs (def excl. undef)
-		# scalar: a coderef returning a list, or nothing, would otherwise shift
-		# every later column of the row
-		return scalar $func->($raw) if ref $func eq 'CODE';
-		return _agg_reduce_named($func, $def, @$raw - @$def, $skipna);
-	}
 
 	# a named reducer over the defined cells $def, of which the group had $nna
 	# more that were undef
@@ -1451,10 +1426,7 @@ sub _untied {
 		if ($func eq 'last')    { return @$def ? $def->[-1] : undef }
 		if ($func eq 'mode') {
 			return undef unless @$def;
-			my @m = mode($def);
-			return (grep { !looks_like_number($_) } @m)
-				? (sort @m)[0]
-				: (sort { $a <=> $b } @m)[0];
+			return _agg_mode($def);
 		}
 		die "agg: unknown aggregator '$func'\n" unless exists $AGG_MIN{$func};
 		return undef if @$def < $AGG_MIN{$func};
@@ -1465,6 +1437,16 @@ sub _untied {
 		return var($def)    if $func eq 'var';
 		return min($def)    if $func eq 'min';
 		return max($def)    if $func eq 'max';
+	}
+
+	# the mode of the defined cells $def, ties going to the smallest number, or
+	# the lowest string when any is not a number; _agg_combine() (LikeR.xs)
+	# calls it too
+	sub _agg_mode {
+		my @m = mode($_[0]);
+		return (grep { !looks_like_number($_) } @m)
+			? (sort @m)[0]
+			: (sort { $a <=> $b } @m)[0];
 	}
 
 	sub agg {
@@ -1565,61 +1547,13 @@ sub _untied {
 			push @$groups, [ [], [ (0) x @agg_cols ], map { [] } @agg_cols ];
 		}
 
-		my @order = 0 .. $#$groups;
-		if ($dosort && @by && @order > 1) {
-			my %repr = map { $_ => $groups->[$_][0] } @order;
-			@order = @{ _sort_group_keys(\@order, \%repr) };
-		}
-
-# combine + materialise straight into the requested shape
-		my (@aoa_rows, @aoh_rows, %hoa, %hoh, %seen_label);
-		if ($otype eq 'hoa') { $hoa{$_} = [] for @out_names }
-
-		for my $gi (@order) {
-			my ($repr, $nna, @cells) = @{ $groups->[$gi] };
-			$groups->[$gi] = undef;      # this group's cells go once it is reduced
-			my @vals = @$repr;           # by-column values, in order
-			for my $j (0 .. $#agg_plan) {
-				my ($c, $funcs) = @{ $agg_plan[$j] };
-				my $cells = $cells[$j];
-				my $def = $how[$j] || !$nna->[$j] ? $cells : [ grep { defined } @$cells ];
-				for my $f (@$funcs) {
-					if (ref $f eq 'CODE') {
-						push @vals, scalar $f->($cells);   # see _agg_reduce
-						next;
-					}
-					my $v = eval { _agg_reduce_named($f, $def, $nna->[$j], $skipna) };
-					if (!defined $v && $@) {
-						my $where = @by
-							? 'group (' . join(', ', map {
-								"$by[$_] = " . (defined $repr->[$_] ? "'$repr->[$_]'" : 'undef')
-							  } 0 .. $#by) . ')'
-							: 'the whole frame';
-						die "agg: $f of column '$c' over $where: $@";
-					}
-					push @vals, $v;
-				}
-			}
-			if ($otype eq 'aoa') {
-				push @aoa_rows, \@vals;
-			} elsif ($otype eq 'aoh') {
-				my %h; @h{ @out_names } = @vals; push @aoh_rows, \%h;
-			} elsif ($otype eq 'hoa') {
-				push @{ $hoa{ $out_names[$_] } }, $vals[$_] for 0 .. $#out_names;
-			} else { # hoh
-				my $label = @by
-					? join('.', map { defined $_ ? $_ : '' } @$repr)
-					: 'all';
-				my $uniq = $label; my $j = 0;
-				while (exists $seen_label{$uniq}) { $uniq = $label . '.' . (++$j) }
-				$seen_label{$uniq} = 1;
-				my %h; @h{ @out_names } = @vals; $hoh{$uniq} = \%h;
-			}
-		}
-		return \@aoa_rows if $otype eq 'aoa';
-		return \@aoh_rows if $otype eq 'aoh';
-		return \%hoa      if $otype eq 'hoa';
-		return \%hoh;
+# combine, in XS: each group reduced, in key order when sorting, and laid
+# straight out in the requested shape.  Up to 0.3424 this was a perl loop with
+# an eval around every named reducer, and its group sort ran a perl comparator.
+		my %otype_code = ( aoa => 0, aoh => 1, hoa => 2, hoh => 3 );	# _agg_combine's `otype`
+		return _agg_combine($groups, ($dosort && @by) ? 1 : 0,
+			[ map { $_->[1] } @agg_plan ], \@how, $skipna, $otype_code{$otype},
+			\@out_names, [ @by ], [ @agg_cols ]);
 	}
 }
 
@@ -2362,24 +2296,12 @@ sub dropna {
 		my @cols = @$sel;
 		return [ @$df ] unless @cols;			# nothing to check -> keep all
 		return [] unless @$df;				# empty frame -> empty result
-		my %seen;
-		for my $row (@$df) {
-			next unless ref $row eq 'HASH';
-			$seen{$_} = 1 for keys %$row;
-		}
+		my %seen = map { $_ => 1 } @{ _aoh_key_union($df) };
 		for my $c (@cols) {
 			die "dropna: column '$c' not found\n" unless $seen{$c};
 		}
-		my @keep;
-		for my $i (0 .. $#$df) {
-			my $row = $df->[$i];
-			my $nundef = (ref $row eq 'HASH')
-				? (grep { !defined $row->{$_} } @cols)
-				: @cols;						# malformed row counts as all-NA
-			my $drop = $how eq 'any' ? $nundef > 0 : $nundef == @cols;
-			push @keep, $i unless $drop;
-		}
-		return [ map { $df->[$_] } @keep ];
+		# the rows kept, in XS; a row that is not a hash counts as all NA
+		return _dropna_xs($df, 1, [ @cols ], $how eq 'all' ? 1 : 0);
 	}
 
 	#HoA vs HoH
@@ -2401,16 +2323,7 @@ sub dropna {
 			}
 			my @cols = @$sel;
 			return { %$df } unless @cols;
-			my %out;
-			for my $rk (keys %$df) {
-				my $row = $df->{$rk};
-				my $nundef = (ref $row eq 'HASH')
-					? (grep { !defined $row->{$_} } @cols)
-					: @cols;
-				my $drop = $how eq 'any' ? $nundef > 0 : $nundef == @cols;
-				$out{$rk} = $row unless $drop;
-			}
-			return \%out;
+			return _dropna_xs($df, 2, [ @cols ], $how eq 'all' ? 1 : 0);
 		}
 
 		#HoA (also the empty-hash fallthrough)
@@ -2428,13 +2341,7 @@ sub dropna {
 		for my $c (@cols) {
 			die "dropna: column '$c' not found\n" unless exists $df->{$c};
 		}
-		my @keep;
-		for my $i (0 .. $n - 1) {
-			my $nundef = grep { !defined $df->{$_}[$i] } @cols;
-			my $drop = $how eq 'any' ? $nundef > 0 : $nundef == @cols;
-			push @keep, $i unless $drop;
-		}
-		return { map { $_ => [ @{ $df->{$_} }[@keep] ] } keys %$df };
+		return _dropna_xs($df, 4, [ @cols ], $how eq 'all' ? 1 : 0);
 	}
 
 	_usage_error('dropna', 'data frame must be an arrayref (AoH) or hashref (HoA/HoH)');
@@ -2791,30 +2698,29 @@ sub summary {
 	_usage_error($current_sub, "data must either be a hash or an array, not \"$rt\"")
 		unless $rt eq 'ARRAY' or $rt eq 'HASH';
 
-	# resolve the data shape into (label, numeric-vector) series
-	my (@labels, @vecs, $lab_header);
+	# resolve the data shape into series: a label, and where its numbers come
+	# from, as _numeric_cells's (src, kind, key)
+	my (@labels, @srcs, $lab_header);
 	if ($rt eq 'ARRAY') {
 		my $first;
 		for my $e (@$data) { if (defined $e) { $first = $e; last } }
 		my $ft = ref $first;
 		if ($ft eq 'HASH') {			# AoH: one series per column
 			$lab_header = 'Column';
-			my %seen;
-			for my $row (@$data) { next unless ref $row eq 'HASH'; $seen{$_} = 1 for keys %$row }
-			for my $col (sort keys %seen) {
+			for my $col (sort @{ _aoh_key_union($data) }) {
 				push @labels, $col;
-				push @vecs, [ map { ref $_ eq 'HASH' ? $_->{$col} : undef } @$data ];
+				push @srcs, [ $data, 1, $col ];
 			}
 		} elsif ($ft eq 'ARRAY') {		# AoA: one series per inner array
 			$lab_header = 'Index';
 			for my $i (0 .. $#$data) {
 				push @labels, $i;
-				push @vecs, (ref $data->[$i] eq 'ARRAY' ? [ @{ $data->[$i] } ] : []);
+				push @srcs, (ref $data->[$i] eq 'ARRAY' ? [ $data->[$i], 3, undef ] : undef);
 			}
 		} else {						# flat vector: a single series
 			$lab_header = '';
 			push @labels, '';
-			push @vecs, [ @$data ];
+			push @srcs, [ $data, 3, undef ];
 		}
 	} else { # HASH
 		my @keys = keys %$data;
@@ -2825,43 +2731,44 @@ sub summary {
 			$lab_header = 'Key';
 			for my $k (sort { lc $a cmp lc $b } @keys) {
 				push @labels, $k;
-				push @vecs, (ref $data->{$k} eq 'ARRAY' ? [ @{ $data->{$k} } ] : []);
+				push @srcs, (ref $data->{$k} eq 'ARRAY' ? [ $data->{$k}, 3, undef ] : undef);
 			}
 		} elsif ($vt eq 'HASH') {		# HoH: one series per column (inner key)
 			$lab_header = 'Column';
-			my %seen;
-			for my $k (@keys) { next unless ref $data->{$k} eq 'HASH'; $seen{$_} = 1 for keys %{ $data->{$k} } }
-			for my $col (sort keys %seen) {
+			for my $col (sort @{ _aoh_key_union([ values %$data ]) }) {
 				push @labels, $col;
-				push @vecs, [ map { ref $data->{$_} eq 'HASH' ? $data->{$_}{$col} : undef } @keys ];
+				push @srcs, [ $data, 2, $col ];
 			}
 		} else {						# flat hash: its values as one series
 			$lab_header = '';
 			push @labels, '';
-			push @vecs, [ map { $data->{$_} } @keys ];
+			push @srcs, [ $data, 4, undef ];
 		}
-	}
-
-	# compute the statistics grid
-	my @colnames = ('# values', 'Min.', '1st Qu.', 'Median', 'Mean', '3rd Qu.', 'Max.');
-	my @raw;
-	for my $vec (@vecs) {
-		my @numeric = grep { defined $_ && looks_like_number($_) } @$vec;
-		if (!@numeric) { push @raw, [ 0, (undef) x 6 ]; next }	# empty -> na stats
-		my $q = quantile(\@numeric, probs => [0.25, 0.75]);
-		# format as %.4g strings; they still look numeric, so _render_grid
-		# right-aligns and colours them as numbers.
-		push @raw, [
-			scalar @numeric,
-			sprintf('%.4g', min(\@numeric)),    sprintf('%.4g', $q->{'25%'}),
-			sprintf('%.4g', median(\@numeric)), sprintf('%.4g', mean(\@numeric)),
-			sprintf('%.4g', $q->{'75%'}),       sprintf('%.4g', max(\@numeric)),
-		];
 	}
 
 	# cap the number of series shown (keep the true total for the "... more" note)
 	my $total = scalar @labels;
-	if ($nrows < $total) { $#labels = $nrows - 1; $#raw = $nrows - 1; }
+	if ($nrows < $total) { $#labels = $nrows - 1; $#srcs = $nrows - 1; }
+
+	# compute the statistics grid, one series at a time and only for the series
+	# shown.  Up to 0.3424 every series was copied whole, all of them at once,
+	# and then filtered in perl; _numeric_cells (LikeR.xs) hands back only the
+	# numbers, as copies.
+	my @colnames = ('# values', 'Min.', '1st Qu.', 'Median', 'Mean', '3rd Qu.', 'Max.');
+	my @raw;
+	for my $src (@srcs) {
+		my $numeric = $src ? _numeric_cells(@$src) : [];
+		if (!@$numeric) { push @raw, [ 0, (undef) x 6 ]; next }	# empty -> na stats
+		my $q = quantile($numeric, probs => [0.25, 0.75]);
+		# format as %.4g strings; they still look numeric, so _render_grid
+		# right-aligns and colours them as numbers.
+		push @raw, [
+			scalar @$numeric,
+			sprintf('%.4g', min($numeric)),    sprintf('%.4g', $q->{'25%'}),
+			sprintf('%.4g', median($numeric)), sprintf('%.4g', mean($numeric)),
+			sprintf('%.4g', $q->{'75%'}),      sprintf('%.4g', max($numeric)),
+		];
+	}
 
 	# The display options go on as they were given; _render_grid() checks them.
 	return _render_grid('summary', $total, \@colnames, \@labels, \@raw, $lab_header,
@@ -4629,14 +4536,10 @@ sub _tukey_compare {
 }
 
 # melt / pivot_table / fillna / ffill / bfill
-#   pure-Perl additions to lib/Stats/LikeR.pm
 #
-# Placement: splice the reshape pair (melt, pivot_table) in after concat/
-# rbind, and the impute trio (fillna, ffill, bfill) in after dropna.  Add
-#   melt pivot_table fillna ffill bfill
-# to @EXPORT_OK (== @EXPORT).  All five reshape/impute at the Perl level
-# only; the sole numeric work is in pivot_table, which reuses the XS
-# reducers through _agg_reduce, so there is no XS/ABI surface added here.
+# Each checks its arguments here and hands the frame to an XSUB in LikeR.xs
+# (_melt_xs, _pivot_split, _impute_xs), which up to 0.3424 were perl loops;
+# pivot_table still reduces each bucket here, through the reducers agg() uses.
 #
 # NA is undef throughout, exactly as dropna() treats it (a missing hash key
 # counts as NA).  Every function returns a NEW top-level frame and never
@@ -4670,54 +4573,6 @@ sub _frame_cols {
 		for my $c (@$need) { $col{$c} = [ map { $_->{$c} } @$rows ] }
 	}
 	return (\%col, scalar @$rows, $rows);
-}
-
-# _sort_group_keys(\@order, \%repr) -> \@sorted
-#
-# Order group keys by their representative value tuple.  Each tuple position
-# is compared on its own terms: numerically when every defined value in that
-# position (across every group) looks like a number, else as strings.  Within a
-# position undef sorts last, as pandas puts its NaN group, and a NaN sorts after
-# every number and before undef -- `<=>` has no answer for it, and under this
-# module's FATAL warnings a sort comparator that returns undef dies.
-#
-# Up to 0.3212 one numeric-or-string decision covered every position and any
-# undef made it "string", so by => ['sex', 'age'], or a single missing key,
-# sorted the numbers 10, 2, 9.  Used by agg() and pivot_table().  Not exported.
-sub _sort_group_keys {
-	my ($order, $repr) = @_;
-	return [ @$order ] unless @$order;
-	my $width = @{ $repr->{ $order->[0] } };
-	my @num = (1) x $width;
-	for my $k (@$order) {
-		my $t = $repr->{$k};
-		for my $j (0 .. $width - 1) {
-			$num[$j] = 0 if $num[$j] && defined $t->[$j] && !looks_like_number($t->[$j]);
-		}
-	}
-	# per position: [ class, value ]; class 0 = value, 1 = NaN, 2 = undef
-	my %key;
-	for my $k (@$order) {
-		my $t = $repr->{$k};
-		$key{$k} = [ map {
-			my $v = $t->[$_];
-			!defined $v  ? ( 2, 0 )
-			: !$num[$_]  ? ( 0, $v )
-			: $v != $v   ? ( 1, 0 )
-			:              ( 0, 0 + $v )
-		} 0 .. $width - 1 ];
-	}
-	return [ sort {
-		my ($ka, $kb) = ($key{$a}, $key{$b});
-		my $c = 0;
-		for my $j (0 .. $width - 1) {
-			my $i = 2 * $j;
-			last if $c = $ka->[$i] <=> $kb->[$i]
-			          || ( $num[$j] ? $ka->[$i + 1] <=> $kb->[$i + 1]
-			                        : $ka->[$i + 1] cmp $kb->[$i + 1] );
-		}
-		$c;
-	} @$order ];
 }
 
 # melt($df, id_vars => $col|\@cols, value_vars => $col|\@cols,
@@ -4788,55 +4643,14 @@ sub melt {
 		}
 	}
 
-	my %need; $need{$_} = 1 for @id, @val;
-	my ($col, $R) = _frame_cols($df, $shape, [ keys %need ]);
-
-	# Column-major, straight into the requested shape.  This used to build the
-	# whole long frame first, as one arrayref-of-arrayrefs record per output
-	# row, and then walk it again to materialise -- so a melt of R rows over V
-	# value columns held R*V records, each with a nested arrayref of the id
-	# values, alive at the same time as the result it was about to become.  On
-	# a million-row frame with ten value columns that is ten million throwaway
-	# containers, and none of them is anything the output needs.  Emitting as
-	# the loops go keeps only the result.  The output type is branched on once,
-	# outside the loops, and a hoa is built a whole column at a time: per cell,
-	# the branch and the pushes made a hoa melt about 4 times slower.
-	my @idcol = map { $col->{$_} } @id;
-	if ($otype eq 'hoa') {
-		my %hoa = map { $_ => [] } @id, $var_name, $value_name;
-		for my $v (@val) {
-			my $vcol = $col->{$v};
-			# _frame_cols() columns can be short (ragged AoA rows); a slice
-			# reads undef past the end, as $vcol->[$i] did, and keeps R cells.
-			push @{ $hoa{ $id[$_] } }, @{ $idcol[$_] }[0 .. $R - 1] for 0 .. $#id;
-			push @{ $hoa{$var_name} },   ($v) x $R;
-			push @{ $hoa{$value_name} }, @{$vcol}[0 .. $R - 1];
-		}
-		return \%hoa;
-	}
-	if ($otype eq 'aoa') {
-		my @aoa;
-		for my $v (@val) {
-			my $vcol = $col->{$v};
-			for my $i (0 .. $R - 1) {
-				push @aoa, [ (map { $_->[$i] } @idcol), $v, $vcol->[$i] ];
-			}
-		}
-		return \@aoa;
-	}
-	my @rows;                                    # aoh and hoh share the row
-	for my $v (@val) {
-		my $vcol = $col->{$v};
-		for my $i (0 .. $R - 1) {
-			my %h;
-			@h{ @id } = map { $_->[$i] } @idcol;
-			$h{$var_name}   = $v;
-			$h{$value_name} = $vcol->[$i];
-			push @rows, \%h;
-		}
-	}
-	return \@rows if $otype eq 'aoh';
-	return { map { $_ => $rows[$_] } 0 .. $#rows };   # hoh: RangeIndex
+	# Column-major, straight into the requested shape, in XS.  Up to 0.3424
+	# this was perl, which copied every id and value column out of the frame
+	# before it emitted a row, and on a 200,000-row AoH melted over three
+	# value columns took 0.54 s and 324 MB above the frame; see Changes.
+	my %shape_code = ( AoH => 1, HoH => 2, AoA => 3, HoA => 4 );	# _melt_xs's `shape`
+	my %otype_code = ( aoa => 0, aoh => 1, hoa => 2, hoh => 3 );	# and its `otype`
+	return _melt_xs($df, $shape_code{$shape}, [ @id ], [ @val ], $otype_code{$otype},
+		$var_name, $value_name);
 }
 
 # pivot_table($df, index => $col|\@cols, columns => $col|\@cols,
@@ -4927,46 +4741,41 @@ sub pivot_table {
 		die "pivot_table: column '$c' not found\n" unless $uni{$c};
 	}
 
-	my %need; $need{$_} = 1 for @index, @columns, @values;
-	my ($col, $R) = _frame_cols($df, $shape, [ keys %need ]);
-
-	# bucket every row under (index tuple, columns tuple), first-seen order
-	my (%rrepr, @rorder, %rseen, %crepr, @corder, %cseen, %bucket);
-	for (my $i = 0; $i < $R; $i++) {
-		my @cv = map { $col->{$_}[$i] } @columns;
-		next if grep { !defined } @cv;           # NA columns tuple -> unnameable
-		my $ck = join "\x1e", map { "v$_" } @cv;
-		unless ($cseen{$ck}) {
-			$cseen{$ck} = 1; push @corder, $ck; $crepr{$ck} = [ @cv ];
-		}
-		my @iv = map { $col->{$_}[$i] } @index;
-		my $rk = @index
-			? join("\x1e", map { defined $_ ? "v$_" : "\0" } @iv)
-			: "\0all";
-		unless ($rseen{$rk}) {
-			$rseen{$rk} = 1; push @rorder, $rk; $rrepr{$rk} = [ @iv ];
-		}
-		push @{ $bucket{$rk}{$ck}{$_} }, $col->{$_}[$i] for @values;
-	}
+	# split, in XS: every row's index tuple, columns tuple and value cells,
+	# each tuple numbered in first-seen order.  Up to 0.3424 this was a perl
+	# loop that copied every column it needed first, joined two key strings for
+	# each row, and pushed every value cell into a three-level hash.
+	my $has_code = grep { ref $_ eq 'CODE' } @funcs;
+	my $how = $has_code ? 0                                     # cells incl. undef, copied
+	        : ( grep { $_ eq 'mode' || $_ eq 'nunique' } @funcs ) ? 1   # defined cells, copied
+	        : 2;                                                # defined cells, shared
+	my ($src, $code) = $shape eq 'AoA' ? ( $df, 3 )
+	                 : $shape eq 'AoH' ? ( $df, 1 )
+	                 : $shape eq 'HoA' ? ( $df, 4 )
+	                 : ( [ @{$df}{ sort keys %$df } ], 1 );   # HoH: its rows, key order
+	my ($rrepr, $crepr, $buckets) = @{ _pivot_split($src, $code, [ @index ],
+		[ @columns ], [ @values ], [ ($how) x @values ]) };
+	my @rorder = 0 .. $#$rrepr;
+	my @corder = 0 .. $#$crepr;
 	if ($dosort) {
-		@rorder = @{ _sort_group_keys(\@rorder, \%rrepr) } if @index;
-		@corder = @{ _sort_group_keys(\@corder, \%crepr) };
+		@rorder = @{ _group_order($rrepr) } if @index;
+		@corder = @{ _group_order($crepr) };
 	}
 
 	# output column plan: aggfunc-major, then value, then columns tuple
 	my $multi_f = @funcs > 1;
 	my $multi_v = @values > 1;
-	my @colplan;                                 # [ ck, value, func, outname ]
+	my @colplan;                                 # [ col id, value index, func, outname ]
 	for my $f (@funcs) {
 		my $fl = ref $f eq 'CODE' ? 'fn' : $f;
-		for my $vv (@values) {
+		for my $vi (0 .. $#values) {
 			for my $ck (@corder) {
-				my $cstr = join $sep, map { defined $_ ? $_ : '' } @{ $crepr{$ck} };
+				my $cstr = join $sep, map { defined $_ ? $_ : '' } @{ $crepr->[$ck] };
 				my @pieces;
 				push @pieces, $fl if $multi_f;
-				push @pieces, $vv if $multi_v;
+				push @pieces, $values[$vi] if $multi_v;
 				push @pieces, $cstr;
-				push @colplan, [ $ck, $vv, $f, join($sep, @pieces) ];
+				push @colplan, [ $ck, $vi, $f, join($sep, @pieces) ];
 			}
 		}
 	}
@@ -4978,42 +4787,12 @@ sub pivot_table {
 		  . "pass a different 'sep' or rename inputs\n" if @dup;
 	}
 
-	# materialise straight into the requested shape
-	my (@aoa, @aoh, %hoa, %hoh, %lseen);
-	if ($otype eq 'hoa') { $hoa{$_} = [] for @out_names }
-	for my $rk (@rorder) {
-		my @vals = @{ $rrepr{$rk} };              # index values
-		for my $cp (@colplan) {
-			my ($ck, $vv, $f) = @$cp;
-			my $raw = $bucket{$rk}{$ck}{$vv};
-			my $cell;
-			if (defined $raw && @$raw) {
-				my @def = grep { defined } @$raw;
-				$cell = _agg_reduce($f, $raw, \@def, $skipna);
-			}
-			$cell = $fill if !defined $cell && $has_fill;
-			push @vals, $cell;
-		}
-		if ($otype eq 'aoa') {
-			push @aoa, \@vals;
-		} elsif ($otype eq 'aoh') {
-			my %h; @h{ @out_names } = @vals; push @aoh, \%h;
-		} elsif ($otype eq 'hoa') {
-			push @{ $hoa{ $out_names[$_] } }, $vals[$_] for 0 .. $#out_names;
-		} else {                                  # hoh
-			my $label = @index
-				? join('.', map { defined $_ ? $_ : '' } @{ $rrepr{$rk} })
-				: 'all';
-			my $uniq = $label; my $j = 0;
-			while (exists $lseen{$uniq}) { $uniq = $label . '.' . (++$j) }
-			$lseen{$uniq} = 1;
-			my %h; @h{ @out_names } = @vals; $hoh{$uniq} = \%h;
-		}
-	}
-	return \@aoa if $otype eq 'aoa';
-	return \@aoh if $otype eq 'aoh';
-	return \%hoa if $otype eq 'hoa';
-	return \%hoh;
+	# combine, in XS: each row's cells reduced and laid straight out in the
+	# requested shape.  Up to 0.3424 this was perl, one reducer call per cell.
+	my %otype_code = ( aoa => 0, aoh => 1, hoa => 2, hoh => 3 );	# _pivot_combine's `otype`
+	return _pivot_combine($rrepr, \@rorder, $buckets, scalar @$crepr,
+		[ map { [ @{$_}[0 .. 2] ] } @colplan ], $how, $skipna, $has_fill ? 1 : 0, $fill,
+		$otype_code{$otype}, \@out_names, scalar @index);
 }
 
 # fillna($df, value => $scalar | { col => val, ... }, cols => \@cols)
@@ -5053,7 +4832,7 @@ sub fillna {
 	my @universe = colnames($df);
 	my %uni = map { $_ => 1 } @universe;
 
-	my (%fillmap, $scalar_fill, %tset, @targets);
+	my (%fillmap, $scalar_fill, @targets);
 	if ($per_col) {
 		%fillmap = %$value;
 		@targets = grep { $uni{$_} } keys %fillmap;   # ignore unknown dict keys
@@ -5070,77 +4849,12 @@ sub fillna {
 			@targets = @universe;
 		}
 	}
-	%tset = map { $_ => 1 } @targets;
-	my $tv = sub { $per_col ? $fillmap{ $_[0] } : $scalar_fill };
-
-	if ($shape eq 'AoH') {
-		my @out;
-		for my $row (@$df) {
-			unless (ref $row eq 'HASH') { push @out, $row; next }
-			my %h = %$row;
-			for my $c (@targets) { $h{$c} = $tv->($c) unless defined $h{$c} }
-			push @out, \%h;
-		}
-		return \@out;
-	}
-	if ($shape eq 'HoH') {
-		my %out;
-		for my $rk (keys %$df) {
-			my $row = $df->{$rk};
-			unless (ref $row eq 'HASH') { $out{$rk} = $row; next }
-			my %h = %$row;
-			for my $c (@targets) { $h{$c} = $tv->($c) unless defined $h{$c} }
-			$out{$rk} = \%h;
-		}
-		return \%out;
-	}
-	if ($shape eq 'HoA') {
-		my $R = 0;
-		for my $v (values %$df) { $R = @$v if ref $v eq 'ARRAY' && @$v > $R }
-		my %out;
-		for my $c (keys %$df) {
-			my $arr = ref $df->{$c} eq 'ARRAY' ? $df->{$c} : [];
-			if ($tset{$c}) {
-				my $fv = $tv->($c);
-				$out{$c} = [ map { defined $arr->[$_] ? $arr->[$_] : $fv } 0 .. $R - 1 ];
-			} else {
-				$out{$c} = [ @$arr ];
-			}
-		}
-		return \%out;
-	}
-	# AoA
-	my @out;
-	for my $row (@$df) {
-		unless (ref $row eq 'ARRAY') { push @out, $row; next }
-		my @r = @$row;
-		for my $c (@targets) {
-			$r[$c] = $tv->($c) if $c <= $#r && !defined $r[$c];
-		}
-		push @out, \@r;
-	}
-	return \@out;
-}
-
-# _fill_seq(\@vals, $dir, $limit) -> \@vals   (modifies in place)
-#
-# Propagate the last (dir=1, forward) or next (dir=-1, backward) defined value
-# over runs of undef.  With a defined `limit`, at most `limit` consecutive
-# undefs are filled per gap; the rest stay undef.  Not exported.
-sub _fill_seq {
-	my ($vals, $dir, $limit) = @_;
-	my $n = scalar @$vals;
-	my @idx = $dir > 0 ? ( 0 .. $n - 1 ) : reverse( 0 .. $n - 1 );
-	my ($last, $have, $run) = (undef, 0, 0);
-	for my $i (@idx) {
-		if (defined $vals->[$i]) {
-			$last = $vals->[$i]; $have = 1; $run = 0;
-		} elsif ($have) {
-			next if defined $limit && $run >= $limit;
-			$vals->[$i] = $last; $run++;
-		}
-	}
-	return $vals;
+	# the copy and the fill, in XS (_impute_xs), which up to 0.3424 was perl
+	# that called a closure for every cell of every target column
+	my %shape_code = ( AoH => 1, HoH => 2, AoA => 3, HoA => 4 );	# _impute_xs's `shape`
+	return _impute_xs($df, $shape_code{$shape}, [ @targets ], 0,
+		[ map { $per_col ? $fillmap{$_} : $scalar_fill } @targets ],
+		(undef) x 6);
 }
 
 # _impute_prop($df, $name, $dir, %opts) -- shared core of ffill/bfill.
@@ -5182,59 +4896,11 @@ sub _impute_prop {
 	} else {
 		@targets = @universe;
 	}
-	my %tset = map { $_ => 1 } @targets;
-
-	if ($shape eq 'AoH') {
-		my @out = map { ref $_ eq 'HASH' ? { %$_ } : $_ } @$df;
-		# Only the rows that are hashes take part, so a row that cannot be
-		# written neither breaks a gap nor counts against `limit`.
-		my @rows = grep { ref eq 'HASH' } @out;
-		for my $c (@targets) {
-			my @vals = map { $_->{$c} } @rows;
-			_fill_seq(\@vals, $dir, $limit);
-			for my $i (0 .. $#rows) {
-				$rows[$i]{$c} = $vals[$i] if defined $vals[$i];
-			}
-		}
-		return \@out;
-	}
-	if ($shape eq 'HoH') {
-		my @keys = sort keys %$df;
-		my %out = map {
-			$_ => ( ref $df->{$_} eq 'HASH' ? { %{ $df->{$_} } } : $df->{$_} )
-		} keys %$df;
-		my @rows = grep { ref eq 'HASH' } map { $out{$_} } @keys;   # as for AoH
-		for my $c (@targets) {
-			my @vals = map { $_->{$c} } @rows;
-			_fill_seq(\@vals, $dir, $limit);
-			for my $j (0 .. $#rows) {
-				$rows[$j]{$c} = $vals[$j] if defined $vals[$j];
-			}
-		}
-		return \%out;
-	}
-	if ($shape eq 'HoA') {
-		my %out;
-		for my $c (keys %$df) {
-			my $arr = ref $df->{$c} eq 'ARRAY' ? [ @{ $df->{$c} } ] : [];
-			_fill_seq($arr, $dir, $limit) if $tset{$c};
-			$out{$c} = $arr;
-		}
-		return \%out;
-	}
-	# AoA
-	my @out = map { ref $_ eq 'ARRAY' ? [ @$_ ] : $_ } @$df;
-	for my $c (@targets) {
-		# Only rows long enough to hold column $c take part (rows are not
-		# extended), so a short row neither breaks a gap nor counts against `limit`.
-		my @rows = grep { ref eq 'ARRAY' && $c <= $#$_ } @out;
-		my @vals = map { $_->[$c] } @rows;
-		_fill_seq(\@vals, $dir, $limit);
-		for my $i (0 .. $#rows) {
-			$rows[$i][$c] = $vals[$i] if defined $vals[$i];
-		}
-	}
-	return \@out;
+	# the copy and the fill, in XS (_impute_xs); up to 0.3424 perl, which
+	# copied each target column out of the rows, filled it and wrote it back
+	my %shape_code = ( AoH => 1, HoH => 2, AoA => 3, HoA => 4 );	# _impute_xs's `shape`
+	return _impute_xs($df, $shape_code{$shape}, [ @targets ], $dir, undef, $limit,
+		(undef) x 5);
 }
 
 # ffill($df, cols => \@cols, limit => $n)  -- forward-fill NA (last valid obs).
@@ -5339,7 +5005,6 @@ sub interpolate {
 	} else {
 		@targets = @universe;
 	}
-	my %tset = map { $_ => 1 } @targets;
 
 	# x coordinate: arrayref, or a column key whose values are the coordinates
 	my ($x_is_col, $x_col);
@@ -5379,42 +5044,11 @@ sub interpolate {
 		}
 		return \@x;
 	};
-	# shape dispatch mirrors _impute_prop (ffill/bfill).  The per-column numeric
-	# fill (all methods, the dense solve, the preserve mask) is done in XS by
-	# _interp_column_xs, which modifies the extracted @vals in place.
-	# shape dispatch mirrors _impute_prop (ffill/bfill)
-	if ($shape eq 'AoH') {
-		my @out = map { ref $_ eq 'HASH' ? { %$_ } : $_ } @$df;
-		my $xcolseq = $x_is_col ? [ map { ref $_ eq 'HASH' ? $_->{$x_col} : undef } @out ] : undef;
-		my $coords = $mkcoords->(scalar @out, $xcolseq);
-		for my $c (@targets) {
-			my @vals = map { ref $_ eq 'HASH' ? $_->{$c} : undef } @out;
-			_interp_column_xs(\@vals, $coords, $method, $order, $dir, $limit, $area);
-			for my $i (0 .. $#out) {
-				next unless ref $out[$i] eq 'HASH';
-				$out[$i]{$c} = $vals[$i] if defined $vals[$i];
-			}
-		}
-		return \@out;
-	}
-	if ($shape eq 'HoH') {
-		my @keys = sort keys %$df;
-		my %out = map {
-			$_ => ( ref $df->{$_} eq 'HASH' ? { %{ $df->{$_} } } : $df->{$_} )
-		} keys %$df;
-		my $xcolseq = $x_is_col ? [ map { ref $out{$_} eq 'HASH' ? $out{$_}{$x_col} : undef } @keys ] : undef;
-		my $coords = $mkcoords->(scalar @keys, $xcolseq);
-		for my $c (@targets) {
-			my @vals = map { ref $out{$_} eq 'HASH' ? $out{$_}{$c} : undef } @keys;
-			_interp_column_xs(\@vals, $coords, $method, $order, $dir, $limit, $area);
-			for my $j (0 .. $#keys) {
-				my $rk = $keys[$j];
-				next unless ref $out{$rk} eq 'HASH';
-				$out{$rk}{$c} = $vals[$j] if defined $vals[$j];
-			}
-		}
-		return \%out;
-	}
+	# The numeric fill (every method, the dense solve, the preserve mask) is
+	# _interp_column_xs's.  A HoA's columns go to it whole; the rows of the
+	# other shapes are copied and their target columns filled by _impute_xs,
+	# which up to 0.3424 was perl that copied each column out of the rows and
+	# wrote it back.
 	if ($shape eq 'HoA') {
 		my %out;
 		for my $c (keys %$df) {
@@ -5430,19 +5064,15 @@ sub interpolate {
 		}
 		return \%out;
 	}
-	# AoA
-	my @out = map { ref $_ eq 'ARRAY' ? [ @$_ ] : $_ } @$df;
-	my $xcolseq = $x_is_col ? [ map { ref $_ eq 'ARRAY' ? $_->[$x_col] : undef } @out ] : undef;
-	my $coords = $mkcoords->(scalar @out, $xcolseq);
-	for my $c (@targets) {
-		my @vals = map { ref $_ eq 'ARRAY' ? $_->[$c] : undef } @out;
-		_interp_column_xs(\@vals, $coords, $method, $order, $dir, $limit, $area);
-		for my $i (0 .. $#out) {
-			next unless ref $out[$i] eq 'ARRAY';
-			$out[$i][$c] = $vals[$i] if $c <= $#{ $out[$i] } && defined $vals[$i];
-		}
-	}
-	return \@out;
+	# AoH, HoH, AoA: one coordinate per row, in the order the rows are filled
+	my $rows = $shape eq 'HoH' ? [ map { $df->{$_} } sort keys %$df ] : $df;
+	my $xcolseq = !$x_is_col       ? undef
+	            : $shape eq 'AoA'  ? [ map { ref $_ eq 'ARRAY' ? $_->[$x_col] : undef } @$rows ]
+	            :                    [ map { ref $_ eq 'HASH'  ? $_->{$x_col} : undef } @$rows ];
+	my $coords = $mkcoords->(scalar @$rows, $xcolseq);
+	my %shape_code = ( AoH => 1, HoH => 2, AoA => 3 );	# _impute_xs's `shape`
+	return _impute_xs($df, $shape_code{$shape}, [ @targets ], 2, undef, $limit,
+		$coords, $method, $order, $dir, $area);
 }
 
 # _tukey_col($data, $col) -- pull one column's cells, in row order, from any
@@ -5466,19 +5096,9 @@ sub _tukey_col {
 	die 'TukeyHSD: unsupported data shape';
 }
 
-# table_one: a stratified descriptive "Table 1"
-# Classify a column's non-missing values: 'continuous' if every one looks
-# numeric, else 'categorical'.
-sub _t1_classify {
-	my ($vals) = @_;
-	my $any = 0;                     # 0 = no defined value seen yet
-	for (@$vals) {
-		next unless defined;
-		return 'categorical' unless looks_like_number($_);
-		$any = 1;
-	}
-	return $any ? 'continuous' : 'categorical';
-}
+# table_one: a stratified descriptive "Table 1".  A variable whose type is not
+# given is continuous when every defined cell looks like a number and one is
+# defined, and otherwise categorical (_t1_col in LikeR.xs decides).
 
 # p-value + test label for a continuous variable across >=2 groups.
 # @$byg is one arrayref of (numeric, defined) values per group.  Returns
@@ -5597,36 +5217,30 @@ sub table_one {
 		@gidx   = (0) x $R;
 	}
 
+	# Each variable's pass over the rows is _t1_col (LikeR.xs): a continuous
+	# one's numbers by group, a categorical one's level counts by group.  Up to
+	# 0.3424 that pass was perl, over a copy of the column.
+	my ($t1_kind, $t1_src) = $shape eq 'HoA' ? ( 4, undef )
+	                       : $shape eq 'AoA' ? ( 3, $rows )
+	                       :                   ( 1, $rows );	# _t1_col's `kind`
 	my @out;
 	for my $v (@vars) {
-		my ($vc) = _frame_cols($df, $shape, [$v], $rows);
-		my $vals = $vc->{$v};
-		my $type = $types{$v} || _t1_classify($vals);
+		my $src = $shape eq 'HoA' ? ( ref $df->{$v} eq 'ARRAY' ? $df->{$v} : undef ) : $t1_src;
+		my ($type, $per, $allv) = @{ _t1_col($src, $t1_kind, $v, \@gidx, scalar @groups, $R, $types{$v}) };
 
 		if ($type eq 'continuous') {
 			my %row = (variable => $v, level => '', type => 'continuous');
-			# One pass in row order, so each group's values and the Overall
-			# ones keep the order they had, and with it mean()'s and sd()'s
-			# last bit.  Each value is made a number once, here: mean(), sd()
-			# and the test used to read copies of the cell, and each copy of a
-			# numeric string was parsed again.
-			my @byg = map { [] } @groups;
-			my @allv;
-			for my $r (0 .. $R - 1) {
-				my $x = $vals->[$r];
-				next unless defined $x && looks_like_number($x);
-				my $num = 0 + $x;
-				push @{ $byg[ $gidx[$r] ] }, $num;
-				push @allv, $num;
-			}
+			# The numbers keep their row order, and with it mean()'s and sd()'s
+			# last bit; each is `0 + $cell`, made once.
+			my @byg = @$per;
 			for my $gi (0 .. $#groups) {
 				my $gv = $byg[$gi];
 				$row{ $groups[$gi] } = @$gv
 					? sprintf('%.*f (%.*f)', $digits, mean($gv), $digits, @$gv > 1 ? sd($gv) : 0)
 					: '';
 			}
-			$row{Overall} = @allv
-				? sprintf('%.*f (%.*f)', $digits, mean(\@allv), $digits, @allv > 1 ? sd(\@allv) : 0)
+			$row{Overall} = @$allv
+				? sprintf('%.*f (%.*f)', $digits, mean($allv), $digits, @$allv > 1 ? sd($allv) : 0)
 				: '';
 			if (defined $by && @groups >= 2) {
 				($row{'p_value'}, $row{test}) = _t1_cont_p(\@byg, $nonpar);
@@ -5634,23 +5248,11 @@ sub table_one {
 			push @out, \%row;
 		}
 		else {
-			# One pass over the rows counts every (group, level) pair; the
-			# Overall count of a level is the sum over the groups, since every
-			# row is in exactly one.  Up to 0.3217 a string was built for every
-			# row and counted twice, and the levels listed came from the cells
-			# themselves, so a column shorter than the frame counted its rows
-			# past the end as NA without listing an NA row; they are listed now.
-			#
-			# Before that the counts came from a `grep` over a group's rows for
-			# each (level, group) pair -- run twice -- plus one more scan of
-			# every row per level for the Overall column: O(levels x groups x
-			# rows), which on 20000 rows cost 0.021s at 5 levels against 0.120s
-			# at 40.
-			my @gcnt = map { {} } @groups;   # $gcnt[$gi]{$level} = rows in that group
-			for my $r (0 .. $R - 1) {
-				my $x = $vals->[$r];
-				$gcnt[ $gidx[$r] ]{ defined $x ? $x : 'NA' }++;
-			}
+			# Every (group, level) pair is counted in one pass; the Overall
+			# count of a level is the sum over the groups, since every row is
+			# in exactly one.  A column shorter than the frame counts its rows
+			# past the end as NA.
+			my @gcnt = @$per;                # $gcnt[$gi]{$level} = rows in that group
 			my %allcnt;
 			for my $c (@gcnt) { $allcnt{$_} += $c->{$_} for keys %$c }
 			my @levels = keys %allcnt;
@@ -6701,7 +6303,7 @@ Stats::LikeR - Get basic statistical functions, like in R, but with Perl using X
 
 =head1 VERSION
 
-version 0.3424
+version 0.3425
 
 =head1 Synopsis
 

@@ -625,7 +625,8 @@ element are in no stack.
 
 The I<box> of a stack is the smallest box that holds the boxes of the
 display lines of its leaves, as C<bbox> gives them.  In the default
-layout it is the box of the block.
+layout it is the box of the block, less the room of the frames (see
+below) on each side.
 
 B<Numbers.>  A number is drawn in binary, as one I<stroke> for each
 bit that is set:
@@ -668,10 +669,14 @@ reports it (see L<What else is in the widget?>): 0 if both leaves have
 the same parent, 1 if their parents are different children of one
 node, and so on.  If I<s> is 0, nothing is drawn.  Otherwise I<s> is
 drawn as horizontal lines across the box of the stack, from its left
-side to its right side.  The lines start on the top row of pixels of
-the lower leaf, that is, of its first display line, and go down: the
-stroke of the lowest bit that is set comes first, and the strokes of
-the higher bits follow one under another.
+side to its right side.  The lines take room (since 2.10): the lower
+leaf is below the upper one by the I<room> of the lines (see the
+frames below for the room of a number; with two halves, the room of
+the larger), and the lines go down from the first row of that room:
+the stroke of the lowest bit that is set comes first, and the strokes
+of the higher bits follow one under another.  So the last row of the
+lines is right above the lower leaf, that is, above its first display
+line.
 
 In a ragged tree (see L<Ragged trees>) I<s> is the depth in the
 uniform tree that the widget keeps, and the two leaves may have
@@ -743,18 +748,27 @@ is the innermost frame, and the strokes of the higher bits are further
 out, so that two frames 1 pixel wide are 2 pixels apart.  The dots or
 dashes of a frame start at its top left corner.
 
-B<What they are not.>  The lines and frames take no room: the block
-and its leaves are laid out exactly as without them, and C<bbox>,
-C<dlineinfo> and the pointer do not see them.  They are made anew at
-every layout of the block.  They are drawn under the text of the
-block, as the ornaments of the block with C<-layer under> are (see
-L<Ornaments of blocks>), and before all of those.  As those, they are
-clipped to the display line of the block and to the text area of the
-widget: where a stack reaches the top, the bottom, the left end or the
-right end of its display line, that side of its frames is outside and
-is not drawn.  (A block that is as high as its line reaches the top
-and the bottom of the line, unless the line has space above and below
-it: C<-spacing1>, C<-spacing3>.)  They are not ornaments of the
+The frames take room (since 2.10): the I<room> of I<n> is the number
+of pixels from the box of the stack to the outermost pixel of its
+frames, the widths of the strokes and one pixel between two of them
+(1 for I<n> = 1, 2 or 4, 3 for 3, 5 for 9).  In the default layout
+the leaves move in by the room, and the block is bigger by it on each
+side: the outermost frame is on the edge of the box of the block.
+Under a layout callback, a child that will be a stack with frames is
+reported to the callback bigger by the room on each side, and its
+leaves go the room in from each side of the box the callback gives it
+(see L<Layout callback>); a callback that places children by the sizes
+it is given leaves the room.
+
+B<What they are not.>  C<bbox>, C<dlineinfo> and the pointer do not
+see the lines and frames, only the room they take.  They are made anew
+at every layout of the block.  They
+are drawn under the text of the block, as the ornaments of the block
+with C<-layer under> are (see L<Ornaments of blocks>), and before all
+of those.  As those, they are clipped to the display line of the block
+and to the text area of the widget; since they take room, they are
+inside the box of the block (unless a layout callback gives a stack
+less room than it was told).  They are not ornaments of the
 program: C<ornament names> does not list them.
 
 The option C<-splitlines> of the type of the block (see C<block
@@ -809,6 +823,17 @@ form as a single leaf. In this case the I<repeat count> above can be
 bigger than 1.
 
 =back
+
+The split lines and frames take room (see L<Split lines and
+frames>), and the sizes reported hold it (since 2.10; without the
+split lines, C<-splitlines 0>, there is no room).  A group of several
+leaves (a I<repeat count> above 1) is as high as its leaves with the
+room of the lines between them; it is placed as a whole, so the leaves
+keep that room.  A child (a leaf, or a group) that will have frames
+when laid out as given is reported bigger by the room of its frames on
+each side: its width, I<total width> and height by twice the room, its
+baseline by the room.  The box the callback returns for it holds the
+frames, and the widget puts its leaves the room in from each side.
 
 B<Summary:>
 
@@ -1951,11 +1976,28 @@ modified>, as insertions and deletions do, with C<-undo> off too
 that highlights can keep the flag with C<edit modified> around the
 calls.
 
+The setting of a value (C<block data>, C<block nodedata>, C<mark
+data>, C<tag data>; since 2.10, before only inside an edit step) is
+recorded too: the value the place had goes into the undo step instead
+of being freed, the undo gives it back and takes the value that was
+set into the step, and the redo exchanges them again (see L<Undo and
+redo> in L<Values>).  A set that changes nothing (no value there and
+none given) is not recorded.  With C<-autoseparators> a setting joins
+the undo step that is open, without ending it: a value that a program
+gives what the user's edit made (a new leaf told C<new>, say) is
+undone with that edit, and typing on around it stays one step.  Where
+no step is open (after C<edit undo>, C<edit redo>, C<edit reset>, the
+end of an edit step, a C<block> command), a setting starts one, which
+the settings after it join and the next edit ends.  A setting moves no
+text, so it does not drop the steps that can be redone; and it does
+not count for C<edit modified>, nor do its undo and redo.  A program
+that sets values it does not want in the history (a cache, say) can
+switch C<-undo> off around those calls.
+
 Not recorded (so not undone, and what they drop is freed when they
 return): C<tag delete>, C<tag configure>, C<mark set>, C<mark unset>,
-C<block delete>, C<block configure>, and, outside an edit step, the
-setting of values (C<block data>, C<block nodedata>, C<mark data>,
-C<tag data>).
+C<block delete>, C<block configure>, and, with C<-undo> off, the
+setting of values.
 
 =head2 Several changes as one undo step
 
@@ -1963,8 +2005,8 @@ One edit of the user is often several commands: a block is made with
 C<block insert>, then gets its instance data, its separators and the
 values of its nodes; a selection is replaced by a deletion and an
 insertion; two pieces are exchanged by two cuts and two pastes.  With
-C<-autoseparators> each change of another kind is an undo step, and a
-value set is not recorded at all.
+C<-autoseparators> each change of another kind is an undo step (a
+value set joins the step that is open).
 
   .t edit step begin
   ...
@@ -1983,11 +2025,9 @@ and C<edit separator> does nothing;
 =item *
 
 the setting of a value (C<block nodedata>, C<tag data>, C<mark data>,
-C<block data>) is recorded, with C<-undo> on: the value the place had
-goes into the undo step instead of being freed, the undo gives it back
-and takes the value that was set into the step, and the redo
-exchanges them again.  A set that changes nothing (no value there and
-none given) is not recorded.
+C<block data>) is recorded as outside a step, with C<-undo> on (see
+L<Undo and redo of block and tag changes>; before 2.10 only inside a
+step), and belongs to the step.
 
 =back
 
@@ -2265,7 +2305,8 @@ C<[name, value]> (see L<What else is in the widget?>).
 
 =head2 When values are freed
 
-A node value is freed when it is replaced (or set to C<undef>), when
+A node value is freed when it is replaced (or set to C<undef>; with
+C<-undo> on it waits in the undo step instead, see below), when
 its node is deleted, when its block is deleted or dissolved, when it
 loses a join (deletion, C<block insert>), when C<block trim> drops it,
 when C<block insert> empties its node, and when the widget is
@@ -2276,8 +2317,8 @@ C<undef>), when all the text of the run is deleted, when C<tag remove>
 covers the whole run, when C<tag delete> removes the tag, when it
 loses a merge, and when the widget is destroyed.  With C<-undo> on,
 the edits that can be undone (insertions, deletions, C<block insert>,
-C<block split>, C<block trim>, C<tag add>, C<tag remove>) do not free
-what they drop: it is kept by their undo step (L<Undo and redo>), and
+C<block split>, C<block trim>, C<tag add>, C<tag remove>, the setting
+of values) do not free what they drop: it is kept by their undo step (L<Undo and redo>), and
 freed when the step is discarded.  Nothing
 else frees a value: in particular, setting other values, tag
 configuration, moves of marks and unrelated edits do not.
@@ -2448,10 +2489,12 @@ their depth, and the runs as separate runs again), then gives every
 value back to the node, run or block at its address, and moves back
 the values a join moved.  C<edit redo> takes them into the step again.  The undo of
 an insertion and its redo do the same.  A value the undo finds on the
-node or run it gives a value back to (one set after the edit, or of a
-run made since and merged with the restored one) is not freed either:
+node or run it gives a value back to (one set after the edit with
+C<-undo> off, or of a run made since and merged with the restored one;
+a value set with C<-undo> on is in the history, and its undo comes
+first) is not freed either:
 it waits in the step, and the redo gives it back.  So does a value
-set after a deletion on a leaf made of what was left of a block the
+set (with C<-undo> off) after a deletion on a leaf made of what was left of a block the
 deletion dissolved, also when that block was nested in another one:
 the undo re-creates the block, and the value waits in the step with
 the place the leaf has in the text without the deleted range, where
@@ -2466,11 +2509,14 @@ and when the widget is destroyed.
 Marks need no records: the undo moves an existing mark back with its
 value.  C<block insert>, C<block split>, C<block trim>, C<tag add> and
 C<tag remove> keep what they drop in their undo steps in the same way
-(see L<Undo and redo of block and tag changes>).  C<tag delete>,
-C<mark unset> and the setting of values are not undoable, so the
-values they drop are freed when they return; but a value set inside
-an edit step is recorded, and the value it replaces waits in the undo
-step (see L<Several changes as one undo step>).
+(see L<Undo and redo of block and tag changes>).  C<tag delete>
+and C<mark unset> are not undoable, so the values they drop are freed
+when they return.  The setting of a value is recorded with C<-undo> on
+(since 2.10; before, only inside an edit step): the value it replaces
+waits in the undo step, the undo gives it back, the redo sets the new
+one again (see L<Undo and redo of block and tag changes> for how
+settings join the undo steps).  With C<-undo> off, the value replaced
+is freed when the command returns.
 
 The redo of an insertion re-inserts it exactly: when the insertion is
 undone, the inserted range is recorded in block-list form, as a
@@ -2720,8 +2766,9 @@ destroy the widget.
 
 Nothing is told when the widget is destroyed (its values are freed
 then, see L<When values are freed>), nor about values that have no
-Perl part (in a widget built with representation B, a container that
-holds only other slots).  Without the option nothing of this runs: no
+Perl part (in a widget built as value=C-array, with
+C<ETEXT_DATA_ARRAYS=1 perl Makefile.PL>, a container that holds only
+other slots).  Without the option nothing of this runs: no
 look-ahead, no table.
 
 B<The ready-made callback.>  With

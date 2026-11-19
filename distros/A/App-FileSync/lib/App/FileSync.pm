@@ -4,43 +4,14 @@ package App::FileSync;
 # byte-transparent JSON, path and id validation, conflict-copy naming, date
 # parsing and (re-exported from App::FileSync::IO) atomic file writes.
 
-# TODO: from the 0.002.0 gap analysis.  Pre-release blockers first.
-#
-# Behaviour that is silently wrong or inconsistent:
-# TODO: trash retention of 0 means different things on each side: the client's
-#	local_trash_days 0 keeps trash forever (Client.pm, "//"), the server's
-#	trash_days 0 silently becomes 30 days (Store.pm prune_trash, "||").
-#	Pick one meaning, document it, add a regression test.
-# TODO: document for users that 0 switches off --max-deletes and
-#	--max-delete-percent (only Merge's internal POD says so; not the help
-#	text, the admin POD or website/html/commands.html).
-# TODO: give --max-delete-percent an upper bound of 100 (150 is accepted).
-# TODO: Params::Validate::Strict failures bypass the catalogue and name the
-#	internal parameter ('trash_days') instead of the option (--trash-days).
-# TODO: I18N::warning is exported but never called or tested, and its
-#	trailing "\n" to carp puts the location on its own line, unlike its
-#	FORMAL SPECIFICATION.  Test and fix it, or remove it.
-#
-# Failure and rollback paths no test runs:
-# TODO: Delta past the 8 MiB scan window (the literal tail loop in diff):
-#	large-file deltas are unverified; "local $SCAN_LIMIT" makes it cheap.
-# TODO: Snapshot rollback: a failed build should remove its temp directory.
-# TODO: IO::write_atomic failure (a full disk): the temp file is discarded.
-# TODO: Scan::clean_stale_temps never deletes a stale temp in any test.
-# TODO: type changes: moving a directory into the trash (Trash::move_to_trash)
-#	and replacing a directory with a file (IO::clear_target).
-# TODO: the admin root-not-writable path in Admin::repo_create.
-#
-# Commands and APIs with no tests:
-# TODO: filesync-admin "repo show" and "client list" (Admin::repo_show,
-#	Admin::client_list) never run, in-process or through the CLI.
-# TODO: Protocol::close, Transport::SSH::command and exit_status,
-#	Transport::Local::error_text, Store::root and Store::repo.
-# TODO: the extra_args check in Transport::SSH->new has never run.
+# TODO: open work from the 0.002.0 gap analysis.  None of it blocks a
+#	release: 0.002.1 and 0.002.2 shipped with it.
 #
 # Mutation testing:
-# TODO: the 80% score is 10 mutants, all in Platform.pm.  Mutation-test Merge,
-#	Delta, the server's %MAY table and the deletion guard.
+# TODO: Server.pm's remaining survivors (about 80 of its 154 mutants) all
+#	negate or undef a return value nothing reads: _loop discards every
+#	command handler's, and the upload, journal and _reply helpers' callers
+#	ignore theirs.  Either test them white-box or stop promising "returns 1".
 # TODO: kill the two survivors: nothing checks the return value of
 #	Platform::use_plain_end_of_scope_hook.
 #
@@ -52,8 +23,6 @@ package App::FileSync;
 #	bytes, and NFC and NFD forms of a name are different files.
 # TODO: warn when the client cache is damaged: the run silently re-hashes
 #	every file (no data is at risk; the merge base is on the server).
-# TODO: remove the unused message key word.snapshot, and make t/locales.t
-#	report unused keys as well as missing ones.
 #
 # Post-release roadmap: features.
 # TODO: incremental manifests (a change journal or Merkle summary), so an
@@ -69,8 +38,11 @@ package App::FileSync;
 # TODO: a conflict review command to list and resolve conflict copies.
 #
 # Post-release roadmap: technical debt.
-# TODO: widen mutation testing (Merge, Delta, Server, Trash first) and gate CI
-#	on condition coverage (57% now).
+# TODO: mutation-test Trash, Store and Client next (Merge, Delta and Server
+#	are done, and t/mutation.t holds them to their scores), and gate CI
+#	on condition coverage (57% now).  CI's mutation workflow is shared by
+#	every repo and pins App::Test::Generator 0.50, which drops every
+#	module that loads another App::FileSync module; it needs 0.51.
 # TODO: pipeline the protocol: one request in flight bounds throughput by the
 #	round-trip time.
 # TODO: stream the plan as JSON lines instead of one huge line, which also
@@ -79,8 +51,6 @@ package App::FileSync;
 #	power cut.
 # TODO: an optional native rolling checksum (Inline::C or XS) to lift the
 #	8 MiB scan window; pure Perl manages about 2.5 MB/s when nothing matches.
-# TODO: one validation error layer that turns Params::Validate::Strict
-#	failures into catalogue messages naming the CLI option.
 
 use App::FileSync::Platform;
 
@@ -100,7 +70,7 @@ use App::FileSync::Constants qw($MAX_ID_LENGTH $SECONDS_PER_DAY);
 use App::FileSync::I18N qw(message throw);
 use App::FileSync::IO qw(write_atomic read_text set_mtime);
 
-use version; our $VERSION = version->declare('0.002.1');
+use version; our $VERSION = version->declare('0.002.2');
 
 our @EXPORT_OK = qw(
 	json_encode json_decode
@@ -182,7 +152,7 @@ App::FileSync - cron-driven file synchronisation without a daemon
 
 =head1 VERSION
 
-0.002.1
+0.002.2
 
 =head1 SYNOPSIS
 

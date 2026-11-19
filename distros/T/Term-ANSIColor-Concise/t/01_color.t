@@ -179,6 +179,17 @@ SKIP: {
     skip $@ =~ s/\)\K.*//r, 1 if $@;
 }
 
+# T is the color of the terminal, the default one: 39, and 49 for the
+# background.  There is one for both cases.
+is(ansi_code("T"),   "\e[39m", "T - the default color");
+is(ansi_code("t"),   "\e[39m", "t is the same");
+is(ansi_code("/T"),  "\e[49m", "/T - the default background");
+is(ansi_code("/t"),  "\e[49m", "/t is the same");
+is(ansi_code("R/T"), "\e[31;49m", "R/T");
+is(ansi_code("T/W"), "\e[39;47m", "T/W");
+is(ansi_code("DT/L24"), "\e[1;39;48;5;255m", "with others");
+is(ansi_color("/T", "text"), "\e[49m"."text".RESET, "ansi_color");
+
 done_testing;
 
 sub ansi_end {

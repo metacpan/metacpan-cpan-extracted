@@ -124,6 +124,28 @@ subtest 'a corrupt/truncated archive is survived, not fatal' => sub {
   ok((grep {m{sibling\.txt$}} keys %{$j->{unpacked}}), 'sibling file still unpacked');
 };
 
+subtest 'a tarball with directories lacking u+wx is fully unpacked' => sub {
+  my $tmp = tempdir("FU_11p_XXXXXX", TMPDIR => 1, CLEANUP => 1);
+  my $src = tempdir("FU_11q_XXXXXX", TMPDIR => 1, CLEANUP => 1);
+  mkdir "$tmp/package";
+  mkdir "$tmp/package/lib";
+  write_file("$tmp/package/lib/png.js", "module.exports = 1;\n");
+  write_file("$tmp/package/README",     "readme\n");
+
+  # Leaving package/lib before its file is what makes tar apply the mode too early (pngjs-5.0.0.tgz)
+  my $members = 'package package/lib package/README package/lib/png.js';
+  system('/bin/sh', '-c', "cd '$tmp' && tar --mode=0666 --no-recursion -cf '$src/pngjs.tar' $members") == 0
+    or plan skip_all => 'tar --mode failed';
+
+  my $log;
+  my $dest = tempdir(CLEANUP => 1);
+  my $u    = File::Unpack2->new(destdir => $dest, verbose => 0, logfile => \$log, world_readable => 1);
+  ok(guarded(30, sub { $u->unpack("$src") }), 'unpack() returned');
+  my $j = eval { JSON::from_json($log) };
+  ok(!(grep { $_->{failed} } values %{$j->{unpacked}}), 'tar did not fail');
+  ok((grep {m{package/lib/png\.js$}} keys %{$j->{unpacked}}), 'file below the u-x directory was unpacked');
+};
+
 subtest 'lzma-family helpers carry --memlimit-decompress' => sub {
   my $u = File::Unpack2->new(destdir => tempdir(CLEANUP => 1), verbose => 0, logfile => '/dev/null');
   my $h = $u->find_mime_helper('application/xz');

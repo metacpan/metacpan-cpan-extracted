@@ -1,7 +1,7 @@
 package Review::Helper::CLI::Export;
 use v5.36;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use File::Basename qw/dirname/;
 use File::Path qw/make_path/;

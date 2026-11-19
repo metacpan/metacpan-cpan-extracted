@@ -8,6 +8,8 @@ use FindBin qw($Bin);
 
 use lib 't/lib';
 use TestSync;
+use App::FileSync::Admin;
+use App::FileSync::Config;
 
 my $T0 = 1_700_000_000;
 my $admin = File::Spec->catfile($Bin, '..', 'bin', 'filesync-admin');
@@ -369,6 +371,65 @@ sub copies_named {
 	is($forced->{summary}{pushed}, 0, 'the replica still pushes nothing');
 	is_deeply(files_only($env, $env->{client}), [],
 		'the explicitly forced mirror is now empty');
+}
+
+
+# ------------------------------------------------------------- client list
+# filesync-admin client list: the admitted clients, sorted, with their role
+# and whether the server holds a base for them (they have synced).
+{
+	my $env = TestSync->new_env();	# admits test-1 as a client
+	my $api = App::FileSync::Admin->new(root => $env->{server});
+	my $list = sub { scalar `$^X $admin --root $env->{server} client list --repo docs 2>&1` };
+
+	is_deeply($api->client_list('docs'), [ { client => 'test-1', role => 'client', base => 0 } ],
+		'before any sync: the client, with no base');
+	like($list->(), qr/\Atest-1 {19}client {3}never synced\n\z/, 'and the command says it never synced');
+
+	$env->sync();
+	$api->client_allow(repo => 'docs', client => 'backup', role => 'replica');
+	$api->client_allow(repo => 'docs', client => 'alpha');
+	is_deeply($api->client_list('docs'), [
+		{ client => 'alpha',  role => 'client',  base => 0 },
+		{ client => 'backup', role => 'replica', base => 0 },
+		{ client => 'test-1', role => 'client',  base => 1 },
+	], 'sorted by id, with each role, and test-1 has a base after its sync');
+	is($list->(), join('', map { sprintf "%-24s %-8s %s\n", @{$_} }
+		[ alpha => client => 'never synced' ], [ backup => replica => 'never synced' ], [ 'test-1' => client => 'has synced' ]),
+		'the command prints one aligned row each');
+	is($?, 0, 'and exits 0');
+
+	# A hand-edited policy: an entry that is not a hash takes the default
+	# role, and an id that is not one is listed without a base, not fatal.
+	my $policy = App::FileSync::Config::load_repo($env->{server}, 'docs');
+	$policy->{clients}{'odd'} = 1;
+	$policy->{clients}{'../bad'} = { role => 'replica' };
+	App::FileSync::Config::save_repo($env->{server}, 'docs', $policy);
+	my %by_id = map { $_->{client} => $_ } @{ $api->client_list('docs') };
+	is_deeply($by_id{odd}, { client => 'odd', role => 'client', base => 0 }, 'a non-hash entry is a client');
+	is_deeply($by_id{'../bad'}, { client => '../bad', role => 'replica', base => 0 }, 'a bad id is listed without a base');
+
+	# Forgetting a client keeps it admitted but drops its base.
+	$api->client_forget(repo => 'docs', client => 'test-1');
+	is($by_id{'test-1'}{base}, 1, 'test-1 had a base');
+	is((grep { $_->{client} eq 'test-1' } @{ $api->client_list('docs') })[0]{base}, 0, 'and has none after client forget');
+}
+
+{
+	my $env = TestSync->new_env();
+	my $api = App::FileSync::Admin->new(root => $env->{server});
+
+	# An empty table admits every client; the command says none are registered.
+	my $policy = App::FileSync::Config::load_repo($env->{server}, 'docs');
+	$policy->{clients} = {};
+	App::FileSync::Config::save_repo($env->{server}, 'docs', $policy);
+	is_deeply($api->client_list('docs'), [], 'no admitted clients: an empty list');
+	is(scalar `$^X $admin --root $env->{server} client list --repo docs 2>&1`, "No clients registered for docs\n", 'and the command says so');
+
+	throws_ok { $api->client_list('nope') } qr/No such repo 'nope'/, 'an unknown repo is config.no_repo';
+	my $out = `$^X $admin --root $env->{server} client list 2>&1`;
+	isnt($? >> 8, 0, 'client list without --repo fails');
+	like($out, qr/client list: --repo is required/, 'and says --repo is required');
 }
 
 done_testing();

@@ -127,6 +127,7 @@ for my $name (@highlighter) {
             [ 'a.c',      "int x = 1; /* c */\n\nint y;\n" ],
             [ 'a.pm',     "package A;\nmy \$x = 1; # c\n" ],
             [ 'Makefile', "all: # c\n\techo done\n" ],
+            [ 'cpanfile', "requires 'perl', '5.016'; # c\n" ],
             [ 'noext',    "#!/bin/bash\necho hello # c\n" ],
             [ 'env',      "#!/usr/bin/env perl\nmy \$x = 1; # c\n" ],
         ) {

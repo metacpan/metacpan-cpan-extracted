@@ -26,7 +26,7 @@ BEGIN {
 
 # Quoted, not the bare number: a numeric version is stringified through %g,
 # so 0.20 would become "0.2" and compare as older than "0.15" on CPAN.
-our $VERSION = '0.195';
+our $VERSION = '0.1961';
 
 use Cwd 'getcwd';
 use Digest::MD5 'md5_hex';
@@ -38,7 +38,7 @@ use File::Find ();
 use File::Path ();
 use File::Spec;
 use File::Temp ();
-use List::Util qw(max min);
+use List::Util qw(max min sum);
 use POSIX ();
 use Scalar::Util 'openhandle';
 use Storable ();
@@ -2193,12 +2193,15 @@ sub report {
 	my %opt = @_;
 	my @accepted = (
 		'html',  # the file to write the page to
+		'svg',   # the file to write the flow diagram to, as an SVG image
 		'title', # the page's title; by default, "SimpleFlow report"
 		'trace', # the trace file to read, as "trace_fh" wrote it
 	);
 	my @unknown = grep { my $key = $_; not grep { $_ eq $key } @accepted } sort keys %opt;
 	die 'report() does not accept ' . join(', ', map { "\"$_\"" } @unknown) if scalar @unknown > 0;
-	foreach my $key ('trace', 'html') {
+	# "html" was required until 0.196; now either output will do, or both
+	die 'report() needs "html" or "svg", a file name to write' if (not defined $opt{html}) && (not defined $opt{svg});
+	foreach my $key ('trace', grep { defined $opt{$_} } 'html', 'svg') {
 		die "report() needs \"$key\", a file name" if (not defined $opt{$key}) || (ref $opt{$key} ne '') || ($opt{$key} eq '');
 	}
 	my $title = $opt{title} // 'SimpleFlow report';
@@ -2233,9 +2236,17 @@ sub report {
 		$task->{_status} = $label{ $task->{'will.do'} // '' } // ($task->{'will.do'} // 'unknown');
 		$count{ $task->{_status} }++;
 	}
-	my @summary = map { ($count{$_} // 0) . ' ' . (($_ eq 'dry run') ? 'dry runs' : lc $_) }
-		grep { ($_ ne 'dry run') || $count{$_} } 'done', 'skipped', 'FAILED', 'dry run';
-	my $summary = scalar(@tasks) . ' tasks: ' . join(', ', @summary);
+	# The four statuses task() writes, then any other, from a trace it did not
+	# write, under its own name. Until 0.196 the others were counted but not
+	# shown, and "3 tasks: 1 done, 0 skipped, 0 failed" did not add up. The
+	# tasks and dry runs are counted in the singular for one: until 0.196,
+	# "1 tasks" and "1 dry runs".
+	my %noun = ('FAILED' => 'failed');
+	my @other = sort grep { not exists $class{$_} } keys %count;
+	my @summary = map { my $k = $count{$_} // 0; "$k " . ($noun{$_} // $_) . ((($_ eq 'dry run') && ($k != 1)) ? 's' : '') }
+		(grep { ($_ ne 'dry run') || $count{$_} } 'done', 'skipped', 'FAILED', 'dry run'), @other;
+	my $summary = scalar(@tasks) . ((scalar @tasks == 1) ? ' task: ' : ' tasks: ') . join(', ', @summary);
+	my ($flow, $links) = _flow_svg(\@tasks, \%class);
 	# the timeline spans the first start to the last end among tasks that ran
 	my @ran = grep { ($_->{'start.time'} // 0) > 0 } @tasks;
 	my $first = min(map { $_->{'start.time'} } @ran) // 0;
@@ -2249,9 +2260,12 @@ sub report {
 			? POSIX::strftime('%Y-%m-%d %H:%M:%S', localtime int $t->{'start.time'}) : '';
 		my $bar = '';
 		if (($t->{'start.time'} // 0) > 0) {
-			my $left  = sprintf '%.2f', 100 * ($t->{'start.time'} - $first) / $span;
-			# a bar of at least half a percent, so that a quick task is seen
+			# A bar of at least half a percent, so that a quick task is seen,
+			# moved left if it must be to end inside the lane. Until 0.196 a
+			# quick task in the run's last half percent stuck out past the end.
+			# The width is rounded first, so that the two rounded add to 100.
 			my $width = sprintf '%.2f', max(0.5, 100 * ($t->{duration} // 0) / $span);
+			my $left  = sprintf '%.2f', min(100 - $width, 100 * ($t->{'start.time'} - $first) / $span);
 			my $bar_class = $class{ $t->{_status} } // 'other';
 			$bar = qq{<div class="bar $bar_class" style="margin-left:$left%;width:$width%"></div>};
 		}
@@ -2295,8 +2309,10 @@ td code { white-space: pre-wrap; word-break: break-all; }
 tr.done .status { color: var(--done); } tr.skipped .status { color: var(--skipped); }
 tr.failed .status { color: var(--failed); } tr.dry .status { color: var(--dry); }
 .lane { position: relative; min-width: 160px; height: 10px; margin-top: 4px; }
-.bar { height: 10px; border-radius: 2px; }
+.bar { height: 10px; border-radius: 2px; background: var(--skipped); } /* any status without its own color; until 0.196, none */
 .bar.done { background: var(--done); } .bar.failed { background: var(--failed); }
+h2 { font-size: 16px; margin: 24px 0 8px; }
+.flow { overflow: auto; max-height: 80vh; border: 1px solid var(--line); border-radius: 4px; }
 </style>
 </head>
 <body>
@@ -2310,16 +2326,294 @@ tr.failed .status { color: var(--failed); } tr.dry .status { color: var(--dry); 
 </tbody>
 </table>
 </div>
+@{[ ($links > 0) ? qq{<h2>Flow</h2>\n<div class="flow">\n$flow</div>} : '' ]}
 </body>
 </html>
 HTML
-	my $bytes = $html;
-	utf8::encode($bytes); # the page says it is UTF-8, and the trace's strings are characters
-	open my $out, '>', $opt{html} or die "cannot write the report \"$opt{html}\": $!";
-	binmode $out;
-	print {$out} $bytes;
-	close $out or die "cannot write the report \"$opt{html}\": $!";
+	my @out;
+	push @out, [$opt{html}, $html, 'report'] if defined $opt{html};
+	push @out, [$opt{svg}, qq{<?xml version="1.0" encoding="UTF-8"?>\n$flow}, 'diagram'] if defined $opt{svg};
+	_write_utf8(@out);
 	return scalar @tasks;
+}
+# Write report()'s files, each given as [file, text, noun]: the text is
+# characters, written as the UTF-8 the page and the image say they are, and
+# the noun names the file in an error, 'report' or 'diagram'.
+#
+# Each is written under a File::Temp name in its own directory, and all are
+# renamed into place only once every one is written in full, so that a write
+# that fails leaves the files as they were. Until 0.196 each was opened in
+# place and written in turn, which left a page cut short by a full disk where
+# the old one had been, or a new page beside a diagram that could not be
+# written. File::Temp makes its files 0600, so each is given the mode open()
+# would have: the old file's, or 0666 less the umask. A link at a file's name
+# is replaced, where open() wrote through it. A rename that fails once the
+# writes have succeeded can still leave the earlier files renamed.
+sub _write_utf8 {
+	my @partial; # [the File::Temp name, the file, the noun]
+	my $error;
+	foreach my $out (@_) {
+		my ($file, $text, $noun) = @$out;
+		utf8::encode($text);
+		my ($volume, $dirs) = File::Spec->splitpath($file);
+		my $dir = File::Spec->catpath($volume, $dirs, '');
+		$dir = File::Spec->curdir if $dir eq '';
+		my $fh = eval { File::Temp->new(DIR => $dir, TEMPLATE => 'partial-XXXXXXXX', UNLINK => 0) };
+		if (not defined $fh) {
+			(my $why = $@) =~ s/ at \S+ line \d+.*//s;
+			$error = "cannot write the $noun \"$file\": $why";
+			last;
+		}
+		push @partial, [$fh->filename, $file, $noun];
+		my $mode = (-e $file) ? ((stat _)[2] & 07777) : (0666 & ~(umask() // 0)); # umask is undef where unimplemented
+		binmode $fh;
+		if (not ((print {$fh} $text) && (close $fh) && (chmod $mode, $fh->filename))) {
+			$error = "cannot write the $noun \"$file\": $!";
+			last;
+		}
+	}
+	foreach my $k (0 .. $#partial) {
+		last if defined $error;
+		my ($name, $file, $noun) = @{ $partial[$k] };
+		if (rename $name, $file) {
+			$partial[$k] = undef;
+		} else {
+			$error = "cannot write the $noun \"$file\": $!";
+		}
+	}
+	if (defined $error) {
+		unlink map { $_->[0] } grep { defined } @partial;
+		die $error;
+	}
+	return;
+}
+# The flow diagram of a trace, as an SVG image, and the number of arrows in it.
+#
+# Each task is a box, and an arrow runs from a task to a later one that reads
+# what it wrote, as Snakemake's --dag and Nextflow's -with-dag draw them: an
+# input file or directory is linked to the most recent earlier task that
+# declared it as an output, or, failing that, declared a directory it is in.
+# Names are compared as absolute paths, each made from the record's "dir", the
+# directory the step ran in, so that "a.txt" and "./a.txt" are one file, and
+# the same name in two directories is two. Only earlier tasks are searched,
+# so the graph has no cycles, and a pipeline re-run onto the same trace links
+# the second run's tasks to each other, not to the first's.
+#
+# A task's column is one more than the furthest of the tasks it reads from
+# (longest-path layering), so the flow runs left to right. Within a column the
+# boxes are ordered by the mean row of their neighbors (the barycenter
+# heuristic of Sugiyama, Tagawa and Toda, 1981), to keep arrows from crossing.
+# There is no routing: an arrow that skips a column is drawn behind its boxes.
+#
+# Sizes are SVG user units (px). The label is set in a monospace face, whose
+# advance is 0.6 em in DejaVu Sans Mono, Menlo and Courier (Consolas, 0.55),
+# so that the 33 characters of a label take 33 * 0.6 * 11 = 218 of the 224
+# the box leaves inside its 8 of padding on each side, without font metrics.
+my %FLOW = (
+	box_w  => 240, box_h => 44, # a task's box
+	gap_x  => 56,  gap_y => 14, # between columns, and between boxes in one
+	pad    => 12,               # around the whole diagram
+	chars  => 33,               # the longest label, in characters
+	sweeps => 4,                # ordering passes, alternately forwards and back; more rarely helps
+);
+my %FLOW_COLOR = ( # light, then dark: the report's own palette
+	bg     => ['#ffffff', '#0d1117'], fg     => ['#1f2328', '#e6edf3'],
+	muted  => ['#656d76', '#8d96a0'], line   => ['#8c959f', '#6e7681'],
+	done   => ['#1a7f37', '#3fb950'], failed => ['#cf222e', '#f85149'],
+	dry    => ['#9a6700', '#d29922'], skipped => ['#8c959f', '#6e7681'],
+);
+sub _flow_svg {
+	my ($tasks, $class) = @_; # $class: report()'s CSS class of each status
+	my $n = scalar @$tasks;
+	my (%producer, %files, @preds);
+	my @succs = map { [] } 1 .. $n;
+	foreach my $j (0 .. $n - 1) {
+		my $t = $tasks->[$j];
+		my (%from, %seen);
+		foreach my $name (map { @{ $t->{$_} // [] } } 'input_files', 'input_dirs') {
+			my @keys = _flow_keys($name, $t->{dir});
+			# each file once in an arrow's tooltip, as first written, however
+			# many times or ways the task names it: until 0.196, "a\na\n./a"
+			next if $seen{ $keys[0] }++;
+			my ($i) = grep { defined } map { $producer{$_} } @keys;
+			next if not defined $i;
+			push @{ $files{"$i $j"} }, $name;
+			$from{$i} = 1;
+		}
+		$preds[$j] = [sort { $a <=> $b } keys %from];
+		push @{ $succs[$_] }, $j foreach @{ $preds[$j] };
+		# after the inputs, so that a step that rewrites its input is not its own source
+		$producer{ (_flow_keys($_, $t->{dir}))[0] } = $j foreach map { @{ $t->{$_} // [] } } 'output_files', 'output_dirs';
+	}
+	my @layer;
+	foreach my $j (0 .. $n - 1) {
+		$layer[$j] = 1 + max(-1, map { $layer[$_] } @{ $preds[$j] });
+	}
+	my $depth = max(0, @layer); # the last column
+	# An arrow that skips columns takes a row in each column it crosses, as a
+	# placeholder node numbered from $n up, so that it runs between the boxes
+	# there and not behind one. @up and @down are the neighbors of every
+	# node, placeholders included, along the arrows' routes.
+	my %route; # "$i $j" => [$i, the placeholders, $j]
+	my @up   = map { [] } 1 .. $n;
+	my @down = map { [] } 1 .. $n;
+	foreach my $edge (sort { ($a->[0] <=> $b->[0]) || ($a->[1] <=> $b->[1]) } map { [split / /] } keys %files) {
+		my ($i, $j) = @$edge;
+		my @path = ($i);
+		foreach my $c ($layer[$i] + 1 .. $layer[$j] - 1) {
+			push @layer, $c;
+			push @path, $#layer;
+		}
+		push @path, $j;
+		foreach my $k (1 .. $#path) {
+			push @{ $up[ $path[$k] ] },       $path[$k - 1];
+			push @{ $down[ $path[$k - 1] ] }, $path[$k];
+		}
+		$route{"$i $j"} = \@path;
+	}
+	my @cols = map { [] } 0 .. $depth;
+	push @{ $cols[ $layer[$_] ] }, $_ foreach 0 .. $#layer;
+	my @pos; # each node's row within its column
+	foreach my $col (@cols) {
+		$pos[ $col->[$_] ] = $_ foreach 0 .. $#$col;
+	}
+	foreach my $sweep (1 .. $FLOW{sweeps}) {
+		my $forward = $sweep % 2;
+		foreach my $c ($forward ? (1 .. $depth) : reverse(0 .. $depth - 1)) {
+			my %key;
+			foreach my $j (@{ $cols[$c] }) {
+				my @near = @{ $forward ? ($up[$j] // []) : ($down[$j] // []) };
+				$key{$j} = (scalar @near > 0) ? sum(map { $pos[$_] } @near) / scalar(@near) : $pos[$j];
+			}
+			$cols[$c] = [sort { ($key{$a} <=> $key{$b}) || ($pos[$a] <=> $pos[$b]) } @{ $cols[$c] }];
+			$pos[ $cols[$c][$_] ] = $_ foreach 0 .. $#{ $cols[$c] };
+		}
+	}
+	my $rows   = max(map { scalar @$_ } @cols);
+	my $columns = ($n > 0) ? $depth + 1 : 0; # an empty trace is a diagram of its margins
+	my $width  = 2 * $FLOW{pad} + $columns * $FLOW{box_w} + max(0, $columns - 1) * $FLOW{gap_x};
+	my $height = 2 * $FLOW{pad} + $rows * $FLOW{box_h} + max(0, $rows - 1) * $FLOW{gap_y};
+	my (@x, @y);
+	foreach my $j (0 .. $#layer) {
+		my $center = ($rows - scalar @{ $cols[ $layer[$j] ] }) / 2; # a short column is centered
+		$x[$j] = $FLOW{pad} + $layer[$j] * ($FLOW{box_w} + $FLOW{gap_x});
+		$y[$j] = $FLOW{pad} + ($center + $pos[$j]) * ($FLOW{box_h} + $FLOW{gap_y});
+	}
+	my @css = map {
+		my $k = $_; # 0 = light, 1 = dark
+		my %c = map { $_ => $FLOW_COLOR{$_}[$k] } keys %FLOW_COLOR;
+		join("\n",
+			".sf-bg { fill: $c{bg}; }",
+			".sf-task rect { fill: $c{bg}; stroke: $c{muted}; stroke-width: 1.5; }",
+			(map { ".sf-$_ rect { stroke: $c{$_}; } .sf-$_ .sf-head { fill: $c{$_}; }" } 'done', 'failed', 'dry', 'skipped'),
+			".sf-task text { fill: $c{fg}; }",
+			".sf-edge { fill: none; stroke: $c{line}; stroke-width: 1.5; }",
+			".sf-arrow { fill: $c{line}; }");
+	} 0, 1;
+	my $f = $FLOW{box_h} / 2;
+	my @svg = (
+		qq{<svg xmlns="http://www.w3.org/2000/svg" class="sf-flow" width="$width" height="$height" viewBox="0 0 $width $height" role="img" aria-label="the flow of $n tasks">},
+		'<style>',
+		$css[0],
+		'.sf-task text { font-family: ui-monospace, Menlo, Consolas, "DejaVu Sans Mono", monospace; font-size: 11px; }',
+		'.sf-head { font-weight: bold; }',
+		'@media (prefers-color-scheme: dark) {',
+		$css[1],
+		'}',
+		'</style>',
+		'<defs><marker id="sf-arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="7" markerHeight="7" orient="auto">'
+			. '<path class="sf-arrow" d="M 0 0 L 10 5 L 0 10 z"/></marker></defs>',
+		qq{<rect class="sf-bg" width="$width" height="$height"/>},
+	);
+	# arrows first, so that the boxes are drawn over them
+	# a curve across each gap between columns, and a straight line through
+	# each placeholder's row
+	foreach my $edge (sort keys %route) {
+		my @path = @{ $route{$edge} };
+		my ($x1, $y1) = ($x[ $path[0] ] + $FLOW{box_w}, $y[ $path[0] ] + $f);
+		my $d = "M $x1 $y1";
+		foreach my $k (@path[1 .. $#path]) {
+			my ($x2, $y2) = ($x[$k], $y[$k] + $f);
+			my $mid = ($x1 + $x2) / 2;
+			$d .= " C $mid $y1, $mid $y2, $x2 $y2";
+			($x1, $y1) = ($x2 + $FLOW{box_w}, $y2);
+			$d .= " L $x1 $y1" if $k >= $n;
+		}
+		push @svg, qq{<path class="sf-edge" d="$d" marker-end="url(#sf-arrow)">}
+			. '<title>' . _xml(join "\n", @{ $files{$edge} }) . '</title></path>';
+	}
+	foreach my $j (0 .. $n - 1) {
+		my $t = $tasks->[$j];
+		my $label = $t->{cmd} // '';
+		$label =~ s/\A\s+|\s+\z//g; # so that "\n  echo hi\n" is "echo hi", not " echo hi "
+		$label =~ s/\s+/ /g;
+		$label = substr($label, 0, $FLOW{chars} - 1) . "\x{2026}" if length($label) > $FLOW{chars};
+		my @tip = ('#' . ($j + 1) . " $t->{_status}", $t->{cmd} // '');
+		push @tip, $t->{note} if ($t->{note} // '') ne '';
+		foreach my $way ('input', 'output') {
+			my @names = map { @{ $t->{$_} // [] } } "${way}_files", "${way}_dirs";
+			push @tip, "${way}s: " . join(', ', @names) if scalar @names > 0;
+		}
+		my ($tx, $ty) = ($x[$j] + 8, $y[$j]);
+		push @svg, '<g class="sf-task sf-' . ($class->{ $t->{_status} } // 'other') . '">'
+			. '<title>' . _xml(join "\n", @tip) . '</title>'
+			. qq{<rect x="$x[$j]" y="$y[$j]" width="$FLOW{box_w}" height="$FLOW{box_h}" rx="4"/>}
+			. '<text class="sf-head" x="' . $tx . '" y="' . ($ty + 17) . '">#' . ($j + 1) . ' ' . _xml($t->{_status}) . '</text>'
+			. '<text x="' . $tx . '" y="' . ($ty + 34) . '">' . _xml($label) . '</text></g>';
+	}
+	push @svg, '</svg>';
+	return (join("\n", @svg) . "\n", scalar keys %files);
+}
+# A name as an absolute path, made from the directory its step ran in, then
+# each directory above it, nearest first: the keys an input is looked up by.
+# A trace written before 0.19 has no "dir", and its names are compared as
+# they are.
+#
+# The path is resolved through any symbolic links, as far as it still
+# exists, because "dir" is recorded with getcwd(), which gives the real path:
+# a step run in "dir" => '/tmp/x' records /private/tmp/x on macOS, where /tmp
+# is a link, and until 0.196 its output "a" was not the "/tmp/x/a" another
+# step read.
+sub _flow_keys {
+	my ($name, $dir) = @_;
+	my $key = File::Spec->canonpath((defined $dir) && ($dir ne '') ? File::Spec->rel2abs($name, $dir) : $name);
+	$key = _resolved($key) if File::Spec->file_name_is_absolute($key);
+	my @keys = ($key);
+	while (1) {
+		my ($volume, $dirs) = File::Spec->splitpath($keys[-1]);
+		my $up = File::Spec->canonpath(File::Spec->catpath($volume, $dirs, ''));
+		last if ($up eq '') || ($up eq $keys[-1]);
+		push @keys, $up;
+	}
+	return @keys;
+}
+# An absolute path with its longest existing head replaced by that head's
+# real path, and the names after it, which do not exist (yet, or any more),
+# kept as they are. Unchanged when nothing of it exists or the head cannot be
+# resolved, as for a trace read on another machine.
+sub _resolved {
+	my $path = shift;
+	my @tail;
+	my $head = $path;
+	while (not -e $head) {
+		my ($volume, $dirs, $last) = File::Spec->splitpath($head);
+		my $up = File::Spec->canonpath(File::Spec->catpath($volume, $dirs, ''));
+		return $path if ($up eq '') || ($up eq $head);
+		unshift @tail, $last;
+		$head = $up;
+	}
+	my $real = _realpath($head);
+	return $path if not defined $real;
+	return (scalar @tail > 0) ? File::Spec->catfile($real, @tail) : File::Spec->canonpath($real);
+}
+# Text for XML: _html, after replacing what XML 1.0 cannot hold even escaped,
+# the control characters other than tab, newline and return, with U+FFFD. An
+# HTML page shows them; an SVG file with one in it is not an image at all.
+sub _xml {
+	my $text = shift;
+	$text = '' if not defined $text;
+	$text =~ s/[\x00-\x08\x0B\x0C\x0E-\x1F\x{FFFE}\x{FFFF}]/\x{FFFD}/g;
+	return _html($text);
 }
 # Why a decoded trace line cannot be shown, or undef if it can. The page does
 # arithmetic with the times and puts the rest in its cells, and until 0.192 a
@@ -2328,9 +2622,17 @@ HTML
 # epoch seconds below 1e15, the year 31690708: past 1e16 perl's localtime
 # dies on 5.44.0 ("too large", at 1e17) and returns nothing on 5.10.1.
 my @TRACE_TIMES = ('start.time', 'duration', 'cpu.user', 'cpu.system');
-my @TRACE_TEXTS = ('cmd', 'note', 'will.do', 'exit', 'signal', 'attempts', 'source.file', 'source.line');
+my @TRACE_TEXTS = ('cmd', 'note', 'will.do', 'exit', 'signal', 'attempts', 'source.file', 'source.line', 'dir');
+# the names the flow diagram links tasks by, each a list of strings
+my @TRACE_NAMES = ('input_files', 'input_dirs', 'output_files', 'output_dirs');
 sub _bad_trace_field {
 	my $task = shift;
+	foreach my $field (@TRACE_NAMES) {
+		my $names = $task->{$field};
+		next if not defined $names;
+		return "its \"$field\" is not a list of names"
+			if (ref $names ne 'ARRAY') || grep { (not defined $_) || (ref $_ ne '') || ($_ eq '') } @$names;
+	}
 	foreach my $field (@TRACE_TIMES) {
 		my $value = $task->{$field};
 		next if not defined $value;
@@ -2464,7 +2766,7 @@ SimpleFlow - easy, simple workflow manager (and logger); for keeping track of an
 
 =head1 VERSION
 
-version 0.194
+version 0.1961
 
 =head1 DESCRIPTION
 
@@ -2481,7 +2783,7 @@ L<read-only|/"Protected outputs">, keep a L<trace|/"Tracing"> of the whole run,
 L<lock|/"Locking"> a step against a second copy of the pipeline, run it in a
 L<container, a conda environment or on a SLURM cluster|/"Containers, conda and clusters">,
 and L<run independent steps at once|/"Running steps in parallel">. A trace
-becomes an L<HTML report|/"Reports">.
+becomes an L<HTML report|/"Reports"> and a L<flow diagram|/"Flow diagrams">.
 
 Two subroutines are exported by default: L</"task"> and L</"say2">.
 Two more are exported on request:
@@ -3432,7 +3734,7 @@ C<0>, C<stdout> and C<stderr> are C<''>, C<duration> is C<0>).
 </tr>
 <tr>
   <td><code>cpu.user</code>, <code>cpu.system</code></td>
-  <td>CPU seconds the command, and everything it waited for, spent in user and system mode. The clock counts in ticks of 1/100 s on Linux. Not known to be filled in on Windows.</td>
+  <td>CPU seconds the command, and everything it waited for, spent in user and system mode. The clock counts in ticks of 1/100 s on Linux. Not known to be filled in on Windows, and <code>0</code> on GNU/Hurd unless its glibc was built to count a finished child's time.</td>
 </tr>
 <tr>
   <td><code>exit</code></td>
@@ -3537,7 +3839,7 @@ When the last attempt started, in epoch seconds with a fractional part; C<0> if 
 
 =item C<cpu.user>, C<cpu.system>
 
-CPU seconds the command, and everything it waited for, spent in user and system mode. The clock counts in ticks of 1/100 s on Linux. Not known to be filled in on Windows.
+CPU seconds the command, and everything it waited for, spent in user and system mode. The clock counts in ticks of 1/100 s on Linux. Not known to be filled in on Windows, and C<0> on GNU/Hurd unless its glibc was built to count a finished child's time.
 
 =item C<exit>
 
@@ -3641,7 +3943,7 @@ When the last attempt started, in epoch seconds with a fractional part; C<0> if 
 
 =item C<cpu.user>, C<cpu.system>
 
-CPU seconds the command, and everything it waited for, spent in user and system mode. The clock counts in ticks of 1/100 s on Linux. Not known to be filled in on Windows.
+CPU seconds the command, and everything it waited for, spent in user and system mode. The clock counts in ticks of 1/100 s on Linux. Not known to be filled in on Windows, and C<0> on GNU/Hurd unless its glibc was built to count a finished child's time.
 
 =item C<exit>
 
@@ -3936,7 +4238,8 @@ Re-running such a step over its outputs, with C<overwrite> or C<stale>, is then
 refused with a message naming them, instead of failing inside the command with
 an error that does not say why the file is read-only. Remove them, or make them
 writable, to run it again. Symbolic links are left alone. C<root> can write to a
-read-only file, so for C<root> this protects nothing.
+read-only file, so for C<root> this protects nothing, and nor, under Cygwin, for
+a Windows administrator, whose backup and restore privileges do the same.
 
 =head2 Tracing
 
@@ -4269,8 +4572,41 @@ self-contained file, with no scripts and nothing fetched, which follows the
 reader's light or dark setting, so that it can be mailed or archived as it
 is. C<report> returns the number of tasks it read, and dies naming the line of
 the trace it could not read: one that is not strict JSON in UTF-8, nests more
-than 512 deep, or has a time that is not a number of seconds or a command that
-is not a string. A C<title> may be a character string or UTF-8 bytes.
+than 512 deep, or has a time that is not a number of seconds, a command or
+C<dir> that is not a string, or file and directory names that are not a list of
+strings. A C<title> may be a character string or UTF-8 bytes.
+
+=head2 Flow diagrams
+
+C<svg> writes the pipeline's flow diagram as an SVG image, like Snakemake's
+C<--dag> and Nextflow's C<-with-dag>:
+
+ report(trace => 'trace.jsonl', html => 'report.html', svg => 'flow.svg');
+
+Each task is a box, numbered as in the page and colored by its status, showing
+its command, clipped to 33 characters. An arrow runs from a task to each later
+task that reads what it wrote: an input file or directory is linked to the
+most recent earlier task that declared it as an output, or declared a directory
+it is in. Names are compared as absolute paths, each relative to the C<dir> its
+step ran in, so C<a.txt> and C<./a.txt> are the same file, and the same name in
+two directories is two. Each is then resolved, as far as it exists when
+C<report> runs, through symbolic links and C<..>, so a file named through a link
+to its directory, such as C</tmp> on macOS, is the file its real path names;
+C<x/../a.txt> is C<a.txt> while C<x> exists, and otherwise is not.
+The flow runs left to right, each task one column to the right of the furthest
+of its sources. Hovering over a box shows the whole command, the note and the
+names, and over an arrow, the names that link the two tasks. A pipeline run
+twice onto one trace draws two separate flows.
+
+The diagram is drawn from what each step declared, not from what its command
+did: a file a command reads without declaring it as an input is not linked.
+
+C<report> takes C<html>, C<svg> or both. The HTML page shows the same diagram
+below the table, when at least one task uses another's output. The image, like
+the page, follows the reader's light or dark setting, and needs nothing else to
+be shown. Each file is written under a temporary name beside it and renamed
+into place once all are written in full, so a C<report> that dies, on a full
+disk or a missing directory, leaves the page and the diagram as they were.
 
 =head1 Dependencies
 

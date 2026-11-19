@@ -39,6 +39,7 @@ ev_ch_newSVsv_nomg(pTHX_ SV *sv) {
  * not touch insert_err — caller decides whether to clear it. */
 #define CLEAR_INSERT(s) do { \
     CLEAR_STR((s)->insert_data); (s)->insert_data_len = 0; \
+    (s)->insert_native_body = 0; \
     CLEAR_SV((s)->insert_av); \
 } while (0)
 

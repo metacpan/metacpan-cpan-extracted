@@ -40,8 +40,8 @@ for my $file (@files) {
             $line =~ s/\r$//;
             next if $line =~ /^\s*#/ || $line !~ /\S/;
 
-            my @col = split /\t/, $line;
-            is(scalar(@col), 10, "row " . ($rows + 1) . " has 10 columns")
+            my @col = split /\t/, $line, -1;
+            is(scalar(@col), 12, "row " . ($rows + 1) . " has 12 columns")
                 or next;
             my ($name, $proto2, $addr, $subaddr, $cmd, $pronto,
                 $dproto, $daddr, $dsub, $dcmd) = @col;
@@ -55,8 +55,18 @@ for my $file (@files) {
             };
             ok($code, "$name: structured code imports") or next;
 
-            is($converter->export_code($code, 'Pronto'), $pronto,
-                "$name: structured -> Pronto matches fixture");
+            my $exported = $converter->export_code($code, 'Pronto');
+            my $roundtrip = $converter->import_format('Pronto', $exported);
+            is($roundtrip->protocol, $dproto, "$name: structured round-trips as $dproto");
+            is($roundtrip->address,  _int($daddr), "$name: structured round-trip address");
+            is($roundtrip->subaddress, _int($dsub), "$name: structured round-trip subaddress");
+            is($roundtrip->command,  _int($dcmd),  "$name: structured round-trip command");
+
+            my $ref = $converter->import_format('Pronto', $pronto);
+            is($ref->protocol,    $dproto,   "$name: reference Pronto decodes as $dproto");
+            is($ref->address,     _int($daddr), "$name: reference Pronto address");
+            is($ref->subaddress,  _int($dsub),  "$name: reference Pronto subaddress");
+            is($ref->command,     _int($dcmd),  "$name: reference Pronto command");
 
             my $decoded = eval { $converter->import_format('Pronto', $pronto) };
             ok($decoded, "$name: Pronto decodes") or next;

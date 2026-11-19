@@ -194,6 +194,9 @@ decode_entities(pTHX_ SV* sv, HV* entity2char, bool expand_prefix)
 		STRLEN cur = SvCUR(sv);
 		STRLEN alloc = SvLEN(sv);
 		U32 utf8 = SvUTF8(sv);
+		/* SvPV can call magic or overload. A callback may change entity2char
+		 * and invalidate svp, so retain the value until its text is copied.
+		 * A plain undefined value is not a valid replacement. */
 		if (              (svp = hv_fetch(entity2char, ent_name, s - ent_name, 0)) ||
 		    (s < end && *s == ';' && (svp = hv_fetch(entity2char, ent_name, s - ent_name + 1, 0)))
 		   )
@@ -204,8 +207,17 @@ decode_entities(pTHX_ SV* sv, HV* entity2char, bool expand_prefix)
 			repl_len = len;
 			repl_utf8 = orig_utf8;
 		    } else {
-			repl = SvPV(*svp, repl_len);
-			repl_utf8 = SvUTF8(*svp);
+			SV *repl_sv = *svp;
+			/* Check magic first: it may make the scalar defined or undef. */
+			bool may_call_perl = SvGAMAGIC(repl_sv);
+			if (!may_call_perl && !SvOK(repl_sv))
+			    croak("Entity value is undefined");
+			if (may_call_perl) {
+			    SvREFCNT_inc_simple_void(repl_sv);
+			    SAVEFREESV(repl_sv);
+			}
+			repl = SvPV(repl_sv, repl_len);
+			repl_utf8 = SvUTF8(repl_sv);
 		    }
 		}
 		else if (expand_prefix) {
@@ -219,8 +231,17 @@ decode_entities(pTHX_ SV* sv, HV* entity2char, bool expand_prefix)
 				repl_len = len;
 				repl_utf8 = orig_utf8;
 			    } else {
-				repl = SvPV(*svp, repl_len);
-				repl_utf8 = SvUTF8(*svp);
+				SV *repl_sv = *svp;
+				/* Check magic first: it may make the scalar defined or undef. */
+				bool may_call_perl = SvGAMAGIC(repl_sv);
+				if (!may_call_perl && !SvOK(repl_sv))
+				    croak("Entity value is undefined");
+				if (may_call_perl) {
+				    SvREFCNT_inc_simple_void(repl_sv);
+				    SAVEFREESV(repl_sv);
+				}
+				repl = SvPV(repl_sv, repl_len);
+				repl_utf8 = SvUTF8(repl_sv);
 			    }
 			    s = ss;
 			    break;

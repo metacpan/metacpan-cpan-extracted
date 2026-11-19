@@ -407,9 +407,10 @@ function hunkHeader(h) {
     return `@@ -${h.old_start},${h.old_count} +${h.new_start},${h.new_count} @@`;
 }
 
-// A named unit's diff comes in parts, its code and its documentation, with
-// nothing from between them. A row names each part that follows another, and
-// the documentation even when it comes first.
+// A named unit's diff comes in parts, its code and its documentation apart
+// from it, with nothing from between them; documentation next to the code is
+// in a code hunk. A row names each part that follows another, and the
+// documentation even when it comes first.
 function partRow(hunks, i) {
     const part = hunks[i].part;
     if (!part || part === (i ? hunks[i - 1].part : 'code')) return [];

@@ -89,6 +89,7 @@ share/ux/js/highlight/yaml.min.js
 share/ux/js/languages.js
 share/ux/js/logic.js
 share/ux/js/speech.js
+share/ux/package.json
 share/ux/t/logic.test.mjs
 t/acceptance/Manual.t
 t/integration/build-fill.t

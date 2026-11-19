@@ -24,9 +24,9 @@ requires 'JSON::PP';
 requires 'List::Util', '1.54';
 requires 'Log::Abstraction', '0.36';   # structured fields
 requires 'Object::Configure';
+requires 'POSIX';
 requires 'Params::Get', '0.17';
 requires 'Params::Validate::Strict', '0.41';
-requires 'POSIX';
 requires 'Readonly', '2.05';
 requires 'Scalar::Util';
 requires 'Sub::Private', '0.07';
@@ -36,12 +36,7 @@ requires 'Time::HiRes';
 requires 'Time::Local';
 requires 'autodie', '2.37';
 requires 'version', '0.77';
-
 recommends 'Cpanel::JSON::XS';   # JSON::MaybeXS adds it given a compiler
-
-if ($^O eq 'MSWin32') {
-	requires 'Win32API::File';   # Process: pipe ends the child must not inherit
-}
 
 on 'configure' => sub {
 	requires 'ExtUtils::MakeMaker', '6.64';   # first to honour TEST_REQUIRES
@@ -54,6 +49,8 @@ on 'test' => sub {
 	requires 'Test::Exception';
 	requires 'Test::Mockingbird::TimeTravel', '0.14';
 	requires 'Test::Most';
+	requires 'Test::Permissions';
+	requires 'Tie::Hash';
 };
 
 on 'develop' => sub {

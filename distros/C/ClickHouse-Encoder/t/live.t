@@ -15,13 +15,18 @@ if (!$ch_client) {
     exit 0;
 }
 
-# Check if we can connect to a running ClickHouse server
-my $ch_running = system("clickhouse-client --query 'select 1' >/dev/null 2>&1") == 0;
-
 my $tmpdir;
 my $ch_pid;
-my $ch_port = 9000;
-my $http_port = 8123;
+my $ch_port = $ENV{TEST_CLICKHOUSE_NATIVE_PORT} // 9000;
+my $http_port = $ENV{TEST_CLICKHOUSE_PORT} // 8123;
+my $ch_host = $ENV{TEST_CLICKHOUSE_HOST} // '127.0.0.1';
+my $ch_running = 0;
+if (open my $probe, '-|', $ch_client, '--host', $ch_host, '--port', $ch_port, '--query', 'select 1') {
+    my $reply = do { local $/; <$probe> };
+    $ch_running = close($probe) && defined($reply) && $reply =~ /^1/;
+}
+plan skip_all => 'Configured ClickHouse server is not reachable'
+    if !$ch_running && exists $ENV{TEST_CLICKHOUSE_NATIVE_PORT};
 
 if (!$ch_running) {
     # Try to find clickhouse-server
@@ -143,7 +148,7 @@ END {
 # Now we have a running ClickHouse - run the tests
 use ClickHouse::Encoder;
 
-my @ch_cmd = ('clickhouse-client', '--port', $ch_port);
+my @ch_cmd = ('clickhouse-client', '--host', $ch_host, '--port', $ch_port);
 
 sub ch_query {
     my ($query) = @_;

@@ -14,14 +14,18 @@ long double decimal_pow10l (int n);
  * Used by the Decimal256 negate-in-place sequence in encode_scalar. */
 int add_digit_256(uint64_t limbs[4], uint64_t digit);
 
-/* Parse "[+-]?digits[.digits]?" into 128/256-bit two's-complement
+/* Parse decimal strings, including exponents, into two's-complement
  * integers scaled by 10^scale. Return 1 on success, 0 if malformed
  * or out-of-range. */
-int parse_decimal128_str   (const char *s, STRLEN len, int scale,
+int parse_decimal128_str   (const char *s, STRLEN len, int scale, int precision,
                             uint64_t *hi_out, uint64_t *lo_out);
-int parse_decimal256_str   (const char *s, STRLEN len, int scale,
+int parse_decimal256_str   (const char *s, STRLEN len, int scale, int precision,
                             uint64_t limbs_out[4]);
-int parse_decimal_int64_str(const char *s, STRLEN len, int scale,
+int parse_decimal_int64_str(const char *s, STRLEN len, int scale, int precision,
                             int64_t *out);
+
+/* 1 if |value| < 10^precision, for two's-complement 128/256-bit values. */
+int decimal128_within_precision(uint64_t hi, uint64_t lo, int precision);
+int decimal256_within_precision(const uint64_t limbs[4], int precision);
 
 #endif

@@ -3757,6 +3757,37 @@ static struct {
 };
 
 /*
+ *----------------------------------------------------------------------
+ *
+ * TkTextOrnSplitRoom --
+ *
+ *	The room that the frames showing the number n take on each side
+ *	of the box they are around (see TkTextOrnLayoutSplits): from the
+ *	pixel next to the box to the outermost pixel of the last stroke,
+ *	the strokes one pixel apart.
+ *
+ * Results:
+ *	The number of pixels; 0 if n is not positive.
+ *
+ *----------------------------------------------------------------------
+ */
+
+int
+TkTextOrnSplitRoom(n)
+    int n;
+{
+    int bit, room = 0;
+
+    for (bit = 0; (n >> bit) > 0; bit++) {
+	if ((n >> bit) & 1) {
+	    room += ((room > 0) ? 1 : 0)
+		    + strokes[(bit < NUM_STROKES) ? bit : NUM_STROKES - 1].width;
+	}
+    }
+    return room;
+}
+
+/*
  * The strokes of a widget: NUM_STROKES lines, then as many rectangles;
  * NULL if they cannot be made.
  */

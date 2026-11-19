@@ -1,6 +1,104 @@
 Revision history for SimpleFlow
 
 
+0.1961 2026-11-18 (Claude Opus 5.5 helped)
+
+ [Fixed]
+
+ - **`report()`'s flow diagram did not link a file named through a symbolic
+     link to the same file named by its real path.** `task()` records `dir`
+     with `getcwd()`, which gives the real path, so a step run in `/tmp/x`
+     where `/tmp` is a link recorded `/private/tmp/x`, and its output `a` was
+     not the `/tmp/x/a` a later step read: the two were drawn with no arrow
+     between them. Each name is now resolved through symbolic links and `..`
+     as far as it exists when `report()` runs, so `x/../a.txt` is also
+     `a.txt` while `x` exists, where the documentation used to say it never
+     was. CPAN testers on Haiku, whose `/tmp` is a link, and on a FreeBSD set
+     up like macOS, whose `TMPDIR` is under the link `/var/folders`, failed
+     `t/11.flow.t` this way, as macOS would have. `t/13.fixes.t` makes the
+     link itself, and fails against 0.196. A module defect.
+
+ [Tests]
+
+ - **The tests of `protect` and of an unreadable output asked whether the
+     user was root, instead of whether file modes held.** Under Cygwin, a
+     Windows administrator's backup and restore privileges let it read and
+     write a file whatever its mode, as root can, under a uid other than 0,
+     so 2 subtests of `t/02.fixes.t` and 2 of `t/05.features.t` failed on a
+     Cygwin perl 5.44.0 smoker. They now try to open a file of the mode they
+     rely on, with `modes_ignored` from the new `t/lib/Platform.pm`, and skip
+     when that succeeds. The module was right; for such a user `protect`
+     protects nothing, as for root, and the documentation now says so.
+ - **The test of `cpu.user` assumed that every platform but MSWin32 counts
+     a finished child's CPU time.** On GNU/Hurd, glibc's `times()` gives 0
+     for it unless glibc was built with
+     `HAVE_HURD_PROC_GETCHILDREN_RUSAGE`, and on GNU/Hurd 0.9 smokers with
+     perls 5.24.4 and 5.44.0 `cpu.user` was 0 and 1 subtest of
+     `t/05.features.t` failed. The test now runs a child that spins and
+     checks that `times()` counted it, with `children_cpu_unreported` from
+     `t/lib/Platform.pm`, and skips when it did not. The module reports what
+     `times()` gives; the documentation of `cpu.user` now names the Hurd.
+
+0.196 2026-11-17 (Claude Opus 5.5 helped)
+
+ [Added]
+
+ - **`report()` draws the pipeline's flow diagram,** as Snakemake's `--dag`
+     and Nextflow's `-with-dag` do: a box for each task, colored by its
+     status, and an arrow from a task to each later one that reads a file or
+     directory it declared as an output, or a file in a directory it
+     declared. Names are compared as absolute paths made from each record's
+     `dir`. The new `svg` option writes the diagram as a standalone SVG image,
+     and the HTML page shows it below the table whenever at least one task
+     uses another's output. Like the page, the image follows the reader's
+     light or dark setting and needs no scripts. `t/11.flow.t` tests it.
+
+ [Changed]
+
+ - **`report()` no longer requires `html`:** it needs `html`, `svg` or
+     both, and with neither it dies saying so. The message for a missing
+     `html` changed from `report() needs "html", a file name` to
+     `report() needs "html" or "svg", a file name to write`.
+ - **`report()` refuses a trace line whose `input_files`, `output_files`,
+     `input_dirs` or `output_dirs` is not a list of names, or whose `dir` is
+     not a single value,** naming the line, as it already did for a bad time
+     or command. Every trace `task()` writes passes; only a hand-made or
+     damaged one can fail.
+ - **`report()` writes its files under temporary names and renames them into
+     place once all are written in full,** so that one that dies leaves the
+     page and the diagram as they were. Until 0.196 the page was written in
+     place, and a page cut short by a full disk replaced the whole one before
+     it. A file `report()` replaces keeps its permissions, and a new one gets
+     0666 less the umask, as before; a symbolic link at the page's name is
+     now replaced by the page, where it used to be written through.
+
+ [Fixed]
+
+ - **The page's summary left out any status other than the four `task()`
+     writes,** counting it but not showing it, so that a hand-made trace
+     with a `will.do` of `yes`, or none, was summed up as
+     `3 tasks: 1 done, 0 skipped, 0 failed`. Each other status is now counted
+     after the four under its own name, a missing one as `unknown`, as the
+     table already showed them.
+ - **A quick task near the end of the run had a timeline bar that stuck out
+     past the end of its lane,** by up to half a percent of its width: the
+     bar's minimum width of 0.5% was added to where it started. Such a bar
+     now ends at the lane's end.
+ - **The summary said "1 tasks" and "1 dry runs";** each is now singular
+     for one.
+ - **A task with a status other than `done` or `FAILED` that had run, from
+     a hand-made trace, had a timeline bar with no color,** and so could not
+     be seen. Such a bar is now gray, as a skipped task's status is.
+     `t/12.fixes.t` tests these four, and each test fails against 0.195.
+
+ [Packaging]
+
+ - **`read.me.pod` is gone, from the repository and the distribution.** It
+     was a copy of the POD that `md2pod.pl` wrote for the maintainer to paste
+     into the module by hand, and 0.194 and 0.195 shipped it beside the
+     module; the copy lagged, and 0.195's POD said "version 0.194".
+     `md2pod.pl` now writes the POD into `lib/SimpleFlow.pm` itself again.
+
 0.195 2026-10-07 (Claude Opus 5.5 helped)
 
  [Tests]

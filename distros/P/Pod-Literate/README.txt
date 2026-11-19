@@ -1,4 +1,4 @@
-"Pod::Literate" Version 0.0.4
+"Pod::Literate" Version 0.0.5
 
 Abstract:
 ---------
@@ -6,9 +6,9 @@ This package provides a POD format mechanism that supports naming and referencin
 
 What's new in recent versions:
 ------------------------------
+* Inline declarations
 * Multiple output target support
-* Establish spacing behaviors
-* Switch to literate:command target=filename
+* literate:command target=filename
 
 Copyright & License:
 --------------------

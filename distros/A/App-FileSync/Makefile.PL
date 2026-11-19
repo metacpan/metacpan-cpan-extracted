@@ -1,3 +1,5 @@
+#!/usr/bin/env perl
+
 use strict;
 use warnings;
 use ExtUtils::MakeMaker 6.64;
@@ -10,6 +12,14 @@ my $dist = {
 if ($^O eq 'darwin') {
 	$dist->{'TAR'} = 'gtar';
 }
+
+# Process keeps a child from inheriting the parent's pipe ends on Windows.
+# Win32API::File is core there (since 5.8.9) and cannot be built anywhere
+# else, so it is declared only when Makefile.PL runs on Windows.  It is kept
+# out of the PREREQ_PM literal on purpose: makefilepl2cpanfile reads that
+# block without running it, and would make it a requirement everywhere,
+# which fails "cpanm --installdeps ." on Linux and macOS.
+my %windows_only = $^O eq 'MSWin32' ? ('Win32API::File' => 0) : ();
 
 WriteMakefile(
 	NAME               => 'App::FileSync',
@@ -58,7 +68,7 @@ WriteMakefile(
 		'Time::HiRes'    => 0,
 		'Time::Local'    => 0,
 		'version'        => '0.77',
-		($^O eq 'MSWin32' ? ('Win32API::File' => 0) : ()),	# Process: pipe ends the child must not inherit
+		%windows_only,
 	}, TEST_REQUIRES   => {
 		'Errno'          => 0,
 		'File::Find'     => 0,
@@ -66,6 +76,8 @@ WriteMakefile(
 		'Test::Exception' => 0,
 		'Test::Mockingbird::TimeTravel' => '0.14',
 		'Test::Most'     => 0,
+		'Test::Permissions' => 0,
+		'Tie::Hash'      => 0,
 	}, META_MERGE      => {
 		'meta-spec' => { version => 2 },
 		prereqs     => {
@@ -75,7 +87,9 @@ WriteMakefile(
 				},
 			},
 		},
-		dynamic_config => 0,
+		# 1: the prerequisites depend on the platform (%windows_only), so
+		# an installer must run Makefile.PL rather than trust META.json.
+		dynamic_config => 1,
 		no_index    => {
 			directory => [ 't', 'xt' ],	# t/lib/TestSync.pm is not for CPAN
 		},

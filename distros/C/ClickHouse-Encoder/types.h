@@ -28,18 +28,26 @@ struct EnumEntry {
 };
 
 typedef struct TypeInfo TypeInfo;
+typedef struct CHTimezone CHTimezone;
 struct TypeInfo {
     int code;
     int has_prefix;
     int split_prefix;
     void *decode_state; /* temporary state, owned by the decoder scope */
     int param;             /* FixedString(N), DateTime64 precision, Decimal scale */
+    int precision;
+    char *timezone;
+    CHTimezone *tz;         /* owned by the encoder */
+    CHTimezone **zones;     /* encoder cache, set until timezone is loaded */
+    int empty_as_null;
     TypeInfo *inner;       /* Array, Nullable */
     TypeInfo **tuple;      /* Tuple */
     int tuple_len;
     EnumEntry *enum_entries;
     int enum_count;
     HV *enum_lookup;       /* name -> value, for O(1) string lookup */
+    unsigned char *enum_codes;
+    int enum_has_integer_labels;
     /* Variant only: ClickHouse stores sub-columns and discriminators in
      * alphabetical order of variant type names, not declaration order.
      * variant_decl_to_wire[d] = wire idx of declared variant d.

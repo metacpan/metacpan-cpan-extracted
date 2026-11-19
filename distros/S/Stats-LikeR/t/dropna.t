@@ -116,6 +116,22 @@ throws_ok { dropna({ A => [1], r => { x => 1 } }, cols => ['A']) } qr/ambiguous/
 lives_ok { dropna({ A => [1, undef] }, cols => ['A']) }
 	'a well-formed call lives';
 
+# An undef column of a HoA reads as all undef, and stays undef in the caller's
+# frame.  Up to 0.3424 dropna() autovivified it there into [] -- the frame it
+# promises never to modify -- because the perl read it as $df->{$c}[$i].
+{
+	my %df = (A => [1, undef, 3], B => undef);
+	is_deeply(dropna(\%df, cols => ['A']), { A => [1, 3], B => [undef, undef] },
+		'dropna: an undef HoA column is cut like an empty one');
+	is_deeply(dropna(\%df, cols => ['B'], how => 'all'), { A => [], B => [] },
+		'dropna: an undef HoA column in cols makes every row all NA');
+	ok(exists $df{B} && !defined $df{B},
+		'dropna: and the undef column is left undef in the caller\'s frame');
+	throws_ok { dropna({ A => [1], B => 'x' }, cols => ['A']) }
+		qr/^dropna: column 'B' is not an ARRAY reference/,
+		'dropna: a HoA value that is not a column dies naming it';
+}
+
 # memory
 no_leaks_ok {
 	my $x = dropna({ A => [1, 2, undef], B => [1, 2, 3] }, cols => ['A']);
@@ -128,6 +144,10 @@ no_leaks_ok {
 no_leaks_ok {
 	eval { dropna({ A => [1] }, cols => ['Z']) };
 } 'dropna: no memory leaks (die path)' unless $INC{'Devel/Cover.pm'};
+
+no_leaks_ok {
+	eval { dropna({ A => [1], B => 'x' }, cols => ['A']) };
+} 'dropna: no memory leaks (a HoA value that is not a column)' unless $INC{'Devel/Cover.pm'};
 
 # A call-form error dies with the function's argparse-style help screen from
 # lib/Stats/LikeR/Usage.pm, the error itself on the last line.

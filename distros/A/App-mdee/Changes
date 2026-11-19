@@ -1,5 +1,21 @@
 Revision history for Perl extension App-mdee
 
+1.22 2026-11-19T07:51:22Z
+
+    - A code block of pandoc-embedz (```embedz, ```{.embedz ...}) is
+      colored part by part: the configuration as YAML, the template
+      as Jinja2, and the data by its format, in the backgrounds of
+      code_config, code_block and code_data.  The lines of ---
+      between them have no color.  The lines of a part labelled NAME
+      by a block module of Text::ANSI::Highlight are in code_NAME
+    - The language of a fence is also the first class in braces:
+      ```{.perl .numberLines}
+    - In the dark mode the default highlighter is pandoc in the style
+      breezedark.  The background colors of a style are not used
+    - The background of code blocks is L03 on a dark background,
+      darker than before
+    - Requires Text::ANSI::Highlight 0.04
+
 1.21 2026-11-18T09:43:38Z
 
     - The code in a fenced code block is shown in the colors of its

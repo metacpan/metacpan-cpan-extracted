@@ -12,6 +12,12 @@ my $top = abs_path('.'); my $data = "$top/t/batteries/portable.txt";
 my %WIN = (   # the line => why Windows differs (the platform's, not a bug)
   "trap 'echo c' 10 12; kill -USR1 \$\$; kill -USR2 \$\$; echo after" => 'no signals 10 and 12 (USR1, USR2) on Windows',
 );
+my %SYSTEM1 = (   # the line => why it differs with the primitive system1 (Perl's own spawn) on Windows: a ❰BUG❱ in Perl,
+  # perl-win32-system-bugs.md, 1 (the user: no bug-for-bug workaround); in the TODO test below, not in the first one
+  q{A=1 B=$(true)$A sh -c 'echo "[$B]"'} => 'an argument of sh with " (post-0.12)',
+  q{A=1 B=$(echo $A) sh -c 'echo "[$B]"'} => 'an argument of sh with " (post-0.12)',
+);
+my $SYSTEM1 = $WIN && ($ENV{PROC_SPAWNER_MISSING} // '') =~ /\bposix_spawn\b/;
 
 our $ONLYPERL;   # (the recording: PATH as it is set, with nothing but perl)
 sub run_line {   # (OUTPUT with | for newlines, then <STATUS>) of one line, in a fresh directory
@@ -51,13 +57,16 @@ if ($record) {   # on Linux: the lines that pass every variation, with their out
 
 open my $in, '<', $data or die "$data: $!"; binmode $in;
 my @t = map { chomp; [split /\t/, $_, 2] } grep !/^#/, <$in>;
-my (@bad, $n, $known);
+my (@bad, $n, $known, @s1);
 for (@t) {
   my ($line, $want) = @$_;
   if ($WIN && $WIN{$line}) { $known++; next }
+  if ($SYSTEM1 && $SYSTEM1{$line}) { push @s1, $_; next }
   my $got = run_line($line); $n++;
   push @bad, "$line\n  want: $want\n  got:  $got" if $got ne $want }
-ok !@bad, "$n lines as on Linux" . ($known ? " ($known left out: the platform's, %WIN)" : '') or diag join "\n", @bad;
+ok !@bad, "$n lines as on Linux" . ($known ? " ($known left out: the platform's, %WIN)" : '') . (@s1 ? ', ' . @s1 . ' more below (%SYSTEM1)' : '')
+  or diag join "\n", @bad;
+for (@s1) { local our $TODO = "with system1: $SYSTEM1{$$_[0]} (Perl's ❰BUG❱, perl-win32-system-bugs.md, 1)"; is run_line($$_[0]), $$_[1], $$_[0] }
 
 # Windows only (post-0.10): its own paths, the output written by hand.  UNC names: Wine has no server shares, but its
 # device names \\.\C:\... are UNC names in form (server '.', share 'C:'), so the code takes them as \\server\share.

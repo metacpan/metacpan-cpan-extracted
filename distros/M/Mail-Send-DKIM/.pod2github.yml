@@ -1,0 +1,6 @@
+# Read from the current directory, so plain `pod2github lib/Mail/Send/DKIM.pm >
+# README.md` picks it up with no flags.  The headers in the POD are shifted down
+# one level by default, which leaves the document with no H1 at all; the header
+# file supplies it.  Its content is included verbatim, so the blank line that
+# separates the title from the first section has to be in the file.
+header-file: .pod2github-header.md

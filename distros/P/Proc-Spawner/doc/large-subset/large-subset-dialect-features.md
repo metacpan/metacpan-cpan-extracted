@@ -2,7 +2,7 @@
 
 Prefix `large-subset-`. Started 2026-11-02, revised twice the same day after the user's reviews (the second time with bash's manual). This list replaces the sorting in item Y1 of the page "Shell Corpus Gaps".
 
-## 1. The definition (the user's words, 2026-11-02)
+## <a id="my-section-1"></a>1. The definition (the user's words, 2026-11-02)
 
 A mismatch between dash and bash is **blatant** when:
 
@@ -19,13 +19,13 @@ Where both shells agree, our parser must accept the form; for example, items P1�
 
 **Why Y1 was wrong.** Y1 sorted our parser's rejection messages, so the yardsticks depended on the parser they measure. It also paraphrased the definition as "one shell errors, or the result is clearly different", which is not what the user said.
 
-## 2. Who decided each verdict
+## <a id="my-section-2"></a>2. Who decided each verdict
 
 Every verdict carries a **basis**:
 
 - **P:ID** (set in stone): a probe run in both shells shows it. ID names the probe in [`doc/large-subset/dialect-cases/cases.txt`](dialect-cases/cases.txt) or [`large-subset-dialect-probes2.txt`](dialect-cases/large-subset-dialect-probes2.txt). Each probe runs in `dash -c` and in `bash --posix -c`, in a fresh empty folder, with stdin from `/dev/null`. A probe settles "one shell refuses what the other runs" and "the results differ".
 - **P:-n** (set in stone): a shell refuses to parse the string.
-- **M:N** (set in stone): item N of "Bash POSIX Mode" (section 6.11 of the Bash Reference Manual of bash 5.2.21, from the Debian package `bash-doc`; gnu.org is not reachable from Claude's workspace).
+- **M:N** (set in stone): item N of "Bash POSIX Mode" ([section 6](#my-section-6).11 of the Bash Reference Manual of bash 5.2.21, from the Debian package `bash-doc`; gnu.org is not reachable from Claude's workspace).
 - **SC:CODE**: ShellCheck 0.11.0 says dash lacks the construct, so dash fails. Not probed one by one.
 - **J** (a judgement by Claude, 2026-11-02, not yet reviewed by the user): the probe shows a difference, but whether it is blatant or subtle is not settled by the probe alone. Such verdicts are kept, as free-form text, in [`tools/large-subset-verdicts.txt`](tools/large-subset-verdicts.txt) and count as open until the user rules.
 
@@ -33,11 +33,13 @@ When the user rules on a verdict, [`tools/large-subset-verdicts.txt`](tools/larg
 
 **Both shells refusing** (the user, 2026-11-02): "both shell refusing means that we should better refuse this too". Such forms are counted as blatant, so they stay outside both yardsticks.
 
-**Class X** (the user, 2026-11-02): for the commands the subset runs as programs (`echo`, `printf`, `test`, `[`, `kill`, `time`), the program beats the shells' difference. Those differences are marked X and exclude nothing. The order of all rules is in [`large-subset-state.md`](large-subset-state.md), section 2.
+**Class X** (the user, 2026-11-02): for the commands the subset runs as programs (`echo`, `printf`, `test`, `[`, `kill`, `time`), the program beats the shells' difference. Those differences are marked X and exclude nothing. The order of all rules is in [`large-subset-state.md`](large-subset-state.md#my-section-2), section 2.
 
 dash 0.5.12 and `bash --posix` 5.2.21 throughout. In the tables, the dash and bash results are separated by "/".
 
-## 3. Blatant: one shell refuses what the other runs (basis: probe)
+## <a id="my-section-3"></a>3. Blatant: one shell refuses what the other runs (basis: probe)
+
+The verdicts in sections 3 to 6 are those of 2026-11-02 (with a few later notes); the current verdict and basis of each feature, rule E's class X among them, are in the table of [`tools/large-subset-features.pl`](tools/large-subset-features.pl).
 
 | Feature | Example | dash / bash | Probe |
 |---|---|---|---|
@@ -78,7 +80,7 @@ dash 0.5.12 and `bash --posix` 5.2.21 throughout. In the tables, the dash and ba
 | a read-only bash variable as an assignment | `UID=5 echo hi` | works / "readonly variable" | uidset (for `UID`: uidassign, rule E as dash since post-0.04; reading `$UID` where the string does not set it: uidread) |
 | `return` outside a function | `echo a; return; echo b` | ends quietly / error | return |
 
-## 4. Blatant: both run it, the results differ (basis: probe, except where marked J)
+## <a id="my-section-4"></a>4. Blatant: both run it, the results differ (basis: probe, except where marked J)
 
 | Feature | Example | dash / bash | Probe |
 |---|---|---|---|
@@ -102,14 +104,14 @@ dash 0.5.12 and `bash --posix` 5.2.21 throughout. In the tables, the dash and ba
 | `$-` (open) | `echo "$-"` | empty / `hBc`; but a test for `*i*` gives the same answer | dashvar |
 | `$LINENO` | `echo "$LINENO"` | empty in `-c` / `1`; that dash's manual documents it is unchecked | lineno (rule E as bash since post-0.04) |
 
-## 5. Both shells refuse, or misbehave alike (all **J**)
+## <a id="my-section-5"></a>5. Both shells refuse, or misbehave alike (the basis with each)
 
-- **`local` outside a function** (probe localout): both give an error. dash stops; bash goes on with the rest of the string (`local` is not a POSIX special builtin, so M:24 does not apply). Open verdict, in [`tools/large-subset-verdicts.txt`](tools/large-subset-verdicts.txt).
-- **A special builtin's error** (probes shiftover, exportbad): `shift 3` with too few arguments, `export "1x=2"`. Both give an error; dash stops, bash goes on. The manual (M:24) says: "If a POSIX special builtin returns an error status, a non-interactive shell exits." So bash does not match its documentation: blatant, basis M:24. **❰BUG❱ bash 5.2.21** (known issue X22). `set -o nosuch` and `unset -x` do stop bash. This cannot be found from a string's text, so the detector does not flag it.
-- **`kill -SIGHUP`** (probe killsig): both refuse. This matches bash's manual (M:38: "The `kill` builtin does not accept signal names with a `SIG` prefix"), so it is no bash bug. Both refusing: we refuse too. But the subset runs the program `kill`, which accepts the prefix; which rule wins is a question in [`large-subset-state.md`](large-subset-state.md), section 2.
-- **`>&3` with fd 3 not open** (probe dupnum): both refuse, with statuses 2 / 1. Counted **subtle**: the same refusal, differing only in the status.
+- **`local` outside a function** (probe localout): both give an error. dash stops; bash goes on with the rest of the string (`local` is not a POSIX special builtin, so M:24 does not apply). Blatant, basis P:local (feature `scope` of [`tools/large-subset-features.pl`](tools/large-subset-features.pl)); the parser rejects it.
+- **A special builtin's error** (probes shiftover, exportbad): `shift 3` with too few arguments, `export "1x=2"`. Both give an error; dash stops, bash goes on. The manual (M:24) says: "If a POSIX special builtin returns an error status, a non-interactive shell exits." So bash does not match its documentation: blatant, basis M:24. **❰BUG❱ bash 5.2.21** (known issue [X22](../pspawn-known-issues.md#my-x22)). `set -o nosuch` and `unset -x` do stop bash. This cannot be found from a string's text, so the detector does not flag it.
+- **`kill -SIGHUP`** (probe killsig; basis M:38): both refuse. This matches bash's manual (M:38: "The `kill` builtin does not accept signal names with a `SIG` prefix"), so it is no bash bug. Both refusing: we refuse too. But the subset runs the program `kill`, which accepts the prefix; decided: R-refuse beats R-program (Q1, the user, 2026-11-03: "refusing is better"), so the parser rejects it ([`large-subset-state.md`](large-subset-state.md#my-section-2), section 2).
+- **`>&3` with fd 3 not open** (probe dupnum): both refuse, with statuses 2 / 1. Counted **subtle** (J): the same refusal, differing only in the status.
 
-## 6. Subtle (basis: probe, except where marked J)
+## <a id="my-section-6"></a>6. Subtle (basis: probe, except where marked J)
 
 | Feature | Example | Where the results differ | Probe |
 |---|---|---|---|
@@ -127,11 +129,11 @@ dash 0.5.12 and `bash --posix` 5.2.21 throughout. In the tables, the dash and ba
 | `set -m` | `set -m` | dash prints a warning; status 0 in both | setm |
 | `$PS1` | `echo "$PS1"` | set in dash, empty in bash | ps1 |
 
-## 7. No difference (probed)
+## <a id="my-section-7"></a>7. No difference (probed)
 
-`read -p`, `read -r`, `echo -n`, `echo --`, `printf %b`, `printf %.2f`, `kill -l`, `trap` with a number or `0`, `set -o vi`, `set -o emacs`, `break` and `continue` outside a loop, `local x=2` in a function, `umask -S`, `cd -`, `pwd -P`, `hash`, `command -p`, `ulimit -n`, `>|`, `<>`, `2>&-`, `$((x+=2))`, `$(…)` and `${#x}` inside `$((…))`, `$((010))`, `[ \( … \) -o … ]`, `[ a \< b ]`, `type NAME`, `command -V`, an alias used on the line that defines it.
+`read -p`, `read -r`, `echo -n`, `echo --`, `printf %b`, `printf %.2f`, `kill -l 2`, `trap` with a number or `0`, `set -o vi`, `set -o emacs`, `break` and `continue` outside a loop, `local x=2` in a function, `umask -S`, `cd -` (`OLDPWD` set), `pwd -P`, `hash`, `command -p`, `ulimit -n`, `>|`, `<>`, `2>&-`, `$((x+=2))`, `$(…)` and `${#x}` inside `$((…))`, `$((010))`, `[ \( … \) -o … ]`, `[ a \< b ]`, `type NAME`, `command -V`, an alias used on the line that defines it.
 
-## 8. The per-test record
+## <a id="my-section-8"></a>8. The per-test record
 
 [`t/parser/large-subset-shells.tsv`](../../t/parser/large-subset-shells.tsv) gives each test of the four parser test files one line:
 
@@ -142,7 +144,7 @@ dash 0.5.12 and `bash --posix` 5.2.21 throughout. In the tables, the dash and ba
 | expected | `ok` or `rej`, as in the test file |
 | parse | which shells parse the string (`-n`): `both`, `dash`, `bash` or `none` |
 | verdict | `B` blatant, `S` subtle, `X` only differences that a program we run decides, `O` open (a postponed verdict), `-` no difference found |
-| features | each difference found, as `id:verdict:basis`; for example, `echobs:X:P:echobs` or `scope:O:open` |
+| features | each difference found, as `id:verdict:basis`; for example, `echobs:X:P:echobs` or `dashflags:O:open` |
 | note | a free-form verdict for this one test, if any |
 
 It is made by [`doc/large-subset/tools/large-subset-features.pl`](tools/large-subset-features.pl) `-n`. That script holds the table of features: each feature's verdict, basis and the text pattern that finds it. It looks only at the string's text and at the shells' `-n`, never at our parser. Patterns can miss a use, or see one that is not there. Known misses so far: `x+=1`, `~+`, and `${1//…}`; the corpus measurement adds ShellCheck's codes, which catch these.
@@ -162,4 +164,4 @@ The **108** are the work list for the tests (many are deliberate rejections, suc
 
 No test is accepted with a blatant difference any more: the 26 of the first count (early-post-0.02, 2026-11-02) were class X (`echo -e`, `[ a == b ]`, `printf -v`, `time`, `kill %1`), which the rule "the program beats the shells' difference" now covers.
 
-A column `note` carries a free-form verdict for one test ("test:ID" in [`tools/large-subset-verdicts.txt`](tools/large-subset-verdicts.txt)); none is set yet.
+A column `note` carries a free-form verdict for one test ("test:ID" in [`tools/large-subset-verdicts.txt`](tools/large-subset-verdicts.txt)); one is set: LS:299 (`P:fnkill`).

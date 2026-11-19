@@ -5,6 +5,7 @@ META.json
 README.md
 cpanfile
 lib/Text/ANSI/Highlight.pm
+lib/Text/ANSI/Highlight/Block/embedz.pm
 lib/Text/ANSI/Highlight/IO.pm
 lib/Text/ANSI/Highlight/pandoc.pm
 lib/Text/ANSI/Highlight/skylighting.pm
@@ -18,6 +19,7 @@ t/03_command.t
 t/04_filter.t
 t/05_io.t
 t/06_style.t
+t/07_block.t
 t/lib/Highlighters.pm
 META.yml
 MANIFEST

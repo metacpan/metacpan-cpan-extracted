@@ -15,7 +15,11 @@
 # - each run starts in a fresh copy of the same small directory (FIXTURE below), with HOME inside it;
 # - PATH is the programs of %QUIET (run, not logged), then one directory of recorders: one for every program name on the system's PATH.  A recorder appends
 #   its name and arguments to the run's log; for the names in %REAL (the programs we run in place of builtins,
-#   and tools that only read or print) it then runs the real program, otherwise it exits 0 with no output.
+#   and tools that only read or print) it then runs the real program, otherwise it exits 0 with no output, after
+#   reading what the sample feeds it (to the end or to 64 KB; its size and SHA-256 join the log line after \036; not
+#   the run's own standard input: IN1, post-0.12, the recorder below), unless the program never reads its standard
+#   input (A24 (b): it would take what the program only inherits and another command reads, as in a while-read loop
+#   around mv; the list, and rm, mv, cp, ln with -i, which do read: the recorder).
 # So the three shells see the same files, the same environment and the same "programs", and only the shells differ.
 # Ours runs from a copy of lib/, blib/ and t/try.pl made at the start (BASE/dist), so lib/ may be edited during a run.
 #
@@ -47,14 +51,21 @@
 # timeout) to end, so that their effects count whichever shell started them; then the rest is killed and the run
 # records "after": "killed".  -after 0: killed at once, as before (the shells' jobs then often died before they did
 # anything, while ours finishes its jobs before it ends).  With -env pidns, process 1 of the namespace waits for all.
+# -end MODE (post-0.12, K5): ours' wait at exit for its background jobs, PROC_SHELLSPAWN_END (shell, the default; all;
+# none; each with :SECONDS), hidden from the samples as -run's setting is (TRY_HIDE); OUTDIR/end.txt names it.
+# -programs FILE|system (post-0.12, A23 (b), the user, 2026-11-15): the program names that get recorders, one a line
+# ('#' lines skipped): by default large-subset-programs.txt beside this script, every name there whether installed or not
+# and no other, so that what the samples meet is the same in every container; 'system': every name on the system's
+# PATH (as before).  OUTDIR/programs.txt names the list and its SHA-256.
 # -workers-from DIR (post-0.10): each sample runs in the worker K (directory BASE/wK, user rcK) that ran it in the earlier
 # run DIR (its run-K.jsonl), so that paths, $PWD and $USER are those of that run; samples not there are spread as usual.
 use strict; use warnings; use JSON::PP; use File::Path qw(make_path remove_tree); use Cwd 'abs_path'; use Getopt::Long;
 use POSIX ();
-my ($J, $MAX, $ONLY, $Q, $ENVL, $BASE, $RUNLIB, $SHELLS, $WFROM, $SETUPF, $STANDIN, $AFTER) = (4, 0, '', 0, '', '/var/tmp/runcompare', '', 'dash,bash,ours', '', '', '', 5);   # -q: run ours only, and log the programs of %QUIET too, each line headed by its caller's name and \035 (for large-subset-threeway.pl),
+my ($J, $MAX, $ONLY, $Q, $ENVL, $BASE, $RUNLIB, $SHELLS, $WFROM, $SETUPF, $STANDIN, $AFTER, $ENDW) = (4, 0, '', 0, '', '/var/tmp/runcompare', '', 'dash,bash,ours', '', '', '', 5, '');
+my $PROGS = do { (my $d = abs_path($0)) =~ s{/[^/]*\z}{}; "$d/large-subset-programs.txt" };   # -q: run ours only, and log the programs of %QUIET too, each line headed by its caller's name and \035 (for large-subset-threeway.pl),
 #     and every builtin call (t/try.pl, RECBUILTIN; for large-subset-builtins.pl)
-GetOptions('j=i' => \$J, 'n=i' => \$MAX, 'only=s' => \$ONLY, 'q' => \$Q, 'env=s' => \$ENVL, 'base=s' => \$BASE, 'run=s' => \$RUNLIB, 'shells=s' => \$SHELLS, 'workers-from=s' => \$WFROM, 'standin=s' => \$STANDIN, 'setup=s' => \$SETUPF, 'after=f' => \$AFTER) && @ARGV == 3
-  or die "usage: $0 [-j N] [-n MAX] [-only IDS|\@FILE] [-q] [-env V,...] [-base DIR] [-run RUNLIB] [-shells LIST] [-workers-from DIR] [-standin LIST] [-setup FILE] [-after SECONDS] samples.jsonl samples.tsv OUTDIR\n";
+GetOptions('j=i' => \$J, 'n=i' => \$MAX, 'only=s' => \$ONLY, 'q' => \$Q, 'env=s' => \$ENVL, 'base=s' => \$BASE, 'run=s' => \$RUNLIB, 'shells=s' => \$SHELLS, 'workers-from=s' => \$WFROM, 'standin=s' => \$STANDIN, 'setup=s' => \$SETUPF, 'after=f' => \$AFTER, 'end=s' => \$ENDW, 'programs=s' => \$PROGS) && @ARGV == 3
+  or die "usage: $0 [-j N] [-n MAX] [-only IDS|\@FILE] [-q] [-env V,...] [-base DIR] [-run RUNLIB] [-shells LIST] [-workers-from DIR] [-standin LIST] [-setup FILE] [-after SECONDS] [-end MODE] [-programs FILE|system] samples.jsonl samples.tsv OUTDIR\n";
 my %SETUP;   # -setup: sample id => its setup
 if (length $SETUPF) { open my $in, '<', $SETUPF or die "$SETUPF: $!"; while (<$in>) { my $s = decode_json($_); $SETUP{$s->{id}} = $s }
   %SETUP or die "-setup $SETUPF: no setups\n" }
@@ -115,22 +126,56 @@ my %REAL = (%QUIET, map +($_ => 1), qw(cat grep egrep fgrep sed awk sort head ta
   dirname printenv env xargs tee ls mkdir touch cmp diff od rev nl paste join fold comm tac realpath readlink stat
   sha256sum md5sum base64 yes));
 delete $REAL{$_} for grep !$QUIET{$_}, split /,/, $STANDIN;   # -standin: stand-ins too
-# The recorders, made once: one per program name found on the system's PATH.
+# The recorders, made once: one per program name of the list (-programs), or found on the system's PATH (-programs system).
 my $REC = "$BASE/bin"; remove_tree($REC); make_path($REC);
 open my $r, '>', "$BASE/rec" or die; print $r <<'SH'; close $r; chmod 0755, "$BASE/rec";
 #!/bin/sh
 n=${0##*/}
 l=$n; for a in "$@"; do l="$l$(printf '\037')$a"; done
 if [ -n "$RECPARENT" ]; then read p < /proc/$PPID/comm; l="$p$(printf '\035')$l"; fi   # -q: who called it (perl, xargs, env, ...)
+case " $REALNAMES " in *" $n "*) printf '%s\n' "$l" >> "$RECLOG"; exec "$REALDIR/$n" "$@";; esac   # %REAL: its input is its own
+# A stand-in (IN1, post-0.12): what the sample feeds it (a pipe, a file given by <, a here-document) is read, to the end
+# or to 64 KB, and its size and SHA-256 join the log line: \036 then "BYTES SHA256" ("65536+ ..." when it stopped at the
+# cap).  The run's own standard input (/dev/null, or a setup's file, BASE/wK/stdin beside RECLOG) is not read: a later
+# read of the sample's would lose it.  Told apart by what descriptor 0 is: the same file (device and inode) as the run's
+# input (inherited, or <&0, or < /dev/stdin: nothing to log), or another (read).  test -ef through /dev/stdin, which is
+# /proc/self/fd/0; without /proc (-env noproc) stat's fstat of "-".  "\036closed": no descriptor 0; "\036unreadable":
+# reading it failed (a directory).
+# A24 (b) (the user, 2026-11-17): programs that never read their standard input are not read for either, since they
+# would only take what they inherit and another command reads (a while-read loop around mv, sed's e command): their
+# line is as before IN1.  rm, mv, cp, ln still are when asked to prompt (-i, -I, --interactive): they read the answer.
+noin=
+case $n in rm|rmdir|mv|cp|ln|mkdir|touch|chmod|chown|chgrp|mkfifo|mknod|unlink|link|truncate|sleep|ls|basename|dirname|seq|expr|readlink|realpath|stat|yes) noin=1
+  case $n in rm|mv|cp|ln) for a in "$@"; do case $a in --) break;; --interactive*) noin=;; --*) ;; -*[iI]*) noin=;; esac; done;; esac;;
+zcat) o=; d=; noin=1   # (the user, 2026-11-17) zcat reads its input only when it names no file (options alone), or names -
+  for a in "$@"; do if [ -z "$d" ]; then case $a in --) d=1; continue;; -) noin=; break;; -?*) continue;; esac; fi
+    [ "$a" = - ] && { noin=; break; }; o=1; done
+  [ -n "$o" ] || noin=;; esac
+if [ -n "$RECLOG" ] && [ -z "$noin" ]; then
+  own=${RECLOG%/*}/stdin; [ -e "$own" ] || own=/dev/null
+  if [ -e /dev/stdin ]; then [ /dev/stdin -ef "$own" ]; s=$?   # 0: the run's own, 1: another
+  elif i=$(/usr/bin/stat -L -c %d:%i - 2>/dev/null); then [ "$i" = "$(/usr/bin/stat -L -c %d:%i "$own")" ]; s=$?
+  else s=2; fi
+  if [ $s = 1 ]; then t=$RECLOG.in$$
+    if /usr/bin/head -c 65537 > "$t" 2>/dev/null; then c=$(/usr/bin/wc -c < "$t")
+      if [ "$c" -gt 65536 ]; then c=65536+; h=$(/usr/bin/head -c 65536 "$t" | /usr/bin/sha256sum); else h=$(/usr/bin/sha256sum < "$t"); fi
+      l="$l$(printf '\036')$c ${h%% *}"
+    else l="$l$(printf '\036')unreadable"; fi
+    /usr/bin/rm -f "$t"
+  elif [ $s = 2 ]; then l="$l$(printf '\036')closed"; fi
+fi
 printf '%s\n' "$l" >> "$RECLOG"   # one write, so that pipeline elements do not mix their lines
-case " $REALNAMES " in *" $n "*) exec "$REALDIR/$n" "$@";; esac
 printf '%s' "${STANDIN_OUTPUT-}"   # -env output: the stand-in's answer (else nothing)
 exit "${STANDIN_STATUS:-0}"        # -env fail
 SH
 my %seen;
-for my $d (qw(/usr/local/sbin /usr/local/bin /usr/sbin /usr/bin /sbin /bin)) {
-  opendir my $dh, $d or next;
-  for my $n (readdir $dh) { next if $n =~ /^\./ || $seen{$n}++ || !-x "$d/$n" || -d "$d/$n"; symlink "$BASE/rec", "$REC/$n" or die "$REC/$n: $!" } }
+if ($PROGS eq 'system') {
+  for my $d (qw(/usr/local/sbin /usr/local/bin /usr/sbin /usr/bin /sbin /bin)) {
+    opendir my $dh, $d or next;
+    for my $n (readdir $dh) { next if $n =~ /^\./ || $seen{$n}++ || !-x "$d/$n" || -d "$d/$n"; symlink "$BASE/rec", "$REC/$n" or die "$REC/$n: $!" } } }
+else {
+  open my $pl, '<', $PROGS or die "-programs $PROGS: $!";
+  while (<$pl>) { chomp; next if /^#/ || !length || $seen{$_}++; m{/} and die "-programs: '$_' is not a name\n"; symlink "$BASE/rec", "$REC/$_" or die "$REC/$_: $!" } }
 my $REALDIR = "$BASE/real"; remove_tree($REALDIR); make_path($REALDIR);   # the real programs, by absolute path
 for my $n (keys %REAL) { for my $d (qw(/usr/bin /bin)) { if (-x "$d/$n") { symlink "$d/$n", "$REALDIR/$n"; last } } }
 my $QDIR = "$BASE/quiet"; remove_tree($QDIR); make_path($QDIR);   # first in PATH: run under their own names, not logged
@@ -153,6 +198,13 @@ my @todo; { open my $in, '<', $SJ or die "$SJ: $!";
 print STDERR scalar(@todo), " samples to run, ", scalar(keys %done), " done before", (%ENV_ON ? ", -env " . join(',', sort keys %ENV_ON) : ''), "\n";
 if (length $RUNLIB) { require Digest::SHA; open my $e, '>', "$OUT/run.txt" or die;
   print $e "ours through Run: PROC_SPAWNER_MISSING=\"posix_spawn fork\"; Run.pm sha256 ", Digest::SHA->new(256)->addfile("$COPY/run/Run.pm")->hexdigest, "\n"; close $e }
+if (length $ENDW) { open my $e, '>', "$OUT/end.txt" or die; print $e "ours at exit: PROC_SHELLSPAWN_END=$ENDW\n"; close $e }
+{ open my $e, '>', "$OUT/programs.txt" or die; require Digest::SHA;   # (A23: which program names the run saw)
+  print $e $PROGS eq 'system' ? "programs: every name on the system's PATH\n"
+    : "programs: $PROGS, SHA-256 " . Digest::SHA->new(256)->addfile($PROGS)->hexdigest . "\n"; close $e }
+
+my %OURSENV = ((length $RUNLIB ? (PROC_SPAWNER_MISSING => 'posix_spawn fork') : ()), (length $ENDW ? (PROC_SHELLSPAWN_END => $ENDW) : ()));
+$OURSENV{TRY_HIDE} = join ' ', sort keys %OURSENV if %OURSENV;
 if (%SETUP) { open my $e, '>', "$OUT/setup.txt" or die; print $e "setups from ", abs_path($SETUPF), "\n"; close $e }
 if (%ENV_ON) { open my $e, '>', "$OUT/env.txt" or die; print $e map "$_: $ENVV{$_}\n", sort keys %ENV_ON;
   my %used = (fail => 'STANDIN_STATUS', output => 'STANDIN_OUTPUT', mtime => 'FIXTURE_MTIME');
@@ -178,7 +230,7 @@ sub worker {
     my %rec = (id => $s->{id}, src => $s->{src}, text => $s->{text}, verdict => $acc{$s->{id}}[0], features => $acc{$s->{id}}[1]);
     local $CURSETUP = $SETUP{$s->{id}} && { %{$SETUP{$s->{id}}}, failed => [] }; $rec{setup} = $CURSETUP->{k} if $CURSETUP;
     for my $sh (($Q ? () : ([dash => {}, '/usr/bin/dash', '-c'], [bash => {}, '/usr/bin/bash', '--posix', '-c'])),
-                [ours => (length $RUNLIB ? {PROC_SPAWNER_MISSING => 'posix_spawn fork', TRY_HIDE => 'PROC_SPAWNER_MISSING'} : {}),
+                [ours => {%OURSENV},
                  $^X, "-I$COPY/blib/lib", "-I$COPY/blib/arch", (length $RUNLIB ? "-I$COPY/run" : ()), "$COPY/t/try.pl"]) {
       my ($name, $xenv, @cmd) = @$sh; next unless $SH{$name};
       local $ARG0 = $name eq 'ours' ? 'sh' : $cmd[0];   # -setup with arguments: $0 as each shell has it without (so its messages' prefix)
@@ -237,7 +289,7 @@ sub run1 {   # one shell, one sample, in a fresh copy of the fixture
   system('pkill', '-9', '-u', $u);
   my %r = (status => $st, out => slurp("$W/out"), err => slurp("$W/err"), rec => slurp("$W/log"), $Q ? (builtins => slurp("$W/blog")) : (),
            $after ? (after => $after) : ());
-  my (@files, @nomsg); my $walk; $walk = sub { my ($d, $p) = @_; opendir my $dh, $d or return;
+  my (@files, @nomsg); my $walk; $walk = sub { no warnings "recursion"; my ($d, $p) = @_; opendir my $dh, $d or return;
     for my $n (sort grep !/^\.\.?\z/, readdir $dh) { my $f = "$d/$n";
       if (-l $f) { push @files, "$p$n -> " . readlink $f; push @nomsg, $files[-1] }
       elsif (-d $f) { push @files, "$p$n/"; push @nomsg, $files[-1]; $walk->($f, "$p$n/") }

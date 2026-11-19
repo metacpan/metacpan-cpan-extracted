@@ -1663,6 +1663,7 @@ extern void		TkTextOrnLayoutTemplates _ANSI_ARGS_((
 			    struct TkTextOrnTemplates *templPtr,
 			    TkTextOrnBlockBoxes *boxesPtr,
 			    struct TkTextBlockOrns **listPtrPtr));
+extern int		TkTextOrnSplitRoom _ANSI_ARGS_((int n));
 extern void		TkTextOrnLayoutSplits _ANSI_ARGS_((TkText *textPtr,
 			    TkTextOrnSplit *splits, int num,
 			    struct TkTextBlockOrns **listPtrPtr));

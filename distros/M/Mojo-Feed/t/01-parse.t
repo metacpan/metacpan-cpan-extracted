@@ -66,7 +66,7 @@ $feed =
   Mojo::Feed::Reader->new->ua( $t->app->ua )->parse( Mojo::URL->new("/feed") );
 isa_ok( $feed, 'Mojo::Feed', 'got feed on redirect' );
 is( $feed->title, 'First Weblog', 'title ok' );
-is ( $feed->source->path, 'atom.xml' , 'source changed on redirect' );
+is($feed->source->path, '/atom.xml', 'source changed on redirect');
 
 ## Callback and non-blocking no longer supported - how do we make a promise API?
 

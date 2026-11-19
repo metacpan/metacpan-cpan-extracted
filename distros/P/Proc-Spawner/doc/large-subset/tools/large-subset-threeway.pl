@@ -32,7 +32,7 @@ for my $f (map glob("$_/run-*.jsonl"), @ARGV) { open my $in, '<', $f or die;
   while (<$in>) { my $s = eval { decode_json($_) } or next;
     for my $l (records($s->{ours}{rec}, qr/^[^\035\037]*\035/)) {
       my $who = $l =~ s/^([^\035\037]*)\035// ? $1 : 'perl';   # the caller: perl (our shell) or a program (xargs, env, ...)
-      my ($n) = split /\037/, $l; next unless defined $n && $TOOL{$n};
+      my ($n) = split /[\036\037]/, $l; next unless defined $n && $TOOL{$n};   # (\036: a stand-in's input, IN1)
       if ($who !~ /^perl/) { $byprog{$who}++; next }               # a program calls it so in every shell: no builtin involved
       next if $seen{$s->{id}}{$l}++;                               # a sample counts once per call, over all QDIRs
       $calls{$l}++; push @{$samples{$l}}, $s->{id} if @{$samples{$l} // []} < 3 }

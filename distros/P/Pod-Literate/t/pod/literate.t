@@ -148,11 +148,15 @@ The goal here is to show that begin/for has slightly different behavior with ter
 
 =for literate:command target=$tfnb
 
+Here is some text.
+
+The print statement is constructed of two components.  With C<D< leading word >Second> and C<D<+tailing word> = output>, the full statement can be constructed in the main script:
+
 =for literate $tfnb
 
 	#!/usr/bin/perl
 	use strict; use warnings;
-	print "Second output!\\n";
+	print "#<leading word>##< tailing word  >#!\\n";
 	#< Say something in2resting >#
 
 =for literate .
@@ -162,6 +166,7 @@ The goal here is to show that begin/for has slightly different behavior with ter
 	#
 	my $literate=Pod::Literate->new();
 	$literate->accept_targets('literate','literate:command');
+	$literate->accept_codes('D');
 	$literate->expand_verbatim_tabs(0);
 	$literate->parse_string_document($doc);
 	#

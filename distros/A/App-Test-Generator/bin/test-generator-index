@@ -4488,6 +4488,12 @@ sub _mutation_index {
 		"<li><b>Total</b>: $data->{total}</li>";
 	push @html, '<li><b>Killed</b>: ', scalar(@{$data->{killed} || []}), '</li>';
 	push @html, '<li><b>Survived</b>: ', scalar(@{$data->{survived} || []}), '</li>';
+	if($data->{compile_skipped}) {
+		my $compile_skipped = 0;
+		$compile_skipped += $_ for values %{$data->{compile_skipped}};
+		push @html, '<li><b>Skipped (compile)</b>: ', $compile_skipped,
+			' <em>(mutants that did not compile; not run and not in the score)</em></li>';
+	}
 
 	if($cpd_data) {
 		my $cpd_files = scalar keys %$cpd_data;
@@ -4670,7 +4676,7 @@ THEAD
 			$total,
 			$killed,
 			$survived,
-			$skipped,
+			_skipped_cell($skipped, $files->{$file}{compile_skipped}),
 			$badge_html,
 			$complexity_html,
 			$ter_cell,
@@ -5268,6 +5274,11 @@ sub _dup_badge {
 # Exit:       Returns a hashref of the form:
 #               { filename => { survived => [...],
 #                               killed   => [...] } }
+#             plus skipped (MUTANT_SKIP lines) and
+#             compile_skipped (mutants that did not
+#             compile) counts where the JSON has them.
+#             A file whose mutants all failed to
+#             compile still gets an entry.
 #             Mutants missing a 'file' field are
 #             silently skipped.
 #
@@ -5295,7 +5306,45 @@ sub _group_by_file {
 		}
 	}
 
+	if($data->{compile_skipped}) {
+		for my $file (keys %{$data->{compile_skipped}}) {
+			$files{$file}{compile_skipped} = $data->{compile_skipped}{$file};
+		}
+	}
+
 	return \%files;
+}
+
+# --------------------------------------------------
+# _skipped_cell
+#
+# Purpose:    Render the Skipped cell of the mutation
+#             files table.
+#
+# Entry:      $skipped         - lines excluded by
+#                                MUTANT_SKIP annotations
+#             $compile_skipped - mutants that did not
+#                                compile, or undef
+#
+# Exit:       Returns an HTML fragment that starts with
+#             $skipped, so the column still sorts on it.
+#
+# Side effects: None.
+#
+# Notes:      A mutant that does not compile is never
+#             run, so it is not in Total or the score.
+# --------------------------------------------------
+sub _skipped_cell {
+	my ($skipped, $compile_skipped) = @_;
+
+	my $cell = int($skipped // 0);
+	if(my $n = int($compile_skipped // 0)) {
+		$cell .= sprintf(
+			q{ <em class="compile-skipped" title="%d mutant(s) did not compile and were not run">(+%d not compiled)</em>},
+			$n, $n
+		);
+	}
+	return $cell;
 }
 
 # --------------------------------------------------
@@ -5415,6 +5464,10 @@ sub _mutant_file_report {
 		print $out qq{ <a href="$link">Next ➡</a>};
 	}
 	print $out qq{</div>};
+
+	if(my $compile_skipped = $mutants->{compile_skipped}) {
+		print $out "<p><em>$compile_skipped mutant(s) did not compile and were not run.</em></p>\n";
+	}
 
 	# --------------------------------------------------
 	# File-level structural coverage (if available)

@@ -115,7 +115,7 @@ my $dump = <<'DUMP';
 IRsend 38000,9185,4490,650,500,655,500,655,1630
 DUMP
 my $dump_codes = $converter->import_format('Tasmota', $dump);
-is(scalar(@$dump_codes), 2, 'dump decodes the supported signals, drops the rest');
+is(scalar(@$dump_codes), 3, 'dump decodes the supported signals, drops the rest');
 is($dump_codes->[0]->protocol, 'NEC',        'dump first signal is structured NEC');
 is($dump_codes->[0]->alias,    '0x08F700FF', 'dump NEC alias keeps the accumulated Data hex');
 is($dump_codes->[1]->protocol, 'JVC',        'dump second signal is raw JVC data');

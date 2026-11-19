@@ -1,5 +1,12 @@
 Revision history for Perl extension App-nup
 
+1.21 2026-11-19T07:03:27Z
+
+    - A style of the highlighter can be given after its name and a
+      colon: --highlight=pandoc:breezedark, --hi=gnu:esc256
+    - Requires App::ansicolumn 1.68, for the label which grows to the
+      left first, and Text::ANSI::Highlight 0.03
+
 1.20 2026-11-18T08:34:01Z
 
     - The default highlighter is pandoc (--highlight=pandoc), in place

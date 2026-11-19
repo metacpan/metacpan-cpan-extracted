@@ -15,7 +15,7 @@ use Tk::eText;
 my $mw = eval { MainWindow->new };
 plan skip_all => "no X display available ($@)" unless $mw;
 my $have_lt = eval { require Test::LeakTrace; 1 };
-plan tests => 306;
+plan tests => 331;
 $mw->geometry('+10+10');
 
 my @log;			# names of the objects destroyed, in order
@@ -29,6 +29,18 @@ my @log;			# names of the objects destroyed, in order
 # The names of the objects destroyed while the code runs.
 sub freed (&) { @log = (); $_[0]->(); my @r = @log; @log = (); return \@r }
 sub sfreed (&) { my $r = &freed($_[0]); return [sort @$r] }
+# Settings made with -undo off: not recorded, the value replaced is
+# freed when the command returns (with -undo on it waits in the undo
+# step, see "Settings are recorded" below).
+sub unrecorded {
+  my ($t, $code) = @_;
+  my $undo = $t->cget('-undo');
+  $t->configure(-undo => 0);
+  my $ok = eval { $code->(); 1 };
+  my $err = $@;
+  $t->configure(-undo => $undo);
+  die $err unless $ok;
+}
 
 # A text with a two-leaf block (a fraction) on line 2:
 #   line 1 "ab", line 2 "{num|den}" (head 2.0, num 2.1-2.3 and its
@@ -476,9 +488,11 @@ sub dies_like { my ($code, $re, $name) = @_;
   is(nv($t, '2.5', 0), 'new', 'the redone insertion gives the value back');
   is(nv($t, '2.1', 0), 'nu', 'the leaf before keeps its own');
   $t->editUndo;
-  is_deeply(freed { $t->insert('1.0', 'q') }, ['new'],
+  # The two settings joined the step of the insertion (recorded with
+  # -undo on), so the step that could be redone holds both values.
+  is_deeply(sfreed { $t->insert('1.0', 'q') }, [qw(new nu)],
 	    'a new edit drops the redo history, and frees its values');
-  is_deeply(freed { $t->destroy; $mw->update }, ['nu'], 'the rest goes with the widget');
+  is_deeply(freed { $t->destroy; $mw->update }, [], 'nothing is left for the widget');
 }
 
 {
@@ -513,7 +527,7 @@ sub dies_like { my ($code, $re, $name) = @_;
   is(nv($t, '2.3', 0), 'y', 'the nested block value is in the restored nested block');
   is(nv($t, '2.8', 0), 'uv', 'the outer block leaf value is back');
   is(nv($t, '2.8', -1), 'Froot', 'the outer block root value is back');
-  is_deeply(freed { $t->blockNodedata('2.3', 0, undef) }, ['y'],
+  is_deeply(freed { unrecorded($t, sub { $t->blockNodedata('2.3', 0, undef) }) }, ['y'],
 	    'the undo history holds no copy of a value');
   $t->destroy;
 }
@@ -765,6 +779,96 @@ for my $case (['1.4', '1.12', [], '{aa|{bb|cc|dd}|ee}', undef],
   $t->blockData('3.1', V->new('inst3', sub { $end = eval { $t->index('end') } || 'gone' }));
   is_deeply(freed { $t->destroy; $mw->update }, ['inst3'], 'destroying the widget');
   is($end, 'gone', 'after it is gone');
+}
+
+# ---------------------------------------------------------------------
+# Settings are recorded (2.10): with -undo on, setting a node value, a
+# run value, a mark value or instance data is a change the undo takes
+# back; the value replaced waits in the undo step.
+{
+  my $t = fraction(-undo => 1);
+  my $text = sub { $t->get('2.0', '2.end') };
+  my $st = sub { join ' ', map { ref $_ ? $_->{n} : defined $_ ? $_ : '-' }
+		   scalar $t->blockNodedata('2.2', 0), scalar $t->tagData('b', '1.0'),
+		   scalar $t->markData('m'), scalar $t->blockData('2.2') };
+  $t->tagAdd('b', '1.0', '1.2');
+  $t->markSet('m', '1.1');
+  $t->blockNodedata('2.2', 0, V->new('n1'));
+  $t->tagData('b', '1.0', V->new('r1'));
+  $t->markData('m', V->new('m1'));
+  $t->blockData('2.2', V->new('i1'));
+  $t->editReset;
+  $t->editModified(0);
+  is($st->(), 'n1 r1 m1 i1', 'settings: four values');
+  is_deeply(freed {
+    $t->blockNodedata('2.2', 0, V->new('n2'));
+    $t->tagData('b', '1.0', V->new('r2'));
+    $t->markData('m', V->new('m2'));
+    $t->blockData('2.2', V->new('i2'));
+  }, [], 'replaced with -undo on: nothing is freed');
+  is($st->(), 'n2 r2 m2 i2', 'the new values');
+  ok(!$t->editModified, 'a setting does not make the widget modified');
+  is_deeply(freed { $t->editUndo }, [], 'undo frees nothing');
+  is($st->(), 'n1 r1 m1 i1', 'undo: the old values (the settings in a row are one step)');
+  ok(!$t->editModified, 'nor does its undo');
+  is_deeply(freed { $t->editRedo }, [], 'redo frees nothing');
+  is($st->(), 'n2 r2 m2 i2', 'redo: the new ones');
+  is_deeply(sfreed { $t->editReset }, [qw(i1 m1 n1 r1)], 'edit reset frees the old values, once');
+
+  # With -autoseparators, a setting joins the step of the edit before it
+  # (a program giving the new leaf a value): one undo takes back both.
+  $t->insert('2.3', "\n");
+  is($text->(), '{nu|m|den}', 'a new leaf m');
+  $t->blockNodedata('2.4', 0, V->new('new'));
+  is_deeply(freed { $t->editUndo }, [], 'one undo');
+  is($text->(), '{num|den}', 'takes back the insertion');
+  is(nv($t, '2.2', 0), 'n2', 'and the leaf before keeps its value');
+  is_deeply(freed { $t->editRedo }, [], 'redo');
+  is_deeply([$text->(), nv($t, '2.4', 0)], ['{nu|m|den}', 'new'], 'the leaf and its value again');
+
+  # After an undo a setting is a step of its own, and the steps that can
+  # be redone stay (a setting moves no text).
+  $t->editUndo;
+  $t->blockNodedata('2.2', 0, V->new('n3'));
+  ok(eval { $t->editRedo; 1 }, 'a setting after an undo keeps the redo');
+  is_deeply([$text->(), nv($t, '2.2', 0), nv($t, '2.4', 0)], ['{nu|m|den}', 'n3', 'new'],
+	    'the redo: the insertion, beside the value set after the undo');
+  $t->editUndo;
+  is_deeply([$text->(), nv($t, '2.2', 0)], ['{num|den}', 'n3'], 'undo: the insertion');
+  $t->editUndo;
+  is(nv($t, '2.2', 0), 'n2', 'the next undo: the setting');
+  $t->editRedo;
+  is(nv($t, '2.2', 0), 'n3', 'and its redo');
+
+  # With -undo off nothing is recorded: the value replaced is freed when
+  # the command returns.
+  $t->configure(-undo => 0);
+  is_deeply(freed { $t->blockNodedata('2.2', 0, undef) }, ['n3'], '-undo off: freed at once');
+  $t->configure(-undo => 1);
+  $t->destroy;
+}
+
+# The undo of a mark's setting tells the mark's place as it is then
+# ("mark set" is not recorded: the mark may have moved).
+{
+  my @told;
+  my $t = fraction(-undo => 1, -valuecommand => sub {
+    my (undef, $ev, $kind, $where, $v, $cause) = @_;
+    push @told, "$ev [@$where] $cause" if $kind eq 'mark';
+  });
+  $t->markSet('m', '1.1');
+  $t->markData('m', 'a');
+  $t->editReset;			# (else 'a' and 'b' are one step)
+  @told = ();
+  $t->markData('m', 'b');
+  is("@told", 'stash [m 1.1] set', 'a recorded setting of a mark value: stash');
+  $t->markSet('m', '3.2');
+  @told = ();
+  $t->editUndo;
+  is(join(', ', @told), 'stash [m 3.2] undo, restore [m 3.2] undo',
+     'its undo names the mark where it is now');
+  is($t->markData('m'), 'a', 'and gives the old value back');
+  $t->destroy;
 }
 
 # ---------------------------------------------------------------------

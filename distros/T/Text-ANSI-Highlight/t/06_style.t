@@ -142,4 +142,52 @@ SKIP: {
     is `$cmd -w $name -s $other{$name} $c`, $want, 'ansihighlight -s';
 }
 
+# background => 0 takes the colors of the background out of what the
+# highlighter gives: a style for a dark screen of pandoc has them
+subtest 'background' => sub {
+    my $strip = \&Text::ANSI::Highlight::_no_background;
+    is $strip->("\e[37;40;22mx\e[0m"), "\e[37;22mx\e[0m", '40';
+    is $strip->("\e[107;1mx"), "\e[1mx", '107';
+    # 49 puts the background back to the default one: the background
+    # of the program which shows the text would end there
+    is $strip->("\e[31;49mx\e[49my\e[39;49mz"), "\e[31mxy\e[39mz", '49';
+    is $strip->("\e[48;5;234;31mx"), "\e[31mx", '48;5;N';
+    is $strip->("\e[1;48;2;10;20;30;31mx"), "\e[1;31mx", '48;2;R;G;B';
+    is $strip->("\e[38;5;45;44mx"), "\e[38;5;45mx", '38;5;N stays, with 45 in it';
+    is $strip->("\e[38;2;40;41;42;43mx"), "\e[38;2;40;41;42mx", '38;2;R;G;B stays';
+    is $strip->("\e[41mx\e[mx"), "x\e[mx", 'a sequence of the background alone is gone';
+    # the parameters with colons (ITU T.416)
+    is $strip->("\e[48:2::10:20:30;31mx"), "\e[31mx", '48:2::R:G:B';
+    is $strip->("\e[1;48:5:234mx"), "\e[1mx", '48:5:N';
+    is $strip->("\e[38:2::40:41:42;4:3;44mx"), "\e[38:2::40:41:42;4:3mx", '38:2::R:G:B and 4:3 stay';
+    is $strip->("\e[38:5:45mx"), "\e[38:5:45mx", '38:5:N stays';
+
+    ok !eval { Text::ANSI::Highlight->new(background => 2, nosuch => 1); 1 }, 'still dies for another';
+    SKIP: {
+        skip 'pandoc is not installed', 4 unless grep { $_ eq 'pandoc' } @highlighter;
+        my $with = (Text::ANSI::Highlight->new('pandoc:breezedark')->highlight([ c => $code ]))[0];
+        my $without = (Text::ANSI::Highlight->new('pandoc:breezedark', background => 0)
+                       ->highlight([ c => $code ]))[0];
+        like $with, qr/\e\[[\d;]*\b40\b/, 'breezedark has a background';
+        unlike $without, qr/\e\[(?:[\d;]*;)?(?:4[0-7]|10[0-7])[;m]/, 'not with background => 0';
+        like $without, qr/\e\[[\d;]*3\d/, 'the colors of the text are there';
+        is $text->($without), $code, 'the text is the same';
+    }
+};
+
+# The sequences with colons are colors as the others
+subtest 'sequences with colons' => sub {
+    my $name = $highlighter[0];
+    no strict 'refs';
+    no warnings 'redefine';
+    local *{"Text::ANSI::Highlight::${name}::highlight"} = sub {
+        map { $_->[1] =~ s/^(.+)$/\e[38:2::200:100:50;48:5:234m$1\e[0m/mgr } @_;
+    };
+    my($out) = Text::ANSI::Highlight->new($name)->highlight([ c => "int x;\nint y;\n" ]);
+    is $out, "\e[38:2::200:100:50;48:5:234mint x;\e[0m\n\e[38:2::200:100:50;48:5:234mint y;\e[0m\n",
+        'accepted as the text in colors';
+    ($out) = Text::ANSI::Highlight->new($name, background => 0)->highlight([ c => "int x;\n" ]);
+    is $out, "\e[38:2::200:100:50mint x;\e[0m\n", 'without the background';
+};
+
 done_testing;

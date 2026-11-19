@@ -285,7 +285,8 @@ subtest 'report: dry runs, unknown statuses, blank lines, and a trace where noth
 	is($count, 3, 'reading three tasks, and skipping the blank lines');
 	my $html = slurp($html_file);
 	like($html, qr{<title>Mine &lt;x&gt;</title>}, 'the title given is used, escaped');
-	like($html, qr/3 tasks: 0 done, 0 skipped, 0 failed, 1 dry runs/, 'a dry run is counted in the summary');
+	# "1 dry runs" until 0.196, which also added the other statuses
+	like($html, qr/3 tasks: 0 done, 0 skipped, 0 failed, 1 dry run, 1 unknown, 1 yes</, 'a dry run is counted in the summary, and so is every other status');
 	like($html, qr/<tr class="dry">.*class="status">dry run<.*<tr class="other">.*class="status">yes<.*<tr class="other">.*class="status">unknown</s,
 		'a status report() does not know is shown as it is, and a missing one as unknown');
 	like($html, qr/<div class="lane"><\/div>/, 'the positive half: the timeline column is there');

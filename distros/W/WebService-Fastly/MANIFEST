@@ -144,6 +144,8 @@ docs/BotManagementBotResponseExtra.md
 docs/BotManagementBotsResponse.md
 docs/BotManagementCategoriesResponse.md
 docs/BotManagementCategory.md
+docs/BotManagementCategoryBots.md
+docs/BotManagementCategoryBotsAction.md
 docs/BotManagementCategoryResponse.md
 docs/BotManagementCategoryResponseExtra.md
 docs/BotManagementError.md
@@ -1444,6 +1446,8 @@ lib/WebService/Fastly/Object/BotManagementBotResponseExtra.pm
 lib/WebService/Fastly/Object/BotManagementBotsResponse.pm
 lib/WebService/Fastly/Object/BotManagementCategoriesResponse.pm
 lib/WebService/Fastly/Object/BotManagementCategory.pm
+lib/WebService/Fastly/Object/BotManagementCategoryBots.pm
+lib/WebService/Fastly/Object/BotManagementCategoryBotsAction.pm
 lib/WebService/Fastly/Object/BotManagementCategoryResponse.pm
 lib/WebService/Fastly/Object/BotManagementCategoryResponseExtra.pm
 lib/WebService/Fastly/Object/BotManagementError.pm

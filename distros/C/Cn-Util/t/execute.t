@@ -30,6 +30,15 @@ SKIP: {
 	is( execute(perl_cmd('print qq{hello\n}'), 'stdout'), 'hello', 'stdout is chomped' );
 }
 
+SKIP: {
+	skip "a newline is \"\\r\\n\" on $^O", 1 if $^O eq 'MSWin32';
+	# chomp uses $/, and up to 0.0242 that was the caller's: under this
+	# `local $/;` the newline was left on.
+	local $/;
+	is( execute(perl_cmd('print qq{hello\n}'), 'stdout'), 'hello',
+		'stdout is chomped whatever the caller\'s $/ is' );
+}
+
 my $all = execute(perl_cmd('print qq{out}; print STDERR qq{err}'), 'all');
 is( ref $all, 'HASH', 'return => all yields a hashref' );
 is( $all->{stdout}, 'out', 'all: stdout field' );

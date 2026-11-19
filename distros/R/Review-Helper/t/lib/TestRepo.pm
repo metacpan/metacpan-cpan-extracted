@@ -6,8 +6,15 @@ our @EXPORT_OK = qw/make_repo run_git write_file commit_file pinned_refs/;
 
 use File::Basename qw/dirname/;
 use File::Path qw/make_path/;
+use File::Spec;
 use File::Temp qw/tempdir/;
 use Cwd qw/abs_path/;
+use Test2::Tools::Basic qw/skip_all/;
+
+skip_all "git is not installed" if system('git --version >' . File::Spec->devnull . ' 2>&1');
+
+# A tester's own identity in the environment overrides the test repository's.
+delete @ENV{qw/GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_AUTHOR_DATE GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL GIT_COMMITTER_DATE/};
 
 # A throwaway repository in a temp dir, isolated from user and system git config.
 sub make_repo() {

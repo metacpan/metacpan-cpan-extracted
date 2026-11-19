@@ -11,7 +11,7 @@ use Tk::eText;
 
 my $mw = eval { MainWindow->new };
 plan skip_all => "no X display available ($@)" unless $mw;
-plan tests => 96;
+plan tests => 106;
 $mw->geometry('+10+10');
 
 # Collect background errors (Tk::Error) instead of printing them.
@@ -730,6 +730,54 @@ for my $case ([ 'leaves to hide', [0,0,0,50,50,40,20], [-1] ],
   $w->destroy;
 }
 @bgerrors = ();
+
+# BUGS 39: when an element of the result of a layout callback was
+# refused, the elements before it stayed applied: a leaf they had moved
+# stayed moved, one they had hid stayed hidden, a line they had stolen
+# stayed.  The block is laid out as if it had no callback: the leaves
+# are where they are without one.
+sub leaf_boxes {
+  my ($result) = @_;
+  my $w = $mw->eText(-width => 30, -height => 6)->pack;
+  $w->blockConfigure('P', $result ? (-layoutcmd => sub { @$result })
+				   : (-splitlines => 1));
+  $w->insert('end', "xx aa\nbb\ncc yy\nmore\n");
+  $w->block('addline', '4.0');
+  $w->blockInsert('P', '1.3', '3.2');
+  @bgerrors = ();
+  $mw->update;
+  my @boxes = map { [ $w->bbox($_) ] } '1.3', '1.4', '1.7', '1.10';
+  $w->destroy;
+  return \@boxes;
+}
+my $default_boxes = leaf_boxes(undef);
+for my $case ([ 'a leaf moved', [0,0,0,90,90,80,20], [1,30,30,40,40,19,14], [1,2,3] ],
+	      [ 'a leaf hidden', [0,0,0,90,90,80,20], [1], [1,2,3] ],
+	      [ 'a line stolen', [0,0,0,90,90,80,20], [3,10,0,20,20,20,15],
+		[1,0,60,20,20,20,15], [1,2] ]) {
+  my ($what, @result) = @$case;
+  my $boxes = leaf_boxes(\@result);
+  like($bgerrors[0] // 'no error', qr/^List of wrong size as element in return from LayoutProc/,
+       "BUGS 39 ($what before a refused element): a background error");
+  is_deeply($boxes, $default_boxes, "BUGS 39 ($what): the block and its leaves have the default layout");
+}
+@bgerrors = ();
+
+# "get" of an empty range (the same index twice, from the end) returned
+# no result, which came to Perl as undef; Tk::Text gives an empty string
+# (and no result for a reversed range, as before).
+{
+  my $tk = $mw->Text;
+  my $e = $mw->eText;
+  for my $w ($tk, $e) { $w->insert('end', "ab\ncd\n") }
+  for my $range (['1.1', '1.1'], ['2.0', '1.0'], ['end'], ['end', 'end']) {
+    my $want = $tk->get(@$range);
+    my $got = $e->get(@$range);
+    is($got // 'undef', $want // 'undef', "get @$range: as Tk::Text");
+  }
+  $tk->destroy;
+  $e->destroy;
+}
 
 $t->destroy;
 $mw->destroy;

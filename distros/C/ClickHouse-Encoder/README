@@ -38,10 +38,12 @@ SUPPORTED TYPES
     Dynamic: standalone Dynamic column, same wire format as one JSON
     path's Dynamic sub-column without the Object wrapper.
     DateTime / DateTime64 strings accept ISO 8601 with timezone offsets
-    (Z, +HH:MM, -HH:MM, +HHMM); the offset is applied to convert to UTC.
+    (Z, +HH:MM, -HH:MM, +HHMM); without one they are wall time in the
+    column's timezone, else the timezone => option, else UTC.
     See `perldoc ClickHouse::Encoder` for value coercion rules and limits.
 
 OUTPUT APIS
+    from_columns(\@system_columns_rows)   build an encoder without I/O
     encode(\@rows)                        return Native bytes for one block
     encode_into(\$buf, \@rows)            append a block to an existing scalar
     encode_columns(\%cols)                column-oriented input (same bytes)

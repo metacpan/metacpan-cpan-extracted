@@ -70,6 +70,6 @@
          "web" : "https://github.com/vividsnow/perl5-clickhouse-encoder"
       }
    },
-   "version" : "0.03",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

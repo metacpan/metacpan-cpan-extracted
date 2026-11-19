@@ -100,7 +100,7 @@ skip 'server has no empty Tuple()', 1 unless $have_tuple0;
     my $ch = new_ch();
     my ($oerr, $cerr, $sel);
     $ch->query('drop table if exists t63_dt', sub {
-    $ch->query('create table t63_dt (d DateTime64(9)) engine=Memory', sub {
+    $ch->query(q{create table t63_dt (d DateTime64(9, 'UTC')) engine=Memory}, sub {
         $ch->insert('t63_dt', [['2262-04-11 23:47:16.9']], sub {
             (undef, $oerr) = @_;
             $ch->insert('t63_dt', [['2262-04-11 23:47:16.8']], sub {

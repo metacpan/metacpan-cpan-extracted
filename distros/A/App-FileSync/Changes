@@ -1,5 +1,66 @@
 Revision history for App-FileSync
 
+0.002.2	Wed Nov 18 09:33:20 PM EST 2026
+	[ Bug Fixes ]
+	- When the server refused a request that carries data (a delta
+	  signature, an upload chunk), it closed the connection without reading
+	  that data, so the client could fail with "Broken pipe" instead of
+	  showing the reason.  This happened mostly on Windows.  The server now
+	  reads the data before it replies.
+	- A server repo created with "--trash-days 0" pruned its trash after
+	  30 days, while a client's "local_trash_days": 0 kept its trash
+	  forever.  0 now means "keep forever" on both sides, and the
+	  documentation says so.  "filesync-admin repo show" prints
+	  "kept forever" for such a repo instead of "0 days".
+	- "filesync-admin repo show" printed "0 files / 0%" for a repo whose
+	  deletion limits are switched off, which read as "nothing may be
+	  deleted".  It now says "no file limit", "no percentage limit", or
+	  "none (any number of deletions)" when both are off.
+	- "filesync-admin repo create --max-delete-percent" accepted values
+	  over 100.  It now refuses anything above 100, and so does the
+	  deletion check when a policy file holds such a value.
+	- A bad argument was reported in Params::Validate::Strict's own
+	  English, naming the internal parameter: "Admin::repo_create:
+	  Parameter 'trash_days' (-1) must be at least 0".  It is now a
+	  catalogued message, and the programs name the option that was
+	  typed: "--trash-days must be at least 0, not -1".
+	- A directory that became a file could not be synced if it still
+	  held an ignored file (a .DS_Store, say): the sync failed with
+	  "Cannot replace non-empty directory", then and on every later run.
+	  The directory, with whatever the sync does not track, now goes to
+	  the trash (the server's or the client's local one) and the file
+	  takes its place.  The server journals it; the client logs a
+	  warning naming the trash.
+	- An error the server sent a client named where the server keeps its
+	  files ("Cannot create a temporary file in
+	  /srv/filesync/master/docs/sub").  A path in the master is now given
+	  relative to the repo ("in sub"), and any other server path starts
+	  with "[server root]".  The server's log is written the same way,
+	  since over ssh its standard error reaches the client; the journal
+	  keeps the full paths.
+	- The server accepted a "mkdir" request for a path whose planned
+	  action was a conflict the client's file had won, which no client
+	  sends: a client wins a conflict only with a file, and uploads it.
+	  Such a request is now refused like any other outside the plan.
+
+	[ Documentation ]
+	- "filesync-admin help", the repo_create POD and the website now
+	  describe the repo create options, and say that a --max-deletes or
+	  --max-delete-percent of 0 switches that deletion limit off.
+	- The deletion limits are documented as they behave: both are
+	  inclusive (a sync may delete exactly --max-deletes files), and the
+	  percentage limit rounds down but always allows one file.
+	- filesync-server documents its exit status: 0 after a finished
+	  session, 1 after any other.
+
+	[ Build ]
+	- META.json says dynamic_config 1, since Win32API::File is required
+	  only on Windows; it said 0, so an installer could skip Makefile.PL
+	  and miss it.
+	- A regression test that builds a 20 MB file runs only with
+	  EXTENDED_TESTING set (or on GitHub Actions), so it does not burden
+	  CPAN smokers.
+
 0.002.1	Sun Nov 15 03:36:05 PM EST 2026
 	[ Enhancements ]
 	- Block deltas are much faster to compute.  A changed file of 8 MiB or
@@ -44,7 +105,7 @@ Revision history for App-FileSync
 	  the first newline, and imported LC_MESSAGES, which Windows' POSIX
 	  lacks.  The child is now a script file and falls back to LC_CTYPE.
 
-0.001.5 Sun Oct 25 12:53:45 PM EDT 2026
+0.001.5	Sun Oct 25 12:53:45 PM EDT 2026
 	[ Bug Fixes ]
 	- Log::Abstraction 0.36 is now required, because the client logs its
 	  run summary as structured fields in a trailing hashref.  An older
@@ -74,63 +135,63 @@ Revision history for App-FileSync
 
 0.001.2	Sat Oct 24 09:02:12 PM EDT 2026
 	[ Bug Fixes ]
-        - filesync-admin repo create names the server root and the directory
-          that blocks it when the root cannot be written, and says to chown
-          it to the running account or use --root elsewhere.  It used to
-          report only "Permission denied" against a path below the root.
-        - That advice is given only when a directory really is unwritable, so
-          a full disk or a root that is a file keeps its own error.
+	- filesync-admin repo create names the server root and the directory
+	  that blocks it when the root cannot be written, and says to chown
+	  it to the running account or use --root elsewhere.  It used to
+	  report only "Permission denied" against a path below the root.
+	- That advice is given only when a directory really is unwritable, so
+	  a full disk or a root that is a file keeps its own error.
 
 	[ Documentation ]
-        - The examples are split by machine - what to run on the
-          server, on each client, and from cron - and keep the master in a
-          home directory, so nothing needs sudo.
-        - What a /srv/filesync root needs instead, the wrapper that
-          adds --root to filesync-server, and the ssh key the first sync
-          requires.
-        - The backup and restore commands follow the example's master
-          layout, and make the backup directory before cron mirrors into it.
-        - The synopsis creates the repo first, so it runs as printed.
+	- The examples are split by machine - what to run on the
+	  server, on each client, and from cron - and keep the master in a
+	  home directory, so nothing needs sudo.
+	- What a /srv/filesync root needs instead, the wrapper that
+	  adds --root to filesync-server, and the ssh key the first sync
+	  requires.
+	- The backup and restore commands follow the example's master
+	  layout, and make the backup directory before cron mirrors into it.
+	- The synopsis creates the repo first, so it runs as printed.
 
-0.001.1 Sat Oct 24 09:52:47 AM EDT 2026
+0.001.1	Sat Oct 24 09:52:47 AM EDT 2026
 	[ Bug Fixes ]
-        - Build: test on Windows with Perl 5.42 again.  Its B::Hooks::EndOfScope
-          faults at exit, so the plain-Perl hook is used there.
-        - filesync, filesync-server and filesync-admin select that hook for
-          themselves on 5.42 for Windows, so it no longer has to be set to run
-          them; an implementation already in the environment is left alone.
-          A test checks the choice in a child process that starts without the
-          variable.
-        - Security: an ssh server of the form "-v@host" (or a program name
-          starting with "-") is refused; it was passed to ssh as an option.
-        - Security: client and repo names that are not plain ids ("../x",
-          over 64 characters) are refused by the server, admin and client.
-        - Server: a conflict copy is kept under the planned name whether or
-          not the client names it, and any other name is refused; acks are
-          accepted only for actions the client applies; get validates its
-          offset and caps its size; an upload larger than announced is
-          refused and discarded.
-        - Ignore: building a matcher no longer modifies the caller's pattern
-          list (which turned "!keep.tmp" into "keep.tmp" and could delete the
-          file remotely); "/top" anchors to the root; "build/" matches at any
-          depth.
-        - Trash: same-day versions sort numerically and are no longer capped
-          at .99.  Each client repo has its own local trash; restore still
-          finds files in the old shared one.
-        - Admin: journal_read works when the server root contains spaces.
-        - All messages come from a catalogue (App::FileSync::I18N::en) and can
-          be translated; errors no longer show Perl file and line numbers
-          unless FILESYNC_TRACE is set.
-        - Internals: new Args, Base, Constants, I18N, IO and Platform modules;
-          private subs are enforced with Sub::Private; full POD.
-        - Removed the unused POSIX and Encode prerequisites.
-        - Build: requires Perl 5.14; declares ExtUtils::MakeMaker 6.64 as a
-          configure prerequisite so test prerequisites are honoured; the
-          gzip and (on macOS) gtar dist settings are now actually applied;
-          t/ and xt/ are not indexed; bug tracker link added.
-        - $VERSION is a version object (version->declare), so every tool
-          reads 0.001.1 as the dotted version v0.1.1.
-        - Every module and program carries the same GPL v2 licence notice.
+	- Build: test on Windows with Perl 5.42 again.  Its B::Hooks::EndOfScope
+	  faults at exit, so the plain-Perl hook is used there.
+	- filesync, filesync-server and filesync-admin select that hook for
+	  themselves on 5.42 for Windows, so it no longer has to be set to run
+	  them; an implementation already in the environment is left alone.
+	  A test checks the choice in a child process that starts without the
+	  variable.
+	- Security: an ssh server of the form "-v@host" (or a program name
+	  starting with "-") is refused; it was passed to ssh as an option.
+	- Security: client and repo names that are not plain ids ("../x",
+	  over 64 characters) are refused by the server, admin and client.
+	- Server: a conflict copy is kept under the planned name whether or
+	  not the client names it, and any other name is refused; acks are
+	  accepted only for actions the client applies; get validates its
+	  offset and caps its size; an upload larger than announced is
+	  refused and discarded.
+	- Ignore: building a matcher no longer modifies the caller's pattern
+	  list (which turned "!keep.tmp" into "keep.tmp" and could delete the
+	  file remotely); "/top" anchors to the root; "build/" matches at any
+	  depth.
+	- Trash: same-day versions sort numerically and are no longer capped
+	  at .99.  Each client repo has its own local trash; restore still
+	  finds files in the old shared one.
+	- Admin: journal_read works when the server root contains spaces.
+	- All messages come from a catalogue (App::FileSync::I18N::en) and can
+	  be translated; errors no longer show Perl file and line numbers
+	  unless FILESYNC_TRACE is set.
+	- Internals: new Args, Base, Constants, I18N, IO and Platform modules;
+	  private subs are enforced with Sub::Private; full POD.
+	- Removed the unused POSIX and Encode prerequisites.
+	- Build: requires Perl 5.14; declares ExtUtils::MakeMaker 6.64 as a
+	  configure prerequisite so test prerequisites are honoured; the
+	  gzip and (on macOS) gtar dist settings are now actually applied;
+	  t/ and xt/ are not indexed; bug tracker link added.
+	- $VERSION is a version object (version->declare), so every tool
+	  reads 0.001.1 as the dotted version v0.1.1.
+	- Every module and program carries the same GPL v2 licence notice.
 
 0.001.0	Fri Oct 23 03:44:45 PM EDT 2026
-        First draft
+	First draft

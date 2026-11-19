@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Changes &mdash; App::FileSync</title>
-<meta name="description" content="Release history for App::FileSync, from the first draft to 0.002.0.">
+<meta name="description" content="Release history for App::FileSync, from the first draft to 0.002.2.">
 <meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#12161b" media="(prefers-color-scheme: dark)">
 <link rel="canonical" href="changelog.html">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="App::FileSync">
 <meta property="og:title" content="Changes &mdash; App::FileSync">
-<meta property="og:description" content="Release history for App::FileSync, from the first draft to 0.002.0.">
+<meta property="og:description" content="Release history for App::FileSync, from the first draft to 0.002.2.">
 <meta name="twitter:card" content="summary">
 <link rel="stylesheet" href="../css/site.css">
 </head>
@@ -43,14 +43,57 @@
 	<p class="lede">Revision history, newest first. The authoritative list is the
 	<code>Changes</code> file in the distribution.</p>
 
-	<h2 id="v0-002-0">0.002.0 <span class="muted">&mdash; 4 November 2026</span></h2>
+	<h2 id="v0-002-2">0.002.2 <span class="muted">&mdash; 18 November 2026</span></h2>
+
+	<h3>Bug fixes</h3>
+	<ul>
+		<li>A server repo created with <code>--trash-days 0</code> pruned its trash
+		after 30 days, while a client's <code>"local_trash_days": 0</code> kept its
+		trash forever. 0 now means &ldquo;keep forever&rdquo; on both sides.
+		<code>filesync-admin repo show</code> prints &ldquo;kept forever&rdquo; for
+		such a repo instead of &ldquo;0 days&rdquo;.</li>
+		<li><code>filesync-admin repo show</code> printed &ldquo;0 files / 0%&rdquo;
+		for a repo whose deletion limits are switched off, which read as
+		&ldquo;nothing may be deleted&rdquo;. It now says &ldquo;no file
+		limit&rdquo;, &ldquo;no percentage limit&rdquo;, or &ldquo;none (any number
+		of deletions)&rdquo; when both are off.</li>
+		<li><code>filesync-admin repo create --max-delete-percent</code> accepted
+		values over 100. It now refuses anything above 100, and so does the
+		deletion check when a policy file holds such a value.</li>
+		<li>A bad argument was reported in <code>Params::Validate::Strict</code>'s
+		own English, naming the internal parameter. It is now a catalogued
+		message that names the option that was typed: <code>--trash-days must be
+		at least 0, not -1</code>.</li>
+		<li>A directory that became a file could not be synced if it still held
+		an ignored file (a <code>.DS_Store</code>, say): the sync failed with
+		&ldquo;Cannot replace non-empty directory&rdquo;, then and on every later
+		run. The directory, with whatever the sync does not track, now goes to the
+		trash and the file takes its place.</li>
+		<li>An error the server sent a client named where the server keeps its
+		files. A path in the master is now given relative to the repo, and any
+		other server path starts with <code>[server root]</code>. The server's log
+		is written the same way; the journal keeps the full paths.</li>
+		<li>The server accepted a <code>mkdir</code> request for a path whose
+		planned action was a conflict the client's file had won, which no client
+		sends. Such a request is now refused like any other outside the plan.</li>
+	</ul>
+
+	<h3>Documentation</h3>
+	<ul>
+		<li><code>filesync-admin help</code>, the POD and this website describe
+		the <code>repo create</code> options, and say that a
+		<code>--max-deletes</code> or <code>--max-delete-percent</code> of 0
+		switches that deletion limit off.</li>
+		<li>Both deletion limits are inclusive, and the percentage limit rounds
+		down but always allows one file; the help, the POD and this website now
+		say so.</li>
+		<li><code>filesync-server</code> documents its exit status.</li>
+	</ul>
+
+	<h2 id="v0-002-1">0.002.1 <span class="muted">&mdash; 15 November 2026</span></h2>
 
 	<h3>Enhancements</h3>
 	<ul>
-		<li>Created this website.</li>
-		<li><code>filesync sync --quiet</code> prints nothing for a repo where
-		nothing happened, instead of an all-zero summary and transfer line, so a
-		cron job that finds nothing to do stays silent.</li>
 		<li>Block deltas are much faster to compute. A changed file of 8 MiB or
 		more with no blocks in common took about 45 seconds to diff; it now
 		takes about 3. Signatures are computed about twice as fast. The wire
@@ -62,14 +105,37 @@
 		<code>JSON::PP</code> and takes under half a second with
 		<code>Cpanel::JSON::XS</code>. Pure-Perl installs still work, on
 		<code>JSON::PP</code>, and either side of a sync may use either backend.</li>
-	</ul>
-
-	<h3>Bug fixes</h3>
-	<ul>
 		<li>Paths read back from JSON as hash keys (manifests are keyed by path)
 		kept Perl's UTF-8 flag, so a file test on a non-ASCII name looked for a
 		differently encoded file. <code>verify</code> silently left such files out
 		of its random sample. Keys are now byte strings, like values.</li>
+	</ul>
+
+	<h3>Bug fixes</h3>
+	<ul>
+		<li>On Windows, a client whose session ended early (any error mid-sync)
+		hung for ever instead of reporting the error: the server or ssh it started
+		inherited the client's end of its own input pipe, so it never saw end of
+		file. The client's pipe ends are no longer inheritable, and a server or ssh
+		that has not exited 30 seconds after the session ends is stopped.</li>
+		<li><code>filesync settings</code> on Windows named an environment variable
+		in the spelling it was looked up with (<code>App__FileSync__ssh_identity</code>)
+		rather than the one the environment holds
+		(<code>APP__FILESYNC__SSH_IDENTITY</code>).</li>
+	</ul>
+
+	<h2 id="v0-002-0">0.002.0 <span class="muted">&mdash; 4 November 2026</span></h2>
+
+	<h3>Enhancements</h3>
+	<ul>
+		<li>Created this website.</li>
+		<li><code>filesync sync --quiet</code> prints nothing for a repo where
+		nothing happened, instead of an all-zero summary and transfer line, so a
+		cron job that finds nothing to do stays silent.</li>
+	</ul>
+
+	<h3>Bug fixes</h3>
+	<ul>
 		<li>The system-locale tests in <code>t/locales.t</code> failed on Windows:
 		they passed a multi-line child program to <code>perl -e</code>, which
 		Windows cut at the first newline, and imported <code>LC_MESSAGES</code>,
@@ -206,7 +272,7 @@
 
 <footer class="site-footer">
 	<div class="wrap">
-		<p>App::FileSync 0.002.0 &middot; Copyright 2026 Nigel Horne &middot; GPL-2.0</p>
+		<p>App::FileSync 0.002.2 &middot; Copyright 2026 Nigel Horne &middot; GPL-2.0</p>
 		<p><a href="https://metacpan.org/dist/App-FileSync">CPAN</a> &middot;
 		<a href="https://github.com/nigelhorne/App-FileSync">GitHub</a> &middot;
 		<a href="https://github.com/nigelhorne/App-FileSync/issues">Issues</a> &middot;

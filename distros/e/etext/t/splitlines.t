@@ -94,9 +94,14 @@ sub strokes {
   my ($v) = @_;
   map { $stroke[$_ > 3 ? 3 : $_] } grep { ($v >> $_) & 1 } 0 .. 30;
 }
-# Lines for the number v from the row y down, over w columns from x.
+# Lines for the number v between two leaves, over w columns from x; y is
+# the top row of the lower leaf.  Since 2.10 the lines take room: the
+# leaves are that many rows apart, and the lines go down from the first
+# row of the room.  The room is that of the larger of the two halves:
+# gap if given, else the room of v.
 sub want_lines {
-  my ($v, $x, $y, $w) = @_;
+  my ($v, $x, $y, $w, $gap) = @_;
+  $y -= $gap // room($v);
   my @r;
   for my $s (strokes($v)) {
     push @r, join ' ', 'line', $v, $s->[0], $x, $y, $x + $w - 1, $y + $s->[1] - 1;
@@ -115,6 +120,24 @@ sub want_frames {
     $o += $s->[1] + 1;
   }
   @r;
+}
+# The room the frames for the number v take on each side (since 2.10):
+# from the pixel next to the box to the outermost pixel.
+sub room {
+  my ($v) = @_;
+  my @s = strokes($v);
+  return 0 unless @s;
+  my $r = -1;
+  $r += $_->[1] + 1 for @s;
+  $r;
+}
+# Frames for the number v of a block laid out by default, w by h: the
+# frames take room, so the box of the stack (the leaves) is that much
+# inside the box of the block, and the outermost frame is on its edge.
+sub want_block_frames {
+  my ($v, $w, $h) = @_;
+  my $r = room($v);
+  want_frames($v, $r, $r, $w - 2 * $r, $h - 2 * $r);
 }
 # The box of a leaf (or of several consecutive leaves) of a block, from
 # the top left corner of the block.
@@ -243,7 +266,7 @@ for my $s (1 .. 4) {
   my @B = @{box($b->{head})};
   my ($x, $y, $w, $h) = rel($b, 1);
   is_deeply(splits($b), [want_lines($s, 0, $y, $B[2])],
-	    "depth $s: across the block, at the top of the lower leaf");
+	    "depth $s: across the block, in the room above the lower leaf");
 }
 is_deeply([map { (split ' ')[2] } map { @{splits($_)} } @one],
 	  ['dotted', 'dashed', 'dotted', 'dashed', 'solid'],
@@ -259,11 +282,11 @@ SKIP: {
   ok(drawn($ph, $one[$_ - 1]), "depth $_: drawn as listed") for 1 .. 4;
   my @B = @{box($one[0]{head})};
   my ($x, $y) = rel($one[0], 1);
-  is(row($ph, $B[0], $B[0] + 8, $B[1] + $y), '#..#..#..',
+  is(row($ph, $B[0], $B[0] + 8, $B[1] + $y - room(1)), '#..#..#..',
      'a dotted line: one pixel on, two off');
   @B = @{box($one[1]{head})};
   ($x, $y) = rel($one[1], 1);
-  is(row($ph, $B[0], $B[0] + 13, $B[1] + $y), '####...####...',
+  is(row($ph, $B[0], $B[0] + 13, $B[1] + $y - room(2)), '####...####...',
      'a dashed line: four pixels on, three off');
 }
 
@@ -278,18 +301,23 @@ $one[0]{after}[1] = "$one[0]{line}.24";
 	    'after an insertion the line is as wide as the block is now');
 }
 
-# -splitlines 0: nothing is drawn, and nothing else changes.
+# -splitlines 0: nothing is drawn, and the room of the lines goes (since
+# 2.10 they take room): a block without lines is laid out the same.
 {
-  my @all = map { my $l = $_; map { "$l.$_" } 0 .. 20 } 1 .. 5;
-  my @boxes = map { box($_) } @all;
-  my @dlines = map { [$t->dlineinfo("$_.0")] } 1 .. 5;
+  my @flat = map { "$flat->{line}.$_" } 0 .. 20;
+  my @boxes = map { box($_) } @flat;
+  my $dline = [$t->dlineinfo("$flat->{line}.0")];
+  # The top of the lower leaf from the corner of the block, the height
+  # of the block.
+  my $lower = sub { [ map { [ (rel($_, 1))[1], box($_->{head})->[3] ] } @one ] };
+  my $with = $lower->();
   $t->blockConfigure('F', -splitlines => 0);
   is($t->blockCget('F', '-splitlines'), 0, '-splitlines 0');
   is_deeply([map { @{splits($_)} } $flat, @one], [], 'no lines are generated');
-  is_deeply([map { box($_) } @all], \@boxes,
-	    'the bbox of every position is the same without the lines');
-  is_deeply([map { [$t->dlineinfo("$_.0")] } 1 .. 5], \@dlines,
-	    'and so are the display lines');
+  is_deeply([[map { box($_) } @flat], [$t->dlineinfo("$flat->{line}.0")]], [\@boxes, $dline],
+	    'the block without lines: the bbox of every position and its display line are the same');
+  is_deeply($lower->(), [map { [$with->[$_ - 1][0] - room($_), $with->[$_ - 1][1] - room($_)] } 1 .. 4],
+	    'the blocks with lines: the lower leaf and the bottom of the block that much higher');
  SKIP: {
     skip 'no Tk::WinPhoto to capture the window', 4 unless $can_shoot;
     my $ph = shot();
@@ -320,7 +348,7 @@ widget();
   is_deeply(splits($b), [want_lines(8, 0, (rel($b, 1))[1], $B[2]),
 			 want_lines(12, 0, (rel($b, 2))[1], $B[2])],
 	    'depths 8 and 12: a thick line; a solid and a thick one');
-  my $y = (rel($b, 2))[1];
+  my $y = (rel($b, 2))[1] - room(12);		# The first row of the room.
   is_deeply([map { join ' ', (split ' ')[2, 4, 6] } @{splits($b)}[1, 2]],
 	    ["solid $y $y", 'thick ' . ($y + 2) . ' ' . ($y + 4)],
 	    'the thick line takes three rows, one row under the solid one');
@@ -348,22 +376,24 @@ widget();
   is_deeply(at($b[1]), [[4]], 'R( N( a ) ): the root and N have one child each');
   for my $i (0 .. 4) {
     my @B = @{box($b[$i]{head})};
-    is_deeply(splits($b[$i]), [want_frames($n[$i], 0, 0, $B[2], $B[3])],
-	      "a chain of $n[$i]: frames around the block");
+    is_deeply(splits($b[$i]), [want_block_frames($n[$i], $B[2], $B[3])],
+	      "a chain of $n[$i]: frames around the leaves, inside the block");
   }
   is_deeply([map { join ' ', (split ' ')[2 .. 4] } map { @{splits($_)} } @b],
-	    ['dotted -1 -1', 'dashed -1 -1', 'dotted -1 -1', 'dashed -3 -3',
-	     'solid -1 -1', 'dotted -1 -1', 'thick -5 -5'],
+	    ['dotted 0 0', 'dashed 0 0', 'dotted 2 2', 'dashed 0 0',
+	     'solid 0 0', 'dotted 4 4', 'thick 0 0'],
 	    '1 dotted, 2 dashed, 3 both, 4 solid, 9 dotted and thick: '
-	    . 'the first one pixel outside the box, the next 2 pixels further');
+	    . 'the outermost on the edge of the block, the next 2 pixels in, '
+	    . 'the leaves one pixel inside the innermost');
  SKIP: {
     skip 'no Tk::WinPhoto to capture the window', 6 unless $can_shoot;
     my $ph = shot();
     ok(drawn($ph, $b[$_]), "a chain of $n[$_]: drawn as listed") for 0 .. 4;
     my @B = @{box($b[0]{head})};
     is(join('', map { px($ph, $B[0] + $_->[0], $B[1] + $_->[1]) }
-	    [-1, -1], [-2, -1], [-1, -2], [0, 0]), '#...',
-       'the corner of the frame is one pixel outside the corner of the box');
+	    [0, 0], [-1, 0], [0, -1], [1, 1]), '#...',
+       'the corner of the frame is the corner of the block, '
+       . 'the leaf one pixel inside');
   }
   # The undo of a structural change lays the block out again.
   $t->editSeparator;
@@ -382,7 +412,7 @@ widget();
   $t->blockSplit("$b->{line}.9", 0);
   is_deeply(at($b), [[4, 4]], 'R( N( a | b ) )');
   my @B = @{box($b->{head})};
-  is_deeply(splits($b), [want_frames(1, 0, 0, $B[2], $B[3])],
+  is_deeply(splits($b), [want_block_frames(1, $B[2], $B[3])],
 	    'a chain of 1 (the root), and no line between a and b');
   # R( N( a | b ) | M( c ) ).
   my $c = block('F', [4, 4, 4], [0, 1]);
@@ -401,8 +431,8 @@ widget();
   my $in = { head => "$e->{line}.12" };
   my @I = @{box($in->{head})};
   is_deeply(splits($e), [], 'the outer block, R( a | b{c}d ): nothing');
-  is_deeply(splits($in), [want_frames(1, 0, 0, $I[2], $I[3])],
-	    'the block in its leaf, R( c ): a frame around its own box');
+  is_deeply(splits($in), [want_block_frames(1, $I[2], $I[3])],
+	    'the block in its leaf, R( c ): a frame in its own box');
  SKIP: {
     skip 'no Tk::WinPhoto to capture the window', 3 unless $can_shoot;
     my $ph = shot();
@@ -458,7 +488,7 @@ widget();
     ok(drawn($ph, $d), 'two different halves: drawn as listed');
     is(row($ph, $B[0], $B[0] + $half - 1, $B[1] + (rel($b, 1))[1]), '.' x $half,
        'the half that shows 0 is empty');
-    is(row($ph, $D[0] + $half - 7, $D[0] + $half + 6, $D[1] + $y),
+    is(row($ph, $D[0] + $half - 7, $D[0] + $half + 6, $D[1] + $y - room(1)),
        substr(pattern('dashed', $half), -7) . pattern('dotted', 7),
        'the dashes end and the dots start in the middle');
   }
@@ -483,20 +513,25 @@ widget();
       grep { ref($_) =~ /BlockSeparator/ } @$blk;
     unshift @sep, [undef, 0] if !@sep || defined $sep[0][0];
     my @B = @{box($b->{head})};
-    my $half = int($B[2] / 2);
     # The chain from the root: nested lists of one element.
     my ($chain, $tree) = (0, at($b));
     while (ref $tree && @$tree == 1) { $chain++; $tree = $tree->[0] }
-    my @want = want_frames($chain, 0, 0, $B[2], $B[3]);
+    # The box of the stack: inside the block by the room of the frames.
+    my $r = room($chain);
+    my ($sx, $sw) = ($r, $B[2] - 2 * $r);
+    my $half = int($sw / 2);
+    my @want = want_frames($chain, $r, $r, $sw, $B[3] - 2 * $r);
     for my $k (1 .. $n - 1) {
       my ($s, $da, $db) = ($sep[$k][0], $sep[$k - 1][1], $sep[$k][1]);
       my $y = (rel($b, $k))[1];
       if ($da == $db) {
-	push @want, want_lines($s - $da, 0, $y, $B[2]);
+	push @want, want_lines($s - $da, $sx, $y, $sw);
 	$kinds{whole}++ if $s > $da;
       } else {
-	push @want, want_lines($s - $da, 0, $y, $half),
-	  want_lines($s - $db, $half, $y, $B[2] - $half);
+	my ($ra, $rb) = (room($s - $da), room($s - $db));
+	my $gap = $ra > $rb ? $ra : $rb;
+	push @want, want_lines($s - $da, $sx, $y, $half, $gap),
+	  want_lines($s - $db, $sx + $half, $y, $sw - $half, $gap);
 	$kinds{halves}++;
       }
     }
@@ -514,8 +549,8 @@ widget();
     or diag(join ' ', %kinds);
 }
 
-# A leaf of several display lines: the line is at the top of the first
-# one, and the box of the stack holds them all.
+# A leaf of several display lines: the line is in the room above the
+# first one, and the box of the stack holds them all.
 widget(-width => 24);
 {
   $t->insert('end', "x   .... " . ('.. ' x 40) . "  y\n");
@@ -527,7 +562,7 @@ widget(-width => 24);
   my @last = @{box('1.128')};	# One of its last characters.
   cmp_ok($last[1], '>', $first[1], 'the lower leaf is wrapped');
   is_deeply(splits($b), [want_lines(1, 0, $first[1] - $B[1], $B[2])],
-	    'the line is at the top of its first display line');
+	    'the line is in the room above its first display line');
  SKIP: {
     skip 'no Tk::WinPhoto to capture the window', 1 unless $can_shoot;
     ok(drawn(shot(), $b), 'drawn as listed');
@@ -605,18 +640,31 @@ $t->blockConfigure('Frac', -layoutdepth => 1, -layoutwidths => [2], -layoutcmd =
   }
 
   # A child hidden with a list of one element is in no stack.
-  my @boxes = map { box("$b->{line}.$_") } 0 .. 24;
+  # (The boxes of the block without frames, from its own corner: the
+  # lines above it get higher or lower with the frames of theirs.)
+  my $dboxes = sub {
+    my @H = @{box($d->{head})};
+    [ map { my @k = @{box("$d->{line}.$_")}; @k ? [$k[0] - $H[0], $k[1] - $H[1], @k[2, 3]] : [] }
+	  0 .. 24 ];
+  };
+  my $dbefore = $dboxes->();
   $hide = 1;
   $t->blockConfigure('Frac', -layoutdepth => 1);	# Lays the blocks out again.
   is_deeply(splits($b), [want_lines(1, $g1[0], (rel($b, 1))[1], $g1[2])],
 	    'the second group hidden: no frame for it');
   $hide = 0;
 
-  # Without the lines the callback lays the same boxes out.
+  # Without the lines the frames take no room (since 2.10 they do): the
+  # callback is told the group D without it and puts the leaf of D one
+  # pixel further up and to the left (the room of a chain of 2 is 1); a
+  # block without frames is laid out the same.
   $t->blockConfigure('Frac', -splitlines => 0);
   is_deeply([map { @{splits($_)} } $b, $c, $d], [], '-splitlines 0: nothing generated');
-  is_deeply([map { box("$b->{line}.$_") } 0 .. 24], \@boxes,
-	    'the bbox of the block, of its leaves and of their characters is the same');
+  # (Group A, above D, is one row lower too: the room of its line.)
+  is_deeply([(rel($b, 2))[0, 1]], [$g2[0] - 1, $g2[1] - 1 - room(1)],
+	    '-splitlines 0: no room for the frames of D, nor for the line in A');
+  is_deeply($dboxes->(), $dbefore,
+	    'a block without frames: the bbox of the block, of its leaves and of their characters is the same');
   $t->blockConfigure('Frac', -splitlines => 1);
   is(scalar(@bgerrors), 0, 'no background errors so far') or diag(join "\n", @bgerrors);
 }

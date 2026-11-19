@@ -1,7 +1,7 @@
 package Review::Helper::Server;
 use v5.36;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Carp qw/croak/;
 use Encode qw/decode FB_DEFAULT/;
@@ -857,7 +857,7 @@ lists them from every iteration, whichever iteration is selected.
 
 A section's diff is L<Review::Helper::Diff>'s C<section_hunks>: its whole
 code and whole documentation, each hunk with a C<part> of C<code> or
-C<docs>.
+C<docs>, one hunk where they sit next to each other.
 
 In a Perl file, C<GET /api/file/ID> gives each unit whose C<doc_ranges> are
 POD (each range's first line starts with C<=> and a letter) a C<doc_html>: its

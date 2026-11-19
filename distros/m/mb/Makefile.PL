@@ -5,20 +5,40 @@ use ExtUtils::MakeMaker;
 
 my %args = (
     'NAME'      => q{mb},
-    'VERSION'   => q{0.66},
+    'VERSION'   => q{0.67},
     'ABSTRACT'  => q{Can easy script in Big5, Big5-HKSCS, GBK, Sjis(also CP932), UHC, UTF-8, ...},
     'PREREQ_PM' => {
-        'ExtUtils::MakeMaker' => '5.4302',
-        'perl' => '5.00503',
+
     },
     'AUTHOR'    => q{ina <ina.cpan@gmail.com>},
 );
+
+# Install bin/*.pl as executables (EUMM creates .bat wrappers on Win32).
+# A dist without a bin/ directory is unaffected.
+if (-d 'bin') {
+    local *BINDIR;
+    if (opendir(BINDIR, 'bin')) {
+        $args{EXE_FILES} =
+            [map { "bin/$_" } sort grep { /\.pl\z/ && -f "bin/$_" } readdir(BINDIR)];
+        closedir(BINDIR);
+    }
+}
 
 # LICENSE was introduced in ExtUtils::MakeMaker 6.31 (2006).
 # Passing it to older versions produces an "is not a known parameter" warning
 # without failing, but we suppress the noise by checking the version.
 if ($ExtUtils::MakeMaker::VERSION >= 6.31) {
     $args{LICENSE} = q{perl};
+}
+
+# CONFIGURE_REQUIRES was introduced in ExtUtils::MakeMaker 6.52.  Older
+# versions ignore an unknown parameter with a warning, so it is passed
+# only when it is understood; the generated META files carry the same
+# information for every toolchain.
+if ($ExtUtils::MakeMaker::VERSION >= 6.52) {
+    $args{CONFIGURE_REQUIRES} = {
+        'ExtUtils::MakeMaker' => '5.4302',
+    };
 }
 
 # MIN_PERL_VERSION (6.48) and META_MERGE (6.46) arrived together in the
@@ -30,19 +50,11 @@ if ($ExtUtils::MakeMaker::VERSION >= 6.48) {
         'meta-spec' => { version => 2 },
         'resources' => {
             'license'    => [ 'http://dev.perl.org/licenses/' ],
-            'bugtracker' => {
-                'web' => 'https://github.com/ina-cpan/mb/issues',
-            },
-            'repository' => {
-                'url'  => 'https://github.com/ina-cpan/mb',
-                'web'  => 'https://github.com/ina-cpan/mb',
-                'type' => 'git',
-            },
         },
         'provides' => {
             'mb' => {
                 'file'    => 'lib/mb.pm',
-                'version' => '0.66',
+                'version' => '0.67',
             }
         },
     };

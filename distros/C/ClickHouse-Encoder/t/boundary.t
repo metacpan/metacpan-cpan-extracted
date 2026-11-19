@@ -78,23 +78,16 @@ for my $boundary (127, 128, 16383, 16384, 2097151, 2097152) {
 
 {
     my $enc = ClickHouse::Encoder->new(columns => [['v', 'Decimal128(0)']]);
-    # 2^127 - 1 = 170141183460469231731687303715884105727 (39 digits)
-    my $bin = $enc->encode([['170141183460469231731687303715884105727']]);
+    # +-(10^38 - 1), the Decimal(38, 0) limits
+    my $bin = $enc->encode([['9' x 38]]);
     my $off = skip_header($bin);
-    my $lo  = unpack('Q<', substr($bin, $off,   8));
-    my $hi  = unpack('q<', substr($bin, $off+8, 8));
-    is($lo, 0xFFFFFFFFFFFFFFFF,  'Decimal128 max lo = all ones');
-    is($hi, 0x7FFFFFFFFFFFFFFF, 'Decimal128 max hi = INT64_MAX');
-}
-{
-    my $enc = ClickHouse::Encoder->new(columns => [['v', 'Decimal128(0)']]);
-    # -(2^127) = -170141183460469231731687303715884105728
-    my $bin = $enc->encode([['-170141183460469231731687303715884105728']]);
-    my $off = skip_header($bin);
-    my $lo = unpack('Q<', substr($bin, $off,   8));
-    my $hi = unpack('q<', substr($bin, $off+8, 8));
-    is($lo, 0,                              'Decimal128 min lo = 0');
-    is($hi, unpack('q<', "\0\0\0\0\0\0\0\x80"), 'Decimal128 min hi = INT64_MIN bits');
+    is(unpack('H*', substr($bin, $off, 16)), 'ffffffff3f228a097ac4865aa84c3b4b', 'Decimal128 max bytes');
+    $bin = $enc->encode([['-' . '9' x 38]]);
+    is(unpack('H*', substr($bin, $off, 16)), '01000000c0dd75f6853b79a557b3c4b4', 'Decimal128 min bytes');
+    for my $too_big ('1' . '0' x 38, '170141183460469231731687303715884105727') {
+        eval { $enc->encode([[$too_big]]) };
+        like($@, qr/Decimal128 overflow/, 'Decimal128 beyond 38 digits rejected');
+    }
 }
 
 # ---- Float32 subnormal ------------------------------------------------------

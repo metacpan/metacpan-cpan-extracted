@@ -1,5 +1,5 @@
 package Proc::ShellSubset::Large;  # The large subset (doc/large-subset/large-subset-spec.md): Proc::ShellSubset, and where it rejects, a wider grammar
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 use strict; use warnings; use Proc::ShellSubset; use List::Util qw(pairs pairvalues);
 
 # Proc::ShellSubset::Large::parse($string, %opt) returns a List, or { error, pos, last, tree } as Proc::ShellSubset::parse does.
@@ -94,7 +94,7 @@ my %SETOK = map +($_ => 1), qw(PS1 PS4 HOSTNAME PIPESTATUS BASH);   # shell-set 
 
 our %TREECHK;   # checks applied to the whole tree, also where the base grammar accepted the string (see Large::treecheck)
 # P5: [ and test are the program (coreutils), which decides every form; R1: except a literal < or > argument, which both
-# shells take as a string comparison and the program refuses.  Rule F (the user, 2026-11-03; post2-0.04): where the program
+# shells take as a string comparison and the program refuses.  Rule F (the user, 2026-11-03; post3-0.04): where the program
 # is wrong, we may do better: 's1 < s2' and 's1 > s2' alone (also after '!') are compared by the executor itself, by bytes as
 # both shells (POSIX 2024 adds them); other forms with < or > stay rejected unless the caller sets the option test_lt_gt.
 my $TOP = qr/^(?:!?=|==|<|>|-(?:eq|ne|lt|le|gt|ge|nt|ot|ef|a|o)|!|\()\z/;   # what may stand before an operand

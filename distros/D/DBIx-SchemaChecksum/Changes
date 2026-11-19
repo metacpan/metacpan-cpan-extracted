@@ -1,5 +1,14 @@
 Revision history for DBIx-SchemaChecksum
 
+1.106     2026-11-18 14:03:28+01:00
+    - updated Maroš email
+
+
+1.105     2026-11-18 13:18:23+01:00
+    - add --check to apply_changes
+    - fix the checksums in the test suite, because metadata returned by DBD::SQLite 1.78 changed
+
+
 1.104     2021-01-26 13:11:18+01:00
     - explicitly use File::HomeDir, because MooseX::App only lists it as a recommended prereq
 

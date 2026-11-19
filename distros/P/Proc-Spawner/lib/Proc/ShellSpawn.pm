@@ -1,4 +1,5 @@
 package Proc::ShellSpawn;
+BEGIN { *ProcSS:: = \*Proc::ShellSpawn:: }   # JU3 (post-0.12, the user, 2026-11-15): the alias by which Large and Builtins call this module
 # Runs Proc::ShellSubset parse trees with posix_spawn(3), in the simplest scenario:
 # this module is the only code that starts child processes, and it owns
 # SIGCHLD while it runs.  No fork in Perl: compound commands, pipelines of
@@ -23,12 +24,14 @@ use Proc::Spawner;
 use Proc::Spawner::Graph;
 use Scalar::Util qw(weaken);
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 our $TRACE; *TRACE = \$Proc::Spawner::TRACE;   # undef, or a code ref given one line per fd or process operation
-our %PARSE = map +($_ => 1), qw(assign param_ops if while for case read empty);   # options for Proc::ShellSubset and Proc::ShellSubset::Large
+our %PARSE = map +($_ => 1), qw(assign param_ops if while for case read empty);   # options for Proc::ShellSubset and
+                                                                                  # Proc::ShellSubset::Large
   # (empty, post4-0.04: a string with no command, or only comments, runs as nothing, status 0, as in both shells; also eval '')
 # The parser for run(STRING): run(STRING, parser => CODE), CODE->(TEXT) returning a tree or an error hash.
-# Default (EXPERIMENTAL, awaiting approval): the largest of Proc::ShellSubset::Large, Proc::ShellSubset, Proc::ShellSubset::Small that the
+# Default (EXPERIMENTAL, awaiting approval):
+# the largest of Proc::ShellSubset::Large, Proc::ShellSubset, Proc::ShellSubset::Small that the
 # caller has loaded; if none is, Proc::ShellSubset is loaded.  The executor itself loads no parser otherwise.
 sub default_parser {
   defined &Proc::ShellSubset::Large::parse ? sub { Proc::ShellSubset::Large::parse($_[0], %PARSE, @_[1 .. $#_]) }
@@ -50,8 +53,10 @@ our $G = Proc::Spawner::Graph->new(dot => $DOT);   # our children and our own re
 #   a Part [ext => NAME, ...] of a Word:                                  NAME->(CONTEXT, PART, K) with K->(TEXT)
 # Each calls K exactly once (or ends the shell with leave), maybe later, and never waits (D2).
 our %KIND = map +($_ => "Proc::ShellSpawn::Large::x_$_"), qw(func export readonly local exec);
-our %CMD = ((map +($_ => ['Proc::ShellSpawn::builtin']), ':', qw(exit break continue read)),
-            (map +($_ => ["Proc::ShellSpawn::Large::b_$_"]), qw(return shift set eval trap wait umask command getopts unset kill pwd)),
+our %CMD = (':' => ['Proc::ShellSpawn::b_colon'], exit => ['Proc::ShellSpawn::b_exit'], read => ['Proc::ShellSpawn::b_read'],
+            (map +($_ => ['Proc::ShellSpawn::b_break']), qw(break continue)),   # (JU2, post-0.12: a function each)
+            (map +($_ => ["Proc::ShellSpawn::Large::b_$_"]),
+              qw(return shift set eval trap wait umask command getopts unset kill pwd)),
             '.' => ['Proc::ShellSpawn::Large::b_dot'], (map +($_ => ['Proc::ShellSpawn::Large::b_test']), '[', 'test'));
 our $ONBUILTIN;   # undef, or a code ref called (HANDLER, [ARGV], {SETTINGS}) for each command where no program runs: before a
                  # builtin or function runs (cd: x_cd; export, readonly, local: x_NAME, after), a command not found ('not found',
@@ -66,6 +71,7 @@ our $SIGNALLED;   # after run(): the signal of 'kill ... $$' that ended the stri
 our %TRAPSAVE;   # signals the trap builtin changed during run(), with their old settings
 our %SPECIAL = map +($_ => 1), qw(: break continue . eval exec exit export readonly return set shift times trap unset);
 BEGIN { *handler = \&Proc::Spawner::Graph::handler }
+sub done { my ($k, $st) = @_; sub { $k->($st) } }   # "then finish with status $st": for a call that takes what to do next
 sub fail {   # stop this shell with $st, after the message $text if given
   my ($c, $st, $text) = @_; defined $text ? msg($c, $text, sub { leave($c, $st) }) : defer(\&leave, $c, $st); return }
 
@@ -90,7 +96,8 @@ sub has_dir { $WIN ? $_[0] =~ m{[/\\]} : $_[0] =~ m{/} }   # a command name with
 sub path_in {   # PATH from the shell's directory
   my ($c, $p) = @_;
   return $p if $WIN ? $p =~ m{^[A-Za-z]:[/\\]|^[/\\]{2}} : $p =~ m{^/};
-  return ($c->{sh}{cwd} =~ m{^([A-Za-z]:|[/\\]{2}[^/\\]+[/\\][^/\\]+)} ? $1 : '') . $p if $WIN && $p =~ m{^[/\\]};   # (the drive, or the UNC share)
+  return ($c->{sh}{cwd} =~ m{^([A-Za-z]:|[/\\]{2}[^/\\]+[/\\][^/\\]+)} ? $1 : '') . $p if $WIN && $p =~ m{^[/\\]};   # (the drive,
+    # or the UNC share)
   "$c->{sh}{cwd}/$p" }
 sub path_list { Proc::Spawner::path_split(@_) }   # a PATH value's directories (an empty one: the current directory, POSIX)
 sub win_home {   # ~user on Windows (post-0.10, the user's follow-up (b) to WS1): one's own name is %USERPROFILE%; another
@@ -100,6 +107,24 @@ sub win_home {   # ~user on Windows (post-0.10, the user's follow-up (b) to WS1)
   return $up if lc $n eq lc($ENV{USERNAME} // '');
   my $d = ($up =~ s{[^/\\]+[/\\]*\z}{}r) . $n; -d $d ? $d : undef }
 sub os_path { my $p = shift; $WIN && $p eq '/dev/null' ? 'NUL' : $p }   # a redirection's file name, as the system has it
+# files_eq(A, B): do the two names mean the same file?  The one place for this question (the user, 2026-11-14, JH3: the
+# device and inode numbers are a legacy way to tell, and the uses are not to be tied to it): where the shell starts
+# (start_pwd), and test -ef and pwd -L of Proc::ShellSpawn::Programs, which loads this module for it only then.  On the
+# legacy systems: the same device and inode numbers.  Where stat gives no usable numbers for one of the two (an inode of
+# 0, as Perl on Windows gave before 5.34): paths_eq.  On Windows (post-0.12, the user, 2026-11-16) the way Microsoft
+# documents: both opened, and the volume's serial number with the 128-bit file ID compared (the 64-bit file index where
+# that is not there; Proc::Spawner::__win_same_file), the names made absolute first (Perl's directory, which a
+# pseudo-process does not share with the process); only if that cannot tell, the rest.  False if either does not exist.
+sub files_eq {
+  my @a = stat $_[0] or return ''; my @b = stat $_[1] or return '';
+  if ($WIN && defined &Proc::Spawner::__win_same_file) {
+    require File::Spec; my $here = Cwd::getcwd();
+    my $r = Proc::Spawner::__win_same_file(map File::Spec->rel2abs($_, $here), @_[0, 1]);
+    return $r ? 1 : '' if defined $r }
+  $a[1] && $b[1] ? $a[0] == $b[0] && $a[1] == $b[1] : paths_eq(@_) }
+sub paths_eq {   # the same path once symbolic links, '.' and '..' are resolved (Windows: without regard to case); two
+  my ($x, $y) = map Cwd::realpath($_), @_[0, 1];   # hard links to one file are not found the same this way
+  defined $x && defined $y && ($WIN ? lc $x eq lc $y : $x eq $y) }
 
 sub open_end {  # an end on a file, or undef with $!
   my ($c, $name, $op) = @_;
@@ -117,6 +142,7 @@ sub open_end {  # an end on a file, or undef with $!
 #   loops => [ { brk => K, cont => K, scope => [contexts] }, ... ] of the enclosing loops
 #   shell => { exit => K, scope => [contexts] } for exit
 #   held  => 1 if this context holds its map's ends; released by release_ctx, once
+my %LIVE;   # each shell (context) not ended yet, weakly: a job's shell is released once its last process has started
 sub derive {    # a context with its own map, which it holds
   my ($c, $map, %o) = @_;
   my $d = { %$c, map => $map, held => 1, released => 0, root => !!$o{shell}, late => 0 };
@@ -128,20 +154,21 @@ sub derive {    # a context with its own map, which it holds
                  pend => [], twait => [], tbusy => 0,   # the caught signals belong to the shell whose trap caught them (X19)
                  trap => { map +($_ => ''), grep $sh->{trap}{$_} eq '', keys %{$sh->{trap}} } };   # sh: only ignored traps stay
     my $scope = [];
-    $d->{loops} = []; delete @$d{qw(frame cond)}; $d->{shell} = { scope => $scope, exit => shell_exit($d, $scope, $k) } }
+    $d->{loops} = []; delete @$d{qw(frame cond)}; $d->{shell} = { scope => $scope, exit => shell_exit($d, $scope, $k) };
+    weaken($LIVE{$d} = $d) }   # (for the wait at exit, K5)
   hold($_) for values %$map;
   push @{ @{$d->{loops}} ? $d->{loops}[-1]{scope} : $d->{shell}{scope} }, $d;
   $d }
 sub leave { my ($c, $st) = @_; release_all(map $_->{scope}, @{$c->{loops}}); $c->{shell}{exit}->($st) }   # exit
 sub shell_exit {   # the end of a shell: its EXIT trap first (once; an exit inside the trap ends it there)
-  my ($c, $scope, $k) = @_; weaken($c); my $state = 0;
+  my ($c, $scope, $k) = @_; my $id = "$c"; weaken($c); my $state = 0;
   sub { my $st = shift;
     return if $state == 2;
     my $a = $state == 0 && $c && delete $c->{sh}{trap}{EXIT};
     if (defined $a && $a ne '' and ref(my $t = $c->{sh}{parse}->($a, nolineno => 1)) eq 'ARRAY') {
       $state = 1; my $tc = { %$c, loops => [], held => 0, cond => undef, frame => undef };
-      return x_list($tc, $t, undef, sub { return if $state == 2; $state = 2; late($c); release_all($scope); $k->($st) }) }
-    $state = 2; late($c); release_all($scope); $k->($st) } }
+      return x_list($tc, $t, undef, sub { return if $state == 2; $state = 2; delete $LIVE{$id}; late($c); release_all($scope); $k->($st) }) }
+    $state = 2; delete $LIVE{$id}; late($c); release_all($scope); $k->($st) } }
 sub late { my $c = shift; release_ctx($c) if $c && $c->{late} }   # the release a trap postponed (the trap is gone by now)
 sub release_ctx {
   my $c = shift; return if !$c->{held} or $c->{released};
@@ -155,7 +182,8 @@ sub release_all { for my $s (@_) { release_ctx($_) for @$s; @$s = () } }   # als
 # child's node carries its continuation as on_exit ['Proc::ShellSpawn::resume', K].
 BEGIN { *defer = \&Proc::Spawner::defer; *hold = \&Proc::Spawner::Graph::hold; *release = \&Proc::Spawner::Graph::release }
 sub loop_until { Proc::Spawner::wait_until(@_) }
-sub on_read { my ($e, $n, $cb) = @_; $G->perl_read($e, $n, sub { $cb->($_[1]) }) }   # one read of end $e: $cb->(BYTES), or undef at end of file
+sub on_read { my ($e, $n, $cb) = @_; $G->perl_read($e, $n, sub { $cb->($_[1]) }) }   # one read of end $e: $cb->(BYTES),
+                                                                                     # or undef at end of file
 sub on_write { my ($e, $bytes, $cb) = @_; $G->perl_write($e, $bytes, $cb) }   # Perl writes BYTES to end $e without blocking
 
 sub status_of {   # a wait status as sh's $?
@@ -168,7 +196,24 @@ my %JOBS;
 # them back by sigdefault; a background child keeps them ignored, as POSIX asks of an asynchronous list).
 sub ignoring_int { local @SIG{qw(INT QUIT PIPE)} = ('IGNORE') x 3; $_[0]->() }   # PIPE: a here-document's reader may go away
 sub wait_all { idle(0); ignoring_int(sub { loop_until(sub { !%JOBS }) }) if %JOBS }
-END { local $?; wait_all() }
+# At exit (post-0.12, K5, the user, 2026-11-15: "as shell"): the shells leave their background jobs running.  Ours
+# starts every command of a job itself (no fork: a job's next command is started here when the one before ends), so
+# it waits while it has anything left to do for a job: a command still to start, a read or write of its own, a call
+# queued; then it exits, leaving the processes running, as the shells do.  PROC_SHELLSPAWN_END, or $END_WAIT at run
+# time (a stopgap until such choices are arguments of the API): MODE[:SECONDS], MODE shell (the default), all (wait
+# until every job has ended: before post-0.12), none (exit at once: the jobs' commands not yet started never start);
+# SECONDS: wait at most that long (then as none).
+our $END_WAIT = $ENV{PROC_SHELLSPAWN_END} // 'shell';
+sub end_wait_mode { my ($m, $s) = ($_[0] // '') =~ /\A(shell|all|none)?(?::(\d+(?:\.\d*)?))?\z/ or return; ($m // 'shell', $s) }
+(end_wait_mode($END_WAIT))[0] // do { my $v = $END_WAIT; $END_WAIT = 'shell';   # (so that END does not complain again)
+  die "PROC_SHELLSPAWN_END: '$v' is not MODE[:SECONDS], MODE one of shell, all, none\n" };
+sub settled { !grep(defined && !$_->{released}, values %LIVE) && !%{$G->{io}} && !Proc::Spawner::loop()->queued }
+sub end_wait {
+  my ($mode, $secs) = end_wait_mode($END_WAIT);
+  $mode //= 'shell', warn "Proc::ShellSpawn: \$END_WAIT '$END_WAIT' is not MODE[:SECONDS]; shell taken\n" unless defined $mode;
+  return if !%JOBS or $mode eq 'none';
+  idle(0); ignoring_int(sub { Proc::Spawner::wait_until($mode eq 'all' ? sub { !%JOBS } : sub { !%JOBS || settled() }, $secs) }) }
+END { local $?; end_wait() }
 # Between run() calls (K3, the user's choice B, post-0.04): while background jobs remain, a deferred SIGCHLD
 # handler moves them on when a child ends, whatever Perl is doing (a chain's next command starts at once).
 # Its cost, documented: the program's own sleep and select return early when a child ends, and the
@@ -211,7 +256,8 @@ sub write_fd {   # as put, then $k->(ERRNO or undef): EBADF when the fd is close
 
 # Programs run inside this process (Proc::ShellSpawn::Programs, after coreutils 9.4), by name (X21).  Decision IP1 (the
 # user, 2026-11-08: "when a well-debugged builtin is already present, use it.  (By default; Configurable.)"): echo
-# printf test [ true false, and since post-0.10 pwd (b_pwd runs it as 'pwd -L', X23), on every platform; PROC_SHELLSPAWN_INPROC changes the default (none: the programs; names:
+# printf test [ true false, and since post-0.10 pwd (b_pwd runs it as 'pwd -L', X23), on every platform;
+# PROC_SHELLSPAWN_INPROC changes the default (none: the programs; names:
 # only these; all), and %INPROC can be changed at run time.  A name with a '/' is always a program.
 our @INPROC = qw(echo printf test [ true false pwd);
 our %INPROC = map +($_ => 1), map $_ eq 'all' ? @INPROC : $_ eq 'none' ? () : $_,
@@ -226,15 +272,18 @@ die "PROC_SHELLSPAWN_ECHO: '$ECHO' is none of coreutils, dash, bash\n" unless $E
 # (no directory) runs as $^X -MPARSER -MProc::ShellSpawn=sh -e0 -- ARGS, PARSER the largest parser loaded here (as
 # default_parser), with this Perl's @INC; then sh_main below reads ARGS as sh does.  PROC_SHELLSPAWN_SH (or $SH at run
 # time): auto (the default: so when the command's PATH has no sh), perl (always), program (never).  The text after -c is
-# an argument: through the primitive system1 on Windows, Perl's own spawn drops a " from it, and splits it at blanks too if it has one (❰BUG❱ in
+# an argument: through the primitive system1 on Windows, Perl's own spawn drops a " from it,
+# and splits it at blanks too if it has one (❰BUG❱ in
 # Perl, doc/perl-win32-system-bugs.md, 1); not worked around.
 our $SH = $ENV{PROC_SHELLSPAWN_SH} || 'auto';
 die "PROC_SHELLSPAWN_SH: '$SH' is none of auto, perl, program\n" unless $SH =~ /\A(?:auto|perl|program)\z/;
 sub sh_argv {   # the argv of sh as Perl, or undef: run the program sh
   my ($c, $argv, $path) = @_;
   return if $argv->[0] ne 'sh' or $SH eq 'program' or $SH eq 'auto' && defined((find_cmd($c, 'sh', $path))[0]);
-  my ($parser) = grep { no strict 'refs'; defined &{"${_}::parse"} } qw(Proc::ShellSubset::Large Proc::ShellSubset Proc::ShellSubset::Small);
-  [$^X, (map "-I$_", grep !ref, @INC), '-M' . ($parser // 'Proc::ShellSubset'), '-MProc::ShellSpawn=sh', '-e0', '--', @$argv[1 .. $#$argv]] }
+  my ($parser) = grep { no strict 'refs'; defined &{"${_}::parse"} }
+    qw(Proc::ShellSubset::Large Proc::ShellSubset Proc::ShellSubset::Small);
+  [$^X, (map "-I$_", grep !ref, @INC), '-M' . ($parser // 'Proc::ShellSubset'), '-MProc::ShellSpawn=sh', '-e0', '--',
+   @$argv[1 .. $#$argv]] }
 sub import {   # use Proc::ShellSpawn 'sh': run as sh with @ARGV, then exit (SH1); with no list, nothing
   my ($pkg, @w) = @_; return unless @w;
   die "Proc::ShellSpawn: only 'sh' can be imported\n" unless @w == 1 && $w[0] eq 'sh';
@@ -269,9 +318,11 @@ our @BIN = !defined $ENV{PROC_SHELLSPAWN_BIN} ? ($WIN ? win_posix_bin() : ())
 sub win_posix_bin {
   my $sd = $ENV{SystemDrive} // 'C:';
   my $up = sub { $_[0] =~ s{[/\\][^/\\]+\z}{}r };   # the parent directory
-  my @git = map { ($up->($_), $up->($up->($_))) } grep -f "$_\\git.exe", Proc::Spawner::path_split($ENV{PATH});   # Git\cmd, Git\mingw64\bin
+  my @git = map { ($up->($_), $up->($up->($_))) } grep -f "$_\\git.exe", Proc::Spawner::path_split($ENV{PATH});   # Git\cmd,
+    # Git\mingw64\bin
   for my $d ((map "$_\\usr\\bin", @git), (map "$_\\Git\\usr\\bin", grep defined, @ENV{qw(ProgramFiles ProgramW6432)}),
-             (defined $ENV{LOCALAPPDATA} ? "$ENV{LOCALAPPDATA}\\Programs\\Git\\usr\\bin" : ()), "$sd\\msys64\\usr\\bin", "$sd\\cygwin64\\bin") {
+             (defined $ENV{LOCALAPPDATA} ? "$ENV{LOCALAPPDATA}\\Programs\\Git\\usr\\bin" : ()),
+             "$sd\\msys64\\usr\\bin", "$sd\\cygwin64\\bin") {
     return $d if -f "$d\\cat.exe" } () }
 my %WINCLASH = map +($_ => 1), qw(sort find timeout expand);   # Windows' own programs of these names are others (BIN1)
 sub win_clash { my ($name, $p) = @_; my $r = $ENV{SystemRoot} // return 0;
@@ -292,22 +343,28 @@ sub find_cmd {   # the path to run for $name, or undef and the status (127, 126)
 
 sub spawn {   # starts @$argv with $map; $k->(STATUS) when it has ended; returns its process node or undef
   my ($c, $map, $argv, $env, $k, $search) = @_;   # $search: the PATH to look in, if not the command's own (command -p)
-  my %e = (%{$c->{sh}{vars}}{grep $c->{sh}{exp}{$_} && /^[A-Za-z_][A-Za-z_0-9]*\z/, keys %{$c->{sh}{vars}}}, %$env);   # as dash: names only
+  my %e = (%{$c->{sh}{vars}}{grep $c->{sh}{exp}{$_} && /^[A-Za-z_][A-Za-z_0-9]*\z/, keys %{$c->{sh}{vars}}}, %$env);   # as dash:
+    # names only
   return inproc($c, $map, $argv, \%e, $k) if $INPROC{$argv->[0]};
   if (my $a = sh_argv($c, $argv, $search // $e{PATH})) { $argv = $a; undef $search }   # sh as Perl (SH1)
   my ($path, $st, $what) = find_cmd($c, $argv->[0], $search // $e{PATH});
-  $c->{sh}{hash}{$argv->[0]} = $path if defined $path && !defined $search && !has_dir($argv->[0]);   # remembered, as dash (hash, type)
-  if (!defined $path) {
-    $ONBUILTIN->($st == 127 ? 'not found' : 'denied', $argv, {%$env}) if $ONBUILTIN;   # (measurement: no program runs)
-    return cmd_msg($c, $map, $st == 127 ? "$argv->[0]: not found" : "$argv->[0]: Permission denied", sub { $k->($st) }) }
-  if ($WIN && -e path_in($c, $path) && (-d _ || !-x _)) {   # Windows runs neither: as sh says it (CreateProcess: not found,
-    $ONBUILTIN->('denied', $argv, {%$env}) if $ONBUILTIN;   # or "Exec format error")
-    return cmd_msg($c, $map, "$argv->[0]: Permission denied", sub { $k->(126) }) }
+  $c->{sh}{hash}{$argv->[0]} = $path if defined $path && !defined $search && !has_dir($argv->[0]);   # remembered, as dash
+    # (hash, type)
+  my $no = sub {   # the command does not start: its message and the status, 127 (not found) or 126 ($why); with $log the
+    my ($st, $why, $log) = @_;   # measuring hook is told too (no program runs)
+    $ONBUILTIN->($st == 127 ? 'not found' : 'denied', $argv, {%$env}) if $log && $ONBUILTIN;
+    cmd_msg($c, $map, "$argv->[0]: " . ($st == 127 ? 'not found' : $why), done($k, $st)) };
+  return $no->($st, 'Permission denied', 1) if !defined $path;
+  return $no->(126, 'Permission denied', 1)   # Windows runs neither: as sh says it (CreateProcess: not found,
+                                              # or "Exec format error")
+    if $WIN && -e path_in($c, $path) && (-d _ || !-x _);
   my @envp = map "$_=$e{$_}", sort keys %e;
-  my %def = map +($_ => 1), grep !$IGN0{$_} && ($SIG{$_} // '') eq 'IGNORE' && ($c->{sh}{trap}{$_} // 1) ne '',   # trap '' SIG: stays ignored
+  my %def = map +($_ => 1), grep !$IGN0{$_} && ($SIG{$_} // '') eq 'IGNORE' && ($c->{sh}{trap}{$_} // 1) ne '',   # trap '' SIG:
+    # stays ignored
     keys %SIG, $FPE ? () : 'FPE';
   delete @def{qw(INT QUIT)} if $c->{sh}{job};   # in the background: left ignored
-  my @o = (sigdefault => [sort keys %def], $WIN ? () : (umask => $c->{sh}{umask}), on_exit => ['Proc::ShellSpawn::resume', $k],   # (Windows: no umask)
+  my @o = (sigdefault => [sort keys %def],
+           $WIN ? () : (umask => $c->{sh}{umask}), on_exit => ['Proc::ShellSpawn::resume', $k],   # (Windows: no umask)
            $c->{sh}{cwd} ne Cwd::getcwd() ? (chdir => $c->{sh}{cwd}) : ());
   my $node = $G->start($path, $argv, \@envp, $map, @o);
   if (!$node && !$WIN && $! == POSIX::ENOEXEC()) {   # a script without #!: sh runs it with sh
@@ -316,8 +373,8 @@ sub spawn {   # starts @$argv with $map; $k->(STATUS) when it has ended; returns
   my $err = "$!";   # an fd of ours that is not open: the first one the child should have got
   my ($bad) = grep !is_open($_), map $map->{$_} ? $map->{$_}{fd} : (), sort { $a <=> $b } keys %$map;
   $st = $! == POSIX::ENOENT() ? 127 : 126;
-  return msg($c, "$bad: Bad file descriptor", sub { $k->($st) }) if defined $bad;   # (a redirection failed: the shell's own fd 2)
-  cmd_msg($c, $map, $st == 127 ? "$argv->[0]: not found" : "$argv->[0]: $err", sub { $k->($st) }) }
+  return msg($c, "$bad: Bad file descriptor", done($k, $st)) if defined $bad;   # (a redirection failed: the shell's own fd 2)
+  $no->($st, $err) }
 sub cmd_msg {   # X47: a command that does not start: its message to the command's own fd 2 (2>log, 2>&1 | ...), as both shells
   my ($c, $map, $text, $k) = @_; my @e = grep defined, values %$map; hold($_) for @e;
   msg({ %$c, map => $map }, $text, sub { release($_) for @e; $k->() }) }
@@ -334,12 +391,12 @@ sub inproc {   # a program of %INPROC, run here: its output and messages in the 
   my @seq = grep length $_->[1], @{$seq // [[2, $err], [1, $out]]};
   my $pipe_dfl = !$IGN0{PIPE} && ($c->{sh}{trap}{PIPE} // 1) ne '';   # (Windows: as POSIX, though it has no SIGPIPE)
   my $werr;
-  sub {
-    my $next = __SUB__;
+  loop_async(sub {
+    my $next = shift;
     my $p = shift @seq;
     if (!$p) {
       release($_) for values %$map; return $k->($st) unless $werr;
-      local $! = $werr; return write_fd($d, 2, "$argv->[0]: write error" . ($werr > 0 ? ": $!" : '') . "\n", sub { $k->(1) }) }
+      local $! = $werr; return write_fd($d, 2, "$argv->[0]: write error" . ($werr > 0 ? ": $!" : '') . "\n", done($k, 1)) }
     return $next->() if $p->[0] == 1 && $werr;
     write_fd($d, $p->[0], $p->[1], sub {
       my $e = shift;
@@ -348,7 +405,7 @@ sub inproc {   # a program of %INPROC, run here: its output and messages in the 
         # the reason only when it failed in the final flush (close_stream: errno 0 after an earlier failure): the last
         # piece for stdout, short enough for one write of the buffer (glibc's: st_blksize, 4096 for a pipe)
         $werr = !grep($_->[0] == 1, @seq) && length $p->[1] <= 4096 ? $e : -1 }
-      $next->() }) }->();
+      $next->() }) });
   return }
 sub resume { my ($g, $node, $w, $k) = @_; $k->(defined $w ? status_of($w) : 1) }   # on_exit of our children
 
@@ -359,11 +416,10 @@ sub redirect {
   my %m = %{$c->{map}}; my @opened;
   my $fail = sub { msg({ map => \%m }, shift, sub { release($_) for @opened; $k->() }) };   # through the redirections so far
   my $i = 0;
-  sub {
+  loop_async(sub { my $next = shift;
     return $k->(\%m, \@opened) if $i > $#$redirs;
     my ($fd, $op, $w) = @{$redirs->[$i++]};
     if ($op eq '<<') {   # a here-document: Perl writes the expanded body into a pipe the command reads
-      my $next = __SUB__;
       # X50: expanded with the redirections so far (messages, $( )), and an error that would end the shell (set -u,
       # ${x:?}, arithmetic) fails the redirection instead, as dash: the command does not run, status 2, the shell goes
       # on (a special builtin's failed redirection still ends it)
@@ -377,15 +433,14 @@ sub redirect {
       elsif (exists $m{$w}) { defined $m{$w} ? ($m{$fd} = $m{$w}) : return $fail->("$w: Bad file descriptor") }
       elsif (visible($w)) { $m{$fd} = own_fd($w) }
       else { return $fail->("$w: Bad file descriptor") }
-      return __SUB__->() }
-    my $next = __SUB__;
+      return $next->() }
     expand_str($c, $w, sub {
       my $name = shift;
       my $e = $name ne '' && open_end($c, $name, $op);
       if (!$e) {   # dash's wording
         my $err = $name eq '' || $!{ENOENT} ? ($op eq '<' ? 'No such file' : 'Directory nonexistent') : "$!";
         return $fail->(($op eq '<' ? 'cannot open' : 'cannot create') . " $name: $err") }
-      push @opened, $m{$fd} = $e; $next->() }) }->() }
+      push @opened, $m{$fd} = $e; $next->() }) }) }
 
 # Runs $body->(CONTEXT, K2) with @$redirs applied, then $k->(STATUS); status 2 if they fail.
 sub with_redirs {
@@ -429,20 +484,22 @@ my %CLASS = (   # X40: the classes in the C locale, as ranges [FROM, TO] and sin
   alpha => [['a', 'z'], ['A', 'Z']], upper => [['A', 'Z']], lower => [['a', 'z']], digit => [['0', '9']],
   alnum => [['a', 'z'], ['A', 'Z'], ['0', '9']], xdigit => [['0', '9'], ['A', 'F'], ['a', 'f']],
   space => [" ", "\t", "\n", "\r", "\f", "\013"], blank => [" ", "\t"], cntrl => [["\x01", "\x1f"], "\x7f"],
-  print => [["\x20", "\x7e"]], graph => [["\x21", "\x7e"]], punct => [grep $_ ne "/" && /[[:punct:]]/, map chr, 33 .. 126]);   # (no / in a name)
+  print => [["\x20", "\x7e"]], graph => [["\x21", "\x7e"]],
+  punct => [grep $_ ne "/" && /[[:punct:]]/, map chr, 33 .. 126]);   # (no / in a name)
 sub class_chars {   # X40: bsd_glob has no character classes: [:digit:] as its characters, in the C locale (as dash there;
   my $n = shift; my $m = $CLASS{$n} or return "[:$n:]";   # in a UTF-8 locale other letters belong too, not here)
   join '', map { ref $_ ? quote_bracket($_->[0]) . '-' . quote_bracket($_->[1]) : quote_bracket($_) } @$m }
 sub quote_bracket { my $c = shift; $c =~ /[A-Za-z0-9]/ ? $c : "\\$c" }   # a member of a bracket expression, for bsd_glob
 
 # A Word into fields: $k->([FIELD, ...]).  $how: 'argv' splits and globs; 'str' gives one string.
-# A field under construction is [TEXT, PATTERN, KEEP]: PATTERN is the text for globbing, with
-# quoted characters escaped, or undef if nothing in it may glob.
+# A field under construction is a hash (JU1, post-0.12; before, an array by number): text, the field's text; pat, the
+# same as a glob pattern (quoted characters escaped); keep, true to keep the field even if it is empty (something quoted
+# was in it); glob, true if it has an active glob character; gone, true when "$@" stood for no parameters (L1).
+sub fresh_field { +{ text => '', pat => '', keep => 0, glob => 0, gone => 0 } }
 sub expand {
   my ($c, $word, $how, $k) = @_;
   return $k->([$word]) unless ref $word;
-  # a field: [TEXT, GLOB PATTERN (quoted characters escaped), KEEP even if empty, HAS ACTIVE GLOB CHARS]
-  my @f; my $cur = ['', '', 0, 0];
+  my @f; my $cur = fresh_field();
   my $add = sub {   # text; $pat: its glob characters are active; $split: an unquoted expansion
     my ($t, $pat, $split) = @_;
     my $ifs = $c->{sh}{vars}{IFS} // " \t\n";
@@ -452,32 +509,35 @@ sub expand {
       my @p = split /($d)/, $t, -1;
       for my $j (0 .. $#p) {
         if ($j % 2) {   # a delimiter: one with a non-blank IFS character ends a field even if it is empty
-          push @f, $cur if length $cur->[0] or $cur->[2] or $nw ne '' && $p[$j] =~ /[$nw]/; $cur = ['', '', 0, 0]; next }
-        $cur->[0] .= $p[$j]; $cur->[1] .= $p[$j]; $cur->[3] ||= active($p[$j]) } }
-    elsif ($split && $how eq 'argv') { $cur->[0] .= $t; $cur->[1] .= $t; $cur->[3] ||= active($t) }   # IFS empty: no splitting
-    else { $cur->[0] .= $t; $cur->[1] .= $pat ? $t : glob_quote($t); $cur->[3] ||= $pat && $t =~ /[*?\[]/;
-           $cur->[2] = 1 unless $pat } };
+          push @f, $cur if length $cur->{text} or $cur->{keep} or $nw ne '' && $p[$j] =~ /[$nw]/; $cur = fresh_field(); next }
+        $cur->{text} .= $p[$j]; $cur->{pat} .= $p[$j]; $cur->{glob} ||= active($p[$j]) } }
+    elsif ($split && $how eq 'argv') { $cur->{text} .= $t; $cur->{pat} .= $t; $cur->{glob} ||= active($t) }   # IFS empty: no splitting
+    else { $cur->{text} .= $t; $cur->{pat} .= $pat ? $t : glob_quote($t); $cur->{glob} ||= $pat && $t =~ /[*?\[]/;
+           $cur->{keep} = 1 unless $pat } };
+  my $params = sub {   # "$@" and "${@#p}": one field per parameter; none: the field goes, quotes or not (L1)
+    $cur->{gone} = 1 unless @_;
+    for my $j (0 .. $#_) { if ($j) { push @f, $cur; $cur = fresh_field() } $add->($_[$j], 0) } };
   my @parts = @$word; my $i = 0;
-  sub {
+  loop_async(sub { my $next = shift;
     if ($i > $#parts) {
-      push @f, $cur if length $cur->[0] or $cur->[2] && !$cur->[4] or $how ne 'argv';
-      return $k->([map $_->[0], @f]) if $how ne 'argv';
+      push @f, $cur if length $cur->{text} or $cur->{keep} && !$cur->{gone} or $how ne 'argv';
+      return $k->([map $_->{text}, @f]) if $how ne 'argv';
       return $k->([map {   # a pattern that matches nothing stays as it is
-        my ($t, $p, undef, $g) = @$_;
+        my ($t, $p, $g) = @$_{qw(text pat glob)};
         my $base = !$g || is_abs($p) || $c->{sh}{cwd} eq Cwd::getcwd() ? '' : glob_quote($c->{sh}{cwd}) . '/';
-        my @m = $g && !$c->{sh}{opt}{f} ? sort { $a cmp $b } grep !m{(?:^|/)\.\.?\z}, File::Glob::bsd_glob($base . slash_brackets($p), File::Glob::GLOB_QUOTE()) : ();   # never . or .. (rule E, as bash)
+        my @m = $g && !$c->{sh}{opt}{f} ? sort { $a cmp $b } grep !m{(?:^|/)\.\.?\z},
+          File::Glob::bsd_glob($base . slash_brackets($p), File::Glob::GLOB_QUOTE()) : ();   # never . or .. (rule E, as bash)
         s{^\Q$c->{sh}{cwd}\E/}{} for $base ? @m : ();
         @m ? @m : $t } @f]) }
-    my $x = $parts[$i++]; my $next = __SUB__;
+    my $x = $parts[$i++];
     return $add->($x, 0), $next->() unless ref $x;
     my ($kind, @a) = @$x; (my $q = $kind) =~ s/^"//; my $split = $kind !~ /^"/;
     if    ($kind eq '*')   { $add->($a[0], 1) }
-    elsif ($kind eq '~')   { $add->($a[0] ne '' ? ($WIN ? win_home($a[0]) : (getpwnam $a[0])[7]) // "~$a[0]"   # ~ without HOME: from the password
+    elsif ($kind eq '~')   { $add->($a[0] ne '' ? ($WIN ? win_home($a[0]) : (getpwnam $a[0])[7]) // "~$a[0]"   # ~ without HOME:
+                                    #   from the password
                                     : exists $c->{sh}{vars}{HOME} ? var($c, 'HOME')   #   file (G16); Windows: no user database,
                                     : ($WIN ? $ENV{USERPROFILE} : (getpwuid $<)[7]) // '~', 0) }   #   USERPROFILE
-    elsif ($kind eq '"$' && $a[0] eq '@' && $how eq 'argv') {   # "$@": one field per parameter
-      my @p = @{$c->{sh}{args}}; $cur->[4] = 1 unless @p;   # none: the field goes, quotes or not (L1)
-      for my $j (0 .. $#p) { if ($j) { push @f, $cur; $cur = ['', '', 0, 0] } $add->($p[$j], 0) } }
+    elsif ($kind eq '"$' && $a[0] eq '@' && $how eq 'argv') { $params->(@{$c->{sh}{args}}) }   # "$@"
     elsif ($q eq '$')      { my $v = getvar($c, $a[0]) // return; $add->($v, 0, $split) }
     elsif ($q eq '${#')    { my $v = getvar($c, $a[0]) // return; $add->(length $v, 0, $split) }
     elsif ($q eq '${')     {   # the word is expanded only if it is used, as in sh
@@ -487,20 +547,21 @@ sub expand {
         getvar($c, $n) // return;   # set -u (L4)
         return pattern_re($c, $w, sub { my $re = shift;
           my $trim = sub { my $v = shift; my @i = 0 .. length $v; @i = reverse @i if $op =~ /^(?:%|##)\z/;
-            for my $i (@i) { my ($cut, $keep) = $op =~ /%/ ? (substr($v, $i), substr($v, 0, $i)) : (substr($v, 0, $i), substr($v, $i));
+            for my $i (@i) { my ($cut, $keep) = $op =~ /%/ ? (substr($v, $i), substr($v, 0, $i))
+                               : (substr($v, 0, $i), substr($v, $i));
                              return $keep if $cut =~ $re }
             $v };
           if ($n eq '@' || $n eq '*') {   # G4 (rule E, as bash): from each parameter, then as $@ or $* would be
             my @t = map $trim->($_), @{$c->{sh}{args}};
-            if ($kind eq '"${' && $n eq '@' && $how eq 'argv') {   # "${@#p}": one field per parameter, as "$@"
-              $cur->[4] = 1 unless @t; for my $j (0 .. $#t) { if ($j) { push @f, $cur; $cur = ['', '', 0, 0] } $add->($t[$j], 0) } }
+            if ($kind eq '"${' && $n eq '@' && $how eq 'argv') { $params->(@t) }   # "${@#p}": as "$@"
             else { $add->(join(ifs1($c), @t), 0, $split) } }
           else { $add->($trim->($v), 0, $split) }
           $next->() }) }
       my $word = $op =~ /[-=?]/ ? !$set : $set;
       unless ($word) { $add->($op =~ /[-=?]/ ? $v : '', 0, $split); return $next->() }
       return expand($c, $w, 'str', sub { my $t = $_[0][0];
-        return fail($c, 2, "$n: " . ($t ne '' ? $t : $op =~ /:/ ? 'parameter not set or null' : 'parameter not set')) if $op =~ /\?/;
+        return fail($c, 2, "$n: " . ($t ne '' ? $t : $op =~ /:/ ? 'parameter not set or null' : 'parameter not set'))
+          if $op =~ /\?/;
         if ($op =~ /=/) { setvar($c, $n, $t) or return }
         $add->($t, 0, $split); $next->() }) if !$split || $op =~ /[=?]/;
       return each_async(ref $w ? $w : [$w], sub { my ($p, $more) = @_;   # unquoted: strings are split, ["'", text] is not
@@ -515,19 +576,20 @@ sub expand {
     elsif ($q eq '$(')     { return subst($c, $a[0], sub { $add->(shift, 0, $split); $next->() }) }
     elsif ($kind eq '{' || $kind eq '{..') { die "Proc::ShellSpawn: brace expansion is not implemented" }
     else { die "Proc::ShellSpawn: unknown part '$kind'" }
-    $next->() }->() }
+    $next->() }) }
+sub loop_async {   # JH1 (post-0.12, X60): $body->(NEXT) again each time it calls NEXT; it stops by not calling it.  A
+  my $body = shift;   # NEXT called at once continues a plain loop (no recursion, however many steps finish at once); a
+  sub { my $resume = __SUB__;   # NEXT called later (a program, a $( ) to wait for) resumes it from the event loop
+    while (1) { my ($now, $again) = 1;
+      $body->(sub { $now ? ($again = 1) : $resume->() });
+      $now = 0; $again or return } }->(); return }
 sub each_async {   # $body->(ITEM, NEXT) for each item in turn (each may finish later), then $done->()
   my ($items, $body, $done) = @_; my $i = 0;
-  sub { my $next = __SUB__; return $done->() if $i > $#$items; $body->($items->[$i++], $next) }->() }
+  loop_async(sub { my $next = shift; return $done->() if $i > $#$items; $body->($items->[$i++], $next) }) }
 sub expand_str  { my ($c, $w, $k) = @_; expand($c, $w, 'str', sub { $k->($_[0][0]) }) }
 sub expand_list {   # several words, one after another (each may see the effect of the one before)
-  my ($c, $ws, $how, $k) = @_; my @out; my $i = 0;
-  sub { my $next = __SUB__;   # a loop while words expand at once (no deep recursion); a $( ) resumes it later
-    while ($i <= $#$ws) {
-      my ($now, $done) = 1;
-      expand($c, $ws->[$i++], $how, sub { push @out, @{$_[0]}; $now ? $done = 1 : $next->() });
-      $now = 0; $done or return }
-    $k->(\@out) }->() }
+  my ($c, $ws, $how, $k) = @_; my @out;
+  each_async($ws, sub { my ($w, $next) = @_; expand($c, $w, $how, sub { push @out, @{$_[0]}; $next->() }) }, sub { $k->(\@out) }) }
 
 sub subst {   # $( list ): $k->(OUTPUT without trailing newlines)
   my ($c, $list, $k) = @_;
@@ -545,49 +607,51 @@ sub arith {
   my ($c, $e) = @_; my $src = $e;
   my $unset; $e =~ s/\$\{?([A-Za-z_][A-Za-z_0-9]*|[0-9]+|[?!#\$])\}?/getvar($c, $1) \/\/ ($unset = '0')/ge;
   return if $unset;
-  my @t = $e =~ /\G\s*(0[xX][0-9a-fA-F]+|[0-9]+|[A-Za-z_][A-Za-z_0-9]*|<<=|>>=|<<|>>|<=|>=|==|!=|&&|\|\||[-+*\/%&^|]=|[-+*\/%<>&^|!~?:()=])/gc;
+  my @t = $e =~
+    /\G\s*(0[xX][0-9a-fA-F]+|[0-9]+|[A-Za-z_][A-Za-z_0-9]*|<<=|>>=|<<|>>|<=|>=|==|!=|&&|\|\||[-+*\/%&^|]=|[-+*\/%<>&^|!~?:()=])/gc;
   my $err = sub { fail($c, 2, "arithmetic expression: $_[0]: \"$src\""); undef };
   return $err->('syntax error') if $e !~ /\G\s*\z/gc;
-  my $p = 0; my $bad; local our $skip = 0;   # $skip: inside the side of && || ?: that is not taken
-  use integer;
+  # JU4 (post-0.12): the two parsers are named functions over these variables, set with local for this call, as test's
+  # parser is written (before: two closures calling each other, kept from a cycle by weak references, E21).  Each
+  # thread has its own interpreter, so its own copies of them.
+  local our ($AC, @AT, $AP, $ABAD, $ADEAD, $ASKIP) = ($c, @t); $AP = 0; $ASKIP = 0;   # $ASKIP: inside the side of && || ?:
+  my $v = arith_expr(0); $ABAD //= 'syntax error' if $AP <= $#AT;                       # that is not taken
+  return if $ADEAD;   # a readonly variable: the shell is already ending
+  defined $ABAD ? $err->($ABAD) : $v }
+{ use integer;
   my %bin = ('*' => 9, '/' => 9, '%' => 9, '+' => 8, '-' => 8, '<<' => 7, '>>' => 7, '<' => 6, '<=' => 6,
              '>' => 6, '>=' => 6, '==' => 5, '!=' => 5, '&' => 4, '^' => 3, '|' => 2, '&&' => 1, '||' => 0);
-  my ($expr, $unary);   # weak (below): the two parsers call each other, and strong references would form a cycle
-  my $unary_s = $unary = sub {
-    my $x = $t[$p++] // return +($bad //= 'syntax error') && 0;
-    return -$unary->() if $x eq '-'; return +$unary->() if $x eq '+';
-    return !$unary->() ? 1 : 0 if $x eq '!'; return ~$unary->() if $x eq '~';
-    if ($x eq '(') { my $v = $expr->(0); ($t[$p++] // '') eq ')' or $bad //= 'syntax error'; return $v }
+  our ($AC, @AT, $AP, $ABAD, $ADEAD, $ASKIP);
+  sub arith_unary {
+    my $x = $AT[$AP++] // return +($ABAD //= 'syntax error') && 0;
+    return -arith_unary() if $x eq '-'; return +arith_unary() if $x eq '+';
+    return !arith_unary() ? 1 : 0 if $x eq '!'; return ~arith_unary() if $x eq '~';
+    if ($x eq '(') { my $v = arith_expr(0); ($AT[$AP++] // '') eq ')' or $ABAD //= 'syntax error'; return $v }
     return do { no warnings 'portable'; $x =~ /^0[xX]/ ? hex $x : $x =~ /^0/ ? oct $x : $x } if $x =~ /^[0-9]/;   # 64-bit, as dash
-    if ($x =~ /^[A-Za-z_]/) { my $v = var($c, $x); $v = 0 if $v =~ /^\s*\z/;
-      unless ($v =~ /^\s*[-+]?[0-9]+\s*\z/) { $bad //= "$x: not a number" unless $skip; return 0 }   # (X42: no Perl warning)
+    if ($x =~ /^[A-Za-z_]/) { my $v = var($AC, $x); $v = 0 if $v =~ /^\s*\z/;
+      unless ($v =~ /^\s*[-+]?[0-9]+\s*\z/) { $ABAD //= "$x: not a number" unless $ASKIP; return 0 }   # (X42: no Perl warning)
       return $v + 0 }
-    $bad //= 'syntax error'; 0 };
-  my $dead;
-  my $expr_s = $expr = sub {
+    $ABAD //= 'syntax error'; 0 }
+  sub arith_expr {
     my $min = shift;
-    if (!$min && ($t[$p] // '') =~ /^[A-Za-z_]/ && ($t[$p + 1] // '') =~ /^(?:<<|>>|[-+*\/%&^|])?=\z/) {   # NAME op= EXPR, right to left
-      my ($n, $op) = @t[$p, $p + 1]; $p += 2; my $r = $expr->(0); $op =~ s/=\z//;
-      my $o = var($c, $n); $o = 0 if $o =~ /^\s*\z/;
-      ($op =~ m{^[/%]\z} && !$r) ? ($bad //= 'division by zero') : $op ne '' and $r = eval "\$o $op \$r";
-      $skip or $dead or setvar($c, $n, $r) or $dead = 1; return $r }
-    my $l = $unary->();
-    while (defined(my $op = $t[$p])) {
+    if (!$min && ($AT[$AP] // '') =~ /^[A-Za-z_]/ && ($AT[$AP + 1] // '') =~ /^(?:<<|>>|[-+*\/%&^|])?=\z/) {   # NAME op= EXPR,
+      # right to left
+      my ($n, $op) = @AT[$AP, $AP + 1]; $AP += 2; my $r = arith_expr(0); $op =~ s/=\z//;
+      my $o = var($AC, $n); $o = 0 if $o =~ /^\s*\z/;
+      ($op =~ m{^[/%]\z} && !$r) ? ($ABAD //= 'division by zero') : $op ne '' and $r = eval "\$o $op \$r";
+      $ASKIP or $ADEAD or setvar($AC, $n, $r) or $ADEAD = 1; return $r }
+    my $l = arith_unary();
+    while (defined(my $op = $AT[$AP])) {
       if ($op eq '?' && $min <= 0) {
-        $p++; my $a = do { local $skip = $skip || !$l; $expr->(0) };
-        ($t[$p++] // '') eq ':' or $bad //= 'syntax error';
-        my $b = do { local $skip = $skip || $l; $expr->(0) }; $l = $l ? $a : $b; next }
-      my $pr = $bin{$op}; last unless defined $pr && $pr >= $min; $p++;
-      my $r = do { local $skip = $skip || ($op eq '&&' ? !$l : $op eq '||' ? $l : 0); $expr->($pr + 1) };
+        $AP++; my $a = do { local $ASKIP = $ASKIP || !$l; arith_expr(0) };
+        ($AT[$AP++] // '') eq ':' or $ABAD //= 'syntax error';
+        my $b = do { local $ASKIP = $ASKIP || $l; arith_expr(0) }; $l = $l ? $a : $b; next }
+      my $pr = $bin{$op}; last unless defined $pr && $pr >= $min; $AP++;
+      my $r = do { local $ASKIP = $ASKIP || ($op eq '&&' ? !$l : $op eq '||' ? $l : 0); arith_expr($pr + 1) };
       if    ($op eq '&&') { $l = $l && $r ? 1 : 0 } elsif ($op eq '||') { $l = $l || $r ? 1 : 0 }
-      elsif ($op =~ m{^[/%]\z} && !$r) { $bad //= 'division by zero' unless $skip; $l = 0 }
+      elsif ($op =~ m{^[/%]\z} && !$r) { $ABAD //= 'division by zero' unless $ASKIP; $l = 0 }
       else { $l = eval "\$l $op \$r" ; $l = $l ? 1 : 0 if $op =~ /^[<>=!]=?\z|^[<>]\z/ } }
-    $l };
-  no integer;
-  weaken($expr); weaken($unary);   # $expr_s and $unary_s keep them alive until arith returns
-  my $v = $expr->(0); $bad //= 'syntax error' if $p <= $#t;
-  return if $dead;   # a readonly variable: the shell is already ending
-  defined $bad ? $err->($bad) : $v }
+    $l } }
 
 # ------------------------------------------------------------------ the tree
 # x_*($c, NODE, $tail, $k): run NODE in context $c, then $k->(STATUS).  $tail: the contexts to
@@ -597,7 +661,8 @@ sub after_start { release_ctx($_) for @{$_[0] // []} }
 sub x_list {
   my ($c, $l, $tail, $k) = @_; my $i = 0;
   sub { my $st = shift; my $p = $c->{sh}{pend}; my $me = __SUB__;
-        return Proc::ShellSpawn::Large::run_pending($c, sub { $c->{sh}{q} = $st; $me->($st) }) if !$c->{intrap} && ($p && @$p || $c->{sh}{tbusy});   # X19
+        return Proc::ShellSpawn::Large::run_pending($c, sub { $c->{sh}{q} = $st; $me->($st) })
+          if !$c->{intrap} && ($p && @$p || $c->{sh}{tbusy});   # X19
         return defer($k, $st) if $i > $#$l;
         x_andor($c, $l->[$i++], $i > $#$l ? $tail : undef, $me) }->(0) }
 
@@ -616,7 +681,7 @@ sub cond { +{ %{$_[0]}, cond => 1, held => 0 } }   # a context whose commands do
 
 sub x_bg {   # chain & : its own shell and job, fd 0 from /dev/null
   my ($c, $ao, $k) = @_;
-  my $null = open_end($c, '/dev/null', '<') or return msg($c, "/dev/null: $!", sub { $k->(2) });
+  my $null = open_end($c, '/dev/null', '<') or return msg($c, "/dev/null: $!", done($k, 2));
   my $job = { pids => [] }; $JOBS{$job} = $job; push @{$c->{sh}{jobl}}, $job;
   $job->{id} = ++$c->{sh}{jobs};
   my $d = derive($c, { %{$c->{map}}, 0 => $null }, shell => sub {
@@ -648,8 +713,10 @@ sub x_cmd {
   my ($c, $x, $tail, $k) = @_;
   $c->{sh}{vars}{LINENO} = $x->{line} if $x->{line};   # G8 (rule E, as bash): the line where the command starts
   return x_simple($c, $x, $tail, $k) if $x->{argv};
-  return with_redirs($c, $x->{redir}, undef, $k, sub { x_cd($_[0], $x, $_[2]) }) if exists $x->{cd};   # cd with redirections (post4-0.03)
-  return x_set($c, $x, $k) if $x->{set};
+  return with_redirs($c, $x->{redir}, undef, $k, sub { x_cd($_[0], $x, $_[2]) }) if exists $x->{cd};   # cd with redirections
+    # (post4-0.03)
+  return with_redirs($c, $x->{redir}, undef, $k, sub { x_set($_[0], $x, $_[2]) }) if $x->{set};   # (D2: as dash, redirect
+    # first; failed: no setting, status 2; the values are expanded with the redirections in force; JH2, post-0.12)
   return handler('Proc::ShellSpawn::Large::x_rest')->($c, $x, $tail, $k) if exists $x->{rest};   # P1
   if (my ($h) = $x->{ext} // map $KIND{$_}, grep exists $x->{$_}, sort keys %KIND) { return handler($h)->($c, $x, $tail, $k) }
   with_redirs($c, $x->{redir}, $tail, $k, sub {
@@ -666,11 +733,11 @@ sub x_cmd {
 
 sub x_if {
   my ($c, $arms, $tail, $k) = @_; my $i = 0;
-  sub {
+  loop_async(sub { my $next = shift;
     return defer($k, 0) if $i > $#$arms;
     return x_list($c, $arms->[$i], $tail, $k) if $i == $#$arms;       # else
-    my $then = $arms->[$i + 1]; $i += 2; my $next = __SUB__;
-    x_list(cond($c), $arms->[$i - 2], undef, sub { $_[0] ? $next->() : x_list($c, $then, $tail, $k) }) }->() }
+    my $then = $arms->[$i + 1]; $i += 2;
+    x_list(cond($c), $arms->[$i - 2], undef, sub { $_[0] ? $next->() : x_list($c, $then, $tail, $k) }) }) }
 
 sub loop {   # runs $iter->(CONTEXT, NEXT, END) per iteration, with break and continue
   my ($c, $k, $iter) = @_; my $st = 0;
@@ -698,22 +765,21 @@ sub x_for {
 sub x_case {
   my ($c, $x, $tail, $k) = @_; my @in = @{$x->{in}};
   expand_str($c, $x->{case}, sub { my $s = shift;
-    sub { return defer($k, 0) unless @in;
-      my ($pats, $l) = splice @in, 0, 2; my $next = __SUB__; my @p = @$pats;
-      sub { return $next->() unless @p;
-        my $again = __SUB__;
-        pattern_re($c, shift @p, sub { $s =~ $_[0] ? x_list($c, $l, $tail, $k) : $again->() }) }->() }->() }) }
+    loop_async(sub { my $next = shift; return defer($k, 0) unless @in;
+      my ($pats, $l) = splice @in, 0, 2; my @p = @$pats;
+      loop_async(sub { my $again = shift; return $next->() unless @p;
+        pattern_re($c, shift @p, sub { $s =~ $_[0] ? x_list($c, $l, $tail, $k) : $again->() }) }) }) }) }
 
 sub pattern_re {   # a case (or ${N%p}) pattern as a regex anchored at both ends: quoted parts literal.  The whole
   my ($c, $w, $k) = @_;   # pattern is put together first, quoted text escaped, so that a bracket expression may span Parts
   my @parts = ref $w ? @$w : ($w); my $g = ''; my $i = 0;
-  sub {
+  loop_async(sub { my $next = shift;
     return $k->(eval { my $re = glob_re($g); qr/\A$re\z/s } // do { (my $t = $g) =~ s/\\(.)/$1/gs; qr/\A\Q$t\E\z/s })
       if $i > $#parts;
-    my $x = $parts[$i++]; my $next = __SUB__;
+    my $x = $parts[$i++];
     return $g .= glob_quote($x), $next->() unless ref $x;
     if ($x->[0] eq '*') { $g .= $x->[1]; return $next->() }
-    expand($c, [$x], 'str', sub { $g .= $x->[0] =~ /^"/ ? glob_quote($_[0][0]) : $_[0][0]; $next->() }) }->() }
+    expand($c, [$x], 'str', sub { $g .= $x->[0] =~ /^"/ ? glob_quote($_[0][0]) : $_[0][0]; $next->() }) }) }
 sub glob_re {   # a glob pattern (quoted characters escaped with '\') as a regex
   my $g = shift; my $re = '';
   while ($g =~ /\G(?:(\*)|(\?)|\[([!^]?)(\]?(?:\\.|\[:[a-z]+:\]|[^\]\\])*)\]|\\(.)|(.))/gcs) {
@@ -729,15 +795,13 @@ sub setvar {   # 1, or 0 after ending the shell (a readonly variable, as dash)
   return do { fail($c, 2, "$n: is read only"); 0 } if $sh->{ro}{$n};
   $sh->{exp}{$n} = 1 if $sh->{opt}{a}; $sh->{vars}{$n} = $v; 1 }
 
-sub x_set {   # NAME=value ... alone, or with redirections (D2: as dash, redirect first; failed: no setting, status 2)
+sub x_set {   # NAME=value ... alone (with redirections: through with_redirs, in x_cmd; rule E: category effect)
   my ($c, $x, $k) = @_; my @s = @{$x->{set}};
-  return redirect($c, $x->{redir}, sub { my ($m, $opened) = @_ or return defer($k, 2);   # the values are expanded with
-    my $d = derive($c, $m); release($_) for @$opened;                                      # the redirections in force
-    x_set($d, { set => $x->{set} }, sub { release_ctx($d); $k->(@_) }) }) if $x->{redir};   # (rule E: category effect)
   delete $c->{sh}{qsub}; my %log;   # the settings as made, for $ONBUILTIN (measurement)
-  sub { unless (@s) { $ONBUILTIN->('x_set', [], {%log}) if $ONBUILTIN; return defer($k, $c->{sh}{qsub} // 0) }
-        my ($n, $w) = splice @s, 0, 2; my $next = __SUB__;
-        expand_str($c, $w, sub { $log{$n} = $_[0]; setvar($c, $n, shift) or return; $next->() }) }->() }
+  loop_async(sub { my $next = shift;
+        unless (@s) { $ONBUILTIN->('x_set', [], {%log}) if $ONBUILTIN; return defer($k, $c->{sh}{qsub} // 0) }
+        my ($n, $w) = splice @s, 0, 2;
+        expand_str($c, $w, sub { $log{$n} = $_[0]; setvar($c, $n, shift) or return; $next->() }) }) }
 
 sub x_cd {
   my ($c, $x, $k) = @_;
@@ -746,20 +810,20 @@ sub x_cd {
     my $d = @f ? $f[0] : var($c, 'HOME');
     my $dash = @f == 1 && $d eq '-' and $d = var($c, 'OLDPWD');   # cd -: back, and print where
     return defer($k, 0) if @f == 1 && $d eq '';
-    return msg($c, "cd: too many arguments", sub { $k->(1) }) if $x->{cd_extra} || @f > 1;   # as bash (rule E), also when
+    return msg($c, "cd: too many arguments", done($k, 1)) if $x->{cd_extra} || @f > 1;   # as bash (rule E), also when
       # an expansion gives the extra fields at run time (X54)
-    return msg($c, "cd: HOME not set", sub { $k->(1) }) if !@f && !isset($c, 'HOME');   # as bash (rule E; N4)
+    return msg($c, "cd: HOME not set", done($k, 1)) if !@f && !isset($c, 'HOME');   # as bash (rule E; N4)
     return defer($k, 0) if !@f && $d eq '';   # HOME empty: nothing, as both shells (X45)
-    if ($d =~ /^-/ && !$dash) { return msg($c, "cd: bad argument", sub { $k->(2) }) }
+    if ($d =~ /^-/ && !$dash) { return msg($c, "cd: bad argument", done($k, 2)) }
     my $new = path_in($c, $d);
     if ($x->{cd_p}) { $new = -d $new && Cwd::realpath($new) }   # cd -P: symbolic links resolved, '..' physical (P6)
     else {   # (Windows: the drive or the //server/share stays in front)
       my ($pre, $rest) = $WIN && $new =~ m{^([A-Za-z]:|[/\\]{2}[^/\\]+[/\\][^/\\]+)(.*)}s ? ($1 =~ tr{\\}{/}r, $2) : ('', $new);
       my @p; for (split $SEP, $rest) { next if $_ eq '' or $_ eq '.'; $_ eq '..' ? pop @p : push @p, $_ }
       $new = $pre . '/' . join '/', @p }
-    $new && -d $new && ($WIN || -x _) or return msg($c, "cd: can't cd to $d", sub { $k->(2) });   # X44: and searchable, as both shells
+    $new && -d $new && ($WIN || -x _) or return msg($c, "cd: can't cd to $d", done($k, 2));   # X44: and searchable, as both shells
     setvar($c, OLDPWD => $c->{sh}{cwd}) && setvar($c, PWD => $new) or return; $c->{sh}{cwd} = $new;
-    $dash ? put($c, 1, "$new\n", sub { $k->(0) }) : defer($k, 0) };
+    $dash ? put($c, 1, "$new\n", done($k, 0)) : defer($k, 0) };
   defined $x->{cd} ? expand($c, $x->{cd}, 'argv', sub { $go->(@{$_[0]}) }) : $go->() }
 
 sub x_simple {
@@ -769,18 +833,19 @@ sub x_simple {
   delete $c->{sh}{qsub};
   my $settings = sub {   # NAME=value before the command, left to right, each seeing the ones before
     my $next = shift;
-    sub { return $next->() unless @env;
-          my ($n, $w) = splice @env, 0, 2; my $again = __SUB__;
+    loop_async(sub { my $again = shift; return $next->() unless @env;
+          my ($n, $w) = splice @env, 0, 2;
           my $v = { %$c, sh => { %{$c->{sh}}, vars => { %{$c->{sh}{vars}}, %env } } };
-          expand_str($v, $w, sub { $env{$n} = shift; $c->{sh}{qsub} = $v->{sh}{qsub} if exists $v->{sh}{qsub}; $again->() }) }->() };
+          expand_str($v, $w, sub { $env{$n} = shift;
+            $c->{sh}{qsub} = $v->{sh}{qsub} if exists $v->{sh}{qsub}; $again->() }) }) };
   $settings->(sub { expand_list($c, $x->{argv}, 'argv', sub {
     my @argv = @{$_[0]};
-    return redirect($c, $x->{redir} // [], sub {   # every word expanded to nothing: the redirections are still done
-      my ($m, $opened) = @_ or return defer($k, 2); release($_) for @$opened; defer($k, $c->{sh}{qsub} // 0) }) unless @argv;
-    redirect($c, $x->{redir} // [], sub {
+    redirect($c, $x->{redir} // [], sub {   # (JH2: one call; every word expanded to nothing, the redirections are still done)
       my ($m, $opened) = @_;
-      if (!$m) { return $SPECIAL{$argv[0]} ? leave($c, 2) : defer($k, 2) }
-      if (my $e = $c->{sh}{cmd}{$argv[0]} // ($x->{fn} ? ['Proc::ShellSpawn::Large::b_late'] : cmd_of($argv[0]))) {   # a function or a builtin, in this process
+      if (!$m) { return @argv && $SPECIAL{$argv[0]} ? leave($c, 2) : defer($k, 2) }
+      unless (@argv) { release($_) for @$opened; return defer($k, $c->{sh}{qsub} // 0) }
+      if (my $e = $c->{sh}{cmd}{$argv[0]} // ($x->{fn} ? ['Proc::ShellSpawn::Large::b_late'] : cmd_of($argv[0]))) {   # a function
+        # or a builtin, in this process
         my $d = derive($c, $m); release($_) for @$opened;          # a context holds its fds until it is done
         $ONBUILTIN->($e->[0], \@argv, {%env}) if $ONBUILTIN;   # (measurement: doc/large-subset/tools/large-subset-builtins.pl)
         if ($SPECIAL{$argv[0]}) { setvar($c, $_, $env{$_}) or return for sort keys %env; %env = () }   # these settings stay
@@ -791,7 +856,8 @@ sub x_simple {
       release($_) for @$opened; after_start($tail) }) }) }) }
 
 sub printf_zero {   # the 0 flag of %s, %c, %b dropped from printf's format, as both shells (glibc's printf(3) ignores it; the
-  my @a = @_;       # flag is undefined for them in C and POSIX); the program printf (coreutils) refuses it (decision Z0, 2026-11-05)
+  my @a = @_;       # flag is undefined for them in C and POSIX); the program printf (coreutils) refuses it
+                    # (decision Z0, 2026-11-05)
   my $i = ($a[1] // '') eq '--' ? 2 : 1;
   return @a unless defined $a[$i] && $a[$i] !~ /^-/;   # printf -v ...: the program's, as decided (Q2)
   $a[$i] =~ s{%(%|([-+ #0']*)(\*|[0-9]*)((?:\.(?:\*|[0-9]*))?)([a-zA-Z]))}{
@@ -801,22 +867,21 @@ sub printf_zero {   # the 0 flag of %s, %c, %b dropped from printf's format, as 
 sub ok_num {   # NV1 (the user, 2026-11-10; X42): an operand of exit, return, break, continue known only at run time is a
   # number as dash takes it: digits, maybe after +, at most 2^31-1, at least $min; else an error, status 2, as the shells
   my ($v, $min) = @_; defined $v && $v =~ /^\+?[0-9]+\z/ && $v <= 2147483647 && $v >= $min }
-sub builtin {   # : exit break continue read
-  my ($c, $argv, $env, $k) = @_; my $m = $c->{map};
-  my ($n, @a) = @$argv;
-  return defer($k, 0) if $n eq ':';
-  if ($n eq 'exit') { return leave($c, $c->{sh}{q}) unless @a;
-    return fail($c, 2, "exit: Illegal number: $a[0]") unless ok_num($a[0], 0);   # NV1 (X42): known only at run time, as the shells
-    return leave($c, $a[0] % 256) }   # exit 1000: 232, as both shells (parser item P4)
-  if ($n eq 'break' || $n eq 'continue') {
-    my $l = $c->{loops}; my $j = @a ? $a[0] : 1;
-    return fail($c, 2, "$n: Illegal number: $j") unless ok_num($j, 1);   # NV1: 0, -1, x1 (bash goes on after 0: dash's way)
-    $j += 0;
-    return leave($c, 0) if $j > @$l;   # the loop is outside this subshell: it ends the subshell, as dash (rule E, post-0.04)
-    release_all(map $_->{scope}, @$l[$#$l - $j + 1 .. $#$l]);
-    return defer($l->[-$j]{$n eq 'break' ? 'brk' : 'cont'}) }
-  if ($n eq 'read') { return read_line($c, $m, $env, \@a, $k) }
-  die "Proc::ShellSpawn: builtin $n" }
+sub b_colon { my ($c, $argv, $env, $k) = @_; defer($k, 0) }   # :
+sub b_exit {
+  my ($c, $argv, $env, $k) = @_; my (undef, @a) = @$argv;
+  return leave($c, $c->{sh}{q}) unless @a;
+  return fail($c, 2, "exit: Illegal number: $a[0]") unless ok_num($a[0], 0);   # NV1 (X42): known only at run time, as the shells
+  leave($c, $a[0] % 256) }   # exit 1000: 232, as both shells (parser item P4)
+sub b_break {   # break and continue
+  my ($c, $argv, $env, $k) = @_; my ($n, @a) = @$argv;
+  my $l = $c->{loops}; my $j = @a ? $a[0] : 1;
+  return fail($c, 2, "$n: Illegal number: $j") unless ok_num($j, 1);   # NV1: 0, -1, x1 (bash goes on after 0: dash's way)
+  $j += 0;
+  return leave($c, 0) if $j > @$l;   # the loop is outside this subshell: it ends the subshell, as dash (rule E, post-0.04)
+  release_all(map $_->{scope}, @$l[$#$l - $j + 1 .. $#$l]);
+  defer($l->[-$j]{$n eq 'break' ? 'brk' : 'cont'}) }
+sub b_read { my ($c, $argv, $env, $k) = @_; my (undef, @a) = @$argv; read_line($c, $c->{map}, $env, \@a, $k) }
 
 # read [-r] [-p PROMPT] NAME...: one line from fd 0, one byte at a time (later commands get the rest), split
 # as sh does: IFS blanks around fields are dropped, one other IFS character ends a field, the last
@@ -827,31 +892,33 @@ sub read_line {
   my ($c, $m, $env, $names, $k) = @_; my @a = @$names; my ($raw, $prompt);
   while (@a && $a[0] =~ /^-(r*)(p?)\z/ && "$1$2" ne '') { shift @a; $raw ||= $1 ne ''; $prompt = shift @a if $2 }
   # names may come from expansions (post-0.04): checked here, with dash's messages and status 2 (A5)
-  return msg($c, "read: arg count", sub { $k->(2) }) unless @a;
-  for (@a) { return msg($c, "read: $_: bad variable name", sub { $k->(2) }) unless /^[A-Za-z_][A-Za-z0-9_]*\z/;
-             return handler("Proc::ShellSpawn::Large::unsupported")->($c, "the name '$_' in 'read'") unless Proc::ShellSubset::settable($_);
-             return msg($c, "read: $_: is read only", sub { $k->(2) }) if $c->{sh}{ro}{$_} }
+  return msg($c, "read: arg count", done($k, 2)) unless @a;
+  for (@a) { return msg($c, "read: $_: bad variable name", done($k, 2)) unless /^[A-Za-z_][A-Za-z0-9_]*\z/;
+             return handler("Proc::ShellSpawn::Large::unsupported")->($c, "the name '$_' in 'read'")
+               unless Proc::ShellSubset::settable($_);
+             return msg($c, "read: $_: is read only", done($k, 2)) if $c->{sh}{ro}{$_} }
   my $e = $m->{0} or return defer($k, 1);
   my $ifs = $env->{IFS} // $c->{sh}{vars}{IFS} // " \t\n";
-  my %ws = map +($_ => 1), grep /[ \t\n]/, split //, $ifs;
-  my %nw = map +($_ => 1), grep !/[ \t\n]/, split //, $ifs;
+  # JC1 (post-0.12): the line is split by regular expressions (before: a character array walked by an index).  $ws: the
+  # IFS blanks, $nws: the other IFS characters, both for a bracket expression (without -r never a backslash: none is left
+  # unprotected), and either may be empty, so each expression is built for the case (a class that cannot match, under
+  # '*+', makes Perl 5.38 panic); a unit: one character, or (without -r) a backslash with the character it protects
+  my ($ws, $nws) = map { join '', map quotemeta, grep $raw || $_ ne '\\', @$_ } [$ifs =~ /[ \t\n]/g], [$ifs =~ /[^ \t\n]/g];
+  my $W = length $ws ? qr/[$ws]*+/ : qr//;                # IFS blanks, as many as there are
+  my $sep = length $nws ? qr/$W(?:[$nws]$W)?/ : $W;       # after a field: blanks, at most one other IFS character, blanks
+  my $end = length $nws ? qr/$W(?:[$nws]$W)?\z/ : qr/$W\z/;   # after the only field left: blanks, at most one such character, blanks (X61)
+  my $unit = $raw ? qr/./s : qr/\\.|[^\\]/s;
+  my $field = length "$ws$nws" ? qr/(?:(?![$ws$nws])$unit)*+/ : qr/(?:$unit)*+/;   # units up to an unprotected IFS character
+  my $val = sub { my $s = shift; $raw ? $s : $s =~ s/\\(.)/$1/gsr };   # a field's text: the protecting backslashes go
   my $line = '';
   my $got = sub {
     my $eof = shift;
-    my @ch;   # [character, protected by a backslash]
-    if ($raw) { @ch = map [$_, 0], split //, $line }
-    else { push @ch, defined $1 ? [$1, 1] : [$2, 0] while $line =~ /\G(?:\\(.)|([^\\]))/gs }
-    my $isws = sub { !$_[0][1] && $ws{$_[0][0]} }; my $isnw = sub { !$_[0][1] && $nw{$_[0][0]} };
-    my $i = 0; $i++ while $i < @ch && $isws->($ch[$i]);
-    for my $j (0 .. $#a) {
-      if ($j == $#a) {   # the rest; a single trailing delimiter after the only field is dropped, as in dash
-        my @r = @ch[$i .. $#ch]; pop @r while @r && $isws->($r[-1]);
-        if (@r && $isnw->($r[-1]) && !grep $isws->($_) || $isnw->($_), @r[0 .. $#r - 1]) { pop @r; pop @r while @r && $isws->($r[-1]) }
-        setvar($c, $a[$j], join '', map $_->[0], @r); last }
-      my $f = ''; $f .= $ch[$i++][0] while $i < @ch && !$isws->($ch[$i]) && !$isnw->($ch[$i]);
-      setvar($c, $a[$j], $f);
-      $i++ while $i < @ch && $isws->($ch[$i]);
-      if ($i < @ch && $isnw->($ch[$i])) { $i++; $i++ while $i < @ch && $isws->($ch[$i]) } }
+    $line =~ s/(?<!\\)((?:\\\\)*)\\\z/$1/ unless $raw;   # a lone backslash at the end of the input goes
+    $line =~ s/^$W//;
+    for my $name (@a[0 .. $#a - 1]) { $line =~ s/^($field)$sep//; setvar($c, $name, $val->($1)) }
+    # the last name: the rest without its final blanks; a single trailing delimiter after the only field is dropped, as in dash
+    $line =~ /^($field)$end/ or $line =~ /^((?:$unit)*?)$W\z/;
+    setvar($c, $a[-1], $val->($1));
     defer($k, $eof ? 1 : 0) };
   my $go = sub { on_read($e, 1, sub {
     my $b = shift;
@@ -866,7 +933,7 @@ sub read_line {
 sub start_pwd {
   my $phys = Cwd::getcwd();
   my $p = $ENV{PWD};
-  return $p if defined $p && is_abs($p) && (stat $p)[1] && join(':', (stat $p)[0, 1]) eq join(':', (stat '.')[0, 1]);
+  return $p if defined $p && is_abs($p) && files_eq($p, '.');   # PWD from the environment, if it names where we are
   $phys }
 
 # run(STRING or TREE, parser => CODE, interactive => 'nop' or 'dash', args => [$1 ...], arg0 => $0, opt => {e => 1, ...}):
@@ -875,14 +942,29 @@ sub start_pwd {
 # parser->(TEXT, aliases => {NAME => VALUE})).  interactive: what history, fc, bind, help, compopt, logout and
 # set -o history do (B2): nothing (nop, the default; give the parser the same option) or as in dash (not found).
 require Proc::ShellSpawn::Builtins;
+# The variables a shell starts with: %ENV's.  On Windows Perl gives %ENV's names in upper case, so a shell started there
+# would see only Z for an inherited z (X65).  The names there (post-0.12, the user, 2026-11-15, A22 (a)): as the process's
+# environment block spells them, but PATH (Windows spells it Path; the shell needs PATH, as Cygwin makes it); the values
+# from %ENV.  PROC_SHELLSPAWN_ENVNAMES (or $Proc::ShellSpawn::ENV_NAMES before run): 'block', the default, or 'upper',
+# the names as %ENV gives them (A22 (b)), so that on Windows only an upper-case name reaches a shell of ours.
+our $ENV_NAMES = $ENV{PROC_SHELLSPAWN_ENVNAMES} // 'block';
+die "PROC_SHELLSPAWN_ENVNAMES: '$ENV_NAMES' is neither block nor upper\n" unless $ENV_NAMES =~ /\A(?:block|upper)\z/;
+sub env_vars {
+  return %ENV unless $WIN && $ENV_NAMES eq 'block' && defined &Proc::Spawner::__win_env_names;
+  my %name = map +(uc($_) => $_), Proc::Spawner::__win_env_names(); $name{PATH} = 'PATH';
+  map +(($name{uc $_} // $_) => $ENV{$_}), keys %ENV }
 sub run {
   my ($s, %o) = @_; my $parse = $o{parser} // default_parser(); a4();
   my $tree = ref $s ? $s : $parse->($s);
   return (undef, $tree) if ref $tree eq 'HASH';
   my $cwd = start_pwd();
   # dash sets OPTIND and IFS when it starts (L3)
-  my $sh = { vars => { %ENV, PWD => $cwd, OPTIND => 1, IFS => " \t\n", PPID => $Proc::Spawner::WIN ? Proc::Spawner::__win_ppid() : getppid() }, exp => { map +($_ => 1), keys %ENV, 'PWD' }, cwd => $cwd, q => 0,
-             parse => $parse, args => [@{$o{args} // []}], arg0 => $o{arg0}, pid => $$, opt => {%{$o{opt} // {}}}, cmd => {}, ro => {}, trap => {}, jobl => [], umask => umask,
+  my %env = env_vars();
+  my $sh = { vars => { %env, PWD => $cwd, OPTIND => 1, IFS => " \t\n",
+                       PPID => $Proc::Spawner::WIN ? Proc::Spawner::__win_ppid() : getppid() },
+             exp => { map +($_ => 1), keys %env, 'PWD' }, cwd => $cwd, q => 0,
+             parse => $parse, args => [@{$o{args} // []}], arg0 => $o{arg0}, pid => $$, opt => {%{$o{opt} // {}}},
+             cmd => {}, ro => {}, trap => {}, jobl => [], umask => umask,
              alias => {}, hash => {}, intext => 0, interactive => $o{interactive} // 'nop' };
   my $st;
   my $c = { sh => $sh, loops => [], map => { map +($_ => is_open($_) ? own_fd($_) : undef), 0 .. 2 } };

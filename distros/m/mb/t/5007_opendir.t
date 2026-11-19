@@ -16,7 +16,7 @@ $MSWin32_MBCS = 0; # ($^O =~ /MSWin32/) and (qx{chcp} =~ m/[^0123456789](932|936
 BEGIN {
     $SIG{__WARN__} = sub {
         local($_) = @_;
-        /\Aclosedir\(\) attempted on invalid dirhandle [A-Za-z0-9_]+ at / ? return :
+        /\Aclosedir\(\) attempted on invalid dirhandle \$?[A-Za-z0-9_]+ at / ? return :
         warn $_[0];
     };
 }

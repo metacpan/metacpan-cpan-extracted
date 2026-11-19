@@ -2,7 +2,7 @@
 
 # PODNAME: scs.pl
 # ABSTRACT: run DBIx::SchemaChecksum, but really you should use dbchecksum
-our $VERSION = '1.104'; # VERSION
+our $VERSION = '1.106'; # VERSION
 
 use strict;
 use warnings;
@@ -22,7 +22,7 @@ scs.pl - run DBIx::SchemaChecksum, but really you should use dbchecksum
 
 =head1 VERSION
 
-version 1.104
+version 1.106
 
 =head1 USAGE
 
@@ -42,17 +42,17 @@ Thomas Klausner <domm@plix.at>
 
 =item *
 
-Maroš Kollár <maros@cpan.org>
+Maroš Kollár <cpan@k-1.com>
 
 =item *
 
-Klaus Ita <koki@worstofall.com>
+Klaus Ita
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 - 2021 by Thomas Klausner, Maroš Kollár, Klaus Ita.
+This software is copyright (c) 2012 - 2026 by Thomas Klausner, Maroš Kollár, Klaus Ita.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

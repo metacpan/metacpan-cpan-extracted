@@ -1,0 +1,41 @@
+Revision history for Mail::Send::DKIM - Sign mail with DKIM, and summarise DMARC reports
+
+0.001	Tue Nov 17 12:40:18 PM EST 2026
+	First release.
+	- dmarc-report: summarise the DMARC aggregate reports in a directory,
+	  one row per sending source, and flag the ones that were not expected:
+	  a sender outside DMARC_EXPECTED, a message that failed both SPF and
+	  DKIM, a report filed by policy anyway.  --file-list names the reports
+	  read, so a wrapper can archive them, and the exit status says whether
+	  anything needs looking at.
+	- dmarc-weekly.sh: the cron wrapper.  Silent when the week is clean and
+	  a mail with the full output otherwise, with the reports moved to an
+	  archive afterwards.  --dry-run rehearses it, and --crontab prints the
+	  line to paste into a crontab rather than installing one.
+	- dmarc-check-mail.pl: sends one message, signed or (with --plain)
+	  unsigned, so the Authentication-Results header at the far end shows
+	  what receivers make of this host's mail before the DMARC policy is
+	  tightened.  --to is checked like --from, because both become headers
+	  and --from is also the envelope sender.  It leaves with 1 when
+	  nothing was sent - no key found, no --save written, no sendmail run -
+	  and with 2 only when the options cannot be used, so a wrapper can
+	  tell a message that was never attempted from one that failed on the
+	  way out.
+	- mail-dkim: a drop-in for a direct call to sendmail(1).  A message from
+	  one of the domains in DKIM_DOMAINS is signed rsa-sha256 with relaxed
+	  canonicalization and then handed to sendmail; anything else - a
+	  foreign From:, no key, no From: at all - is passed through unsigned,
+	  so installing it cannot stop mail being delivered.
+	- Mail::Send::DKIM is the signing behind mail-dkim, usable directly and
+	  tested without a process and a pipe.
+	- The failure paths of dmarc-check-mail.pl are tested rather than
+	  assumed: a --save that cannot be written, a sendmail that cannot be
+	  run, one that reports a failure, and one that leaves with 2 of its
+	  own, each with a stub in place of sendmail.
+	- t/pod-code.t holds each programme's page against the programme: an
+	  option GetOptions takes and OPTIONS does not list, one OPTIONS lists
+	  and the programme does not take, an environment variable it reads -
+	  through Mail::Send::DKIM->new() as well as directly - that
+	  ENVIRONMENT does not name, and an exit status EXIT STATUS leaves out.
+	  dmarc-weekly.sh's documented --dry-run is the mistake it is there to
+	  catch.

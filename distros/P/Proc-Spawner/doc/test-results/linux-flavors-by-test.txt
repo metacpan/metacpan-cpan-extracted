@@ -1,0 +1,131 @@
+# t/flavors-outcomes.pl per flavor, compared by t/flavors-compare.pl; Linux (glibc 2.39, Perl v5.38.2, dash 0.5.12, bash 5.2.21), Proc::Spawner post-0.12 (commit 6c084cc), Run 0.07; 2026-11-18
+# flavors: as built (posix_spawn); redirections only (PROC_SPAWNER_MISSING: every setting but dup2, close, open); fork (posix_spawn missing); system1 (posix_spawn and fork missing, Run on PERL5LIB)
+# the test files of make test (t/*.t), the quick tests only; the library of samples not run
+
+flavor                          ok      FAILED TODO-FAILED TODO-PASSED        SKIP FILE-SKIPPED FILE-FAILED
+L1-as-built                    206           0           0           0           4           6           0
+L2-redirections-only           194           0           0           0          16           6           0
+L3-fork                        204           0           0           0           6           6           0
+L4-system1                     194           0           0           0          16           6           0
+
+Tests whose outcome differs between the flavors (absent: the test does not exist in that flavor):
+t/spawner.t    sigignore
+    L1-as-built            ok           
+    L2-redirections-only   absent       
+    L3-fork                ok           
+    L4-system1             absent       
+t/spawner.t    sigignore: ours put back
+    L1-as-built            ok           
+    L2-redirections-only   absent       
+    L3-fork                ok           
+    L4-system1             absent       
+t/spawner.t    sigignore and sigdefault of one signal: EINVAL
+    L1-as-built            ok           
+    L2-redirections-only   absent       
+    L3-fork                ok           
+    L4-system1             absent       
+t/spawner.t    sigignore of SIGCHLD: unsupported (our other children would be reaped)
+    L1-as-built            ok           
+    L2-redirections-only   absent       
+    L3-fork                ok           
+    L4-system1             absent       
+t/spawner.t    rlimit: NOFILE in the child
+    L1-as-built            ok           
+    L2-redirections-only   absent       
+    L3-fork                ok           
+    L4-system1             absent       
+t/spawner.t    rlimit: ours put back
+    L1-as-built            ok           
+    L2-redirections-only   absent       
+    L3-fork                ok           
+    L4-system1             absent       
+t/spawner.t    nice
+    L1-as-built            ok           
+    L2-redirections-only   absent       
+    L3-fork                ok           
+    L4-system1             absent       
+t/spawner.t    nice: ours put back
+    L1-as-built            ok           
+    L2-redirections-only   absent       
+    L3-fork                ok           
+    L4-system1             absent       
+t/spawner.t    pgroup => 0: a new group led by the child
+    L1-as-built            ok           
+    L2-redirections-only   absent       
+    L3-fork                absent       
+    L4-system1             absent       
+t/spawner.t    setsid: a new session
+    L1-as-built            ok           
+    L2-redirections-only   absent       
+    L3-fork                absent       
+    L4-system1             absent       
+t/spawner.t    win_priority elsewhere: the child at the class's nice value
+    L1-as-built            ok           
+    L2-redirections-only   absent       
+    L3-fork                ok           
+    L4-system1             absent       
+t/spawner.t    win_priority elsewhere: nice, if given, wins
+    L1-as-built            ok           
+    L2-redirections-only   absent       
+    L3-fork                ok           
+    L4-system1             absent       
+t/spawner.t    skip: sigignore: not done by this spawn
+    L1-as-built            absent       
+    L2-redirections-only   SKIP         sigignore: not done by this spawn
+    L3-fork                absent       
+    L4-system1             SKIP         sigignore: not done by this spawn
+t/spawner.t    skip: sigignore: not done by this spawn#2
+    L1-as-built            absent       
+    L2-redirections-only   SKIP         sigignore: not done by this spawn
+    L3-fork                absent       
+    L4-system1             SKIP         sigignore: not done by this spawn
+t/spawner.t    skip: sigignore: not done by this spawn#3
+    L1-as-built            absent       
+    L2-redirections-only   SKIP         sigignore: not done by this spawn
+    L3-fork                absent       
+    L4-system1             SKIP         sigignore: not done by this spawn
+t/spawner.t    skip: sigignore: not done by this spawn#4
+    L1-as-built            absent       
+    L2-redirections-only   SKIP         sigignore: not done by this spawn
+    L3-fork                absent       
+    L4-system1             SKIP         sigignore: not done by this spawn
+t/spawner.t    skip: rlimit: not done by this spawn
+    L1-as-built            absent       
+    L2-redirections-only   SKIP         rlimit: not done by this spawn
+    L3-fork                absent       
+    L4-system1             SKIP         rlimit: not done by this spawn
+t/spawner.t    skip: rlimit: not done by this spawn#2
+    L1-as-built            absent       
+    L2-redirections-only   SKIP         rlimit: not done by this spawn
+    L3-fork                absent       
+    L4-system1             SKIP         rlimit: not done by this spawn
+t/spawner.t    skip: nice: not done by this spawn, or not undone without privilege here
+    L1-as-built            absent       
+    L2-redirections-only   SKIP         nice: not done by this spawn, or not undone without privilege here
+    L3-fork                absent       
+    L4-system1             SKIP         nice: not done by this spawn, or not undone without privilege here
+t/spawner.t    skip: nice: not done by this spawn, or not undone without privilege here#2
+    L1-as-built            absent       
+    L2-redirections-only   SKIP         nice: not done by this spawn, or not undone without privilege here
+    L3-fork                absent       
+    L4-system1             SKIP         nice: not done by this spawn, or not undone without privilege here
+t/spawner.t    skip: pgroup => 0: not done by this spawn
+    L1-as-built            absent       
+    L2-redirections-only   SKIP         pgroup => 0: not done by this spawn
+    L3-fork                SKIP         pgroup => 0: not done by this spawn
+    L4-system1             SKIP         pgroup => 0: not done by this spawn
+t/spawner.t    skip: setsid: not done by this spawn
+    L1-as-built            absent       
+    L2-redirections-only   SKIP         setsid: not done by this spawn
+    L3-fork                SKIP         setsid: not done by this spawn
+    L4-system1             SKIP         setsid: not done by this spawn
+t/spawner.t    skip: nice: not done by this spawn, or not undone without privilege here#3
+    L1-as-built            absent       
+    L2-redirections-only   SKIP         nice: not done by this spawn, or not undone without privilege here
+    L3-fork                absent       
+    L4-system1             SKIP         nice: not done by this spawn, or not undone without privilege here
+t/spawner.t    skip: nice: not done by this spawn, or not undone without privilege here#4
+    L1-as-built            absent       
+    L2-redirections-only   SKIP         nice: not done by this spawn, or not undone without privilege here
+    L3-fork                absent       
+    L4-system1             SKIP         nice: not done by this spawn, or not undone without privilege here

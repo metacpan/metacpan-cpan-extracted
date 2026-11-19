@@ -4,7 +4,7 @@ Protocol::IR::Code - Intermediate representation of an IR remote control code
 
 # VERSION
 
-version 1.2
+version 1.3
 
 # SYNOPSIS
 
@@ -74,9 +74,9 @@ handlers; you normally do not construct `Protocol::IR::Code` objects directly.
 - send\_count
 
     How many times the whole signal transmits per press (the wig's `send_count`,
-    the repeat hint a JSON dump's keycode carries).  Zero means the source carried
-    no repeat count, so a wig export omits `send_count` and the default single
-    press is assumed.
+    the device's `timing.pressMinRepeats` for a JSON dump import).  Zero means
+    the source carried no repeat count, so a wig export omits `send_count` and
+    the default single press is assumed.
 
 - bypass\_protocol
 
@@ -163,8 +163,9 @@ Brett T. Warden <bwarden@cpan.org>
 Copyright (c) 2026 Brett T. Warden
 
 This library is free software; you can redistribute it and/or modify it
-under the terms of the GNU Lesser General Public License version 2.1 as
-published by the Free Software Foundation.
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 2 of the License, or (at your
+option) any later version.
 
 # TRADEMARK NOTICE
 

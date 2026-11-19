@@ -51,7 +51,7 @@ ok(!$@, 'mb loads without error');
 diag("load error: $@") if $@;
 
 ok(defined $mb::VERSION,         'mb: $VERSION defined');
-ok($mb::VERSION =~ /^\d+\.\d+/, 'mb: $VERSION looks like a version number');
+ok(($mb::VERSION =~ /^\d+\.\d+/) ? 1 : 0, 'mb: $VERSION looks like a version number');
 ok(mb->can('set_script_encoding'), 'mb->can(set_script_encoding)');
 
 for my $m (@pub_methods) {

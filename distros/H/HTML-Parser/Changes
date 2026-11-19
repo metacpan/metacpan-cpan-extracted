@@ -1,5 +1,9 @@
 Change history for HTML-Parser
 
+3.87      2026-11-18
+    - Retain entity values across stringification callbacks (GH#72)
+      (Yves Orton)
+
 3.86      2026-09-19
     - Expand an entity whose value is the string being decoded to the
       value that string had when the call began (GH#69) (Paul Johnson)

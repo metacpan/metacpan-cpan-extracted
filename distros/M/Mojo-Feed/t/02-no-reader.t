@@ -30,7 +30,7 @@ get '/feed/:id' => sub {
     my ($c) = shift;
     my $id = $c->stash('id');
     if ($id > 3) {
-        $c->redirect_to('atom.xml');
+        $c->redirect_to('/atom.xml');
     }
     else {
         $c->redirect_to('/feed/' . ($id+1));
@@ -82,7 +82,7 @@ $feed =
   Mojo::Feed->new( url => Mojo::URL->new("/feed") );
 isa_ok( $feed, 'Mojo::Feed', 'got feed on redirect' );
 is( $feed->title, 'First Weblog', 'title ok' );
-is ( $feed->source->path, 'atom.xml' , 'source changed on redirect' );
+is($feed->source->path, '/atom.xml', 'source changed on redirect');
 } );
 subtest( 'with Max redirect' => sub {
 $feed =
@@ -94,7 +94,7 @@ like($excp, qr/Number of redirects exceeded when loading feed/, 'Max redirects e
 $feed =
   Mojo::Feed->new( url => Mojo::URL->new("/feed/1"), max_redirects => 5 );
 is ($feed->title, 'First Weblog', 'multiple redirects OK');
-is ( $feed->source->path, 'atom.xml' , 'source changed on redirect' );
+is($feed->source->path, '/atom.xml', 'source changed on redirect');
 } );
 
 ## Callback and non-blocking no longer supported - how do we make a promise API?

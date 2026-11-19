@@ -63,11 +63,15 @@ static ev_ch_send_t* alloc_send(void) {
     s->insert_data = NULL;
     s->insert_data_len = 0;
     s->insert_av = NULL;
+    s->insert_empty_as_default = 0;
+    s->insert_native_body = 0;
+    s->insert_defaults = NULL;
     s->raw = 0;
     s->on_data = NULL;
     s->on_complete = NULL;
     s->query_timeout = 0;
     s->query_id = NULL;
+    s->session_tz = NULL;
     s->deferred_sql = NULL;
     s->deferred_sql_len = 0;
     s->deferred_defaults = NULL;
@@ -89,6 +93,8 @@ static void free_send_deferred(ev_ch_send_t *s) {
 
 static void release_send(ev_ch_send_t *s) {
     CLEAR_STR(s->query_id);
+    CLEAR_STR(s->session_tz);
+    CLEAR_SV(s->insert_defaults);
     free_send_deferred(s);
     *(ev_ch_send_t **)s = send_freelist;
     send_freelist = s;

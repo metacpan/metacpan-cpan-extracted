@@ -4,7 +4,7 @@ App::Test::Generator - Fuzz Testing, Mutation Testing, LCSAJ Metrics and Test Da
 
 ## Version
 
-Version 0.50
+Version 0.51
 
 ## Synopsis
 

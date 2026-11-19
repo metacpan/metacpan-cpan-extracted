@@ -1,12 +1,12 @@
 {
     "name" : "mb",
-    "version" : "0.66",
+    "version" : "0.67",
     "abstract" : "Can easy script in Big5, Big5-HKSCS, GBK, Sjis(also CP932), UHC, UTF-8, ...",
     "author" : [
         "ina <ina.cpan@gmail.com>"
     ],
     "dynamic_config" : 1,
-    "generated_by" : "pmake.bat version 0.40",
+    "generated_by" : "pmake.bat version 0.53",
     "license" : [
         "perl_5"
     ],
@@ -14,42 +14,47 @@
         "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
         "version" : 2
     },
+    "no_index" : {
+        "directory" : [
+            "t",
+            "eg",
+            "doc"
+        ]
+    },
     "release_status" : "stable",
     "resources" : {
         "license" : [
             "http://dev.perl.org/licenses/"
-        ],
-        "bugtracker" : {
-            "web" : "https://github.com/ina-cpan/mb/issues"
-        },
-        "repository" : {
-            "url"  : "https://github.com/ina-cpan/mb",
-            "web"  : "https://github.com/ina-cpan/mb",
-            "type" : "git"
-        }
+        ]
     },
     "prereqs" : {
         "build" : {
             "requires" : {
-                "ExtUtils::MakeMaker" : "5.4302",
                 "perl" : "5.00503"
             }
         },
         "configure" : {
             "requires" : {
-                "ExtUtils::MakeMaker" : "5.4302",
-                "perl" : "5.00503"
+                "ExtUtils::MakeMaker" : "5.4302"
             }
         },
         "runtime" : {
             "requires" : {
-                "ExtUtils::MakeMaker" : "5.4302",
                 "perl" : "5.00503"
+            },
+            "recommends" : {
+                "Filter::Util::Call" : "0"
             }
         },
         "test" : {
             "requires" : {
-                "ExtUtils::MakeMaker" : "5.4302",
+                "Cwd" : "0",
+                "Exporter" : "0",
+                "File::Basename" : "2.6",
+                "File::Find" : "0",
+                "File::Path" : "1.0401",
+                "File::Spec" : "0",
+                "FindBin" : "1.42",
                 "perl" : "5.00503"
             }
         }
@@ -57,7 +62,7 @@
     "provides" : {
         "mb" : {
             "file" : "lib/mb.pm",
-            "version" : "0.66"
+            "version" : "0.67"
         }
     }
 }

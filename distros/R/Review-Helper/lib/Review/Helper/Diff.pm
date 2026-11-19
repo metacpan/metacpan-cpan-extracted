@@ -1,7 +1,7 @@
 package Review::Helper::Diff;
 use v5.36;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Carp qw/croak/;
 use List::Util qw/min/;
@@ -157,15 +157,41 @@ sub section_hunks($hunks, $new_lines, $sections, $index) {
 
     _removed_parts(\@seq);
 
-    my (@runs, $prev);
+    # Runs of one part, each with the lines the unit does not take between
+    # it and the run before.
+    my (@runs, @gaps, @gap, $prev);
     for my $entry (@seq) {
         my $part = $entry->[1];
-        push @runs        => []     if defined($part) && !($prev && $prev eq $part);
-        push @{$runs[-1]} => $entry if defined $part;
+        unless (defined $part) {
+            push @gap => $entry if @runs;
+            $prev = undef;
+            next;
+        }
+        unless ($prev && $prev eq $part) {
+            push @runs => [];
+            push @gaps => [@gap];
+            @gap = ();
+        }
+        push @{$runs[-1]} => $entry;
         $prev = $part;
     }
     return [] unless grep { $_->[0]->{type} ne ' ' } map { @$_ } @runs;
-    return [map { _run_hunk($_) } @runs];
+
+    # Runs next to each other, apart only by blank lines, read as one diff:
+    # they join, the blank lines as they are.
+    my @hunks = ([$runs[0]->[0]->[1], @{$runs[0]}]);
+    for my $r (1 .. $#runs) {
+        my ($run, $gap) = ($runs[$r], $gaps[$r]);
+        my @blank = map { $_->[0] // {type => ' ', text => $new_lines->[$_->[3] - 1], old => $_->[2], new => $_->[3]} } @$gap;
+        unless (grep { ($_->{text} // '') =~ m/\S/ } @blank) {
+            my $merged = $hunks[-1];
+            $merged->[0] = 'code' if $run->[0]->[1] eq 'code';
+            push @$merged => (map { [$blank[$_], undef, @{$gap->[$_]}[2, 3]] } 0 .. $#blank), @$run;
+            next;
+        }
+        push @hunks => [$run->[0]->[1], @$run];
+    }
+    return [map { _run_hunk(@$_) } @hunks];
 }
 
 sub map_lines($hunks, $start, $end = undef) {
@@ -319,11 +345,12 @@ sub _removed_parts($seq) {
     return;
 }
 
-# One hunk over consecutive entries. A side with no lines names the line
-# before the hunk, as git does.
-sub _run_hunk($run) {
-    my @lines = map { $_->[0] } @$run;
-    my %hunk  = (part => $run->[0]->[1], lines => \@lines);
+# One hunk of a part over consecutive entries. A side with no lines names
+# the line before the hunk, as git does.
+sub _run_hunk($part, @run) {
+    my $run   = \@run;
+    my @lines = map { $_->[0] } @run;
+    my %hunk  = (part => $part, lines => \@lines);
     for my $side (0, 1) {
         my $name  = $side ? 'new' : 'old';
         my $count = grep { $_->{type} ne ($side ? '-' : '+') } @lines;
@@ -417,10 +444,13 @@ C<\@new_lines>, the file after the change, one string per line), with the
 C<+> lines of C<\@hunks> and the C<-> lines C<line_owners> gives the
 section, in file order. Each unbroken run of one part is
 a hunk with a C<part> of C<code> or C<docs> and its own line numbers; lines
-between runs do not appear. A removed line takes the part of the section's
-next line in its run, else the previous one, else C<code>. A deleted section
-shows its removed lines. Returns no hunks when the section has no added or
-removed line.
+between runs do not appear, except that runs with nothing or only blank
+lines between them, code or documentation alike, are one hunk that holds
+those blank lines as they are (context, or their C<+> or C<-> lines). A hunk's C<part> is C<code> when it holds any
+code, C<docs> when it holds documentation alone. A removed line takes the
+part of the section's next line in its run, else the previous one, else
+C<code>. A deleted section shows its removed lines. Returns no hunks when the
+section has no added or removed line.
 
 =item ($ranges, $changed) = move_ranges(\@hunks, \@ranges)
 

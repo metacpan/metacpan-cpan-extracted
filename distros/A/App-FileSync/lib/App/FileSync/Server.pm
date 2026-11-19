@@ -13,6 +13,7 @@ use warnings;
 use autodie qw(:all);
 
 use Digest::SHA ();
+use File::Spec;
 use File::Temp ();
 use List::Util qw(any);
 use Readonly;
@@ -31,12 +32,13 @@ use App::FileSync::Constants qw(
 );
 use App::FileSync::Delta;
 use App::FileSync::I18N qw(message os_error strip_location);
+use App::FileSync::IO qw(list_dir);
 use App::FileSync::Merge;
 use App::FileSync::Protocol;
 use App::FileSync::Settings;
 use App::FileSync::Store;
 
-use version; our $VERSION = version->declare('0.002.1');
+use version; our $VERSION = version->declare('0.002.2');
 
 # Package variables for compatibility: the CLI checks $PROTO, and tests may
 # localise $CHUNK.
@@ -82,12 +84,14 @@ Readonly my %COMMANDS => (
 
 # Which planned actions each kind of request may serve.  "conflict:client"
 # is a conflict the client's version won; "conflict:remote" one the master's won.
+# The client wins a conflict only with a file (Merge::_conflict), so mkdir
+# never serves one.
 Readonly my %MAY => (
 	read   => [ 'pull', 'conflict:remote' ],
 	write  => [ 'push', 'conflict:client' ],
 	delta  => [ 'push' ],
 	pull   => [ 'pull' ],
-	mkdir  => [ 'push', 'conflict:client' ],
+	mkdir  => [ 'push' ],
 	delete => [ 'delete_remote' ],
 	ack    => [ 'pull', 'delete_local', 'conflict:remote' ],
 );
@@ -266,6 +270,11 @@ Usage:
 Raised once the session is open.  Each ends the session: the open uploads
 are discarded, the failure is journalled, and the text (without Perl's
 file and line) reaches the client as C<< { ok => 0, fatal => 1, error => ... } >>.
+In that text a path in the master is relative to the repo, and any other
+server path starts with C<[server root]>: the client is not told where the
+server keeps its files.  The server's log is written the same way, because
+over ssh its standard error reaches the client; the journal, which stays on
+the server, keeps the full paths.
 Most mean a client bug or a hostile client; the resolution is to fix the
 client, or simply to rerun the sync.
 
@@ -357,16 +366,44 @@ sub run {
 
 	return 1 if $ok;
 
-	# The client shows this text to a person, so no Perl file and line.
+	# The client shows this text to a person, so no Perl file and line, and
+	# only where in the repo, not where the server keeps it.  The log is
+	# rewritten too: over ssh the server's stderr reaches the client.  Only
+	# the journal, which stays on the server, keeps the absolute paths.
 	my $error = strip_location($@) || $self->i18n('server.unknown_error');
-	$self->{logger}->error($error);
+	my $shown = $self->_for_client($error);
+	$self->{logger}->error($shown);
 	$self->_discard_uploads();
 	$self->_journal_failed_session($error);
 
 	eval {
-		$connection->send({ ok => 0, error => $error, fatal => 1, ($self->{refusal} ? (code => $self->{refusal}) : ()) });
+		$connection->send({ ok => 0, error => $shown, fatal => 1, ($self->{refusal} ? (code => $self->{refusal}) : ()) });
 	};
 	return 0;
+}
+
+# _for_client
+# Purpose:     take the server's file layout out of an error for the client
+#              (and for the log, whose stderr reaches the client over ssh).
+# Entry:       $text is an error as the server logs it.
+# Exit:        returns the text with each path under the master made relative
+#              to the repo ("x", not "/srv/filesync/master/docs/x") and any
+#              other mention of the server root replaced by a placeholder.
+# Side effects: none.
+sub _for_client :Private {
+	my ($self, $text) = @_;
+
+	# new() refuses a server without a root or a repo, so both are set.  The
+	# store builds its paths with catdir, so match the canonical form: a root
+	# given as "/srv/filesync/" appears as "/srv/filesync/master/...".
+	my $root = File::Spec->canonpath($self->{root});
+	my $master = File::Spec->catdir($root, 'master', $self->{repo});
+	$text =~ s{\Q$master\E[\\/]}{}g;
+	# Only a whole path component: a root of /srv must not touch /srvdata.
+	my $placeholder = $self->i18n('server.root_placeholder');
+	$text =~ s{\Q$root\E(?=[\\/'"\s:,)]|\z)}{$placeholder}g;
+
+	return $text;
 }
 
 =head2 validate_forced_command
@@ -500,7 +537,7 @@ sub _journal_failed_session :Private {
 		});
 		1;
 	};
-	$self->{logger}->warn($self->i18n('server.journal_failed', { error => strip_location($@) })) unless $ok;
+	$self->{logger}->warn($self->_for_client($self->i18n('server.journal_failed', { error => strip_location($@) }))) unless $ok;
 
 	return $ok ? 1 : 0;
 }
@@ -560,11 +597,42 @@ sub _loop :Private {
 
 	until ($self->{finished}) {
 		my $message = $self->{conn}->recv();
-		my $command = $message->{cmd} // '';
-		my $method = $COMMANDS{$command} or $self->_throw('server.unknown', { command => $command });
-		$self->$method($message);
+		my $received = $self->{conn}->bytes_received();
+		my $ok = eval {
+			my $command = $message->{cmd} // '';
+			my $method = $COMMANDS{$command} or $self->_throw('server.unknown', { command => $command });
+			$self->$method($message);
+			1;
+		};
+		next if $ok;
+
+		my $error = $@;
+		$self->_discard_payload($message) if $self->{conn}->bytes_received() == $received;
+		die $error;
 	}
 
+	return 1;
+}
+
+# _discard_payload
+# Purpose:     read and drop the payload of a request that was refused before
+#              its handler read it.
+# Entry:       $message announced len bytes that are still on the wire.
+# Exit:        returns 1.
+# Side effects: consumes the bytes.  The client writes a payload straight
+#              after its header, so a server that exits without reading it
+#              can close the pipe under that write: the client then sees a
+#              broken pipe (on Windows, where the server often wins the race)
+#              instead of the refusal.  A bad length, a failed transport or a
+#              read error leaves the bytes where they are.
+sub _discard_payload :Private {
+	my ($self, $message) = @_;
+
+	my $length = $message->{len};
+	return 1 unless defined $length && $length =~ $UINT && $length > 0
+		&& $length <= $App::FileSync::Protocol::MAX_WIRE && !$self->{conn}->transport_failed();
+
+	eval { $self->{conn}->read_bytes($length + 0) };
 	return 1;
 }
 
@@ -1256,6 +1324,16 @@ sub _commit_upload :Private {
 	if ($key) {
 		eval { unlink $upload->{temp} };
 		$self->_throw($key, \%args);
+	}
+
+	# A directory where the file goes still holds what the sync does not list
+	# (ignored files such as .DS_Store): its listed contents were deleted
+	# earlier in this plan.  Keep it in the trash rather than refuse the file,
+	# which would fail this and every later sync.
+	my $abs = $self->{store}->abs_path($path);
+	if (-d $abs && !-l $abs && @{ list_dir($abs) || [$abs] }) {
+		my $trashed = $self->{store}->move_to_trash($path, time);
+		$self->_journal({ action => 'delete', path => $path, trash => $trashed, reason => 'replaced by a file', result => 'ok' });
 	}
 
 	$self->{store}->commit_temp($path, $upload->{temp}, $upload->{mtime}, $upload->{mode});

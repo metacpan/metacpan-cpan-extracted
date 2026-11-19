@@ -100,11 +100,61 @@ int add_digit_256(uint64_t limbs[4], uint64_t digit) {
     return (int)carry;
 }
 
-int parse_decimal128_str(const char *s, STRLEN len, int scale,
+static int expand_exponent(const char *s, STRLEN len, int scale, int precision,
+                           int max_digits, char *out, STRLEN *out_len) {
+    STRLEN i = 0, start, end, digits = 0, fractional = 0, first = len, j, n = 0;
+    int negative = 0, dot = 0, exp_negative = 0;
+    int64_t exponent = 0, keep;
+    while (i < len && (s[i] == ' ' || s[i] == '\t')) i++;
+    if (i < len && (s[i] == '+' || s[i] == '-')) negative = s[i++] == '-';
+    start = i;
+    for (; i < len && s[i] != 'e' && s[i] != 'E'; i++) {
+        if (s[i] == '.' && !dot) { dot = 1; continue; }
+        if (s[i] < '0' || s[i] > '9') return 0;
+        if (s[i] != '0' && first == len) first = digits;
+        digits++;
+        if (dot) fractional++;
+    }
+    end = i;
+    if (!digits || i == len) return 0;
+    i++;
+    if (i < len && (s[i] == '+' || s[i] == '-')) exp_negative = s[i++] == '-';
+    if (i == len) return 0;
+    for (; i < len; i++) {
+        if (s[i] < '0' || s[i] > '9') return 0;
+        if (exponent < 1000000000) exponent = exponent * 10 + s[i] - '0';
+    }
+    if (exp_negative) exponent = -exponent;
+    if (exponent + scale > precision) return 0;
+    keep = (int64_t)digits + scale + exponent - (int64_t)fractional;
+    if (keep - (int64_t)(first == len ? digits : first) > max_digits) return 0;
+    if (negative) out[n++] = '-';
+    j = 0;
+    for (i = start; i < end; i++) {
+        if (s[i] == '.') continue;
+        if (j >= first && (int64_t)j < keep) out[n++] = s[i];
+        j++;
+    }
+    if (first != len) {
+        while ((int64_t)j < keep) { out[n++] = '0'; j++; }
+    }
+    if (n == (STRLEN)negative) out[n++] = '0';
+    *out_len = n;
+    return 1;
+}
+
+int parse_decimal128_str(const char *s, STRLEN len, int scale, int precision,
                          uint64_t *hi_out, uint64_t *lo_out) {
     STRLEN i = 0;
     int neg = 0, seen_digit = 0, seen_dot = 0, frac_used = 0;
     uint64_t lo = 0, hi = 0;
+
+    if (memchr(s, 'e', len) || memchr(s, 'E', len)) {
+        char expanded[41];
+        STRLEN expanded_len;
+        if (!expand_exponent(s, len, scale, precision, 39, expanded, &expanded_len)) return 0;
+        return parse_decimal128_str(expanded, expanded_len, 0, precision, hi_out, lo_out);
+    }
 
     while (i < len && (s[i] == ' ' || s[i] == '\t')) i++;
     if (i < len && (s[i] == '+' || s[i] == '-')) {
@@ -157,11 +207,18 @@ int parse_decimal128_str(const char *s, STRLEN len, int scale,
     return 1;
 }
 
-int parse_decimal256_str(const char *s, STRLEN len, int scale,
+int parse_decimal256_str(const char *s, STRLEN len, int scale, int precision,
                          uint64_t limbs_out[4]) {
     STRLEN i = 0;
     int neg = 0, seen_digit = 0, seen_dot = 0, frac_used = 0;
     uint64_t limbs[4] = {0,0,0,0};
+
+    if (memchr(s, 'e', len) || memchr(s, 'E', len)) {
+        char expanded[80];
+        STRLEN expanded_len;
+        if (!expand_exponent(s, len, scale, precision, 78, expanded, &expanded_len)) return 0;
+        return parse_decimal256_str(expanded, expanded_len, 0, precision, limbs_out);
+    }
 
     while (i < len && (s[i] == ' ' || s[i] == '\t')) i++;
     if (i < len && (s[i] == '+' || s[i] == '-')) {
@@ -207,10 +264,38 @@ int parse_decimal256_str(const char *s, STRLEN len, int scale,
     return 1;
 }
 
-int parse_decimal_int64_str(const char *s, STRLEN len, int scale,
+static int pow10_256(uint64_t limbs[4], int n) {
+    limbs[0] = 1; limbs[1] = limbs[2] = limbs[3] = 0;
+    while (n-- > 0) if (!mul10_256(limbs)) return 0;
+    return 1;
+}
+
+int decimal256_within_precision(const uint64_t limbs[4], int precision) {
+    uint64_t magnitude[4], bound[4];
+    int j;
+    memcpy(magnitude, limbs, sizeof(magnitude));
+    if (magnitude[3] >> 63) {
+        for (j = 0; j < 4; j++) magnitude[j] = ~magnitude[j];
+        add_digit_256(magnitude, 1);
+    }
+    if (!pow10_256(bound, precision)) return 1;
+    for (j = 3; j >= 0; j--)
+        if (magnitude[j] != bound[j]) return magnitude[j] < bound[j];
+    return 0;
+}
+
+int decimal128_within_precision(uint64_t hi, uint64_t lo, int precision) {
+    uint64_t limbs[4];
+    limbs[0] = lo;
+    limbs[1] = hi;
+    limbs[2] = limbs[3] = hi >> 63 ? ~(uint64_t)0 : 0;
+    return decimal256_within_precision(limbs, precision);
+}
+
+int parse_decimal_int64_str(const char *s, STRLEN len, int scale, int precision,
                             int64_t *out) {
     uint64_t lo, hi;
-    if (!parse_decimal128_str(s, len, scale, &hi, &lo)) return 0;
+    if (!parse_decimal128_str(s, len, scale, precision, &hi, &lo)) return 0;
     /* Fits in int64 iff hi is sign extension of lo's high bit. */
     if (hi == 0 && (lo & 0x8000000000000000ULL) == 0) {
         *out = (int64_t)lo;

@@ -51,41 +51,20 @@ is($via_wig->[0]->alias, 'PowerToggle', 'wig import uses the command name');
 is($via_wig->[0]->data,  0x830000FF,   'wig import decodes the same payload');
 is($via_wig->[1]->command, 2,          'wig import second command');
 
-# The number after a keycode's last colon is the command's repeat hint: how
-# many times one press transmits.  It rides send_count and survives a wig
-# round trip.  Most commands hint the same value, but it does vary.
-is($power->send_count, 3, 'repeat hint parsed from the keycode');
-is($vol->send_count,   3, 'second command hint parsed too');
-is($via_wig->[0]->send_count, 3, 'the wig entry point keeps the hint');
+# The repeat count is the device's timing.pressMinRepeats, not anything in the
+# keycode.  A bare code set carries no device timing, so its codes keep the
+# single-press default and the wig export omits send_count.
+is($power->send_count, 0, 'no device timing means single-press default');
+is($vol->send_count,   0, 'second command default too');
+is($via_wig->[0]->send_count, 0, 'the wig entry point keeps the default');
 
-my $hint_4 = $converter->import_format('JSON',
-    '{"commands": [{"keycode": "G:Toshiba 32 Bit:(0x407F58A7)(Repeat)():4",'
-    . ' "name": "Power",'
-    . ' "pronto": "0000 006D 0002 0000 0071 0072 0013 0013"}]}');
-is($hint_4->[0]->send_count, 4, 'a hint other than 3 is read too');
-
-# A keycode with no usable hint keeps the single-press default, which the wig
-# exporter then leaves out.
-my $no_hint;
-for my $keycode ('G:MemorexO1 32 Bit:(0x7689906F)(Repeat)()',
-                 'G:Memorex 32 Bit:()(0xC100E01F)()',
-                 'G:Memorex 32 Bit:()(0xC100E01F)():0') {
-    my $json = sprintf
-        '{"commands": [{"keycode": "%s", "name": "X",'
-        . ' "pronto": "0000 006D 0002 0000 0071 0072 0013 0013"}]}', $keycode;
-    $no_hint = $converter->import_format('JSON', $json);
-    is($no_hint->[0]->send_count, 0, "no usable hint in $keycode");
-}
+# A device document supplies timing.pressMinRepeats, which rides send_count on
+# every command in its code set and survives a wig round trip; exercised in
+# the device-pointer subtest below.
 
 my $power_wig = $converter->export_code($power, 'wig');
-is(JSON::PP->new->decode($power_wig)->{signals}[0]{send_count}, 3,
-    'wig carries the hint as send_count');
-is($converter->import_format('wig', $power_wig)->[0]->send_count, 3,
-    'wig -> code preserves the hint');
-is(JSON::PP->new->decode($converter->export_code($hint_4->[0], 'wig'))
-       ->{signals}[0]{send_count}, 4, 'a hint of 4 rides a wig export');
-ok(!exists JSON::PP->new->decode($converter->export_code($no_hint->[0], 'wig'))
-       ->{signals}[0]{send_count}, 'a code with no hint omits send_count');
+ok(!exists JSON::PP->new->decode($power_wig)->{signals}[0]{send_count},
+    'wig omits send_count for the single-press default');
 
 # A device document carries no commands of its own, only a "codeset" path
 # to the re-usable command set shared by every device with those commands.
@@ -100,12 +79,14 @@ subtest 'device document follows its code set pointer' => sub {
         $codeset_json);
     _write(File::Spec->catfile($root, 'devices', 'JVC', 'EM40NF5.json'),
         '{"codeset": "codesets/dd/ddc59c768a8b0c95.json", '
-        . '"manufacturer": "JVC", "model": "EM40NF5"}');
+        . '"manufacturer": "JVC", "model": "EM40NF5", '
+        . '"timing": {"pressMinRepeats": 2}}');
 
     my $device = File::Spec->catfile($root, 'devices', 'JVC', 'EM40NF5.json');
     my $imported = $converter->import_format('JSON', $device);
     is(scalar(@$imported), 2, 'absolute device path resolves its code set');
     is($imported->[0]->alias, 'PowerToggle', 'alias from the code set');
+    is($imported->[0]->send_count, 2, 'device timing rides send_count');
 
     # The same document, addressed relative to the dump root.
     my $cwd = Cwd::getcwd();

@@ -18,10 +18,21 @@ x=1; (x=2); echo $x	1|<0>
 x=1; echo a | x=2; echo $x	1|<0>
 v='a  b'; echo $v "$v"	a b a  b|<0>
 y=; echo [$y] ["$y"] ['']	[] [] []|<0>
+A=1 B=$A sh -c 'echo $A$B'	11|<0>
 exec echo replaced	replaced|<0>
 exit 3; echo not here	<3>
 ! true; echo st=$?	st=1|<0>
 echo $((1/0)); echo after	sh: arithmetic expression: division by zero: "1/0"|<2>
+echo 'a\tb' "c\nd"	a\tb c\nd|<0>
+echo -n 'x\c'; echo y	x\cy|<0>
+echo -e 'a\nb'	a|b|<0>
+echo -n -n a; echo	a|<0>
+echo -- -n	-- -n|<0>
+echo 'a\cb' c; echo next	a\cb c|next|<0>
+x='a\tb\\'; echo $x "$x"	a\tb\\ a\tb\\|<0>
+echo 'end\' '\\' '\'	end\ \\ \|<0>
+printf '%s\n' 'echo "a\\tb"' > e.sh; . ./e.sh	a\tb|<0>
+f() { echo "$@"; }; f -n 'q\tr'; echo	q\tr|<0>
 ./fds	sh: ./fds: not found|<127>
 echo $(./fds)	sh: ./fds: not found||<0>
 alias ll="echo L"@Nll x	L x|<0>
@@ -109,6 +120,7 @@ set -- "a b" c; echo "[${1}]" "[$*]"; IFS=:; echo "$*"	[a b] [a b c]|a b:c|<0>
 set -- a b; set --; echo $#	0|<0>
 set -u; echo $nope; echo after	sh: nope: parameter not set|<2>
 set -u; echo ${nope-ok} ${nope:+no}; echo after	ok|after|<0>
+set -a; x=1; sh -c 'echo $x'	1|<0>
 x=; echo ${x:=d} ${y=e} $x $y	d e d e|<0>
 echo ${nope?gone}; echo after	sh: nope: gone|<2>
 echo ${x:?}	sh: x: parameter not set or null|<2>
@@ -130,6 +142,8 @@ f() { echo func; }; command echo plain; f	plain|func|<0>
 (exec echo in sub; echo not); echo out	in sub|out|<0>
 exec echo bye; echo never	bye|<0>
 x=1 export y=2; echo $x $y; sh -c 'echo $y'	outside the subset: settings or redirections on 'export' at 4|<255>
+export z=3; sh -c 'echo $z'	3|<0>
+x=4; export x; sh -c 'echo $x'	4|<0>
 trap "echo T" EXIT; echo a	a|T|<0>
 (trap "echo S" EXIT; echo in); echo out	in|S|out|<0>
 trap "echo T" EXIT; exit 3	T|<3>
@@ -166,15 +180,28 @@ f() { n=a.b; unset $n; echo in; }; f; echo after	sh: unset: a.b: bad variable na
 n=a.b; unset -f $n; echo "after $?"	after 0|<0>
 n=''; unset "$n"; echo after	sh: unset: : bad variable name|<2>
 x=1; n=x; unset $n; echo "ok [$x] $?"	ok [] 0|<0>
+v=x1; exit $v	sh: exit: Illegal number: x1|<2>
+v=+3; (exit $v); echo "st=$?"; v=1000; (exit $v); echo "st=$?"	st=3|st=232|<0>
+v=x1; f() { return $v; }; f; echo "st=$?"	sh: return: Illegal number: x1|<2>
+v=x1; set -o $v; echo after	sh: set: Illegal option -o x1|<2>
+v=z; set -$v; echo after	sh: set: Illegal option -z|<2>
+x="a*"; v=abcabc; q="?"; echo "${v#$x}" "${v##$x}" "${v%$x}" "${v#"$x"}" "${v%$q}" "${v%[$q]}"	bcabc  abc abcabc abcab abcabc|<0>
+HOME=; cd; echo "st=$?"	st=0|<0>
+shift $(($#-1)); echo after	sh: shift: Illegal number: -1|<2>
+v="[n]"; shift $v; echo after	sh: shift: Illegal number: [n]|<2>
 ec\@Nho joined	joined|<0>
 x=5 >f 2>&1; echo $x	5|<0>
 echo "[${!-unset}]"	[unset]|<0>
 echo $((0 && 1/0)) $((1 || 1/0)) $((1 ? 2 : 1/0))	0 1 2|<0>
+A=1 B=$(true)$A sh -c 'echo "[$B]"'	[1]|<0>
+A=1 B=$(echo $A) sh -c 'echo "[$B]"'	[1]|<0>
 printf 'a\\ b c\n' | { read x y; echo "[$x][$y]"; }	[a b][c]|<0>
 printf 'a\\\\\nb\n' | { read x; echo "[$x]"; }	[a\]|<0>
 printf 'a : b\n' | { IFS=': ' read x y z; echo "[$x][$y][$z]"; }	[a][b][]|<0>
 printf 'x:y:\n' | { IFS=: read a b; echo "[$a][$b]"; }	[x][y]|<0>
 printf 'x:y:z\n' | { IFS=: read a b; echo "[$a][$b]"; }	[x][y:z]|<0>
+echo "a :" | { IFS=" :" read x; echo "[$x]"; }	[a]|<0>
+printf 'a b :  \n' | { IFS=" :" read -r x; echo "[$x]"; }	[a b :]|<0>
 printf '  a  b  \n' | { read a; echo "[$a]"; }	[a  b]|<0>
 printf 'a\n' | { IFS= read -r a b; echo "[$a][$b]"; }	[a][]|<0>
 case a in [[:alpha:]]) echo y;; *) echo n;; esac	y|<0>

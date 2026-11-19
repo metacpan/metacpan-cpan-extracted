@@ -60,7 +60,7 @@
             "DBI" : "0",
             "Data::Dumper" : "0",
             "Digest::SHA" : "0",
-            "Ekorn::Pipeline" : ">= v0.3.6, < v0.4.0",
+            "Ekorn::Pipeline" : ">= v0.3.7, < v0.4.0",
             "Exporter" : "0",
             "List::Util" : "0",
             "Ref::Util" : "0",
@@ -81,7 +81,7 @@
    "provides" : {
       "DBIx::Squirrel" : {
          "file" : "lib/DBIx/Squirrel.pm",
-         "version" : "v3.2.0"
+         "version" : "v3.4.1"
       },
       "DBIx::Squirrel::Context" : {
          "file" : "lib/DBIx/Squirrel/Context.pm"
@@ -147,7 +147,7 @@
          "web" : "https://github.com/nukopian/DBIx-Squirrel"
       }
    },
-   "version" : "v3.2.0",
+   "version" : "v3.4.1",
    "x_serialization_backend" : "JSON::PP version 4.18",
    "x_static_install" : 1
 }

@@ -7,7 +7,7 @@ package App::FileSync::I18N::en;
 use strict;
 use warnings;
 
-use version; our $VERSION = version->declare('0.002.1');
+use version; our $VERSION = version->declare('0.002.2');
 
 our %MESSAGES = (
 	# ---------------------------------------------------------- i18n itself
@@ -15,12 +15,25 @@ our %MESSAGES = (
 	'i18n.bad_catalogue' => "The catalogue for '%{language}s' is not a hash",
 
 	# -------------------------------------------------------- arguments
-	'args.invalid' => '%{routine}s: %{reason}s',
+	# %{what}s is args.param, or the command-line option the value came from.
+	'args.invalid'     => '%{routine}s: %{reason}s',
+	'args.param'       => q{%{routine}s: '%{param}s'},
+	'args.unknown'     => '%{what}s is not a known argument',
+	'args.missing'     => '%{what}s is required',
+	'args.not_number'  => q{%{what}s must be a number, not '%{value}s'},
+	'args.not_integer' => q{%{what}s must be a whole number, not '%{value}s'},
+	'args.too_small'   => '%{what}s must be at least %{min}s, not %{value}s',
+	'args.too_large'   => '%{what}s must be no more than %{max}s, not %{value}s',
+	'args.too_short'   => { _by => 'count', one => '%{what}s must be at least %{count}d character long', other => '%{what}s must be at least %{count}d characters long' },
+	'args.too_long'    => { _by => 'count', one => '%{what}s must be at most %{count}d character long', other => '%{what}s must be at most %{count}d characters long' },
+	'args.too_few'     => { _by => 'count', one => '%{what}s must have at least %{count}d entry', other => '%{what}s must have at least %{count}d entries' },
+	'args.too_many'    => { _by => 'count', one => '%{what}s must have at most %{count}d entry', other => '%{what}s must have at most %{count}d entries' },
+	'args.not_one_of'  => q{%{what}s must be one of %{list}s, not '%{value}s'},
+	'args.bad_form'    => q{%{what}s is not in the expected form: '%{value}s'},
 
 	# ------------------------------------------------------- shared words
 	'word.file'      => { _by => 'count', one => '%{count}d file', other => '%{count}d files' },
 	'word.empty_dir' => { _by => 'count', one => '%{count}d empty dir', other => '%{count}d empty dirs' },
-	'word.snapshot'  => { _by => 'count', one => 'snapshot', other => 'snapshots' },
 
 	# ---------------------------------------------------- path validation
 	'path.missing'            => 'missing path',
@@ -147,6 +160,7 @@ our %MESSAGES = (
 	'server.no_connection'   => 'Server: no connection',
 	'server.locked'          => q{Another sync session holds the lock for repo '%{repo}s'},
 	'server.unknown_error'   => 'unknown server error',
+	'server.root_placeholder' => '[server root]',
 	'server.journal_failed'  => 'cannot journal the failed session: %{error}s',
 	'server.not_allowed'     => q{Client '%{client}s' is not allowed on repo '%{repo}s'},
 	'server.wrong_role'      => q{Client '%{client}s' is registered as '%{registered}s', not '%{asked}s'},
@@ -234,6 +248,7 @@ our %MESSAGES = (
 	'client.need_server'      => 'Repo %{repo}s needs a server (user@host) for the ssh transport',
 	'client.bad_transport'    => q{Unknown transport '%{transport}s' for repo %{repo}s},
 	'client.record_failed'    => 'cannot record this run in %{path}s: %{error}s',
+	'client.dir_replaced'     => q{%{path}s was a directory holding files the sync does not track (such as ignored ones); it was moved to the trash in %{trash}s before the file replaced it},
 	'client.no_versions'      => q{No trashed version of '%{path}s' for repo '%{repo}s' in %{trash}s},
 	'client.not_dir'          => 'Restore target %{path}s is not a directory',
 	'client.exists'           => 'Refusing to overwrite %{path}s; move it aside or use --to DIR',
@@ -327,6 +342,18 @@ filesync-admin --root DIR <command>
     restore NAME PATH [--to DIR] [--list] [--date YYYY-MM-DD]
     log NAME... [-n N] [--client ID] [--since YYYY-MM-DD|EPOCH]
                   [--until YYYY-MM-DD|EPOCH] [--exit N]... [--warnings] [--json]
+
+repo create options:
+  --trash-days N          days the server keeps deleted files; default 30,
+                          0 keeps them forever
+  --max-deletes N         most files one sync may delete (N itself is
+                          allowed); default 200, 0 switches this limit off
+  --max-delete-percent N  most deletions in one sync, as a percentage of
+                          the files the client last synced, rounded down
+                          but at least 1; 0 to 100, default 10, 0 switches
+                          this limit off
+  A sync stops at whichever limit it reaches first, unless it is run with
+  "filesync sync --force".
 
 Exit codes: 0 ok, 1 fatal, 4 verification found drift.
 USAGE
@@ -474,12 +501,20 @@ USAGE
 	'cli.admin.unknown_verb' => q{Unknown %{group}s command '%{verb}s'},
 	'cli.admin.empty_name'   => 'log: NAME must not be empty',
 
-	'cli.repo.created.name'   => q{Created repo '%{repo}s'},
-	'cli.repo.created.master' => '  master: %{master}s',
-	'cli.repo.created.config' => '  config: %{config}s',
-	'cli.repo.none'           => 'No repos under %{root}s',
-	'cli.repo.no_clients'     => '(none)',
-	'cli.repo.show'           => "name:    %{name}s\nmaster:  %{master}s\nmeta:    %{meta}s\ntrash:   %{trash_days}s days\nlimits:  %{max_deletes}s files / %{max_delete_percent}s%%\nclients: %{clients}s",
+	'cli.repo.created.name'      => q{Created repo '%{repo}s'},
+	'cli.repo.created.master'    => '  master: %{master}s',
+	'cli.repo.created.config'    => '  config: %{config}s',
+	'cli.repo.none'              => 'No repos under %{root}s',
+	'cli.repo.no_clients'        => '(none)',
+	'cli.repo.trash_days'        => { _by => 'count', one => 'kept %{count}d day', other => 'kept %{count}d days' },
+	'cli.repo.trash_forever'     => 'kept forever',
+	'cli.repo.limits'            => '%{files}s / %{percent}s',
+	'cli.repo.limits_off'        => 'none (any number of deletions)',
+	'cli.repo.limit_files'       => { _by => 'count', one => '%{count}d file', other => '%{count}d files' },
+	'cli.repo.limit_files_off'   => 'no file limit',
+	'cli.repo.limit_percent'     => '%{percent}s%%',
+	'cli.repo.limit_percent_off' => 'no percentage limit',
+	'cli.repo.show'              => "name:    %{name}s\nmaster:  %{master}s\nmeta:    %{meta}s\ntrash:   %{trash}s\nlimits:  %{limits}s\nclients: %{clients}s",
 
 	'cli.reindex.would'   => '%{repo}s: would index %{files}s, %{dirs}s (%{size}s); index unchanged',
 	'cli.reindex.done'    => '%{repo}s: indexed %{files}s, %{dirs}s (%{size}s); master index written',

@@ -150,9 +150,22 @@ sub missing_values {
   }
   $n;
 }
+# The values the test sets to keep "fill" widgets full are set with
+# -undo off: not recorded (since 2.10 a setting with -undo on is
+# recorded, and an undo would take them away again).
+sub unrecorded {
+  my ($code) = @_;
+  my $u = $t->cget('-undo');
+  $t->configure(-undo => 0);
+  my $ok = eval { $code->(); 1 };
+  my $err = $@;
+  $t->configure(-undo => $u);
+  die $err unless $ok;
+}
 # Set a value on every node without one (slow: every position, every
 # level).
-sub fill_all {
+sub fill_all { unrecorded(\&fill_all_now) }
+sub fill_all_now {
   my $n = (split /\./, $t->index('end'))[0] - 1;
   for my $l (1 .. $n) {
     my $len = (split /\./, $t->index("$l.end"))[1];
@@ -419,11 +432,12 @@ for my $seed ($first .. $last) {
 	  if ($@) {
 	    push @p, "new [" . where(@{$e->{where}}) . "]: no such node";
 	  } elsif (!defined $v) {
-	    $t->blockNodedata(@{$e->{where}}, nv());
+	    unrecorded(sub { $t->blockNodedata(@{$e->{where}}, nv()) });
 	  }
 	}
 	if ($desc =~ /^nodedata (\S+) (\S+) undef/) {
-	  eval { $t->blockNodedata($1, $2, nv()) };
+	  my ($i, $lv) = ($1, $2);
+	  eval { unrecorded(sub { $t->blockNodedata($i, $lv, nv()) }) };
 	}
 	# An undo or a redo is not told "new" for what it re-creates:
 	# every node it leaves has a value, the one the change took or

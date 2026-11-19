@@ -1,6 +1,6 @@
 package SPVM::Thread;
 
-our $VERSION = "0.011";
+our $VERSION = "0.012";
 
 1;
 
@@ -41,11 +41,15 @@ Thead caller information.
 
 =head1 Class Methods
 
+=head2 new
+
 C<static method new : L<Thread|SPVM::Thread> ($task : L<Callback|SPVM::Callback>);>
 
 Creates a new native thread and run the task $task on it.
 
 And creates a new L<Thread|SPVM::Thread> object and returns it.
+
+All maskable signals are blocked in the newly created thread.
 
 =head1 Instance Methods
 

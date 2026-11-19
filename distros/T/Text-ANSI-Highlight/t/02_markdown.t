@@ -150,4 +150,14 @@ for my $name (@highlighter) {
     };
 }
 
+# A class in braces is the language, as pandoc takes it
+subtest 'a class in braces' => sub {
+    plan skip_all => 'no highlighter is installed' unless Highlighters::available();
+    my $hl = Text::ANSI::Highlight->new((Highlighters::available())[0]);
+    my $doc = "```{.c .numberLines}\nint x; /* c */\n```\n";
+    my $out = $hl->markdown($doc);
+    is $text->($out // ''), $doc, 'the text is the same';
+    like $out // '', qr/\e\[[\d;]+mint\e/, 'colored';
+};
+
 done_testing;

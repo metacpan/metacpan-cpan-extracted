@@ -1,0 +1,4 @@
+# Conversion fixture for RC5 (Harmony pronto)
+# Columns: name, protocol, address, subaddress, command, expected Pronto hex,
+#          decoded protocol, decoded address, decoded subaddress, decoded command
+RC5	RC5	1	-1	0	0000 0073 0011 0000 0000 0020 0020 0000 0000 0020 0020 0000 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0000 0020 0020 0000 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020	RC5	1	-1	0		

@@ -10,7 +10,7 @@ use Devel::Confess;
 
 package Cn::Util;
 require 5.010001;
-our $VERSION = 0.0242;
+our $VERSION = 0.0243;
 require Exporter;
 our @ISA = ('Exporter');
 our @EXPORT = qw(dir execute file2string format_commas json_file_to_ref random_key random_value ref_to_json_file st structure);
@@ -446,8 +446,13 @@ sub execute {
 		die "$cmd\n failed";
 	}
 	return $exit if $return eq 'exit';
-	chomp $stdout;
-	chomp $stderr;
+	# chomp removes whatever $/ is, and $/ is the caller's: under a caller's
+	# `local $/;` it removed nothing, and "hi\n" came back with its newline.
+	{
+		local $/ = "\n";
+		chomp $stdout;
+		chomp $stderr;
+	}
 	return $stdout if $return eq 'stdout';
 	return $stderr if $return eq 'stderr';
 	return { exit => $exit, stdout => $stdout, stderr => $stderr };   # 'all', the only mode left
@@ -455,7 +460,9 @@ sub execute {
 
 sub file2string {
 	my ($file) = @_;
-	open my $fh, '<', $file or die "can't read $file: $!"; # was autodie
+	# :raw, as the documentation promises: with the default layers, Windows
+	# perls read through :crlf, and "\r\n" came back as "\n".
+	open my $fh, '<:raw', $file or die "can't read $file: $!"; # was autodie
 	# open() succeeds on a directory on POSIX systems.  Linux, OpenBSD and
 	# FreeBSD 13+ then fail the read with EISDIR, but NetBSD's read(2) returns
 	# the raw directory entries, so 0.0241 handed back binary garbage there
@@ -499,6 +506,8 @@ sub format_commas { # https://stackoverflow.com/questions/33442240/perl-printf-t
 		$int = int $abs;
 		# int(100 * (.005 + frac)) is the original expression, and is exactly
 		# round-half-up to hundredths -- .005 * 100 is the +0.5 before truncation.
+		# Of the binary value, not the decimal the caller wrote: 1.005 is held as
+		# 1.00499999999999989... as a double, and gives 1.00, as README.md says.
 		# It is kept verbatim so no already-correct result shifts by a cent.
 		$cents = int(100 * (.005 + ($abs - $int)));
 		# ...but it can land on 100 (.999 rounds up to 1.00), which used to be
@@ -530,7 +539,9 @@ sub json_file_to_ref {
 	close $fh;
 	# Python/NumPy emit bare NaN / Infinity / -Infinity, which are not valid
 	# JSON. Rewrite them to null (-> undef) only when they sit in JSON value
-	# position (after '[', ',' or ':').  That test alone also matched text
+	# position (after '[', ',' or ':', or as the whole document, which Python
+	# writes for json.dumps(float('nan')) and which used to reach decode_json
+	# unchanged and die there).  That test alone also matched text
 	# inside a string -- "values: [1, NaN, 2]" became "values: [1, null, 2]"
 	# -- so the first alternative matches each whole string literal and
 	# (*SKIP)(*FAIL) resumes the scan after its closing quote.
@@ -539,7 +550,7 @@ sub json_file_to_ref {
 	# decode_json's 0.30 s (Cpanel::JSON::XS), measured 2026-11-09.  The two
 	# index() calls that rule it out took 4.5 ms there, so a file with neither
 	# word, which is most of them, is not scanned at all.
-	$json =~ s/"(?:[^"\\]++|\\.)*+"(*SKIP)(*FAIL)|[\[,:]\s*\K-?(?:NaN|Infinity)(?=\s*[,\]}])/null/gs
+	$json =~ s/"(?:[^"\\]++|\\.)*+"(*SKIP)(*FAIL)|(?:\A|[\[,:])\s*\K-?(?:NaN|Infinity)(?=\s*(?:[,\]}]|\z))/null/gs
 		if index($json, 'NaN') >= 0 || index($json, 'Infinity') >= 0;
 	require JSON::MaybeXS; # ~4.3 ms
 	return JSON::MaybeXS::decode_json($json);
@@ -585,9 +596,13 @@ sub ref_to_json_file {
 		die "$json_filename isn't a scalar/string";
 	}
 	require JSON::MaybeXS;
+	# Encoded before the file is opened, because opening it empties it: up to
+	# 0.0242 a structure encode_json refused -- a cycle, a code reference --
+	# died after an existing file had already been truncated to nothing.
+	my $json = JSON::MaybeXS::encode_json($ref);
 	open my $fh, '>:raw', $json_filename   # Write it unmangled
 		or die "can't write $json_filename: $!"; # was autodie
-	say $fh JSON::MaybeXS::encode_json($ref);
+	say $fh $json;
 	# A full disk shows up at close, when the buffer is flushed.  Unchecked,
 	# perl up to 5.20 reported "Wrote" and returned the name of a truncated
 	# file, and later perls died with "unable to close filehandle" from the
@@ -671,8 +686,12 @@ sub _structure_kind {
 #   { kind => 'sref',  node => .. }                       # \$x and \\$x
 #   { kind => 'leaf',  types => { typename => 1, ... } }
 #   { kind => 'union', alts => { kindname => node } }
-# $stack holds the refaddrs of the containers we are currently inside, so a
-# self-referential structure terminates instead of recursing forever.
+# $stack holds the refaddrs of the containers being described here or further
+# out, so a self-referential structure terminates instead of recursing forever.
+# $up is [ the batch of containers the values were taken from, the hash key
+# they were taken from or undef ], which is where a value that is cut off
+# finds the containers that hold it; see _structure_cut_label.  $opt->{root}
+# is the whole structure.
 #
 # The values arrive as $chunks, a list of array references whose elements,
 # taken together, are the values.  The elements of the arrays being merged are
@@ -681,9 +700,9 @@ sub _structure_kind {
 # union by kind.  Copying at every level, as up to 0.024 did, took 413 MB on
 # top of a 362 MB array of 300,000 five-key records, and 2.0 s; this takes
 # 237 MB and 1.4 s (perl 5.44, 2026-11-09).  Most of what is left is the
-# copies of hash values, one list per key, and the cycle guard's $stack.
+# copies of hash values, one list per key, and the cut-off guard's $stack.
 sub _structure_describe {
-	my ($chunks, $opt, $depth, $stack) = @_;
+	my ($chunks, $opt, $depth, $stack, $up) = @_;
 	my %count;   # kind => how many values are of that kind
 	for my $chunk (@{ $chunks }) {
 		# A plain scalar, the commonest value, is classified here rather than
@@ -702,7 +721,7 @@ sub _structure_describe {
 		}
 		return {
 			kind => 'union',
-			alts => { map { $_ => _structure_describe([$by_kind{$_}], $opt, $depth, $stack) } @kinds },
+			alts => { map { $_ => _structure_describe([$by_kind{$_}], $opt, $depth, $stack, $up) } @kinds },
 		};
 	}
 	my $k = $kinds[0] // 'null';
@@ -716,7 +735,7 @@ sub _structure_describe {
 		my $fresh = (grep { $stack->{ Scalar::Util::refaddr($_) } } @{ $all })
 			? [ grep { !$stack->{ Scalar::Util::refaddr($_) } } @{ $all } ]
 			: $all;
-		return { kind => 'leaf', types => { '(cycle)' => 1 } } unless @{ $fresh };
+		return { kind => 'leaf', types => _structure_cut_label($all, $up, $opt) } unless @{ $fresh };
 		if ($opt->{max_depth} && $depth >= $opt->{max_depth}) {
 			return { kind => 'leaf', types => { '(...)' => 1 } };
 		}
@@ -738,7 +757,7 @@ sub _structure_describe {
 					n     => scalar @{ $fresh },
 					wide  => scalar keys %vals,
 					keys  => { '*' => {
-						node     => _structure_describe([values %vals], $opt, $depth + 1, $stack),
+						node     => _structure_describe([values %vals], $opt, $depth + 1, $stack, [$fresh]),
 						optional => 0,
 					}},
 				};
@@ -746,7 +765,7 @@ sub _structure_describe {
 			my %out;
 			for my $key (keys %vals) {
 				$out{$key} = {
-					node     => _structure_describe([$vals{$key}], $opt, $depth + 1, $stack),
+					node     => _structure_describe([$vals{$key}], $opt, $depth + 1, $stack, [$fresh, $key]),
 					optional => (@{ $vals{$key} } < @{ $fresh } ? 1 : 0),
 				};
 			}
@@ -757,7 +776,7 @@ sub _structure_describe {
 			return {
 				kind  => 'array',
 				class => $class,
-				node  => ((grep { $_ } @lens) ? _structure_describe($fresh, $opt, $depth + 1, $stack) : undef),
+				node  => ((grep { $_ } @lens) ? _structure_describe($fresh, $opt, $depth + 1, $stack, [$fresh]) : undef),
 				n     => scalar @{ $fresh },
 				lens  => \@lens,
 			};
@@ -765,10 +784,109 @@ sub _structure_describe {
 		return { # SCALAR / REF
 			kind  => 'sref',
 			class => $class,
-			node  => _structure_describe([[ map { ${ $_ } } @{ $fresh } ]], $opt, $depth + 1, $stack),
+			node  => _structure_describe([[ map { ${ $_ } } @{ $fresh } ]], $opt, $depth + 1, $stack, [$fresh]),
 		};
 	}
 	return { kind => 'leaf', types => { $k => 1 } };
+}
+
+# The leaf types for a place whose every value was cut off because it is
+# already being described further out.  Up to 0.0242 that was always
+# '(cycle)', but a value shared by two places, such as $b in [$a, $b] with
+# $a->{child} = $b, was cut just the same and so was called a cycle when the
+# data had none.  Following it instead, through every path, is exact but can
+# grow without bound: a tree whose n nodes each list their siblings has
+# roughly n**3 paths through them, against the n steps the cut-off takes.  So
+# the cut stays and only its label changes.
+#
+# A reference X held by a container P lies on a loop exactly when X leads
+# back to P, that is, when they share a strongly connected component of the
+# whole structure's graph.  So each reference to a cut value from this place
+# -- under the hash key it came from, when it came from one, because P may
+# hold X under another key as part of a different loop -- is '(cycle)' or
+# '(shown above)', and a place with both kinds shows both.  The components
+# are found once per call to structure(), and only once something is cut.
+sub _structure_cut_label {
+	my ($all, $up, $opt) = @_;
+	my ($from, $key) = @{ $up };
+	my $comp = $opt->{scc} //= _structure_scc($opt->{root});
+	my %cut = map { Scalar::Util::refaddr($_) => 1 } @{ $all };
+	my %types;
+	for my $p (@{ $from }) {
+		my $pc = $comp->{ Scalar::Util::refaddr($p) };
+		my @held = !defined $key      ? @{ _structure_kids($p) }
+		         : exists $p->{$key}  ? ($p->{$key})
+		         :                      ();
+		for my $kid (@held) {
+			next unless ref $kid && $cut{ Scalar::Util::refaddr($kid) };
+			$types{ $comp->{ Scalar::Util::refaddr($kid) } == $pc ? '(cycle)' : '(shown above)' } = 1;
+		}
+	}
+	return \%types;
+}
+
+# The containers $v holds directly, as _structure_describe descends into them:
+# hash values, array elements and the referent of a scalar reference.
+sub _structure_kids {
+	my ($v) = @_;
+	my $rt = Scalar::Util::reftype($v);
+	return [ grep { ref $_ && _structure_kind($_) =~ /(?:\A|=)(?:HASH|ARRAY|SCALAR|REF)\z/ }
+		$rt eq 'HASH' ? values %{ $v } : $rt eq 'ARRAY' ? @{ $v } : ${ $v } ];
+}
+
+# Strongly connected components of the containers reachable from $root, as
+# { refaddr => component number }, by Tarjan's algorithm (R. E. Tarjan, "Depth-
+# first search and linear graph algorithms", SIAM J. Comput. 1(2), 1972).  It
+# runs on an explicit stack rather than by recursion, because a linked list a
+# few thousand nodes long would otherwise die of "Deep recursion" under FATAL
+# warnings.
+#
+# Two hashes rather than the textbook's four, which on 300,000 records took
+# 95 MB: %low holds exactly the nodes on Tarjan's stack, so it doubles as the
+# on-stack set, and each node's entry in %num is its visiting order until its
+# component is found, then its component number.
+sub _structure_scc {
+	my ($root) = @_;
+	my (%num, %low, @stack, @frames);
+	my ($next, $ncomp) = (0, 0);
+	for my $w (@{ _structure_kids([$root]) }) {   # [$root]: so that a $root that is no container is skipped
+		my $addr = Scalar::Util::refaddr($w);
+		$num{$addr} = $low{$addr} = $next++;
+		push @stack, $addr;
+		push @frames, [ $addr, _structure_kids($w), 0 ];   # refaddr, its containers, how many visited
+	}
+	while (@frames) {
+		my $f = $frames[-1];
+		my $addr = $f->[0];
+		if ($f->[2] < @{ $f->[1] }) {
+			my $w = $f->[1][ $f->[2]++ ];
+			my $kaddr = Scalar::Util::refaddr($w);
+			if (!exists $num{$kaddr}) {
+				$num{$kaddr} = $low{$kaddr} = $next++;
+				push @stack, $kaddr;
+				push @frames, [ $kaddr, _structure_kids($w), 0 ];
+			} elsif (exists $low{$kaddr} && $num{$kaddr} < $low{$addr}) {
+				$low{$addr} = $num{$kaddr};
+			}
+			next;
+		}
+		pop @frames;
+		my $low = $low{$addr};
+		if ($low == $num{$addr}) {
+			my $kaddr;
+			do {
+				$kaddr = pop @stack;
+				delete $low{$kaddr};
+				$num{$kaddr} = $ncomp;
+			} until $kaddr == $addr;
+			$ncomp++;
+		}
+		if (@frames) {
+			my $p = $frames[-1][0];
+			$low{$p} = $low if $low < $low{$p};
+		}
+	}
+	return \%num;
 }
 
 sub _structure_array_desc {
@@ -860,7 +978,7 @@ sub structure {
 
 	my @lines;
 	push @lines, $c->('key', $opt{as}) if defined $opt{as};
-	_structure_render(undef, _structure_describe([[$ref]], \%opt, 0, {}), 0, \%opt, $c, \@lines);
+	_structure_render(undef, _structure_describe([[$ref]], { %opt, root => $ref }, 0, {}, [[]]), 0, \%opt, $c, \@lines);
 	my $out = join("\n", @lines) . "\n";
 	print {$fh} $out unless $opt{output} eq 'string';
 	return $out;
@@ -1015,17 +1133,19 @@ Returns the whole of a file as one string, read without any decoding layer.  A f
 
 Puts a comma between each group of three digits of the integer part and appends the hundredths, rounded half up.  The second argument is the C<sprintf> format the hundredths are printed with, C<'.%02d'> by default; C<'%.0u'> rounds half up to a whole number and prints no fraction.  Rounding that carries into the integer part does so (C<0.999> is C<1.00>), a negative number keeps its sign, a number that rounds to zero has none, and a large number is grouped as digits rather than printed in exponent form.  Infinity and NaN are returned as perl prints them.
 
+What is rounded is the number perl holds, which is binary, not the decimal written in the source.  Most decimal fractions have no exact binary form, so a value written as exactly half a cent is stored a little above or below it, and rounds accordingly: C<1.005> is held as 1.00499999999999989... where perl's numbers are doubles, so C<format_commas(1.005)> is C<'1.00'>, and likewise C<2.675> gives C<'2.67'> and C<9.995> gives C<'9.99'>, which is also what C<sprintf('%.2f', ...)> prints.  Money that must round by its decimal digits should be kept in whole cents, or in C<Math::BigFloat>.
+
 =head2 json_file_to_ref
 
  my $ref = json_file_to_ref('results.json');
 
-Reads a JSON file and returns the decoded data, through C<JSON::MaybeXS>.  Python's C<json> module and NumPy write C<NaN>, C<Infinity> and C<-Infinity> as bare words, which are not JSON; where one of those stands as a value it is read as C<null>, so it becomes C<undef>.  The same words inside a string are left alone.  A file that does not exist, or is empty, dies.
+Reads a JSON file and returns the decoded data, through C<JSON::MaybeXS>.  Python's C<json> module and NumPy write C<NaN>, C<Infinity> and C<-Infinity> as bare words, which are not JSON; where one of those stands as a value, or is the whole document, it is read as C<null>, so it becomes C<undef>.  The same words inside a string are left alone.  A file that does not exist, or is empty, dies.
 
 =head2 ref_to_json_file
 
  ref_to_json_file($data, 'results.json');   # prints "Wrote results.json"
 
-Writes a data structure to a file as JSON, through C<JSON::MaybeXS>, prints C<Wrote> and the file name, and returns the file name.  The name is colored by the rule C<structure>'s C<< color =E<gt> 'auto' >> follows: when C<STDOUT> is a terminal, or C<CLICOLOR_FORCE> is set, and C<NO_COLOR> is not.  The file name must be a plain string; a reference dies, and so does a write that fails, such as on a full disk, before anything is printed.
+Writes a data structure to a file as JSON, through C<JSON::MaybeXS>, prints C<Wrote> and the file name, and returns the file name.  The name is colored by the rule C<structure>'s C<< color =E<gt> 'auto' >> follows: when C<STDOUT> is a terminal, or C<CLICOLOR_FORCE> is set, and C<NO_COLOR> is not.  The file name must be a plain string; a reference dies, and so does a write that fails, such as on a full disk, before anything is printed.  A structure that cannot be encoded, such as one holding a code reference or a reference to itself, dies before the file is opened, so an existing file of that name is left as it was.
 
 =head2 random_key, random_value
 
@@ -1059,7 +1179,7 @@ prints
              [*]: string
          name: string
 
-A key that only some of the merged hashes have is marked C<?>.  Values in the same place that are of different kinds are shown as a C<UNION> of each kind.  Arrays show the range of their lengths.  Blessed references show their class.  A reference back to a containing structure is shown as C<(cycle)> rather than followed.
+A key that only some of the merged hashes have is marked C<?>.  Values in the same place that are of different kinds are shown as a C<UNION> of each kind.  Arrays show the range of their lengths.  Blessed references show their class.  A reference to something already being described further out is not followed again.  It is shown as C<(cycle)> when it leads back to the container that holds it, so that following it would go round forever, and as C<(shown above)> when it does not, as when the same hash is both an element of an array and held by another element; a place holding both kinds shows C<(cycle)|(shown above)>.
 
 It takes these options after the reference:
 

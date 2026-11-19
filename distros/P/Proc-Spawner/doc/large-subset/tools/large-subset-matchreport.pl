@@ -38,9 +38,9 @@
 #   (large-subset-env-setups.tsv) of the samples of the setups without FAMILY, from base and s1, ... alone.
 #   -step3 [-class affects-shell]: the record is step 3's (large-subset-env-control.tsv: the class control, the default;
 #   large-subset-env-affects-shell.tsv), with its own header lines first.
-#   -ai large-subset-ai-classes.tsv (2026-11-13): the samples classified by reading count in the level table as N+M=T
-#   (found by the programs + classified by reading = all): AI-strict in strict, AI-values passed on unchanged and on split
-#   in those rows; the others of them stay undecided, all classified by reading.
+#   -ai large-subset-ai-classes.tsv (2026-11-13): the samples classified by Claude reading them count in the level table as N+M=T
+#   (found by the programs + classified by Claude reading them = all): AI-strict in strict, AI-values passed on unchanged and on split
+#   in those rows; the others of them stay undecided, all classified by Claude reading them.
 #   -q LABEL=QDIR (LABEL as for -run): the logging run (large-subset-runcompare.pl -q) of that environment, for its calls of echo, printf,
 #   test, [, kill, pwd; -calls: large-subset-threeway.pl -db over those runs, each call's answers by dash's builtin,
 #   bash's builtin and the program.  Without them builtin-vs-coreutils is never found.
@@ -117,7 +117,7 @@ if ($CALLS) { open my $in, '<', $CALLS or die "$CALLS: $!"; while (<$in>) { my $
 for my $q (@QRUNS) { my ($label, $dir) = $q =~ m{^([\w-]+(?:/[\w-]+)?)=(.+)\z} or die "-q $q: LABEL=DIR\n";
   my @f = glob "$dir/run-*.jsonl" or die "-q $q: no run-*.jsonl\n";
   for my $f (@f) { open my $in, '<', $f or die; while (<$in>) { my $s = eval { decode_json($_) } or next; my $c = $QC{$s->{id}}{$label} = [];
-    for my $l (records($s->{ours}{rec}, qr/^[^\035\037]*\035/)) { next unless $l =~ s/^perl[^\035\037]*\035//; my ($n) = split /\037/, $l;   # a program (kill)
+    for my $l (records($s->{ours}{rec}, qr/^[^\035\037]*\035/)) { next unless $l =~ s/^perl[^\035\037]*\035//; my ($n) = split /[\036\037]/, $l;   # a program (kill)
       push @$c, $l if defined $n && $TOOL{$n} }
     for my $b (records($s->{ours}{builtins}, qr/^[^\035\036\037]*\035/)) { my ($h, undef, $l) = split /\035/, $b, 3;   # inside Perl (IP1)
       next unless $h eq 'Proc::ShellSpawn::inproc' && defined $l; my ($n) = split /\037/, $l; push @$c, $l if defined $n && $TOOL{$n} } } } }
@@ -143,7 +143,7 @@ sub setups_of { my ($c, $p) = @_; sort { ($a =~ /(\d+)\z/)[0] <=> ($b =~ /(\d+)\
 for my $id (sort keys %C) { my $lv = $LV{$id} or next; my $c = $C{$id}; next unless $c->{base};
   my @env = ('base', setups_of($c, ''), map { my $f = $_; (grep(defined $c->{$_}, "$f/base"), setups_of($c, "$f/")) } sort keys %FAMS);
   my $row = $lv ne 'A' ? $lv : ($CODE{$id} // '') =~ /splitglob/ ? 'A2' : ($CODE{$id} // '') =~ /passthrough/ ? 'A1' : 'A';   # the rows (LV1)
-  my $ai = defined $AIC{$id} ? 1 : 0; $row = $AIROW{$AIC{$id}} // $row if $ai;   # (-ai) found by the programs: 0; by reading: 1
+  my $ai = defined $AIC{$id} ? 1 : 0; $row = $AIROW{$AIC{$id}} // $row if $ai;   # (-ai) found by the programs: 0; by Claude reading them: 1
   $MANY{$row} = 1 if @env > 1;
   my @cl = map $c->{$_}, @env; my @nt = grep $cl[$_] ne 'timeout', 0 .. $#cl;
   my $shells = !@nt ? 'timeout' : !grep(!$AGREE{$cl[$_]}, @nt) ? 'agree' : !grep($AGREE{$cl[$_]}, @nt) ? 'differ' : 'some';
@@ -187,7 +187,7 @@ printf "| %-54s | %13s | %s |\n", 'level', 'samples', join ' | ', map sprintf('%
 sub pm { my $v = $_[0] // []; my ($p, $a) = ($v->[0] // 0, $v->[1] // 0); $a ? sprintf('%s+%s=%s', fmtn($p), fmtn($a), fmtn($p + $a)) : fmtn($p) }   # N+M=T, or N
 for my $l (grep $N{$_}, qw(S H A A1 A2 P U)) { printf "| %-54s | %13s | %s |\n", $LN{$l}, pm($N{$l}), join ' | ',   # some: only where it ran in
   map { $_ eq 'some' && !$MANY{$l} ? sprintf('%13s', 'N/A') : sprintf('%13s', pm($T1{$l}{$_})) } @SH }   # several environments
-print "N+M=T: N found by the programs (the parse trees, step 3's rules), M classified by reading (AI-...), T both.\n" if $AIF;
+print "N+M=T: N found by the programs (the parse trees, step 3's rules), M classified by Claude reading them (AI-...), T both.\n" if $AIF;
 
 # The two trees (post-0.11, the user's layout, 2026-11-11): every sample in one box by the match; the columns by
 # builtin-vs-coreutils; tree 2 splits each box by legalization.  Then the totals, the commands, the rulings, the rest.

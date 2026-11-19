@@ -2,12 +2,12 @@
 
 Status: 2026-10-29. Covers the two test files of the shell-subset parser ([`ShellSubset.pm`](../../lib/Proc/ShellSubset.pm)):
 
-- [`shell-subset-tests.pl`](../../t/parser/shell-subset-tests.pl): 204 hand-written tests, one rule of [`shell-subset-spec.md`](shell-subset-spec.md) per line.
+- [`shell-subset-tests.pl`](../../t/parser/shell-subset-tests.pl): 222 hand-written tests (204 on 2026-10-29), one rule of [`shell-subset-spec.md`](shell-subset-spec.md) per line.
 - [`shell-subset-corpus-tests.pl`](../../t/parser/shell-subset-corpus-tests.pl): 612 tests taken from public collections of shell commands, one per group of very similar commands.
 
-Every test line carries a **snippet ID** that says where its text comes from. (The same IDs name the 40,410 corpus samples of the large parser's measurement: [`../large-subset/large-subset-provenance.tsv`](../large-subset/large-subset-provenance.tsv) has one line per sample, by ID, with what its run-time comparison may depend on, known issue X27; the codes: [`../large-subset/large-subset-environment.md`](../large-subset/large-subset-environment.md).) With the pinned sources below, [`prov.pl`](tools/prov.pl) restores the text of every corpus test from its ID alone; on 2026-10-29 all 612 restored exactly.
+Every test line carries a **snippet ID** that says where its text comes from. (The same IDs name the 40,410 corpus samples of the large parser's measurement: [`../large-subset/large-subset-provenance.tsv`](../large-subset/large-subset-provenance.tsv) has one line per sample, by ID, with what its run-time comparison may depend on, known issue [X27](../pspawn-known-issues.md#my-x27); the codes: [`../large-subset/large-subset-environment.md`](../large-subset/large-subset-environment.md).) With the pinned sources below, [`prov.pl`](tools/prov.pl) restores the text of every corpus test from its ID alone; on 2026-10-29 all 612 restored exactly.
 
-## 1. Test line format
+## <a id="my-section-1"></a>1. Test line format
 
 ```
 ok|rej  OPTIONS  ID  TEXT
@@ -15,12 +15,12 @@ ok|rej  OPTIONS  ID  TEXT
 
 - `ok` / `rej`: the expected result (parsed, or rejected).
 - `OPTIONS`: parser options separated by commas, or `-` for none (`nocaret`, `nopwd`, `assign`, `param_ops`, `if`, `while`, `for`, `case`, `read`, `brace`, `empty`, `fdmulti`, `tilde_args`).
-- `ID`: the snippet ID (section 2). It contains no blanks.
+- `ID`: the snippet ID ([section 2](#my-section-2)). It contains no blanks.
 - `TEXT`: the string given to the parser, after one or two blanks. `@N`, `@T` and `@R` stand for newline, tab and carriage return.
 
-In the corpus file, the line before each test starts with `#` and names its group (section 5).
+In the corpus file, the line before each test starts with `#` and names its group ([section 5](#my-section-5)).
 
-## 2. Snippet IDs
+## <a id="my-section-2"></a>2. Snippet IDs
 
 An ID is `PREFIX:LOCATOR`. The prefix names the source:
 
@@ -52,7 +52,7 @@ The snippet is that span with leading and trailing white space removed. Examples
 
 When the same text occurs in several places, its ID names the first occurrence in this order: TL, NB, SC, BC, PS, PB, MK, and within a source the order in which [`extract.pl`](tools/extract.pl) reads the files.
 
-## 3. Sources (pinned)
+## <a id="my-section-3"></a>3. Sources (pinned)
 
 The IDs are valid for exactly these versions.
 
@@ -68,7 +68,7 @@ The IDs are valid for exactly these versions.
 
 The MK PDF: `Managing Projects with GNU Make, 3rd Edition.pdf`, 2,452,105 bytes, 302 pages, SHA-256 `b188a032481ff3b41a84f96b86a3e89b75b63c847e19344dd2edc04220fd88b0`, downloaded from `https://raw.githubusercontent.com/yjjing/ebooks/master/Managing%20Projects%20with%20GNU%20Make%2C%203rd%20Edition.pdf` (the same file is in the repository `a10ncoder/books`). Text made with `pdftotext -layout` from poppler 24.02.0; the resulting `make3.txt` has SHA-256 `866d44b86ac8fccc510ed31970b30ea7dc780d12e8681017d6d3f8489d6324d6`. Another `pdftotext` version may break lines differently and shift the MK locators.
 
-## 4. Restoring the sources
+## <a id="my-section-4"></a>4. Restoring the sources
 
 ```sh
 mkdir corpora && cd corpora
@@ -97,7 +97,7 @@ perl prov.pl CORPORA_DIR --check shell-subset-corpus-tests.pl   # restore and co
 
 The NL2Bash repository is large (about 220 MB, mostly other data); only `data/bash/all.cm` is used.
 
-## 5. How the samples were taken and the tests chosen
+## <a id="my-section-5"></a>5. How the samples were taken and the tests chosen
 
 The scripts, in order (all in [`doc/parsers/tools/`](tools), formerly `corpus-run.tar.gz`):
 
@@ -115,7 +115,7 @@ The scripts, in order (all in [`doc/parsers/tools/`](tools), formerly `corpus-ru
 
 Counts on 2026-10-29: 29,672 TL one-liners, 10,624 NB, 330 MK, 81 BC scripts, 44 PS and 122 PB code blocks, 1,667 SC test strings (after removing duplicates within a source). They give 337 accepted and 275 rejected groups.
 
-## 6. Limits
+## <a id="my-section-6"></a>6. Limits
 
 - The MK extraction is heuristic: some "recipe lines" are prose or make syntax that the filter missed.
 - tldr examples contain notation that is not shell syntax (`on|off` for alternatives, `<Ctrl> + c` for keys); such strings are kept as found.

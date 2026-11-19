@@ -1,7 +1,7 @@
 package Review::Helper::CLI::Iterate;
 use v5.36;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Review::Helper::Builder;
 use Review::Helper::DB;

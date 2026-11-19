@@ -1,12 +1,12 @@
 # Perl on Windows: `system LIST` and its handles — drafts of bug reports (2026-11-07, 4 added 2026-11-10; not yet filed)
 
 Found while making Proc::Spawner start children through Perl's own spawn (`system { FILE } 1, ARGV`, decision M2;
-[`doc/pspawn-spawner.md`](pspawn-spawner.md), section 8).  Seen with Strawberry Perl 5.38.2.2 (64-bit) under Wine 9.0 on Ubuntu 24.04;
+[`doc/pspawn-spawner.md`](pspawn-spawner.md#my-section-8), section 8).  Seen with Strawberry Perl 5.38.2.2 (64-bit) under Wine 9.0 on Ubuntu 24.04;
 the code read is `win32/win32.c` of perl v5.38.2.  **Not checked on real Windows**; the reports should say so, or be
 checked there first.  Where to file: <https://github.com/Perl/perl5/issues> for 1, 2 and 4; point 3 may be a security
 issue and goes to Perl's security contact first (see `perlsecpolicy`), not to a public issue.
 
-## 1. `system LIST` / `exec LIST`: the command line is not quoted as the child splits it back
+## <a id="my-section-1"></a>1. `system LIST` / `exec LIST`: the command line is not quoted as the child splits it back
 
 **Summary.** On Windows a child gets one command line, which its C runtime splits back into `argv`
 (`CommandLineToArgvW`'s rules: `\"` is a quote character, backslashes before a `"` are halved, `""` is an empty
@@ -29,7 +29,7 @@ runtime's rules (in quotes; each run of backslashes before a `"` doubled and the
 doubled), as Python's `subprocess.list2cmdline` and Rust's `std::process::Command` do.  An argument that already
 starts and ends with `"` is now copied as it is; that special case would go (or stay only for the shell cases).
 
-## 2. `system LIST` of a missing program runs cmd.exe
+## <a id="my-section-2"></a>2. `system LIST` of a missing program runs cmd.exe
 
 **Summary.** When `CreateProcess` fails, `Perl_do_aspawn()` retries the same argument list through the shell
 (`w32_perlshell_vec`, `cmd.exe /x/d/c`, "possible shell-builtin"), also for the list form, which by `perlfunc` does not
@@ -50,7 +50,12 @@ The second form retries with the same program (so no shell runs), but the result
 **Suggested fix:** no shell retry for the list form (keep it for `system STRING`, if at all); return `-1` with `$!`
 when nothing could be started.
 
-## 3. Batch files (to check, then report privately)
+**Not to be reported as it stands** (the user, 2026-11-13, in the work on a patch to Perl's spawn on Windows: "`dir`
+is sacrosanct"): the shell's own commands must keep working in the list form, `system 'dir', '/b'`.  On real Windows
+the first call above returns 256 (the user's report), not Wine's 12544.  Also (from that work): `system 1, STRING`,
+one string after the 1, reaches the shell only through this retry, and `IPC::Open3` relies on it (`system 1, @_`).
+
+## <a id="my-section-3"></a>3. Batch files (to check, then report privately)
 
 For a `.bat` or `.cmd` program, `create_command_line()` puts the whole line in one pair of quotes and lets
 `CreateProcess` start cmd.exe, without escaping the arguments for cmd.  Whether cmd then interprets characters such
@@ -58,7 +63,7 @@ as `&`, `|`, `%` in the arguments (the class of CVE-2024-24576, "BatBadBut") was
 even run the batch file this way (it does not strip the outer quotes as Windows' cmd does).  To be checked on real
 Windows before anything is reported, and then through the security contact.
 
-## 4. Every child gets every handle: `$^F` is not honoured on Windows
+## <a id="my-section-4"></a>4. Every child gets every handle: `$^F` is not honoured on Windows
 
 (Found 2026-11-09, X38 in [`pspawn-known-issues.md`](pspawn-known-issues.md).)
 
@@ -87,7 +92,7 @@ print "parent: child still waiting for end of file after 5 s\n"; kill 'KILL', $p
 `PROC_THREAD_ATTRIBUTE_HANDLE_LIST` (Vista and later), which is also thread-safe.  At the least, `perlvar` and
 `perlport` should say that `$^F` has no effect on Windows.
 
-## 5. Where this distribution works around them, and what to do when Perl is fixed
+## <a id="my-section-5"></a>5. Where this distribution works around them, and what to do when Perl is fixed
 
 All of these concern the primitive `system1` only (Perl's own spawn, used where the module has no `posix_spawn`:
 on Windows only when it is masked, `PROC_SPAWNER_MISSING=posix_spawn`); the default primitive there,
@@ -100,8 +105,8 @@ on Windows only when it is masked, `PROC_SPAWNER_MISSING=posix_spawn`); the defa
 | 1 | [`t/try.pl`](../t/try.pl), [`t/portable.t`](../t/portable.t) | the shell string comes from a file (`TRY_FILE`), not from an argument | may stay (also convenient elsewhere) |
 | 1 | [`t/spawner.t`](../t/spawner.t) | the Perl programs it starts are written to files (`pe`), not given with `-e` | may go back to `-e` |
 | 1 | [`t/portable.t`](../t/portable.t), [`t/loop.t`](../t/loop.t) | a line written without `"` in an argument; a child's words without `"` | may stay |
-| 1 | `sh` as Perl (SH1, [`pspawn-shell-windows.md`](pspawn-shell-windows.md)) | nothing: the text after `-c` is an argument; [`t/portable.t`](../t/portable.t)'s line `sh -c 'echo "$0..."' nm a b` is TODO under `system1` | it passes: remove the TODO |
-| 2 (cmd.exe retry) | the module (`win_find` in `Spawner.pm`) | the program is looked up before Perl's spawn is called, so a missing one is ENOENT and Perl never retries through cmd.exe | nothing to do (the lookup is posix_spawn's meaning of FILE anyway) |
+| 1 | `sh` as Perl (SH1, [`pspawn-shell-windows.md`](pspawn-shell-windows.md)) | nothing: the text after `-c` is an argument; [`t/portable.t`](../t/portable.t)'s line `sh -c 'echo "$0..."' nm a b` is TODO under `system1`, and so are two lines of its battery, `A=1 B=$(…) sh -c 'echo "[$B]"'` (post-0.12, its list `%SYSTEM1`) | they pass: remove the TODO |
+| 2 (cmd.exe retry) | the module (`win_find` in `Spawner.pm`) | the program is looked up before Perl's spawn is called, so a missing one is ENOENT and Perl never retries through cmd.exe (nothing else here rests on the list form not reaching the shell: the retry stays in Perl, see 2) | nothing to do (the lookup is posix_spawn's meaning of FILE anyway) |
 | 4 (handles) | the module (`system1` in `Spawner.pm`, X38) | our fds from 3 up are made not inheritable around the call and put back after; not thread-safe | remove it for the fixed versions of Perl |
 
 On POSIX, see [`perl-signals-findings.md`](perl-signals-findings.md) for Perl's signal and `waitpid` findings and

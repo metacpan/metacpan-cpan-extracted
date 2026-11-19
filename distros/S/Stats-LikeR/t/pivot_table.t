@@ -228,6 +228,23 @@ is_deeply(
 		'hoh: second colliding label suffixed');
 }
 
+# Two index tuples whose values read the same when joined are two rows.  Up to
+# 0.3424 the key was "v$_" joined with "\x1e", which made ("p\x1evq", "r") and
+# ("p", "q\x1evr") one string, and summed both rows into the first tuple's.
+# The columns tuple was keyed the same way.
+{
+	my @rows = ( { a => "p\x1evq", b => 'r',        c => 1,          v => 1 },
+	             { a => 'p',        b => "q\x1evr", c => 1,          v => 2 } );
+	is_deeply(pivot_table(\@rows, index => [qw(a b)], columns => 'c', values => 'v', aggfunc => 'sum'),
+		[ { a => 'p', b => "q\x1evr", 1 => 2 }, { a => "p\x1evq", b => 'r', 1 => 1 } ],
+		'index tuples that join to the same string stay apart');
+	my @cols = ( { k => 1, a => "p\x1evq", b => 'r', v => 1 },
+	             { k => 1, a => 'p', b => "q\x1evr", v => 2 } );
+	is_deeply(pivot_table(\@cols, index => 'k', columns => [qw(a b)], values => 'v', aggfunc => 'sum', sep => '|'),
+		[ { k => 1, "p|q\x1evr" => 2, "p\x1evq|r" => 1 } ],
+		'columns tuples that join to the same string stay apart');
+}
+
 # error paths
 dies_ok { pivot_table(undef) } 'undef data dies';
 throws_ok { pivot_table([ { a => 1 } ], 'oddarg') }

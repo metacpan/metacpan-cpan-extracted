@@ -10,14 +10,12 @@ use Test::More;
 use lib 'blib/lib', 'blib/arch';
 use ClickHouse::Encoder;
 
-# Decimal128(0): integer values up to (2^127 - 1) ~= 1.7e38
+# Decimal128(0): integer values up to 10^38 - 1 (declared precision 38)
 {
     my $enc = ClickHouse::Encoder->new(columns => [['v','Decimal128(0)']]);
 
-    # Maximum positive (2^127 - 1)
-    my $max_pos = '170141183460469231731687303715884105727';
-    # Maximum negative -2^127
-    my $max_neg = '-170141183460469231731687303715884105728';
+    my $max_pos = '9' x 38;
+    my $max_neg = '-' . $max_pos;
     my $bytes = $enc->encode([[$max_pos], [$max_neg], ['0'], ['1'], ['-1']]);
     my $blk   = ClickHouse::Encoder->decode_block($bytes);
     my @rows  = @{ $blk->{columns}[0]{values} };

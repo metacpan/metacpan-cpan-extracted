@@ -113,8 +113,8 @@ use ClickHouse::Encoder;
 }
 {
     # String-path overflow regression: 2^127 / 2^128 / 2^256 etc. must croak,
-    # not silently wrap. Boundary values (INT128_MAX / INT128_MIN / INT256_MAX
-    # / INT256_MIN) must still work.
+    # not silently wrap. The declared-precision limits must still work, and
+    # storage extremes past them croak.
     my $d128 = ClickHouse::Encoder->new(columns => [['v', 'Decimal128(0)']]);
     eval { $d128->encode([['170141183460469231731687303715884105728']]) };  # 2^127
     like($@, qr/Invalid decimal string/, 'Decimal128 string 2^127 (just past max) croaks');
@@ -122,18 +122,23 @@ use ClickHouse::Encoder;
     like($@, qr/Invalid decimal string/, 'Decimal128 string 2^128 croaks (no silent wrap)');
     eval { $d128->encode([['340282366920938463463374607431768211455']]) };  # 2^128-1
     like($@, qr/Invalid decimal string/, 'Decimal128 string UINT128_MAX croaks');
-    ok(defined eval { $d128->encode([['170141183460469231731687303715884105727']]) },
-        'Decimal128 string INT128_MAX accepted');
-    ok(defined eval { $d128->encode([['-170141183460469231731687303715884105728']]) },
-        'Decimal128 string INT128_MIN accepted');
+    ok(defined eval { $d128->encode([['9' x 38]]) }, 'Decimal128 string 10^38 - 1 accepted');
+    ok(defined eval { $d128->encode([['-' . '9' x 38]]) }, 'Decimal128 string -(10^38 - 1) accepted');
+    for my $extreme ('170141183460469231731687303715884105727', '-170141183460469231731687303715884105728') {
+        eval { $d128->encode([[$extreme]]) };
+        like($@, qr/Decimal128 overflow/, 'Decimal128 storage extreme exceeds precision 38');
+    }
 
     my $d256 = ClickHouse::Encoder->new(columns => [['v', 'Decimal256(0)']]);
     eval { $d256->encode([['115792089237316195423570985008687907853269984665640564039457584007913129639936']]) };  # 2^256
     like($@, qr/Invalid decimal string/, 'Decimal256 string 2^256 croaks');
-    ok(defined eval { $d256->encode([['57896044618658097711785492504343953926634992332820282019728792003956564819967']]) },
-        'Decimal256 string INT256_MAX accepted');
-    ok(defined eval { $d256->encode([['-57896044618658097711785492504343953926634992332820282019728792003956564819968']]) },
-        'Decimal256 string INT256_MIN accepted');
+    ok(defined eval { $d256->encode([['9' x 76]]) }, 'Decimal256 string 10^76 - 1 accepted');
+    ok(defined eval { $d256->encode([['-' . '9' x 76]]) }, 'Decimal256 string -(10^76 - 1) accepted');
+    for my $extreme ('57896044618658097711785492504343953926634992332820282019728792003956564819967',
+                     '-57896044618658097711785492504343953926634992332820282019728792003956564819968') {
+        eval { $d256->encode([[$extreme]]) };
+        like($@, qr/Decimal256 overflow/, 'Decimal256 storage extreme exceeds precision 76');
+    }
 }
 {
     # parse_date_string out-of-bounds read for month >= 14 (looks_like_date

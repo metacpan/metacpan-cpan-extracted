@@ -491,7 +491,7 @@ TkTextTagCmd(textPtr, interp, argc, args)
 	    if (TkTextRecordSet(textPtr, TK_TEXT_VC_RUN,
 		    TkBTreeVcRunPlace(textPtr, tagPtr, &index1), dataPtr,
 		    args[5])) {
-		/* Inside an edit step: the old value is in the step. */
+		/* Recorded (-undo on): the old value is in the undo step. */
 	    } else if (TkTextVcOn(textPtr)
 		    && (TkTextDataGetLang(*dataPtr) != NULL)) {
 		TkTextVcPredict(textPtr, *dataPtr, TK_TEXT_VC_DROP,

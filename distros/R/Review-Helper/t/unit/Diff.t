@@ -140,22 +140,136 @@ subtest removal_owners => sub {
     is(line_owners($all->{hunks}, []), [[undef, undef]], "nothing owns lines of a file that is gone");
 };
 
-# Docs right above their code (JSDoc): two parts, split where they meet; a
-# removed line takes the part of the line after it.
+# The shape of a section's hunks: part, header numbers, and each line's type
+# and number.
+sub hunk_shape($hunks) {
+    return [map { [$_->{part}, @{$_}{qw/old_start old_count new_start new_count/}, join(' ' => map { $_->{type} . ($_->{new} // $_->{old}) } @{$_->{lines}})] } @$hunks];
+}
+
+# Docs right above their code (JSDoc): one diff; a removed line where they
+# meet goes with the code after it.
 subtest section_hunks => sub {
     my @new      = ('x', '/** doc */', 'function f() {', '  two', '}', 'y');
     my $hunks    = parse_diff("@@ -2,4 +2,4 @@\n /** doc */\n-function f () {\n+function f() {\n-  one\n+  two\n }\n")->{hunks};
     my $sections = [{ranges => [[1, 1], [6, 6]], doc_ranges => []}, {ranges => [[3, 5]], doc_ranges => [[2, 2]]}];
 
-    my $out = section_hunks($hunks, \@new, $sections, 1);
     is(
-        [map { [$_->{part}, @{$_}{qw/old_start old_count new_start new_count/}, join(' ' => map { $_->{type} . ($_->{new} // $_->{old}) } @{$_->{lines}})] } @$out],
-        [['docs', 2, 1, 2, 1, ' 2'], ['code', 3, 3, 3, 3, '-3 +3 -4 +4  5']],
-        'docs, then code; the removed line goes with the code after it',
+        hunk_shape(section_hunks($hunks, \@new, $sections, 1)),
+        [['code', 2, 4, 2, 4, ' 2 -3 +3 -4 +4  5']],
+        'docs directly above the code: one code hunk, the removed line in place',
     );
 
     my $same = parse_diff("@@ -1,2 +1,2 @@\n-z\n+x\n /** doc */\n")->{hunks};
     is(section_hunks($same, \@new, $sections, 1), [], 'a unit with no changed line has no hunks');
+
+    my $docs = parse_diff("@@ -2,1 +2,1 @@\n-/** old */\n+/** doc */\n")->{hunks};
+    is(
+        hunk_shape(section_hunks($docs, \@new, $sections, 1)),
+        [['code', 2, 4, 2, 4, '-2 +2  3  4  5']],
+        'a change only in the docs still shows them with the code',
+    );
+};
+
+subtest section_hunks_blank_lines => sub {
+    # Docs, two blank lines, code, a blank line, more docs: each piece next
+    # to the other.
+    my @new      = ('x', '/** doc */', '', ' ', 'function f() {', '  two', '}', '', '// tail doc', 'y', 'z');
+    my $sections = [
+        {ranges => [[1, 1], [10, 11]], doc_ranges => []},
+        {ranges => [[5, 7]], doc_ranges => [[2, 2], [9, 9]]},
+    ];
+
+    my $hunks = parse_diff("@@ -6,1 +6,1 @@\n-  one\n+  two\n")->{hunks};
+    is(
+        hunk_shape(section_hunks($hunks, \@new, $sections, 1)),
+        [['code', 2, 8, 2, 8, ' 2  3  4  5 -6 +6  7  8  9']],
+        'docs above and below across blank lines: one hunk, the blank lines as context',
+    );
+
+    my @added_new      = ('x', '/** doc */', '', '', 'function f() {', '  two', '}', 'y');
+    my $added_sections = [{ranges => [[1, 1], [8, 8]], doc_ranges => []}, {ranges => [[5, 7]], doc_ranges => [[2, 2]]}];
+    my $added_lines    = parse_diff("@@ -2,4 +2,5 @@\n /** doc */\n+\n \n function f() {\n-  one\n+  two\n")->{hunks};
+    is(
+        hunk_shape(section_hunks($added_lines, \@added_new, $added_sections, 1)),
+        [['code', 2, 5, 2, 6, ' 2 +3  4  5 -5 +6  7']],
+        'an added blank line between them joins as it is',
+    );
+
+    my $removed          = parse_diff("@@ -2,4 +2,3 @@\n /** doc */\n-\n \n-function f () {\n+function f() {\n")->{hunks};
+    my @removed_new      = ('x', '/** doc */', '', 'function f() {', '  two', '}', 'y');
+    my $removed_sections = [{ranges => [[1, 1], [7, 7]], doc_ranges => []}, {ranges => [[4, 6]], doc_ranges => [[2, 2]]}];
+    is(
+        hunk_shape(section_hunks($removed, \@removed_new, $removed_sections, 1)),
+        [['code', 2, 6, 2, 5, ' 2 -3  3 -5 +4  5  6']],
+        'a removed blank line at the boundary joins too; the removed code line stays with the code',
+    );
+};
+
+subtest section_hunks_same_part => sub {
+    my @new      = ('/** a */', '', '// b', '', 'function f() {', '  two', '}');
+    my $sections = [{ranges => [[5, 7]], doc_ranges => [[1, 1], [3, 3]]}];
+    my $hunks    = parse_diff("@@ -6,1 +6,1 @@\n-  one\n+  two\n")->{hunks};
+    is(
+        hunk_shape(section_hunks($hunks, \@new, $sections, 0)),
+        [['code', 1, 7, 1, 7, ' 1  2  3  4  5 -6 +6  7']],
+        'two documentation runs apart only by blank lines join, and join the code',
+    );
+
+    my @code      = ('sub f {', '    2;', '}', '', 'f();');
+    my $code_secs = [{ranges => [[1, 3], [5, 5]], doc_ranges => []}];
+    my $code_diff = parse_diff("@@ -2,1 +2,1 @@\n-    1;\n+    2;\n")->{hunks};
+    is(
+        hunk_shape(section_hunks($code_diff, \@code, $code_secs, 0)),
+        [['code', 1, 5, 1, 5, ' 1 -2 +2  3  4  5']],
+        'so do two code runs',
+    );
+};
+
+subtest section_hunks_apart => sub {
+    my @new      = ('sub f {', '    2;', '}', '', 'sub g { }', '', '__END__', '', '=head2 f', '', 'Does f.', '');
+    my $sections = [
+        {ranges => [[1, 4]], doc_ranges => [[9, 12]]},
+        {ranges => [[5, 6]], doc_ranges => []},
+        {ranges => [[7, 8]], doc_ranges => []},
+    ];
+    my $hunks = parse_diff("@@ -2,1 +2,1 @@\n-    1;\n+    2;\n@@ -11,1 +11,1 @@\n-Did f.\n+Does f.\n")->{hunks};
+    is(
+        hunk_shape(section_hunks($hunks, \@new, $sections, 0)),
+        [['code', 1, 4, 1, 4, ' 1 -2 +2  3  4'], ['docs', 9, 4, 9, 4, ' 9  10 -11 +11  12']],
+        'docs far from the code stay a hunk of their own',
+    );
+
+    my @mid          = ('/** doc */', '// not mine', 'function f() {', '}');
+    my $mid_sections = [{ranges => [[3, 4]], doc_ranges => [[1, 1]]}, {ranges => [[2, 2]], doc_ranges => []}];
+    my $mid_hunks    = parse_diff("@@ -3,1 +3,1 @@\n-function f () {\n+function f() {\n")->{hunks};
+    is(
+        hunk_shape(section_hunks($mid_hunks, \@mid, $mid_sections, 0)),
+        [['docs', 1, 1, 1, 1, ' 1'], ['code', 3, 2, 3, 2, '-3 +3  4']],
+        'a line the unit does not own between them keeps them apart',
+    );
+
+    my @unowned          = ('/** doc */', '', '// stray', '', 'function f() {', '}');
+    my $unowned_sections = [{ranges => [[5, 6]], doc_ranges => [[1, 1]]}];
+    my $unowned_hunks    = parse_diff("@@ -5,1 +5,1 @@\n-function f () {\n+function f() {\n")->{hunks};
+    is(
+        hunk_shape(section_hunks($unowned_hunks, \@unowned, $unowned_sections, 0)),
+        [['docs', 1, 1, 1, 1, ' 1'], ['code', 5, 2, 5, 2, '-5 +5  6']],
+        'so does a non-blank line no unit owns, among blank lines',
+    );
+
+    my $gone          = parse_diff("@@ -1,4 +1,3 @@\n /** doc */\n-// removed\n function f() {\n-}\n+} # x\n")->{hunks};
+    my @gone_new      = ('/** doc */', 'function f() {', '} # x');
+    my $gone_sections = [{ranges => [[2, 3]], doc_ranges => [[1, 1]], old_ranges => [[3, 4]]}, {ranges => [], doc_ranges => [], old_ranges => [[2, 2]], deleted => 1}];
+    is(
+        hunk_shape(section_hunks($gone, \@gone_new, $gone_sections, 0)),
+        [['docs', 1, 1, 1, 1, ' 1'], ['code', 3, 2, 2, 2, ' 2 -4 +3']],
+        "another unit's removed line between them keeps them apart",
+    );
+    is(
+        hunk_shape(section_hunks($gone, \@gone_new, $gone_sections, 1)),
+        [['code', 2, 1, 1, 0, '-2']],
+        'and the deleted unit shows it',
+    );
 };
 
 subtest json_numbers => sub {

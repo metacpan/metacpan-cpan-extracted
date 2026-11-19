@@ -28,6 +28,18 @@ my @log;			# names of the objects destroyed, in order
 
 sub freed (&) { @log = (); $_[0]->(); my @r = @log; @log = (); return \@r }
 sub sfreed (&) { my $r = &freed($_[0]); return [sort @$r] }
+# Settings made with -undo off: not recorded, the value replaced is
+# freed when the command returns (with -undo on it waits in the undo
+# step).
+sub unrecorded {
+  my ($t, $code) = @_;
+  my $undo = $t->cget('-undo');
+  $t->configure(-undo => 0);
+  my $ok = eval { $code->(); 1 };
+  my $err = $@;
+  $t->configure(-undo => $undo);
+  die $err unless $ok;
+}
 # The name of the value of the run of $tag at $index ('-' if no run).
 sub rv { my ($t, $tag, $index) = @_;
 	 my $v = eval { $t->tagData($tag, $index) };
@@ -289,7 +301,8 @@ sub two_runs {
   is(rv($t, 'b', '1.0'), 'x', 'the merged run again');
   is_deeply(freed { $t->editUndo }, [], 'undo again');
   is(rv($t, 'b', '1.6'), 'y', 'the right value is back again');
-  is_deeply(freed { $t->tagData('b', '1.6', undef) }, ['y'], 'the undo history holds no copy');
+  is_deeply(freed { unrecorded($t, sub { $t->tagData('b', '1.6', undef) }) }, ['y'],
+	    'the undo history holds no copy');
 
   # The merged run takes the right value (the left one has none).
   $t->tagData('b', '1.0', undef);
@@ -363,10 +376,11 @@ sub two_runs {
 	    '-maxundo drops the step and frees the value');
   $t->configure(-maxundo => 0);
 
-  # The widget destroyed with values in the history.
+  # The widget destroyed with values in the history: h, deleted with
+  # the text, and w, which the setting of h replaced (recorded).
   $t->tagData('b', '1.3', V->new('h'));
   $t->delete('1.0', 'end');
-  is_deeply(freed { $t->destroy; $mw->update }, ['h'], 'the widget frees the values of its history');
+  is_deeply(sfreed { $t->destroy; $mw->update }, [qw(h w)], 'the widget frees the values of its history');
 }
 
 # ---------------------------------------------------------------------

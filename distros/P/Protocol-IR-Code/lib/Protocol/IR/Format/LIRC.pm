@@ -2,7 +2,7 @@ package Protocol::IR::Format::LIRC;
 use strict;
 use warnings;
 
-our $VERSION = '1.2';
+our $VERSION = '1.3';
 
 use Protocol::IR::Code;
 
@@ -603,7 +603,7 @@ Protocol::IR::Format::LIRC - LIRC remote definition format (.lircd.conf) import 
 
 =head1 VERSION
 
-version 1.2
+version 1.3
 
 =head1 SYNOPSIS
 
@@ -719,7 +719,8 @@ Brett T. Warden <bwarden@cpan.org>
 Copyright (c) 2026 Brett T. Warden
 
 This library is free software; you can redistribute it and/or modify it
-under the terms of the GNU Lesser General Public License version 2.1 as
-published by the Free Software Foundation.
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 2 of the License, or (at your
+option) any later version.
 
 =cut

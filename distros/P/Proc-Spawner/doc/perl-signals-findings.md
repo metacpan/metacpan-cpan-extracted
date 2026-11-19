@@ -2,7 +2,7 @@
 
 **The one place for these findings.** The user asked on 2026-11-01 that everything we learn about deficiencies of Perl's signal model be collected here, so that it can eventually be fixed in Perl itself. Add new findings here, with their evidence; other docs should point here instead of repeating them.
 
-Updated 2026-11-01. Tested on Perl 5.38.2 (Debian/Ubuntu build, threaded), glibc 2.39, Linux 6.18. The probe scripts are in `claude/perl-signals-probes.tar.gz-base64.txt`.
+Updated 2026-11-01. Tested on Perl 5.38.2 (Debian/Ubuntu build, threaded), glibc 2.39, Linux 6.18. The probe scripts are in the old Project's files, not shipped.
 
 Words used:
 - A **handler** is the Perl sub given for a signal, in `%SIG` or through `POSIX::sigaction`.
@@ -12,7 +12,7 @@ Words used:
 
 Each finding says what happens, how we know (tested here, or reasoned), what it costs us, and what Perl could change. **❰BUG❱** marks a defect.
 
-## 1. Delivering signals to Perl code
+## <a id="my-section-1"></a>1. Delivering signals to Perl code
 
 **S1. `POSIX::sigaction` installs immediate handlers by default, `%SIG` deferred ones.**
 - Source: `POSIX.pm` creates every `POSIX::SigAction` with `SAFE => 0`. The documentation only says that to handle a signal safely one sets the "safe" flag (`$action->safe(1)`), and points to perlipc.
@@ -23,7 +23,7 @@ Each finding says what happens, how we know (tested here, or reasoned), what it 
 - Tested (`stress.pl`): children end continuously, while the main program allocates and frees memory. The handler only writes one byte to a pipe and counts.
   - Immediate: 4 runs out of 4 aborted after a few seconds. glibc reported "malloc(): unaligned fastbin chunk detected", or a failed assertion in `sysmalloc`. Exit status 134 (SIGABRT).
   - Deferred: 4 runs out of 4 finished normally, each after about 24,000 children.
-- Consequence: the executor `ShellSpawn` installed exactly such a handler (`POSIX::sigaction` without `safe`) while its loop ran. Tested (`exec-stress.pl`, the executor running loops of short pipelines for 20 s): it died with a segmentation fault in 4 runs out of 4. Its known issue X8 (a stray "Undefined value assigned to typeglob" once, at the line that restores the old SIGCHLD action) is very likely this. Recorded as X14 in [`pspawn-known-issues.md`](pspawn-known-issues.md). Interim fix (B1 on the page "Child Exit Wake-up", applied 2026-11-01): a deferred handler, with a 50 ms timeout on `select` against S3; then 4 runs out of 4 finished normally, and the dash comparisons and speed did not change.
+- Consequence: the executor `ShellSpawn` installed exactly such a handler (`POSIX::sigaction` without `safe`) while its loop ran. Tested (`exec-stress.pl`, the executor running loops of short pipelines for 20 s): it died with a segmentation fault in 4 runs out of 4. Its known issue [X8](pspawn-known-issues.md#my-x8) (a stray "Undefined value assigned to typeglob" once, at the line that restores the old SIGCHLD action) is very likely this. Recorded as X14 in [`pspawn-known-issues.md`](pspawn-known-issues.md). Interim fix (B1 on the page "Child Exit Wake-up", applied 2026-11-01): a deferred handler, with a 50 ms timeout on `select` against S3; then 4 runs out of 4 finished normally, and the dash comparisons and speed did not change. The final fix, the same day, was D1: a C handler in the binding writes the wake-up byte (S3 (a) below; [`pspawn-extensions.md`](pspawn-extensions.md#my-section-6), section 6); B1 is only the fallback where the binding lacks it (X14).
 
 **S3. A deferred handler that becomes due just before a blocking call runs only after that call returns: a lost wake-up.**
 - Perl checks for pending signals only at certain points between operations. A signal that arrives after the last check, but before the system call (`select`, `sleep`, `read`, …) starts waiting, does not interrupt that call: the kernel delivered it already, to Perl's C handler, which only took a note.
@@ -33,7 +33,7 @@ Each finding says what happens, how we know (tested here, or reasoned), what it 
 - So in Perl, the standard "self-pipe" technique (the handler writes to a pipe the main loop watches) has no lost wake-up only with an immediate handler, which is unsafe (S2). With a deferred handler, a wake-up can come late by up to the wait's timeout, and never without one.
 - C programs avoid this with `pselect`/`ppoll` (block the signal, then atomically unblock it and wait), or by writing the byte from a C handler. Perl offers neither: `select` and `sleep` are plain calls, and a Perl handler cannot be a C function. (`POSIX::sigsuspend` is atomic, but waits for signals only, not for file descriptors.)
 - Perl could:
-  - (a) offer a built-in "signal to file descriptor" mode: `$SIG{CHLD} = \*FH` (or a `POSIX` function) makes Perl's C handler write a byte to that handle, safely, in addition to queuing the Perl handler. Prototyped in our binding (`PosixSpawn::chld_to_fd`, a C handler that only calls `write(2)`): no lost wake-up (`select` returned as soon as the sort of the S3 test ended, with a 30 s timeout), no crash under the S2 stress, and no measurable cost (`rate.pl`: about 1,900–1,980 children per second with no handler, a deferred Perl handler, or the C handler);
+  - (a) offer a built-in "signal to file descriptor" mode: `$SIG{CHLD} = \*FH` (or a `POSIX` function) makes Perl's C handler write a byte to that handle, safely, in addition to queuing the Perl handler. Prototyped in our binding (`Proc::Spawner::chld_to_fd`, at the time `PosixSpawn::chld_to_fd`, a C handler that only calls `write(2)`): no lost wake-up (`select` returned as soon as the sort of the S3 test ended, with a 30 s timeout), no crash under the S2 stress, and no measurable cost (`rate.pl`: about 1,900–1,980 children per second with no handler, a deferred Perl handler, or the C handler);
   - (b) or make its own blocking calls atomic with respect to pending deferred signals (check, then block with `pselect`/`ppoll` and the signal mask), so a signal noted just before the call still interrupts it.
 
 **S4. `kill` to the program's own pid runs pending deferred handlers at once.**
@@ -55,7 +55,7 @@ Each finding says what happens, how we know (tested here, or reasoned), what it 
 - Tested in the chat "Overriding waitpid in Perl" (2026-10-30): a pure-Perl `waitpid` wrapper was interrupted there by a handler that died; the status was lost, and a second `waitpid` returned -1.
 - Consequence: any Perl-level bookkeeping of statuses must block signals around the reap, or tolerate the loss.
 
-## 2. Children's exit statuses
+## <a id="my-section-2"></a>2. Children's exit statuses
 
 **C1. `$SIG{CHLD} = 'IGNORE'` discards the statuses of all children of the process.**
 - Tested (`facts.pl`, item 4): `waitpid` returned -1 ("No child processes"), and `system` returned -1. `SA_NOCLDWAIT` has the same effect (reasoned).
@@ -83,11 +83,11 @@ Each finding says what happens, how we know (tested here, or reasoned), what it 
 - Tested: `waitpid($pid, WNOHANG)` on a running child returns 0 and sets `$?` to -1 (as does a wait on a pid that is no child). A status kept in `$?` from before is lost.
 - Perl could: leave `$?` alone when nothing was reaped; at least document it.
 
-## 3. What children inherit
+## <a id="my-section-3"></a>3. What children inherit
 
 **I1. SIGFPE: Perl ignores it for itself, and restores the original setting only in its own `exec`.**
 - Perl ignores SIGFPE at startup (`PERL_FPU_INIT`) and puts back the setting it found then only in its own ways of starting programs (`exec`, and the child side of `system`, backticks and piped `open`) (`PERL_FPU_PRE_EXEC`, the global `PL_sigfpe_saved`). Children started any other way (posix_spawn, XS code) get SIGFPE ignored.
-- Tested: every child of the executor had SIGFPE ignored, until we read `PL_sigfpe_saved` from XS (`PosixSpawn::fpe_at_exec()`; fixed issue E1 in [`pspawn-known-issues.md`](pspawn-known-issues.md)).
+- Tested: every child of the executor had SIGFPE ignored, until we read `PL_sigfpe_saved` from XS (`Proc::Spawner::fpe_at_exec()`, at the time `PosixSpawn::fpe_at_exec()`; fixed issue E1 in [`pspawn-known-issues.md`](pspawn-known-issues.md)).
 - Perl could: expose that saved setting (for example in `POSIX`), so that other ways of starting programs can do the same without XS.
 
 **I2. Signals the Perl program ignores are ignored in its children too.**
@@ -96,14 +96,14 @@ Each finding says what happens, how we know (tested here, or reasoned), what it 
 
 **I3. For reference (documented, followed by us): `system` ignores SIGINT and SIGQUIT in the parent while it waits.**
 
-## 4. Where these came from
+## <a id="my-section-4"></a>4. Where these came from
 
 - This session's tests: `when.pl` (S1), `stress.pl` (S2), `window2.pl` (S3), `facts.pl` (S4, S5, S6, C1, C3), `checks2.pl` (S5, C1, and `select` on fd 1100, which works), `exec-stress.pl` (S2 in the executor), `chandler.pl` and `rate.pl` (the C handler of S3 (a)), `pidfd.pl` (a pidfd from `pidfd_spawn` becomes readable when the child exits: `select` returned after 0.30 s for `sleep 0.3`, with no signal handler).
-- The chat "Overriding waitpid in Perl" (2026-10-30) and its page "unwaitpid Design" (https://claude.ai/artifact/BsyqPKCyFpYSCH2aiZvFHw): C2, C3, S7, and the `waitid`/`WNOWAIT` technique. Its planned docs (`claude/unwaitpid-investigation.md`, `claude/unwaitpid-upstream-reports.md`) were never written; their Perl findings are here now.
-- The page "Run Graph API" (https://claude.ai/artifact/NGmE3geAjdC6bfTaGn3Kv3), items R4, R11, L4, L5, L6: S5, S6, C1, C2.
-- [`pspawn-run-shortcomings.md` (0.03)](https://metacpan.org/release/ILYAZ/Proc-Spawner-0.03/view/doc/pspawn-run-shortcomings.md) (in Proc-Spawner 0.03), section 3, and [`pspawn-design.md`](pspawn-design.md), sections 2 and 9: I1, I2, C1.
+- The chat "Overriding waitpid in Perl" (2026-10-30) and its page "unwaitpid Design" (not public): C2, C3, S7, and the `waitid`/`WNOWAIT` technique. Its docs (an investigation and upstream reports) were planned, never written; their Perl findings are here now.
+- The page "Run Graph API" ([`run-graph-api.html` (0.03)](https://metacpan.org/release/ILYAZ/Proc-Spawner-0.03/source/doc/checklists/run-graph-api.html), in Proc-Spawner 0.03), items R4, R11, L4, L5, L6: S5, S6, C1, C2.
+- [`pspawn-run-shortcomings.md` (0.03)](https://metacpan.org/release/ILYAZ/Proc-Spawner-0.03/view/doc/pspawn-run-shortcomings.md) (in Proc-Spawner 0.03), section 3, and [`pspawn-design.md`](pspawn-design.md#my-section-2), sections 2 and 9: I1, I2, C1.
 
-## 5. Candidates for reports to Perl (perlbug), none filed yet
+## <a id="my-section-5"></a>5. Candidates for reports to Perl (perlbug), none filed yet
 
 1. C3: assigning to `${^CHILD_ERROR_NATIVE}` sets `$^C` (confirmed in blead's `mg.c`).
 2. S1: document prominently that `POSIX::sigaction` handlers are immediate unless `safe(1)`; S2 shows the consequence.

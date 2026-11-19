@@ -31,6 +31,18 @@ $mw->geometry('+10+10');
 my @events;
 my $t = $mw->eText(-undo => 1, -autoseparators => 1, -width => 40,
 		   -height => 8)->pack;
+
+# A value set with -undo off: not recorded.  (With -undo on, since 2.10,
+# a setting joins the undo step of the edit before it, and its undo
+# comes first; these tests are about a value the undo of an edit finds
+# set after it.)
+sub unrecorded {
+  my ($code) = @_;
+  my $undo = $t->cget('-undo');
+  $t->configure(-undo => 0);
+  $code->();
+  $t->configure(-undo => $undo);
+}
 $t->blockConfigure('F');
 $t->blockConfigure('G');
 $t->debug(1);
@@ -308,7 +320,7 @@ $t->blockNodedata('2.1', 0, 'N');
 $t->blockNodedata('2.1', 1, 'R');
 $t->blockFlatten('2.1', -1);
 is(nd('2.1', 0), 'R', 'the leaf took the root\'s value (U2)');
-$t->blockNodedata('2.1', 0, 'L');
+unrecorded(sub { $t->blockNodedata('2.1', 0, 'L') });
 $t->editUndo;
 is_deeply([nd('2.1', 0), nd('2.1', 1)], ['N', 'L'],
 	  'the undo: the leaf\'s own value back, the one set after to the root (as a join)');
@@ -383,7 +395,7 @@ exact('a newline in a single leaf', sub { $t->insert('2.3', "\n"); 0 }, 0,
       [2, 4], [['F', 0, undef, [undef, ['V'], [undef]]], 'nu', sep(0), 'mden'],
       # (Provisional, O5) the root made real, the new leaf:
       ['new node [2.1 1] undef insert', 'new node [2.4 0] undef insert']);
-$t->blockNodedata('2.1', 1, 'R');
+unrecorded(sub { $t->blockNodedata('2.1', 1, 'R') });
 $t->editUndo;
 is_deeply([at(), nd('2.1', 0)], [6, 'V'], 'the undo: a single leaf');
 $t->editRedo;
@@ -407,7 +419,7 @@ exact('split level 2', sub { $t->blockSplit('2.3', 2) }, 2,
 # A value set on the root the split added: the undo of the split.
 single();
 $t->blockSplit('2.3', 1);
-$t->blockNodedata('2.1', -1, 'R');
+unrecorded(sub { $t->blockNodedata('2.1', -1, 'R') });
 $t->editUndo;
 is_deeply([at(), nd('2.1', 0)], [6, 'R'], 'the undo of split 1: the leaf takes the root\'s value');
 $t->editRedo;

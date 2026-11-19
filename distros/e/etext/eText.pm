@@ -7,7 +7,7 @@ package Tk::eText;
 
 use strict;
 use vars qw($VERSION);
-$VERSION = '2.09';
+$VERSION = '2.10';
 
 use Tk qw(Ev);
 use Tk::Text;

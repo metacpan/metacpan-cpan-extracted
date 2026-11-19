@@ -1,6 +1,6 @@
 use v5.40;
 
-package Acme::Parataxis::Blocking v0.1.3 {
+package Acme::Parataxis::Blocking v0.1.4 {
     use Config;
     use Exporter        qw[import];
     use Carp            qw[croak];
@@ -126,7 +126,7 @@ package Acme::Parataxis::Blocking v0.1.3 {
                 },
                 $code,
                 \@args,
-                $q,
+                $q
             );
         };
         if ( !$thr ) {

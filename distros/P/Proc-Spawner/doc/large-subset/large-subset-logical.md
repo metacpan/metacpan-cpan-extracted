@@ -2,7 +2,7 @@
 
 Prefix `large-subset-`. Written 2026-11-03 (0.04) on the user's decision of that day.
 
-## 1. The rule
+## <a id="my-section-1"></a>1. The rule
 
 Where dash and bash agree, the large subset behaves as they do (rule R-agree), and where both refuse a form, it refuses it too (R-refuse). These are the user's rules, and they are the only ones that bind the subset to the shells.
 
@@ -10,7 +10,7 @@ Where dash and bash agree, the large subset behaves as they do (rule R-agree), a
 
 Rule E covers forms both shells parse and run. It does not cover **bash-only syntax and builtins** (the group H1–H14 of the page "Shell Dialect Choices", in Proc-Spawner 0.03: `[[ ]]`, arrays, `${x/a/b}`, `source`, options of `read` that dash lacks, and the like): there dash fails, and "the logical behaviour" would mean adding a bash feature. Those stay rejected unless the user asks for one. The commands the subset runs as programs (R-program: `echo`, `printf`, `test`, `[`, `kill`, `time`, `pwd`, `true`, `false`) are not affected either.
 
-## 2. The categories
+## <a id="my-section-2"></a>2. The categories
 
 | Category | What makes one behaviour plainly logical |
 |---|---|
@@ -24,7 +24,7 @@ Rule E covers forms both shells parse and run. It does not cover **bash-only syn
 | **effect** | Only one reading gives the written text any effect (the other makes it a no-op). |
 | **none** | No plainly logical choice: each behaviour is consistent in its own way. The form stays rejected, or an earlier decision stands. |
 
-## 3. The list
+## <a id="my-section-3"></a>3. The list
 
 "Item" names where the difference was put to the user: "DC" items are on the page "Shell Dialect Choices" (`doc/checklists/dialect-choices.html` in Proc-Spawner 0.03; every item is decided in the table below), "CG" items on "Shell Corpus Gaps" (`doc/checklists/corpus-gaps.html` in Proc-Spawner 0.04; https://claude.ai/artifact/MXuAmoBmWRkjUAiRVnYtmN, private), "chat" means a message. "Feature" names the detector's feature ([`tools/large-subset-features.pl`](tools/large-subset-features.pl)); for the rows marked done its basis is now `E:CATEGORY`, and the difference counts as class X. A category in parentheses means the row is outside rule E, for the reason given. "Status" is that of post-0.04; a choice not yet implemented keeps the form rejected.
 
@@ -65,10 +65,10 @@ Rule E covers forms both shells parse and run. It does not cover **bash-only syn
 | — | — | `for v in …; do (cd "$v" \|\| continue; echo x) done`: `continue` ends the subshell, so `echo x` is skipped / `continue` does nothing there, and `echo x` runs | effect | dash | done in post-0.04 (status 0; also in `$( )` and in a pipeline element) |
 | — | — | `break` in a subshell inside a loop: the same difference as `continue` above | effect (as `continue`; Claude's extension, post-0.04: not on any page) | dash | done in post-0.04 |
 | — | — | a here-document cut off at the end of the string: an empty body, silently / the same, with a warning on standard error | none | — | rejected |
-| — | — | a trap action that sends its own signal again (`trap 'kill -INT $$' INT; kill -INT $$`, known issue X24): dash crashes (segmentation fault, status 139) / bash prints nothing, status 0 | (both fail; the parser cannot see it) | — | open (X24) |
+| — | — | a trap action that sends its own signal again (`trap 'kill -INT $$' INT; kill -INT $$`, known issue [X24](../pspawn-known-issues.md#my-x24)): dash crashes (segmentation fault, status 139) / bash prints nothing, status 0 | (both fail; the parser cannot see it) | — | open (X24) |
 | CG Q2 | sc3045-printf-v | `printf -v x %s hi`: an illegal option / sets `x` | (a bash-only option; R-program: the program `printf` runs) | — | unchanged: the program runs (Q2 decided, the user's choice B, 2026-11-03) |
 
-## 4. Earlier decisions checked against rule E
+## <a id="my-section-4"></a>4. Earlier decisions checked against rule E
 
 - R1 of "Shell Dialect Choices" (rule A3: reject every difference until it is decided on that page) is replaced by rule E. The page had no marks; its items stood at their defaults (A: reject) and are now decided by the list above.
 - K1–K3 (programs for `time`, `echo`, `kill %1`) and R-program stand; rule E does not touch them.

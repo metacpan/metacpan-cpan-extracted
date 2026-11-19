@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Test::Most;
 
+use File::Basename qw(dirname);
 use File::Path qw(make_path);
 use File::Spec;
 use File::Temp qw(tempdir);
@@ -124,6 +125,56 @@ ok(-d File::Spec->catdir($trash_root, '2023', '11', '13'), 'dry run deleted noth
 	my @t = gmtime();
 	is((File::Spec->splitpath($store->journal_path()))[2], sprintf('%04d-%02d.jsonl', $t[5] + 1900, $t[4] + 1),
 		"the journal file is named after this UTC month");
+}
+
+
+# --- a directory into the trash ---------------------------------------------------
+
+# A directory is renamed in one step, contents and all (the server trashes an
+# empty directory a client deleted, and a directory a file replaces).
+{
+	my $from = tempdir(CLEANUP => 1);
+	my $trash = File::Spec->catdir(tempdir(CLEANUP => 1), 'trash');
+	my $put = sub {
+		my ($rel, $content) = @_;
+		my $path = File::Spec->catfile($from, split m{/}, $rel);
+		make_path(dirname($path));
+		open my $out, '>', $path or die "Cannot write $path: $!";
+		print {$out} $content;
+		close $out;
+	};
+	$put->('dir/one.txt', "one\n");
+	$put->('dir/sub/two.txt', "two\n");
+	make_path(File::Spec->catdir($from, 'dir', 'empty'));
+
+	my $src = File::Spec->catdir($from, 'dir');
+	my $where = App::FileSync::Trash::move_to_trash(src => $src, rel => 'docs/dir', root => $trash, epoch => $now);
+	ok(!-e $src, 'the directory has left the tree');
+	ok(-d $where, 'and is a directory in the trash');
+	like($where, qr{\Q$trash\E.+docs.dir\z}, 'under its relative path in the day bucket');
+	ok(-f File::Spec->catfile($where, 'sub', 'two.txt'), 'its nested files came with it');
+	ok(-d File::Spec->catfile($where, 'empty'), 'and its empty subdirectory');
+
+	# The same path trashed again that day is kept beside the first.
+	make_path($src);
+	my $again = App::FileSync::Trash::move_to_trash(src => $src, rel => 'docs/dir', root => $trash, epoch => $now);
+	is($again, "$where.1", 'a second directory of the same name the same day gets .1');
+	ok(-d $where && -d $again, 'both are kept');
+
+	# A symlink to a directory is moved as a link; its target stays.
+	SKIP: {
+		my $target = File::Spec->catdir($from, 'target');
+		make_path($target);
+		my $link = File::Spec->catfile($from, 'link');
+		skip 'symlinks are not available here', 3 unless eval { symlink $target, $link };
+		my $moved_link = App::FileSync::Trash::move_to_trash(src => $link, rel => 'link', root => $trash, epoch => $now);
+		ok(-l $moved_link, 'a symlink to a directory goes as a link');
+		ok(!-e $link && !-l $link, 'and leaves the tree');
+		ok(-d $target, 'its target is not moved');
+	}
+
+	throws_ok { App::FileSync::Trash::move_to_trash(src => $src, rel => 'gone', root => $trash, epoch => $now) }
+		qr/\ACannot move \Q$src\E to /, 'a directory that is not there is trash.move';
 }
 
 done_testing();

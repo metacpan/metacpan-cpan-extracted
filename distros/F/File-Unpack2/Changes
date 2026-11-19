@@ -1,3 +1,8 @@
+2.04	kraih Thu Nov 19 11:40:00 CET 2026
+  - Fixed tarballs with directories lacking write or search permission (such as
+    npm's pngjs-5.0.0.tgz) failing to unpack when their members are not in
+    tree order.
+
 2.03	kraih Thu Oct 22 17:30:00 CEST 2026
   - Fixed the cached cpio command being returned as an array reference on
     every lookup after the first, which broke unpacking cpio archives when an

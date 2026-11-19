@@ -313,6 +313,13 @@ subtest 'highlight' => sub {
             unlike nup_highlight('--no-highlight script/nup'), qr/highlight/,
                 '--no-highlight wins over NUP_OPTS';
         }
+        # a style of the highlighter after a colon
+        like nup_highlight('--highlight=pandoc:breezedark script/nup'),
+            qr/--highlight=pandoc:breezedark /, '--highlight=NAME:STYLE';
+        like nup_highlight('--hi=gnu:esc256 script/nup'),
+            qr/--highlight=gnu:esc256 /, '--hi=NAME:STYLE';
+        like nup_highlight('--hi=nosuch:style script/nup'),
+            qr/nosuch:style: unknown highlighter/, 'unknown highlighter with a style';
         # --hi is the short name
         like nup_highlight('--hi script/nup'), qr/--highlight=pandoc /, '--hi';
         like nup_highlight('--hi=sourcehighlight script/nup'),

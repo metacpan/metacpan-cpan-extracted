@@ -134,12 +134,15 @@ sub set_all {
 }
 
 # ---------------------------------------------------------------------
-# 3. Values set inside a step are recorded; outside they are not.
+# 3. Values set are recorded (with -undo on), inside a step and, since
+# 2.10, outside it: there the settings in a row are one undo step (no
+# step is open after edit reset).
 {
   widget();
   set_all();
   is(st(), $set, 'six values set outside a step');
-  ok(!eval { $t->editUndo; 1 }, 'nothing to undo: setting a value is not recorded');
+  $t->editUndo;
+  is(st(), $start, 'undo: outside a step the six settings are recorded, as one step');
 
   widget();
   $t->editStep('begin');
@@ -239,12 +242,14 @@ sub set_all {
 
 # ---------------------------------------------------------------------
 # 6. -valuecommand: a recorded set stashes the old value (an unrecorded
-# one drops it); undo and redo stash and restore.
+# one, with -undo off, drops it); undo and redo stash and restore.
 {
   with_events();
+  $t->configure(-undo => 0);
   $t->blockNodedata('1.2', 0, 'OLD');
   $t->blockNodedata('1.2', 0, 'OUT');
-  is(ev(), 'set: drop node OLD at 1.2 0', 'outside a step the old value is dropped');
+  $t->configure(-undo => 1);
+  is(ev(), 'set: drop node OLD at 1.2 0', 'with -undo off the old value is dropped');
   $t->editStep(sub { set_all() });
   is(ev(), 'set: stash node OUT at 1.2 0', 'inside a step it is stashed; values set where none was tell nothing');
   $t->editUndo;

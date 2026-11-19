@@ -113,7 +113,9 @@ my @list = $t->block('list', '1.0', 'end');
 $t->markData('m', V->new);
 my $calls = 0;
 $t->configure(-valuecommand => sub { $hook->() unless $calls++ });
-$t->markData('m', undef);		# drops the value: the callback runs
+$t->configure(-undo => 0);		# not recorded (2.10: with -undo on
+$t->markData('m', undef);		# the value would wait in the undo
+$t->configure(-undo => 1);		# step): drops it, the callback runs
 $t->configure(-valuecommand => undef);
 is($calls, 1, 'the callback ran');
 for my $c (@modifying) {
@@ -141,7 +143,9 @@ is($t->get('1.0', 'end'), $before, 'and did');
 # none is refused).
 %result = ();
 $t->markData('m', V->new($hook));
+$t->configure(-undo => 0);		# not recorded: freed at once
 $t->markData('m', undef);
+$t->configure(-undo => 1);
 for my $c (@modifying) {
   unlike($result{$c->[0]}, qr/^cannot modify/, "$c->[0] is not refused while values are freed");
 }
@@ -174,7 +178,9 @@ for my $how (['replaced', 'other'], ['removed', undef]) {
     $result{x} = eval { $t->insert('end', 'Y'); 1 } ? 'ok' : $@;
   }));
   ok(!exists $result{x}, "block data $what: not freed while set");
+  $t->configure(-undo => 0);		# not recorded: freed by this command
   $t->blockData('2.2', $new);
+  $t->configure(-undo => 1);
   is($result{seen}, $new, "block data $what: DESTROY sees the new value");
   is($result{x}, 'ok', "block data $what: an insert from its DESTROY works");
   is($t->get('end -2c'), 'Y', "block data $what: once the command is done");
@@ -247,7 +253,8 @@ for my $how (
   $u->markSet('m', '1.1');
   $u->markData('m', V->new(sub { $u->insert('end', 'Y') }));
   $u->insert('1.0', 'A');			# the step open
-  $u->markData('m', undef);		# the DESTROY inserts Y
+  $u->markUnset('m');			# the DESTROY inserts Y (mark unset is
+					# not recorded: the value goes at once)
   $u->insert('1.0', 'B');
   is($u->get('1.0', 'end'), "BAabc\nY\n", 'the insert from DESTROY is made');
   $u->editUndo;

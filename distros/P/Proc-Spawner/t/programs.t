@@ -187,14 +187,14 @@ SKIP: { skip 'root may enter any directory, Windows has no search bit', 1 if $> 
   for (['return || echo o; echo n', "${m}o\nn\n", 0], ['if return; then :; fi; echo n', "${m}n\n", 0],
        ['return 3 && echo a; echo "n $?"', "${m}n 2\n", 0], ['! return; echo "n $?"', "${m}n 0\n", 0],
        ['return; echo n', $m, 2], ['echo a && return; echo n', "a\n$m", 2]) {
-    my ($s, $out, $st) = @$_; my $f = "$dir/x48-cmd"; open my $h, '>', $f or die; print $h $s; close $h;
+    my ($s, $out, $st) = @$_; my $f = "$dir/x48-cmd"; open my $h, '>:raw', $f or die; print $h $s; close $h;
     local $ENV{TRY_FILE} = $f; my $got = `"$^X" "$try" 2>&1`;
     is "$got|" . ($? >> 8), "$out|$st", "return outside a function, as bash (X48): $s" } }
 
 # X49: a signal ignored on entry cannot be trapped or reset, and kill ... $$ with it does nothing (POSIX; both shells)
 SKIP: { skip 'no SIGINT to ignore on Windows', 2 if $WIN;
   for (['trap "echo int" INT; kill -INT $$; echo after', "after\n"], ['kill -INT $$; echo after', "after\n"]) {
-    my ($s, $out) = @$_; my $f = "$dir/x49-cmd"; open my $h, '>', $f or die; print $h $s; close $h;
+    my ($s, $out) = @$_; my $f = "$dir/x49-cmd"; open my $h, '>:raw', $f or die; print $h $s; close $h;
     local $ENV{TRY_FILE} = $f; open my $p, '-|', $^X, '-e', '$SIG{INT} = "IGNORE"; exec $^X, @ARGV', $try or die;
     my $got = do { local $/; <$p> } // ''; close $p;
     is $got, $out, "SIGINT ignored on entry (X49): $s" } }
@@ -207,9 +207,10 @@ SKIP: { skip 'no SIGINT to ignore on Windows', 2 if $WIN;
        ["set -u; cat 2>/dev/null <<E\n\$x\nE\necho after:\$?", "after:2\n", 0], ["cat 2>/dev/null <<E\n\$((1/0))\nE\necho after:\$?", "after:2\n", 0],
        ["cat <<E 2>/dev/null\n\${x:?boom}\nE\necho after:\$?", "sh: x: boom\nafter:2\n", 0], ["set -u; : <<E\n\$x\nE\necho after", $m, 2],
        ["x=1; cat <<E\na \$x\nE\necho after:\$?", "a 1\nafter:0\n", 0]) {
-    my ($s, $out, $st) = @$_; my $f = "$dir/x50-cmd"; open my $h, '>', $f or die; print $h $s; close $h;
+    my ($s, $out, $st) = @$_; my $f = "$dir/x50-cmd"; open my $h, '>:raw', $f or die; print $h $s; close $h;
+    SKIP: { skip 'the program cat runs (none on Windows)', 1 if $WIN && $s =~ /^x=1; cat/;
     local $ENV{TRY_FILE} = $f; my $got = `"$^X" "$try" 2>&1`;
-    is "$got|" . ($? >> 8), "$out|$st", "expansion error in a here-document, as dash (X50): " . ($s =~ s/\n/|/gr) } }
+    is "$got|" . ($? >> 8), "$out|$st", "expansion error in a here-document, as dash (X50): " . ($s =~ s/\n/|/gr) } } }
 
 # X51: a trapped signal's action runs after the foreground command, also when the command runs in this process (a
 # pipeline of builtins); a trap set in a subshell does not replace the main shell's (both shells: another process)
@@ -217,21 +218,22 @@ for (['trap "echo int" INT; kill -INT $$ | while getopts ab: o -a -b v; do echo 
      ['trap "echo int" INT; kill -INT $$ | trap "echo int" INT; kill -INT $$ | true; echo end', "int\nint\nend\n"],
      ['trap "echo main" INT; (trap "echo sub" INT; kill -INT $$; echo in-sub); echo after', "in-sub\nmain\nafter\n"],
      ['trap "echo int" INT; x=$(kill -INT $$); echo after', "int\nafter\n"], ['trap "echo int" INT; { kill -INT $$; echo grp; }', "int\ngrp\n"]) {
-  my ($s, $out) = @$_; my $f = "$dir/x51-cmd"; open my $h, '>', $f or die; print $h $s; close $h;
+  my ($s, $out) = @$_; my $f = "$dir/x51-cmd"; open my $h, '>:raw', $f or die; print $h $s; close $h;
   local $ENV{TRY_FILE} = $f; is scalar(`"$^X" "$try" 2>&1`), $out, "a trap after the foreground command (X51): $s" }
 
 # X52: a word from an unquoted expansion whose only pattern characters are escaped by a backslash is not matched
 # against files (x\* stays x\*, as both shells), with a file x* there (found by the split-and-glob probe, X27)
-{ mkdir "$dir/x52"; open my $t, '>', "$dir/x52/x*" or die; close $t;
+SKIP: { skip 'no * in a file name on Windows', 4 if $WIN;
+  mkdir "$dir/x52"; open my $t, '>', "$dir/x52/x*" or die; close $t;
   for (['x="x\\*"; echo $x', "x\\*\n"], ['x="[x]\\*"; echo $x', "x*\n"], ['x="\\?"; echo $x', "\\?\n"], ['echo x\\*', "x*\n"]) {
-    my ($s, $out) = @$_; my $f = "$dir/x52-cmd"; open my $h, '>', $f or die; print $h "cd x52; $s"; close $h;
+    my ($s, $out) = @$_; my $f = "$dir/x52-cmd"; open my $h, '>:raw', $f or die; print $h "cd x52; $s"; close $h;
     local $ENV{TRY_FILE} = $f; is scalar(`"$^X" "$try" 2>&1`), $out, "an escaped pattern character from an expansion (X52): $s" } }
 
 # X53: a form of command the parser refuses, made only by expansions at run time: outside the subset (A4), status 248
 { my $m = 'Proc::ShellSubset::Large: ';
   for (['x=-n; command $x; echo no', "${m}'command -n' is not supported\n", 248], ['x="-v ls cat"; command $x', "${m}'command -v' with 2 names is not supported\n", 248],
        ['x="-p -x"; command $x', "${m}'command -p -x' is not supported\n", 248], ['x="-p true"; command $x; echo "st=$?"', "st=0\n", 0]) {
-    my ($s, $out, $st) = @$_; my $f = "$dir/x53-cmd"; open my $h, '>', $f or die; print $h $s; close $h;
+    my ($s, $out, $st) = @$_; my $f = "$dir/x53-cmd"; open my $h, '>:raw', $f or die; print $h $s; close $h;
     local $ENV{TRY_FILE} = $f; my $got = `"$^X" "$try" 2>&1`;
     is "$got|" . ($? >> 8), "$out|$st", "command's form from expansions (X53): $s" } }
 
@@ -249,7 +251,7 @@ SKIP: {
   skip 'no coreutils programs to compare with', 1 if $WIN or !-x '/usr/bin/printf' or !-x '/usr/bin/test';
   my @s = ('echo a b; printf "%s|%d\n" x 3z; test -d dir && echo dir; [ 1 -lt 2 ]; echo $?',
            'cd dir; [ -d ../dir ] && echo rel-ok; test -f file; echo $?', 'printf "%s\n" 1 2 3 | head -1', 'echo x >&-; echo $?',
-           'printf "a%db%dc" 1 x 2 y 2>&1 | od -c', '(printf "%01000000d" 0; echo " st $?" >&2) | head -c 3',
+           'printf "a%db%dc" 1 x 2 y 2>&1 | od -c', '(printf "%01000000d" 0; echo " st $?" > st) | head -c 3; cat st',
            'echo x | (read y; [ "$y" = x ] && echo same)', 'true; echo $?; false; echo $?; test; echo $?', 'command -v printf >/dev/null; echo $?');
   my @bad;
   for my $s (@s) {
@@ -279,4 +281,40 @@ SKIP: {
   ok !@bad, scalar(@s) . ' strings with sh: the same with the program and as Perl (SH1)' or diag join "\n", @bad;
   local $ENV{PROC_SHELLSPAWN_SH} = 'zsh'; local $ENV{CMD} = 'true';
   like scalar(`$^X $try "\$CMD" 2>&1`), qr/^PROC_SHELLSPAWN_SH: 'zsh' is none of auto, perl, program$/m, 'PROC_SHELLSPAWN_SH: an unknown value dies' }
+{ # files_eq (JH3, part c): the one test for "the same file", and paths_eq, its fallback where stat's numbers are of no use
+  require File::Temp; my $d = File::Temp::tempdir(CLEANUP => 1);
+  is((Proc::ShellSpawn::Programs::test(['test', "$d", '-ef', "$d/."], {}))[2], 0, 'test -ef through Programs (files_eq is Proc::ShellSpawn\'s)');
+  SKIP: { skip 'checked on POSIX only (a list for a pipe)', 1 if $^O eq 'MSWin32';
+    my $code = 'print $INC{"Proc/ShellSpawn.pm"} ? "loaded" : "not"; (Proc::ShellSpawn::Programs::test(["test", ".", "-ef", "."], {}))[2] == 0 or die;'
+             . ' print $INC{"Proc/ShellSpawn.pm"} ? " loaded" : " not"';
+    open my $h, '-|', $^X, (map "-I$_", grep !ref, @INC), '-MProc::ShellSpawn::Programs', '-e', $code or die "perl: $!";
+    is join('', <$h>), 'not loaded', 'Programs loads Proc::ShellSpawn only when test -ef (or pwd -L) asks' }
+  my $eq = \&Proc::ShellSpawn::files_eq; my $peq = \&Proc::ShellSpawn::paths_eq;
+  for my $f ('a', 'b') { open my $h, '>', "$d/$f" or die "$d/$f: $!"; print $h $f; close $h }
+  mkdir "$d/sub" or die "$d/sub: $!";
+  ok $eq->("$d/a", "$d/a") && $eq->("$d/a", "$d/sub/../a"), 'files_eq: one file under two names';
+  ok !$eq->("$d/a", "$d/b") && !$eq->("$d/a", "$d/nosuch") && !$eq->("$d/nosuch", "$d/nosuch"), 'files_eq: two files; a missing one';
+  ok $peq->("$d/a", "$d/sub/../a") && !$peq->("$d/a", "$d/b"), 'paths_eq, the fallback: by resolved paths';
+  SKIP: { skip 'no symbolic links here', 1 unless eval { symlink "$d/a", "$d/l" } && -l "$d/l" && -e "$d/l";   # (Wine: symlink
+    # returns true, but no link is there)
+    ok $eq->("$d/a", "$d/l") && $peq->("$d/a", "$d/l"), 'files_eq and paths_eq: through a symbolic link' }
+  SKIP: { skip 'no hard links here', 1 unless eval { link "$d/a", "$d/h" } and ((stat "$d/a")[1] or $^O eq 'MSWin32');
+    ok $eq->("$d/a", "$d/h"), 'files_eq: two hard links to one file (by the numbers; on Windows by the file IDs)' }
+  SKIP: { skip 'Windows only: the volume and file IDs (post-0.12)', 2 unless $^O eq 'MSWin32';
+    my $s = \&Proc::Spawner::__win_same_file;
+    ok $s->("$d/a", "$d/a") && !$s->("$d/a", "$d/b") && !defined $s->("$d/a", "$d/nosuch"), '__win_same_file: one file, two files, a missing one';
+    ok $eq->("$d/a", uc "$d/A") && $eq->("$d/sub", "$d/sub/."), 'files_eq on Windows: a name in other case; a directory' } }
+SKIP: { # JH4, part c (way A, provisionally; X63): kill's options are read once; the shell takes a signal itself only for $$
+  # and a signal that exists; every other form goes to the program kill, and the shell goes on
+  skip 'no program kill here', 2 if $^O eq 'MSWin32' or !grep -x "$_/kill", split /:/, $ENV{PATH} // '';
+  my @bad;
+  for my $f ('kill -; echo after:$?', 'kill - TERM; echo after:$?', 'sleep 5 & kill - TERM $!; echo after:$?; kill $!', 'kill - TERM $$; echo after:$?',
+             'kill -l >/dev/null; echo after:$?', 'kill -l 15 >/dev/null; echo after:$?', 'kill -l $$; echo after:$?', 'kill -A_B; echo after:$?',
+             'sleep 5 & kill -A_B $!; echo after:$?; kill $!', 'kill -A_B $$; echo after:$?', 'kill -s A_B $$; echo after:$?',
+             'kill -FOO $$; echo after:$?', 'kill -99 $$; echo after:$?', 'kill -0 $$; echo after:$?') {
+    local $ENV{CMD} = $f; my $r = `$^X $try "\$CMD" 2>&1`;
+    push @bad, "$f\n  $r" unless $r =~ /^after:[0-9]+$/m and $r !~ /No such signal|Unrecognized signal/ }
+  ok !@bad, 'kill: 14 forms that are no signal for the shell itself leave it running (X63)' or diag join "\n", @bad;
+  local $ENV{CMD} = 'kill -TERM $$; echo after'; my $r = `$^X $try "\$CMD" 2>&1`;
+  ok $r !~ /after/ && (($? >> 8) == 143 || ($? & 127) == 15), 'kill -TERM $$: the shell dies by the signal' or diag "$r ($?)" }
 done_testing;

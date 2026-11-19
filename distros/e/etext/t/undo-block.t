@@ -570,8 +570,14 @@ $t->editReset;
     is_deeply(freed { $t->delete('1.3', '1.5') }, [], 'deleting {b frees nothing');
     is(text(), '{xa|c|dy}', 'dissolves G in F');
     my $after = state();
+    # Set with -undo off: a recorded setting (2.10) joins the step of
+    # the deletion and is undone first; BUGS 31 is about values the undo
+    # of the deletion finds set after it.
+    my $undo = $t->cget('-undo');
+    $t->configure(-undo => 0);
     $t->blockNodedata('1.4', 0, V->new('C'));
     $t->blockNodedata('1.6', 0, V->new('DY'));
+    $t->configure(-undo => $undo);
     my $set = state();
     $t->configure(-valuecommand => sub {
       my (undef, $ev, $kind, $where, $v, $cause) = @_;

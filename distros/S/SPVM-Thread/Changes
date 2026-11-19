@@ -1,3 +1,7 @@
+0.012 2026-11-19
+  [Incompatible Changes]
+    * All maskable signals are blocked in the newly created thread.
+  
 0.011 2026-09-02
   [Release Summary]
     * Thread caller information is now displayed in the exception caller stack.

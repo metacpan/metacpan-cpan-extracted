@@ -298,8 +298,25 @@ sub opaque_status { my ($n, $seen) = @_; return 0 if $seen->{$n}++; my $any = 0;
       push @todo, values %$x } elsif (ref $x eq 'ARRAY') { push @todo, @$x } }
   $any }
 
+# The command names a parse tree runs (A23 (c), the user, 2026-11-17: what each sample calls, for later use), in the order
+# met (a command's own name first, then what its parts hold, by key), each once: the first word of a command as written,
+# and after command or exec (not -v, -V) the name after the options; cd, export, readonly, local, exec alone; ? for a name
+# an expansion makes.  Space, tab, newline and % ! + = ? : \ in a name as %XX.  large-subset-calls.pl marks them after a run.
+sub calls_of { my $t = shift; my (@n, %seen, $exp); my $add = sub { my $w = shift;
+    if (ref $w) { $exp = 1 } else { (my $e = $w) =~ s/([\s%!+=?:\\])/sprintf '%%%02X', ord $1/ge; push @n, $e unless $seen{$e}++ } };
+  my $walk; $walk = sub { my $x = shift;
+    if (ref $x eq 'HASH') {
+      if ($x->{argv} && @{$x->{argv}}) { my @a = @{$x->{argv}}; $add->($a[0]);
+        if (!ref $a[0] && $a[0] =~ /^(?:command|exec)\z/) { my $i = 1; my $v; while ($i < @a && !ref $a[$i] && $a[$i] =~ /^-/) { $v = 1 if $a[$i] =~ /^-[vV]/; $i++ }
+          $add->($a[$i]) if $i < @a && !$v } }
+      $add->($_) for grep exists $x->{$_}, qw(cd export readonly local);
+      $add->('exec') if exists $x->{exec} && !$x->{argv};
+      $walk->($x->{$_}) for sort keys %$x }
+    elsif (ref $x eq 'ARRAY') { $walk->($_) for @$x } };
+  $walk->($t); join ' ', @n, $exp ? '?' : () }
+
 # Each sample.
-my (%B, %LV, %LV2, %DL, %RS, %RSA, %RSONLY, %BYSRC, %SAMPLE); my $t0 = time;
+my (%B, %LV, %LV2, %DL, %RS, %RSA, %RSONLY, %BYSRC, %SAMPLE, %CALLS); my $t0 = time;
 my %AICAT;   # -ai: id => category (read again and checked under -p); the rows of the tables take them as N+M=T (2026-11-13)
 my %AIROW = ('AI-strict' => 0, 'AI-values passed on unchanged' => 3, 'AI-values passed on split' => 4);
 if ($AIF) { open my $a, '<:utf8', $AIF or die "$AIF: $!"; while (<$a>) { next if /^#/ || /^id\t/; chomp; my ($id, $cat) = split /\t/; $AICAT{$id} = $cat } }
@@ -322,7 +339,7 @@ for my $s (@S) {
   my %r; $r{$_} = 1 for map keys %{$_->{r}}, @BLKS;
   my $lv = 0; $lv = $LEVEL{$_} > $lv ? $LEVEL{$_} : $lv for keys %r;
   my @rs = grep $r{$_}, @HELD, @ALMOST, @UNDEC; my @here = grep $LEVEL{$_} == $lv, @rs;
-  $SAMPLE{$s->{id}} = [$lv, \@rs, $s];
+  $SAMPLE{$s->{id}} = [$lv, \@rs, $s]; $CALLS{$s->{id}} = calls_of($tree);
   if ($lv == 3) {   # step 3 (X27): where each value from the environment lands; the class, its reasons
     my (%np, %pa, %sp, %ct, %ST, %R, %CTP); for my $b (@BLKS) { for my $r (grep $LEVEL{$_} == 3, keys %{$b->{r}}) {
         my $kd = $b->{pt}{$r} // {}; my $bk = $b->{kind} // '';
@@ -354,7 +371,7 @@ for my $s (@S) {
     $lv = 2; @here = grep $LEVEL{$_} == 2, @rs; @{$SAMPLE{$s->{id}}}[0, 1] = ($lv, \@rs) }
   $LV{$lv}++;
   my $dl = $lv < 2 ? $lv : $lv == 3 ? 5 : (grep $_ eq 'splitglob', @rs) ? 4 : (grep $_ eq 'passthrough', @rs) ? 3 : 2;   # the rows (LV1)
-  my $ai = defined $AICAT{$s->{id}} ? 1 : 0; $dl = $AIROW{$AICAT{$s->{id}}} // $dl if $ai;   # found by the programs 0, by reading 1
+  my $ai = defined $AICAT{$s->{id}} ? 1 : 0; $dl = $AIROW{$AICAT{$s->{id}}} // $dl if $ai;   # found by the programs 0, by Claude reading them 1
   $DL{$s->{id}} = $dl; $LV2{$dl}[$ai]++; $BYSRC{$s->{src}}{$dl}[$ai]++;
   if ($lv) { $RS{$lv}{$_}++ for @here; $RSONLY{$lv}{$here[0]}++ if @here == 1 }
   for my $b (@BLKS) { my $blv = 0; $blv = $LEVEL{$_} > $blv ? $LEVEL{$_} : $blv for keys %{$b->{r}};
@@ -376,7 +393,7 @@ sub fmtn { my $x = reverse shift; $x =~ s/(\d{3})(?=\d)/$1,/g; scalar reverse $x
 sub pm { my $v = $_[0] // []; my ($p, $a) = ($v->[0] // 0, $v->[1] // 0); $a ? sprintf('%s+%s=%s', fmtn($p), fmtn($a), fmtn($p + $a)) : fmtn($p) }   # N+M=T, or N
 sub tot { my $v = $_[0] // []; ($v->[0] // 0) + ($v->[1] // 0) }
 printf "\nSamples by level:\n"; printf "  %-28s %13s  %5.1f %%\n", $LN2[$_], pm($LV2{$_}), 100 * tot($LV2{$_}) / @S for 0 .. 5;
-print "  (N+M=T: N found by the programs, M classified by reading, -ai; AI-strict in strict, AI-values passed on ... in those rows,\n   the other categories undecided)\n" if $AIF;
+print "  (N+M=T: N found by the programs, M classified by Claude reading them, -ai; AI-strict in strict, AI-values passed on ... in those rows,\n   the other categories undecided)\n" if $AIF;
 print "\nBy source (strict / held / almost strict / values passed on unchanged / values passed on split / undecided):\n";
 for (sort keys %BYSRC) { my $t = 0; $t += tot($_) for values %{$BYSRC{$_}}; my $src = $_; printf "  %-16s %6d: %s\n", $src, $t, join ' ', map sprintf('%10s', pm($BYSRC{$src}{$_})), 0 .. 5 }
 for my $lv (1, 2, 3) { print "\n$LN[$lv]: samples with each reason of that level / with that reason alone:\n";
@@ -393,12 +410,12 @@ if ($OUTP) { open my $o, '>:utf8', $OUTP or die;   # step 3: every sample undeci
 # they only pass through the shell; split: the same, some split and globbed into a program's words; both are almost
 # strict in large-subset-provenance.tsv, assumptions passthrough and splitglob; control: it depends on the environment
 # only through what the run can set; affects-shell: a value from the environment affects what the shell itself does; AI-...: a
-# sample of those two classified by reading, large-subset-ai-classes.tsv, with -ai); what keeps it from pass (the
+# sample of those two classified by Claude reading them, large-subset-ai-classes.tsv, with -ai); what keeps it from pass (the
 # codes, or "a value into BUILTIN", "set -e", "set -u", "arithmetic on a value", "a value as a pattern"); what the run
 # controls (CODE:PROGRAM for a program's answer, /tmp, /dev/urandom, the tree; ruling:A5, G2, program for a switch whose
 # other state the named ruling covers); the undecided codes; the text.  large-subset-environment.md, section 12.
 H
-  my %AI;   # -ai (post-0.11, 2026-11-13): samples classified by reading (large-subset-ai-classes.tsv): their category is
+  my %AI;   # -ai (post-0.11, 2026-11-13): samples classified by Claude reading them (large-subset-ai-classes.tsv): their category is
   if ($AIF) { open my $a, '<:utf8', $AIF or die "$AIF: $!";   # the class; each must be one the rules leave in control or affects-shell
     while (<$a>) { next if /^#/ || /^id\t/; chomp; my ($id, $cat, undef, undef, $rc) = split /\t/;
       my $c = $SAMPLE{$id} && $SAMPLE{$id}[4] && $SAMPLE{$id}[4][0];
@@ -409,7 +426,7 @@ H
 if ($OUTD) { open my $o, '>', $OUTD or die; print $o $J->encode($SAMPLE{$_->{id}}[3]), "\n" for grep { $SAMPLE{$_->{id}} && $SAMPLE{$_->{id}}[3] } @S }
 if ($OUTE) { open my $o, '>:utf8', $OUTE or die; print $o <<'H';
 # large-subset-provenance.tsv: every corpus sample the large parser accepts (40,410), one line each, by snippet ID.
-# Columns (tab): ID CODE
+# Columns (tab): ID CODE CALLS
 #   ID    where the text comes from: format in doc/parsers/shell-subset-test-provenance.md, section 2; the texts are
 #         remade from the pinned sources by doc/large-subset/tools/large-subset-extract.pl (doc/test-pools.md, 3).
 #   CODE  known issue X27: could the run-time comparison of dash, bash --posix and ours (large-subset-state.md,
@@ -421,11 +438,21 @@ if ($OUTE) { open my $o, '>:utf8', $OUTE or die; print $o <<'H';
 #           U:r,s/a,b            undecided: may depend on r, s (files, vars, prog-status, path-tmp, ...); the
 #                                assumptions a, b would be needed besides
 #         Every code, how to remake this file and the findings: doc/large-subset/large-subset-environment.md
+#   CALLS what the sample calls (post-0.12, A23 (c), the user, 2026-11-17: kept for later use): the command names its parse
+#         tree runs, space-separated, each once (a name's space, tab, newline, % ! + = ? : \ written %XX): the first
+#         word of each command as written (builtins, functions and programs alike), after command or exec the name
+#         after its options, cd, export, readonly, local; ? where an expansion makes a command's name
+#         (large-subset-blocks.pl -e).  After the behaviour run, large-subset-calls.pl marks them shell by shell,
+#         NAME:DBO, a letter each for dash, bash and ours: p that shell's run started a program of that name (the
+#         shell, or a program it ran: xargs, find -exec), ! that shell said it was not found, - neither; a name with
+#         neither in all three keeps no mark (a builtin, a function, or not reached); =NAME:DBO a program started, or
+#         a name not found, that the text does not write as a command (an expansion made it, or a program started it).
 H
   for my $id (sort keys %SAMPLE) { my ($lv, $rs) = @{$SAMPLE{$id}};
     my @u = grep $LEVEL{$_} == 3, @$rs; my @a = grep $LEVEL{$_} < 3, @$rs;
     my $pt = $SAMPLE{$id}[4] && $lv < 3 ? '(' . join(',', @{$SAMPLE{$id}[4][3]}) . ')' : '';   # (a): the codes it passes through
-    print $o "$id\t", $lv == 0 ? 'S' : $lv < 3 ? ('', 'H', 'A')[$lv] . ':' . join(',', map $_ eq 'passthrough' ? "$_$pt" : $_, @a) : 'U:' . join(',', @u) . (@a ? '/' . join(',', @a) : ''), "\n" } }
+    print $o "$id\t", $lv == 0 ? 'S' : $lv < 3 ? ('', 'H', 'A')[$lv] . ':' . join(',', map $_ eq 'passthrough' ? "$_$pt" : $_, @a) : 'U:' . join(',', @u) . (@a ? '/' . join(',', @a) : ''),
+      "\t$CALLS{$id}\n" } }
 
 # Words.  A Word is a string or [Part, ...]; rebuilt as shell text for reading (approximately: quoting is not exact).
 sub wtext { my $w = shift; return '' unless defined $w; return lit($w) unless ref $w; join '', map ptext($_), @$w }

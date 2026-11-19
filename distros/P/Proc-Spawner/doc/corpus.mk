@@ -49,14 +49,14 @@ $(CORPUS)/large-scan.jsonl : $(CORPUS)/samples.jsonl
 	if test -n "$(OLDSCAN)"; then $(PERL) -Ilib $(CT)/large-subset-reparse.pl $(CORPUS)/samples.jsonl $(OLDSCAN) > $@.new; \
 	else $(PERL) -Ilib $(CT)/large-subset-scan.pl $(CORPUS)/samples.jsonl > $@.new; fi && mv $@.new $@
 
-#: corpus-figures      the parse figures (large-subset-state.md): CORPUS/samples.tsv, CORPUS/figures.txt
-corpus-figures : $(CORPUS)/samples.tsv
-	@cat $(CORPUS)/figures.txt
+#: corpus-parse        the parse results (large-subset-state.md): CORPUS/samples.tsv, CORPUS/parse.txt
+corpus-parse : $(CORPUS)/samples.tsv
+	@cat $(CORPUS)/parse.txt
 $(CORPUS)/samples.tsv : $(CORPUS)/large-scan.jsonl
 	$(PERL) $(CT)/large-subset-drops.pl $(CORPUS)/samples.jsonl $(CORPUS)/drops.tsv
-	$(PERL) $(CT)/large-subset-yardsticks.pl -v -c $(SCCACHE) -o $@.new $(CORPUS)/samples.jsonl $(CORPUS)/large-scan.jsonl $(CORPUS)/drops.tsv > $(CORPUS)/figures.txt && mv $@.new $@
+	$(PERL) $(CT)/large-subset-yardsticks.pl -v -c $(SCCACHE) -o $@.new $(CORPUS)/samples.jsonl $(CORPUS)/large-scan.jsonl $(CORPUS)/drops.tsv > $(CORPUS)/parse.txt && mv $@.new $@
 
-#: corpus-digest       the digest the parse figures depend on (unchanged: the figures hold; large-subset-state.md, 3)
+#: corpus-digest       the digest the parse results depend on (unchanged: the parse results hold; large-subset-state.md, 3)
 corpus-digest :
 	@cat lib/Proc/ShellSubset.pm lib/Proc/ShellSubset/*.pm $(CT)/large-subset-extract.pl $(CT)/large-subset-scan.pl \
 	  $(CT)/large-subset-drops.pl $(CT)/large-subset-features.pl $(CT)/large-subset-yardsticks.pl \
@@ -69,7 +69,7 @@ corpus-shells :
 
 #: corpus-provenance   (record) large-subset-provenance.tsv: every sample's level (large-subset-environment.md;
 #:                     8 seconds), and large-subset-step3.tsv (step 3, section 12); the tables of its sections 1
-#:                     and 3 in CORPUS/levels.txt; the samples classified by reading (AI-...) from large-subset-ai-classes.tsv
+#:                     and 3 in CORPUS/levels.txt; the samples classified by Claude reading them (AI-...) from large-subset-ai-classes.tsv
 corpus-provenance : $(CORPUS)/samples.tsv
 	$(PERL) -Ilib $(CT)/large-subset-blocks.pl -e $(CPROV) -p $(CSTEP3) -ai $(CAI) -s $(CORPUS)/levels.tsv -o $(CORPUS)/blocks.jsonl $(CSAMPLES) > $(CORPUS)/levels.txt
 
@@ -83,10 +83,14 @@ corpus-qrun : $(CORPUS)/q/.done
 $(CORPUS)/q/.done : $(CORPUS)/samples.tsv pure_all
 	@$(CROOT)
 	$(CRUN) -q -j $(CJ) $(CENV) $(CSAMPLES) $(CORPUS)/q && touch $@
+#: corpus-calls       (record) the column CALLS of large-subset-provenance.tsv marked from the run, per shell (A23 (c))
+corpus-calls : $(CORPUS)/run/.done
+	$(PERL) $(CT)/large-subset-calls.pl $(CPROV) $(CORPUS)/run
+
 #: corpus-runreport    (record) large-subset-run-differences.tsv; the tables (large-subset-state.md, 7) in CORPUS
 corpus-runreport : $(CORPUS)/run/.done $(CORPUS)/q/.done
-	$(PERL) $(CT)/large-subset-runreport.pl -q $(CORPUS)/q -l $(CT)/large-subset-run-differences.tsv $(CORPUS)/run > $(CORPUS)/runreport.txt
-	$(PERL) $(CT)/large-subset-runreport.pl -x -q $(CORPUS)/q $(CORPUS)/run > $(CORPUS)/runreport-x.txt
+	$(PERL) $(CT)/large-subset-runreport.pl -q $(CORPUS)/q -known $(CT)/large-subset-match-known.tsv -l $(CT)/large-subset-run-differences.tsv $(CORPUS)/run > $(CORPUS)/runreport.txt
+	$(PERL) $(CT)/large-subset-runreport.pl -x -q $(CORPUS)/q -known $(CT)/large-subset-match-known.tsv $(CORPUS)/run > $(CORPUS)/runreport-x.txt
 #: corpus-threeway     (root; record) large-subset-threeway-db.jsonl, -differences.tsv: each call, three ways
 corpus-threeway : $(CORPUS)/q/.done
 	@$(CROOT)
@@ -99,7 +103,8 @@ corpus-builtins : $(CORPUS)/q/.done
 	  -db $(CORPUS)/builtins.jsonl $(CORPUS)/q > $(CORPUS)/builtins.txt
 
 #: corpus-env-variants (root; record) large-subset-env-variants.tsv: the environment varied, each variant on the
-#:                     samples of its code, against two base runs (large-subset-environment.md, 9; hours)
+#:                     samples of its code, against two base runs (large-subset-environment.md, 9; hours); each
+#:                     sample runs with the worker of its base run (directory BASE/wK, user rcK: X66)
 CVARIANTS = posix:echo utf8:locale sigpipe:pipeline noproc:devfd tmp:path-tmp random:path-random \
   private:path-home,path-mnt,path-var dev:path-dev
 CSTANDINS = fail:prog-status output:prog-output mtime:time
@@ -110,10 +115,11 @@ corpus-env-variants : $(CORPUS)/samples.tsv pure_all
 	  if test $$g = base; then vs="$(CVARIANTS)"; else vs="$(CSTANDINS)"; fi; codes=""; \
 	  for v in $$vs; do codes="$$codes `echo $$v | cut -d: -f2 | tr , ' '`"; done; \
 	  $(PERL) $(CT)/large-subset-ids.pl $(CPROV) $$codes > $(CORPUS)/env/ids-$$g.txt; \
-	  for r in $$g $${g}2; do $(CCLEAN); $(CRUN) -j $(CJ) -base $(CBASE) -only @$(CORPUS)/env/ids-$$g.txt $(CSAMPLES) $(CORPUS)/env/$$r || exit 1; done; \
+	  for r in $$g $${g}2; do w=; test $$r = $$g || w="-workers-from $(CORPUS)/env/$$g"; \
+	    $(CCLEAN); $(CRUN) -j $(CJ) -base $(CBASE) $$w -only @$(CORPUS)/env/ids-$$g.txt $(CSAMPLES) $(CORPUS)/env/$$r || exit 1; done; \
 	  for v in $$vs; do n=`echo $$v | cut -d: -f1`; c=`echo $$v | cut -d: -f2 | tr , ' '`; \
 	    $(PERL) $(CT)/large-subset-ids.pl $(CPROV) $$c > $(CORPUS)/env/ids-$$n.txt; $(CCLEAN); \
-	    $(CRUN) -j $(CJ) -base $(CBASE) -env $$n -only @$(CORPUS)/env/ids-$$n.txt $(CSAMPLES) $(CORPUS)/env/v-$$n || exit 1; \
+	    $(CRUN) -j $(CJ) -base $(CBASE) -env $$n -workers-from $(CORPUS)/env/$$g -only @$(CORPUS)/env/ids-$$n.txt $(CSAMPLES) $(CORPUS)/env/v-$$n || exit 1; \
 	    $(PERL) $(CT)/large-subset-runreport.pl -b $(CORPUS)/env/$$g -bl $(CORPUS)/env/variants.tsv -tag $$n \
 	      -noise $(CORPUS)/env/$${g}2 $(CORPUS)/env/v-$$n > $(CORPUS)/env/cmp-$$n.txt || exit 1; done; \
 	done && mv $(CORPUS)/env/variants.tsv $(CT)/large-subset-env-variants.tsv
@@ -188,11 +194,26 @@ corpus-races :
 	D=$(CORPUS)/races; S=$(CORPUS)/step3-affects-shell; mkdir -p $$D && \
 	$(PERL) $(CT)/large-subset-repeat.pl -ids $$S/match.tsv $$D && \
 	r=1; while test $$r -le $(RACERUNS); do \
-	  for f in $$D/ids-*; do e=$${f##*/ids-}; k=$$e; test $$e = base && k=0; \
+	  for f in $$D/ids-*; do test -e "$$f" || continue; e=$${f##*/ids-}; k=$${e#s}; test $$e = base && k=0; \
 	    $(CRUN) -env cowroot,tmp,random,mtime,samearg0,pidns -base $(CBASE) -setup $$S/setup-$$k.jsonl -only @$$f $(CSAMPLES) $$D/r$$r/$$e > /dev/null || exit 1; done; \
 	  r=`expr $$r + 1`; done; \
-	A=; for d in $$D/r*/*; do A="$$A $${d##*/}=$$d"; done; \
+	A=; for d in $$D/r*/*; do test -d "$$d" || continue; A="$$A $${d##*/}=$$d"; done; \
 	$(PERL) $(CT)/large-subset-repeat.pl -v -o $(CT)/large-subset-env-races.tsv $$A > $$D/repeat.txt
+
+#: corpus-endmodes     (root; record; post-0.12, K5) ours' wait at exit for its background jobs, each mode of
+#:                     PROC_SHELLSPAWN_END (shell, the default; all; none): the samples with a background job
+#:                     (large-subset-bgjobs.pl), run ENDRUNS times (default 5) in each mode in the base run's
+#:                     environment, what each shell gave (large-subset-repeat.pl; record large-subset-endmodes.tsv,
+#:                     the environment column is the mode; the report in CORPUS/endmodes/repeat.txt; about 10 minutes)
+ENDRUNS = 5
+corpus-endmodes : $(CORPUS)/samples.tsv
+	@$(CROOT)
+	D=$(CORPUS)/endmodes; mkdir -p $$D && \
+	$(PERL) -Ilib $(CT)/large-subset-bgjobs.pl $(CSAMPLES) > $$D/bg.ids && \
+	A=; for m in shell all none; do r=1; while test $$r -le $(ENDRUNS); do \
+	  $(CRUN) -j $(CJ) $(CENV) -end $$m -only @$$D/bg.ids $(CSAMPLES) $$D/$$m/r$$r > /dev/null || exit 1; \
+	  A="$$A $$m=$$D/$$m/r$$r"; r=`expr $$r + 1`; done; done; \
+	$(PERL) $(CT)/large-subset-repeat.pl -v -o $(CT)/large-subset-endmodes.tsv $$A > $$D/repeat.txt
 
 #: corpus-match        (root; records) section 11 of large-subset-environment.md: large-subset-match.tsv,
 #:                     large-subset-match-calls.jsonl, large-subset-env-setups.tsv; the report in CORPUS/match.txt,
@@ -253,14 +274,14 @@ docs-map :
 
 #: corpus-all          all of the above in order, step 3 and its races included (many hours; root): what to
 #:                     run again after a change of ours (lib/) or of the runner (large-subset-runcompare.pl)
-corpus-all : corpora corpus-pool-a-check corpus-figures corpus-provenance corpus-shells corpus-run corpus-qrun \
-  corpus-runreport corpus-threeway corpus-builtins corpus-env-variants corpus-step2 corpus-step3 corpus-races corpus-match
+corpus-all : corpora corpus-pool-a-check corpus-parse corpus-provenance corpus-shells corpus-run corpus-qrun \
+  corpus-calls corpus-runreport corpus-threeway corpus-builtins corpus-env-variants corpus-step2 corpus-step3 corpus-races corpus-endmodes corpus-match
 
 #: corpus-clean        remove CORPUS (the runs too: hours of work)
 corpus-clean :
 	rm -rf $(CORPUS)
 
-.PHONY : corpus-help corpora corpus-pool-a-check corpus-pool-a corpus-samples corpus-scan corpus-figures corpus-digest \
-  corpus-shells corpus-provenance corpus-run corpus-qrun corpus-runreport corpus-threeway corpus-builtins \
-  corpus-env-variants corpus-step2 corpus-step3 corpus-step3-class corpus-races corpus-match corpus-html corpus-all corpus-clean docs-check docs-synced docs-map \
+.PHONY : corpus-help corpora corpus-pool-a-check corpus-pool-a corpus-samples corpus-scan corpus-parse corpus-digest \
+  corpus-shells corpus-provenance corpus-run corpus-qrun corpus-calls corpus-runreport corpus-threeway corpus-builtins \
+  corpus-env-variants corpus-step2 corpus-step3 corpus-step3-class corpus-races corpus-endmodes corpus-match corpus-html corpus-all corpus-clean docs-check docs-synced docs-map \
   probe-fuzz probe-values probe-stress probe-memory

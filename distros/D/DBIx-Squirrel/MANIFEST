@@ -61,5 +61,6 @@ t/29-objects.t
 xt/ekorn-tooling.t
 xt/examples.t
 xt/manuals.t
+xt/reference-index.t
 META.yml
 MANIFEST

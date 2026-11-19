@@ -5,6 +5,9 @@
 # eval, ., exit, return, getopts, command, type, ...), also inside function bodies; settings alone (x=1); and a
 # command that is not found (or not allowed to run).  (The calls to external programs need no such run: large-subset-runcompare.pl's logs already
 # compare them, call by call; the calls to echo, printf, test, [, kill, pwd: large-subset-threeway.pl.)
+# A call not found in the run runs here with PATH a directory of links to the programs of the run's list, those installed
+# (post-0.12, A23; the list named in QDIR/programs.txt): the run offers only the programs of large-subset-runcompare.pl's
+# list, so the name may well be installed here (wine, shellcheck, ...), while what bash's time runs must still be found.
 #
 # Usage (as root, with no network):
 #   unshare -n perl large-subset-runcompare.pl -q samples.jsonl samples.tsv QDIR     # ours only; builtins logged
@@ -44,13 +47,13 @@ my %FIXTURE = ('a.txt' => "alpha\nbeta\n", 'b.txt' => "one two\n", 'file.txt' =>
   '.hidden' => "h\n", 'dir/x.txt' => "in dir\n", 'dir/sub/y.sh' => "echo y\n", 'home/.profile' => '', 'empty' => '');
 my $u = 'rc9'; my $W = '/var/tmp/runcompare/builtins';
 system("id $u >/dev/null 2>&1 || useradd -M -s /usr/sbin/nologin -d /nonexistent $u") == 0 or die "useradd $u\n";
-sub run1 { my @cmd = @_;
+sub run1 { my ($path, @cmd) = @_;   # $path: the run's PATH (the run's list of programs for a call not found in the run, A23)
   system('pkill', '-9', '-u', $u); remove_tree($W); make_path("$W/run");
   for my $f (sort keys %FIXTURE) { my ($d) = $f =~ m{^(.*)/}; make_path("$W/run/$d") if $d;
     open my $o, '>', "$W/run/$f" or die; print $o $FIXTURE{$f}; close $o }
   system('chown', '-R', "$u:$u", $W); chmod 0755, $W;
   my $pid = fork // die;
-  unless ($pid) { chdir "$W/run"; %ENV = (PATH => '/usr/bin:/bin', LANG => 'C', LC_ALL => 'C', HOME => "$W/run/home", USER => $u);
+  unless ($pid) { chdir "$W/run"; %ENV = (PATH => $path, LANG => 'C', LC_ALL => 'C', HOME => "$W/run/home", USER => $u);
     open STDIN, '<', '/dev/null'; open STDOUT, '>', "$W/out"; open STDERR, '>', "$W/err";
     exec '/usr/bin/setpriv', "--reuid=$u", "--regid=$u", '--clear-groups', '--inh-caps=-all', '--', '/usr/bin/timeout', '-k', '1', '5', @cmd; exit 127 }
   waitpid $pid, 0; my $st = $? >> 8; $st = 'signal ' . ($? & 127) if $? & 127; system('pkill', '-9', '-u', $u);
@@ -66,9 +69,17 @@ my (%cls, %name, @list); my $j = JSON::PP->new->utf8->canonical; my $db;
 open $db, '>', $DB or die "$DB: $!" if $DB;
 my %old; if ($REUSE) { open my $in, '<', $REUSE or die "$REUSE: $!\n";
   while (<$in>) { my $x = decode_json($_); $old{$x->{text}} = { map +($_ => $x->{$_}), qw(dash bash ours) } } }
+my $NOPATH = '/usr/bin:/bin';   # the run's programs: as before A23, or the installed ones of its list
+if (open my $pf, '<', "$ARGV[0]/programs.txt") { my $l = <$pf> // ''; if ($l =~ /^programs: (\S+), SHA-256/) { my $list = $1;
+  $NOPATH = "$W.listpath"; remove_tree($NOPATH); make_path($NOPATH); chmod 0755, $NOPATH;
+  open my $in, '<', $list or die "$list (from $ARGV[0]/programs.txt): $!\n"; my $n = 0;
+  while (<$in>) { chomp; next if /^#/ || !length || -e "$NOPATH/$_";
+    for my $d (qw(/usr/bin /bin)) { if (-f "$d/$_" && -x _) { symlink "$d/$_", "$NOPATH/$_" or die "$NOPATH/$_: $!"; $n++; last } } }
+  print STDERR "not-found calls: PATH $NOPATH, $n programs of $list\n" } }
 for my $t (sort keys %calls) {
-  my %r = %{ $old{$t} // { dash => run1('/usr/bin/dash', '-c', $t), bash => run1('/usr/bin/bash', '--posix', '-c', $t),
-           ours => run1($^X, "-I$DIST/blib/lib", "-I$DIST/blib/arch", "$DIST/t/try.pl", $t) } };
+  my $path = $kind{$t} eq 'not found' ? $NOPATH : '/usr/bin:/bin';
+  my %r = %{ $old{$t} // { dash => run1($path, '/usr/bin/dash', '-c', $t), bash => run1($path, '/usr/bin/bash', '--posix', '-c', $t),
+           ours => run1($path, $^X, "-I$DIST/blib/lib", "-I$DIST/blib/arch", "$DIST/t/try.pl", $t) } };
   my ($d, $b, $o) = @r{qw(dash bash ours)};
   my $eq = sub { my ($x, $y) = @_; $x->{status} eq $y->{status} && $x->{out} eq $y->{out} && $x->{files} eq $y->{files} };
   my ($db_, $do, $bo) = ($eq->($d, $b), $eq->($d, $o), $eq->($b, $o));

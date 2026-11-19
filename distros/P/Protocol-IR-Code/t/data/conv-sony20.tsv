@@ -1,0 +1,4 @@
+# Conversion fixture for SONY20 (Harmony pronto)
+# Columns: name, protocol, address, subaddress, command, expected Pronto hex,
+#          decoded protocol, decoded address, decoded subaddress, decoded command
+SONY20	SONY20	26	73	9	0000 0068 0015 0000 0060 0018 0030 0018 0018 0018 0018 0018 0030 0018 0018 0018 0018 0018 0018 0018 0018 0018 0030 0018 0018 0018 0030 0018 0030 0018 0030 0018 0018 0018 0018 0018 0030 0018 0018 0018 0018 0018 0030 0018 0018 0018	SONY20	26	73	9		

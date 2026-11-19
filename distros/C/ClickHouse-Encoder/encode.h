@@ -13,6 +13,11 @@
  * inside encode_column. */
 SV **alloc_sv_array(pTHX_ SSize_t n);
 
+int is_simple_type(TypeInfo *t);
+int nullable_is_null(SV *value, TypeInfo *t);
+void encode_scalar(pTHX_ Buffer *b, SV *value, TypeInfo *t);
+void encode_null_scalar(pTHX_ Buffer *b, TypeInfo *t);
+
 /* Encode `num_rows` values from `values[]` (column-major) of type
  * `t` into the wire-format buffer `b`. Croaks on shape/type errors. */
 void encode_column(pTHX_ Buffer *b, SV **values, SSize_t num_rows,

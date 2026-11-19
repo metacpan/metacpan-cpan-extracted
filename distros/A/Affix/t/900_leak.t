@@ -6,7 +6,7 @@ use Test2::Require::AuthorTesting;
 $|++;
 skip_all 'I have no idea why *BSD is leaking here' if $^O =~ /BSD/i;
 leaks 'use Affix' => sub {
-    use Affix qw[];
+    use Affix qw[:all];
     pass 'loaded';
 };
 leaks 'affix($$$$)' => sub {

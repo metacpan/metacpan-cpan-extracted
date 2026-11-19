@@ -543,9 +543,10 @@ do, with L<Ekorn::Pipeline::Operators>. They're in force only where
 you write C<use Ekorn::Pipeline::Operators>. Elsewhere, they croak.
 
     use Ekorn::Pipeline::Operators;
+    use DBIx::Squirrel::Stages::Rows;
     use Ekorn::Pipeline::Sinks qw(count_items keep_all);
 
-    my $it    = $dbh->iterate('SELECT name FROM artist', sub { $_->[0] });
+    my $it    = $dbh->iterate('SELECT name FROM artist', pluck);
     my $names = $it | keep_all;       # an array reference
     my $n     = $it | count_items;    # a number
     my @names = @$it;                 # every result

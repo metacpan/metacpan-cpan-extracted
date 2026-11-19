@@ -802,7 +802,7 @@ is asked for, a sink's result, if a sink is last, and otherwise how
 many values came out. C<selectrow_array> pushes the row's values,
 C<selectall_array> each row, and the others their one reference.
 
-    my @names = $dbh->selectall_array('SELECT name FROM artist', sub { $_->[0] });
+    my @names = $dbh->selectall_array('SELECT name FROM artist', pluck);
 
 Unlike L</prepare>, they don't croak if the statement can't be
 prepared. Without C<RaiseError>, each returns what the DBI's returns,

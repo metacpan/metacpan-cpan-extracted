@@ -93,6 +93,24 @@ subtest 'geographic: concurrent instances keep their own language' => sub {
 	throws_ok { $admin{en}->_throw('admin.locked', { repo => 'docs' }) } qr/holds the lock for repo 'docs'/, 'English error';
 };
 
+subtest 'warning: catalogued, with the caller on a line of its own' => sub {
+	my @warned;
+	local $SIG{__WARN__} = sub { push @warned, $_[0] };
+
+	my $line = __LINE__ + 1;
+	my $returned = App::FileSync::I18N::warning('client.record_failed', { path => '/x at y line 3', error => 'full' });
+	is($returned, 1, 'returns 1');
+	is(scalar @warned, 1, 'warns once');
+	like($warned[0], qr/\Acannot record this run in \/x at y line 3: full\n at \Q$0\E line $line\.\n\z/,
+		'the message, then the caller (not I18N.pm) on the next line');
+	is(App::FileSync::I18N::strip_location($warned[0]), 'cannot record this run in /x at y line 3: full',
+		'strip_location removes the location and keeps a look-alike inside the message');
+
+	@warned = ();
+	App::FileSync::I18N::warning('admin.locked', { repo => 'docs' }, 'de');
+	like($warned[0], qr/\AEine andere Sitzung halt die Sperre fur 'docs'\n/, 'in the language asked for');
+};
+
 subtest 'plural rules' => sub {
 	is(message('word.file', { count => 0 }, 'en'), '0 files', 'English zero is plural');
 	is(message('word.file', { count => 1 }, 'en'), '1 file', 'English one');
@@ -138,7 +156,7 @@ subtest 'environment selects the language' => sub {
 
 subtest 'catalogue completeness' => sub {
 	my %catalogue = %App::FileSync::I18N::en::MESSAGES;
-	my (%used, @files);
+	my (%used, %mentioned, @files);
 	File::Find::find(sub { push @files, $File::Find::name if /\.pm\z/ }, $lib);
 
 	# Literal keys passed to the message functions.  Keys built at run time
@@ -151,6 +169,13 @@ subtest 'catalogue completeness' => sub {
 		# Code only: POD examples are checked by reading them, not here.
 		$source =~ s/^=[a-zA-Z].*?(?:^=cut\b[^\n]*\n|\z)//msg;
 		$used{$1} = $file while $source =~ /$call/g;
+
+		# Any quoted key counts as a use: some are chosen in a ternary or a
+		# table and passed on later.  Comments, and the catalogue itself, do
+		# not.
+		next if $file =~ m{I18N[\\/]\w+\.pm\z};
+		$source =~ s/^\s*#.*$//mg;
+		$mentioned{$1} = 1 while $source =~ /'([a-z][a-z0-9_]*(?:\.[a-z0-9_]+)+)'/g;
 	}
 
 	ok(scalar(keys %used) > 100, 'the scan found the message calls');
@@ -170,7 +195,14 @@ subtest 'catalogue completeness' => sub {
 	) {
 		my ($prefix, @names) = @{$family};
 		ok(exists $catalogue{"$prefix$_"}, "$prefix$_ exists") for @names;
+		$mentioned{"$prefix$_"} = 1 for @names;
 	}
+
+	# And the other way round: a key nothing uses is dead text that every
+	# translation would have to carry.
+	my @unused = grep { !$mentioned{$_} } sort keys %catalogue;
+	is_deeply(\@unused, [], 'every key in the English catalogue is used')
+		or diag(join("\n", map { "unused: $_" } @unused));
 
 	# POD and messages must stay ASCII so any terminal can show them.
 	my @non_ascii = grep { !ref $catalogue{$_} && $catalogue{$_} =~ /[^\x00-\x7f]/ } keys %catalogue;

@@ -2,7 +2,7 @@ package ClickHouse::Encoder::TCP;  ## no critic (Capitalization)
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 # Encoders/decoders for a useful subset of ClickHouse's native TCP
 # protocol packets. Built for insert pipelines: pack a Hello + Query,

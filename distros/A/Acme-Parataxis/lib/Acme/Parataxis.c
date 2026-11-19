@@ -17,8 +17,9 @@
  * interpreter (`PL_*` variables) to allow disjoint execution flows.
  *
  * @section Caveats
- * Shared subroutines (CVs) with re-entrant yielding calls are handled by a specialized pad-clearing mechanism in
- * `_activate_current_depths` to satisfy Perl's internal `AvFILLp`/`AvREAL` assertions in DEBUGGING builds.
+ * Shared subroutines (CVs) with re-entrant yielding calls are handled by giving every fiber its own padlist for each
+ * active CV at every swap. `_activate_current_depths` snapshots the outgoing fiber's padlists and restores the incoming
+ * fiber's, so no two fibers ever share a pad depth and Perl's `AvFILLp`/`AvREAL` assertions stay satisfied.
  */
 
 #ifdef _WIN32
@@ -59,19 +60,36 @@
  * Assembly-based coroutine context switching.
  *
  * glibc's swapcontext() saves/restores the signal mask (rt_sigprocmask) on every context switch which dominates the
- * cost of fiber switches. On x86_64 we instead switch with a tiny assembly routine that only saves the callee-saved
- * registers and the stack pointer, avoiding the syscall entirely. All other platforms keep the portable ucontext path
- * for now...
+ * cost of fiber switches. The native backends below avoid that syscall:
  *
- * This has to be decided before the includes below: OpenBSD ships no <ucontext.h> at all, so the assembly path must
- * be able to skip it, and Haiku ships no <sys/syscall.h>.
+ *   - x86-64 ELF:  save RBX/RBP/R12-R15, swap RSP, "ret" into para_trampoline.
+ *   - AArch64 ELF: save X19-X30, D8-D15 and FPCR/FPSR in a frame on the outgoing stack, swap SP, "ret" via LR.
+ *   - AArch64 Mach-O: same AArch64 frame, with underscore-prefixed symbols and Mach-O assembler directives.
+ *   - Windows PE: CreateFiber()/SwitchToFiber(). This is architecture-neutral and is the correct backend for
+ *     ARM64 as well: the OS saves the platform register (X18 on Windows ARM64) and NEON state for us.
+ *
+ * Android/Bionic is the reason AArch64 ELF cannot fall back to ucontext: its <ucontext.h> declares ucontext_t but
+ * exposes none of getcontext()/makecontext()/swapcontext(). OpenBSD has no <ucontext.h> at all. This decision has to
+ * be made before the includes below so those platforms can skip the header entirely.
  */
-#if defined(__x86_64__) && !defined(_WIN32) && defined(__ELF__)
-#define USE_ASM_CORO 1
+#if !defined(_WIN32)
+# if defined(__x86_64__) && defined(__ELF__)
+#  define USE_ASM_CORO 1
+#  define USE_X86_64_ASM_CORO 1
+# elif defined(__aarch64__) && (defined(__ELF__) || defined(__MACH__))
+#  define USE_ASM_CORO 1
+#  define USE_AARCH64_ASM_CORO 1
+# endif
+#endif
+
+#if defined(USE_AARCH64_ASM_CORO)
+/* 12 GP regs (96) + 8 FP regs (64) + FPCR/FPSR (16), kept 16-byte aligned. */
+#define PARA_ARM_FRAME_SIZE 176
 #endif
 
 /*
- * Under USE_ASM_CORO, no function ever callse para_entry_point() so let's hide it from lto-enabled compilers.
+ * Under USE_ASM_CORO, no C code ever calls para_entry_point() directly, so keep these symbols hidden and mark them
+ * used. Define this exactly once; a second definition without "used" would silently discard the LTO protection.
  */
 #if defined(__GNUC__) && !defined(_WIN32)
 #define PARA_HIDDEN __attribute__((visibility("hidden"), used))
@@ -154,6 +172,7 @@ static void rightsize_fiber_limit(void);
 #endif
 
 typedef struct para_fiber_t para_fiber_t;
+typedef struct para_pad_frame_t para_pad_frame_t;
 
 /*
  * These three symbols are wired together by hand (the asm trampoline, the stack layout in arm_fiber_context) and are
@@ -162,11 +181,6 @@ typedef struct para_fiber_t para_fiber_t;
  * that refuse relocations against non-writable sections (Solaris and OmniOS ld: "relocations remain against
  * allocatable but non-writable sections") reject the object outright. Hidden symbols resolve at link time instead.
  */
-#if defined(__GNUC__) && !defined(_WIN32)
-#define PARA_HIDDEN __attribute__((visibility("hidden")))
-#else
-#define PARA_HIDDEN
-#endif
 
 /* C-level entry point invoked when a freshly created fiber starts running. */
 PARA_HIDDEN void para_entry_point(para_fiber_t * c);
@@ -175,9 +189,10 @@ PARA_HIDDEN void para_entry_point(para_fiber_t * c);
 /**
  * @brief Raw register-only context switch.
  *
- * Saves the callee-saved registers and the current stack pointer into *from, restores them from *to, then returns
- * (popping the return address off the target stack). A freshly created fiber's stack is pre-arranged so that the return
- * address lands in para_trampoline.
+ * The callee-saved state is pushed onto the outgoing stack and only the resulting stack pointer is stored in *from.
+ * Restoring *to therefore restores every register and "ret" (x86-64) / LR-return (AArch64) lands in the caller that
+ * was current when that context last ran. A freshly created fiber's frame is pre-arranged so that return lands in
+ * para_trampoline.
  *
  * @param from Pointer to the storage slot holding the current stack pointer.
  * @param to   Pointer to the storage slot holding the target stack pointer.
@@ -186,6 +201,7 @@ PARA_HIDDEN extern void para_coro_switch(void ** from, void ** to);
 /** @brief Initial jump target for brand-new fiber stacks. */
 PARA_HIDDEN extern void para_trampoline(void);
 
+#if defined(USE_X86_64_ASM_CORO)
 __asm__(
     ".text\n"
     ".p2align 4\n"
@@ -193,7 +209,6 @@ __asm__(
     ".hidden para_coro_switch\n"
     ".type para_coro_switch, @function\n"
     "para_coro_switch:\n"
-    "    endbr64\n"
     "    pushq %rbx\n"
     "    pushq %rbp\n"
     "    pushq %r12\n"
@@ -215,11 +230,93 @@ __asm__(
     ".hidden para_trampoline\n"
     ".type para_trampoline, @function\n"
     "para_trampoline:\n"
-    "    endbr64\n"
     "    popq %rdi\n"
     "    call para_entry_point\n"
     "    ud2\n"
     ".size para_trampoline, .-para_trampoline\n");
+
+#elif defined(USE_AARCH64_ASM_CORO)
+/*
+ * AArch64/EABI1: x19-x28, x29 (FP) and x30 (LR) are callee-saved; the low 64 bits of v8-v15 are too. x18 is the
+ * platform register (TEB pointer on Windows, reserved elsewhere) and must never be touched. X16/X17 are
+ * intra-procedure scratch, so they are safe to use while moving SP around. FPCR/FPSR are saved as well because a
+ * fiber may be suspended inside floating-point code with non-default rounding or exception state.
+ */
+#if defined(__APPLE__)
+#define PARA_ASM_SWITCH   "_para_coro_switch"
+#define PARA_ASM_TRAMP    "_para_trampoline"
+#define PARA_ASM_ENTRY    "_para_entry_point"
+#define PARA_ASM_VIS(s)   ".globl " s "\n.private_extern " s "\n"
+#define PARA_ASM_TYPE(s)  ""
+#define PARA_ASM_SIZE(s)  ""
+#else
+#define PARA_ASM_SWITCH   "para_coro_switch"
+#define PARA_ASM_TRAMP    "para_trampoline"
+#define PARA_ASM_ENTRY    "para_entry_point"
+#define PARA_ASM_VIS(s)   ".globl " s "\n.hidden " s "\n"
+#define PARA_ASM_TYPE(s)  ".type " s ", @function\n"
+#define PARA_ASM_SIZE(s)  ".size " s ", .-" s "\n"
+#endif
+
+__asm__(
+    ".text\n"
+    ".p2align 4\n"
+    PARA_ASM_VIS(PARA_ASM_SWITCH)
+    PARA_ASM_TYPE(PARA_ASM_SWITCH)
+    PARA_ASM_SWITCH ":\n"
+    "    sub sp, sp, #176\n"
+    "    stp x19, x20, [sp, #0]\n"
+    "    stp x21, x22, [sp, #16]\n"
+    "    stp x23, x24, [sp, #32]\n"
+    "    stp x25, x26, [sp, #48]\n"
+    "    stp x27, x28, [sp, #64]\n"
+    "    stp x29, x30, [sp, #80]\n"
+    "    stp d8,  d9,  [sp, #96]\n"
+    "    stp d10, d11, [sp, #112]\n"
+    "    stp d12, d13, [sp, #128]\n"
+    "    stp d14, d15, [sp, #144]\n"
+    "    mrs x16, fpcr\n"
+    "    str x16, [sp, #160]\n"
+    "    mrs x16, fpsr\n"
+    "    str x16, [sp, #168]\n"
+    "    mov x16, sp\n"
+    "    str x16, [x0]\n"          /* *from = saved frame */
+    "    ldr x16, [x1]\n"          /* x16 = *to */
+    "    mov sp, x16\n"
+    "    ldr x16, [sp, #160]\n"
+    "    msr fpcr, x16\n"
+    "    ldr x16, [sp, #168]\n"
+    "    msr fpsr, x16\n"
+    "    ldp d14, d15, [sp, #144]\n"
+    "    ldp d12, d13, [sp, #128]\n"
+    "    ldp d10, d11, [sp, #112]\n"
+    "    ldp d8,  d9,  [sp, #96]\n"
+    "    ldp x27, x28, [sp, #64]\n"
+    "    ldp x25, x26, [sp, #48]\n"
+    "    ldp x23, x24, [sp, #32]\n"
+    "    ldp x21, x22, [sp, #16]\n"
+    "    ldp x19, x20, [sp, #0]\n"
+    "    ldp x29, x30, [sp, #80]\n"
+    "    add sp, sp, #176\n"
+    "    ret\n"                    /* x30 was restored from the target frame */
+    PARA_ASM_SIZE(PARA_ASM_SWITCH)
+
+    ".p2align 4\n"
+    PARA_ASM_VIS(PARA_ASM_TRAMP)
+    PARA_ASM_TYPE(PARA_ASM_TRAMP)
+    PARA_ASM_TRAMP ":\n"
+    "    mov x0, x19\n"            /* arm_fiber_context puts the fiber pointer in saved x19 */
+    "    bl " PARA_ASM_ENTRY "\n"
+    "    udf #0\n"                 /* para_entry_point must never return */
+    PARA_ASM_SIZE(PARA_ASM_TRAMP));
+
+#undef PARA_ASM_SWITCH
+#undef PARA_ASM_TRAMP
+#undef PARA_ASM_ENTRY
+#undef PARA_ASM_VIS
+#undef PARA_ASM_TYPE
+#undef PARA_ASM_SIZE
+#endif /* USE_AARCH64_ASM_CORO */
 #endif /* USE_ASM_CORO */
 
 /**
@@ -256,13 +353,18 @@ void pin_to_core(int core_id) {
 #ifdef _WIN32
     DWORD_PTR mask = (1ULL << core_id);
     SetThreadAffinityMask(GetCurrentThread(), mask);
-#elif defined(__linux__)
+#elif defined(__linux__) && !defined(__ANDROID__)
     cpu_set_t cpuset;
     CPU_ZERO(&cpuset);
     CPU_SET(core_id, &cpuset);
-    pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset);
+#if defined(__ANDROID__)
+    /* Bionic has no pthread_setaffinity_np(); sched_setaffinity() takes a kernel TID, not a pthread_t. */
+    (void)sched_setaffinity(syscall(SYS_gettid), sizeof(cpu_set_t), &cpuset);
 #else
-    (void)core_id; /* Not supported on macOS/BSD standard APIs */
+    pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset);
+#endif
+#else
+    (void)core_id; /* Not supported on Android, macOS, or standard BSD APIs */
 #endif
 }
 
@@ -339,7 +441,7 @@ typedef struct para_fiber_t {
     void * stack_p;  /**< Pointer to dynamically allocated fiber stack (Unix only) */
     size_t stack_sz; /**< Size of the allocated stack (Unix only) */
 #ifdef USE_ASM_CORO
-    void * rsp; /**< Saved stack pointer for the assembly switch (Unix x86_64) */
+    void * rsp; /**< Saved SP (x86-64) or saved-register frame (AArch64) for the assembly switch */
 #endif
 #endif
 
@@ -395,6 +497,12 @@ typedef struct para_fiber_t {
     SV * self_ref; /**< The Acme::Parataxis Perl object wrapper */
 
     SV * transfer_data; /**< Arguments or return values passed during yield/transfer */
+
+    /* Per-fiber padlist snapshots. At every swap the outgoing fiber donates its live CV padlists and depths here and
+     * the incoming fiber gets its own snapshots restored. This keeps two fibers from ever reusing the same PADLIST. */
+    para_pad_frame_t * pad_frames;
+    I32 pad_frame_count;
+    I32 pad_frame_cap;
 
     void * owner;       /**< PerlInterpreter that allocated this record (arena ownership); NULL never matches */
 
@@ -1294,8 +1402,274 @@ static int para_diag_enabled(void) {
 /** @brief Monotonic swap counter, so the PARA_DIAG dumps from one swap can be told apart. */
 static unsigned long para_diag_swapno = 0;
 
+/* --------------------------------------------------------------------------------------------------------------
+ * Per-fiber padlists.
+ *
+ * CvDEPTH is one counter per CV, and CvPADLIST is one pointer per CV. Two fibers parked inside the same compiled
+ * subroutine therefore cannot both own their pads if Parataxis only shuffles CvDEPTH: any re-entry at a depth held
+ * by another fiber lands on, and rewrites, that fiber's @_ and lexicals. The old parked-depth registry reduced how
+ * often that happened but could not remove the collision (it is the same bug the real HTTP tests hit).
+ *
+ * While a fiber is parked, its padlists are detached from their CVs and stored on the fiber; the CV is given a freshly
+ * derived padlist for whichever fiber runs next. On resume the fiber's own padlists and depths go back. Every live
+ * frame then sees exactly the pad it was executing with, regardless of what other fibers did in the meantime.
+ *
+ * Derived padlists are tracked in a small pointer-keyed table so they can be released when a parked fiber dies or at
+ * shutdown. The original padlist of a CV is never entered in the table and is never freed by us.
+ * -------------------------------------------------------------------------------------------------------------- */
+
+#ifndef newPADLIST
+#define newPADLIST(var) do { Newz(0, (var), 1, PADLIST); Newx(PadlistARRAY(var), 2, PAD *); } while (0)
+#endif
+
+struct para_pad_frame_t {
+    CV * cv;
+    I32 depth;
+    PADLIST * padlist;
+};
+
+typedef struct {
+    PADLIST * padlist;
+    CV * cv;       /* NULL = empty, (CV *)(PTRV)-1 = deleted, otherwise the deriving CV */
+} para_pad_derived_t;
+
+#define PARA_PAD_DERIVED_DELETED ((CV *)(PTRV)-1)
+#define PARA_PAD_DERIVED_HASH(pl) (((U32)(((PTRV)(pl) >> 4) * 2654435761u)) & (para_pad_derived_cap - 1))
+
+static para_pad_derived_t * para_pad_derived = NULL;
+static U32 para_pad_derived_cap = 0;
+static U32 para_pad_derived_used = 0;
+static U32 para_pad_derived_deleted = 0;
+
+static void para_pad_derived_grow(void) {
+    para_pad_derived_t * old = para_pad_derived;
+    U32 old_cap = para_pad_derived_cap;
+    U32 new_cap = old_cap ? old_cap * 2 : 64;
+
+    Newxz(para_pad_derived, new_cap, para_pad_derived_t);
+    para_pad_derived_cap = new_cap;
+    para_pad_derived_used = 0;
+    para_pad_derived_deleted = 0;
+    for (U32 i = 0; i < old_cap; i++) {
+        para_pad_derived_t * src = &old[i];
+        if (!src->cv || src->cv == PARA_PAD_DERIVED_DELETED)
+            continue;
+        U32 j = PARA_PAD_DERIVED_HASH(src->padlist);
+        while (para_pad_derived[j].cv)
+            j = (j + 1) & (para_pad_derived_cap - 1);
+        para_pad_derived[j] = *src;
+        para_pad_derived_used++;
+    }
+    if (old)
+        Safefree(old);
+}
+
+static para_pad_derived_t * para_pad_derived_slot(pTHX_ PADLIST * pl, int create) {
+    if (!pl)
+        return NULL;
+    if (!para_pad_derived_cap) {
+        if (!create)
+            return NULL;
+        para_pad_derived_grow();
+    }
+    U32 mask = para_pad_derived_cap - 1;
+    U32 i = PARA_PAD_DERIVED_HASH(pl);
+    U32 first_deleted = mask + 1;
+    for (;;) {
+        para_pad_derived_t * e = &para_pad_derived[i];
+        if (!e->cv) {
+            if (!create)
+                return NULL;
+            i = (first_deleted <= mask) ? first_deleted : i;
+            e = &para_pad_derived[i];
+            if (e->cv == PARA_PAD_DERIVED_DELETED)
+                para_pad_derived_deleted--;
+            e->padlist = pl;
+            e->cv = (CV *)(PTRV)1;
+            para_pad_derived_used++;
+            return e;
+        }
+        if (e->cv == PARA_PAD_DERIVED_DELETED) {
+            if (first_deleted > mask)
+                first_deleted = i;
+        }
+        else if (e->padlist == pl) {
+            return e;
+        }
+        i = (i + 1) & mask;
+    }
+}
+
+static int para_padlist_is_derived(pTHX_ PADLIST * pl) {
+    return para_pad_derived_slot(aTHX_ pl, 0) != NULL;
+}
+
+static void para_pad_derived_add(pTHX_ PADLIST * pl, CV * cv) {
+    if ((para_pad_derived_used + para_pad_derived_deleted + 1) * 4 >= para_pad_derived_cap * 3)
+        para_pad_derived_grow();
+    para_pad_derived_t * e = para_pad_derived_slot(aTHX_ pl, 1);
+    if (e)
+        e->cv = cv;
+}
+
+static void para_pad_derived_forget(pTHX_ PADLIST * pl) {
+    para_pad_derived_t * e = para_pad_derived_slot(aTHX_ pl, 0);
+    if (!e)
+        return;
+    e->cv = PARA_PAD_DERIVED_DELETED;
+    e->padlist = NULL;
+    para_pad_derived_used--;
+    para_pad_derived_deleted++;
+}
+
+/* Push one fresh pad layer, detach it, and wrap it in a padlist that shares the CV's pad names. Perl then allocates
+ * deeper layers normally if the CV is called recursively. */
+static PADLIST * para_derive_padlist(pTHX_ CV * cv) {
+    PADLIST * padlist = CvPADLIST(cv);
+    if (!padlist || PadlistMAX(padlist) < 0)
+        return NULL;
+
+    PADOFFSET off = PadlistMAX(padlist) + 1;
+    while (off > 1 && !PadlistARRAY(padlist)[off - 1])
+        --off;
+
+    Perl_pad_push(aTHX_ padlist, off);
+    PAD * newpad = PadlistARRAY(padlist)[off];
+    PadlistARRAY(padlist)[off] = 0;
+    if (!newpad)
+        return NULL;
+
+    PADLIST * fresh = NULL;
+    newPADLIST(fresh);
+    PadlistMAX(fresh) = 1;
+    PADNAMELIST * padnames = PadlistNAMES(padlist);
+    if (padnames)
+        PadnamelistREFCNT_inc(padnames);
+    PadlistNAMES(fresh) = padnames;
+    PadlistARRAY(fresh)[1] = newpad;
+
+    para_pad_derived_add(aTHX_ fresh, cv);
+    return fresh;
+}
+
+static void para_free_derived_padlist(pTHX_ PADLIST * pl) {
+    if (!pl || PL_dirty)
+        return;
+    para_pad_derived_forget(aTHX_ pl);
+    for (I32 i = (I32)PadlistMAX(pl); i > 0; i--) {
+        PAD * pad = PadlistARRAY(pl)[i];
+        if (!pad)
+            continue;
+        for (I32 j = (I32)PadMAX(pad); j >= 0; j--) {
+            SV * sv = PadARRAY(pad)[j];
+            if (sv)
+                SvREFCNT_dec(sv);
+        }
+        PadMAX(pad) = -1;
+        SvREFCNT_dec((SV *)pad);
+        PadlistARRAY(pl)[i] = NULL;
+    }
+    PADNAMELIST * padnames = PadlistNAMES(pl);
+    if (padnames)
+        PadnamelistREFCNT_dec(padnames);
+    Safefree(PadlistARRAY(pl));
+    Safefree(pl);
+}
+
+static void para_pad_frames_push(pTHX_ para_fiber_t * c, CV * cv, I32 depth, PADLIST * pl) {
+    if (!c || !cv || !pl)
+        return;
+    if (c->pad_frame_count == c->pad_frame_cap) {
+        I32 new_cap = c->pad_frame_cap ? c->pad_frame_cap * 2 : 8;
+        if (c->pad_frames)
+            Renew(c->pad_frames, new_cap, para_pad_frame_t);
+        else
+            Newx(c->pad_frames, new_cap, para_pad_frame_t);
+        c->pad_frame_cap = new_cap;
+    }
+    para_pad_frame_t * f = &c->pad_frames[c->pad_frame_count++];
+    f->cv = cv;
+    f->depth = depth;
+    f->padlist = pl;
+}
+
+/* A fiber that is killed while parked never pops its frames. Clear array lexicals in its saved pads so a later fiber
+ * cannot observe the dead fiber's `my @x`, then release any padlist we derived for it. */
+static void para_pad_frames_release(pTHX_ para_fiber_t * c) {
+    if (!c || !c->pad_frames)
+        return;
+    for (I32 i = 0; i < c->pad_frame_count; i++) {
+        para_pad_frame_t * f = &c->pad_frames[i];
+        PADLIST * pl = f->padlist;
+        if (pl && f->depth > 0 && f->depth <= PadlistMAX(pl)) {
+            PAD * layer = PadlistARRAY(pl)[f->depth];
+            if (layer) {
+                for (I32 j = 0; j <= (I32)PadMAX(layer); j++) {
+                    SV * sv = PadARRAY(layer)[j];
+                    if (sv && SvTYPE(sv) == SVt_PVAV && SvPADMY(sv) && SvREFCNT(sv) == 1)
+                        av_clear((AV *)sv);
+                }
+            }
+        }
+        if (pl && para_padlist_is_derived(aTHX_ pl))
+            para_free_derived_padlist(aTHX_ pl);
+    }
+    c->pad_frame_count = 0;
+}
+
+static void para_pad_save_si(pTHX_ para_fiber_t * c, PERL_SI * si) {
+    if (!si || !si->si_cxstack)
+        return;
+    for (I32 i = si->si_cxix; i >= 0; i--) {
+        PERL_CONTEXT * cx = &(si->si_cxstack[i]);
+        if (CxTYPE(cx) != CXt_SUB && CxTYPE(cx) != CXt_FORMAT)
+            continue;
+        CV * cv = cx->blk_sub.cv;
+        if (!cv || SvTYPE((SV *)cv) != SVt_PVCV || CvDEPTH(cv) <= 0)
+            continue;
+        PADLIST * pl = CvPADLIST(cv);
+        if (!pl)
+            continue;
+        I32 depth = (I32)CvDEPTH(cv);
+        PADLIST * fresh = para_derive_padlist(aTHX_ cv);
+        if (!fresh)
+            continue;
+        para_pad_frames_push(aTHX_ c, cv, depth, pl);
+        PARA_DIAGF("[pad] SAVE fid=%d cv=%p depth=%d pl=%p fresh=%p\n", c->id, (void*)cv, (int)depth, (void*)pl, (void*)fresh);
+        CvDEPTH(cv) = 0;
+        CvPADLIST(cv) = fresh;
+    }
+}
+
+static void para_pad_save_context(pTHX_ para_fiber_t * c) {
+    if (!c || !c->si)
+        return;
+    /* Starts at the current stackinfo and walks si_prev to MAIN. Fiber stackinfos here are linked only through
+    * si_prev, so walking root->si_next would save the wrong stack entirely. */
+    for (PERL_SI * si = c->si; si; si = si->si_prev)
+        para_pad_save_si(aTHX_ c, si);
+}
+
+static void para_pad_restore_context(pTHX_ para_fiber_t * c) {
+    if (!c || !c->pad_frames)
+        return;
+    for (I32 i = c->pad_frame_count - 1; i >= 0; i--) {
+        para_pad_frame_t * f = &c->pad_frames[i];
+        PADLIST * current = CvPADLIST(f->cv);
+        if (current && current != f->padlist && para_padlist_is_derived(aTHX_ current))
+            para_free_derived_padlist(aTHX_ current);
+        PARA_DIAGF("[pad] RESTORE fid=%d cv=%p depth=%d pl=%p current=%p\n", c->id, (void*)f->cv, (int)f->depth, (void*)f->padlist, (void*)current);
+        CvPADLIST(f->cv) = f->padlist;
+        CvDEPTH(f->cv) = f->depth;
+    }
+    c->pad_frame_count = 0;
+}
+
 /* ------------------------------------------------------------------------------------------
- * Parked-frame depth registry.
+ * Classic parked-frame depth registry.
+ *
+ * Retained only for the explicit para_release_cv_depth() API. Swap-time pad ownership now lives in
+ * the per-fiber padlist code above; the bookkeeping below is no longer consulted by the scheduler.
  *
  * CvDEPTH is a single per-CV counter, but every fiber that parks inside a subroutine leaves a
  * live frame (and a live pad) behind in the shared PadList. pp_entersub allocates its pad as
@@ -1322,7 +1696,7 @@ static unsigned long para_diag_swapno = 0;
  *     depth, so the next ++CvDEPTH() lands at max + 1, strictly above every parked frame.
  *
  * The fabricated depth is a loan, repaid only by the pops of the frames that occupy the pads
- * it reserves, and a pop restores CvDEPTH to that frame's own olddepth -- one level too high
+ * it reserves, and a pop restores CvDEPTH to that frame's own olddepth one level too high
  * per parker. Pass 1c settles the loan at the swap boundary: once no fiber claims the CV and
  * no frame of it is live on the resuming stack, the fabricated depth is unwound to perl's
  * ordinary 0 and the landing pad is made canonical again. The swap is the one reversible point
@@ -1356,7 +1730,7 @@ static U32 para_cvreg_active_cap = 0;
 
 /* Slots whose `pinned` flag is set: CVs Pass 1b fabricated a CvDEPTH for. The list is separate from
  * para_cvreg_active because a pin stays behind after its claims drain (max_depth back to 0), and the
- * debt can only be settled once no frame of the CV is live anywhere -- which the swap boundary knows,
+ * debt can only be settled once no frame of the CV is live anywhere which the swap boundary knows,
  * and the claim cache alone does not. */
 static I32 * para_cvreg_pinned = NULL;
 static U32 para_cvreg_pinned_n = 0;
@@ -1399,7 +1773,7 @@ static void para_cvreg_pin(para_cvreg_entry_t * e) {
         para_cvreg_pinned_cap = new_cap;
     }
     /* The pin outlives every claim and every parked frame, so the registry cannot rely on a suspended
-     * fiber to keep the CV alive until Pass 1c settles the debt -- at global destruction there may be
+     * fiber to keep the CV alive until Pass 1c settles the debt at global destruction there may be
      * no fiber left holding it, and a bare key is no reference at all. Owning one of our own is what
      * makes the settlement write non-fatal. */
     SvREFCNT_inc(e->cv);
@@ -1637,8 +2011,8 @@ static void _clean_landing_pad(pTHX_ CV * cv, I32 depth) {
     /* A depth the registry still counts as occupied belongs to a fiber parked *inside* this CV, which will read
      * its @_ again on resume. Resetting it destroys the victim's live state two ways: the handle read back out
      * of $_[0] comes back undef, and since $_[1] is an alias for the caller's buffer, the caller's buffer is
-     * emptied too -- silently, after the read itself already succeeded. Only a genuinely unoccupied depth may
-     * be reset. See the depth invariant above for why an occupied landing depth exists in the first place. */
+     * emptied silently, after the read itself already succeeded. Only a genuinely unoccupied depth may be reset.
+     * See the depth invariant above for why an occupied landing depth exists in the first place. */
     para_cvreg_entry_t * e = para_cvreg_lookup(cv, 0);
     if (e && e->counts && depth < e->arr_len && e->counts[depth] > 0)
         return;
@@ -1687,122 +2061,21 @@ static void para_diag_pads(pTHX_ const char * tag, PERL_SI * si) {
 }
 
 /**
- * @brief Restores subroutine call depths, syncs the parked-depth registry, and cleans argument pads.
+ * @brief Exchanges padlist ownership at every fiber swap.
  *
- * Runs at every swap. See the registry block above for the invariant this maintains.
+ * The outgoing fiber donates the CvPADLIST and CvDEPTH of every CV it is currently inside; the incoming fiber gets its
+ * own snapshots restored. This is the actual fix for shared-CV re-entrancy: two fibers can never land on the same pad
+ * layer, so Perl's `pp_entersub` @_ assertions cannot fire even when both fibers are inside the same compiled sub.
  *
  * @param from The fiber being deposited (its frames become parked).
  * @param to The fiber being resumed.
  */
 static void _activate_current_depths(pTHX_ para_fiber_t * from, para_fiber_t * to) {
     para_diag_swapno++;
-    /* Pass 0: the depositing fiber is parked now, so publish its live frame depths. Runs first
-     * so a CV shared by both fibers ends the swap with exactly `from` registered and `to` not. */
-    if (from && from != to && from->si && from->si->si_cxstack) {
-        for (I32 i = 0; i <= from->si->si_cxix; i++) {
-            PERL_CONTEXT * cx = &(from->si->si_cxstack[i]);
-            if (CxTYPE(cx) == CXt_SUB || CxTYPE(cx) == CXt_FORMAT) {
-                CV * cv = cx->blk_sub.cv;
-                if (cv && SvTYPE((SV *)cv) == SVt_PVCV)
-                    para_cvreg_add(cv, cx->blk_sub.olddepth + 1);
-            }
-        }
-    }
-
-    PERL_SI * si = to->si;
-    if (!si || !si->si_cxstack)
+    if (!from || !to || from == to)
         return;
-
-    /* Pass 1: Restore CvDEPTH for all active frames of the resuming fiber (its own deepest
-     * frame depth per CV), deregister those depths now that the frames are live again, and
-     * flag CVs on this stack so Pass 1b leaves them at their exact value and Pass 1c does
-     * not settle a debt that a live frame is still entitled to. */
-    for (I32 i = 0; i <= si->si_cxix; i++) {
-        PERL_CONTEXT * cx = &(si->si_cxstack[i]);
-        if (CxTYPE(cx) == CXt_SUB || CxTYPE(cx) == CXt_FORMAT) {
-            CV * cv = cx->blk_sub.cv;
-            if (cv && SvTYPE((SV *)cv) == SVt_PVCV) {
-                I32 depth = cx->blk_sub.olddepth + 1;
-                CvDEPTH(cv) = depth;
-                para_cvreg_entry_t * e = para_cvreg_lookup(cv, 0);
-                if (e) {
-                    para_cvreg_dec(e, depth);
-                    e->on_stack = 1; /* even once the last claim drains: Pass 1c needs this */
-                }
-            }
-        }
-    }
-
-    /* Pass 1b: CVs parked somewhere but absent from the resuming stack: pin CvDEPTH to the
-     * deepest parked frame so the next ++CvDEPTH() lands at max + 1, above every parked pad,
-     * and clean that landing pad.
-     *
-     * Pinning is a loan, not a gift: the pads it reserves are released only by the pops of the frames
-     * that occupy them, and a pop restores CvDEPTH to that frame's own olddepth. So the second parker of
-     * a CV enters at 2 rather than 1 and pops back to 1, the third enters at 3 and pops back to 2 -- each
-     * pop entirely correct, yet the counter settles one level above where it started, once per parker.
-     * Pass 1c below -- run on every swap, never on a sub-return path -- is the repayment. */
-    for (U32 k = 0; k < para_cvreg_active_n; k++) {
-        para_cvreg_entry_t * e = &para_cvreg[para_cvreg_active[k]];
-        int was_on_stack = e->on_stack;
-        if (was_on_stack)
-            continue; /* Pass 1 set this CV to its exact value; a pin here would gift a level.
-                       * Keep on_stack set so Pass 1c knows a live frame is being resumed. */
-        e->on_stack = 0;
-        CvDEPTH(e->cv) = e->max_depth;
-        _clean_landing_pad(aTHX_ e->cv, e->max_depth + 1);
-        para_cvreg_pin(e);
-    }
-
-    /* Pass 1c: settle the pins. The registry only knows who *claims* a depth; it cannot know whether
-     * the frame that justified a claim ever popped. The resuming stack is ground truth for one fiber,
-     * and the swap is the only place this module is invoked while perl holds every live stack in a
-     * known place, so the debt a pin represents is settled here, not from a sub-return hook.
-     *
-     * A pinned CV is released only when (a) no fiber claims a depth in it and (b) no frame of it is
-     * live on the resuming stack. That is exactly the state in which nothing can ever use the pad or
-     * the depth again, so the fabricated CvDEPTH is unwound to perl's ordinary 0 -- the same release
-     * para_release_cv_depth() performs -- and the landing pad is made canonical once more.
-     *
-     * Pops that happen to be followed by a *later* swap are always repaid there: a fiber that pops its
-     * last frame of a CV must hand control back over a swap, and that swap's Pass 1c sees the register
-     * empty and the fiber bare. */
-    for (U32 k = 0; k < para_cvreg_pinned_n; k++) {
-        para_cvreg_entry_t * e = &para_cvreg[para_cvreg_pinned[k]];
-        int was_on_stack = e->on_stack;
-        e->on_stack = 0;
-        if (e->max_depth > 0)
-            continue; /* still claimed by a parked fiber: Pass 1b repinned it this swap */
-        if (was_on_stack)
-            continue; /* a live frame is entitled to the depth Pass 1 gave it */
-        /* The register only knows *claims*, never frames. A frame that is still live can be parked on
-         * either stack including in a nested runlevel of it, which is not visible from the si the
-         * context happens to have stored so ask the runlevel chains of both stacks before unwinding
-         * the fabricated depth. A live frame means nothing may use pad 0 or depth 0 until it pops, so
-         * the entry stays pinned and the next swap retries this settle. */
-        if (para_cv_live_on_swap(aTHX_ from, to, e->cv)) {
-            PARA_DIAGF("[diag] SETTLE-SKIP-LIVE swap=%lu cv=%p dep=%d\n", para_diag_swapno, (void*)e->cv, CvDEPTH(e->cv));
-            continue;
-        }
-        PARA_DIAGF("[diag] SETTLE swap=%lu from=%p to=%p cv=%p dep=%d -> 0 live=%d\n",
-            para_diag_swapno, (void*)from, (void*)to, (void*)e->cv, CvDEPTH(e->cv), para_cv_frame_live(aTHX_ e->cv));
-        CvDEPTH(e->cv) = 0;
-        _clean_landing_pad(aTHX_ e->cv, 1);
-        para_cvreg_unpin(e); /* index k reused: do not advance */
-        k--;
-    }
-
-    /* Pass 2: Clean the landing pad for the NEXT call in each CV on the resuming stack. */
-    for (I32 i = 0; i <= si->si_cxix; i++) {
-        PERL_CONTEXT * cx = &(si->si_cxstack[i]);
-        if (CxTYPE(cx) == CXt_SUB || CxTYPE(cx) == CXt_FORMAT) {
-            CV * cv = cx->blk_sub.cv;
-            if (cv && SvTYPE((SV *)cv) == SVt_PVCV)
-                _clean_landing_pad(aTHX_ cv, CvDEPTH(cv) + 1);
-        }
-    }
-    para_diag_pads(aTHX_ "TO", si);
-    para_diag_pads(aTHX_ "FROM", from->si);
+    para_pad_save_context(aTHX_ from);
+    para_pad_restore_context(aTHX_ to);
 }
 
 /**
@@ -1818,10 +2091,6 @@ void swap_perl_state(para_fiber_t * from, para_fiber_t * to) {
     dTHX;
     /* Save current state into 'from' context */
     from->si = PL_curstackinfo;
-
-    // R4 localization: the just-deposited fiber's live frames are still intact here; any sub-frame whose pad @_
-    // slot 0 is AvREAL is the state that will later trip pp_entersub for another fiber entering the same CV.
-    para_report_reified_at_switch(aTHX_ from, "park");
 
     // The Argument Stack (Main Perl stack)
     from->curstack = PL_curstack;
@@ -1926,7 +2195,7 @@ void swap_perl_state(para_fiber_t * from, para_fiber_t * to) {
     else
         PL_curpad = to->curpad;
 
-    // Restore CvDEPTH, sync the parked-depth registry, and clean landing pads
+    // Exchange per-fiber padlists and depths
     _activate_current_depths(aTHX_ from, to);
 }
 
@@ -1992,6 +2261,11 @@ void restore_perl_state(para_fiber_t * to) {
         PL_curpad = AvARRAY(PL_comppad);
     else
         PL_curpad = to->curpad;
+
+    /* A longjmp out of a fiber lands here with that fiber's padlists installed and the target's still detached. Restore
+     * them now so the eval that catches the jump sees its own pads and depths. Unlike swap_perl_state there is no point
+     * in saving the outgoing fiber's pads: its C stack is gone, so it has no resumable frames. */
+    para_pad_restore_context(aTHX_ to);
 }
 
 /** @brief Number of 16-byte slots in each fiber control stack. */
@@ -2694,13 +2968,31 @@ static void install_stack_guard(void) {
  */
 static void arm_fiber_context(para_fiber_t * c, int idx) {
 #ifdef _WIN32
+    /* PE backend: the OS fiber API handles all ABI state, including ARM64's X18 and NEON registers. */
     c->context = CreateFiber(0, fiber_entry, c);
 #else
-#ifdef USE_ASM_CORO
+#if defined(USE_AARCH64_ASM_CORO)
     /*
-     * Lay out the fresh stack for the assembly switch. When the switch routine resumes this context it first pops the
-     * six dummy saved registers, then "returns" into para_trampoline. The trampoline pops the fiber pointer and
-     * tail-calls para_entry_point with the correct ABI stack alignment.
+     * Forge the frame that para_coro_switch will restore. Slots 0 and 11 are saved x19 and x30 respectively: the
+     * switch's final "ret" therefore enters para_trampoline, which copies x19 into x0 and calls para_entry_point(c).
+     * The remaining x19-x30 slots are zero, as are the callee-saved FP registers. FPCR/FPSR are inherited from the
+     * thread arming the fiber so a fiber never starts with a different rounding/exception environment than its parent.
+     */
+    uint64_t * frame = (uint64_t *)((char *)c->stack_p + c->stack_sz);
+    uint64_t fpcr = 0, fpsr = 0;
+    __asm__ __volatile__("mrs %0, fpcr" : "=r"(fpcr));
+    __asm__ __volatile__("mrs %0, fpsr" : "=r"(fpsr));
+    frame -= PARA_ARM_FRAME_SIZE / sizeof(*frame);
+    memset(frame, 0, PARA_ARM_FRAME_SIZE);
+    frame[0]  = (uint64_t)(uintptr_t)c;                    /* x19 */
+    frame[11] = (uint64_t)(uintptr_t)&para_trampoline;     /* x30 / LR */
+    frame[20] = fpcr;
+    frame[21] = fpsr;
+    c->rsp = frame;
+#elif defined(USE_ASM_CORO)
+    /*
+     * x86-64 ELF: six dummy saved registers, a forged return address, then the fiber pointer. "ret" in
+     * para_coro_switch lands in para_trampoline, which pops the fiber pointer into RDI and calls para_entry_point.
      */
     void ** slot = (void **)((char *)c->stack_p + c->stack_sz);
     slot -= 8; /* 6 saved regs + return address + fiber pointer */
@@ -2945,7 +3237,7 @@ DLLEXPORT int run_fiber_checked(int fiber_id, SV * args) {
     }
     /* A fiber torn down by the deadlock purger (started, not finished, si_cxix == -1) can never be run
      * again: coro_call() would underflow its unwound context stack. Report "not found" so the scheduler
-     * neither re-enqueues it (status 0) nor marks it done (status 1) -- the record and its fid must stay
+     * neither re-enqueues it (status 0) nor marks it done (status 1); the record and its fid must stay
      * occupied. See coro_call()'s guard for the other resume paths. */
     if (c->started && c->si && c->si->si_cxix < 0)
         return -1;
@@ -3167,7 +3459,7 @@ static void _clear_pads_in_stack(pTHX_ PERL_SI * si) {
  * Pass 1b fabricates CvDEPTH values (see the parked-frame depth registry above): a CV some fiber is
  * parked inside gets CvDEPTH = its deepest parked depth, so the next ++CvDEPTH() lands above every
  * parked pad. That is the right value while the parked frame exists, but nothing withdraws it once
- * the frame is gone -- cx_popsub_common() restores depths only for frames that actually leave, and a
+ * the frame is gone; cx_popsub_common() restores depths only for frames that actually leave, and a
  * swap resuming a fiber that holds no frame of the CV skips it entirely. The count then survives for
  * good and the CV looks permanently active to the rest of perl: cv_undef() refuses to finalise a CV
  * whose CvDEPTH is positive, so replacing it dies with "Can't undef active subroutine" and reports
@@ -3222,7 +3514,7 @@ DLLEXPORT void para_release_cv_depth(SV * sv) {
     SvREFCNT_inc(cv);
     para_cvreg_purge(cv);
     CvDEPTH(cv) = 0;
-    /* Back to perl's ordinary state -- and the pad a call at depth 0+1 lands on has to be canonical
+    /* Back to perl's ordinary state and the pad a call at depth 0+1 lands on has to be canonical
      * again, the same treatment Pass 1b gives a landing pad. Without it the next call enters depth 1
      * onto a slot still holding an earlier frame's @_. */
     _clean_landing_pad(aTHX_ cv, 1);
@@ -3277,25 +3569,14 @@ static void _purge_fresh_pads(pTHX_ PERL_SI * si) {
     }
 }
 
-/** @brief Tear a fiber that a dying run abandons out of the parked-depth registry.
+/** @brief Tear a fiber that a dying run abandons out of the per-fiber padlist system.
  *
- * A run ends with remaining fibers parked in two cases: the deadlock detector fires (the "FATAL:
- * deadlock detected" report) or an unobserved fiber death aborts the scheduler loop. By design those
- * parked fibers are never destroyed (their C records keep the fids occupied so a later run cannot
- * be misread as deadlocked) but their parked frames have to leave the depth registry at the moment
- * the torn-down stack is detected, exactly as destroy_coro()'s purge leaves them on destruction.
- * Left behind, a parked claim keeps CvDEPTH fabricated above depths no live frame occupies and Pass
- * 1c refuses to settle it while the frame still counts as live, so every later park of the same CV
- * enters one level high (the "poisoned depth" residual: the shared CV stays inflated for good).
+ * A run ends with remaining fibers parked when the deadlock detector fires or an unobserved fiber death aborts the
+ * scheduler loop. Those fibers are never destroyed (their C records keep the fids occupied) but the padlists they are
+ * holding must be released now, otherwise the detached pads leak and a later run can observe the dead fiber's lexicals.
+ * Marking the context stack exhausted also makes every later destroy/resume guard treat the record as unusable.
  *
- * This performs the destroy_coro() registry walk -- remove every claim on the fiber's frames -- and
- * then marks the context stack torn down (si_cxix = -1) so the frames stop counting as live. With
- * the claims gone and nothing live, the next swap's Pass 1c unwinds any pinned level back to perl's
- * ordinary 0. The fiber record itself, its pads, and its fid stay exactly where the leak design
- * expects them; nothing about this function frees or destroys the fiber, and a wake that races in
- * afterwards is made a no-op by the guards in run_fiber_checked()/coro_call()/coro_transfer().
- *
- * @param fiber_id Fiber whose parked claims are to be purged.
+ * @param fiber_id Fiber whose parked padlists are to be purged.
  */
 DLLEXPORT void para_cvreg_purge_fiber(int fiber_id) {
     dTHX;
@@ -3305,52 +3586,8 @@ DLLEXPORT void para_cvreg_purge_fiber(int fiber_id) {
     if (!c || !c->si || !c->si->si_cxstack || c->si->si_cxix < 0)
         return;
 
-    /* Drop every claim the parked fiber registered, the same walk destroy_coro() performs, and
-     * collect the unique CVs it occupied so the ones left entirely unclaimed can be settled below. */
-    CV ** cvs  = NULL;
-    I32  n_cvs = 0, cap_cvs = 0;
-    for (I32 i = c->si->si_cxix; i >= 0; i--) {
-        PERL_CONTEXT * cx = &(c->si->si_cxstack[i]);
-        if (CxTYPE(cx) == CXt_SUB || CxTYPE(cx) == CXt_FORMAT) {
-            CV * cv = cx->blk_sub.cv;
-            if (cv && SvTYPE((SV *)cv) == SVt_PVCV) {
-                para_cvreg_remove(cv, cx->blk_sub.olddepth + 1);
-                int dup = 0;
-                for (I32 j = 0; j < n_cvs; j++)
-                    if (cvs[j] == cv) { dup = 1; break; }
-                if (!dup) {
-                    if (n_cvs == cap_cvs) {
-                        cap_cvs = cap_cvs ? cap_cvs * 2 : 8;
-                        Renew(cvs, cap_cvs, CV *);
-                    }
-                    cvs[n_cvs++] = cv;
-                }
-            }
-        }
-    }
-
-    /* Tear the frames down for the depth registry's live-frame check: a parked fiber of a run that is
-     * ending will never resume, so its frames must stop counting as live, or Pass 1c would keep seeing
-     * this exact frame and could never settle the fabricated depth. si_cxix = -1 is also the state a
-     * finished fiber leaves behind, so every later destroy path treats the record the same way. */
-    _purge_fresh_pads(aTHX_ c->si);
     c->si->si_cxix = -1;
-
-    /* Settle right now every CV this purge left with no claims and no live frame anywhere. The exact
-     * state Pass 1c releases a pin in, run here so the level is unwound even if the process ends before
-     * any further swap. A CV another fiber still claims (max_depth > 0) or frames (para_cv_frame_live)
-     * is left to that fiber's own swaps. */
-    for (I32 j = 0; j < n_cvs; j++) {
-        para_cvreg_entry_t * e = para_cvreg_lookup(cvs[j], 0);
-        if (e && e->pinned && e->max_depth == 0 && !e->on_stack && !para_cv_frame_live(aTHX_ cvs[j])) {
-            PARA_DIAGF("[diag] PURGE-SETTLE fid=%d cv=%p dep=%d -> 0\n", fiber_id, (void*)cvs[j], CvDEPTH(cvs[j]));
-            CvDEPTH(cvs[j]) = 0;
-            _clean_landing_pad(aTHX_ cvs[j], 1);
-            para_cvreg_unpin(e);
-        }
-    }
-    if (cvs)
-        Safefree(cvs);
+    para_pad_frames_release(aTHX_ c);
 }
 
 /**
@@ -3392,27 +3629,13 @@ DLLEXPORT void destroy_coro(int fiber_id) {
         _release_slot(fiber_id);
     }
 
-    /* Drop this fiber's frames out of the parked-depth registry: a parked fiber registered them when it switched out,
-     * and leaving them behind would pin CvDEPTH above depths no live frame occupies any more. (Pad clearing itself
-     * stays skipped for parked fibers, see below: registry bookkeeping never touches pads.) */
-    if (c->si && c->si->si_cxstack) {
-        for (I32 i = c->si->si_cxix; i >= 0; i--) {
-            PERL_CONTEXT * cx = &(c->si->si_cxstack[i]);
-            if (CxTYPE(cx) == CXt_SUB || CxTYPE(cx) == CXt_FORMAT) {
-                CV * cv = cx->blk_sub.cv;
-                if (cv && SvTYPE((SV *)cv) == SVt_PVCV)
-                    para_cvreg_remove(cv, cx->blk_sub.olddepth + 1);
-            }
-        }
-    }
+    /* Return this fiber's detached padlists. A finished fiber has none (its last swap restored them); a fiber killed
+     * while parked has one per active CV. Clearing them here prevents a later fiber from inheriting the dead fiber's
+     * array lexicals, and releasing derived padlists keeps the per-CV pad cache bounded. */
+    para_pad_frames_release(aTHX_ c);
 
-    /* Unwind pads. This is only ever safe when the fiber's perl context stack has already been unwound to exhaustion
-     * (a fiber that was reaped after finishing: si_cxix == -1, so the walk below is a no-op). A fiber destroyed while
-     * still parked keeps live activation slots in the shared PadLists and the global CvDEPTH counters of every
-     * subroutine it is currently inside (yield, the wait helpers, run, ...); _clear_pads_in_stack frees those slots
-     * and adjusts CvDEPTH for the *running* fiber's bookkeeping, corrupting any other fiber that activates the same
-     * sub at the same depth. The parked fiber's own closures release their pads when user_cv is decref'd below,
-     * and its shared-sub slots are simply overwritten by normal later use, so skipping the unwalk is safe. */
+    /* Unwind the fiber's own context stack only after it has already been exhausted. See the note in
+     * _clear_pads_in_stack(): doing this for a parked fiber would corrupt whichever context currently owns the pad. */
     if (c->si && c->si->si_cxix < 0)
         _clear_pads_in_stack(aTHX_ c->si);
 
@@ -3436,6 +3659,8 @@ DLLEXPORT void destroy_coro(int fiber_id) {
         if (c->stack_p)
             free_fiber_stack(c->stack_p, c->stack_sz);
 #endif
+        if (c->pad_frames)
+            Safefree(c->pad_frames);
         free_perl_stacks(aTHX_ c);
         free(c);
         return;
@@ -3457,6 +3682,8 @@ DLLEXPORT void destroy_coro(int fiber_id) {
     }
 #endif
 
+    if (c->pad_frames)
+        Safefree(c->pad_frames);
     free_perl_stacks(aTHX_ c);
     free(c);
 }
@@ -3530,5 +3757,12 @@ DLLEXPORT void cleanup() {
     if (main_context.transfer_data && main_context.transfer_data != &PL_sv_undef) {
         SvREFCNT_dec(main_context.transfer_data);
         main_context.transfer_data = &PL_sv_undef;
+    }
+    if (para_pad_derived) {
+        Safefree(para_pad_derived);
+        para_pad_derived      = NULL;
+        para_pad_derived_cap  = 0;
+        para_pad_derived_used = 0;
+        para_pad_derived_deleted = 0;
     }
 }

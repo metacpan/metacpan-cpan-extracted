@@ -27,7 +27,9 @@ no_index:
 provides:
   Text::ANSI::Highlight:
     file: lib/Text/ANSI/Highlight.pm
-    version: '0.03'
+    version: '0.04'
+  Text::ANSI::Highlight::Block::embedz:
+    file: lib/Text/ANSI/Highlight/Block/embedz.pm
   Text::ANSI::Highlight::IO:
     file: lib/Text/ANSI/Highlight/IO.pm
   Text::ANSI::Highlight::pandoc:
@@ -43,7 +45,7 @@ resources:
   bugtracker: https://github.com/tecolicom/Text-ANSI-Highlight/issues
   homepage: https://github.com/tecolicom/Text-ANSI-Highlight
   repository: https://github.com/tecolicom/Text-ANSI-Highlight.git
-version: '0.03'
+version: '0.04'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

@@ -166,7 +166,8 @@ one_query(
     eval { $ch->query("select 1",
         { external => { t => {
             structure => [ n => 'NoSuchType' ], data => [[1]] } } }, sub { }) };
-    like $@, qr/cannot encode column/, 'external: unencodable type rejected';
+    like $@, qr/column 'n' \(NoSuchType\): unsupported type/,
+        'external: unencodable type rejected';
 
     $ch->finish;
 }

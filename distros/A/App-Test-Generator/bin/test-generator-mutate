@@ -82,6 +82,13 @@ Skipped lines are silently excluded from the mutation candidate list and
 do not appear in the killed or survived counts.  The number of skipped
 lines is shown in the per-file mutation report.
 
+A mutant that does not compile (C<perl -Ilib -c> fails) is not run.  It is
+not in the killed or survived counts either, but the summary counts it as
+C<Skipped (compile)>, and the JSON report gives the number per file under
+C<compile_skipped>.  Each mutant is compiled against the project's own
+C<--lib> directory, so a large count usually means a broken mutation or a
+dependency that is not installed, not a problem with the tests.
+
 Mismatched markers (a C<## MUTANT_SKIP_BEGIN> with no matching
 C<## MUTANT_SKIP_END>, or vice versa) are fatal errors.
 
@@ -239,7 +246,8 @@ The output structure:
         score    => "85.32",
         total    => 120,
         killed   => 102,
-        survived => [ ... mutant IDs ... ]
+        survived => [ ... mutant IDs ... ],
+        compile_skipped => { 'lib/My/Module.pm' => 2 },
     }
 
 =head2 --cover_json <file>
@@ -374,10 +382,10 @@ The mutation testing process follows this execution flow:
                         ▼
         ┌───────────────────────────────┐
         │ Syntax Check                 │
-        │ perl -c mutated_file.pm      │
+        │ perl -Ilib -c mutated_file.pm│
         └───────────────┬───────────────┘
                         │
-              Compiles? ── No ──► Skip Mutant
+              Compiles? ── No ──► Skip Mutant (Skipped (compile))
                         │
                        Yes
                         │
@@ -578,6 +586,7 @@ my $killed  = 0;
 my @survivors;
 my @killed_mutants;
 my %skipped_by_file;	# lines excluded by MUTANT_SKIP annotations, keyed by filename
+my %compile_skipped_by_file;	# mutants dropped because they do not compile, keyed by filename
 
 for my $file (@files) {
 	my $mutator = App::Test::Generator::Mutator->new(
@@ -624,8 +633,15 @@ for my $file (@files) {
 
 		my $workspace_file = File::Spec->catfile($workspace, $file);
 
-		my $compile = system($^X, '-c', $workspace_file);
-		next if $compile != 0;
+		# Without -I the mutant's own "use" lines resolve to installed copies of
+		# the project's modules, which may be older or missing; the mutant then
+		# "fails to compile" and is skipped rather than run.
+		my $workspace_lib = File::Spec->catdir($workspace, (File::Spec->splitdir($opt{lib}))[-1]);
+		my $compile = system($^X, '-I', $workspace_lib, '-c', $workspace_file);
+		if($compile != 0) {
+			$compile_skipped_by_file{$file} += scalar(@{$group});
+			next;
+		}
 
 		# Apply mutation in-place so test files that use 'use lib "$Bin/../lib"'
 		# (a common CPAN idiom) load the mutated code.  Those files do
@@ -691,12 +707,15 @@ for my $file (@files) {
 # -------------------------
 
 my $score = $total ? sprintf('%.2f', ($killed / $total) * 100) : 100;
+my $compile_skipped = 0;
+$compile_skipped += $_ for values %compile_skipped_by_file;
 
 unless($opt{quiet}) {
 	print "\nMutation Score: $score%\n",
 		"Total: $total\n",
 		"Killed: $killed\n",
-		'Survived: ', scalar(@survivors), "\n";
+		'Survived: ', scalar(@survivors), "\n",
+		'Skipped (compile): ', $compile_skipped, "\n";
 }
 
 # printf "DEBUG argv: json=%s changed_only=%s\n",
@@ -733,6 +752,8 @@ if($opt{json}) {
 		# Merge previous data with current run
 		unshift @survivors, @prev_survived;
 		unshift @killed_mutants, @prev_killed;
+		my %prev_compile_skipped = %{ $prev->{compile_skipped} || {} };
+		$compile_skipped_by_file{$_} //= $prev_compile_skipped{$_} for grep { !$mutated_files{$_} } keys %prev_compile_skipped;
 
 		# Recalculate totals to include previous data
 		$total  += scalar(@prev_survived) + scalar(@prev_killed);
@@ -752,6 +773,7 @@ if($opt{json}) {
 		killed         => \@killed_mutants,
 		survived       => \@survivors,
 		skipped        => \%skipped_by_file,
+		compile_skipped => \%compile_skipped_by_file,
 	});
 	close $fh;
 }

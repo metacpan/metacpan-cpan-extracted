@@ -372,7 +372,14 @@ TkTextUndoPushAction(stackPtr, type, index1, index2, string, list, listIndex,
     atomPtr->values = NULL;
     atomPtr->displaced = NULL;
     PushAtom(&stackPtr->undoStack, atomPtr);
-    ClearStack(stackPtr, &stackPtr->redoStack);
+    if (type != TK_TEXT_UNDO_SETVALUE) {
+	/*
+	 * A value set (TkTextRecordSet) moves no text: the indices of
+	 * the steps that can be redone stay right, and they are kept.
+	 */
+
+	ClearStack(stackPtr, &stackPtr->redoStack);
+    }
     return atomPtr;
 }
 

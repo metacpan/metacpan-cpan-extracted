@@ -1,0 +1,73 @@
+#!perl
+
+use 5.036;
+use warnings;
+
+our $VERSION = '1.0';
+
+use Getopt::Long       qw(GetOptions);
+use Qmail::Deliverable qw(dot_qmail);
+
+GetOptions 'verbose+' => \my $Verbose, or exit 1;
+
+die "USAGE: $0 [-verbose] <domain> <localpart>\n" if @ARGV != 2;
+
+my ( $domain, $localpart ) = @ARGV;
+my ( $code,   $message )   = qrv("$localpart\@$domain");
+say $message if $Verbose;
+exit $code;
+
+sub qrv ($rcpt) {
+    my $dot_qmail = dot_qmail($rcpt) or return 2 => "No .qmail file found.";
+    open my $fh, '<', $dot_qmail or return 3 => "Cannot read $dot_qmail: $!";
+    while ( defined( my $line = <$fh> ) ) {
+        return 1 => "probably at least deliverable to $line" if $line !~ /^#/;
+    }
+    return 2 => "$dot_qmail is empty.";
+}
+
+__END__
+
+=head1 NAME
+
+qmail-deliverable - drop-in replacement for spamdyke-qrv
+
+=head1 SYNOPSIS
+
+    qmail-deliverable example.org localpart
+
+=head1 DESCRIPTION
+
+You can use this tool to find out if an e-mail address is deliverable locally.
+It aims to be a drop in replacement for
+L<spamdyke-qrv|https://www.spamdyke.org/documentation/README_spamdyke_qrv.html>.
+So it uses the following exit codes:
+
+=over 4
+
+=item 1
+
+The address is valid.
+
+=item 2
+
+The address is invalid, delivery is not possible.
+qmail would accept the message, then bounce it. 
+
+=item 3
+
+The address is unavailable until some condition is met -- usually a file's or
+directory's permissions must be changed.
+qmail would accept a message to this e-mail address and queue it until the
+condition is met.
+When qmail was written, this situation was probably common, since most users
+logged into their mail servers at the command line and edited files by hand.
+These days, an "unavailable" condition is most likely due to a misconfiguration
+that won't be fixed for days (if ever) In that case, qmail will queue the
+message for a while and eventually bounce it. 
+
+=head1 OPTIONS
+
+=head2 -verbose
+
+In addition to the return code, also give a one-line diagnosis to STDOUT.

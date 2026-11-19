@@ -198,4 +198,30 @@ ok(!defined App::FileSync::Merge::check_delete_limit(
 	deletions => 201, base_size => 10_000, max_deletes => 200, force => 1),
 	'--force overrides the limits');
 
+# The defaults: 200 deletions and 10% of the known files.  The server always
+# passes the repo's own limits, so only direct callers get these.
+{
+	my $limit = sub { App::FileSync::Merge::check_delete_limit(@_) };
+	ok(!defined $limit->(deletions => 200, base_size => 1_000_000), 'by default 200 deletions are allowed');
+	like($limit->(deletions => 201, base_size => 1_000_000), qr/refusing to delete 201 files \(limit is 200\)/,
+		'and 201 are refused by the count');
+	ok(!defined $limit->(deletions => 100, base_size => 1_000, max_deletes => 0), 'by default 10% of the known files are allowed');
+	like($limit->(deletions => 101, base_size => 1_000, max_deletes => 0), qr/refusing to delete 101 of 1000 known files \(limit is 10%\)/,
+		'and one more is refused by the percentage');
+
+	# The count limit is inclusive.
+	ok(!defined $limit->(deletions => 5, base_size => 10, max_deletes => 5, max_delete_percent => 0),
+		'exactly max_deletes deletions are allowed');
+	ok(defined $limit->(deletions => 6, base_size => 10, max_deletes => 5, max_delete_percent => 0), 'one more is refused');
+
+	# The percentage allowance rounds down: 10% of 25 is 2.5, so 2.
+	ok(!defined $limit->(deletions => 2, base_size => 25, max_deletes => 0, max_delete_percent => 10),
+		'two deletions of 25 known files are allowed');
+	ok(defined $limit->(deletions => 3, base_size => 25, max_deletes => 0, max_delete_percent => 10),
+		'three are refused: 10% of 25 rounds down to 2');
+
+	ok(!defined $limit->(deletions => 0, base_size => 0, max_deletes => 1, max_delete_percent => 1),
+		'no deletions are always allowed');
+}
+
 done_testing();

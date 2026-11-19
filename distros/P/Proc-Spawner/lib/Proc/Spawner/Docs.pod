@@ -58,9 +58,9 @@ The working documents of only historical interest (the investigation that starte
 corpus statistics, the ceiling measurements, the reports between the sessions, the marks, why Run was replaced) are
 in the Proc-Spawner 0.03 distribution on CPAN; this one no longer ships them.
 
-=head2 Which version a figure belongs to
+=head2 Which version a result belongs to
 
-Every measured figure in these documents names the code it was measured on: I<pre-0.01> (the modules
+Every measured result in these documents names the code it was measured on: I<pre-0.01> (the modules
 under their former names, before the first distribution), I<0.01>, I<0.02> (the parsers of 0.01),
 I<early-post-0.02> (0.02 plus items P1-P4 of the page "Shell Corpus Gaps", the evening of 2026-11-02;
 that code was not kept), and I<0.03>.  The table is at the end of F<doc/README.md>.
@@ -163,7 +163,7 @@ The index of this directory. I<Current.>
 =item L<large-subset-state.md|https://metacpan.org/dist/Proc-Spawner/view/doc/large-subset/large-subset-state.md>
 
 The state of the union: the rules for matching dash and bash and which rule beats which, the corpus
-figures, the work list, the open questions. I<Current> (also as F<.md.html>, see above).
+parse results, the work list, the open questions. I<Current> (also as F<.md.html>, see above).
 
 =for html <p><a href="../../../doc/large-subset/large-subset-state.md">The same file in this release</a></p>
 

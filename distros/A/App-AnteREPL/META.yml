@@ -1,0 +1,56 @@
+---
+abstract: 'BASIC-style program editing with real Perl execution'
+author:
+  - 'Brett Estrade'
+build_requires:
+  Cwd: '0'
+  FindBin: '0'
+  IPC::Open3: '0'
+  Symbol: '0'
+  Test::More: '0'
+  lib: '0'
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: '1'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-AnteREPL
+no_index:
+  directory:
+    - t
+  namespace:
+    - App::AnteREPL::Workspace
+  package:
+    - App::AnteREPL::Evaluator
+    - App::AnteREPL::Screen
+    - App::AnteREPL::ScreenInput
+    - App::AnteREPL::ScreenOutput
+recommends:
+  Term::ReadKey: '0'
+requires:
+  Data::Dumper: '0'
+  Devel::Peek: '0'
+  Encode: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  POSIX: '0'
+  Text::Balanced: '0'
+  Text::ParseWords: '0'
+  Time::HiRes: '0'
+  feature: '0'
+  perl: '5.016'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/oodler577/p5-App-AnteREPL/issues
+  homepage: https://github.com/oodler577/p5-App-AnteREPL/wiki
+  repository: https://github.com/oodler577/p5-App-AnteREPL.git
+version: '0.01'
+x_generated_by_perl: v5.40.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -3,7 +3,7 @@ use warnings;
 
 package Mail::Qmail::Filter::DMARC;
 
-our $VERSION = '1.21';
+our $VERSION = '1.33';
 
 sub domain {
     shift =~ s/.*\@//r;
@@ -37,9 +37,9 @@ has 'dry_run';
 has 'reject_text' => 'Failed DMARC test.';
 
 sub filter {
-    my $self    = shift;
-    my $message = $self->message;
-
+    my $self      = shift;
+    my $message   = $self->message;
+    my $remote_ip = $message->remote_ip;
     require Mail::DKIM::Verifier;    # lazy load because filter might be skipped
     my $dkim = Mail::DKIM::Verifier->new;
     $dkim->PRINT( $message->body =~ s/\cM?\cJ/\cM\cJ/gr );
@@ -48,9 +48,9 @@ sub filter {
 
     if ( $dkim->result ne 'pass' ) {
 
-        $self->debug( 'Remote IP' => $ENV{TCPREMOTEIP} );
+        $self->debug( 'Remote IP' => $remote_ip );
 
-        my %spf_query = ( ip_address => $ENV{TCPREMOTEIP} );
+        my %spf_query = ( ip_address => $remote_ip );
 
         $self->debug( helo => $spf_query{helo_identity} = $message->helo );
 
@@ -73,34 +73,45 @@ sub filter {
         $message->add_header( $spf_result->received_spf_header );
 
         require Mail::DMARC::PurePerl;
-        my $dmarc_text = (
-            my $dmarc_result = Mail::DMARC::PurePerl->new(
-                source_ip   => $ENV{TCPREMOTEIP},
-                envelope_to => domain( ( $message->to )[0] ),
-                if_set(
-                    envelope_from => domain( $message->from ),
-                    \&is_valid_domain
-                ),
-                if_set(
-                    header_from => $header_from_domain,
-                    \&is_valid_domain
-                ),
-                dkim => $dkim,
-                spf  => {
-                    if_set( domain => $header_from_domain ),
-                    scope  => $spf_query{scope},
-                    result => $spf_result->code,
-                },
-            )->validate
-        )->result;
-        $self->debug( 'DMARC result' => $dmarc_text );
-        $message->add_header("DMARC-Status: $dmarc_text");
+        if (
+            my $dmarc = eval {
+                Mail::DMARC::PurePerl->new(
+                    source_ip   => $remote_ip,
+                    envelope_to => domain( ( $message->to )[0] ),
+                    if_set(
+                        envelope_from => domain( $message->from ),
+                        \&is_valid_domain
+                    ),
+                    if_set(
+                        header_from => $header_from_domain,
+                        \&is_valid_domain
+                    ),
+                    dkim => $dkim,
+                    spf  => {
+                        if_set( domain => $header_from_domain ),
+                        scope  => $spf_query{scope},
+                        result => $spf_result->code,
+                    },
+                );
+            }
+          )
+        {
+            my $dmarc_text = ( my $dmarc_result = $dmarc->validate )->result;
+            $self->debug( 'DMARC result' => $dmarc_text );
+            $message->add_header("DMARC-Status: $dmarc_text");
 
-        if ( $dmarc_result->result ne 'pass' ) {
-            my $disposition = $dmarc_result->disposition;
-            $self->debug( 'DMARC disposition' => $disposition );
-            $self->reject( $self->reject_text )
-              if $disposition eq 'reject' && !$self->dry_run;
+            if ( $dmarc_text ne 'pass' ) {
+                my $disposition = $dmarc_result->disposition;
+                $self->debug( 'DMARC disposition' => $disposition );
+                $self->reject( $self->reject_text )
+                  if $disposition eq 'reject' && !$self->dry_run;
+            }
+        }
+        else {
+            chomp( my $error = $@ );
+            $error =~ y/\n/ /;
+            $self->debug("DMARC test failed: $error");
+            $self->reject( $self->reject_text ) unless $self->dry_run;
         }
     }
 }

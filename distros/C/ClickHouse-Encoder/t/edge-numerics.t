@@ -97,17 +97,22 @@ for my $case (
 # Decimal128 / Decimal256 boundaries via string path (exact arithmetic) ---
 {
     my $enc = ClickHouse::Encoder->new(columns => [['v', 'Decimal128(0)']]);
-    # 2^127 - 1 = 170141183460469231731687303715884105727 (max signed 128)
-    my $bin = $enc->encode([['170141183460469231731687303715884105727']]);
-    is(tail_bytes($bin, 16),
-       "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\x7f",
-       'Decimal128(0): 2^127 - 1 wire bytes');
+    my $bin = $enc->encode([['9' x 38]]);
+    is(unpack('H*', tail_bytes($bin, 16)), 'ffffffff3f228a097ac4865aa84c3b4b',
+       'Decimal128(0): 10^38 - 1 wire bytes');
+    $bin = $enc->encode([['-' . '9' x 38]]);
+    is(unpack('H*', tail_bytes($bin, 16)), '01000000c0dd75f6853b79a557b3c4b4',
+       'Decimal128(0): -(10^38 - 1) wire bytes (two\'s complement)');
 
-    # -(2^127) = -170141183460469231731687303715884105728 (min signed 128)
-    $bin = $enc->encode([['-170141183460469231731687303715884105728']]);
-    is(tail_bytes($bin, 16),
-       "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80",
-       'Decimal128(0): -2^127 wire bytes (two\'s complement)');
+    $enc = ClickHouse::Encoder->new(columns => [['v', 'Decimal256(0)']]);
+    $bin = $enc->encode([['9' x 76]]);
+    is(unpack('H*', tail_bytes($bin, 32)),
+       'ffffffffffffffffff0f9571f1a57577792965e8abb46407b5159911a7cc1b16',
+       'Decimal256(0): 10^76 - 1 wire bytes');
+    $bin = $enc->encode([['-' . '9' x 76]]);
+    is(unpack('H*', tail_bytes($bin, 32)),
+       '010000000000000000f06a8e0e5a8a8886d69a17544b9bf84aea66ee5833e4e9',
+       'Decimal256(0): -(10^76 - 1) wire bytes');
 }
 
 done_testing();

@@ -1,5 +1,11 @@
 Revision history for Alien::sqlite
 
+1.09 2026-11-19
+    - Share builds: 
+      - Consolidate the gmake plugin checks for BSD and Windows
+      - Remove --with-local configure arg from BSDs as the configure script 
+        does not recognise it and errors with recent sqlite versions.
+
 1.08 2026-11-18
     - Set minimum sqlite version to 3.37.2. This matches Ubuntu 22.04 LTS.
     - Share builds now install 3.54.1

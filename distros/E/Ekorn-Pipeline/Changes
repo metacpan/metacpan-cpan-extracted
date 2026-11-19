@@ -2,6 +2,18 @@ Revision history for Ekorn-Pipeline
 
 Unreleased
 
+v0.3.7 2026-11-18
+
+    The reference ends in an index: each module, A to Z, with its
+    functions and methods, A to Z, what each does, and how it's
+    exported, linked to where it's described.
+
+    It ships no roadmap item, and changes only the documentation: the
+    code is v0.3.6's.
+
+    - Ekorn::Pipeline::Manual::Reference, and docs/REFERENCE.md, have
+      an Index, after The modules.
+
 v0.3.6 2026-11-17
 
     A pipeline can be fed its values as they arrive, from a library

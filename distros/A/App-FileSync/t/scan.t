@@ -83,4 +83,54 @@ sub _write {
 	utime($mtime, $mtime, $path);
 }
 
+# --- clean_stale_temps ---------------------------------------------------------
+
+# A run that dies leaves .filesync-tmp-* files behind.  Those at least
+# max_age old are removed anywhere under the root; younger ones may belong to
+# a run in progress, and nothing else is touched.
+{
+	my $now = time;
+	my $hour = 3_600;
+	my $tree = tempdir(CLEANUP => 1);
+	my $path = sub { File::Spec->catfile($tree, split m{/}, shift) };
+	make_path($path->('sub/deep'), $path->('.filesync-tmp-dir'));
+
+	my %files = (
+		'.filesync-tmp-root'          => $now - 2 * $hour,	# stale, at the root
+		'sub/deep/.filesync-tmp-deep' => $now - 2 * $hour,	# stale, nested
+		'sub/.filesync-tmp-boundary'  => $now - $hour,	# exactly max_age: stale
+		'sub/.filesync-tmp-young'     => $now - 60,	# a run may still own it
+		'old.txt'                     => $now - 9 * $hour,	# not a temporary
+		'sub/x.filesync-tmp-1'        => $now - 9 * $hour,	# the prefix is not at the start
+		'.filesync-tmp-dir/inside'    => $now - 9 * $hour,	# a directory is not a temp file
+	);
+	_write($path->($_), "data\n", $files{$_}) for keys %files;
+
+	is(App::FileSync::Scan::clean_stale_temps(root => $tree), 3, 'three stale temporaries are removed');
+	ok(!-e $path->($_), "$_ is gone") for qw(.filesync-tmp-root sub/deep/.filesync-tmp-deep sub/.filesync-tmp-boundary);
+	ok(-e $path->($_), "$_ is kept")
+		for qw(sub/.filesync-tmp-young old.txt sub/x.filesync-tmp-1 .filesync-tmp-dir/inside);
+	ok(-d $path->('.filesync-tmp-dir'), 'a directory with the prefix is kept');
+
+	is(App::FileSync::Scan::clean_stale_temps(root => $tree), 0, 'a second pass finds nothing');
+	is(App::FileSync::Scan::clean_stale_temps(root => $tree, max_age => 0), 1, 'max_age 0 takes the young one too');
+	ok(!-e $path->('sub/.filesync-tmp-young'), 'which is then gone');
+
+	is(App::FileSync::Scan::clean_stale_temps(root => $path->('missing')), 0, 'a missing root removes nothing');
+	is(App::FileSync::Scan::clean_stale_temps(), 0, 'and so does no root');
+}
+
+# A symlinked directory is not followed out of the tree.
+SKIP: {
+	my $tree = tempdir(CLEANUP => 1);
+	my $outside = tempdir(CLEANUP => 1);
+	my $stale = File::Spec->catfile($outside, '.filesync-tmp-elsewhere');
+	_write($stale, "data\n", time - 7_200);
+	skip 'symlinks are not available here', 2
+		unless eval { symlink $outside, File::Spec->catfile($tree, 'link') };
+
+	is(App::FileSync::Scan::clean_stale_temps(root => $tree), 0, 'nothing is removed through a symlink');
+	ok(-e $stale, 'the temporary outside the tree is untouched');
+}
+
 done_testing();

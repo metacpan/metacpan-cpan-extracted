@@ -33,6 +33,18 @@ my (@warnings, @bgerrors, %freed);
 local $SIG{__WARN__} = sub { push @warnings, $_[0] };
 local *Tk::Error = sub { push @bgerrors, $_[1] };
 sub reset_logs { @warnings = @bgerrors = (); %freed = () }
+# Values set and dropped with -undo off: not recorded, so a value dropped
+# is freed when the command returns (since 2.10 a setting with -undo on
+# keeps the value it replaces in the undo step).
+sub unrecorded {
+  my ($w, $code) = @_;
+  my $undo = $w->cget('-undo');
+  $w->configure(-undo => 0);
+  my $ok = eval { $code->(); 1 };
+  my $err = $@;
+  $w->configure(-undo => $undo);
+  die $err unless $ok;
+}
 
 {
   package V;			# a value; it dies in DESTROY if asked to
@@ -81,7 +93,7 @@ ok(eval { $u->insert('1.0', 'X'); $u->delete('1.0'); 1 }, 'the widget works on')
 reset_logs();
 $u->markSet('a', '1.2');
 $u->markData('a', V::Quiet->new('quiet'));
-$r = eval { $u->markData('a', undef); 'returned' } // "died: $@";
+$r = eval { unrecorded($u, sub { $u->markData('a', undef) }); 'returned' } // "died: $@";
 is($r, 'returned', 'DESTROY dies, warnings off: the command returns normally');
 is_deeply(\%freed, { quiet => 1 }, 'the value is freed');
 is(scalar @warnings, 0, 'and the error is lost');
@@ -94,7 +106,7 @@ $u->editReset;
 $u->markData('q1', V->new('dropped'));
 $u->markData('a', V->new('changes', die => 1, hook => sub {
   $u->insert('1.0', 'Y');
-  $u->markData('q1', undef);
+  unrecorded($u, sub { $u->markData('q1', undef) });
 }));
 $r = eval { $u->markUnset('a'); 'returned' } // "died: $@";
 is($r, 'returned', 'a DESTROY that changes the widget, then dies: the command returns');
@@ -137,17 +149,21 @@ for my $how ('caught', 'rethrown', 'direct, $^W', 'direct') {
       return;
     }
     if ($self->{n} eq '9') {
-      $u->markData('q1', link_value('10a'));
-      $u->markData('q2', link_value('10b'));
-      $u->markData($_, undef) for qw(q1 q2);
+      unrecorded($u, sub {
+	$u->markData('q1', link_value('10a'));
+	$u->markData('q2', link_value('10b'));
+	$u->markData($_, undef) for qw(q1 q2);
+      });
     } else {
-      $u->markData('p', link_value($self->{n} + 1));
-      $u->markData('p', undef);
+      unrecorded($u, sub {
+	$u->markData('p', link_value($self->{n} + 1));
+	$u->markData('p', undef);
+      });
     }
   };
   my $what = "refused, $how";
   $u->markData('p', link_value(1));
-  $r = eval { $u->markData('p', undef); 'returned' } // "died: $@";
+  $r = eval { unrecorded($u, sub { $u->markData('p', undef) }); 'returned' } // "died: $@";
   is($r, 'returned', "$what: the command returns normally");
   is($u->get('1.0', 'end -1c'), "abcdef\nghijkl\n1,2,3,4,5,6,7,8,9,",
      "$what: the changes up to round 9 are made");
@@ -184,13 +200,15 @@ reset_logs();
 $chain_hook = sub {
   my $self = shift;
   $u->insert('end -1c', "$self->{n},");	# refused at the limit: dies
-  $u->markData('p', V::Mult->new($self->{n} + 1, hook => $chain_hook));
-  $u->markData('p', undef);
+  unrecorded($u, sub {
+    $u->markData('p', V::Mult->new($self->{n} + 1, hook => $chain_hook));
+    $u->markData('p', undef);
+  });
 };
 $u->markData('p', V::Mult->new(1, hook => $chain_hook));
 {
   local $^W = 1;
-  $r = eval { $u->markData('p', undef); 'returned' } // "died: $@";
+  $r = eval { unrecorded($u, sub { $u->markData('p', undef) }); 'returned' } // "died: $@";
 }
 $mw->update;
 is($r, 'returned', 'DESTROYmult dies: the command returns normally');
@@ -235,7 +253,7 @@ sub vc_check {
   is_deeply(\%freed, $freed, "$what: the values freed");
 }
 $t->blockNodedata('2.1', 0, V->new('n1'));
-vc_check('a node value replaced', sub { $t->blockNodedata('2.1', 0, V->new('n2')) },
+vc_check('a node value replaced', sub { unrecorded($t, sub { $t->blockNodedata('2.1', 0, V->new('n2')) }) },
 	 ['drop node (set)'], { n1 => 1 });
 is($t->blockNodedata('2.1', 0)->{n}, 'n2', 'the new value is set');
 $t->tagAdd('x', '1.1', '1.3');
@@ -267,7 +285,7 @@ $t->insert('1.0', "abc\n");
 $t->markSet('m', '1.1');
 $t->markData('m', V::Detach->new('d1'));
 reset_logs();
-$r = eval { $t->markData('m', V::Detach->new('d2')); 'returned' } // "died: $@";
+$r = eval { unrecorded($t, sub { $t->markData('m', V::Detach->new('d2')) }); 'returned' } // "died: $@";
 $mw->update;
 is($r, 'returned', 'DETACH dies: the command returns normally');
 is_deeply(\@V::Detach::calls, ['drop'], 'DETACH was called');

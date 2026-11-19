@@ -1,3 +1,55 @@
+2.10 (2026-11-18):
+	Value settings are recorded for undo whenever -undo is on (the
+	owner's decision; BUGS 41): "block nodedata", "tag data", "mark
+	data" and "block data" were recorded only inside an edit step
+	(2.09), and outside it the value replaced was freed at once, so
+	the undo of an earlier edit left the new value where the old one
+	had been.  Now the value replaced waits in the undo step, the
+	undo gives it back, the redo sets the new one again; -valuecommand
+	is told "stash" (with -undo off, "drop", as before).  With
+	-autoseparators a setting joins the step that is open (the edit
+	before it) without ending it; where none is open (after undo,
+	redo, reset, the end of an edit step, a block command) it starts
+	one, which the next settings join and the next edit ends.  A
+	setting keeps the steps that can be redone (it moves no text), and
+	neither it nor its undo and redo count for "edit modified" (the
+	undo of a step holding settings inside an edit step made the
+	widget modified in 2.09).  The undo of a mark's setting tells
+	-valuecommand where the mark is then.  Programs that set values
+	they do not want undone switch -undo off around those calls.  The
+	manual: "Undo and redo of block and tag changes", "Several changes
+	as one undo step", "Values".  Tests in t/values.t, t/step.t and
+	t/data-slots.t; the tests of the old rule set those values with
+	-undo off.
+	The frames of split lines take room (the owner's request; BUGS
+	37): in the default layout the leaves move in by the room of the
+	frames (the stroke widths and one pixel between strokes) and the
+	block is that much bigger on each side; under a layout callback a
+	child that will be a stack with frames is reported bigger by the
+	room on each side, and its leaves go the room in from each side of
+	the box the callback gives it.  The frames are no longer clipped
+	to the display line.  The split lines take room too: in a stack
+	the lower leaf is below the upper one by the room of the lines
+	between them (of the larger of two halves), the lines in that room
+	instead of on the top rows of the lower leaf under its text; a
+	group of leaves is reported to a layout callback with that room in
+	its height.  Blocks with lines or frames are drawn bigger than in
+	2.09 unless -splitlines is off.  The manual: "Split lines and
+	frames", "Layout callback".  Tests in t/splitlines.t.
+	The two builds of the value containers are called value=Perl (the
+	default, the Perl value itself) and value=C-array (typed slots in
+	C arrays, ETEXT_DATA_ARRAYS=1 perl Makefile.PL) in the documents;
+	the entries above, and older notes, call them representation A and
+	B.
+	A refused element of the result of a layout callback no longer
+	leaves the elements before it applied: leaves they had moved or
+	hidden get the default layout back, and lines they had stolen are
+	dropped, so the block is laid out as if it had no callback, as
+	the manual says (BUGS 39).  Test in t/regress.t.
+	"get" of an empty range (the same index twice, or from "end")
+	gives an empty string, as Tk::Text, not undef (BUGS 40).  Test in
+	t/regress.t.
+
 2.09 (2026-11-12):
 	Split lines and frames (the manual's "Split lines and frames",
 	in "Display of blocks"; the owner's design, STRICTURES.md 8.8 to

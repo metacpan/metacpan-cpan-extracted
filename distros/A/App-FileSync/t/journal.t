@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Test::Most;
 
+use Digest::SHA ();
 use File::Spec;
 use FindBin qw($Bin);
 
@@ -361,6 +362,28 @@ unlike($output, qr/^docs:$/m, 'and nothing was printed before the failure');
 		'--warnings filters each repo');
 	is_deeply([ map { $_->{warnings} } @{ $data->{results} } ], [ 1, 1 ],
 		'and is echoed on every result');
+}
+
+# --- a conflict the master wins is journalled when the client acks it -------
+
+# Its own repo: the tests above count the conflict sessions in theirs.
+{
+	my $own = TestSync->new_env();
+	my $own_events = sub { App::FileSync::Admin->new(root => $own->{server})->journal_read(repo => 'docs') };
+
+	$own->write_file('client', 'b.txt', "base b\n", 1_700_000_000);
+	$own->sync();
+	$own->write_file('client', 'b.txt', "client b\n", 1_700_001_000);
+	$own->write_file('server', 'b.txt', "server b\n", 1_700_001_900);
+	$own->write_file('server', 'c.txt', "only pulled\n", 1_700_001_900);
+
+	is($own->sync()->{summary}{conflicts}, 1, 'the master-side edit conflicted');
+	my @remote = grep { $_->{action} eq 'conflict' && $_->{path} eq 'b.txt' } @{ $own_events->() };
+	is(scalar @remote, 1, 'the conflict the master won is journalled once');
+	is($remote[0]{winner}, 'remote', 'with the master as the winner');
+	is($remote[0]{winner_sha256}, Digest::SHA::sha256_hex("server b\n"), 'and the master version as the winning hash');
+	is_deeply([ grep { $_->{action} eq 'conflict' && $_->{path} eq 'c.txt' } @{ $own_events->() } ], [],
+		'a plain pull in the same sync is not journalled as a conflict');
 }
 
 done_testing();

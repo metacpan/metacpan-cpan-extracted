@@ -472,36 +472,71 @@ class TestCase::IO::Socket::SSL {
   static method connect_deadline : int () {
     
     my $success_ref = [1];
+    my $server_start_ch = Go->make(1);
     
-    {
-      my $host = "127.0.0.1";
+    my $wg = Go::Sync::WaitGroup->new;
+    $wg->add(1);
+    Go->go([$success_ref : int[], $server_start_ch : Go::Channel, $wg : Go::Sync::WaitGroup] method : void () {
       
-      # Use a deadline that has already passed to ensure an immediate timeout.
-      my $deadline = Go::Time->now->add(Go::Duration_1l->new_from_sec(-1.0));
+      Fn->defer([$wg : Go::Sync::WaitGroup] method : void () {
+        $wg->done;
+      });
       
-      my $socket = (IO::Socket::SSL)undef;
+      my $port_ref = [0];
+      Go->go([$server_start_ch : Go::Channel, $port_ref : int[]] method : void () {
+        eval {
+          my $listen_socket = IO::Socket::SSL->new({
+            Context => Go->bg,
+            LocalAddr => "127.0.0.1",
+            Listen => 5,
+            SSL_cert_file => "$FILE_DIR/simple-cert.cert.pem",
+            SSL_key_file => "$FILE_DIR/simple-cert.key.pem",
+          });
+          
+          $port_ref->[0] = $listen_socket->sockport;
+          $server_start_ch->write(1);
+          
+          # Accept might fail because client times out immediately
+          eval {
+            my $client_socket = $listen_socket->accept(Go->bg);
+            if ($client_socket) { $client_socket->close; }
+          };
+          
+          $listen_socket->close;
+        }
+        if ($@) {
+          # Ignore server-side accept/handshake errors caused by client immediate timeout
+        }
+      });
+      
       eval {
-        $socket = IO::Socket::SSL->new({
-          Context => Go->bg,
+        $server_start_ch->read;
+        my $port = $port_ref->[0];
+        my $host = "127.0.0.1";
+        
+        # Create a context with a negative timeout to ensure an immediate timeout.
+        my $ctx_derived = Go::Context->with_timeout_sec(Go::Context->background, -1.0);
+        my $ctx = $ctx_derived->context;
+        
+        my $socket = IO::Socket::SSL->new({
+          Context => $ctx,
           PeerAddr => $host,
-          ReadDeadline => $deadline,
-          WriteDeadline => $deadline,
+          PeerPort => $port,
           SSL_verify_mode => SSL->SSL_VERIFY_NONE,
         });
+        
+        warn "Connection unexpectedly succeeded despite an expired context.";
+        $success_ref->[0] = 0;
+        if ($socket) { $socket->close; }
       }
-      
       if ($@) {
         unless ($@ isa Go::Error::IOTimeout) {
           warn "Unexpected error: " . $@;
           $success_ref->[0] = 0;
         }
       }
-      else {
-        warn "Connection unexpectedly succeeded despite an expired deadline.";
-        $success_ref->[0] = 0;
-        if ($socket) { $socket->close; }
-      }
-    }
+    });
+    $wg->wait;
     
     unless ($success_ref->[0]) {
       return 0;
@@ -538,7 +573,7 @@ class TestCase::IO::Socket::SSL {
           $server_start_ch->write(1);
           my $client_socket = $listen_socket->accept(Go->bg);
           
-          # Sleep longer than the client's deadline to trigger the timeout.
+          # Sleep longer than the client's timeout to trigger the timeout.
           Go->sleep(Go::Duration_1l->new_from_sec(1.0));
           
           $client_socket->close;
@@ -560,17 +595,17 @@ class TestCase::IO::Socket::SSL {
           SSL_verify_mode => SSL->SSL_VERIFY_NONE,
         });
         
-        # Set a short deadline (0.5 seconds from now)
-        my $deadline = Go::Time->now->add(Go::Duration_1l->new_from_sec(0.5));
-        $socket->set_deadline($deadline);
+        # Create a context with a short timeout (0.5 seconds)
+        my $ctx_derived = Go::Context->with_timeout_sec(Go::Context->background, 0.5);
+        my $ctx = $ctx_derived->context;
         
         my $buffer = (mutable string)new_string_len 1024;
         
-        # This should block and eventually throw DeadlineExceeded because the server sends nothing.
-        $socket->sysread(Go->bg, $buffer);
+        # This should block and eventually throw IOTimeout because the server sends nothing.
+        $socket->sysread($ctx, $buffer);
         
         # If no exception is thrown, it's a failure.
-        warn "sysread unexpectedly succeeded or returned 0 before deadline.";
+        warn "sysread unexpectedly succeeded or returned 0 before timeout.";
         $success_ref->[0] = 0;
         $socket->close;
       }
@@ -606,14 +641,14 @@ class TestCase::IO::Socket::SSL {
           SSL_key_file => "$FILE_DIR/simple-cert.key.pem",
         });
         
-        # Set a short deadline for accept and accept_SSL.
-        my $deadline = Go::Time->now->add(Go::Duration_1l->new_from_sec(0.5));
-        $listen_socket->set_deadline($deadline);
+        # Create a context with a short timeout (0.5 seconds) for accept.
+        my $ctx_derived = Go::Context->with_timeout_sec(Go::Context->background, 0.5);
+        my $ctx = $ctx_derived->context;
         
-        # This should block and eventually throw DeadlineExceeded because no client connects.
-        my $client_socket = $listen_socket->accept(Go->bg);
+        # This should block and eventually throw IOTimeout because no client connects.
+        my $client_socket = $listen_socket->accept($ctx);
         
-        warn "accept unexpectedly succeeded before deadline.";
+        warn "accept unexpectedly succeeded before timeout.";
         $success_ref->[0] = 0;
         $client_socket->close;
         $listen_socket->close;
@@ -661,7 +696,7 @@ class TestCase::IO::Socket::SSL {
           # Accept the connection but DO NOT read.
           my $client_socket = $listen_socket->accept(Go->bg);
           
-          # Keep the connection alive longer than the client's deadline.
+          # Keep the connection alive longer than the client's timeout.
           Go->sleep(Go::Duration_1l->new_from_sec(2.0));
           
           $client_socket->close;
@@ -682,15 +717,15 @@ class TestCase::IO::Socket::SSL {
           SSL_verify_mode => SSL->SSL_VERIFY_NONE,
         });
         
-        # Set a very short deadline to ensure it triggers.
-        my $deadline = Go::Time->now->add(Go::Duration_1l->new_from_sec(0.5));
-        $socket->set_deadline($deadline);
+        # Create a context with a very short timeout to ensure it triggers.
+        my $ctx_derived = Go::Context->with_timeout_sec(Go::Context->background, 0.5);
+        my $ctx = $ctx_derived->context;
         
         # Smaller payload, but send many times to fill the buffer.
         my $payload = Fn->repeat("a", 8192);
         
         while (1) {
-          $socket->syswrite(Go->bg, $payload);
+          $socket->syswrite($ctx, $payload);
         }
       }
       if ($@) {
@@ -758,13 +793,13 @@ class TestCase::IO::Socket::SSL {
           SSL_verify_mode => SSL->SSL_VERIFY_NONE,
         });
         
-        my $read_deadline = Go::Time->now->add(Go::Duration_1l->new_from_sec(0.3));
-        $socket->set_read_deadline($read_deadline);
+        my $ctx_derived = Go::Context->with_timeout_sec(Go::Context->background, 0.3);
+        my $ctx = $ctx_derived->context;
         
         my $buffer = (mutable string)new_string_len 1024;
-        $socket->sysread(Go->bg, $buffer);
+        $socket->sysread($ctx, $buffer);
         
-        warn "sysread unexpectedly succeeded before ReadDeadline.";
+        warn "sysread unexpectedly succeeded before timeout.";
         $success_ref->[0] = 0;
       }
       if ($@) {
@@ -831,12 +866,12 @@ class TestCase::IO::Socket::SSL {
           SSL_verify_mode => SSL->SSL_VERIFY_NONE,
         });
         
-        my $write_deadline = Go::Time->now->add(Go::Duration_1l->new_from_sec(0.3));
-        $socket->set_write_deadline($write_deadline);
+        my $ctx_derived = Go::Context->with_timeout_sec(Go::Context->background, 0.3);
+        my $ctx = $ctx_derived->context;
         
         my $payload = Fn->repeat("a", 8192);
         while (1) {
-          $socket->syswrite(Go->bg, $payload);
+          $socket->syswrite($ctx, $payload);
         }
       }
       if ($@) {

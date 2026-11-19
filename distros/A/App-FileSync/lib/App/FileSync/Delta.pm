@@ -24,7 +24,7 @@ use Sub::Private { mode => 'enforce' };
 use App::FileSync::I18N qw(throw os_error);
 use App::FileSync::IO qw(open_file);
 
-use version; our $VERSION = version->declare('0.002.1');
+use version; our $VERSION = version->declare('0.002.2');
 
 # Tunables (package variables so tests can shrink them with "local").
 our $MIN_SIZE   = 65_536;
@@ -758,11 +758,12 @@ sub _rolling_scan :Private {
 	# not queued one at a time: $run_start marks where the current literal run
 	# began, and the run is queued in one piece when a match or the end of the
 	# buffer closes it.  $a and $b are always already masked.
-	my $last = $limit > $SCAN_LIMIT ? $SCAN_LIMIT : $limit;
+	# diff fills the buffer with at most $SCAN_LIMIT + $block bytes, so $limit,
+	# the last window position, is never past $SCAN_LIMIT.
 	my ($a, $b) = $weak_parts->(substr($buffer, 0, $block));
 	my ($position, $run_start) = (0, 0);
 
-	while ($position <= $last) {
+	while ($position <= $limit) {
 		if (vec($tags, $a, 1) and my $candidates = $by_weak{ ($b << $HALF_BITS) | $a }) {
 			my $winner = _strong_match($candidates, $buffer, $position, $block);
 			if (defined $winner) {
@@ -770,7 +771,7 @@ sub _rolling_scan :Private {
 				_add_copy($state, $winner * $block, $block);
 				$position += $block;
 				$run_start = $position;
-				($a, $b) = $weak_parts->(substr($buffer, $position, $block)) if $position <= $last;
+				($a, $b) = $weak_parts->(substr($buffer, $position, $block)) if $position <= $limit;
 				next;
 			}
 		}
@@ -778,7 +779,7 @@ sub _rolling_scan :Private {
 		# Roll the window forward one byte, unless this was the last full
 		# window in the buffer.  The byte entering the window is the one just
 		# past its end.
-		if ($position < $last) {
+		if ($position < $limit) {
 			my $out_byte = vec($buffer, $position, $BYTE_BITS);
 			my $in_byte  = vec($buffer, $position + $block, $BYTE_BITS);
 			$a = ($a - $out_byte + $in_byte) & $HALF;

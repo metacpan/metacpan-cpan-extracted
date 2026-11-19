@@ -128,6 +128,9 @@ typedef ptrdiff_t ssize_t;
 #elif defined(__HAIKU__)
 #define INFIX_OS_HAIKU
 #define INFIX_ENV_POSIX
+#elif defined(__gnu_hurd__)
+#define INFIX_OS_HURD
+#define INFIX_ENV_POSIX
 #else
 #warning "Unsupported/unknown operating system"
 #endif

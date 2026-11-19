@@ -1,12 +1,12 @@
 #!/usr/bin/perl
-# Representation B of the containers of values (tkTextData.h, built
+# value=C-array, the containers of values as C arrays (tkTextData.h, built
 # with ETEXT_DATA_ARRAYS=1 perl Makefile.PL): a slot other than the
 # Perl value (a TK_TEXT_DATA_INT, set through the test hook
 # "_dataslot", which only B has) travels with the container: it
 # survives drop -> undo -> redo and the merges (N5 keeps the first
 # container present, whole), it stays when only the Perl value is set
 # to undef, and every container is freed exactly once.  Skipped with
-# representation A (the default), which has no such slots.
+# value=Perl (the default), which has no such slots.
 use strict;
 use warnings;
 use Test::More;
@@ -26,12 +26,24 @@ my $probe = $mw->eText;
 unless (eval { $probe->WidgetMethod('_dataslot', 'live'); 1 }) {
   $probe->destroy;
   $mw->destroy;
-  plan skip_all => 'representation A (the default build): no slots but the Perl value';
+  plan skip_all => 'value=Perl (the default build): no slots but the Perl value';
 }
-plan tests => 140;
+plan tests => 154;
 
 sub live { $probe->WidgetMethod('_dataslot', 'live') }
 sub ds { my $t = shift; $t->WidgetMethod('_dataslot', @_) }
+# The values set below are set with -undo off: not recorded (since 2.10
+# a setting with -undo on is, and with -autoseparators off it would join
+# the step of the edit after it); "A recorded setting" tests that case.
+sub unrecorded {
+  my ($t, $code) = @_;
+  my $undo = $t->cget('-undo');
+  $t->configure(-undo => 0);
+  my $ok = eval { $code->(); 1 };
+  my $err = $@;
+  $t->configure(-undo => $undo);
+  die $err unless $ok;
+}
 
 my %destroyed;			# DESTROY count per name
 {
@@ -65,11 +77,11 @@ is($base, 0, 'no data block alive at first');
   is(ds($t, 'node', '2.2', 0), 11, 'an INT slot on a leaf');
   is(live(), $base + 1, 'one data block');
   ok(!defined $t->blockNodedata('2.2', 0), 'the Perl value is still undef');
-  $t->blockNodedata('2.2', 0, V->new('a'));
+  unrecorded($t, sub { $t->blockNodedata('2.2', 0, V->new('a')) });
   is(nv($t->blockNodedata('2.2', 0)), 'a', 'the Perl value set beside it');
   is(ds($t, 'node', '2.2', 0), 11, 'the slot is still there');
   is(live(), $base + 1, 'in the same block');
-  $t->blockNodedata('2.2', 0, undef);
+  unrecorded($t, sub { $t->blockNodedata('2.2', 0, undef) });
   is($destroyed{a}, 1, 'setting undef frees the Perl value, once');
   is(ds($t, 'node', '2.2', 0), 11, 'and leaves the slot');
   is(live(), $base + 1, 'and the block');
@@ -81,9 +93,9 @@ is($base, 0, 'no data block alive at first');
 
   # Marks.
   $t->markSet('m', '1.1');
-  $t->markData('m', V->new('m1'));
+  unrecorded($t, sub { $t->markData('m', V->new('m1')) });
   ds($t, 'mark', 'm', 5);
-  $t->markData('m', undef);
+  unrecorded($t, sub { $t->markData('m', undef) });
   is($destroyed{m1}, 1, 'mark data undef frees the Perl value once');
   is(ds($t, 'mark', 'm'), 5, 'and leaves the slot of the mark');
   $t->markSet('m', '3.1');
@@ -94,16 +106,16 @@ is($base, 0, 'no data block alive at first');
 
   # Runs.
   $t->tagAdd('b', '1.0', '1.2');
-  $t->tagData('b', '1.0', V->new('r1'));
+  unrecorded($t, sub { $t->tagData('b', '1.0', V->new('r1')) });
   ds($t, 'run', 'b', '1.1', 6);
-  $t->tagData('b', '1.1', undef);
+  unrecorded($t, sub { $t->tagData('b', '1.1', undef) });
   is($destroyed{r1}, 1, 'tag data undef frees the Perl value once');
   is(ds($t, 'run', 'b', '1.0'), 6, 'and leaves the slot of the run');
 
   # Blocks.
-  $t->blockData('2.2', V->new('i1'));
+  unrecorded($t, sub { $t->blockData('2.2', V->new('i1')) });
   ds($t, 'block', '2.2', 7);
-  $t->blockData('2.2', undef);
+  unrecorded($t, sub { $t->blockData('2.2', undef) });
   is($destroyed{i1}, 1, 'block data undef frees the Perl value once');
   is(ds($t, 'block', '2.2'), 7, 'and leaves the slot of the block');
   ($block) = $t->blockList('2.0', '2.end');
@@ -120,7 +132,7 @@ is($base, 0, 'no data block alive at first');
   my $t = fraction(-undo => 1);
   ds($t, 'node', '2.2', 0, 11);			# num: a slot only
   ds($t, 'node', '2.6', 0, 22);			# den: a slot and a value
-  $t->blockNodedata('2.6', 0, V->new('den'));
+  unrecorded($t, sub { $t->blockNodedata('2.6', 0, V->new('den')) });
   ds($t, 'node', '2.2', 1, 33);			# the root: a slot only
   is(live(), $base + 3, 'three containers');
   $t->delete('2.4', '2.8');			# "|den": the leaf den goes
@@ -144,7 +156,7 @@ is($base, 0, 'no data block alive at first');
   is(live(), $base + 3, 'no container made or lost on the way');
 
   # A container with only a slot is dropped and given back whole too.
-  $t->blockNodedata('2.6', 0, undef);
+  unrecorded($t, sub { $t->blockNodedata('2.6', 0, undef) });
   is($destroyed{den}, 1, 'the value freed once');
   $t->delete('2.4', '2.8');
   $t->editSeparator;
@@ -162,7 +174,7 @@ is($base, 0, 'no data block alive at first');
   my $t = fraction(-undo => 1);
   ds($t, 'node', '2.2', 0, 11);			# num: a slot only
   ds($t, 'node', '2.6', 0, 22);			# den: a slot and a value
-  $t->blockNodedata('2.6', 0, V->new('d2'));
+  unrecorded($t, sub { $t->blockNodedata('2.6', 0, V->new('d2')) });
   $t->delete('2.4', '2.5');			# the separator: one leaf
   $t->editSeparator;
   is($t->get('2.0', '2.end'), '{numden}', 'the leaves joined');
@@ -206,7 +218,7 @@ is($base, 0, 'no data block alive at first');
   $t->editSeparator;
   ds($t, 'run', 'b', '1.0', 1);			# a slot only
   ds($t, 'run', 'b', '3.0', 2);			# a slot and a value
-  $t->tagData('b', '3.0', V->new('r2'));
+  unrecorded($t, sub { $t->tagData('b', '3.0', V->new('r2')) });
   $t->tagRemove('b', '1.0', '1.1');		# the whole first run
   $t->editSeparator;
   is_deeply([$t->tagRanges('b')], ['3.0', '3.1'], 'the first run removed');
@@ -240,7 +252,7 @@ is($base, 0, 'no data block alive at first');
   $t->blockInsert('F', '1.0', '1.2');
   $t->editSeparator;
   ds($t, 'block', '1.1', 9);
-  $t->blockData('1.1', V->new('i9'));
+  unrecorded($t, sub { $t->blockData('1.1', V->new('i9')) });
   $t->editUndo;					# dissolves the new block
   is($t->get('1.0', '1.end'), 'ab', 'undo: the block is dissolved');
   ok(!$destroyed{i9}, 'its instance data is kept by the undo atom');
@@ -287,7 +299,7 @@ is($base, 0, 'no data block alive at first');
   my %slot = (E => 1, F => 2, G => 3);
   for my $b (sort keys %at) {
     ds($t, 'block', $at{$b}, $slot{$b});
-    $t->blockData($at{$b}, V->new("b$b")) unless $b eq 'G';	# G: a slot only
+    unrecorded($t, sub { $t->blockData($at{$b}, V->new("b$b")) }) unless $b eq 'G';	# G: a slot only
   }
   is(live(), $base + 3, 'three containers');
   my $slots = sub { join ',', map { ds($t, 'block', $at{$_}) // '-' } sort keys %at };
@@ -345,7 +357,7 @@ is($base, 0, 'no data block alive at first');
   my $t = fraction(-undo => 1);
   my $v = V->new('sprouted');
   ds($t, 'node', '2.2', 0, 44);
-  $t->blockNodedata('2.2', 0, $v);
+  unrecorded($t, sub { $t->blockNodedata('2.2', 0, $v) });
   undef $v;
   $t->blockSprout('2.2', '2.3');			# R( n | N( u ) | m | den )
   is(ds($t, 'node', '2.1', 0), 44, 'sprout: the start piece keeps the slot');
@@ -370,11 +382,46 @@ is($base, 0, 'no data block alive at first');
 }
 
 # ---------------------------------------------------------------------
+# A recorded setting (-undo on, since 2.10): only the Perl value goes
+# into the undo step (in a container of its own); the slot stays with
+# the place.  Undo and redo exchange the Perl values; each value and
+# each container is freed once.
+{
+  my $t = fraction(-undo => 1);
+  ds($t, 'node', '2.6', 0, 22);
+  unrecorded($t, sub { $t->blockNodedata('2.6', 0, V->new('p1')) });
+  is(live(), $base + 1, 'recorded set: one container, with a slot and p1');
+  $t->blockNodedata('2.6', 0, V->new('p2'));
+  $t->editSeparator;
+  is(nv($t->blockNodedata('2.6', 0)), 'p2', 'recorded set: the new Perl value');
+  is(ds($t, 'node', '2.6', 0), 22, 'the slot stays with the place');
+  is(live(), $base + 2, 'p1 waits in the step, in a container of its own');
+  $t->editUndo;
+  is(nv($t->blockNodedata('2.6', 0)), 'p1', 'undo: p1 is back');
+  is(ds($t, 'node', '2.6', 0), 22, 'the slot as it was');
+  $t->editRedo;
+  is(nv($t->blockNodedata('2.6', 0)), 'p2', 'redo: p2');
+  $t->blockNodedata('2.6', 0, undef);
+  $t->editSeparator;
+  is(ds($t, 'node', '2.6', 0), 22, 'a recorded undef keeps the slot');
+  $t->editUndo;
+  is(nv($t->blockNodedata('2.6', 0)), 'p2', 'and its undo gives p2 back');
+  ok(!$destroyed{p1} && !$destroyed{p2}, 'nothing freed so far');
+  $t->editReset;
+  is($destroyed{p1}, 1, 'edit reset frees p1 once');
+  is(live(), $base + 1, 'and its container');
+  $t->destroy;
+  $mw->update;
+  is($destroyed{p2}, 1, 'the widget frees p2 once');
+  is(live(), $base, 'and the last container');
+}
+
+# ---------------------------------------------------------------------
 # Without undo: a dropped container is freed when the command ends.
 {
   my $t = fraction(-undo => 0);
   ds($t, 'node', '2.6', 0, 22);
-  $t->blockNodedata('2.6', 0, V->new('x'));
+  unrecorded($t, sub { $t->blockNodedata('2.6', 0, V->new('x')) });
   ds($t, 'node', '2.2', 1, 33);
   is(live(), $base + 2, 'two containers');
   $t->delete('2.4', '2.8');

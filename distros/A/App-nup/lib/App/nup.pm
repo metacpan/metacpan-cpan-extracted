@@ -1,6 +1,6 @@
 package App::nup;
 
-our $VERSION = "1.20";
+our $VERSION = "1.21";
 
 1;
 =encoding utf-8
@@ -54,7 +54,7 @@ nup - n-up, multi-column paged output for commands and files
 
 =head1 VERSION
 
-Version 1.20
+Version 1.21
 
 =cut
 =head1 DESCRIPTION
@@ -380,6 +380,10 @@ I<NAME> is the highlighter:
     brew install pandoc
     brew install source-highlight
     brew install skylighting
+
+A style of the highlighter can be given after the name and a colon,
+a name of its own or a file: C<--highlight=pandoc:breezedark> for a
+dark screen, C<--hi=gnu:esc256>.  See L<Text::ANSI::Highlight/STYLES>.
 
 Set the one to use in C<NUP_OPTS>:
 

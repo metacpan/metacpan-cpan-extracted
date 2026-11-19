@@ -1,9 +1,10 @@
 package Review::Helper::CLI::Serve;
 use v5.36;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Capture::Tiny qw/capture_stdout/;
+use File::Spec();
 use HTTP::Server::PSGI();
 use IO::Handle();
 use IO::Socket::IP();
@@ -185,8 +186,9 @@ sub exec_detached($class, $command, @args) {
     # Perl marks this copy close-on-exec, so only a failed exec writes to it.
     my $report;
     open($report, q{>&}, \*STDERR) or undef $report;
-    my $null = POSIX::open('/dev/null', POSIX::O_RDWR()) // die "Cannot open /dev/null: $!";
-    POSIX::dup2($null, $_) // die "Cannot redirect to /dev/null: $!" for 0, 1, 2;
+    my $devnull = File::Spec->devnull;
+    my $null    = POSIX::open($devnull, POSIX::O_RDWR()) // die "Cannot open $devnull: $!";
+    POSIX::dup2($null, $_) // die "Cannot redirect to $devnull: $!" for 0, 1, 2;
 
     { exec($command, @args) }
     if ($report) {

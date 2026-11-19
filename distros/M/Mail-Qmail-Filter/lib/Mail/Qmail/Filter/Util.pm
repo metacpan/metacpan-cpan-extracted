@@ -1,16 +1,22 @@
-use 5.014;
+use 5.036;
 use warnings;
 
 package Mail::Qmail::Filter::Util;
 
-our $VERSION = '1.11';
+our $VERSION = '2.0';
 
 use base 'Exporter';
 
-our @EXPORT_OK = qw(addresses_to_hash match_address split_address);
+use Net::IP::Match::Trie;    # ->import necessary, therefore require not enough
 
-sub addresses_to_hash {
-    my $addrs = shift;
+our @EXPORT_OK = qw(
+  addresses_to_hash
+  create_ip_match_trie_from
+  match_address
+  split_address
+);
+
+sub addresses_to_hash ($addrs) {
     my %struct;
     for ( ref $addrs ? @$addrs : $addrs ) {
         my ( $localpart, $domain ) = split_address($_);
@@ -25,15 +31,34 @@ sub addresses_to_hash {
     \%struct;
 }
 
-sub match_address {
-    my ( $struct,    $addr )   = @_;
+sub match_address ( $struct, $addr ) {
     my ( $localpart, $domain ) = split_address($addr);
     defined( my $slot = $struct->{$domain} ) or return;
     !ref $slot || !length $localpart || defined $slot->{$localpart};
 }
 
-sub split_address {
-    my $lc_addr = lc shift;
+sub create_ip_match_trie_from ($file) {
+    require Path::Tiny and Path::Tiny->import('path') unless defined &path;
+    my $label = 'match';
+    my %ips;
+    for ( path($file)->lines( { chomp => 1 } ) ) {
+        if (/^#\s+(.*?):$/) {
+            $label = $1;
+        }
+        else {
+            s/#.*//;
+            push $ips{$label}->@*, split ' ';
+        }
+    }
+    my $matcher = Net::IP::Match::Trie->new;
+    while ( my ( $label, $ips ) = each %ips ) {
+        $matcher->add( $label => $ips );
+    }
+    $matcher;
+}
+
+sub split_address ($addr) {
+    my $lc_addr = lc $addr;
     if ( $lc_addr =~ /\@/ ) {
         split /\@/, $lc_addr, 2;
     }
@@ -77,6 +102,14 @@ Takes a single e-mail address or domain name as string or an array of such
 strings and turns it into a data structure you can later pass to
 L</match_address>.
 Returns a reference to this data structure.
+
+=head2 create_ip_match_trie_from
+
+Expects a filename as an argument.
+Builds a L<Net::IP::Match::Trie> object from the contents of that file.
+The text in lines which begin with C<# > and end with C<:> is used as
+label for the following IP/net objects.
+Other text after C<#> is ignored.
 
 =head2 match_address
 

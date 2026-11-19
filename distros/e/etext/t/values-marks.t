@@ -28,6 +28,18 @@ my @log;			# names of the objects destroyed, in order
 
 sub freed (&) { @log = (); $_[0]->(); my @r = @log; @log = (); return \@r }
 sub sfreed (&) { my $r = &freed($_[0]); return [sort @$r] }
+# Settings made with -undo off: not recorded, the value replaced is
+# freed when the command returns (with -undo on it waits in the undo
+# step; t/values.t tests that).
+sub unrecorded {
+  my ($t, $code) = @_;
+  my $undo = $t->cget('-undo');
+  $t->configure(-undo => 0);
+  my $ok = eval { $code->(); 1 };
+  my $err = $@;
+  $t->configure(-undo => $undo);
+  die $err unless $ok;
+}
 sub mv { my ($t, $m) = @_; my $v = $t->markData($m);
 	 return defined $v ? (ref $v ? $v->{n} : $v) : undef }
 sub dies_like { my ($code, $re, $name) = @_;
@@ -77,13 +89,15 @@ sub dies_like { my ($code, $re, $name) = @_;
 	    'redo, undo and edit reset keep it');
   is(mv($t, 'm'), 'm1', 'the value is still there');
 
-  # Freed: replaced, set to undef, mark unset; the widget is consistent
-  # when the object is destroyed.
+  # Freed: replaced, set to undef (with -undo off: not recorded), mark
+  # unset; the widget is consistent when the object is destroyed.
   my $seen;
-  $t->markData('m', V->new('m2', sub { $seen = join ',', grep { $_ eq 'm' } $t->markNames }));
+  unrecorded($t, sub {
+    $t->markData('m', V->new('m2', sub { $seen = join ',', grep { $_ eq 'm' } $t->markNames })) });
   is_deeply(\@log, ['m1'], 'replacing frees the old value, at once');
   @log = ();
-  is_deeply(freed { $t->markData('m', undef) }, ['m2'], 'setting undef frees the value');
+  is_deeply(freed { unrecorded($t, sub { $t->markData('m', undef) }) }, ['m2'],
+	    'setting undef frees the value');
   ok(!defined $t->markData('m'), 'no value any more');
   is($seen, 'm', 'the mark still exists when its old value is destroyed');
   $t->markData('m', V->new('m3', sub { $seen = join ',', grep { $_ eq 'm' } $t->markNames }));
@@ -125,7 +139,8 @@ sub dies_like { my ($code, $re, $name) = @_;
   my ($err, $read);
   $t->markData('e', V->new('e', sub { $read = $t->get('1.0');
 	$err = eval { $t->insert('1.0', 'E'); 1 } ? 'ok' : $@ }));
-  is_deeply(freed { $t->markData('e', undef) }, ['e'], 'a value whose DESTROY tries to edit the widget');
+  is_deeply(freed { unrecorded($t, sub { $t->markData('e', undef) }) }, ['e'],
+	    'a value whose DESTROY tries to edit the widget');
   is($err, 'ok', 'the edit works');
   is($t->get('1.0'), 'E', 'and is made; reading worked: '.$read);
 
@@ -171,7 +186,7 @@ sub dies_like { my ($code, $re, $name) = @_;
   is(ref $m{n}, 'Tk::Text::MarkRight', 'a mark without a value');
   ok(!UNIVERSAL::isa($m{n}, 'ARRAY') && ${$m{n}} eq 'n', 'is a reference to its name, as before');
   @l = (); %m = ();
-  is_deeply(freed { $t->markData('r', undef) }, ['r'],
+  is_deeply(freed { unrecorded($t, sub { $t->markData('r', undef) }) }, ['r'],
 	    'the copy in the list does not keep the object alive');
 
   # The undo's own list leaves mark values out: a deletion over the mark
@@ -182,7 +197,7 @@ sub dies_like { my ($code, $re, $name) = @_;
   is($t->index('r'), '1.2', 'the mark is back');
   ok($t->markData('r') == $obj, 'with the same value, not a copy from the list');
   undef $obj;
-  is_deeply(freed { $t->markData('r', undef) }, ['r2'],
+  is_deeply(freed { unrecorded($t, sub { $t->markData('r', undef) }) }, ['r2'],
 	    'freed at once when replaced: the undo step holds no copy');
   $t->destroy;
 }

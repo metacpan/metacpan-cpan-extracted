@@ -48,7 +48,7 @@ nup - n-up, multi-column paged output for commands and files
 
 # VERSION
 
-Version 1.19
+Version 1.20
 
 # DESCRIPTION
 
@@ -354,6 +354,10 @@ variable works in both modes; see ["Terminal Size"](#terminal-size).
         brew install pandoc
         brew install source-highlight
         brew install skylighting
+
+    A style of the highlighter can be given after the name and a colon,
+    a name of its own or a file: `--highlight=pandoc:breezedark` for a
+    dark screen, `--hi=gnu:esc256`.  See ["STYLES" in Text::ANSI::Highlight](https://metacpan.org/pod/Text%3A%3AANSI%3A%3AHighlight#STYLES).
 
     Set the one to use in `NUP_OPTS`:
 

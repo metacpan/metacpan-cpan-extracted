@@ -34,6 +34,15 @@ It is not run by hand: sshd starts it with the arguments pinned in F<authorized_
 
 See L<App::FileSync::CLI> and L<App::FileSync>.
 
+=head1 EXIT STATUS
+
+0 when the session finished; 1 when it did not, for any reason: a bad or
+missing argument, a forced command that does not match the arguments, a
+terminal on standard input, a protocol error, a refused request, or another
+session holding the repo's lock.  The client reports the error the server
+sent it; the server's journal records the failed session (with C<exit> 2 for
+a lock refusal).
+
 =head1 AUTHOR
 
 Nigel Horne, C<< <njh at nigelhorne.com> >>

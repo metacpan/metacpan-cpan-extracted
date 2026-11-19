@@ -158,7 +158,7 @@ TkTextMarkCmd(textPtr, interp, argc, args)
 	    if (TkTextRecordSet(textPtr, TK_TEXT_VC_MARK,
 		    TkTextVcMarkPlace(textPtr, LangString(args[3]), &at),
 		    &markPtr->body.mark.value, args[4])) {
-		/* Inside an edit step: the old value is in the step. */
+		/* Recorded (-undo on): the old value is in the undo step. */
 	    } else if (TkTextVcOn(textPtr)
 		    && (TkTextDataGetLang(markPtr->body.mark.value) != NULL)) {
 		TkTextIndex index;

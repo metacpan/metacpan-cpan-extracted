@@ -1,5 +1,8 @@
 Revision history for Hyperman
 
+0.71	2026-11-18
+        - Fix memory leaks relating to a request with a body not being freed from the workers event loop.
+
 0.70	2026-11-13
         - $writer->close(\@trailers) sends trailer fields after a body: always on HTTP/2, on a chunked HTTP/1.1 body when the request's TE lists trailers, and HTTP/3 croaks.
         - ABI v10 adds stream_close_trailers, the same ending for a C producer.

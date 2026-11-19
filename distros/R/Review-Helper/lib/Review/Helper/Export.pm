@@ -1,10 +1,11 @@
 package Review::Helper::Export;
 use v5.36;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Carp qw/croak/;
 use Cpanel::JSON::XS();
+use Path::Tiny qw/path/;
 
 use Review::Helper();
 use Review::Helper::Builder;
@@ -152,7 +153,7 @@ sub default_file($self, $name, $export) {
     $name =~ s/\A[-.]+|-+\z//g;
     $name = 'review' unless length $name;
 
-    return $self->{+REPO}->state_dir . "/$name.sqlite";
+    return path($self->{+REPO}->state_dir)->child("$name.sqlite")->stringify;
 }
 
 # Core tables load first, in schema order, so their rows replace the ones

@@ -1,14 +1,13 @@
 package Review::Helper::VCS::Git;
 use v5.36;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Carp qw/croak/;
-use Cwd qw/abs_path/;
 use Encode qw/decode/;
-use File::Basename qw/dirname/;
 use File::Spec();
 use File::Temp();
+use Path::Tiny qw/path/;
 use POSIX();
 
 use Object::HashBase qw{
@@ -34,9 +33,9 @@ sub init($self) {
 
 sub find($class, $path) {
     croak "No path given" unless defined $path && length $path;
-    my $dir = -d $path ? $path : dirname($path);
+    my $dir = -d $path ? path($path) : path($path)->parent;
     croak "No such directory: $dir" unless -d $dir;
-    $dir = abs_path($dir);
+    $dir = $dir->realpath->stringify;
 
     my ($git_dir, $common_dir, $in_git_dir) = split /\n/ => $class->_git_in($dir, qw/rev-parse --path-format=absolute --git-dir --git-common-dir --is-inside-git-dir/);
 
@@ -52,10 +51,10 @@ sub find($class, $path) {
 }
 
 sub state_dir($self)        { $self->_git_path('review-helper') }
-sub shared_state_dir($self) { $self->{+COMMON_DIR} . '/review-helper' }
+sub shared_state_dir($self) { path($self->{+COMMON_DIR})->child('review-helper')->stringify }
 
 sub is_internal_path($self, $path) {
-    return !!grep { index($path, "$_/") == 0 } $self->{+GIT_DIR}, $self->{+COMMON_DIR};
+    return !!grep { path($_)->subsumes($path) && path($_) ne path($path) } $self->{+GIT_DIR}, $self->{+COMMON_DIR};
 }
 
 sub resolve($self, $rev) {
@@ -139,11 +138,11 @@ sub range_diff($self, $from, $to, $path, $old_path = undef) {
 
 sub resolution_changes($self, $sha, $paths = undef) {
     return [] unless $self->_has_remerge_diff && @{$self->parents($sha)} > 1;
-    return $self->_parse_raw($self->_git(qw/diff-tree --remerge-diff --no-commit-id -r -z -M --raw --end-of-options/, $sha, '--', @{$paths // []}));
+    return $self->_parse_raw($self->_git(qw/show --no-show-signature --no-abbrev --format= --remerge-diff -r -z -M --raw --end-of-options/, $sha, '--', @{$paths // []}));
 }
 
 sub resolution_diff($self, $sha, $path, $old_path = undef) {
-    return $self->_git(qw/diff-tree --remerge-diff --no-commit-id -r -p/, @DIFF_OPTIONS, '--end-of-options', $sha, '--', $self->_file_pathspecs($path, $old_path));
+    return $self->_git(qw/show --no-show-signature --format= --remerge-diff -r -p/, @DIFF_OPTIONS, '--end-of-options', $sha, '--', $self->_file_pathspecs($path, $old_path));
 }
 
 sub parents($self, $sha) {
@@ -212,7 +211,8 @@ sub _file_pathspecs($self, $path, $old_path = undef) {
     return map { ":(literal)$_" } defined($old_path) ? ($old_path, $path) : ($path);
 }
 
-# git 2.36 added --remerge-diff.
+# git 2.36 added --remerge-diff. show, not diff-tree: diff-tree dies with a BUG
+# on it before 2.47.
 sub _has_remerge_diff($self) {
     return $self->{_has_remerge_diff} //= do {
         my ($major, $minor) = $self->_git('version') =~ m/(\d+)\.(\d+)/;
@@ -243,16 +243,16 @@ sub _root_from_git_dir($class, $git_dir, $common_dir) {
     chomp($root);
     if ($top_exit || !length($root)) {
         if ($git_dir eq $common_dir) {
-            $root = dirname($git_dir);
+            $root = path($git_dir)->parent->stringify;
         }
         else {
-            open(my $fh, '<', "$git_dir/gitdir") or croak "Cannot find the worktree of $git_dir: $!";
+            open(my $fh, '<', path($git_dir)->child('gitdir')) or croak "Cannot find the worktree of $git_dir: $!";
             my $dot_git = <$fh>;
             chomp($dot_git);
 
             # Relative when the worktree was added with --relative-paths.
-            $root = dirname(File::Spec->rel2abs($dot_git, $git_dir));
-            $root = abs_path($root) // $root if -d $root;
+            $root = path($dot_git)->absolute($git_dir)->parent;
+            $root = (-d $root ? $root->realpath : $root)->stringify;
         }
     }
 
@@ -336,9 +336,9 @@ sub _run($class, $dir, $input, @args) {
         # and 2 (in-memory handles), and git inherits descriptors. The error
         # file goes to 2 first, since it is on 0 when the parent has 0 closed.
         my ($msg, $stdin);
-        if    (!defined POSIX::dup2(fileno($err), 2))                 { $msg = "cannot set up git's error output: $!" }
-        elsif (!open($stdin, '<', $in ? $in->filename : '/dev/null')) { $msg = "cannot open git's input: $!" }
-        elsif (!defined POSIX::dup2(fileno($stdin), 0))               { $msg = "cannot set up git's input: $!" }
+        if    (!defined POSIX::dup2(fileno($err), 2))                         { $msg = "cannot set up git's error output: $!" }
+        elsif (!open($stdin, '<', $in ? $in->filename : File::Spec->devnull)) { $msg = "cannot open git's input: $!" }
+        elsif (!defined POSIX::dup2(fileno($stdin), 0))                       { $msg = "cannot set up git's input: $!" }
         else {
             no warnings 'exec';    # reported below
             exec(@argv);

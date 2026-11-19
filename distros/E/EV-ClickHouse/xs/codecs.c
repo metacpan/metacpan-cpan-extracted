@@ -293,49 +293,45 @@ static int valid_civil_date(int year, int month, int day) {
     return day <= max_day;
 }
 
+#define DIG2(p) (((p)[0] - '0') * 10 + ((p)[1] - '0'))
+#define DIG4(p) (DIG2(p) * 100 + DIG2((p) + 2))
+
 /* 1 if s starts with a valid "YYYY-MM-DD" calendar date. */
 static int valid_date_prefix(const char *s, size_t len) {
-    int year, month, day;
     if (len < 10 || s[4] != '-' || s[7] != '-') return 0;
     if (!all_digits(s, 4) || !all_digits(s + 5, 2) || !all_digits(s + 8, 2))
         return 0;
-    year = atoi(s);
-    month = atoi(s + 5);
-    day = atoi(s + 8);
-    return valid_civil_date(year, month, day);
+    return valid_civil_date(DIG4(s), DIG2(s + 5), DIG2(s + 8));
 }
 
 /* 1 if the "HH:MM:SS" part at s[11..18] is valid. Caller checked len >= 19.
  * s[10] may be a space, 'T', or anything else — the encoder ignores it. */
 static int valid_time_part(const char *s) {
-    int hour, min, sec;
     if (s[13] != ':' || s[16] != ':') return 0;
     if (!all_digits(s + 11, 2) || !all_digits(s + 14, 2) || !all_digits(s + 17, 2))
         return 0;
-    hour = atoi(s + 11);
-    min = atoi(s + 14);
-    sec = atoi(s + 17);
-    return hour < 24 && min < 60 && sec < 60;
+    return DIG2(s + 11) < 24 && DIG2(s + 14) < 60 && DIG2(s + 17) < 60;
 }
 
 /* Seconds-since-midnight for the time part, 0 when absent (len < 19).
  * Caller validated via valid_time_part when present. */
 static int32_t parse_hms(const char *s, size_t len) {
-    int hour = 0, min = 0, sec = 0;
-    if (len >= 19) {
-        hour = atoi(s + 11);
-        min = atoi(s + 14);
-        sec = atoi(s + 17);
-    }
-    return hour * 3600 + min * 60 + sec;
+    if (len < 19) return 0;
+    return DIG2(s + 11) * 3600 + DIG2(s + 14) * 60 + DIG2(s + 17);
 }
 
 static int32_t date_string_to_days(const char *s, size_t len) {
     int year, month, day;
     if (len >= 10 && s[4] == '-' && s[7] == '-') {
-        year = atoi(s);
-        month = atoi(s + 5);
-        day = atoi(s + 8);
+        if (all_digits(s, 4) && all_digits(s + 5, 2) && all_digits(s + 8, 2)) {
+            year = DIG4(s);
+            month = DIG2(s + 5);
+            day = DIG2(s + 8);
+        } else {
+            year = atoi(s);
+            month = atoi(s + 5);
+            day = atoi(s + 8);
+        }
         /* civil_from_days algorithm (Howard Hinnant) */
         if (month <= 2) { year--; month += 9; } else { month -= 3; }
         {

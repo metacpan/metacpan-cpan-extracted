@@ -16,10 +16,14 @@
 #     race         ours gave only results that dash or bash gave too (in this environment, in some run)
 #     ours         ours gave a result neither shell gave in any run (with -v: which parts differ from the nearest)
 #   and over its environments the worst (ours, then race, then same), with whether a shell varied (the shells' own race).
-#   -o: one line per sample and environment (id, env, runs, results of dash, bash, ours, verdict, ours' own runs).
+#   Then, over the pairs of a sample and an environment (post-0.12, the user, 2026-11-15): where ours varies (more than
+#   one result), whether each shell repeated (one result in every run), only one of them, or neither: only where a shell
+#   repeats is ours' variation a difference of ours (chance); where both vary there is no one behaviour to compare with.
+#   -o: one line per sample and environment (id, env, runs, results of dash, bash, ours, verdict, ours' own runs, shells
+#   repeating: each, one, neither).
 use strict; use warnings; use JSON::PP; use Getopt::Long; use Digest::MD5 'md5_hex';
-my ($OUT, $V, $IDS) = ('', 0, ''); GetOptions('o=s' => \$OUT, 'v' => \$V, 'ids=s' => \$IDS) && @ARGV or die "usage: $0 [-o OUT.tsv] [-v] ENV=DIR ... | -ids MATCH.tsv DIR\n";
-if (length $IDS) { my $dir = shift; my %e; open my $in, '<', $IDS or die "$IDS: $!";
+my ($OUT, $V, $IDS) = ('', 0, ''); GetOptions('o=s' => \$OUT, 'v' => \$V, 'ids=s' => \$IDS) && (@ARGV || length $OUT) or die "usage: $0 [-o OUT.tsv] [-v] ENV=DIR ... | -ids MATCH.tsv DIR\n";
+if (length $IDS) { my $dir = shift; my %e; unlink glob "$dir/ids-*"; open my $in, '<', $IDS or die "$IDS: $!";
   while (<$in>) { next if /^#/; chomp; my @f = split /\t/; next unless ($f[7] // '') =~ /\(code [a-z -]*\brace\b/;
     for (split / /, $f[9] // '') { my ($env, $c) = split /:/; push @{$e{$env}}, $f[0] unless $c eq 'same' } }
   for my $env (sort keys %e) { open my $o, '>', "$dir/ids-$env" or die "$dir/ids-$env: $!"; my %u; print $o map "$_\n", grep !$u{$_}++, @{$e{$env}} }
@@ -36,7 +40,7 @@ for (@ARGV) { my ($env, $dir) = /^([^=]+)=(.+)\z/ or die "$_: ENV=DIR\n";
   for my $f (glob "$dir/run-*.jsonl") { open my $in, '<', $f or die "$f: $!";
     while (<$in>) { my $s = decode_json $_; next unless ref $s->{ours}; $N{$s->{id}}{$env}++;
       for my $sh (qw(dash bash ours)) { my $n = norm($s->{$sh}, $sh); my $k = key($n); $R{$s->{id}}{$env}{$sh}{$k}++; $EX{$k} //= $n } } } }
-my %RANK = (same => 0, race => 1, ours => 2); my (%tally, @rows);
+my %RANK = (same => 0, race => 1, ours => 2); my (%tally, @rows, %pairs, %psamples, %etally);
 for my $id (sort keys %R) { my ($worst, $vary) = ('same', 0); my @lines;
   for my $env (sort { (($a =~ /(\d+)/)[0] // -1) <=> (($b =~ /(\d+)/)[0] // -1) } keys %{$R{$id}}) { my $r = $R{$id}{$env};
     my %sh = map +($_ => [sort keys %{$r->{$_} // {}}]), qw(dash bash ours); my %shells = map +($_ => 1), @{$sh{dash}}, @{$sh{bash}};
@@ -49,9 +53,25 @@ for my $id (sort keys %R) { my ($worst, $vary) = ('same', 0); my @lines;
     if ($V && @own) { for my $k (@own) { my $e = $EX{$k};   # which parts differ from the nearest result of a shell
         my ($best) = sort { $a->[0] <=> $b->[0] } map { my $s = $EX{$_}; [scalar(grep { ($e->{$_} // '') ne ($s->{$_} // '') } @P), $s] } grep $_ ne 'timeout', keys %shells;
         $line .= "\n        ours: " . ($k eq 'timeout' ? 'timeout' : join '; ', map { my $p = $_; "$p " . JSON::PP->new->encode([substr($e->{$p} // '', 0, 120)]) . ($best && ($best->[1]{$p} // '') ne ($e->{$p} // '') ? ' (a shell: ' . JSON::PP->new->encode([substr($best->[1]{$p} // '', 0, 120)]) . ')' : '') } @P) } }
-    push @lines, $line; push @rows, join("\t", $id, $env, $N{$id}{$env}, map(scalar @{$sh{$_}}, qw(dash bash ours)), $v, $nown) }
+    my $rep = (@{$sh{dash}} == 1) + (@{$sh{bash}} == 1); my $shells = (qw(neither one each))[$rep];
+    my $pk = (@{$sh{ours}} > 1 ? 'ours varies' : 'ours repeats') . ", $shells " . ($rep == 1 ? 'shell repeats' : $rep ? 'repeat' : 'varies (not comparable)');
+    $pk =~ s/neither varies/both shells vary/; $pk =~ s/each repeat\b/each shell repeats/;
+    $pairs{$pk}++; $psamples{$pk}{$id} = 1; $etally{$env}{$v}++; $etally{$env}{$pk}++;
+    push @lines, $line; push @rows, join("\t", $id, $env, $N{$id}{$env}, map(scalar @{$sh{$_}}, qw(dash bash ours)), $v, $nown, $shells) }
   $tally{$worst}++; $tally{"$worst, a shell varied"}++ if $vary;
   print "$id: $worst", ($vary ? ' (a shell varied)' : ''), "\n", map("$_\n", @lines) }
-print "\n", join(', ', map "$_ $tally{$_}", sort keys %tally), "\n";
+print "\n", (%tally ? join(', ', map "$_ $tally{$_}", sort keys %tally) : 'no samples (none called chance by the code race)'), "\n";
+if (%pairs) { my $n = 0; $n += $_ for values %pairs;
+  my ($e, $o) = map $pairs{"ours varies, $_"} // 0, 'each shell repeats', 'one shell repeats';
+  my %s = map +($_ => scalar keys %{$psamples{"ours varies, $_"} // {}}), 'each shell repeats', 'one shell repeats';
+  my %u = map +($_ => 1), map keys %{$psamples{"ours varies, $_"} // {}}, 'each shell repeats', 'one shell repeats';
+  printf "%d pairs of a sample and an environment; ours varies where a shell repeats: %d + %d = %d (each shell repeats + one shell repeats; samples %d + %d, %d in all)\n",
+    $n, $e, $o, $e + $o, $s{'each shell repeats'}, $s{'one shell repeats'}, scalar keys %u;
+  print map "  $_: $pairs{$_}\n", sort keys %pairs;
+  if (keys %etally > 1) { print "per environment (verdicts; where ours varies: each shell repeats + one shell repeats; both shells vary):\n";
+    for my $env (sort keys %etally) { my $t = $etally{$env};
+      printf "  %-6s same %d, race %d, ours %d; ours varies %d + %d, both shells vary %d\n", $env, map($t->{$_} // 0, qw(same race ours)),
+        map($t->{"ours varies, $_"} // 0, 'each shell repeats', 'one shell repeats'),
+        ($t->{'ours varies, both shells vary (not comparable)'} // 0) + ($t->{'ours repeats, both shells vary (not comparable)'} // 0) } } }
 if ($OUT) { open my $o, '>', $OUT or die "$OUT: $!";
-  print $o "# large-subset-repeat.pl: id, environment, runs, results of dash, bash, ours, verdict (same, race, ours), runs with ours' own result\n", map "$_\n", @rows }
+  print $o "# large-subset-repeat.pl: id, environment, runs, results of dash, bash, ours, verdict (same, race, ours), runs with ours' own result, shells repeating (each, one, neither)\n", map "$_\n", @rows }

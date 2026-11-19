@@ -95,17 +95,19 @@ Returns the whole of a file as one string, read without any decoding layer.  A f
 
 Puts a comma between each group of three digits of the integer part and appends the hundredths, rounded half up.  The second argument is the `sprintf` format the hundredths are printed with, `'.%02d'` by default; `'%.0u'` rounds half up to a whole number and prints no fraction.  Rounding that carries into the integer part does so (`0.999` is `1.00`), a negative number keeps its sign, a number that rounds to zero has none, and a large number is grouped as digits rather than printed in exponent form.  Infinity and NaN are returned as perl prints them.
 
+What is rounded is the number perl holds, which is binary, not the decimal written in the source.  Most decimal fractions have no exact binary form, so a value written as exactly half a cent is stored a little above or below it, and rounds accordingly: `1.005` is held as 1.00499999999999989... where perl's numbers are doubles, so `format_commas(1.005)` is `'1.00'`, and likewise `2.675` gives `'2.67'` and `9.995` gives `'9.99'`, which is also what `sprintf('%.2f', ...)` prints.  Money that must round by its decimal digits should be kept in whole cents, or in `Math::BigFloat`.
+
 ## json_file_to_ref
 
     my $ref = json_file_to_ref('results.json');
 
-Reads a JSON file and returns the decoded data, through `JSON::MaybeXS`.  Python's `json` module and NumPy write `NaN`, `Infinity` and `-Infinity` as bare words, which are not JSON; where one of those stands as a value it is read as `null`, so it becomes `undef`.  The same words inside a string are left alone.  A file that does not exist, or is empty, dies.
+Reads a JSON file and returns the decoded data, through `JSON::MaybeXS`.  Python's `json` module and NumPy write `NaN`, `Infinity` and `-Infinity` as bare words, which are not JSON; where one of those stands as a value, or is the whole document, it is read as `null`, so it becomes `undef`.  The same words inside a string are left alone.  A file that does not exist, or is empty, dies.
 
 ## ref_to_json_file
 
     ref_to_json_file($data, 'results.json');   # prints "Wrote results.json"
 
-Writes a data structure to a file as JSON, through `JSON::MaybeXS`, prints `Wrote` and the file name, and returns the file name.  The name is colored by the rule `structure`'s `color => 'auto'` follows: when `STDOUT` is a terminal, or `CLICOLOR_FORCE` is set, and `NO_COLOR` is not.  The file name must be a plain string; a reference dies, and so does a write that fails, such as on a full disk, before anything is printed.
+Writes a data structure to a file as JSON, through `JSON::MaybeXS`, prints `Wrote` and the file name, and returns the file name.  The name is colored by the rule `structure`'s `color => 'auto'` follows: when `STDOUT` is a terminal, or `CLICOLOR_FORCE` is set, and `NO_COLOR` is not.  The file name must be a plain string; a reference dies, and so does a write that fails, such as on a full disk, before anything is printed.  A structure that cannot be encoded, such as one holding a code reference or a reference to itself, dies before the file is opened, so an existing file of that name is left as it was.
 
 ## random_key, random_value
 
@@ -139,7 +141,7 @@ prints
                 [*]: string
             name: string
 
-A key that only some of the merged hashes have is marked `?`.  Values in the same place that are of different kinds are shown as a `UNION` of each kind.  Arrays show the range of their lengths.  Blessed references show their class.  A reference back to a containing structure is shown as `(cycle)` rather than followed.
+A key that only some of the merged hashes have is marked `?`.  Values in the same place that are of different kinds are shown as a `UNION` of each kind.  Arrays show the range of their lengths.  Blessed references show their class.  A reference to something already being described further out is not followed again.  It is shown as `(cycle)` when it leads back to the container that holds it, so that following it would go round forever, and as `(shown above)` when it does not, as when the same hash is both an element of an array and held by another element; a place holding both kinds shows `(cycle)|(shown above)`.
 
 It takes these options after the reference:
 

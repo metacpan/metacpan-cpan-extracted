@@ -122,7 +122,9 @@ END1
     sub { mb::eval(<<'END1'); }, # test no 33
 $_='\\'; my $r=tr/\\/5/; $_ eq '5'
 END1
-    sub { CORE::eval(<<'END1'); }, # test no 34
+# test no 34 is perl itself, which warns of \U in tr/// and of the longer
+# replacement list under -w; the two expected warnings are caught here
+    sub { local $SIG{__WARN__} = sub { warn $_[0] unless $_[0] =~ /\A(?:Unrecognized escape \\U passed through|Replacement list is longer than search list) at /; }; CORE::eval(<<'END1'); }, # test no 34
 $_='U'; my $r=tr/\U/56/; $_ eq '5'
 END1
     sub { CORE::eval(<<'END1'); }, # test no 35

@@ -42,12 +42,12 @@ File::Unpack2 - Aggressively unpack any archive, recursively, by mime type
 
 =head1 VERSION
 
-Version 2.03
+Version 2.04
 
 =cut
 
 # Please run perl Makefile.PL after changing the version here.
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 
 POSIX::setlocale(&POSIX::LC_ALL, 'C');
 $ENV{PATH} = '/usr/bin:/bin';
@@ -160,6 +160,10 @@ sub _locate_tar
     unless $self->run([@tar, "--force-local", "--help"], { out_err => '/dev/null' });
   push @tar, "--no-unquote"  
     unless $self->run([@tar, "--no-unquote", "--help"],  { out_err => '/dev/null'});
+  ## Archives not in tree order (npm's pngjs-5.0.0.tgz) would get a u-x directory mode applied before its last member
+  ## is written. unpack() makes each directory readable before descending, so the late modes are harmless.
+  push @tar, "--delay-directory-restore"
+    unless $self->run([@tar, "--delay-directory-restore", "--help"], { out_err => '/dev/null'});
 
   $self->{_locate_tar} = \@tar;
   return @tar;

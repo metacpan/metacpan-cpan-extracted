@@ -1,5 +1,10 @@
 Revision history for Perl extension Term-ANSIColor-Concise
 
+3.05 2026-11-19T03:41:13Z
+
+    - T (and t) is the default color of the terminal: T gives SGR 39,
+      and /T gives 49
+
 3.04 2026-11-06T02:34:24Z
 
     - Allow colons in the parameters of {SGR...}: {SGR4:2} and {SGR(4:3,58:2::255:0:0)}; other CSI names still reject a colon

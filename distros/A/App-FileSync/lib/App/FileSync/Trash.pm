@@ -25,7 +25,7 @@ use App::FileSync::Constants qw($MODE_MASK $TRASH_DAYS $SECONDS_PER_DAY $STAT_MO
 use App::FileSync::I18N qw(throw os_error);
 use App::FileSync::IO qw(copy_preserving ensure_dir list_dir);
 
-use version; our $VERSION = version->declare('0.002.1');
+use version; our $VERSION = version->declare('0.002.2');
 
 # The three levels of a day bucket, as strftime writes them and as the
 # patterns recognise them.

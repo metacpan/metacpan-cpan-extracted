@@ -2,6 +2,122 @@ Revision history for DBIx-Squirrel
 
 Unreleased
 
+v3.4.1 2026-11-18
+
+    v3.4.0, which never reached CPAN, with its POD spelling fixed.
+
+    v3.4.0 was tagged, and released on GitHub, but its distribution
+    failed the POD spelling test, so it never reached CPAN. This is
+    v3.4.0, with that fixed: as_hash takes the columns to keep
+    (roadmap 2026-0043), the reference's index says how to use each
+    name, and the text shows it in context (roadmap 2026-0040 to
+    2026-0042), and connect_cached takes its arguments as connect
+    does. Still requires Ekorn::Pipeline >= v0.3.7, < v0.4.0.
+
+    - The reference says drop(20), take(10) passes on values 21 to 30,
+      not "the 21st to the 30th", which the spelling test didn't know.
+
+v3.4.0 2026-11-18
+
+    as_hash takes the columns to keep; the reference's index says how to
+    use each name, and the text shows it in context; connect_cached
+    takes its arguments as connect does.
+
+    as_hash(@names) keeps only the columns named (roadmap 2026-0043).
+    A minor release; still requires Ekorn::Pipeline >= v0.3.7, < v0.4.0.
+
+    The index and the reference text now divide the work: the index
+    gives each name's synopsis and what it's for, and the text
+    discusses it in context, with examples (roadmap 2026-0040,
+    2026-0041, 2026-0042). connect_cached, given the attributes
+    straight after the data source, shares its connection again.
+
+    - DBIx::Squirrel::Stages::Rows: as_hash takes an optional list of
+      column names, the columns its hash keeps, found in any case and
+      keyed as fetchrow_hashref keys them; with none, every column, as
+      before. A name the row hasn't got croaks, "Expected a column of
+      the row (age)", and an empty or undefined one, "Expected a column
+      name". It has no prototype now, so as_hash(...) compiles; a bare
+      as_hash parses as before (roadmap 2026-0043).
+    - Each entry in the reference's index has a synopsis of all the
+      name's forms, a paragraph or two saying what it does and how
+      it's exported, and a link to the section that shows it in use
+      (roadmap 2026-0041).
+    - The sections the index links to no longer repeat a name's
+      synopsis or definition: they discuss it in context, with
+      examples the tests run. The iterator's methods, Context's
+      functions, the select methods, pipe and tap, and the canned
+      stages are discussed together, with examples of each, in place
+      of tables that only defined them; the Sugar's database and
+      statement, in "Defining them as the program runs" (roadmap
+      2026-0040, 2026-0042).
+    - DBIx::Squirrel->connect_cached takes its arguments as connect
+      does. Given the attributes straight after the data source, it
+      made a new connection each time: the DBI's connect_cached read
+      them as the username, and passed connect attributes of its own,
+      which connect, finding the shortcut, didn't read. 1.x had a
+      connect_cached of its own; this one restores the shortcut.
+
+v3.3.2 2026-11-18
+
+    The reference's index is laid out as Ekorn::Pipeline's is.
+
+    A docs release, with Ekorn::Pipeline v0.3.7, whose reference has an
+    index laid out the same way. Requires Ekorn::Pipeline >= v0.3.7,
+    < v0.4.0.
+
+    - Requires Ekorn::Pipeline v0.3.7 or later, below v0.4.0.
+    - Each name in the reference's index has a heading of its own,
+      under its module's, with what it does, whether it's exported by
+      default or on request, and a link to where it's described, as in
+      Ekorn::Pipeline's reference. The operators, the Sugar's use forms
+      and Tooling's tags are in their module's paragraph (roadmap
+      2026-0039).
+
+v3.3.1 2026-11-18
+
+    The reference has an index, by module.
+
+    A docs release: the reference ends with an index of each module and
+    what callers use from it, A to Z, each linked to its section
+    (roadmap 2026-0039). No code changes; still requires
+    Ekorn::Pipeline >= v0.3.6, < v0.4.0.
+
+    - The reference ends with an index in place of "The modules": each
+      module, A to Z, says what it is, then lists what callers use from
+      it, A to Z, each in a line, linked to where the reference
+      describes it. Internal modules have a line each (roadmap
+      2026-0039).
+
+v3.3.0 2026-11-18
+
+    pluck with no column gives the only one; the Sugar's pipelines,
+    and sinks, are documented.
+
+    pluck(), or pluck written bare, gives each row's only column, so a
+    one-column query gives plain values without sub { $_->[0] }
+    (roadmap 2026-0038). Still requires Ekorn::Pipeline >= v0.3.6,
+    < v0.4.0.
+
+    - DBIx::Squirrel::Stages::Rows: pluck with no column gives each
+      row's only column, counted from the row: an array of one element,
+      a hash of one key, a row object of one column. So it needs no
+      statement, and works in a select method's stages. A row of more
+      columns, or none, croaks, "Expected one column to pluck, not 2",
+      rather than give the first; pluck(0) gives the first.
+      pluck(undef) and pluck('') still croak. It has no prototype, so
+      pluck(@cols) is unchanged (roadmap 2026-0038).
+    - The docs' examples over a one-column query use pluck, where the
+      stage did nothing else (roadmap 2026-0038).
+    - DBIx::Squirrel::Sugar's POD, and the reference's Sugar chapter,
+      have a section on pipelines: calling the function each gets, and
+      giving one to a single call with pipeline('name'). Both say the
+      word pipeline comes from Ekorn::Pipeline::Factories or
+      DBIx::Squirrel::Tooling.
+    - DBIx::Squirrel's POD says what a sink is, where sinks and sources
+      come from, and that DBIx::Squirrel::Tooling exports them. Its
+      list of Flow's stages has take_if and drop_if.
+
 v3.2.0 2026-11-18
 
     tee, a tap that takes stages, and loading rows with a feed.

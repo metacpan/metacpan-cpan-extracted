@@ -828,7 +828,7 @@ static SV *hm_new_input(pTHX_ const char *body, STRLEN len) {
         if (f) return f;
     }
     bufsv = newSVpvn(body, len);
-    SV *rv = sv_2mortal(newRV_noinc(bufsv));
+    SV *rv = newRV_noinc(bufsv);
     PerlIO *fp;
     GV *gv;
     IO *io;
@@ -836,7 +836,12 @@ static SV *hm_new_input(pTHX_ const char *body, STRLEN len) {
         load_module(PERL_LOADMOD_NOIMPORT, newSVpvs("PerlIO::scalar"), NULL);
         layer_loaded = 1;
     }
+    /* The layer takes its own reference to the body, so the RV is ours to
+     * drop here. It must not be mortal: this runs in the event loop's scope,
+     * whose temps are freed only when the loop returns, so a mortal kept one
+     * body per request for the life of the worker. */
     fp = PerlIO_openn(aTHX_ ":scalar", "r", -1, 0, 0, NULL, 1, &rv);
+    SvREFCNT_dec(rv);
     /*
      # uncoverable branch true
      # uncoverable condition left count:1 class:ignore_covered_err */
@@ -5983,8 +5988,16 @@ static void hm_loop_run(pTHX_ hm_loop *loop, SV *until) {
      * This frame's state goes on the save stack, so a croak out of here (a
      * die from a signal handler under a ->get) restores it as a return
      * does. loop->batch most of all: left behind, it names this frame's
-     * evs after the frame is gone. */
+     * evs after the frame is gone.
+     *
+     * The temps are freed on every turn. This frame lasts as long as the
+     * worker, so a mortal made anywhere under it outside a call's own
+     * SAVETMPS - the glob name newGVgen makes for each psgi.input, the
+     * Future trampoline before 0.54 - was otherwise kept until the worker
+     * exited. SAVETMPS sets a floor, so a nested run under ->get frees only
+     * what it made itself. */
     ENTER;
+    SAVETMPS;
     SAVEINT(hm_fq_active);
     SAVEVPTR(hm_cur_loop);
     SAVEINT(loop->running);
@@ -6007,6 +6020,7 @@ static void hm_loop_run(pTHX_ hm_loop *loop, SV *until) {
     for (;;) {
         double timeout = -1.0;
         int n, i;
+        FREETMPS;
         loop->now = time(NULL);
         if (b.up) hm_batch_drain(aTHX_ loop, b.up);
         if (loop->recycle_pending && !loop->stopping) { /* # uncoverable condition right count:2 class:ignore_covered_err */
@@ -6080,6 +6094,7 @@ static void hm_loop_run(pTHX_ hm_loop *loop, SV *until) {
      # uncoverable condition left count:2 class:ignore_covered_err
      # uncoverable condition right count:2 class:ignore_covered_err */
     if (loop->tw_gy && loop->running == 1) hm_tw_gy_sweep(loop);
+    FREETMPS;
     LEAVE;
 }
 

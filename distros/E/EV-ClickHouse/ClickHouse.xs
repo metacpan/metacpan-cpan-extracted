@@ -19,7 +19,11 @@
 #define CH_MAX_DECOMPRESS_SIZE (128 * 1024 * 1024)  /* 128 MB safety limit */
 
 #ifdef HAVE_LZ4
-#include <lz4.h>
+/* Bundled LZ4, compiled separately in lz4_unit.c. */
+#if defined(__GNUC__) && __GNUC__ >= 4
+#  define LZ4LIB_VISIBILITY __attribute__ ((visibility ("hidden")))
+#endif
+#include "xs/lz4.h"
 #include "cityhash.h"
 
 #define CH_LZ4_METHOD     0x82
@@ -38,6 +42,7 @@
 typedef struct ev_clickhouse_s ev_clickhouse_t;
 typedef struct ev_ch_cb_s ev_ch_cb_t;
 typedef struct ev_ch_send_s ev_ch_send_t;
+typedef struct tc_cols_s tc_cols_t;
 
 typedef ev_clickhouse_t* EV__ClickHouse;
 typedef struct ev_loop* EV__Loop;
@@ -173,14 +178,20 @@ struct ev_clickhouse_s {
     char *server_name;
     char *server_display_name;
     char *server_timezone;
+    char *query_session_tz;         /* in-flight query's session_timezone */
     unsigned int server_version_major, server_version_minor, server_revision;
     unsigned int server_version_patch;
     int native_state;           /* NATIVE_IDLE, NATIVE_WAIT_HELLO, NATIVE_WAIT_RESULT, ... */
     AV *native_rows;            /* accumulate rows across Data blocks */
     char *insert_data;          /* pending TabSeparated data for two-phase INSERT */
     size_t insert_data_len;
-    SV *insert_av;              /* pending AV* of AV*s for arrayref INSERT */
+    SV *insert_av;              /* snapshot_insert_av() of an arrayref INSERT */
     char *insert_err;           /* deferred error from unsupported INSERT encoding */
+    int insert_empty_as_default;/* empty cells fall back to column DEFAULT */
+    int insert_native_body;     /* insert_data is a Native block, sent as Data */
+    HV *insert_defaults;        /* per-column caller defaults (owned) */
+    tc_cols_t *insert_tc;       /* parsed TableColumns for pending INSERT */
+    struct ch_tz_s *zones;      /* time zones loaded so far (immutable) */
 
     /* queues */
     ngx_queue_t cb_queue;
@@ -293,12 +304,16 @@ struct ev_ch_send_s {
     SV          *cb;
     char        *insert_data;     /* deferred TSV data for native INSERT */
     size_t       insert_data_len;
-    SV          *insert_av;      /* deferred AV* data for native INSERT */
+    SV          *insert_av;      /* snapshot_insert_av() for native INSERT */
+    int          insert_empty_as_default;
+    int          insert_native_body;
+    HV          *insert_defaults;
     int          raw;            /* return raw response body */
     SV          *on_data;        /* per-query streaming callback */
     SV          *on_complete;    /* per-query on_query_complete override */
     double       query_timeout;  /* per-query timeout */
     char        *query_id;       /* query_id for tracking */
+    char        *session_tz;     /* per-query session_timezone setting */
     /* Pre-connect native builds: server_revision is unknown at enqueue,
      * so the packet (whose params block depends on it) is built at
      * dispatch from these retained inputs. data==NULL while deferred;
@@ -319,6 +334,7 @@ static void timer_cb(EV_P_ ev_timer *w, int revents);
 static void stop_keepalive(ev_clickhouse_t *self);
 static void schedule_reconnect(ev_clickhouse_t *self);
 static void lc_free_dicts(ev_clickhouse_t *self);
+static void free_insert_default_state(ev_clickhouse_t *self);
 static void start_reading(ev_clickhouse_t *self);
 static void stop_reading(ev_clickhouse_t *self);
 static void start_writing(ev_clickhouse_t *self);
@@ -373,6 +389,7 @@ static void capture_tls_error(ev_clickhouse_t *self);
     CLEAR_STR((self)->server_name); \
     CLEAR_STR((self)->server_display_name); \
     CLEAR_STR((self)->server_timezone); \
+    CLEAR_STR((self)->query_session_tz); \
     CLEAR_STR((self)->insert_err); \
     CLEAR_STR((self)->recv_buf); \
     CLEAR_STR((self)->http_decoded); \
@@ -387,6 +404,7 @@ static void capture_tls_error(ev_clickhouse_t *self);
 
 #include "xs/macros.h"
 #include "xs/queues.c"
+#include "xs/tzif.c"
 
 /* --- watcher helpers --- */
 
@@ -427,6 +445,8 @@ static void stop_timing(ev_clickhouse_t *self) {
 
 static int check_destroyed(ev_clickhouse_t *self) {
     if (self->magic == EV_CH_FREED && self->callback_depth == 0) {
+        CLEAR_STR(self->recv_buf);
+        ch_tz_free(self->zones);
         Safefree(self);
         return 1;
     }
@@ -977,6 +997,25 @@ static int ch_tls_active(ev_clickhouse_t *self) {
 #endif
 }
 
+/* Build-time capabilities for features()/has_lz4()/has_tls().
+ * File scope: xsubpp mangles preprocessor conditionals inside
+ * braced XSUB bodies, so the XSUBs below call these instead. */
+static int ch_have_lz4(void) {
+#ifdef HAVE_LZ4
+    return 1;
+#else
+    return 0;
+#endif
+}
+
+static int ch_have_tls(void) {
+#ifdef HAVE_OPENSSL
+    return 1;
+#else
+    return 0;
+#endif
+}
+
 static int cleanup_connection(ev_clickhouse_t *self, int reconnecting) {
     int was_connected = self->connected;
 
@@ -1027,7 +1066,7 @@ static int cleanup_connection(ev_clickhouse_t *self, int reconnecting) {
     CLEAR_SV(self->native_totals);
     CLEAR_SV(self->native_extremes);
     lc_free_dicts(self);
-    CLEAR_INSERT(self);
+    CLEAR_INSERT(self); free_insert_default_state(self);
     CLEAR_STR(self->insert_err);
 
     /* Fire on_disconnect AFTER state is reset, so a handler that queues
@@ -1345,26 +1384,42 @@ static void nbuf_ledouble(native_buf_t *b, double d) {
     nbuf_le64(b, v);
 }
 
-/* Write a parameter value as a Field::dump-format quoted string.
- * ClickHouse's Field::restoreFromDump for String parses a single-quoted token
- * with backslash escaping for ' and \. Without escaping, embedded single
- * quotes truncate the value silently. */
-static void nbuf_quoted_param(native_buf_t *b, const char *s, size_t len) {
-    size_t i, esc = 0;
-    for (i = 0; i < len; i++) if (s[i] == '\'' || s[i] == '\\') esc++;
-    nbuf_varuint(b, (uint64_t)(len + esc + 2));
-    nbuf_grow(b, len + esc + 2);
-    b->data[b->len++] = '\'';
-    if (esc == 0) {
-        memcpy(b->data + b->len, s, len);
-        b->len += len;
-    } else {
-        for (i = 0; i < len; i++) {
-            if (s[i] == '\'' || s[i] == '\\') b->data[b->len++] = '\\';
-            b->data[b->len++] = s[i];
+/* The server parses a parameter value as escaped text: write \, tab,
+ * newline, CR and NUL as escapes. Returns the length; out may be NULL. */
+static size_t param_text_escape(const char *s, size_t len, char *out) {
+    size_t i, n = 0;
+    for (i = 0; i < len; i++) {
+        char e = s[i] == '\\' ? '\\' : s[i] == '\t' ? 't' : s[i] == '\n' ? 'n'
+               : s[i] == '\r' ? 'r' : s[i] == '\0' ? '0' : 0;
+        if (e) {
+            if (out) { out[n] = '\\'; out[n + 1] = e; }
+            n += 2;
+        } else {
+            if (out) out[n] = s[i];
+            n++;
         }
     }
+    return n;
+}
+
+/* Write a parameter value as a Field::dump-format quoted string (escaped
+ * text, then backslash-escaped ' and \ inside single quotes). Without the
+ * quoting, embedded single quotes truncate the value silently. */
+static void nbuf_quoted_param(native_buf_t *b, const char *s, size_t len) {
+    size_t i, tlen = param_text_escape(s, len, NULL), esc = 0;
+    char *t;
+    Newx(t, tlen + 1, char);
+    param_text_escape(s, len, t);
+    for (i = 0; i < tlen; i++) if (t[i] == '\'' || t[i] == '\\') esc++;
+    nbuf_varuint(b, (uint64_t)(tlen + esc + 2));
+    nbuf_grow(b, tlen + esc + 2);
     b->data[b->len++] = '\'';
+    for (i = 0; i < tlen; i++) {
+        if (t[i] == '\'' || t[i] == '\\') b->data[b->len++] = '\\';
+        b->data[b->len++] = t[i];
+    }
+    b->data[b->len++] = '\'';
+    Safefree(t);
 }
 
 /* --- Native protocol read helpers (from recv_buf) --- */
@@ -1473,6 +1528,11 @@ static int is_client_only_key(const char *key, I32 klen) {
         || (klen == 6 && memcmp(key, "params", 6) == 0)
         || (klen == 8 && memcmp(key, "external", 8) == 0)
         || (klen == 10 && memcmp(key, "idempotent", 10) == 0)
+        || (klen == 11 && memcmp(key, "data_format", 11) == 0)
+        || (klen == 10 && memcmp(key, "data_block", 10) == 0)
+        || (klen == 10 && memcmp(key, "columns_at", 10) == 0)
+        || (klen == 16 && memcmp(key, "empty_as_default", 16) == 0)
+        || (klen == 8 && memcmp(key, "defaults", 8) == 0)
         || (klen == 17 && memcmp(key, "on_query_complete", 17) == 0);
 }
 
@@ -1480,8 +1540,19 @@ static int is_client_only_key(const char *key, I32 klen) {
 static void append_url_param(native_buf_t *b, const char *key, size_t klen,
                              const char *val, size_t vlen) {
     /* Guard the *3 arithmetic itself against size_t wraparound. */
-    if (klen > (SIZE_MAX - 64) / 3 || vlen > (SIZE_MAX - 64) / 3)
+    if (klen > (SIZE_MAX - 64) / 3 || vlen > (SIZE_MAX - 64) / 6)
         croak("URL parameter too large");
+    if (klen > 6 && memcmp(key, "param_", 6) == 0) {
+        size_t tlen = param_text_escape(val, vlen, NULL);
+        if (tlen != vlen) {
+            char *t;
+            Newx(t, tlen, char);
+            SAVEFREEPV(t);
+            param_text_escape(val, vlen, t);
+            val = t;
+            vlen = tlen;
+        }
+    }
     nbuf_grow(b, 2 + klen * 3 + vlen * 3);
     b->data[b->len++] = '&';
     b->len += url_encode(key, klen, b->data + b->len);
@@ -1683,6 +1754,7 @@ BOOT:
     ch_openssl_init();
     /* Permanent no-op CV used for internal callbacks (HTTP keepalive ping). */
     keepalive_noop_cb = newRV_inc((SV*)get_cv("EV::ClickHouse::__keepalive_noop", GV_ADD));
+    ch_guard_cv = newXS(NULL, ch_guard_xs, __FILE__);
     /* Per-process rand() seed so reconnect_jitter desynchronises forks
      * (otherwise every worker generates the same sequence and the
      * jitter is uniform across the herd, defeating its purpose). */
@@ -1698,6 +1770,20 @@ CODE:
      * keepalive_noop_cb binds to a callable CV instead of an
      * undefined stub that would die. */
     PERL_UNUSED_VAR(items);
+}
+
+void
+_literal_value(SV *text)
+PPCODE:
+{
+    /* A ClickHouse literal (as toString prints arrays and tuples) as a
+     * Perl value; the empty list when it is not one. */
+    STRLEN len;
+    const char *s = SvPV(text, len);
+    lit_t *l = parse_default_literal(s, len);
+    SV *v = l ? lit_to_sv(aTHX_ l) : NULL;
+    if (l) free_lit(l);
+    if (v) XPUSHs(sv_2mortal(v));
 }
 
 EV::ClickHouse
@@ -1769,7 +1855,9 @@ CODE:
         CLEAR_PERSISTENT_STATE(self);
         failover_free(self);
         CLEAR_INSERT(self);
+        free_insert_default_state(self);
         lc_free_dicts(self);
+        ch_tz_free(self->zones);
         Safefree(self);
         return;
     }
@@ -1799,13 +1887,24 @@ CODE:
     self->connected = 0;
 
     CLEAR_CONNECTION_HANDLERS(self);
-    CLEAR_PERSISTENT_STATE(self);
+    {
+        /* The parser in a callback frame still points into recv_buf
+         * (column names, types); check_destroyed frees it with self. */
+        char *keep_recv = NULL;
+        if (self->callback_depth > 0) {
+            keep_recv = self->recv_buf;
+            self->recv_buf = NULL;
+        }
+        CLEAR_PERSISTENT_STATE(self);
+        self->recv_buf = keep_recv;
+    }
     failover_free(self);
     lc_free_dicts(self);
-    CLEAR_INSERT(self);
+    CLEAR_INSERT(self); free_insert_default_state(self);
 
     self->magic = EV_CH_FREED;
     if (self->callback_depth == 0) {
+        ch_tz_free(self->zones);
         Safefree(self);
     }
     /* else: check_destroyed() will Safefree when callback_depth reaches 0 */
@@ -2013,10 +2112,13 @@ CODE:
                                        &req_len);
     } else {
         if (external) {
-            char ext_errbuf[256];
+            char ext_errbuf[640];
             ext_errbuf[0] = '\0';
-            ext_data = build_external_tables(aTHX_ self, external, &ext_len,
-                                             ext_errbuf, sizeof(ext_errbuf));
+            char *ext_tz = query_session_tz(aTHX_ self, settings);
+            if (ext_tz) SAVEFREEPV(ext_tz);
+            ext_data = build_external_tables(aTHX_ self, external,
+                effective_tz(self, ext_tz),
+                &ext_len, ext_errbuf, sizeof(ext_errbuf));
             if (!ext_data) {
                 if (settings_copy) SvREFCNT_dec((SV*)settings_copy);
                 if (qlc_sql) Safefree(qlc_sql);
@@ -2056,6 +2158,7 @@ CODE:
     if (on_data_sv)     s->on_data     = SvREFCNT_inc(on_data_sv);
     if (on_complete_sv) s->on_complete = SvREFCNT_inc(on_complete_sv);
     if (settings) send_apply_settings(s, settings);
+    s->session_tz = query_session_tz(aTHX_ self, settings);
     s->cb = SvREFCNT_inc(cb);
     if (settings_copy) SvREFCNT_dec((SV*)settings_copy);
     enqueue_send(self, s);
@@ -2102,8 +2205,85 @@ CODE:
         data_av = (AV *)SvRV(data_sv);
     }
 
+    char data_format[65];
+    STRLEN data_format_len = 0;
+    if (settings) {
+        SV **fmt = hv_fetchs(settings, "data_format", 0);
+        if (fmt) SvGETMAGIC(*fmt);
+        if (fmt && SvOK(*fmt)) {
+            STRLEN i;
+            const char *f = SvPV_nomg(*fmt, data_format_len);
+            if (data_format_len == 0 || data_format_len >= sizeof(data_format))
+                croak("data_format must be a ClickHouse format name");
+            for (i = 0; i < data_format_len; i++)
+                if (!isALNUM(f[i]))
+                    croak("data_format must be a ClickHouse format name");
+            if (data_is_av)
+                croak("data_format needs the data as one pre-formatted string");
+            Copy(f, data_format, data_format_len, char);
+        }
+    }
+    data_format[data_format_len] = '\0';
+    int native_block = 0;
+    if (settings) {
+        SV **db = hv_fetchs(settings, "data_block", 0);
+        if (db) SvGETMAGIC(*db);
+        if (db && SvTRUE_nomg(*db)) {
+            if (data_format_len != 6 || memcmp(data_format, "Native", 6) != 0)
+                croak("data_block needs data_format => 'Native'");
+            native_block = self->protocol == PROTO_NATIVE;
+        }
+    }
+
+    SSize_t ncols_at;
+    SSize_t *cols_at = insert_columns_at(aTHX_ settings, &ncols_at);
+    if (cols_at && !data_is_av)
+        croak("columns_at needs the data as an array of rows");
+
+    /* Client-side defaults for empty values: validated here, snapshotted
+     * onto the send entry after alloc_send. Native only; with data_format
+     * the data rides pre-formatted and the server applies its own rules. */
+    int want_empty_default = 0;
+    int have_user_defaults = 0;
+    HV *user_defaults = NULL;
+    if (settings) {
+        SV **esv = hv_fetch(settings, "empty_as_default", 16, 0);
+        SV **dsv = hv_fetch(settings, "defaults", 8, 0);
+        if (esv && *esv && SvGMAGICAL(*esv)) mg_get(*esv);
+        if (esv && *esv && SvTRUE(*esv)) want_empty_default = 1;
+        if (dsv && *dsv && SvGMAGICAL(*dsv)) mg_get(*dsv);
+        if (dsv && *dsv && SvOK(*dsv)) {
+            HV *dhv;
+            if (!SvROK(*dsv) || SvTYPE(SvRV(*dsv)) != SVt_PVHV)
+                croak("defaults must be a HASH reference");
+            dhv = (HV *)SvRV(*dsv);
+            hv_iterinit(dhv);
+            if (hv_iternext(dhv)) {
+                HE *he;
+                have_user_defaults = 1;
+                /* copied now: `settings` may become settings_copy, freed
+                 * before the send entry is filled */
+                user_defaults = (HV *)sv_2mortal((SV *)newHV());
+                hv_iterinit(dhv);
+                while ((he = hv_iternext(dhv))) {
+                    I32 klen;
+                    char *key = hv_iterkey(he, &klen);
+                    (void)hv_store(user_defaults, key, klen,
+                                   newSVsv(hv_iterval(dhv, he)), 0);
+                }
+            }
+        }
+        if (want_empty_default || have_user_defaults) {
+            if (self->protocol == PROTO_HTTP)
+                croak("empty_as_default and defaults require the native protocol");
+            if (data_format_len)
+                croak("empty_as_default and defaults cannot be combined with data_format");
+        }
+    }
+
     /* Native two-phase INSERT can only have one in flight at a time */
-    if (self->protocol == PROTO_NATIVE && (self->insert_data || self->insert_av))
+    if (self->protocol == PROTO_NATIVE && (!data_format_len || native_block)
+        && (self->insert_data || self->insert_av))
         croak("cannot pipeline native INSERT: previous INSERT still pending");
 
     /* Validate/serialize HTTP TSV data first — serialize_av_to_tsv can croak,
@@ -2111,14 +2291,22 @@ CODE:
     char *tsv_buf = NULL;
     STRLEN tsv_len = 0;
     const char *http_data = NULL;
+    SV *snap = NULL;
+    if (self->protocol == PROTO_NATIVE && !data_format_len && data_is_av)
+        snap = sv_2mortal(snapshot_insert_av(aTHX_ data_av, cols_at, ncols_at));
     if (self->protocol == PROTO_HTTP) {
         if (data_is_av) {
-            tsv_buf = serialize_av_to_tsv(aTHX_ data_av, &tsv_len);
+            tsv_buf = serialize_av_to_tsv(aTHX_ data_av, cols_at, ncols_at,
+                                          &tsv_len);
             http_data = tsv_buf;
         } else {
             http_data = SvPV(data_sv, tsv_len);
         }
     }
+    const char *inline_data = NULL;
+    STRLEN inline_len = 0;
+    if (self->protocol == PROTO_NATIVE && data_format_len && !native_block)
+        inline_data = SvPV(data_sv, inline_len);
 
     /* Expand params => { x => 1 } to param_x => '1' AND idempotent => 1|$tok
      * to insert_deduplication_token in a single owned settings copy. */
@@ -2169,20 +2357,29 @@ CODE:
         if (settings_copy) settings = settings_copy;
     }
 
-    /* Build "insert into table format TabSeparated" (no inline data),
-     * optionally prefixed with the connection's query_log_comment so the
-     * server's system.query_log shows the same tag for selects and
-     * inserts (parity with the query() XSUB above). */
+    /* "insert into table format F", optionally prefixed with the
+     * connection's query_log_comment so the server's system.query_log
+     * shows the same tag for selects and inserts. With data_format on
+     * native the data rides inline in the query (one round trip, parsed
+     * by the server's input format); otherwise it follows in phase 2. */
     size_t qlc_extra = self->query_log_comment
                      ? strlen(self->query_log_comment) + 7
                      : 0;
     char *insert_sql;
-    Newx(insert_sql, table_len + qlc_extra + 64, char);
+    if (inline_len > SIZE_MAX - table_len - qlc_extra - 128)
+        croak("insert data too large");
+    Newx(insert_sql, table_len + qlc_extra + 128 + inline_len, char);
     size_t off = qlc_emit_prefix(insert_sql, self->query_log_comment);
     size_t insert_sql_len = off + (size_t)snprintf(insert_sql + off,
-                               table_len + 64,
-                               "insert into %.*s format TabSeparated",
-                               (int)table_len, table);
+                               table_len + 128,
+                               "insert into %.*s format %s",
+                               (int)table_len, table,
+                               data_format_len ? data_format : "TabSeparated");
+    if (inline_data) {
+        insert_sql[insert_sql_len++] = '\n';
+        Copy(inline_data, insert_sql + insert_sql_len, inline_len, char);
+        insert_sql_len += inline_len;
+    }
 
     int defer_build = 0;
     if (self->protocol == PROTO_HTTP) {
@@ -2198,8 +2395,8 @@ CODE:
         req = NULL;
         req_len = 0;
     } else {
-        /* Native two-phase: phase 1 sends the query (no data), phase 2
-         * sends the binary Data block once we have the sample block. */
+        /* Two-phase unless inline: phase 1 sends the query, phase 2 the
+         * binary Data block once we have the sample block. */
         req = build_native_query(self, insert_sql, insert_sql_len,
                                   self->default_settings, settings,
                                   NULL, 0, &req_len);
@@ -2222,6 +2419,7 @@ CODE:
     }
     Safefree(insert_sql);
     if (settings) send_apply_settings(s, settings);
+    s->session_tz = query_session_tz(aTHX_ self, settings);
     /* Per-query on_query_complete override: extract BEFORE freeing
      * settings_copy (matches query() XSUB pattern; otherwise the
      * hv_fetch below would read a freed HV). */
@@ -2237,9 +2435,10 @@ CODE:
     /* For native INSERT, store data in the send entry (deferred to dispatch).
      * Even empty data needs the two-phase INSERT protocol to send an empty
      * DATA block. */
-    if (self->protocol == PROTO_NATIVE) {
+    if (self->protocol == PROTO_NATIVE && (!data_format_len || native_block)) {
+        s->insert_native_body = native_block;
         if (data_is_av) {
-            s->insert_av = snapshot_insert_av(aTHX_ data_av);
+            s->insert_av = SvREFCNT_inc(snap);
         } else {
             STRLEN data_len;
             const char *data = SvPV(data_sv, data_len);
@@ -2249,6 +2448,9 @@ CODE:
             s->insert_data[data_len] = '\0';
             s->insert_data_len = data_len;
         }
+        s->insert_empty_as_default = want_empty_default;
+        if (have_user_defaults)
+            s->insert_defaults = (HV *)SvREFCNT_inc((SV *)user_defaults);
     }
 
     s->cb = SvREFCNT_inc(cb);
@@ -2468,6 +2670,39 @@ CODE:
 OUTPUT:
     RETVAL
 
+SV *
+features(SV *thing)
+CODE:
+{
+    HV *h = newHV();
+    (void)hv_stores(h, "lz4", newSViv(ch_have_lz4()));
+    (void)hv_stores(h, "tls", newSViv(ch_have_tls()));
+    PERL_UNUSED_VAR(thing);
+    RETVAL = newRV_noinc((SV *)h);
+}
+OUTPUT:
+    RETVAL
+
+int
+has_lz4(SV *thing)
+CODE:
+{
+    PERL_UNUSED_VAR(thing);
+    RETVAL = ch_have_lz4();
+}
+OUTPUT:
+    RETVAL
+
+int
+has_tls(SV *thing)
+CODE:
+{
+    PERL_UNUSED_VAR(thing);
+    RETVAL = ch_have_tls();
+}
+OUTPUT:
+    RETVAL
+
 void
 skip_pending(EV::ClickHouse self)
 CODE:
@@ -2493,7 +2728,7 @@ CODE:
             pipeline_advance(self);
         return;
     }
-    CLEAR_INSERT(self);
+    CLEAR_INSERT(self); free_insert_default_state(self);
     CLEAR_STR(self->insert_err);
     if (had_inflight) {
         if (cleanup_connection(self, 0)) return;
@@ -3231,6 +3466,7 @@ CODE:
         double t = SvNV(timeout_sv);
         if (t > 0) timeout = t;
     }
+    ev_now_update(loop);
     double expires = timeout > 0 ? ev_now(loop) + timeout : 0;
 
     ev_timer to;

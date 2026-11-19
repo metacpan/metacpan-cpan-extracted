@@ -1,20 +1,31 @@
 # Contributing to this project
 
-Before you go crazy with huge changes, send some small e-mail to check
-that we want to change the tools in that way. E-mail that have one logical
-change are better.
+This distribution is maintained by e-mail.  There is no public issue
+tracker and no pull requests; send everything to the author, whose address
+is in the AUTHOR section of the module documentation and in META.yml.
 
-Good e-mail, patches, improvements, new features - are a fantastic help.
-They should remain focused in scope and avoid containing unrelated commits.
+## Reporting a bug
 
-**Please ask first** before embarking on any significant e-mail (e.g.
-implementing features, refactoring code, porting to a different language),
-otherwise you risk spending a lot of time working on something that the
-project's developers might not want to merge into the project.
+Please include a minimal, self-contained script that reproduces the
+problem, the version of the distribution, the output of `perl -V`, and
+your operating system and file system.  A report that can be run as-is is
+worth more than a long description.
 
-Please adhere to the coding conventions used throughout a project
-(indentation, accurate comments, etc.) and any other requirements (such
-as test coverage).
+## Sending a patch
+
+Ask first before starting anything large -- a new feature, a refactoring,
+a port to another environment.  It costs you one e-mail and can save you a
+lot of work on something that will not be merged.
+
+Send a unified diff (`diff -u`) against the latest release.  One patch per
+logical change: a patch that fixes a bug and reformats three files at the
+same time is hard to review and will be sent back.  Please include a test
+that fails before the patch and passes after it.
+
+Follow the conventions already used in the code: indentation, the style of
+the surrounding comments, and the Perl version the distribution supports.
+The distribution ships its own test suite; please make sure it still
+passes before you send anything.
 
 **IMPORTANT**: By submitting a patch, you agree to allow the project owner
 to license your work under the same license as that used by the project.

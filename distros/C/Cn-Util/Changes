@@ -1,5 +1,31 @@
 Revision history for Cn-Util
 
+0.0243 2026-11-18 CST (Claude Opus 5.5 helped)
+
+ [`ref_to_json_file`]
+
+ - A structure that cannot be encoded, such as one holding a code reference or a reference to itself, now dies with the existing file left as it was. The file used to be opened, and so emptied, before the structure was encoded, so a failed call destroyed what the file held.
+
+ [`structure`]
+
+ - A reference that is already being described further out is now shown as `(cycle)` only when it leads back to the container that holds it, and as `(shown above)` otherwise. It used to be called `(cycle)` whenever it was cut off, so in `[$a, $b]` with `$a->{child} = $b` the key `child` was reported as a cycle although the data had none. Such a reference is still not followed again, which is what keeps `structure` linear on structures such as a tree whose nodes list their siblings. Telling the two apart takes one extra pass over the structure, made only when something is cut off: 1.0 s for 300,000 records that each refer to the root.
+
+ [`execute`]
+
+ - The output returned for `'stdout'`, `'stderr'` and `'all'` now loses its trailing newline whatever the caller's `$/` is. Under a caller's `local $/;` the newline used to be left on.
+
+ [`json_file_to_ref`]
+
+ - A file holding only a bare `NaN`, `Infinity` or `-Infinity`, as Python's `json.dumps(float('nan'))` writes it, now reads as `undef`. It used to die in `decode_json`.
+
+ [`file2string`]
+
+ - The file is now read with the `:raw` layer, as the documentation always said. On Windows, where perl reads through `:crlf` by default, `"\r\n"` used to come back as `"\n"`; elsewhere nothing changes.
+
+ [Documentation]
+
+ - `format_commas` says that it rounds the binary number perl holds, not the decimal the caller wrote, so `1.005`, held as 1.00499999999999989... in a double, gives `1.00`, as `sprintf('%.2f')` does.
+
 0.0242 2026-11-14 CST (Claude Opus 5.5 helped)
 
  [`file2string`]

@@ -37,6 +37,7 @@ use File::Spec;
 use FindBin ();
 use lib File::Spec->catdir($FindBin::Bin, 'lib'); # t/lib: CaptureStd, the tests' capture {}
 use CaptureStd 'capture';
+use Platform 'modes_ignored'; # t/lib: whether this user is held to file modes
 use File::Temp qw(tempfile tempdir);
 use SimpleFlow qw(task say2);
 
@@ -234,7 +235,10 @@ subtest 'the result record has a uniform shape' => sub {
 # output that existed but could not be read counted as "already done".
 SKIP: {
 	skip 'file permissions do not work the same way on Windows', 2 if $^O eq 'MSWin32';
-	skip 'running as root: an unreadable file is still readable', 2 if $< == 0;
+	# until 0.196 this skipped for uid 0 alone, and failed for a Windows
+	# administrator under Cygwin, who can read and write it too
+	my $why = modes_ignored(0000);
+	skip $why, 2 if $why ne '';
 	my $unreadable = "$dir/unreadable.dat";
 	open my $ufh, '>', $unreadable or die; print {$ufh} 'x'; close $ufh;
 	chmod 0000, $unreadable;

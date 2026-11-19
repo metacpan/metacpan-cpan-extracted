@@ -1,4 +1,4 @@
-package Affix v1.4.0 {    # 'FFI' is my middle name!
+package Affix v1.4.1 {    # 'FFI' is my middle name!
 
     #~ |-----------------------------------|-----------------------------------||
     #~ |--------------------------4---5~---|--4--------------------------------||
@@ -71,7 +71,7 @@ package Affix v1.4.0 {    # 'FFI' is my middle name!
         push @{ $EXPORT_TAGS{all} }, grep { !$seen{$_}++ } @{ $EXPORT_TAGS{$_} } for keys %EXPORT_TAGS;
     }
     #
-    @EXPORT    = sort @{ $EXPORT_TAGS{default} };    # XXX: Don't do this...
+    #~ @EXPORT    = sort @{ $EXPORT_TAGS{default} };    # XXX: Don't do this...
     @EXPORT_OK = sort @{ $EXPORT_TAGS{all} };
     #
     sub libm() { CORE::state $m //= find_library('m'); $m }

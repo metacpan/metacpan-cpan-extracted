@@ -159,13 +159,20 @@
 	<p>A deletion is a plan action like any other, but it is bounded: by default a
 	session may delete at most 200 files or 10% of the known files, whichever
 	limit is reached first. A tree that suddenly looks empty therefore stops the
-	run instead of being propagated. <code>filesync sync --force</code> proceeds
+	run instead of being propagated. Each limit is set per repo, and a limit of 0
+	switches it off. <code>filesync sync --force</code> proceeds
 	when that is really what you want.</p>
 
 	<p>On the client, a removed file is moved into that repo's local trash, kept
-	for 30 days by default. A second deletion of the same path on the same day is
+	for 30 days by default (<code>local_trash_days</code>; 0 keeps it forever). A second deletion of the same path on the same day is
 	stored as <code>PATH.1</code>, then <code>PATH.2</code>, and so on. The server
-	keeps its own trash, with the retention set per repo.</p>
+	keeps its own trash, with the retention set per repo
+	(<code>trash_days</code>, where 0 likewise means forever).</p>
+
+	<p>When a directory on one side becomes a file on the other, the files the
+	sync knows about are deleted first. Anything it does not track, such as an
+	ignored <code>.DS_Store</code>, goes to the trash with the directory, so
+	nothing is lost and the file can take its place.</p>
 
 <pre><code>filesync restore notes/a.txt --list
 filesync restore notes/a.txt
@@ -263,7 +270,7 @@ filesync restore notes/a.txt --to /tmp/recovered</code></pre>
 
 <footer class="site-footer">
 	<div class="wrap">
-		<p>App::FileSync 0.002.0 &middot; Copyright 2026 Nigel Horne &middot; GPL-2.0</p>
+		<p>App::FileSync 0.002.2 &middot; Copyright 2026 Nigel Horne &middot; GPL-2.0</p>
 		<p><a href="https://metacpan.org/dist/App-FileSync">CPAN</a> &middot;
 		<a href="https://github.com/nigelhorne/App-FileSync">GitHub</a> &middot;
 		<a href="https://github.com/nigelhorne/App-FileSync/issues">Issues</a> &middot;

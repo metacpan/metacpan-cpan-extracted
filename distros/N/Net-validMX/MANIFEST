@@ -6,6 +6,8 @@ t/03-valid.t
 t/04-full.t
 t/05-email.t
 t/06-oo.t
+t/07-resolver.t
+t/08-named-args.t
 lib/Net/validMX.pm
 LICENSE
 Makefile.PL

@@ -1,0 +1,53 @@
+---
+abstract: 'Say whether an account other than you could change a path, or make sure it cannot'
+author:
+  - 'George S. Baugh <george@troglodyne.net>'
+build_requires:
+  File::Spec: '0'
+  File::Temp: '0'
+  FindBin::libs: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  POSIX: '0'
+  Test2::Plugin::NoWarnings: '0'
+  Test2::V0: '0'
+  Test::MockModule: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Path-Secure
+no_index:
+  directory:
+    - docs
+    - t
+    - templates
+provides:
+  Path::Secure:
+    file: lib/Path/Secure.pm
+    version: '0.001'
+requires:
+  Cwd: '0'
+  Exporter: '0'
+  Fcntl: '0'
+  File::Spec: '0'
+  parent: '0'
+  perl: '5.014'
+  re: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/Troglodyne-Internet-Widgets/Path-Secure/issues
+  homepage: https://github.com/Troglodyne-Internet-Widgets/Path-Secure
+  repository: https://github.com/Troglodyne-Internet-Widgets/Path-Secure.git
+version: '0.001'
+x_contributors:
+  - 'troglodyne-robot <trogbot@troglodyne.net>'
+x_generated_by_perl: v5.44.0
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: MIT

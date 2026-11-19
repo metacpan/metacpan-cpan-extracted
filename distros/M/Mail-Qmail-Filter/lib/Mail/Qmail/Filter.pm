@@ -3,11 +3,11 @@ use warnings;
 
 package Mail::Qmail::Filter;
 
-our $VERSION = '1.31';
+our $VERSION = '1.71';
 
-use Carp qw(confess);
-use FindBin    ();
-use IO::Handle ();
+use Carp                      qw(confess);
+use FindBin                   ();
+use IO::Handle                ();
 use Mail::Qmail::Filter::Util qw(addresses_to_hash match_address);
 use MailX::Qmail::Queue::Message;
 use Scalar::Util qw(blessed);
@@ -25,20 +25,26 @@ BEGIN {
 }
 
 has 'defer_only';
-has 'feedback_fh'     => $feedback_fh;
-has 'filters'         => [];
-has 'reject_text'     => 'Rejected.';
+has 'feedback_fh' => $feedback_fh;
+has 'filters'     => [];
+has 'log_fh';
+has 'reject_text' => 'Rejected.';
 has 'skip_if';
 has 'skip_for_from'   => coerce => \&addresses_to_hash;
 has 'skip_for_rcpt'   => coerce => \&addresses_to_hash;
 has 'skip_for_sender' => coerce => \&addresses_to_hash;
+has 'skip_if_remote_ip_matches';
 has 'skip_if_relayclient';
 
 my @debug;
 
 sub debug {
     my $self = shift;
-    push @debug, join ': ', @_;
+    push @debug, my $message = join ': ', @_;
+    if ( $self->log_fh ) {
+        my $package = ref($self) . ' ';
+        $self->log_fh->say( $message !~ /^\Q$package/ && $package, $message );
+    }
 }
 
 $SIG{__DIE__} //= sub {
@@ -97,6 +103,19 @@ sub run {
         return;
     }
 
+    if (
+        $self->skip_if_remote_ip_matches
+        && (
+            my $match = $self->skip_if_remote_ip_matches->match_ip(
+                $self->message->remote_ip
+            )
+        )
+      )
+    {
+        $self->debug("$package skipped because remote IP belongs to $match");
+        return;
+    }
+
     if ( my $skip_for_sender = $self->skip_for_sender ) {
         if (
             match_address(
@@ -136,7 +155,9 @@ sub _exit {
     my $reject_text = shift // $self->reject_text;
     $reject_text = $reject_text->(@_)
       if ref $reject_text && 'CODE' eq ref $reject_text;
-    $self->feedback_fh->print( $status, $reject_text =~ y/\n/ /r );
+    $reject_text =~ y/\n/ /;
+    $self->feedback_fh->print( $status, $reject_text );
+
     exit 88;
 }
 
@@ -235,6 +256,15 @@ check deliverability according to .qmail files
 
 validate message against DMARC policy of the sender domain
 
+=item L<Mail::Qmail::Filter::Graylist>
+
+implements a graylisting which tries to be compatible to
+that of L<Spamdyke|https://www.spamdyke.org>
+
+=item L<Mail::Qmail::Filter::RDNS>
+
+checks the reverse DNS of the IP address of the client
+
 =item L<Mail::Qmail::Filter::RequireFrom>
 
 only allow certain RFC322.From addresses
@@ -253,7 +283,15 @@ validate RFC5322.From
 
 =item L<Mail::Qmail::Filter::ValidateSender>
 
-validate RFC5321.MailFrom
+validate RFC5321.MailFrom syntactically
+
+=item L<Mail::QMail::Filter::VerifyFrom>
+
+verify RFC5322.From via SMTP callout
+
+=item L<Mail::QMail::Filter::VerifySender>
+
+verify RFC5321.MailFrom via SMTP callout
 
 =back
 
@@ -304,11 +342,18 @@ If the sub routine returns a true value, the rest of the filter is skipped.
 When set to a true value, the L</run> method will skip the filter when
 the environment variable C<RELAYCLIENT> exists.
 
+=head2 skip_if_remote_ip_matches
+
+Expects a L<Net::IP::Match::Trie> object.
+Skips the filter in case the client IP address is matched by that object.
+
 =head2 skip_for_sender
 
 Takes an e-mail address or a reference to a list of such.
 The L</run> method will then skip the filter if the RFC5321.MailFrom address
 of the L</message> is one of these.
+
+You can use domain names without a localpart to skip any address @ that domain.
 
 =head2 skip_for_from
 
@@ -316,11 +361,15 @@ Takes an e-mail address or a reference to a list of such.
 The L</run> method will then skip the filter if the RFC5322.From address
 of the L</message> is one of these.
 
+You can use domain names without a localpart to skip any address @ that domain.
+
 =head2 skip_for_rcpt
 
 Takes an e-mail address or a reference to a list of such.
 The L</run> method will then skip the filter if at least one of the recipients
 in the envelope of the L</message> is one of these.
+
+You can use domain names without a localpart to skip any address @ that domain.
 
 =head2 defer_only
 

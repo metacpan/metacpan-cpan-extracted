@@ -72,6 +72,65 @@ HASH{2}
     name: string
     self: (cycle)
 END
+# A reference to something already being described further out is not
+# followed again.  Up to 0.0242 it was always called a cycle; it is one only
+# when it leads back to the container that holds it.
+{
+	my $shared = { x => 1 };
+	my $holder = { child => $shared };
+	is( shape([ $holder, $shared ]), <<'END', 'a hash shared by two places is shown above, not a cycle' );
+ARRAY[2]
+    [*]: HASH{2} (from 2 instances)
+        child?: (shown above)
+        x?: number
+END
+	$shared->{back} = $holder;
+	is( shape([ $holder, $shared ]), <<'END', 'two hashes that refer to each other are a cycle both ways' );
+ARRAY[2]
+    [*]: HASH{3} (from 2 instances)
+        back?: (cycle)
+        child?: (cycle)
+        x?: number
+END
+	delete $shared->{back};
+	# $shared's loop through its own "me" must not make $holder's "child" a cycle.
+	$shared->{me} = $shared;
+	is( shape([ $holder, $shared ]), <<'END', 'a loop under another key does not make a shared hash a cycle' );
+ARRAY[2]
+    [*]: HASH{3} (from 2 instances)
+        child?: (shown above)
+        me?: (cycle)
+        x?: number
+END
+	my ($p, $q, $r) = ({}, {}, { n => 1 });
+	$p->{c} = $r;
+	$q->{c} = $q;
+	is( shape([ $p, $q, $r ]), <<'END', 'a place holding both kinds shows both' );
+ARRAY[3]
+    [*]: HASH{2} (from 3 instances)
+        c?: (cycle)|(shown above)
+        n?: number
+END
+	my $x = [];
+	push @$x, $x;
+	is( shape($x), "ARRAY[1]\n    [*]: (cycle)\n", 'an array that contains itself' );
+	my $s;
+	$s = \$s;
+	is( shape(\$s), "\\ (cycle)\n", 'a scalar reference to itself' );
+	# 5,000 nodes, past the 100 levels at which a recursive search would warn
+	# "Deep recursion" and so die under FATAL warnings.
+	my $head = { n => 0 };
+	my $node = $head;
+	for my $i (1 .. 5000) {
+		$node->{next} = { n => $i, prev => $node };
+		$node = $node->{next};
+	}
+	my $deep = $head;
+	$deep = $deep->{next} for 1 .. 4998;
+	$deep->{back_to_head} = $head;
+	like( structure($head, output => 'string', color => 0, max_depth => 3), qr/prev: \(cycle\)/,
+		'a 5,000-node linked list is searched for loops without recursion' );
+}
 is( shape([ [], [ 1, 'x' ], [ 3 ] ]), <<'END', 'arrays of different lengths merge their elements' );
 ARRAY[3]
     [*]: ARRAY[0-2] (from 3 instances)

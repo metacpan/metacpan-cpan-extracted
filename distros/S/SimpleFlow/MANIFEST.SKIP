@@ -29,3 +29,12 @@
 # refers to either.
 ^cover\.sh$
 ^dzil\.sh$
+
+# The sample pipeline behind report()'s screenshots, and its stand-in tool and
+# output. Author-only: it needs symbolic links and writes into the tree.
+^pipeline\.pl$
+^example/
+
+# Author-only: a script that charts the CPAN Testers reports for a release,
+# and the charts it writes. Nothing that ships refers to them.
+^cpantesters\.

@@ -25,7 +25,7 @@ Term::ANSIColor::Concise - Produce ANSI terminal sequence by concise notation
 
 # VERSION
 
-Version 3.04
+Version 3.05
 
 # DESCRIPTION
 
@@ -141,6 +141,13 @@ Single uppercase character representing 8 colors, and alternative
     K  k  Black
     W  w  White
 
+`T` stands for the default color of the Terminal: `T` sets the
+foreground to the default (SGR 39), and `/T` sets the background to
+the default (SGR 49).  It has no brighter variant; `t` is the same
+as `T`.
+
+    T  t  Terminal (default color)
+
 ## 6x6x6 216 COLORS
 
 Combination of 0..5 for 216 RGB values:
@@ -239,6 +246,9 @@ indicate SGR (Select Graphic Rendition) parameter values:
     /    Toggle foreground/background
     ^    Reset to foreground
     ~    Cancel following effect
+
+`Z` resets everything.  To reset the color alone, use `T` (see
+["BASIC 8+8"](#basic-8-8)).
 
 Tilde (`~`) negates the following effect; `~S` resets the effect of
 `S`.  The negation of `D` is discussed in the Wikipedia page in

@@ -1,7 +1,7 @@
 package DBIx::SchemaChecksum::App::ApplyChanges;
 
 # ABSTRACT: Apply changes based on current checksum
-our $VERSION = '1.104'; # VERSION
+our $VERSION = '1.106'; # VERSION
 
 use 5.010;
 
@@ -12,12 +12,33 @@ use Try::Tiny;
 
 option '+sqlsnippetdir' => ( required => 1);
 option 'dry_run'        => ( is => 'rw', isa => 'Bool', default => 0, documentation=>'Only list changes, do not apply' );
+option 'check'          => ( is => 'rw', isa => 'Bool', default => 0, documentation=>'Check whether the database is up to date without applying changes' );
 has 'no_prompt'    => ( is => 'rw', isa => 'Bool', default => 0, documentation=>'Do not prompt, just use defaults');
 
 sub run {
     my $self = shift;
 
-    $self->apply_sql_snippets($self->checksum);
+    my $checksum = $self->checksum;
+    if ($self->check) {
+        my $path = $self->_update_path || {};
+        if (exists $path->{$checksum}) {
+            say 'unapplied changes found for current checksum';
+            exit 1;
+        }
+        for my $entry (values %$path) {
+            my $start = $entry->[0] eq 'SAME_CHECKSUM' ? 1 : 0;
+            for (my $i = $start + 1; $i < @$entry; $i += 2) {
+                if ($entry->[$i] eq $checksum) {
+                    say 'current checksum matches last changes';
+                    return;
+                }
+            }
+        }
+        say 'no changes match current checksum';
+        exit 1;
+    }
+
+    $self->apply_sql_snippets($checksum);
 }
 
 
@@ -162,7 +183,7 @@ DBIx::SchemaChecksum::App::ApplyChanges - Apply changes based on current checksu
 
 =head1 VERSION
 
-version 1.104
+version 1.106
 
 =head1 DESCRIPTION
 
@@ -170,7 +191,11 @@ Apply all changes found in C<sqlsnippetdir> based on the current
 checksum. For each file there will be a prompt asking if you want to
 apply the file. Use C<--no_prompt> to always accept each change
 (useful for deployment scripts etc). Use C<--dry_run> to run all
-changes, but do not apply them.
+changes, but do not apply them. Use C<--check> to check whether the
+current checksum is at the end of the changes tree, without applying
+changes. It exits with a failure status if changes remain or no checksum
+matches. Changes that do not alter the checksum are treated as unapplied,
+since their application cannot be determined from the checksum alone.
 
 =head1 METHODS
 
@@ -192,17 +217,17 @@ Thomas Klausner <domm@plix.at>
 
 =item *
 
-Maroš Kollár <maros@cpan.org>
+Maroš Kollár <cpan@k-1.com>
 
 =item *
 
-Klaus Ita <koki@worstofall.com>
+Klaus Ita
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 - 2021 by Thomas Klausner, Maroš Kollár, Klaus Ita.
+This software is copyright (c) 2012 - 2026 by Thomas Klausner, Maroš Kollár, Klaus Ita.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

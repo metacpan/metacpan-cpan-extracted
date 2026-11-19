@@ -16,6 +16,7 @@ t/9010-encoding.t
 t/9020-perl5compat.t
 t/9025-perl542compat.t
 t/9030-distribution.t
+t/9032-meta_prereqs.t
 t/9040-style.t
 t/9050-pod.t
 t/9060-readme.t
@@ -99,6 +100,7 @@ t/3030_charclass_hyphen_euctw.t
 t/3031_charclass_hyphen_hp15.t
 t/3032_charclass_hyphen_informixv6als.t
 t/3033_charclass_hyphen_johab.t
+t/3034_charclass_escaped_delimiter.t
 t/4001_mb_chop.t
 t/4002_mb_chr.t
 t/4003_mb_do.t
@@ -130,6 +132,7 @@ t/5006_unlink.t
 t/5007_opendir.t
 t/5008_signatures.t
 t/5009_xx_modifier.t
+t/5010_perl544.t
 t/6101_filetest.t
 t/6102_filetest.t
 t/6103_filetest.t

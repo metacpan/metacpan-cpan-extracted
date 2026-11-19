@@ -17,7 +17,7 @@ use overload
   '""'     => sub { shift->to_string },
   fallback => 1;
 
-our $VERSION = "0.21";
+our $VERSION = "0.22";
 
 has charset => 'UTF-8';
 
@@ -53,7 +53,7 @@ has text => sub {
 
 has dom => sub {
   my ($self) = @_;
-  return Mojo::DOM->new($self->text);
+  return Mojo::DOM->new->xml(1)->parse($self->text);
 };
 
 # The top node, not the root
@@ -150,11 +150,13 @@ sub set_items {
 };
 
 has is_valid => sub {
-  shift->dom->children->first->tag =~ /^(feed|rss|rdf|rdf:rdf)$/i;
+  my $top = shift->dom->children->first;
+  return defined $top && $top->tag =~ /^(feed|rss|rdf|rdf:rdf)$/i;
 };
 
 sub is_feed_content_type {
   my ($self, $content_type) = @_;
+  return undef unless defined $content_type && length $content_type;
   # use split to remove charset attribute from content_type header
   ($content_type) = split(/[; ]+/, $content_type);
 # feed mime-types:
@@ -169,17 +171,26 @@ sub is_feed_content_type {
 
 sub _load {
   my ($self) = @_;
-  my $tx     = $self->ua->get($self->url);
-  my $result = $tx->result;                  # this will croak on network errors
+  my $tx = $self->ua->get($self->url);
+  if (my $error = $tx->error) {
+    unless ($tx->res->code) {
+      $self->is_valid(undef);
+      croak "Error getting feed from url ", $self->url, ": ",
+        $error->{message};
+    }
+  }
+  my $result = $tx->result;
 
   if ($result->is_error) {
     $self->is_valid(undef);
-    croak "Error getting feed from url ", $self->url, ": ", $result->message;
+    croak "Error getting feed from url ", $self->url, ": ",
+      $result->code, " ", ($result->message // '');
   }
 
   # Redirect:
-  elsif ($result->code == 301 || $result->code == 302) {
-    my $new_url = Mojo::URL->new($result->headers->location);
+  elsif ($result->code =~ /^(301|302|303|307|308)$/) {
+    my $new_url = Mojo::URL->new($result->headers->location)
+      ->to_abs($tx->req->url);
     push @{$self->redirects}, $self->url;
     $self->url($new_url);
     if (@{$self->redirects} > $self->max_redirects) {

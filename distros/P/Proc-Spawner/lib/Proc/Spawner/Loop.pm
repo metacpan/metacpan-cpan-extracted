@@ -9,7 +9,7 @@ package Proc::Spawner::Loop;
 # a backend may take process-wide state only while wait_until runs (D3: SIGCHLD on POSIX).
 use strict; use warnings;
 use Scalar::Util qw(weaken);
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 our $TRACE;          # undef, or a code ref given one line per operation (Proc::Spawner's $TRACE is this one)
 our $CAUSE;          # the caller's: a queued call keeps the value current when it was queued, and runs with it
@@ -46,15 +46,18 @@ sub cancel {
   my ($l, $id) = @_; my $w = delete $l->{watch}{$id} or return 0;
   $w->[0] eq 'timer' ? (@{$l->{timers}} = grep $_->[1] != $id, @{$l->{timers}}) : $l->{backend}->cancel($id); 1 }
 sub pending { my $l = shift; @{$l->{q}} + keys %{$l->{watch}} }
+sub queued { scalar @{$_[0]{q}} }   # the calls queued, not yet run
 
 # ------------------------------------------------------------------ running
-sub wait_until {
-  my ($l, $done) = @_;
+sub wait_until {   # true when CODE->() came true; with TIMEOUT (seconds; post-0.12, K5): false if the time ran out first
+  my ($l, $done, $timeout) = @_;
   die "Proc::Spawner: wait inside a reaction\n" if $REACTING;   # D2
   $l->{backend}->begin unless $DEPTH;
-  my $ok = eval { local $DEPTH = $DEPTH + 1; $l->turn until $done->(); 1 };
+  my $end = defined $timeout ? now() + $timeout : undef; my $met;
+  my $ok = eval { local $DEPTH = $DEPTH + 1;
+    until ($met = !!$done->()) { my $left; if (defined $end) { $left = $end - now(); last if $left <= 0 } $l->turn($left) } 1 };
   $l->{backend}->end unless $DEPTH;
-  die $@ unless $ok }
+  die $@ unless $ok; $met }
 sub poll {   # what is ready now, without waiting; nothing inside wait_until or a callback (K3, post-0.04)
   my $l = shift; return if $REACTING || $DEPTH;
   local $DEPTH = $DEPTH + 1;   # (a callback's own wait_until still dies: D2)
@@ -137,10 +140,11 @@ C<CODE-E<gt>()> once SECONDS have passed.
 
 Queues C<CODE-E<gt>(ARGS)>.
 
-=item C<wait_until(CODE)>, C<poll()>
+=item C<wait_until(CODE [, TIMEOUT])>, C<poll()>
 
 C<wait_until> runs the queue and waits for events until C<CODE-E<gt>()> is
-true (it dies if nothing is left to wait for).  C<poll> runs what is ready
+true (it dies if nothing is left to wait for), and returns true; with
+C<TIMEOUT> (seconds), at most that long: false if the time ran out first.  C<poll> runs what is ready
 now, without waiting, and does nothing inside C<wait_until> or a callback.
 
 =item C<pipe(overlapped =E<gt> 'r' | 'w' | 'rw')>

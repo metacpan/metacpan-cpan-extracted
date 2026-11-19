@@ -11,7 +11,7 @@ skips work that has already been done. It can also bound a step with a
 [lock](#locking) a step against a second copy of the pipeline, run it in a
 [container, a conda environment or on a SLURM cluster](#containers-conda-and-clusters),
 and [run independent steps at once](#running-steps-in-parallel). A trace
-becomes an [HTML report](#reports).
+becomes an [HTML report](#reports) and a [flow diagram](#flow-diagrams).
 
 Two subroutines are exported by default: [`task`](#task) and [`say2`](#say2).
 Two more are exported on request:
@@ -198,7 +198,7 @@ execution-only fields simply hold their empty values (`exit` and `signal` are
 | `duration`         | Wall-clock seconds the command took (`0` for skips/dry runs). With [retries](#retries), the last attempt's. |
 | `attempts`         | How many times the command was run: `0` for a skip or a dry run, `1` without retries. |
 | `start.time`       | When the last attempt started, in epoch seconds with a fractional part; `0` if none did. |
-| `cpu.user`, `cpu.system` | CPU seconds the command, and everything it waited for, spent in user and system mode. The clock counts in ticks of 1/100 s on Linux. Not known to be filled in on Windows. |
+| `cpu.user`, `cpu.system` | CPU seconds the command, and everything it waited for, spent in user and system mode. The clock counts in ticks of 1/100 s on Linux. Not known to be filled in on Windows, and `0` on GNU/Hurd unless its glibc was built to count a finished child's time. |
 | `exit`             | Exit code of the command, or `-1` if it could not be launched at all (`stderr` then says why). |
 | `signal`           | Signal number if the command process was killed by a signal, else `0`. A non-zero `signal` makes the step `"FAILED"`, even though `exit` is then `0`. Always `0` on Windows (no POSIX signals). |
 | `timed.out`        | `1` if the command was killed for exceeding its `timeout`, else `0`. |
@@ -439,7 +439,8 @@ Re-running such a step over its outputs, with `overwrite` or `stale`, is then
 refused with a message naming them, instead of failing inside the command with
 an error that does not say why the file is read-only. Remove them, or make them
 writable, to run it again. Symbolic links are left alone. `root` can write to a
-read-only file, so for `root` this protects nothing.
+read-only file, so for `root` this protects nothing, and nor, under Cygwin, for
+a Windows administrator, whose backup and restore privileges do the same.
 
 ## Tracing
 
@@ -772,8 +773,41 @@ self-contained file, with no scripts and nothing fetched, which follows the
 reader's light or dark setting, so that it can be mailed or archived as it
 is. `report` returns the number of tasks it read, and dies naming the line of
 the trace it could not read: one that is not strict JSON in UTF-8, nests more
-than 512 deep, or has a time that is not a number of seconds or a command that
-is not a string. A `title` may be a character string or UTF-8 bytes.
+than 512 deep, or has a time that is not a number of seconds, a command or
+`dir` that is not a string, or file and directory names that are not a list of
+strings. A `title` may be a character string or UTF-8 bytes.
+
+## Flow diagrams
+
+`svg` writes the pipeline's flow diagram as an SVG image, like Snakemake's
+`--dag` and Nextflow's `-with-dag`:
+
+    report(trace => 'trace.jsonl', html => 'report.html', svg => 'flow.svg');
+
+Each task is a box, numbered as in the page and colored by its status, showing
+its command, clipped to 33 characters. An arrow runs from a task to each later
+task that reads what it wrote: an input file or directory is linked to the
+most recent earlier task that declared it as an output, or declared a directory
+it is in. Names are compared as absolute paths, each relative to the `dir` its
+step ran in, so `a.txt` and `./a.txt` are the same file, and the same name in
+two directories is two. Each is then resolved, as far as it exists when
+`report` runs, through symbolic links and `..`, so a file named through a link
+to its directory, such as `/tmp` on macOS, is the file its real path names;
+`x/../a.txt` is `a.txt` while `x` exists, and otherwise is not.
+The flow runs left to right, each task one column to the right of the furthest
+of its sources. Hovering over a box shows the whole command, the note and the
+names, and over an arrow, the names that link the two tasks. A pipeline run
+twice onto one trace draws two separate flows.
+
+The diagram is drawn from what each step declared, not from what its command
+did: a file a command reads without declaring it as an input is not linked.
+
+`report` takes `html`, `svg` or both. The HTML page shows the same diagram
+below the table, when at least one task uses another's output. The image, like
+the page, follows the reader's light or dark setting, and needs nothing else to
+be shown. Each file is written under a temporary name beside it and renamed
+into place once all are written in full, so a `report` that dies, on a full
+disk or a missing directory, leaves the page and the diagram as they were.
 
 # Dependencies
 

@@ -4,7 +4,7 @@
       "Dotan Dimet <dotan@corky.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.6",
+   "generated_by" : "Minilla/v3.3.2",
    "license" : [
       "artistic_2"
    ],
@@ -58,7 +58,7 @@
    "provides" : {
       "Mojo::Feed" : {
          "file" : "lib/Mojo/Feed.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       },
       "Mojo::Feed::Item" : {
          "file" : "lib/Mojo/Feed/Item.pm"
@@ -71,7 +71,7 @@
       },
       "Mojolicious::Plugin::FeedReader" : {
          "file" : "lib/Mojolicious/Plugin/FeedReader.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       }
    },
    "release_status" : "stable",
@@ -81,16 +81,17 @@
       },
       "homepage" : "https://github.com/dotandimet/Mojo-Feed",
       "repository" : {
-         "url" : "git://github.com/dotandimet/Mojo-Feed.git",
+         "type" : "git",
+         "url" : "https://github.com/dotandimet/Mojo-Feed.git",
          "web" : "https://github.com/dotandimet/Mojo-Feed"
       }
    },
-   "version" : "0.21",
+   "version" : "0.22",
    "x_authority" : "cpan:DOTAN",
    "x_contributors" : [
       "Ed J <mohawk2@users.noreply.github.com>",
       "Mario Domgoergen <mdom@taz.de>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

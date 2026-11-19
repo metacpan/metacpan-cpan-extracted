@@ -175,8 +175,13 @@ or mode change alone) has no hunks.
 `?section=ID` gives that section's diff instead: every line of its `ranges`
 and `doc_ranges`, unchanged ones as context, with its added and removed
 lines, in file order. Each unbroken run of code or of documentation is a
-hunk with a `part` of `code` or `docs`; lines between runs do not appear. A
-section with no added or removed line has no hunks. 400 for a bad section
+hunk with a `part` of `code` or `docs`; lines between runs do not appear.
+Runs with nothing or only blank (whitespace-only) lines between them, code
+or documentation alike, are one hunk instead, holding those blank lines as
+they are; documentation apart from the code, such as POD
+after `__END__`, stays a hunk of its own. A hunk's `part` is `code` when it
+holds any code, `docs` when it holds documentation alone. A section with no
+added or removed line has no hunks. 400 for a bad section
 id, 404 for a section not in the file.
 
 ### `GET /api/resolution/ID`

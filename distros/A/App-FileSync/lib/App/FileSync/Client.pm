@@ -34,7 +34,7 @@ use App::FileSync::Constants qw(
 );
 use App::FileSync::Delta;
 use App::FileSync::I18N qw(os_error strip_location);
-use App::FileSync::IO qw(append_line ensure_dir install_file open_file read_text temp_file write_atomic);
+use App::FileSync::IO qw(append_line ensure_dir install_file list_dir open_file read_text temp_file write_atomic);
 use App::FileSync::Ignore;
 use App::FileSync::Lock;
 use App::FileSync::Protocol;
@@ -46,7 +46,7 @@ use App::FileSync::Transport::SSH;
 use App::FileSync::Trash;
 use App::FileSync::Verify;
 
-use version; our $VERSION = version->declare('0.002.1');
+use version; our $VERSION = version->declare('0.002.2');
 
 # Tunables, kept as package variables so tests can localise them.
 our $CHUNK          = 262_144;
@@ -81,7 +81,7 @@ App::FileSync::Client - sync one repo, and the client-side repo commands
 
 =head1 VERSION
 
-0.002.1
+0.002.2
 
 =head1 SYNOPSIS
 
@@ -1195,8 +1195,10 @@ sub _receive :Private {
 # Entry:       $receipt is from _receive.
 # Exit:        returns 1.
 # Side effects: replaces the local path (whatever was there: a file, a
-#              symlink or an empty directory); records the new entry in
-#              $after.  A mismatch removes the temporary file and raises.
+#              symlink or an empty directory; a directory that still holds
+#              untracked files goes to the local trash); records the new
+#              entry in $after.  A mismatch removes the temporary file and
+#              raises.
 sub _finish_pull :Private {
 	my ($self, $connection, $action, $after, $abs, $receipt) = @_;
 
@@ -1210,6 +1212,15 @@ sub _finish_pull :Private {
 	if ($key) {
 		eval { unlink $receipt->{temp} };
 		$self->_throw($key, { path => $path, %args });
+	}
+
+	# A directory where the file goes still holds what the sync does not list
+	# (ignored files): its listed contents were deleted earlier in this plan.
+	# Keep it in the local trash rather than refuse the file, which would fail
+	# this and every later sync.
+	if (-d $abs && !-l $abs && @{ list_dir($abs) || [$abs] }) {
+		$self->_delete_local($path);
+		$self->{logger}->warn($self->i18n('client.dir_replaced', { path => $path, trash => $self->_trash_root() }));
 	}
 
 	install_file($receipt->{temp}, $abs, $server->{m}, $server->{mode});

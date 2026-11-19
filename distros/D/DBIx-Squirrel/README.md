@@ -14,7 +14,7 @@ the query. It never hides the SQL, and it isn't an ORM.
 my @names = $dbh->iterate(
     'SELECT name FROM track WHERE plays > :plays ORDER BY plays DESC',
     plays => 6000,
-    sub { $_->[0] },    # each row's name
+    pluck,              # each row's name
     sub { uc },         # in capitals
 )->all;
 ```
@@ -182,11 +182,11 @@ objects.
 ### 6. Give your databases and statements names.
 
 ```perl
-use DBIx::Squirrel::Tooling qw(keep_all);
+use DBIx::Squirrel::Tooling qw(pluck keep_all);
 use DBIx::Squirrel::Sugar
     database  => {music => ['dbi:SQLite:dbname=music.db', '', '']},
     statement => {
-        titles_by => [music => 'SELECT title FROM album WHERE artist_id = ?', sub { $_->[0] }],
+        titles_by => [music => 'SELECT title FROM album WHERE artist_id = ?', pluck],
     };
 
 my @titles = titles_by 2, keep_all;

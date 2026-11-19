@@ -59,6 +59,21 @@ run_ok('encoder built inside the thread',
             my $e = ClickHouse::Encoder->new(columns=>[["a","String"]]);
             $e->encode([["x"]]); 1 })->join;');
 
+run_ok('independent timezone encoders in concurrent threads',
+       'my @spec = (["Europe/Moscow", 1794942000], ["Europe/Berlin", 1794949200],
+                    ["America/New_York", 1794970800], ["UTC", 1794952800]);
+        my @threads = map { my ($zone, $expected) = @$_;
+            threads->create(sub {
+                my $e = ClickHouse::Encoder->new(timezone => $zone, columns => [["v", "DateTime"]]);
+                for (1 .. 100) {
+                    my $b = ClickHouse::Encoder->decode_block($e->encode([["2026-11-17 22:00:00"]]));
+                    die "timezone drift" if $b->{columns}[0]{values}[0] != $expected;
+                }
+                return 1;
+            })
+        } @spec;
+        for (@threads) { die "thread failed" unless $_->join }');
+
 run_ok('several threads, encoder alive in the parent',
        'my $e = ClickHouse::Encoder->new(columns=>[["a","String"]]);
         for (1..4) {

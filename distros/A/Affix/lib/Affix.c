@@ -6000,8 +6000,8 @@ void boot_Affix(pTHX_ CV * cv) {
         // Library & core utils
         XSUB_EXPORT(load_library, "$", "lib");
         XSUB_EXPORT(find_symbol, "$$", "lib");
-        XSUB_EXPORT(error, "", "core");
-        XSUB_EXPORT(get_last_error_message, "", "core");
+        XSUB_EXPORT(error, "", "error");
+        XSUB_EXPORT(get_last_error_message, "", "error");
 
         // Introspection
         XSUB_EXPORT(sizeof, "$", "core");

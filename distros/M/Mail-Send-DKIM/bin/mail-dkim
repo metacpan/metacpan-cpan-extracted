@@ -1,0 +1,136 @@
+#!/usr/bin/env perl
+#
+# mail-dkim - sign a message that arrives on stdin, then hand it to sendmail(1)
+# with the arguments given on the command line.
+#
+# It exists to be dropped where a CGI script or a cron job calls
+# /usr/sbin/sendmail directly: those messages go out with no signature, so a
+# forwarded copy looks exactly like a forgery to the receiving site.  Pointing
+# that one call at this instead signs the mail without touching the script.
+#
+# The signing is in Mail::Send::DKIM; this is the command line around it, so
+# that the module can be used and tested without a process and a pipe.
+
+use strict;
+use warnings;
+
+use FindBin qw($Bin);
+# Where the module is: beside this script in a checkout, and one level down
+# under lib/perl5 when the distribution was installed with INSTALL_BASE - which
+# is how perlbrew, local::lib and cpanm -l put it, and where @INC does not
+# reach unless PERL5LIB is set for every caller, cron included.
+use lib grep { -d } map { "$Bin/../$_" } qw(lib lib/perl5);
+use Mail::Send::DKIM;
+
+my $dkim = Mail::Send::DKIM->new();
+
+my $message = do { local $/; <STDIN> } // '';
+my $signed = $dkim->sign($message);
+$message = $signed if(defined($signed));
+
+exit($dkim->send($message, @ARGV));
+
+__END__
+
+=head1 NAME
+
+mail-dkim - sign a message on stdin with DKIM, then send it with sendmail
+
+=head1 SYNOPSIS
+
+	mail-dkim [-t] [-f address] [sendmail options...] < message
+
+	# the way a CGI script or a crontab calls it
+	DKIM_DOMAINS=example.org DKIM_KEYDIR=~/dkim \
+		/usr/local/bin/mail-dkim -t -f webmaster@example.org
+
+=head1 DESCRIPTION
+
+Reads a complete message, headers and body, from standard input.  If the
+domain in its C<From:> header is one of the domains this host signs for, a
+C<DKIM-Signature> header is added and the signed message is written to
+sendmail.  Otherwise the message is written to sendmail unsigned.  Either way
+it is written in the local form, with LF line endings and no carriage returns,
+so an MTA that writes the CRLF of SMTP itself cannot double them.
+
+It is meant to be put in place of a direct call to sendmail(1), so that mail
+sent by a script or a cron job is signed without the script being changed: a
+copy forwarded by a mailing list or a colleague otherwise arrives with no
+signature at all, which is indistinguishable from a forgery, and that is what
+makes a DMARC policy at C<p=quarantine> or C<p=reject> expensive.
+
+Every argument is passed to sendmail as it was given, so C<-t>, C<-f> and
+C<-odq> keep working, and the exit status is sendmail's own.
+
+The signing itself - which domains, which key, the canonicalization, and the
+line endings handed to sendmail - is L<Mail::Send::DKIM>, which can be used
+directly and is tested without running this programme.
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item B<DKIM_DOMAINS>
+
+A comma or space separated list of the domains to sign for, for example
+C<example.org,example.net>.  A message whose C<From:> domain is not in the
+list is passed through unsigned.  When this is empty or unset nothing is
+signed, which is the safe state before the keys are in place.
+
+The comparison is case insensitive, and the domain comes from the address, not
+from a display name: C<< From: "Nigel" <alerts@example.org> >> is
+C<example.org>.
+
+=item B<DKIM_KEYDIR>
+
+The directory holding the private keys.  Defaults to F<~/dkim>.
+
+=item B<DKIM_SELECTOR>
+
+The selector the key is published under, which names the key file:
+C<$DKIM_KEYDIR/$DKIM_SELECTOR.private>.  When it is unset the only
+F<*.private> file in B<DKIM_KEYDIR> is used and its name is the selector, so a
+host with one key needs no configuration beyond B<DKIM_DOMAINS>.
+
+=item B<DKIM_KEYFILE>
+
+The key file itself, used as it stands, for a key that is not kept under
+B<DKIM_KEYDIR> in the naming convention above - a host given one key to try,
+for instance.  When B<DKIM_SELECTOR> is not set the selector is the name of
+this file, without the F<.private>, so setting this is an alternative to
+setting both of those rather than a third thing to set with them.
+
+=item B<SENDMAIL>
+
+The program to hand the message to.  Defaults to F</usr/sbin/sendmail>.
+
+=item B<HOME>
+
+The home directory the default B<DKIM_KEYDIR> of F<~/dkim> is taken from.  When
+it is unset the home directory in the password file entry is used instead.
+
+=back
+
+=head1 BEHAVIOUR WHEN IT CANNOT SIGN
+
+Signing never stands between a message and its recipient.  A missing or
+unreadable key, several keys and no selector to choose between them, or a key
+that will not load each produce a warning on standard error and the message is
+delivered unsigned.
+
+=head1 EXIT STATUS
+
+The exit status of sendmail, so C<0> when the message was accepted.  C<1> when
+sendmail cannot be run at all, and a warning on standard error.  Signing
+problems do not change the exit status: the mail is still delivered.
+
+=head1 SEE ALSO
+
+L<Mail::Send::DKIM>, which does the signing, and F<dmarc-report.pl>, which is
+what makes the reports worth signing for.
+
+=head1 LICENCE
+
+GNU General Public License, version 2, as in the F<LICENSE> file.
+
+=cut

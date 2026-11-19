@@ -1,5 +1,22 @@
 Revision history for Perl extension Text-ANSI-Highlight
 
+0.04 2026-11-19T03:56:42Z
+
+    - A code block which has parts is colored part by part, by a
+      module Text::ANSI::Highlight::Block::NAME for a block of that
+      name.  Text::ANSI::Highlight::Block::embedz is the one for a
+      block of pandoc-embedz: the configuration is YAML, the template
+      is Jinja2, and the data has the language of its format
+    - highlight takes the line of a fence for the language, and the
+      class method parts gives the parts of a block with their labels
+    - A class in braces is the language of a fence, as pandoc takes
+      it: ```{.perl .numberLines}
+    - new(background => 0) takes the colors of the background out of
+      what the highlighter gives
+    - SGR sequences which have a parameter with colons (38:2::R:G:B)
+      are taken for colors
+    - A file of the name cpanfile is Perl
+
 0.03 2026-11-18T09:18:39Z
 
     - The style of the highlighter can be given: new(style => ...),

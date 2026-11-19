@@ -1,7 +1,7 @@
 package Review::Helper::Manual;
 use v5.36;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 1;
 
@@ -206,8 +206,9 @@ C<package Foo::Bar>. The agent names every part of the file, the header and
 code between subs too; blank lines go with the section before them. Only
 sections the commit changed are listed. A file the agent has not split yet says so and lists none; a file it
 left whole lists none either: read its diff. A section's diff shows the
-whole sub and its whole documentation, changes marked, as two parts, even
-when the documentation is far below (after C<__END__>); POD beside the
+whole sub and its whole documentation, changes marked: one diff when the
+documentation sits right above or below the code (only blank lines between),
+two parts when it is apart, such as after C<__END__>; POD beside the
 summary is shown formatted. Feedback and requests given on a section that a
 later split took away show on its file, noting the section they were on.
 

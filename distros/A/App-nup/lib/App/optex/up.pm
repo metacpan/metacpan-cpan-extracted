@@ -1,6 +1,6 @@
 package App::optex::up;
 
-our $VERSION = "1.20";
+our $VERSION = "1.21";
 
 =encoding utf-8
 
@@ -204,8 +204,9 @@ When the command is C<ansicolumn>, give it the option
 C<--highlight=>I<NAME>: the files are read through the highlighter of
 the name, and shown with syntax highlight.  The highlighters are
 those of L<Text::ANSI::Highlight>: C<pandoc>, C<sourcehighlight>
-(C<gnu>) and C<skylighting> (C<sky>).  Nothing is done when
-L<Text::ANSI::Highlight::IO> is not installed.
+(C<gnu>) and C<skylighting> (C<sky>).  A style of the highlighter can
+be after the name and a colon (C<pandoc:breezedark>).  Nothing is done
+when L<Text::ANSI::Highlight::IO> is not installed.
 
 =item Other options
 
@@ -655,7 +656,7 @@ sub finalize {
         # it, without loading.
         if (my $name = $config->{highlight}) {
             unshift @ac_opts, "--highlight=$name"
-                if $name =~ /\A\w+\z/
+                if $name =~ /\A\w+(?::\S+)?\z/	# NAME, or NAME:STYLE
                 and grep { !ref and -f "$_/Text/ANSI/Highlight/IO.pm" } @INC;
         }
 
