@@ -3,12 +3,13 @@ package VPNDetection::Bogon;
 use strict;
 use warnings;
 
+use Mojo::JSON ();
 use Socket qw(AF_INET AF_INET6 inet_pton);
 
 use VPNDetection::Bogons;
 use VPNDetection::Result;
 
-our $VERSION = '3.16.1';
+our $VERSION = '3.17.0';
 
 # Whether an address is private, loopback, link-local, documentation, multicast
 # or otherwise not routable on the public internet, including the IPv6
@@ -45,15 +46,20 @@ sub unmapped {
 }
 
 # The answer a bogon gets, in the full shape the API serves at its widest plan:
-# every flag present and false, every detail object present and empty, and a
-# location and AS of empty strings and AS 0.
+# every flag present and false, every detail object present and empty, web an
+# empty list, the hostname an empty string, and a location, AS, company and abuse
+# contact of empty strings and zeros, abuse's validated false.
 sub bogon_result {
     my ($ip) = @_;
-    my %answer = (ip => $ip, is_bogon => 1);
+    my %answer = (ip => $ip, is_bogon => 1, hostname => '');
     $answer{$_} = 0 for @VPNDetection::Result::FLAGS;
-    $answer{$_} = {} for @VPNDetection::Result::DETAILS;
-    $answer{location} = { map { $_ => '' } @VPNDetection::Result::LOCATION };
-    $answer{asn} = { map { $_ => $_ eq 'asn' ? 0 : '' } @VPNDetection::Result::ASN };
+    $answer{$_} = $_ eq 'web' ? [] : {} for @VPNDetection::Result::DETAILS;
+    my %numbers = map { $_ => 1 } qw(latitude longitude accuracy_radius asn);
+    $answer{location} = { map { $_ => $numbers{$_} ? 0 : '' } @VPNDetection::Result::LOCATION };
+    $answer{asn} = { map { $_ => $numbers{$_} ? 0 : '' } @VPNDetection::Result::ASN };
+    $answer{company} = { map { $_ => '' } @VPNDetection::Result::COMPANY };
+    $answer{abuse} = { map { $_ => '' } @VPNDetection::Result::ABUSE };
+    $answer{abuse}{validated} = Mojo::JSON::false;
     return VPNDetection::Result->_new(\%answer, {});
 }
 

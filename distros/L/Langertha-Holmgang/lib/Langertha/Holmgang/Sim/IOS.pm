@@ -9,7 +9,7 @@ use JSON::MaybeXS ();
 
 with 'Langertha::Holmgang::Role::Simulator';
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 # Typen: voller Name, Kurzform, physisch (Nummer mit Schraegstrichen)
@@ -980,7 +980,7 @@ Langertha::Holmgang::Sim::IOS - The simulator of device type ios — a Cisco IOS
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

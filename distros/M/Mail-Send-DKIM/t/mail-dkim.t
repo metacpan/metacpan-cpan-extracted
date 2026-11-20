@@ -472,4 +472,42 @@ subtest 'the programme, end to end: stdin in, sendmail out, status back' => sub 
 	is($sent, $foreign, 'and reached sendmail untouched');
 };
 
+subtest 'log_send writes the sender, recipients and subject to syslog' => sub {
+	my @logged;
+	no warnings 'redefine';
+	local *Sys::Syslog::openlog = sub { push(@logged, ['open', @_]) };
+	local *Sys::Syslog::syslog = sub { push(@logged, ['log', @_]) };
+	local *Sys::Syslog::closelog = sub { };
+
+	my $dkim = signer();
+	my $msg = "From: Alerts <alerts\@example.org>\nTo: a\@example.net, \"B\" <b\@example.net>\nCc: c\@example.net\nSubject: Disk\n nearly full\n\nbody\n";
+
+	ok($dkim->log_send($msg, '-t', '-f', 'bounce@example.org'), 'it reports success');
+	is($logged[0][1], 'mail-dkim', 'under the identity mail-dkim');
+	is($logged[0][3], 'mail', 'and the mail facility');
+	is($logged[1][-1], 'sender=bounce@example.org recipient=a@example.net,b@example.net,c@example.net subject=Disk nearly full',
+		'-f gives the sender, -t the recipients from the headers, and a folded subject is joined');
+
+	@logged = ();
+	$dkim->log_send($msg, 'x@example.net');
+	like($logged[1][-1], qr/\Asender=alerts\@example\.org recipient=x\@example\.net subject=/, 'with no -f the From: address, and only the recipients named');
+
+	@logged = ();
+	$dkim->log_send("From: a\@example.org\n\nbody\n", '-t');
+	is($logged[1][-1], 'sender=a@example.org recipient=- subject=-', 'missing values are logged as -');
+
+	@logged = ();
+	$dkim->log_send("From: a\@example.org\nSubject: one\x01two\n\nx\n", 'r@example.net');
+	like($logged[1][-1], qr/subject=one two\z/, 'control characters in the subject become spaces');
+};
+
+subtest 'a syslog that cannot be written to is a warning, not a failure' => sub {
+	no warnings 'redefine';
+	local *Sys::Syslog::openlog = sub { die "no syslog\n" };
+
+	my ($result, $warnings) = quietly(sub { signer()->log_send(message(from => 'a@example.org'), 'r@example.net') });
+	ok(!$result->[0], 'it returns false');
+	like($warnings, qr/cannot write to syslog/, 'and says why');
+};
+
 done_testing();

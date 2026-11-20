@@ -180,15 +180,33 @@ SKIP: {
 }
 
 # T is the color of the terminal, the default one: 39, and 49 for the
-# background.  There is one for both cases.
+# background.  The lower case is the same.
 is(ansi_code("T"),   "\e[39m", "T - the default color");
-is(ansi_code("t"),   "\e[39m", "t is the same");
 is(ansi_code("/T"),  "\e[49m", "/T - the default background");
-is(ansi_code("/t"),  "\e[49m", "/t is the same");
 is(ansi_code("R/T"), "\e[31;49m", "R/T");
 is(ansi_code("T/W"), "\e[39;47m", "T/W");
 is(ansi_code("DT/L24"), "\e[1;39;48;5;255m", "with others");
 is(ansi_color("/T", "text"), "\e[49m"."text".RESET, "ansi_color");
+
+# V is a color by the values written after it: 38, and 48 for the
+# background, with the values as they are.
+is(ansi_code("V:5:224"),      "\e[38:5:224m",       "V - 256 colors");
+is(ansi_code("/V:5:224"),     "\e[48:5:224m",       "/V - the background");
+is(ansi_code("V:2::255:0:0"), "\e[38:2::255:0:0m",  "V - RGB with an empty value");
+is(ansi_code("V:5:196/V:5:224"), "\e[38:5:196;48:5:224m", "V/V");
+is(ansi_code("DV:5:196/W"),   "\e[1;38:5:196;47m",  "with others");
+is(ansi_code("V:5:196;555"),  "\e[38:5:196;38;5;231m", "a color in digits after ;");
+is(ansi_color("V:5:224", "text"), "\e[38:5:224m"."text".RESET, "ansi_color");
+for my $spec (qw(V /V V: DV)) {
+    eval { ansi_code($spec) };
+    like($@, qr/Color spec error/, "$spec without values is an error");
+}
+
+# the lower case of T and V is the same
+is(ansi_code("t"),        "\e[39m",        "t is the same as T");
+is(ansi_code("/t"),       "\e[49m",        "/t is the same as /T");
+is(ansi_code("v:5:224"),  "\e[38:5:224m",  "v is the same as V");
+is(ansi_code("/v:5:224"), "\e[48:5:224m",  "/v is the same as /V");
 
 done_testing;
 

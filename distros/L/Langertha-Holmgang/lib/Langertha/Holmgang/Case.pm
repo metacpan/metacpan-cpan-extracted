@@ -13,7 +13,7 @@ use Langertha::Content::Image;
 use Langertha::Holmgang::Haystack;
 use Langertha::Holmgang::Simulators;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 # built-in fallbacks of the settings, below the suite's defaults; a true constant
 my %DEFAULT = ( temperature => 0, max_tokens => 2000, max_turns => 12, system => '' );
@@ -25,7 +25,7 @@ has id => ( is => 'ro', required => 1 );
 
 
 has $_ => ( is => 'ro' ) for qw(
-  title tags difficulty system messages state observe rules solution
+  title tags difficulty scenario system messages state observe rules solution
   alternatives wrong_solutions temperature max_tokens max_turns source weight
 );
 
@@ -183,6 +183,7 @@ sub report_meta {
     tags       => $self->tags,
     tier       => $self->tier,
     difficulty => $self->difficulty,
+    ( defined $self->scenario ? ( scenario => $self->scenario ) : () ),
     weight     => $self->effective_weight,
     hard       => $self->is_hard,
     untrusted  => $self->has_untrusted,
@@ -204,7 +205,7 @@ Langertha::Holmgang::Case - One case of a suite: its own format 2 values and wha
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -251,6 +252,12 @@ L</tag_list>.
 =head2 difficulty
 
 C<leicht>, C<mittel> or C<schwer>, as format 2 writes it.
+
+=head2 scenario
+
+Optional. Cases with the same C<scenario> (C<[a-z0-9-]>) are variants of one task;
+L<Langertha::Holmgang::Evaluation/verdicts> counts a scenario as solved only when
+every variant is (AppWorld's scenario goal completion).
 
 =head2 system
 

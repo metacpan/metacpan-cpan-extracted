@@ -1,0 +1,15 @@
+Revision history for HTTP-Message-Signature:
+
+v0.0.2    2026-11-19 18:00:54+00:00 Europe/London
+  [Bug Fixes]
+  - Removed use of "equ" operator and state hash variables that caused problems with older Perl versions.
+
+  - Specify minimum version of List::Util.
+
+  [Documentation]
+  - Fixed broken Changes file.
+
+  - Move STATUS section to the top.
+
+v0.0.1  2026-11-19 16:01:20
+  - Initial version uploaded to CPAN.

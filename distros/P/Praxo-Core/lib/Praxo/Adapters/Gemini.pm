@@ -17,6 +17,7 @@ sub new {
         api_key => $args{api_key},
         max_output_tokens => $args{max_output_tokens} // 0,
         transport => $args{transport},
+        stream_transport => $args{stream_transport},
         timeout => $args{timeout} // 60,
     }, $class;
 }
@@ -34,6 +35,102 @@ sub generate {
         ? $self->{transport}->($path, $payload)
         : $self->_post($path, $payload);
     return _parse_response($data);
+}
+
+sub generate_stream {
+    my ($self, $request, $on_delta) = @_;
+    praxo_error('MODEL_CONFIG', 'gemini: API key is required')
+        unless defined $self->{api_key} && $self->{api_key} ne '';
+    praxo_error('MODEL_CONFIG', 'gemini: model is required')
+        unless $self->{model} ne '';
+    my $payload = _payload($self, $request);
+    my $path = '/v1beta/models/' . _escape($self->{model})
+        . ':streamGenerateContent?alt=sse';
+    my $text = $self->{stream_transport}
+        ? $self->{stream_transport}->($path, $payload)
+        : $self->_post_stream($path, $payload);
+    praxo_error('PROVIDER_HTTP', 'gemini: stream transport must return SSE text')
+        if ref($text) || !defined $text;
+    return _parse_sse($text, $on_delta);
+}
+
+sub _parse_sse {
+    my ($text, $on_delta) = @_;
+    my $content = '';
+    my @calls;
+    my $input_tokens = 0;
+    my $output_tokens = 0;
+    my $cached_tokens = 0;
+    my $finish_reason;
+    for my $raw (split /\n/, $text) {
+        my $line = $raw;
+        $line =~ s/^\s+//;
+        $line =~ s/\s+$//;
+        next unless $line =~ /^data:(.*)$/;
+        my $chunk_text = $1;
+        $chunk_text =~ s/^\s+//;
+        $chunk_text =~ s/\s+$//;
+        next if $chunk_text eq '' || $chunk_text eq '[DONE]';
+        my $chunk = eval { Praxo::Json::parse($chunk_text) };
+        praxo_error('MODEL_STREAM', 'gemini: invalid stream chunk')
+            unless ref($chunk) eq 'HASH';
+        praxo_error('MODEL_STREAM', 'gemini: ' . ($chunk->{error}{message} // 'stream error'))
+            if ref($chunk->{error}) eq 'HASH';
+        my $usage = ref($chunk->{usageMetadata}) eq 'HASH' ? $chunk->{usageMetadata} : {};
+        $input_tokens = $usage->{promptTokenCount}
+            if defined $usage->{promptTokenCount};
+        $output_tokens = $usage->{candidatesTokenCount}
+            if defined $usage->{candidatesTokenCount};
+        $cached_tokens = $usage->{cachedContentTokenCount}
+            if defined $usage->{cachedContentTokenCount};
+        my $candidate = ref($chunk->{candidates}) eq 'ARRAY'
+            ? $chunk->{candidates}[0] : undef;
+        next unless ref($candidate) eq 'HASH';
+        $finish_reason = $candidate->{finishReason}
+            if defined $candidate->{finishReason};
+        for my $part (@{ $candidate->{content}{parts} // [] }) {
+            my $piece = $part->{text} // '';
+            if ($piece ne '') {
+                $content .= $piece;
+                $on_delta->($piece);
+            }
+            if (ref($part->{functionCall}) eq 'HASH') {
+                push @calls, Praxo::Models::tool_call(
+                    id => 'call-' . (scalar(@calls) + 1),
+                    name => $part->{functionCall}{name} // '',
+                    arguments => $part->{functionCall}{args} // {},
+                );
+            }
+        }
+    }
+    return Praxo::Models::response(
+        message => Praxo::Models::message_assistant($content, \@calls),
+        usage => Praxo::Models::usage(
+            input_tokens => $input_tokens,
+            output_tokens => $output_tokens,
+            cached_tokens => $cached_tokens,
+        ),
+        finish_reason => $finish_reason,
+    );
+}
+
+sub _post_stream {
+    my ($self, $path, $payload) = @_;
+    my %headers = (
+        'content-type' => 'application/json',
+        'accept' => 'text/event-stream',
+        'x-goog-api-key' => $self->{api_key},
+    );
+    my $http = HTTP::Tiny->new(timeout => $self->{timeout});
+    my $response = $http->post(
+        $self->{base_url} . $path,
+        { headers => \%headers, content => Praxo::Json::stringify($payload) },
+    );
+    praxo_error(
+        'PROVIDER_HTTP',
+        'provider returned HTTP ' . ($response->{status} // 0) . ': ' . ($response->{content} // ''),
+    ) unless $response->{success};
+    return $response->{content};
 }
 
 sub _payload {

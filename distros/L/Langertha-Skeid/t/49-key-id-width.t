@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -148,8 +149,8 @@ my $up_url = 'http://127.0.0.1:' . $up->ports->[0] . '/v1';
         manifest => { enabled => 1, public_url => 'https://llm.example.com' },
         routing  => { wait_timeout_ms => 60, wait_poll_ms => 5 },
         nodes    => [
-          { id => 'n-m',     url => $up_url, model => 'm' },
-          { id => 'n-other', url => $up_url, model => 'other' },
+          { id => 'n-m', trust => 'internal', url => $up_url, model => 'm' },
+          { id => 'n-other', trust => 'internal', url => $up_url, model => 'other' },
         ],
       };
     },

@@ -22,7 +22,7 @@ use parent 'Data::Identifier::Interface::Known';
 
 use Data::TagDB::Plugin::Gamebook::Exit;
 
-our $VERSION = v0.01;
+our $VERSION = v0.02;
 
 my %_wk = map {$_->tagname =~ tr/-/_/r =~ s/^gamebook_/gb_/r => $_->register} (
     Data::Identifier->new(uuid => '7f265548-81dc-4280-9550-1bd0aa4bf748', tagname => 'has-type'),
@@ -148,7 +148,7 @@ Data::TagDB::Plugin::Gamebook - Work with Gamebook data in TagDBs
 
 =head1 VERSION
 
-version v0.01
+version v0.02
 
 =head1 SYNOPSIS
 
@@ -158,7 +158,72 @@ version v0.01
 
     $db->migration->include('Data::TagDB::Plugin::Gamebook'); # must be after load_plugin() or use!
 
+    my $title = $tag->get('Data::TagDB::Plugin::Gamebook#title');
+    my @text  = $tag->get('Data::TagDB::Plugin::Gamebook#text', list => 1);
+    my @exits = $tag->get('Data::TagDB::Plugin::Gamebook#exit', list => 1);
+
 This is a plugin for L<Data::TagDB>. See there for details on plugins.
+
+This plugin is used to interact gamebook data.
+Such data can be used in many contexts, such as in literature or documentation.
+Exits may also be used in all contexts that requires a user to navigate.
+
+=head1 SETUP
+
+This module exports a number of tags related to gamebook structure via L<Data::Identifier::Interface::Known>.
+
+If used it is recommended to include this module in calls to L<Data::TagDB::Migration/include> on database setups and general upgrades.
+
+Calls to this module may C<die> if the required tags are not found in the database.
+
+=head1 ATTRIBUTES
+
+This plugin currently only provides tag attrubutes.
+
+=head2 TAG ATTRIBUTES
+
+=head3 title
+
+    my $title = $tag->get('Data::TagDB::Plugin::Gamebook#title');
+    # or:
+    my $title = $tag->get('Data::TagDB::Plugin::Gamebook#title', default => undef);
+
+(since v0.01)
+
+Returns the title of an exit, scene, story, or book.
+This might be different from the displaytitle.
+It might also be undefined.
+
+The returned data is a Perl Unicode string by default.
+
+=head3 text
+
+    my @text  = $tag->get('Data::TagDB::Plugin::Gamebook#text', list => 1);
+
+(since v0.01)
+
+Returns the text (body) of a scene (or other type).
+
+The returned data us a Perl Unicode string by default.
+
+Multiple values might be returned.
+As of v0.02 it is undefined if they are ordered in any way.
+
+=head3 exit
+
+    my @exits = $tag->get('Data::TagDB::Plugin::Gamebook#exit', list => 1);
+
+(since v0.01)
+
+Returns the exits of any scene, story, or book.
+An exit is a from of hyperlink to another tag.
+
+See L<Data::TagDB::Plugin::Gamebook::Exit> for details.
+
+Multiple values might be returned.
+As of v0.02 it is undefined if they are ordered in any way.
+
+The default return type is L<Data::TagDB::Plugin::Gamebook::Exit>.
 
 =head1 AUTHOR
 

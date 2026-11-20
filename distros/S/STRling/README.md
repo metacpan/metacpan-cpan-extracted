@@ -1,7 +1,8 @@
 # STRling Perl adapter
 
-STRling 4.0.1 is not publicly published. Public installation commands describe
-the proposed separately authorized release. Candidate tests use staged artifacts.
+STRling 4.0.3 public installation requires the separately authorized release.
+Check the release certificate for public availability and independent acceptance.
+Candidate tests use staged artifacts; certification alone does not prove publication.
 See the [support matrix](../../docs/support-matrix.md) for exact supported scopes.
 
 This distribution is a thin Perl projection of the canonical STRling compiler. `FFI::Platypus` carries strict JSON over a caller-selected `strling.c-abi` version 1 library. The distribution no longer owns parsing, semantics, validation, target selection, or regex emission.
@@ -44,7 +45,7 @@ See the [canonical interop contract](../../spec/interop/1.0/README.md) and the [
 After separately authorized publication, the exact proposed coordinate is:
 
 ```bash
-cpanm STRling@4.0.1
+cpanm STRling@4.0.3
 ```
 
 The exact approved PAUSE owner and release archive must be reconciled in the protected publication handoff. Dependency-locking limits remain Preview.

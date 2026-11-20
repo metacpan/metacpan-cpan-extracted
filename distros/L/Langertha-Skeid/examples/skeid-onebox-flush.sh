@@ -53,6 +53,7 @@ nodes:
     engine: ${ENGINE}
     weight: 1
     max_conns: ${MAX_CONNS}
+    trust: internal
 YAML
 
 echo "[onebox] Config written: ${CONFIG_FILE}"

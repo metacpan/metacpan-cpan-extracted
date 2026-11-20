@@ -7,7 +7,7 @@ use autodie qw(:all);
 use Carp;
 use Config::Abstraction 0.38;
 use File::Spec;
-use Log::Abstraction 0.26;
+use Log::Abstraction 0.41;
 use mro;
 use Params::Get 0.13;
 use Readonly;
@@ -55,11 +55,11 @@ Object::Configure - Runtime Configuration for an Object
 
 =head1 VERSION
 
-0.25
+0.26
 
 =cut
 
-our $VERSION = 0.25;
+our $VERSION = 0.26;
 
 =head1 DESCRIPTION
 

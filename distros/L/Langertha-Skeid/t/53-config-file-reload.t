@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -20,7 +21,7 @@ sub write_config {
 # dispatch. A different version bypasses that retry window so a correction takes effect promptly.
 {
   my ($fh, $path) = tempfile();
-  print {$fh} "nodes:\n  - id: kept\n    url: http://kept/v1\n";
+  print {$fh} "nodes:\n  - id: kept\n    url: http://kept/v1\n    trust: internal\n";
   close $fh;
   my $mtime = (stat($path))[9];
 
@@ -47,7 +48,7 @@ sub write_config {
 
   write_config(
     $path,
-    "nodes:\n  - id: fixed\n    url: http://fixed/v1\n",
+    "nodes:\n  - id: fixed\n    url: http://fixed/v1\n    trust: internal\n",
     $mtime + 20,
   );
   $skeid->call_function('nodes.list', {});
@@ -61,7 +62,7 @@ sub write_config {
 # bounded retry; remembering it forever would leave a valid config unapplied until another edit.
 {
   my ($fh, $path) = tempfile();
-  print {$fh} "nodes:\n  - id: old\n    url: http://old/v1\n";
+  print {$fh} "nodes:\n  - id: old\n    url: http://old/v1\n    trust: internal\n";
   close $fh;
   my $mtime = (stat($path))[9];
 
@@ -78,7 +79,7 @@ sub write_config {
   my $skeid = Langertha::Skeid->new(config_file => $path);
   write_config(
     $path,
-    "nodes:\n  - id: recovered\n    url: http://recovered/v1\n",
+    "nodes:\n  - id: recovered\n    url: http://recovered/v1\n    trust: internal\n",
     $mtime + 10,
   );
   $fail_next = 1;
@@ -101,7 +102,7 @@ sub write_config {
 # The parsed version must be the one marked as seen, so the replacement is loaded next time.
 {
   my ($fh, $path) = tempfile();
-  print {$fh} "nodes:\n  - id: old\n    url: http://old/v1\n";
+  print {$fh} "nodes:\n  - id: old\n    url: http://old/v1\n    trust: internal\n";
   close $fh;
   my $mtime = (stat($path))[9];
 
@@ -115,7 +116,7 @@ sub write_config {
       $replace_after_load = 0;
       write_config(
         $path,
-        "nodes:\n  - id: latest\n    url: http://latest/v1\n",
+        "nodes:\n  - id: latest\n    url: http://latest/v1\n    trust: internal\n",
         $mtime + 20,
       );
     }
@@ -125,7 +126,7 @@ sub write_config {
   my $skeid = Langertha::Skeid->new(config_file => $path);
   write_config(
     $path,
-    "nodes:\n  - id: middle\n    url: http://middle/v1\n",
+    "nodes:\n  - id: middle\n    url: http://middle/v1\n    trust: internal\n",
     $mtime + 10,
   );
   $replace_after_load = 1;

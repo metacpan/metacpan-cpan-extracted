@@ -21,7 +21,7 @@ use InternetData::Error;
 use InternetData::Oauth;
 use InternetData::Result;
 
-our $VERSION = '1.16.1';
+our $VERSION = '1.17.0';
 our @EXPORT_OK = ('is_bogon');
 
 use constant DEFAULT_BASE_URL => 'https://api.internetdata.io';
@@ -157,14 +157,27 @@ my $DOMAIN_IP_RANGES = [fields => [
     (map { [$_ => ['string'], 1] } qw(domain redirects_to)), (map { [$_ => ['integer'], 1] } qw(total ipv4)),
     [ranges => [list => [fields => [map { [$_ => ['string'], 1] } qw(range name country)]]], 1],
 ]];
+# Each address the domain resolves to, with the address answer's asn.
+my $DOMAIN_HOST = [fields => [[ip => ['string'], 1], [asn => $ASN, 1]]];
+my $COHOSTED_DOMAINS = [fields => [
+    [ip => ['string'], 1], [total => ['integer'], 1], [domains => [list => ['string']], 1],
+]];
+my $DOMAIN_WEB = [fields => [
+    (map { [$_ => ['string'], 1] } qw(url title description last_seen)),
+    [links => [fields => [[total => ['integer'], 1], [hosts => [list => ['string']], 1]]], 1],
+]];
+# Redirects and backlinks share it.
+my $DOMAIN_REFERRERS = [fields => [[total => ['integer'], 1], [domains => [list => ['string']], 1]]];
 our $DOMAIN_LOOKUP = [fields => [
     [domain => ['string'], 1], [is_registered => ['boolean'], 1], [is_disposable => ['boolean']],
     (map { [$_ => ['boolean'], 1] } qw(has_a has_aaaa has_mx has_ns has_cname)),
-    [dns => $DOMAIN_DNS], [ip_ranges => $DOMAIN_IP_RANGES],
+    [dns => $DOMAIN_DNS], [hosting => [list => $DOMAIN_HOST]], [cohosted_domains => $COHOSTED_DOMAINS],
+    [ip_ranges => $DOMAIN_IP_RANGES],
     [disposable => [fields => [
         [confidence => ['string']], [providers => [list => ['string']]],
         (map { [$_ => ['string']] } qw(first_seen last_seen)),
     ]]],
+    [web => $DOMAIN_WEB], (map { [$_ => $DOMAIN_REFERRERS] } qw(redirects backlinks)),
     [trial_expired => ['boolean']],
     [cap_reached => ['boolean']],
 ]];
@@ -975,7 +988,8 @@ Addresses held in this client's cache. Defaults to 10000; B<0 disables caching>.
 
 =item cache_ttl
 
-How long an answer stays fresh, in seconds. Defaults to 3600.
+How long an answer stays fresh, in seconds. Defaults to 3600. An answer whose
+C<trial_expired> or C<cap_reached> is true stays a minute at most.
 
 =item concurrency
 

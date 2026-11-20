@@ -2,7 +2,7 @@ package Protocol::IR::Format::Wig;
 use strict;
 use warnings;
 
-our $VERSION = '1.3';
+our $VERSION = '1.5';
 
 use JSON::PP;
 
@@ -152,7 +152,7 @@ Protocol::IR::Format::Wig - HAIR wig JSON import and export
 
 =head1 VERSION
 
-version 1.3
+version 1.5
 
 =head1 SYNOPSIS
 

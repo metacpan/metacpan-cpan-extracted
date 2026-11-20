@@ -1,5 +1,5 @@
 package Langertha::Skeid::CapacityProbe::Registry;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 # ABSTRACT: Capacity probe reading a downstream Skeid's signed registry snapshot
 use Moo;
 use Carp qw(croak);
@@ -218,7 +218,7 @@ Langertha::Skeid::CapacityProbe::Registry - Capacity probe reading a downstream 
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -228,6 +228,7 @@ version 0.004
       url: http://skeid-b:8090/v1
       model: qwen3-32b
       max_conns: 64
+      trust: internal
       capacity:
         probe: registry                  # or type: registry
         read_key_env: SKEID_B_READ_KEY   # the downstream's registry read key (preferred)
@@ -264,7 +265,7 @@ body with the secret from C<secret_env>;
 
 The bearer token is the downstream's registry read key from C<read_key_env> when that is
 configured -- it opens the snapshot route and nothing else -- and its admin API key from
-C<admin_key_env> only otherwise (skeid #49). With C<read_key_env> set the admin key is never
+C<admin_key_env> only otherwise (skeid k49). With C<read_key_env> set the admin key is never
 sent, not even when the read key variable is empty.
 
 A missing C<secret_env> value or bearer key value forgets too, and so does a secret shorter
@@ -321,7 +322,7 @@ L<Langertha::Skeid::CapacityProbe>
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-skeid/issues>.
 
 =head2 IRC
@@ -334,11 +335,11 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -17,6 +17,7 @@ use_ok 'MIDI::Util', qw(
     get_microseconds
     score2events
     scale_names
+    remove_notes
 );
 
 my $score;
@@ -128,6 +129,19 @@ subtest scale_names => sub {
     is ref($got), 'ARRAY', 'scale_names';
     is @$got, 46, 'scale_names';
     is $got->[0], '3semitone', 'scale_names';
+};
+
+subtest remove_notes => sub {
+    my $got = remove_notes([1], [qw(Gs5 C5 Ds5)]);
+    is_deeply $got, ['Gs5','Ds5'], 'remove_notes';
+    $got = remove_notes([1,2], [qw(Gs5 C5 Ds5)]);
+    is_deeply $got, ['Gs5'], 'remove_notes';
+    $got = remove_notes([], [qw(Gs5 C5 Ds5)]);
+    is_deeply $got, [qw(Gs5 C5 Ds5)], 'remove_notes';
+    $got = remove_notes([9], [qw(Gs5 C5 Ds5)]);
+    is_deeply $got, [qw(Gs5 C5 Ds5)], 'remove_notes';
+    $got = remove_notes([1,2], [qw(C D E F G A B)]);
+    is_deeply $got, [qw(C F G A B)], 'remove_notes';
 };
 
 done_testing();

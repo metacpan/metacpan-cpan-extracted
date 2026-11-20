@@ -11,7 +11,7 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '4.25';
+   our $VERSION = '4.26';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::NetCDF $VERSION;

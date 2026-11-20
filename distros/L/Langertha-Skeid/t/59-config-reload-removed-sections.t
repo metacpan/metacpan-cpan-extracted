@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -28,7 +29,7 @@ sub _records {
   })->{ok};
 }
 
-my @nodes = ({ id => 'n1', url => 'http://127.0.0.1:1/v1', model => 'm' });
+my @nodes = ({ id => 'n1', trust => 'internal', url => 'http://127.0.0.1:1/v1', model => 'm' });
 my $price = { input_per_million => 1, output_per_million => 2 };
 
 # --- pricing: the section replaces the prices, removing it clears them ---
@@ -53,7 +54,7 @@ my $price = { input_per_million => 1, output_per_million => 2 };
   my $cfg = { nodes => [@nodes] };
   my $skeid = _skeid(\$cfg);
   $skeid->call_function('pricing.set', { model => 'api', pricing => $price });
-  $cfg = { nodes => [@nodes, { id => 'n2', url => 'http://127.0.0.1:2/v1', model => 'm' }] };
+  $cfg = { nodes => [@nodes, { id => 'n2', trust => 'internal', url => 'http://127.0.0.1:2/v1', model => 'm' }] };
   $skeid->call_function('nodes.list', {});
   is $skeid->pricing_for_model('api')->{input_per_million}, 1,
     'pricing: a price the file never declared is not the file\'s to remove';
@@ -108,7 +109,7 @@ my $price = { input_per_million => 1, output_per_million => 2 };
 {
   my $cfg = { aliases => {} };
   my $skeid = _skeid(\$cfg);
-  $skeid->call_function('nodes.add', { id => 'api-1', url => 'http://127.0.0.1:3/v1' });
+  $skeid->call_function('nodes.add', { id => 'api-1', trust => 'internal', url => 'http://127.0.0.1:3/v1' });
   $cfg = { aliases => { x => { tiers => [ { model => 'm' } ] } } };
   $skeid->call_function('nodes.list', {});
   is $skeid->list_nodes->[0]{id}, 'api-1', 'nodes: an inventory the file never declared is kept';

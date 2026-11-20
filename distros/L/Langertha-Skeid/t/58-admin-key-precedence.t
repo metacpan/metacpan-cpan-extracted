@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -31,7 +32,7 @@ sub _loader_skeid {
   );
 }
 
-my @nodes = ({ id => 'n1', url => 'http://127.0.0.1:1/v1', model => 'm' });
+my @nodes = ({ id => 'n1', trust => 'internal', url => 'http://127.0.0.1:1/v1', model => 'm' });
 
 # --- the explicit key from build_app survives a changed config ---
 {
@@ -41,7 +42,7 @@ my @nodes = ({ id => 'n1', url => 'http://127.0.0.1:1/v1', model => 'm' });
   my $app = Langertha::Skeid::Proxy->build_app(skeid => $skeid, admin_api_key => 'cli-key');
   is _request($app, '/skeid/nodes', 'cli-key'), 200, 'build_app admin_api_key: in force';
 
-  $cfg = { nodes => [@nodes, { id => 'n2', url => 'http://127.0.0.1:2/v1', model => 'm' }] };
+  $cfg = { nodes => [@nodes, { id => 'n2', trust => 'internal', url => 'http://127.0.0.1:2/v1', model => 'm' }] };
   is _request($app, '/skeid/nodes', 'cli-key'), 200,
     'a changed config without an admin key keeps the explicit key';
   is scalar @{ $skeid->list_nodes }, 2, 'and the changed config was applied';
@@ -70,13 +71,13 @@ my @nodes = ({ id => 'n1', url => 'http://127.0.0.1:1/v1', model => 'm' });
 {
   local $ENV{SKEID_ADMIN_API_KEY} = '';
   my ($fh, $path) = tempfile(SUFFIX => '.yaml', UNLINK => 1);
-  print {$fh} "nodes:\n  - id: f1\n    url: http://127.0.0.1:3/v1\n";
+  print {$fh} "nodes:\n  - id: f1\n    url: http://127.0.0.1:3/v1\n    trust: internal\n";
   close $fh;
   my $app = Langertha::Skeid::Proxy->build_app(config_file => $path, admin_api_key => 'serve-key');
   is _request($app, '/skeid/nodes', 'serve-key'), 200, 'serve --admin-api-key: in force';
 
   open $fh, '>', $path or die "open $path: $!";
-  print {$fh} "nodes:\n  - id: f2\n    url: http://127.0.0.1:4/v1\n";
+  print {$fh} "nodes:\n  - id: f2\n    url: http://127.0.0.1:4/v1\n    trust: internal\n";
   close $fh;
   my $mtime = (stat($path))[9] + 10;
   utime($mtime, $mtime, $path);
@@ -102,7 +103,7 @@ my @nodes = ({ id => 'n1', url => 'http://127.0.0.1:1/v1', model => 'm' });
   is _request($app, '/skeid/nodes', 'env-key'), 404,
     'a config that sets the key empty turns the admin API off, variable or not';
 
-  $cfg = { nodes => [@nodes, { id => 'n3', url => 'http://127.0.0.1:5/v1', model => 'm' }] };
+  $cfg = { nodes => [@nodes, { id => 'n3', trust => 'internal', url => 'http://127.0.0.1:5/v1', model => 'm' }] };
   is _request($app, '/skeid/nodes', 'env-key'), 200,
     'the key removed from the config again: back to SKEID_ADMIN_API_KEY';
 }

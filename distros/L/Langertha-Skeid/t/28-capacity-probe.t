@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -18,7 +19,7 @@ use Langertha::Skeid::Proxy;
 # --- the reading, and what admission does with it ---
 {
   my $skeid = Langertha::Skeid->new;
-  $skeid->add_node(id => 'n1', url => 'http://x/v1', model => 'm', max_conns => 4);
+  $skeid->add_node(id => 'n1', trust => 'internal', url => 'http://x/v1', model => 'm', max_conns => 4);
 
   ok !$skeid->capacity_reading('n1'), 'a node with no probe has no reading';
   is $skeid->route_state(model => 'm')->{has_available}, 1, 'and inflight decides, as before';
@@ -53,7 +54,7 @@ use Langertha::Skeid::Proxy;
 # --- a stale reading is worse than none ---
 {
   my $skeid = Langertha::Skeid->new(capacity_max_age_ms => 50);
-  $skeid->add_node(id => 'n1', url => 'http://x/v1', model => 'm', max_conns => 4);
+  $skeid->add_node(id => 'n1', trust => 'internal', url => 'http://x/v1', model => 'm', max_conns => 4);
 
   $skeid->set_capacity_reading('n1', used => 8, limit => 8, at => time - 10);
   ok !$skeid->capacity_reading('n1'), 'a reading past its age is gone, not merely doubted';
@@ -69,7 +70,7 @@ use Langertha::Skeid::Proxy;
 # --- forget ---
 {
   my $skeid = Langertha::Skeid->new;
-  $skeid->add_node(id => 'n1', url => 'http://x/v1', model => 'm');
+  $skeid->add_node(id => 'n1', trust => 'internal', url => 'http://x/v1', model => 'm');
   $skeid->set_capacity_reading('n1', used => 5, limit => 5);
   ok $skeid->capacity_reading('n1'), 'reading present';
   $skeid->forget_capacity('n1');
@@ -78,7 +79,7 @@ use Langertha::Skeid::Proxy;
 
   $skeid->set_capacity_reading('n1', used => 5, limit => 5);
   $skeid->remove_node('n1');
-  $skeid->add_node(id => 'n1', url => 'http://y/v1', model => 'm');
+  $skeid->add_node(id => 'n1', trust => 'internal', url => 'http://y/v1', model => 'm');
   ok !$skeid->capacity_reading('n1'),
     'removing a node drops its reading, so a re-used id cannot inherit a description of a '
     . 'different machine';
@@ -87,7 +88,7 @@ use Langertha::Skeid::Proxy;
 # --- rate-limit headers: the probe that costs nothing ---
 {
   my $skeid = Langertha::Skeid->new;
-  $skeid->add_node(id => 'cloud', url => 'http://x/v1', model => 'm');
+  $skeid->add_node(id => 'cloud', trust => 'internal', url => 'http://x/v1', model => 'm');
 
   my $r = $skeid->observe_response_headers('cloud', {
     'x-ratelimit-limit-requests'     => '100',
@@ -106,7 +107,7 @@ use Langertha::Skeid::Proxy;
 
   # Remaining with no limit still has to stop admission at zero -- that is the case that matters.
   my $skeid2 = Langertha::Skeid->new;
-  $skeid2->add_node(id => 'cloud', url => 'http://x/v1', model => 'm');
+  $skeid2->add_node(id => 'cloud', trust => 'internal', url => 'http://x/v1', model => 'm');
   $skeid2->observe_response_headers('cloud', { 'x-ratelimit-remaining' => '0' });
   is $skeid2->route_state(model => 'm')->{has_available}, 0, 'remaining 0 without a limit blocks';
   $skeid2->observe_response_headers('cloud', { 'x-ratelimit-remaining' => '7' });
@@ -119,7 +120,7 @@ use Langertha::Skeid::Proxy;
   # usually what runs out first. Reading only the request quota would keep sending to a node
   # with plenty of requests left and no tokens, which answers 429 all the same.
   my $skeid3 = Langertha::Skeid->new;
-  $skeid3->add_node(id => 'cloud', url => 'http://x/v1', model => 'm');
+  $skeid3->add_node(id => 'cloud', trust => 'internal', url => 'http://x/v1', model => 'm');
   my $tokens_tight = $skeid3->observe_response_headers('cloud', {
     'x-ratelimit-limit-requests'     => '1000',
     'x-ratelimit-remaining-requests' => '990',      # 1% used
@@ -172,7 +173,7 @@ use Langertha::Skeid::Proxy;
 # grew that matched one of AKI's bare headers, it would fail here.
 {
   my $skeid = Langertha::Skeid->new;
-  $skeid->add_node(id => 'aki', url => 'https://aki.io', model => 'llama3_8b_chat');
+  $skeid->add_node(id => 'aki', trust => 'internal', url => 'https://aki.io', model => 'llama3_8b_chat');
 
   my %aki_headers = (
     'Access-Control-Allow-Origin' => '*',
@@ -197,7 +198,7 @@ use Langertha::Skeid::Proxy;
 # --- 429 becomes a backoff, and touches nothing else ---
 {
   my $skeid = Langertha::Skeid->new;
-  $skeid->add_node(id => 'cloud', url => 'http://x/v1', model => 'm', healthy => 1);
+  $skeid->add_node(id => 'cloud', trust => 'internal', url => 'http://x/v1', model => 'm', healthy => 1);
 
   my $r = $skeid->observe_response_headers('cloud', { 'retry-after' => '2' }, status => 429);
   ok $r->{retry_after}, 'Retry-After becomes a backoff';
@@ -233,7 +234,7 @@ use Langertha::Skeid::Proxy;
   my $port = $upstream->ports->[0];
 
   my $skeid = Langertha::Skeid->new(route_wait_timeout_ms => 60, route_wait_poll_ms => 5);
-  $skeid->add_node(id => 'cloud', url => "http://127.0.0.1:$port/v1", model => 'm', max_conns => 8);
+  $skeid->add_node(id => 'cloud', trust => 'internal', url => "http://127.0.0.1:$port/v1", model => 'm', max_conns => 8);
 
   my $proxy = Langertha::Skeid::Proxy->build_app(skeid => $skeid);
   $proxy->log->level('fatal');

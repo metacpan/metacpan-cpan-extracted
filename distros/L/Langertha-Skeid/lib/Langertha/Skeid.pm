@@ -1,5 +1,5 @@
 package Langertha::Skeid;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 # ABSTRACT: Dynamic routing control-plane for multi-node LLM serving with normalized metrics and cost accounting
 use Moo;
 use strict;
@@ -13,6 +13,8 @@ use YAML::PP;
 use Langertha ();
 use Langertha::Skeid::UsageStore;
 use Langertha::Skeid::CustomerSource;
+use Langertha::Skeid::NodeFiles;
+use Langertha::Skeid::Rate;
 use Langertha::Skeid::Protocol;
 use Langertha::Skeid::Protocol::Anthropic;
 use Langertha::Skeid::Protocol::Documents;
@@ -66,6 +68,11 @@ has key_policies => (
   is      => 'rw',
   default => sub { {} },
 );
+
+# Per customer key id: the token buckets of its policy's rate, and how often it was refused
+# (skeid k125). In memory, per process.
+has _rate_buckets  => (is => 'rw', default => sub { {} });
+has _rate_refusals => (is => 'rw', default => sub { {} });
 
 
 # Readable name -> customer key id, from the config `names:` section. A config-authoring
@@ -201,6 +208,23 @@ has realtime_max_message_bytes   => (is => 'rw', default => sub { $REALTIME_DEFA
 has realtime_max_queued_bytes    => (is => 'rw', default => sub { $REALTIME_DEFAULT{max_queued_bytes} });
 
 
+
+has correlation_header => (
+  is      => 'rw',
+  builder => '_build_correlation_header',
+);
+
+sub _build_correlation_header {
+  my $name = $ENV{SKEID_CORRELATION_HEADER};
+  return (defined($name) && length($name)) ? _normalize_correlation_header($name) : undef;
+}
+
+
+has catch_all => (
+  is      => 'rw',
+  default => sub { {} },
+);
+
 # Whether x-skeid-key-id / x-api-key-id from the client may name the customer. Off by default:
 # once a policy hangs off the key id, believing that header lets any client pick its own
 # permissions in one line. Turn it on only when something in front of Skeid authenticates the
@@ -321,6 +345,13 @@ has config_loader => (
   predicate => 'has_config_loader',
 );
 
+# Node files (ADR 0031): per path, what was last read -- seen (mtime, size, inode), the nodes
+# of the last good read, its error, and the last check's accepted count and rejections.
+has _node_files => (
+  is      => 'rw',
+  default => sub { {} },
+);
+
 has _config_mtime => (
   is      => 'rw',
   default => sub { undef },
@@ -402,6 +433,14 @@ has _nodes_fingerprint => (
   default => sub { undef },
 );
 
+# Per node id, the digest of the config entry it was built from: an unchanged entry keeps the
+# health an admin set when the nodes section is rebuilt.
+has _node_entry_prints => (
+  is      => 'rw',
+  default => sub { {} },
+);
+has _main_nodes_print => (is => 'rw');
+
 has _rr_cursor => (
   is      => 'rw',
   default => sub { {} },
@@ -415,6 +454,12 @@ has _inventory_generation => (
 has _route_cache => (
   is      => 'rw',
   default => sub { { generation => -1, entries => {}, order => [] } },
+);
+
+# The model names of the chat-kind nodes as of one inventory generation (see _known_node_models).
+has _known_models_cache => (
+  is      => 'rw',
+  default => sub { { generation => -1 } },
 );
 
 # The probe key (see _probe_inventory_key) as of one inventory generation.
@@ -538,7 +583,35 @@ my %ROUTING_SETTINGS = (
   # so a stray 0 falls back to today's single-frontend behaviour instead of dividing max_conns
   # to nothing.
   frontend_count      => [ frontend_count        => sub { my $n = int(0 + $_[0]); $n < 1 ? 1 : $n } ],
+  correlation_header  => [ correlation_header    => \&_normalize_correlation_header ],
+  catch_all           => [ catch_all             => \&_normalize_catch_all ],
 );
+
+# The kinds of route a catch-all can be set for (ADR 0033). The kind is the route's, not a
+# node kind: both are served by chat-kind nodes.
+my %CATCH_ALL_KIND = map { $_ => 1 } qw( chat embeddings );
+
+sub _normalize_catch_all {
+  my ($catch_all) = @_;
+  croak 'routing.catch_all must be a mapping of chat and embeddings' unless ref($catch_all) eq 'HASH';
+  my %targets;
+  for my $kind (sort keys %$catch_all) {
+    croak "routing.catch_all: unknown key '$kind' (expected chat, embeddings)"
+      unless $CATCH_ALL_KIND{$kind};
+    my $target = $catch_all->{$kind};
+    croak "routing.catch_all.$kind must be a model name"
+      if !defined($target) || ref($target) || !length($target);
+    $targets{$kind} = "$target";
+  }
+  return \%targets;
+}
+
+sub _normalize_correlation_header {
+  my ($name) = @_;
+  croak 'routing.correlation_header must be a header name'
+    if ref($name) || $name !~ /\A[!#\$%&'*+.^_`|~0-9A-Za-z-]+\z/;
+  return "$name";
+}
 
 sub BUILD {
   my ($self, $args) = @_;
@@ -585,6 +658,14 @@ sub add_node {
   my $kind    = Langertha::Skeid::Protocol::Documents->normalize_kind($node{kind});
   my $key_header = Langertha::Skeid::Protocol::Documents->normalize_key_header($node{api_key_header});
 
+  # Whose infrastructure the node is (skeid k128, ADR 0032). An external node is sent no client
+  # header beyond an allowlist and never the client's credential: without a key of its own, the
+  # only credential left to send it would be the customer's.
+  my $trust = $self->normalize_trust($node{trust});
+  croak "node '$id' is external and names no key source: "
+    . 'set api_key_env or api_key_ref, or trust: internal'
+    if $trust eq 'external' && !$self->node_has_key_source(\%node);
+
   # Every check that can croak runs before the removal: a bad re-add must leave the working
   # node in the inventory (skeid k98).
   my $engine = $self->normalize_engine_id((defined($node{engine}) && length($node{engine})) ? $node{engine} : 'OpenAIBase');
@@ -599,6 +680,7 @@ sub add_node {
     weight      => (defined $node{weight} ? 0 + $node{weight} : 1),
     max_conns   => (defined $node{max_conns} ? 0 + $node{max_conns} : 0),
     healthy     => (exists $node{healthy} ? ($node{healthy} ? 1 : 0) : 1),
+    trust       => $trust,
     tags        => $tags,
     metadata    => (ref($node{metadata}) eq 'HASH' ? $node{metadata} : {}),
     (defined($node{api_key_env}) && length($node{api_key_env})
@@ -620,9 +702,32 @@ sub add_node {
     # The header the node's key is sent in, raw, instead of `Authorization: Bearer` (docling's
     # `X-Api-Key`). Absent means Authorization.
     (length($key_header) ? (api_key_header => $key_header) : ()),
+    # The node file it came from (ADR 0031): such a node never gets the client's credentials.
+    (defined($node{node_file}) && length($node{node_file}) ? (node_file => "$node{node_file}") : ()),
   };
   $self->_bump_inventory;
   return 1;
+}
+
+
+sub normalize_trust {
+  my ($self, $value) = @_;
+  return 'external' unless defined $value;
+  croak 'node trust must be internal or external' if ref $value;
+  (my $trust = lc "$value") =~ s/\A\s+|\s+\z//g;
+  return 'external' unless length $trust;
+  return $trust if $trust eq 'internal' || $trust eq 'external';
+  croak "unknown node trust '$value': internal or external";
+}
+
+
+sub node_has_key_source {
+  my ($self, $node) = @_;
+  for my $field (qw( api_key_ref api_key_env )) {
+    my $value = $node->{$field};
+    return 1 if defined($value) && !ref($value) && length($value);
+  }
+  return 0;
 }
 
 
@@ -807,7 +912,7 @@ sub pricing_for_model {
 # from an emptied manifest map while routing already ran on the new policies.
 my @CONFIG_STATE = qw(
   model_aliases policies default_policy key_policies key_names nodes
-  route_wait_timeout_ms route_wait_poll_ms trust_key_id_header frontend_count
+  route_wait_timeout_ms route_wait_poll_ms trust_key_id_header frontend_count catch_all
   admin_api_key _config_admin_api_key
   manifest_enabled manifest_available key_manifests client_auth_keys upload_max_bytes
   documents_max_bytes documents_allow_remote_sources
@@ -852,8 +957,9 @@ sub reload_config {
 
   my %before = map { $_ => $self->$_ } @CONFIG_STATE;
   my %pricing = %{$self->model_pricing || {}};
-  my ($generation, $route_cache, $probe_key_cache, $rr_cursor)
-    = ($self->_inventory_generation, $self->_route_cache, $self->_probe_key_cache, $self->_rr_cursor);
+  my ($generation, $route_cache, $probe_key_cache, $rr_cursor, $known_models_cache)
+    = ($self->_inventory_generation, $self->_route_cache, $self->_probe_key_cache, $self->_rr_cursor,
+       $self->_known_models_cache);
 
   my ($nodes_print, $declared, $notices, $source);
   if (eval { ($nodes_print, $declared, $notices, $source) = $self->_apply_config($cfg); 1 }) {
@@ -884,6 +990,7 @@ sub reload_config {
     $self->_route_cache($route_cache);
     $self->_probe_key_cache($probe_key_cache);
     $self->_rr_cursor($rr_cursor);
+    $self->_known_models_cache($known_models_cache);
   }
   die $err;
 }
@@ -968,7 +1075,119 @@ sub _read_config {
   my $fingerprint = defined($version) && !ref($version)
     ? "version:$version"
     : 'digest:' . _config_digest($cfg);
+
+  # Node files are inputs of their own (ADR 0031): a loader's version does not cover them.
+  if (exists $cfg->{node_files}) {
+    my $contributed;
+    ($cfg, $contributed) = $self->_merge_node_files($cfg);
+    $fingerprint .= ';node_files:' . $contributed;
+  } else {
+    $self->_node_files({});
+  }
   return ($cfg, $fingerprint);
+}
+
+# What a node file is now: its mtime, size and inode, or 'missing'. A ConfigMap update swaps a
+# symlink, so the inode changes even when mtime and size happen not to.
+sub _node_file_seen {
+  my ($path) = @_;
+  my @st = stat $path;
+  return 'missing' unless @st;
+  return join ':', @st[9, 7, 1];
+}
+
+# The config with the nodes of its node files appended, and a digest of what they contributed.
+# A file is read only when it changed; one that cannot be read keeps its last good nodes. Every
+# node is checked on every merge, so a changed main config re-judges them all.
+sub _merge_node_files {
+  my ($self, $cfg) = @_;
+  my $entries = Langertha::Skeid::NodeFiles->normalize_config($cfg->{node_files});
+  my $state = $self->_node_files;
+
+  my @main  = ref($cfg->{nodes}) eq 'ARRAY' ? @{$cfg->{nodes}} : ();
+  my %taken = map { (ref($_) eq 'HASH' && defined($_->{id})) ? ("$_->{id}" => 1) : () } @main;
+  my (@added, %next);
+
+  for my $entry (@$entries) {
+    my $path = $entry->{path};
+    my $file = $state->{$path} || { nodes => [], loaded => 0 };
+    my $seen = _node_file_seen($path);
+    my $fresh = !defined($file->{seen}) || $file->{seen} ne $seen;
+    if ($fresh) {
+      $file->{seen} = $seen;
+      my $nodes;
+      if ($seen eq 'missing') {
+        $file->{error} = "node file $path is missing";
+      } elsif (eval { $nodes = Langertha::Skeid::NodeFiles->read_file($path); 1 }) {
+        $file->{nodes}  = $nodes;
+        $file->{loaded} = 1;
+        delete @{$file}{qw( error error_at )};
+      } else {
+        ($file->{error} = $@ || "node file $path cannot be read") =~ s/\s+\z//;
+      }
+      if (defined $file->{error}) {
+        $file->{error_at} = time;
+        warn 'skeid: ' . $file->{error}
+          . ($file->{loaded} ? ', keeping its last good nodes' : '') . "\n";
+      }
+    }
+
+    my @rejected;
+    my $nodes = $file->{nodes};
+    for my $position (0 .. $#$nodes) {
+      my $node = $nodes->[$position];
+      my $rule = Langertha::Skeid::NodeFiles->check($self, $entry, $node);
+      $rule = 'id_taken' if !defined($rule) && $taken{"$node->{id}"};
+      if (defined $rule) {
+        push @rejected, { position => $position, rule => $rule };
+        next;
+      }
+      $taken{"$node->{id}"} = 1;
+      # Marked, so the proxy never hands a node from a node file the client's own credentials.
+      # Its trust is the entry's, never the file's to grant (ADR 0032).
+      push @added, { %$node, node_file => $path, trust => $entry->{trust} };
+    }
+    if ($fresh) {
+      warn "skeid: node file $path: node $_->{position} rejected ($_->{rule})\n" for @rejected;
+    }
+    $file->{rejected} = \@rejected;
+    $file->{accepted} = @$nodes - @rejected;
+    $next{$path} = $file;
+  }
+
+  $self->_node_files(\%next);
+  return ({ %$cfg, nodes => [ @main, @added ] }, _config_digest(\@added));
+}
+
+# Whether a node file changed since it was last read; one stat per file.
+sub _node_files_changed {
+  my ($self) = @_;
+  my $state = $self->_node_files;
+  for my $path (keys %$state) {
+    return 1 if _node_file_seen($path) ne ($state->{$path}{seen} // '');
+  }
+  return 0;
+}
+
+
+sub node_files_status {
+  my ($self) = @_;
+  my $state = $self->_node_files;
+  return undef unless %$state;
+  return [ map {
+    my $file = $state->{$_};
+    my @rejected = @{$file->{rejected} || []};
+    +{
+      path     => $_,
+      ok       => defined($file->{error}) ? 0 : 1,
+      accepted => 0 + ($file->{accepted} // 0),
+      rejected => [ map { +{ %$_ } } @rejected[0 .. _last(49, @rejected)] ],
+      (defined($file->{error}) ? (
+        error     => $file->{error},
+        failed_at => strftime('%Y-%m-%dT%H:%M:%SZ', gmtime($file->{error_at} // time)),
+      ) : ()),
+    };
+  } sort keys %$state ];
 }
 
 # A canonical digest of a loaded config structure: hash keys sorted, so two loads of the same
@@ -1149,12 +1368,29 @@ sub _apply_config {
     # An unchanged nodes section keeps the node list as it is (skeid #38).
     my $print = _config_digest($nodes);
     if (!defined($nodes_print) || $print ne $nodes_print) {
+      # A changed main nodes section is the declared state again, health included. A change that
+      # came only from node files (ADR 0031) must not reset the main config's nodes: there a node
+      # whose entry did not change keeps the health an admin set on it.
+      my $main_print = _config_digest([ grep { !(ref($_) eq 'HASH' && defined $_->{node_file}) } @$nodes ]);
+      my $files_only = defined($self->_main_nodes_print) && $self->_main_nodes_print eq $main_print;
+      $self->_main_nodes_print($main_print);
+      my $entry_prints = $files_only ? $self->_node_entry_prints : {};
+      my %health = map { (($_->{id} // '') => $_->{healthy}) } @{$self->nodes};
+      my %prints;
       $self->nodes([]);
       for my $n (@$nodes) {
         next unless ref($n) eq 'HASH';
         next unless defined $n->{id} && defined $n->{url};
+        my $entry = _config_digest($n);
+        $prints{$n->{id}} = $entry;
         $self->add_node(%$n);
+        if (defined($entry_prints->{$n->{id}}) && $entry_prints->{$n->{id}} eq $entry
+            && exists $health{$n->{id}}) {
+          my ($added) = grep { $_->{id} eq $n->{id} } @{$self->nodes};
+          $added->{healthy} = $health{$n->{id}} if $added;
+        }
       }
+      $self->_node_entry_prints(\%prints);
       $nodes_print = $print;
     }
   } elsif ($before->{nodes}) {
@@ -1271,6 +1507,7 @@ sub maybe_reload_config {
       && defined($retry) && $self->_now < $retry;
     return $self->_reload_on_request($mtime);
   }
+  return $self->_reload_on_request if $self->_node_files_changed;
   return 0;
 }
 
@@ -2044,6 +2281,17 @@ sub record_usage {
   # The pages a documents request converted (skeid k94, ADR 0028), read off json_content of the
   # answer when it carries one. Optional like audio_seconds: absent is not measured, never 0.
   $event{pages} = _num($args{pages}) if defined $args{pages};
+  # The usage contract (skeid k121), each optional like the ones above: how the answer ended
+  # (stop, length, content_filter, tool_calls, error, other), the time to its first token in ms
+  # (streams only), and the caller's correlation id. Absent is "not known", never a default.
+  for my $field (qw( finish_reason correlation_id )) {
+    $event{$field} = "$args{$field}" if defined($args{$field}) && !ref($args{$field});
+  }
+  $event{ttft_ms} = _num($args{ttft_ms}) if defined $args{ttft_ms};
+  # The catch-all target a bent request was routed under (skeid k129, ADR 0033). Only a bent
+  # request has it: an event without the key was not bent.
+  $event{routed_model} = "$args{routed_model}"
+    if defined($args{routed_model}) && !ref($args{routed_model}) && length($args{routed_model});
 
   return $self->_store_usage_event(\%event);
 }
@@ -2071,6 +2319,35 @@ sub _usage_lost {
   return;
 }
 
+
+
+sub purge_usage {
+  my ($self, %args) = @_;
+  my ($request, $error) = Langertha::Skeid::UsageStore->purge_request(\%args);
+  return { ok => 0, error => $error } unless $request;
+  my $store = $self->_usage_store_obj;
+  return { ok => 0, error => 'no usage store is configured' } unless $store;
+  return { ok => 0, error => 'the usage store ' . $store->backend . ' cannot purge' }
+    unless $store->can('purge');
+  my $result = $store->purge($request);
+  $result = { ok => 0, error => 'the usage store answered nothing' } unless ref($result) eq 'HASH';
+  return {
+    %$result,
+    backend   => $store->backend,
+    dry_run   => $request->{dry_run},
+    ($request->{api_key_ids} ? (api_key_ids => scalar @{$request->{api_key_ids}}) : ()),
+    (defined($request->{before}) ? (before => $request->{before}) : ()),
+    purged_at => _iso8601_now(),
+  };
+}
+
+
+sub usage_retention_before {
+  my ($self) = @_;
+  my $cfg = ref($self->usage_store) eq 'HASH' ? $self->usage_store : {};
+  my $days = $cfg->{retention_days} or return undef;
+  return strftime('%Y-%m-%dT%H:%M:%SZ', gmtime(time - $days * 86400));
+}
 
 sub flush_usage {
   my ($self) = @_;
@@ -2425,7 +2702,9 @@ sub set_model_alias {
       tags    => $self->normalize_tags($tier->{tags}),
       model   => ((defined($tier->{model}) && length($tier->{model})) ? "$tier->{model}" : $name),
       engine  => $self->normalize_engine_id($tier->{engine} // ''),
-      wait_ms => (defined($tier->{wait_ms}) && $tier->{wait_ms} > 0 ? 0 + $tier->{wait_ms} : 0),
+      # undef = not written: route_plan gives the last tier the global wait, the others 0.
+      wait_ms => (!defined($tier->{wait_ms}) || !length($tier->{wait_ms}) ? undef
+                 : $tier->{wait_ms} > 0 ? 0 + $tier->{wait_ms} : 0),
     };
   }
 
@@ -2460,7 +2739,14 @@ sub resolve_policy {
     name         => ($name // $spec->{name} // ''),
     allow_models => $allow_models,
     deny_tags    => $self->normalize_tags($spec->{deny_tags}),
+    rate         => _normalize_rate($spec->{rate}, $name),
   };
+}
+
+# A policy's request rate (skeid k125): undef for none; see Langertha::Skeid::Rate.
+sub _normalize_rate {
+  my ($rate, $name) = @_;
+  return Langertha::Skeid::Rate->normalize($rate, defined($name) && length($name) ? "policy '$name'" : undef);
 }
 
 # Key ids before ADR 0016 were the first 12 hex digits of the same digest, so a short id is
@@ -2556,6 +2842,9 @@ sub _load_policies {
         deny_tags    => (exists($overrides->{deny_tags})
                           ? $self->normalize_tags($overrides->{deny_tags})
                           : ($base->{deny_tags} // [])),
+        rate         => (exists($overrides->{rate})
+                          ? Langertha::Skeid::Rate->normalize($overrides->{rate}, "key '$label'")
+                          : $base->{rate}),
       };
       $key_policies{$key} = $intern->($merged);
     }
@@ -2578,6 +2867,7 @@ sub _load_policies {
   $self->default_policy($default);
   $self->key_policies(\%key_policies);
   $self->key_names(\%key_names);
+  $self->_prune_rate_buckets;
   return 1;
 }
 
@@ -2610,7 +2900,89 @@ sub _configured_key_id {
 sub _policy_fingerprint {
   my ($self, $policy) = @_;
   my $models = defined($policy->{allow_models}) ? join(',', sort keys %{$policy->{allow_models}}) : '*';
-  return join("\0", $models, join(',', @{$policy->{deny_tags}}));
+  return join("\0", $models, join(',', @{$policy->{deny_tags}}), _rate_print($policy->{rate}));
+}
+
+sub _rate_print { Langertha::Skeid::Rate->print($_[0]) }
+
+
+my @CAPABILITIES = qw(
+  documents ollama_embed node_files key_rate customer_source_rate usage_contract usage_purge
+  openbao_token_file catch_all
+);
+
+sub capabilities { return @CAPABILITIES }
+
+
+sub rate_admit {
+  my ($self, $api_key_id) = @_;
+  my $policy = $self->policy_for_key($api_key_id);
+  # Without client authentication any string is a key, so a key the config does not list would
+  # get a fresh bucket per made-up key -- no limit, and unbounded memory. Unlisted keys then share
+  # one bucket: the default policy's rate is for everyone it covers together.
+  my $id = $api_key_id // '';
+  $id = '' if length($id) && !$self->client_auth_enabled
+    && !defined($self->_configured_key_id($self->key_policies, $api_key_id));
+  my $rate   = $policy ? $policy->{rate} : undef;
+  my $buckets = $self->_rate_buckets;
+  unless ($rate) {
+    delete $buckets->{$id};
+    return { ok => 1 };
+  }
+
+  my $div   = $self->_admission_divisor;
+  my $now   = $self->_now;
+  my $print = _rate_print($rate) . "/$div";
+  my $b = $buckets->{$id};
+  if (!$b || $b->{print} ne $print) {
+    my @limits;
+    push @limits, { refill => $rate->{per_s} / $div, cap => _at_least_one($rate->{burst} / $div) }
+      if defined $rate->{per_s};
+    push @limits, { refill => $rate->{per_min} / 60 / $div, cap => _at_least_one($rate->{per_min} / $div) }
+      if defined $rate->{per_min};
+    $_->{tokens} = $_->{cap} for @limits;
+    $b = $buckets->{$id} = { print => $print, at => $now, limits => \@limits };
+  }
+
+  my $elapsed = $now - $b->{at};
+  $elapsed = 0 if $elapsed < 0;
+  $b->{at} = $now;
+  my $wait = 0;
+  for my $limit (@{$b->{limits}}) {
+    $limit->{tokens} += $elapsed * $limit->{refill};
+    $limit->{tokens} = $limit->{cap} if $limit->{tokens} > $limit->{cap};
+    if ($limit->{tokens} < 1) {
+      my $need = (1 - $limit->{tokens}) / $limit->{refill};
+      $wait = $need if $need > $wait;
+    }
+  }
+  if ($wait > 0) {
+    $self->_rate_refusals->{$id}++;
+    my $after = POSIX::ceil($wait);
+    return { ok => 0, retry_after => ($after < 1 ? 1 : $after) };
+  }
+  $_->{tokens} -= 1 for @{$b->{limits}};
+  return { ok => 1 };
+}
+
+sub _at_least_one { $_[0] < 1 ? 1 : $_[0] }
+
+# Buckets of keys whose policy no longer has a rate, or that are gone, after a policy load.
+sub _prune_rate_buckets {
+  my ($self) = @_;
+  my $buckets = $self->_rate_buckets;
+  for my $id (keys %$buckets) {
+    my $policy = $self->policy_for_key(length($id) ? $id : undef);
+    delete $buckets->{$id} unless $policy && $policy->{rate};
+  }
+  return;
+}
+
+
+sub key_metrics {
+  my ($self) = @_;
+  my $refusals = $self->_rate_refusals;
+  return { map { ($_ => { rate_limited => 0 + $refusals->{$_} }) } keys %$refusals };
 }
 
 
@@ -2946,6 +3318,39 @@ sub mcp_servers_for_key {
 }
 
 
+sub catch_all_target {
+  my ($self, $model, $route_kind) = @_;
+  my $target = $self->catch_all->{$route_kind // ''};
+  return unless defined $target;
+  $model //= '';
+  return if exists $self->model_aliases->{$model};
+  my $known = $self->_known_node_models;
+  return if $known->{any} || $known->{models}{$model};
+  return $target;
+}
+
+# Which model names the chat-kind nodes serve, and whether one of them serves any name (a node
+# without a model). Health is left out on purpose: a model whose nodes are down is still known.
+# Derived once per inventory generation, like the route cache, so the per-request check is an
+# integer compare and a hash lookup.
+sub _known_node_models {
+  my ($self) = @_;
+  my $generation = $self->_inventory_generation;
+  my $cache = $self->_known_models_cache;
+  return $cache if ($cache->{generation} // -1) == $generation;
+
+  my ($any, %models) = (0);
+  for my $node (@{$self->nodes || []}) {
+    next if length($node->{kind} // '');
+    if (defined($node->{model}) && length($node->{model})) { $models{$node->{model}} = 1 }
+    else                                                   { $any = 1 }
+  }
+  $cache = { generation => $generation, any => $any, models => \%models };
+  $self->_known_models_cache($cache);
+  return $cache;
+}
+
+
 sub route_plan {
   my ($self, %args) = @_;
   my $model  = $args{model} // '';
@@ -2984,6 +3389,15 @@ sub route_plan {
 
   return { tiers => [], permitted => 0, reason => 'all_tiers_denied' }
     if $before && !@tiers;
+
+  # A tier without its own wait_ms waits 0, except the last one left after the deny filter: it
+  # has nowhere to fall through to and waits like a model without an alias.
+  if ($alias) {
+    for my $i (0 .. $#tiers) {
+      next if defined $tiers[$i]{wait_ms};
+      $tiers[$i]{wait_ms} = $i == $#tiers ? 0 + ($self->route_wait_timeout_ms // 0) : 0;
+    }
+  }
 
   return { tiers => \@tiers, permitted => 1, reason => '' };
 }
@@ -3567,7 +3981,7 @@ Langertha::Skeid - Dynamic routing control-plane for multi-node LLM serving with
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -3632,6 +4046,19 @@ B<jsonlog backend> (recommended — no DBI dependency):
 Directory mode is auto-detected when the path is an existing directory or ends
 with C</>.  It writes one C<.json> file per event, which avoids file-level
 locking and concurrent-write collisions entirely.
+
+Three fields of an event say how a request went for its caller (skeid k121), each absent
+(C<NULL> in a DBI store) when it is not known: C<finish_reason> -- C<stop>, C<length>,
+C<content_filter>, C<tool_calls>, C<error> (any failed request) or C<other>, from the upstream's
+OpenAI answer whatever face the client spoke; C<length> is the truncated answer an agent fails
+on silently. C<ttft_ms> -- milliseconds from admission to the first token of a streamed answer.
+C<correlation_id> -- the value of the header L</correlation_header> names, unchanged.
+
+The event of a request the catch-all bent (C<routing.catch_all>, ADR 0033) carries
+C<routed_model>: the catch-all target it was routed under, beside C<requested_model> -- the name
+the client sent -- and C<model>, the served model. Only a bent request has the key, which is what
+tells it from an alias request. The DBI stores keep it in a nullable C<routed_model> column;
+C<jsonlog> writes the key only when it is set.
 
 B<Constructor callbacks> (custom backend, no subclassing):
 
@@ -3731,11 +4158,28 @@ one policy object, and a key that takes the default is not listed at all. C<deny
 node selection, not just the plan, so a denied node cannot be reached by asking for its own
 model name instead of an alias. A refusal is C<403>, never a capacity error.
 
-The optional C<names:> section maps a readable name to a customer key id (karr #17). It makes
+The optional C<names:> section maps a readable name to a customer key id (skeid k17). It makes
 C<keys:> entries legible and confines key rotation to a single line -- change the id a name
 points at, and every policy line that named the customer follows. Its values are ids from
 C<skeid keyid>, never customer keys, so the config still holds no secret; it is read only at
 config load and never on the request path.
+
+A policy may carry a request C<rate> (skeid k125), so a caller that runs away -- a loop, an
+agent gone wrong -- is stopped before it burns capacity or budget:
+
+  policies:
+    agents: { rate: { per_s: 2, burst: 10, per_min: 60 } }
+  keys:
+    bigcorp: { policy: standard, rate: { per_s: 5 } }   # a keys entry may set its own
+
+C<per_s> refills a bucket of C<burst> tokens (default: C<per_s> rounded up), C<per_min> a bucket
+of that many; either may be left out, and a request needs a token from each. Without C<rate> a
+key is unlimited. Over it, the request is answered C<429> with C<Retry-After> before it is routed
+-- nothing reaches a node -- and recorded as a usage event with C<error_type> C<key_rate_limited>.
+The buckets are in memory per process and the rate is divided like C<max_conns>
+(L</worker_count>, L</frontend_count>); a key of a customer source takes the rate of the
+policy its row names, or with C<rate_column> its row's own rate, which may only tighten the
+policy's (L<Langertha::Skeid::CustomerSource/The row contract>). See L</rate_admit>.
 
 Identity comes from the API key the caller presented — see L</key_id_for_key>. See also ADR
 0008 in the distribution repository.
@@ -3804,7 +4248,7 @@ through the same loader. The top-level keys below are every one Skeid reads -- a
 the file is ignored. A reload is all or nothing: a config that fails anywhere leaves the previous
 one in force, and is reported by L</reload_status>.
 
-A reload makes the running config equal to the file (skeid k65), as a restart with that file
+A reload makes the running config equal to the file, as a restart with that file
 would:
 
 =over 4
@@ -3872,12 +4316,29 @@ set by C<skeid serve --workers>).
       rerank_format: tei               # default none; a reranker that speaks TEI's dialect, see below
       kind: documents                  # default chat; a docling-serve node, see below
       api_key_header: X-Api-Key        # default none: the key goes in Authorization: Bearer
+      trust: internal                  # default external; see below
 
-An entry without C<id> or C<url> is skipped; one with an unknown C<engine>, C<rerank_format> or
-C<kind>, or an C<api_key_header> that is no header name, fails the load. When
-a node has a key of its own it replaces the client's C<Authorization> upstream (see
-L<Langertha::Skeid::Proxy>); otherwise the client's headers go through. Key references and
-variable names are the only key material a config holds (ADR 0003).
+An entry without C<id> or C<url> is skipped; one with an unknown C<engine>, C<rerank_format>,
+C<kind> or C<trust>, an C<api_key_header> that is no header name, or an external node without a
+key source fails the load. When a node has a key of its own it replaces the client's
+C<Authorization> upstream (see L<Langertha::Skeid::Proxy>). Key references and variable names
+are the only key material a config holds (ADR 0003).
+
+C<trust> says whose infrastructure a node is (ADR 0032). C<external>, the default, is a provider:
+of the client's headers it is sent C<Content-Type>, C<Accept>, C<anthropic-version>,
+C<anthropic-beta> and C<OpenAI-Beta> only, plus its key and C<User-Agent: Langertha-Skeid>, and it
+must name C<api_key_env> or C<api_key_ref>. C<internal> is the deployment's own: it gets the
+client's headers except the hop-by-hop ones, C<X-Forwarded-*>, C<Forwarded>, C<X-Real-IP>,
+C<Cookie> and the correlation header, and only an internal node without a key source is handed
+the client's own C<Authorization> / C<X-Api-Key> (the pass-through). The admin route
+C<GET /skeid/config> lists each node's C<trust>.
+
+B<INCOMPATIBLE since 0.005:> a node with neither C<api_key_env> nor C<api_key_ref> and no
+C<trust: internal> fails the config load. At start that stops Skeid; on a reload the running
+config stays in force and the error is reported by L</reload_status>, so the new file never
+takes effect. Before upgrading, give every keyless node a key source or C<trust: internal> --
+typically a local vLLM or llama.cpp node that needs no key. L</add_node> and
+C<POST /skeid/nodes> refuse such a node the same way.
 
 The section replaces the whole inventory when it changed -- nodes added through the admin API are
 lost then -- and keeps the node list as it is when it did not: its inventory generation, its
@@ -3911,6 +4372,38 @@ Bearer>: C<X-Api-Key> for docling-serve, which takes no Bearer token. The key so
 every spelling, as for any node with a key. A name that is no RFC 7230 token fails the load;
 C<Authorization> is the default spelled out.
 
+=head2 node_files
+
+  node_files:
+    - path: /etc/skeid/gpm/nodes.yaml                         # required
+      allow_api_key_env: '^SKEID_NODE_GPM_[A-Z0-9_]+_API_KEY$'  # default: no api_key_env
+      allow_api_key_ref: false                                 # default false
+      allow_url_hosts: [ '*.cai-gpm.svc' ]                     # required; * is one DNS label
+      allow_kinds: [ documents, chat ]                         # default [chat]
+      trust: internal                                          # default external
+
+Nodes from files someone else writes (ADR 0031) -- a GPU manager publishing where its models
+run. Each file is a YAML list of nodes (or a mapping with only C<nodes>) in the form of the
+L</nodes> section, without C<capacity>. Its nodes are appended to the C<nodes> section; a file
+contributes nodes and nothing else.
+
+What a node from such a file may say is set here, in the main config, and checked node by node
+(L<Langertha::Skeid::NodeFiles/check>): its C<url> must go to an allowed host, an
+C<api_key_env> must match C<allow_api_key_env>, an C<api_key_ref> needs C<allow_api_key_ref>, its
+C<kind> must be allowed, and its C<id> must not be taken by the main config or an earlier file.
+C<trust> (ADR 0032) is the entry's to set, for every node of the file: a node may name it only
+with the entry's value, and a node of an external entry needs a key source of its own (rule
+C<key_required>). A node from a node file is never handed the client's credentials, whatever
+its trust. A node that breaks a rule is left out and the rest of the file loads. The admin route
+C<GET /skeid/config> lists, per file, the nodes accepted, and each rejected node by position and
+rule -- never the value.
+
+A file is re-read when it changes (its mtime, size or inode: a ConfigMap swaps a symlink), with
+a C<config_file> on the next dispatch, with a C<config_loader> on its next run. It is read whole
+or not at all: a version that does not parse, or a file that is gone, keeps that file's last
+good nodes and is reported on C<GET /skeid/config>. A malformed C<node_files> section fails the
+load like any other section.
+
 =head2 pricing
 
   pricing:
@@ -3938,7 +4431,8 @@ L</set_model_pricing>.
         - { tags: [cloud], model: llama-3.3-70b-versatile }
 
 A client-facing model name as an ordered plan of tiers (ADR 0008). Per tier: C<tags>, C<model>
-(default: the alias name), C<engine> and C<wait_ms> (default 0). C<tiers> may be given as a bare
+(default: the alias name), C<engine> and C<wait_ms> (default 0; the last tier defaults to
+C<routing.wait_timeout_ms>). C<tiers> may be given as a bare
 list. See L</set_model_alias>.
 
 =head2 policies, default_policy, names, keys
@@ -3971,7 +4465,7 @@ warning.
   client_auth:
     keys: [shared, k_9c8b7a6f5e4de5f60718293a4b5c6d7e8f901a2b]
 
-Client authentication (skeid k90), for a Skeid that is itself the public entry rather than
+Client authentication, for a Skeid that is itself the public entry rather than
 sitting behind a gateway that authenticates. With the section, the client routes -- C</v1/*>,
 C</api/*> and the provider manifest -- answer C<401> to a request without a key or with a key
 whose id is not on the list, before anything is routed, forwarded or metered; C</health> and
@@ -4004,10 +4498,12 @@ key id is what has to be on the list.
     listen: skeid_customer_keys          # optional NOTIFY channel: a notification fetches sooner
     max_stale_s: 0                       # default 0: keep the last good rows during an outage
     connect_timeout_s: 5                 # default 5; also bounds each query
+    rate_column: false                   # default false; true reads a fifth column, rate
 
 Customer keys from a database relation (ADR 0026), for when another application -- a
 self-service console -- issues and revokes them. Skeid runs one statement,
-C<SELECT key_id, name, policy, models FROM "skeid"."customer_keys">, and nothing else; the
+C<SELECT key_id, name, policy, models FROM "skeid"."customer_keys"> (with C<rate_column>, C<rate>
+as a fifth column), and nothing else; the
 owner provides the relation, typically as a view over its own tables, and grants C<SELECT> on it.
 The relation is quoted as written, so its case counts. One row per customer key id:
 
@@ -4022,6 +4518,12 @@ a C<names:> entry: the file cannot refer to it.
 
 =item * C<models> (C<text[]>): replaces the profile's model list, as a C<keys:> override does;
 C<NULL> keeps it, C<'{}'> is no models.
+
+=item * C<rate> (C<jsonb>, C<json> or text holding JSON), read only with C<rate_column: true>:
+the key's own request rate, in the shape of a policy's C<rate> (L</Per-Key Routing Policy>);
+C<NULL> keeps the policy's. It may only tighten the rate of the row's policy: a row asking for
+more is rejected with a reason. Without C<rate_column> the statement names four columns, so a
+view without C<rate> keeps working.
 
 =back
 
@@ -4170,7 +4672,7 @@ absolute path.
         description: Files on your own machine
         keys: [alice]
 
-The MCP gateway (skeid k103, ADR 0022): MCP servers assigned to customer key ids. A key reaches
+The MCP gateway (ADR 0022): MCP servers assigned to customer key ids. A key reaches
 a server assigned to it under C</mcp/E<lt>nameE<gt>> with its own Skeid key, and
 C</v1/mcp/servers> lists what it was assigned; see L<Langertha::Skeid::Proxy/MCP routes>.
 Without the section both routes are unknown paths, as before.
@@ -4225,16 +4727,36 @@ repeats a URL, a header value or a C<keys> entry.
     wait_poll_ms: 25             # default 25, at least 1: how often a waiting request retries
     trust_key_id_header: false   # default false; see key_id_for_key
     frontend_count: 1            # default 1, at least 1; see frontend_count
+    correlation_header: X-Correlation-ID   # default none; see correlation_header
+    catch_all:                   # default none; see below
+      chat: qwen3.8-flash
+      embeddings: qwen3-embedding-4b
 
 The defaults come from L</ENVIRONMENT> when set there.
+
+C<catch_all> names, per kind of route, the model an unknown model name is routed to (ADR 0033).
+The kind comes from the route, never from the name: C<chat> is C</v1/chat/completions>,
+C</v1/messages>, C</api/chat> and C</api/generate>; C<embeddings> is C</v1/embeddings>,
+C</api/embed> and C</api/embeddings>. No other route is bent. A name is unknown when it is
+neither an alias nor the C<model> of a chat-kind node -- healthy or not, reachable for the key
+or not -- and a request without a model name carries an unknown one. A chat-kind node without a
+C<model> serves every name, so with such a node the catch-all never applies. A bent request is
+from there an ordinary request for the target, which is a node model or an alias: its tiers, its
+wait, admission, and the key's policy and rate judge the target, so a key that may not reach the
+target gets the C<403> it would get asking for it by name. The answer and an error name the
+target; the usage event keeps the name the client sent as C<requested_model> and carries the
+target as C<routed_model>. The target is not checked at load: until a node serves it, a bent
+request ends as the target's C<503>. C<chat> and C<embeddings> are the only keys; any other key,
+a C<catch_all> that is not a mapping and a target that is not a non-empty string fail the config
+load. The catch-all is not a name, so no model list shows it; C<GET /skeid/config> does. See
+L</catch_all_target>.
 
 =head2 admin
 
   admin:
     api_key_env: SKEID_ADMIN_API_KEY   # or api_key: "..."
 
-The key for the C</skeid/*> admin API. It comes from the first of these that has one
-(skeid k64):
+The key for the C</skeid/*> admin API. It comes from the first of these that has one:
 
 =over 4
 
@@ -4277,11 +4799,19 @@ The provider manifest: C<enabled>, C<public_url>, C<provider_id> (default C<skei
     #             write them in one transaction per interval (write-behind);
     #             spool_dir (default off) -- a local directory, one per instance, that keeps
     #             the events the database cannot take while it is down and replays them
+    # every backend: retention_days (default none) -- how long events are kept; the cut-off
+    #             `skeid usage-purge --retention` deletes before
 
 Where usage events go; see L<Langertha::Skeid::UsageStore/normalize_config> for the inference and
 the defaults. C<usage_db_path>, a top-level key, is the older spelling of a sqlite store and is
 read only when C<usage_store> is absent. A changed store is swapped on reload; a removed one stays
 in force until restart, with a warning -- see L</CONFIGURATION>.
+
+C<retention_days> is the retention a deployment's records can point to: events older than that
+many days are deleted by C<skeid usage-purge --retention>, run on a schedule (a cron job, a
+Kubernetes CronJob). Skeid does not purge on its own: a C<DELETE> over the usage table would run
+on the event loop that serves the requests (ADR 0005). See L</purge_usage> for deleting the
+events of an organisation's keys.
 
 C<flush_interval_ms> moves a database write off the request path: the request is answered at
 once and the queued events are written together once per interval. Queued events are held in
@@ -4315,6 +4845,11 @@ Default of L</route_wait_poll_ms> (25).
 =head2 SKEID_TRUST_KEY_ID_HEADER
 
 Default of L</trust_key_id_header>: C<1>, C<true>, C<yes> or C<on> turn it on.
+
+=head2 SKEID_CORRELATION_HEADER
+
+Default of L</correlation_header> (none): the name of the header a usage event takes its
+C<correlation_id> from.
 
 =head2 SKEID_FRONTEND_COUNT
 
@@ -4482,11 +5017,25 @@ instead of the key it presented (default off, or C<SKEID_TRUST_KEY_ID_HEADER>; c
 C<routing.trust_key_id_header>). Turn it on only behind a gateway that authenticates the caller
 and sets that header itself: the key id selects both the routing policy and the bill.
 
+=head2 correlation_header
+
+The request header whose value a usage event records as C<correlation_id> (default none, or
+C<SKEID_CORRELATION_HEADER>; config C<routing.correlation_header>). The value is recorded
+unchanged when it is 8 to 64 characters of C<A-Z a-z 0-9 . _ ->, and not at all otherwise; it is
+the caller's own id, to join Skeid's usage with the caller's records. The header is not passed
+on to the node: it is for Skeid's records, and a node may be a third party's.
+
+=head2 catch_all
+
+Kind of route (C<chat>, C<embeddings>) to the model an unknown model name is routed to (default
+empty; config C<routing.catch_all>, ADR 0033). Read through L</catch_all_target>.
+
 =head2 route_wait_timeout_ms
 
 How long, in milliseconds, a request for a model without an alias waits for a free node before
 it is answered C<429> (default 2000, or C<SKEID_ROUTE_WAIT_TIMEOUT_MS>; config
-C<routing.wait_timeout_ms>). An alias tier waits its own C<wait_ms> instead.
+C<routing.wait_timeout_ms>). An alias tier waits its own C<wait_ms> instead; the last tier of
+an alias that sets none waits this one.
 
 =head2 route_wait_poll_ms
 
@@ -4580,7 +5129,7 @@ a usage store's C<password_env>) is read again only when the config itself chang
 =head2 config_reload_interval
 
 The least time, in seconds, between two runs of a C<config_loader> (default 1; fractions
-allowed; 0 runs it on every dispatch, as before skeid #38).
+allowed; 0 runs it on every dispatch, as before skeid k38).
 
 A loader-based config is re-read from C<call_function>, which every request passes through
 several times. Without a throttle every request would rerun the loader. A config file normally
@@ -4650,7 +5199,7 @@ whose variable is empty or shorter than 32 bytes does not load, because a snapsh
 published unsigned or weakly signed. Neither does one without a credential to read it: an admin
 API key or a registry read key.
 
-C<read_key_env> names the variable holding the B<registry read key> (skeid #49). The snapshot
+C<read_key_env> names the variable holding the B<registry read key> (skeid k49). The snapshot
 route accepts it as a bearer token besides the admin API key; it opens no other route, so a
 fronting tier holding it cannot add nodes or flip health. A named variable that is empty does
 not load. C<registry_secret>, C<registry_read_key>, C<registry_ttl_s>, C<registry_instance_id>
@@ -4665,9 +5214,24 @@ and C<registry_error_window_s> hold the other fields.
 
 Adds a node, replacing any node with the same id. Takes the fields of a config C<nodes> entry
 and fills in their defaults (see L</nodes>). Returns 1. Croaks without C<id> or C<url>, on an
-unknown C<engine>, C<rerank_format> or C<kind>, on an C<api_key_header> that is no header name, and on a C<registry> capacity block that
+unknown C<engine>, C<rerank_format>, C<kind> or C<trust>, on an C<api_key_header> that is no header name, on an external node
+that names no key source, and on a C<registry> capacity block that
 L<Langertha::Skeid::CapacityProbe::Registry/validate_config> rejects. The C<nodes.add> function
 and C<POST /skeid/nodes> call it.
+
+=head2 normalize_trust
+
+  my $trust = $skeid->normalize_trust($node{trust});   # 'internal' or 'external'
+
+A node's trust zone (ADR 0032), lowercased and trimmed; absent or empty is C<external>. Croaks
+on any other value. Callable on the class.
+
+=head2 node_has_key_source
+
+  my $keyed = $skeid->node_has_key_source(\%node);
+
+True when a node names where its key comes from: a non-empty C<api_key_ref> or C<api_key_env>.
+Whether that source yields a key is decided per request, not here. Callable on the class.
 
 =head2 remove_node
 
@@ -4752,6 +5316,17 @@ L</maybe_reload_config>, which never dies.
 Whether the last config reload succeeded, and if not, why, when, and how many times in a row.
 Served by the admin route C<GET /skeid/config>; the public C</health> carries only C<ok>,
 C<failed_at> and C<failures>, never the message, which can name customers and models.
+
+=head2 node_files_status
+
+  my $files = $skeid->node_files_status;
+  # [ { path => '/etc/skeid/gpm/nodes.yaml', ok => 1, accepted => 3,
+  #     rejected => [ { position => 4, rule => 'api_key_env' } ] } ]
+
+Per node file (see L</node_files>): whether its last read succeeded, how many of its nodes were
+accepted, and each rejected node by position and rule, at most 50. A failed read adds C<error>
+and C<failed_at>; the nodes counted are then the last good ones. undef without node files.
+Served by C<GET /skeid/config>.
 
 =head2 set_admin_api_key
 
@@ -4888,7 +5463,8 @@ C<< { ok => 0, enabled => 0, error => 'usage_store not configured' } >> without 
 event when there is no sink.
 
 The event carries C<created_at>, C<request_id>, C<api_format>, C<endpoint>, C<api_key_id>,
-C<provider>, C<engine>, C<model> (served), C<requested_model> (default C<model>), C<node_id>,
+C<provider>, C<engine>, C<model> (served), C<requested_model> (default C<model>),
+C<routed_model> (only when given: the catch-all target of a bent request), C<node_id>,
 C<route_url>, C<status_code>, C<ok>, C<duration_ms>, C<error_type>, C<error_message>, and from
 C<metrics> the token counts (C<input_tokens>, C<output_tokens>, C<total_tokens>,
 C<cached_tokens>, C<cache_write_tokens>), C<tool_calls> and the costs (C<cost_input_usd>,
@@ -4905,6 +5481,31 @@ L<Langertha::Skeid::UsageStore::DBI/flush>) and returns its answer, or C<< { ok 
 => 0 } >> when the store holds nothing back. F<bin/skeid> calls it when the server stops, and an
 application embedding the proxy should call it before it exits: queued events live in memory
 only. Replacing the store on a reload and destroying this object flush as well.
+
+=head2 purge_usage
+
+  my $result = $skeid->purge_usage(api_key_ids => [ 'k_5f0e...', 'k_9c8b...' ], dry_run => 1);
+  # { ok => 1, dry_run => 1, matched => 1234, deleted => 0, backend => 'postgresql',
+  #   api_key_ids => 2, purged_at => '2026-11-12T05:00:00Z' }
+
+Deletes the usage events of a set of customer key ids -- an organisation's, on an erasure
+request -- or those created C<before> a time, or those of the keys before a time (skeid k122).
+C<dry_run> only counts. Idempotent: repeated, it deletes what is left, so a caller retries until
+C<ok>. This process's write-behind queue is written out first; with C<flush_interval_ms> and
+several processes (C<--workers>, frontends) the others may still write queued events of those
+keys for up to one interval, so an erasure runs the purge again after it. The same holds for the
+spools (C<spool_dir>) of other instances: a purge refuses only while its own spool holds events,
+so an erasure purges again once every instance's spool is replayed. The answer is meant to be recorded by the caller: what was asked (the number of key ids,
+C<before>), what matched, what was deleted, by which backend and when. Served by
+C<POST /skeid/usage/purge> and C<skeid usage-purge>. A store without a C<purge> (a
+C<store_usage_event> callback) answers C<ok> 0.
+
+=head2 usage_retention_before
+
+  my $before = $skeid->usage_retention_before;   # '2026-08-14T05:00:00Z', or undef
+
+The cut-off of C<usage_store.retention_days>: events created before it are past their retention
+and C<skeid usage-purge --retention> deletes them. undef without a retention.
 
 =head2 usage_report
 
@@ -4980,9 +5581,12 @@ the alias name itself, for the case where nodes carry that name), C<engine> opti
 constrains the engine, and C<wait_ms> is how long to wait for capacity in this tier before
 falling through to the next.
 
-C<wait_ms> defaults to B<0>. Writing tiers means "try here, then there"; waiting is the
-exception you opt into, and a tier that waits by default would send traffic to a paid cloud
-only after a delay nobody asked for -- or, worse, make a cheap tier look slow.
+C<wait_ms> defaults to B<0> on every tier but the last. Writing tiers means "try here, then
+there"; waiting is the exception you opt into, and a tier that waits by default would send
+traffic to a paid cloud only after a delay nobody asked for -- or, worse, make a cheap tier look
+slow. The last tier has nowhere to fall through to, so without its own C<wait_ms> it waits
+L</route_wait_timeout_ms>, like a model without an alias: a saturated alias then answers C<429>
+no sooner than its raw model name would. Write C<wait_ms: 0> on the last tier to refuse at once.
 
 =head2 set_policy
 
@@ -4999,6 +5603,58 @@ of their own.
 Turns a policy spec into the immutable form routing uses: C<models> (or C<aliases>) becomes a
 lookup hash of the requested model names the key may ask for, absent meaning all of them, and
 C<deny_tags> becomes a normalized tag list.
+
+=head2 capabilities
+
+  my @can = Langertha::Skeid->capabilities;   # ('documents', 'node_files', ...)
+
+Names of what this Skeid can do that a deployment may have to check before it relies on it --
+a downstream deployment gates its config on them (C<skeid capabilities> prints them, one per
+line). A name is added when its feature ships and never removed or renamed:
+
+=over 4
+
+=item * C<documents> -- nodes of kind C<documents> and the documents routes (ADR 0028)
+
+=item * C<ollama_embed> -- C</api/embed> and C</api/embeddings>
+
+=item * C<node_files> -- C<node_files>, nodes from less trusted files (ADR 0031)
+
+=item * C<key_rate> -- C<rate> in a policy or C<keys> entry
+
+=item * C<customer_source_rate> -- C<customer_source.rate_column>
+
+=item * C<usage_contract> -- C<finish_reason>, C<ttft_ms>, C<correlation_id> on usage events
+
+=item * C<usage_purge> -- C<POST /skeid/usage/purge>, C<skeid usage-purge>, C<retention_days>
+
+=item * C<openbao_token_file> -- C<OPENBAO_TOKEN_FILE> for the OpenBao key broker
+
+=item * C<catch_all> -- C<routing.catch_all> and C<routed_model> on usage events (ADR 0033)
+
+=back
+
+=head2 rate_admit
+
+  my $answer = $skeid->rate_admit($api_key_id);
+  # { ok => 1 }  or  { ok => 0, retry_after => 2 }
+
+Takes one request from the request budget of a customer key (skeid k125): the C<rate> of its
+policy (see L</Per-Key Routing Policy>). A key whose policy has no C<rate> is always admitted.
+Two token buckets, C<per_s> with C<burst> and C<per_min>, both must hold a token. A key is its
+own bucket when C<client_auth> is on or the key has a C<keys> entry; otherwise -- any string
+would be a key -- all such callers share one bucket, keyed C<''>. Kept in memory
+per process; like C<max_conns> the rate is divided among the processes that share the
+deployment (C<worker_count> times C<frontend_count>), with at least one token of burst each.
+C<retry_after> is the whole seconds until a token is back, at least 1.
+
+=head2 key_metrics
+
+  my $keys = $skeid->key_metrics;
+  # { 'k_5f0e...' => { rate_limited => 3 } }
+
+Per customer key id, the requests this process refused for the key's C<rate> since it started
+(C<''> is a request without a key). Served by C<GET /skeid/metrics/keys>.
 
 =head2 key_id_for_key
 
@@ -5072,6 +5728,18 @@ it is the prefix of, as in C<client_auth>; C<anonymous> is assigned nothing.
 
 Every MCP server assigned to this customer key id, relayed and C<stdio> ones alike. Empty for a
 key with no assignment and while the gateway is off.
+
+=head2 catch_all_target
+
+  my $target = $skeid->catch_all_target($requested_model, 'chat');
+
+The catch-all target (C<routing.catch_all>, ADR 0033) an unknown model name is routed to on a
+route of that kind -- C<chat> or C<embeddings>, the kind of the B<route>, not a node kind -- or
+nothing when the request is not bent: no catch-all is set for the kind, or the name is known. A
+name is known when it is an alias or the C<model> of a chat-kind node, whatever the node's health
+and whatever a key may reach; a chat-kind node without a C<model> makes every name known. An
+empty or missing name is unknown. The target is returned as configured and is not looked up
+again: a caller routes it like a name the client sent.
 
 =head2 route_plan
 
@@ -5310,13 +5978,19 @@ Add a function here rather than reaching into the object from the app.
 
 =item * L<Langertha::Skeid::Proxy> -- the HTTP application on top of this control plane, and its routes
 
-=item * L<skeid> -- C<serve>, C<usage> and C<keyid>
+=item * L<skeid> -- C<serve>, C<usage>, C<usage-purge>, C<capabilities> and C<keyid>
 
 =item * L<Langertha::Skeid::CapacityProbe> -- node capacity probes
 
 =item * L<Langertha::Skeid::UsageStore> -- where usage events go
 
 =item * L<Langertha::Skeid::KeyBroker> -- resolving a node's C<api_key_ref>
+
+=item * L<Langertha::Skeid::NodeFiles> -- the checks on nodes from C<node_files>
+
+=item * L<Langertha::Skeid::Rate> -- the shape of a key's C<rate>
+
+=item * L<Langertha::Skeid::CustomerSource> -- customer keys from a database relation
 
 =item * L<Langertha::Skeid::Registry> -- the signed Skeid-to-Skeid snapshot
 
@@ -5328,7 +6002,7 @@ Add a function here rather than reaching into the object from the app.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-skeid/issues>.
 
 =head2 IRC
@@ -5341,11 +6015,11 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

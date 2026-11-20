@@ -1,5 +1,62 @@
 Revision history for Langertha-Holmgang
 
+0.002     2026-11-19 18:21:03Z
+  - cpanfile declares the core modules the code loads but did not list:
+    Archive::Tar, File::Temp, JSON::PP, Text::ParseWords
+  - Scenarios: a case may carry scenario (an id of [a-z0-9-]); cases with
+    the same scenario are variants of one task. The report keeps the field,
+    and every verdict of a suite with scenarios carries scenarios
+    { total, solved, rate, unsolved }: a scenario is solved only when every
+    variant passed in all k repetitions (AppWorld's scenario goal
+    completion). The text notes it per suite; it does not decide ok
+  - journald speaks about itself: journalctl -u systemd-journald shows at
+    the boot time "Journal started" and "Runtime Journal (/run/log/journal/
+    ID) is …, max …, … free." (or "System Journal" in /var), and a restart
+    logs the new process's journal with its limit and the flush, after
+    "Started". journalctl --header lists path, state and time span of every
+    journal file; -t, SYSLOG_IDENTIFIER=, _COMM= (cut to 15 characters as
+    the kernel does) and _SYSTEMD_UNIT= filter by sender. --list-boots
+    starts at the boot time, as uptime -s
+  - RouterOS simulator: /ip pool used lists the addresses the DHCP leases
+    hold in their server's pool (print, where, count-only; read only)
+  - Monitoring simulator: Prometheus answers /api/v1/targets (static
+    targets of the running configuration; health from the service's
+    scrape_health or the connection probe) and /api/v1/query for a single
+    selector, optionally with time() - before and a comparison after it
+    (up from the targets, other series only from the service's metrics).
+    Alertmanager answers /api/v2/alerts, /api/v2/silences and
+    /api/v2/receivers from the same data amtool uses. Anything else stays
+    a gap
+  - Shell filters: python3 -m json.tool behind a pipe formats JSON like
+    the real module (key order kept, indent 4, \uXXXX), without a sandbox
+  - PostgreSQL simulator: the near relatives of the slot query answer truly
+    instead of ending as a gap -- plugin, database and confirmed_flush_lsn
+    of a physical slot are NULL, a WAL difference to a NULL LSN is NULL,
+    pg_stat_replication is empty while no slot is active, DROP REPLICATION
+    SLOT is the syntax error of an SQL session, and psql takes -Atc
+  - A wget that no observation matches is answered from the case's curl
+    observation for the same request, in wget's words, when the document
+    goes to standard output (wget -qO- URL). Before, such a call fell
+    through to the simulator and could get "Connection refused" for a
+    service the case describes as running (ADR 0013)
+  - Linux simulator: the world is closed on a device's own network. An
+    address in a directly connected network that no device carries and the
+    state names nowhere does not exist: /dev/tcp, nc, wget and curl fail
+    with "No route to host" and ping with "Destination Host Unreachable",
+    without a sim_gap. Named addresses and everything beyond a gateway
+    answer as before. A device reaches its own networks even when the
+    case lists no routes (ADR 0012)
+  - `holmgang run --sandbox docker|podman [--sandbox-image IMAGE]`: a real
+    program the Linux simulator does not model (python3 -c, perl -e, an awk
+    script past the filter grammar) runs in a locked-down container on a
+    copy of the device's files instead of ending as a sim_gap; what it wrote
+    comes back into the state. Opt-in per run, never in loading or lint
+    (ADR 0011). New: Langertha::Holmgang::Sandbox::Docker, the image in
+    share/sandbox/Dockerfile
+  - A call whose programs ran for real carries `sandbox` in the report, and
+    `generator.sandbox` names runtime, image and image id; both only when a
+    sandbox was used
+
 0.001     2026-11-17 03:22:26Z
   - Initial release
   - Deterministic tool-use benchmarks for language models: a case gives the

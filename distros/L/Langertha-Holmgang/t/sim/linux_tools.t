@@ -89,7 +89,8 @@ sub sh {
     ok( !$ok, 'unbekannte Option' );
     is( $o, "journalctl: unrecognized option '--no-legend'", '... Meldung wie journalctl' );
     like( sh('journalctl -n 1'), qr/\AOct 20 14:00:00 srv /, 'Journal reicht so weit wie seine Dateien' );
-    like( sh('journalctl --list-boots'), qr/\A 0 [0-9a-f]{32} Tue 2026-10-20 14:00:00 CEST\x{2014}Tue 2026-10-20 14:00:00 CEST\z/, '--list-boots' );
+    # der Start beginnt mit der Startmeldung von journald zur Startzeit (wie uptime -s), nicht mit der ersten Dateizeile
+    like( sh('journalctl --list-boots'), qr/\A 0 [0-9a-f]{32} Tue 2026-10-20 09:00:00 CEST\x{2014}Tue 2026-10-20 14:00:00 CEST\z/, '--list-boots' );
     like( sh('journalctl -n 1 -o short-iso'), qr/\A2026-10-20T14:00:00\+0200 srv /, '-o short-iso' );
     is( sh('journalctl --since 2026-10-21'), '-- No entries --', '--since' );
     ( $o, $ok ) = sh('journalctl --since gestern');

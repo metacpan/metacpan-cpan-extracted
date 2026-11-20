@@ -9,7 +9,7 @@ use Digest::SHA ();
 use Encode ();
 use JSON::MaybeXS ();
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 our @GAPS;
@@ -1810,7 +1810,7 @@ Langertha::Holmgang::Sim::Linux::Git - git on simulated Linux hosts — working 
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

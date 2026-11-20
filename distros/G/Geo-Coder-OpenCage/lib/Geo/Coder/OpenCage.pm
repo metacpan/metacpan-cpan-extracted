@@ -1,6 +1,6 @@
-package Geo::Coder::OpenCage;
+package Geo::Coder::OpenCage 0.44;
 # ABSTRACT: Geocode coordinates and addresses with the OpenCage Geocoding API
-$Geo::Coder::OpenCage::VERSION = '0.43';
+
 use strict;
 use warnings;
 
@@ -9,6 +9,7 @@ use HTTP::Tiny;
 use JSON::MaybeXS;
 use Scalar::Util 'blessed';
 use URI;
+use URI::QueryParam;
 
 my $version = our $VERSION || 'dev';
 my $ua_string = "Geo::Coder::OpenCage/$version";
@@ -20,11 +21,13 @@ sub new {
         croak "api_key is a required parameter for new()";
     }
 
-    my $ua = $params{ua} || HTTP::Tiny->new(timeout => 10);
+    # verify_SSL because HTTP::Tiny's default was off before 0.083
+    my $ua = $params{ua} || HTTP::Tiny->new(timeout => 10, verify_SSL => 1);
     $ua->agent($ua_string);
     my $api_url = 'https://api.opencagedata.com/geocode/v1/json';
     
     if (defined($params{http}) && $params{http} eq '1') {
+        # verify_SSL has no effect when the protocol isn't https
         $api_url =~ s|^https://|http://|;
     }
     my $self = {
@@ -82,7 +85,7 @@ sub geocode {
 
     foreach my $k (keys %params) {
         if (!exists($valid_params{$k})) {
-            carp "Unknown geocode parameter: $k";
+            carp "Unknown geocode parameter: " . ($k =~ s/[[:cntrl:]]//gr);
             delete $params{$k};
         } elsif ($valid_params{$k} == 0) { # is a real parameter but we dont support it
             carp "Unsupported geocode parameter: $k";
@@ -107,6 +110,12 @@ sub geocode {
     my $content    = $is_lwp ? $response->decoded_content() : $response->{content};
     my $is_success = $is_lwp ? $response->is_success()      : $response->{success};
 
+    if (my $error = _transport_error($response, $is_lwp)) {
+        $error =~ s/[[:cntrl:]]//g;
+        carp "request to '" . $self->_sanitized_url($URL) . "' failed: $error";
+        return;
+    }
+
     my $rh_content;
     my $ok = eval { $rh_content = $self->{json}->decode($content); 1 };
     if (!$ok) {
@@ -115,8 +124,13 @@ sub geocode {
         return;
     }
 
+    if (ref($rh_content) ne 'HASH') {
+        carp "unexpected response from '" . $self->_sanitized_url($URL) . "': not a JSON object";
+        return;
+    }
+
     if (!$is_success) {
-        my $status = $rh_content->{status} || {};
+        my $status = ref($rh_content->{status}) eq 'HASH' ? $rh_content->{status} : {};
         # Cleanup server-supplied strings, e.g. new-lines
         my $code = ($status->{code}    // '?')             =~ s/[[:cntrl:]]//gr;
         my $msg  = ($status->{message} // 'unknown error') =~ s/[[:cntrl:]]//gr;
@@ -129,9 +143,22 @@ sub geocode {
 # mask the API key in a URL before logging, so it doesn't leak into stderr
 sub _sanitized_url {
     my ($self, $url) = @_;
-    my $masked = substr($self->{api_key}, 0, 6) . '...';
-    (my $str = "$url") =~ s/\Q$self->{api_key}\E/$masked/g;
-    return $str;
+    my $masked = $url->clone;
+    $masked->query_param(key => substr($self->{api_key}, 0, 6) . '...');
+    return $masked->as_string;
+}
+
+# the HTTP client's error message if no response arrived (connection, TLS, timeout)
+sub _transport_error {
+    my ($response, $is_lwp) = @_;
+    if ($is_lwp) {
+        my $warning = $response->header('Client-Warning') // '';
+        return $response->status_line if $warning eq 'Internal response';
+    }
+    elsif (($response->{status} // 0) == 599) {
+        return $response->{content};
+    }
+    return;
 }
 
 sub reverse_geocode {
@@ -162,7 +189,7 @@ Geo::Coder::OpenCage - Geocode coordinates and addresses with the OpenCage Geoco
 
 =head1 VERSION
 
-version 0.43
+version 0.44
 
 =head1 SYNOPSIS
 
@@ -220,9 +247,11 @@ specific reason to disable TLS (e.g. debugging via a local proxy).
 =item C<< ua => $user_agent >>
 
 Supply your own UserAgent object instead of the default L<HTTP::Tiny> (which
-is constructed with a 10 second timeout). Useful for things like rate limiting
-(L<LWP::UserAgent::Throttled>) or testing with a mock UA. See L</ua> for
-details on the User-Agent header.
+is constructed with a 10 second timeout and always verifies TLS certificates,
+even if C<PERL_HTTP_TINY_SSL_INSECURE_BY_DEFAULT> is set). Useful for things
+like rate limiting (L<LWP::UserAgent::Throttled>) or testing with a mock UA.
+A supplied UserAgent is used as it is, including its TLS settings. See L</ua>
+for details on the User-Agent header.
 
 =back
 

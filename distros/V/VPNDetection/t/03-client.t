@@ -772,6 +772,17 @@ subtest 'a member of the wrong type or a null is a retried server_error' => sub 
         ['lookup, a null protocol', 'lookup', { %$lookup, pubproxy => { entry => \1, protocols => [undef] } }],
         ['lookup, an AS number of "9009"', 'lookup', { %$lookup, asn => { asn => '9009', name => 'n', domain => 'd', type => 't', prefix => 'p' } }],
         ['lookup, a location without its country', 'lookup', { %$lookup, location => { continent => 'EU' } }],
+        ['lookup, is_anycast of "yes"', 'lookup', { %$lookup, is_anycast => 'yes' }],
+        ['lookup, a web row without its port', 'lookup', { %$lookup, is_web => \1, web => [{ tls_ok => \1 }] }],
+        ['lookup, web of {}', 'lookup', { %$lookup, is_web => \0, web => {} }],
+        ['lookup, a satellite AS of "14593"', 'lookup', { %$lookup, satellite => { asn => '14593' } }],
+        ['lookup, a latitude of "1.5"', 'lookup', { %$lookup, location => {
+            (map { $_ => '' } qw(continent continent_name country country_name timezone currency_code
+                currency_name currency_symbol flag_emoji flag_unicode)), latitude => '1.5',
+        } }],
+        ['lookup, a company without its name', 'lookup', { %$lookup, company => { domain => 'd' } }],
+        ['lookup, a hostname of 5', 'lookup', { %$lookup, hostname => 5 }],
+        ['lookup, an abuse validated of "yes"', 'lookup', { %$lookup, abuse => { email => 'e', validated => 'yes' } }],
         ['my_ip, a flag of "yes"', 'my_ip', { %$lookup, is_relay => 'yes' }],
         ['my_entitlement, requests of "1"', 'my_entitlement', { %$entitlement, usage => { %{ $entitlement->{usage} }, requests => '1' } }],
         ['my_entitlement, a null CIDR', 'my_entitlement', { %$entitlement, apikey => { %{ $entitlement->{apikey} }, allowed_cidrs => [undef] } }],

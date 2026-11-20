@@ -1,6 +1,8 @@
 requires 'perl', '5.010';
 
 requires 'JSON::PP', '2.00';
+requires 'File::Spec', '0';
+requires 'Math::BigInt', '0';
 
 # Used by the installed bin/ tools to fetch IRDB CSV files.
 requires 'HTTP::Tiny', '0.017';

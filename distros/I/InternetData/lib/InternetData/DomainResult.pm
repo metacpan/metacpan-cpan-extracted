@@ -5,11 +5,11 @@ use warnings;
 
 use Carp ();
 
-our $VERSION = '1.16.1';
+our $VERSION = '1.17.0';
 
 our @FLAGS = qw(is_registered is_disposable has_a has_aaaa has_mx has_ns has_cname);
 # Copied as served, and paid: absent from an answer whose plan leaves them out.
-our @MEMBERS = qw(dns ip_ranges disposable);
+our @MEMBERS = qw(dns hosting cohosted_domains ip_ranges disposable web redirects backlinks);
 our @MARKERS = qw(trial_expired cap_reached);
 
 my %KNOWN = map { $_ => 1 } 'domain', @FLAGS, @MEMBERS, @MARKERS;
@@ -89,6 +89,20 @@ them.
 Paid: the records themselves (C<a>, C<aaaa>, C<mx>, C<ns> and C<cname>, each an
 array reference), and the IP ranges its organization holds. C<undef> when your
 plan omits them.
+
+=head2 hosting, cohosted_domains
+
+Paid: each address in C<dns.a> and then C<dns.aaaa> with the network announcing
+it (C<< $domain->hosting->[0]{asn}{name} >>), and the other registered domains
+on its first IPv4 address (C<ip>, C<total> and up to 10 C<domains>, the most
+popular first). C<undef> when your plan omits them.
+
+=head2 web, redirects, backlinks
+
+Paid: what our crawl last read of its home page (C<url>, C<title>,
+C<description>, C<last_seen> and the external hosts it C<links> to), and the
+registered domains whose home page redirects or links to it (C<total> and up to
+10 C<domains>, the most popular first). C<undef> when your plan omits them.
 
 =head2 trial_expired
 

@@ -3,9 +3,10 @@
 # modify it under the same terms as Perl itself.
 
 package Convert::ASN1;
-$Convert::ASN1::VERSION = '0.36';
+$Convert::ASN1::VERSION = '0.37';
 use strict;
 use warnings;
+use Scalar::Util 'blessed';
 
 BEGIN {
   unless (CHECK_UTF8) {
@@ -86,10 +87,34 @@ sub _enc_integer {
 # 0      1    2       3     4     5      6
 # $optn, $op, $stash, $var, $buf, $loop, $path
   if (abs($_[3]) >= 2**31) {
-    my $os = i2osp($_[3], ref($_[3]) || $_[0]->{encode_bigint} || 'Math::BigInt');
+    my $biclass = $_[0]->{encode_bigint} || 'Math::BigInt';
+    my $digits;
+    if (blessed($_[3]) && $_[3]->isa($biclass)) {
+        ($digits = "$_[3]") =~ s/^[+-]//;
+        $digits = length $digits;
+    }
+    # size exponent-form strings before the bigint class expands them
+    elsif ("$_[3]" =~ /\A\s*[+-]?0*(\d*)(?:\.(\d*))?(?:[eE]([+-]?\d+))?\s*\z/
+           && (length($1) || (defined($2) && length($2)))) {
+        $digits = length($1) + ($3 || 0);
+    }
+    else {
+        die "INTEGER value is not an integer\n";
+    }
+    my $max = exists $_[0]->{encode_max_int_len}
+                ? $_[0]->{encode_max_int_len}
+                : 1025;
+    die "encode: max_int_len must not be negative\n" if $max < 0;
+    if ($max) {
+        # estimate byte size 0.415 = log(10) / log(256)
+        die "INTEGER too large\n" if int(($digits - 1) * 0.415) > $max + 1;
+    }
+    my $os = i2osp($_[3], blessed($_[3]) || $biclass);
     my $len = length $os;
     my $msb = (vec($os, 0, 8) & 0x80) ? 0 : 255;
     $len++, $os = pack("C",$msb) . $os if $msb xor $_[3] > 0;
+    die "INTEGER too large (length $len exceeds max_int_len $max)\n"
+        if $max && $len > $max;
     $_[4] .= asn_encode_length($len);
     $_[4] .= $os;
   }
@@ -164,6 +189,18 @@ sub _enc_object_id {
 # $optn, $op, $stash, $var, $buf, $loop, $path
 
   my @data = ($_[3] =~ /(\d+)/g);
+
+  # pack "w" is quadratic in arc length, so bound each arc first
+  my $max = exists $_[0]->{encode_max_oid_arc_len}
+              ? $_[0]->{encode_max_oid_arc_len}
+              : 32;
+  die "encode: max_oid_arc_len must not be negative\n" if $max < 0;
+  if ($max) {
+    # any arc of this many digits fits in $max bytes: 2.107 < 7 * log10(2)
+    my $digits = int($max * 2.107);
+    die "OBJECT IDENTIFIER arc too large\n"
+        if grep { length > $digits } @data;
+  }
 
   if ($_[1]->[cTYPE] == opOBJID) {
     if(@data < 2) {

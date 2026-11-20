@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -12,7 +13,7 @@ use Langertha::Skeid;
       $calls++;
       return {
         nodes => [
-          { id => 'dyn', url => 'http://dyn', healthy => 1 },
+          { id => 'dyn', trust => 'internal', url => 'http://dyn', healthy => 1 },
         ],
       };
     },
@@ -28,7 +29,7 @@ use Langertha::Skeid;
   my ($fh, $path) = tempfile();
   print $fh "nodes:\n";
   print $fh "  - id: first\n";
-  print $fh "    url: http://first\n";
+  print $fh "    url: http://first\n    trust: internal\n";
   close $fh;
 
   my $skeid = Langertha::Skeid->new(config_file => $path);
@@ -38,7 +39,7 @@ use Langertha::Skeid;
   open my $out, '>', $path or die $!;
   print $out "nodes:\n";
   print $out "  - id: second\n";
-  print $out "    url: http://second\n";
+  print $out "    url: http://second\n    trust: internal\n";
   close $out;
 
   $skeid->call_function('nodes.list', {});

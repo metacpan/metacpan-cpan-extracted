@@ -1,5 +1,5 @@
 package Langertha::Skeid::CapacityProbe::Prometheus;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 # ABSTRACT: Capacity probe reading vLLM/SGLang/TGI Prometheus metrics
 use Moo;
 use Mojo::UserAgent;
@@ -159,7 +159,7 @@ Langertha::Skeid::CapacityProbe::Prometheus - Capacity probe reading vLLM/SGLang
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -168,6 +168,7 @@ version 0.004
       url: http://gpu-1:8000/v1
       model: qwen3-32b
       max_conns: 32
+      trust: internal
       capacity:
         probe: prometheus
         url: http://gpu-1:8000/metrics
@@ -231,7 +232,7 @@ L<Langertha::Skeid::CapacityProbe>, and ADR 0009 in the distribution repository.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-skeid/issues>.
 
 =head2 IRC
@@ -244,11 +245,11 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

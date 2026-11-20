@@ -1,5 +1,5 @@
 package Langertha::Skeid::UsageStore::JsonLog;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 # ABSTRACT: Append-only JSON usage store - one file per event, or one line per event
 use Moo;
 use strict;
@@ -143,16 +143,106 @@ sub store {
   my $id = _event_id();
   my $json = encode_json({ %$event, id => $id });
   my $path = $self->path;
-  open my $fh, '>>', $path or return { ok => 0, error => "Cannot append $path: $!" };
-  unless (flock($fh, LOCK_EX)) {
-    my $error = _io_error('lock', $path, "$!");
+  my $fh;
+  # A purge replaces the file by renaming a rewritten copy over it, under this same lock. An
+  # append that opened the old file and waited for the lock would write into the replaced file
+  # and be lost, so after the lock it checks that it still holds the file at $path.
+  for (1 .. $CREATE_ATTEMPTS) {
+    open $fh, '>>', $path or return { ok => 0, error => "Cannot append $path: $!" };
+    unless (flock($fh, LOCK_EX)) {
+      my $error = _io_error('lock', $path, "$!");
+      close $fh;
+      return { ok => 0, error => $error };
+    }
+    my @held = stat $fh;
+    my @now  = stat $path;
+    last if @now && $held[0] == $now[0] && $held[1] == $now[1];
     close $fh;
-    return { ok => 0, error => $error };
+    undef $fh;
   }
+  return { ok => 0, error => "Cannot append $path: it was replaced while waiting for the lock" } unless $fh;
   my $error = _write_and_close($self, $fh, $path, $json, 'append');
   return { ok => 0, error => $error } if $error;
 
   return { ok => 1, id => $id };
+}
+
+
+sub purge {
+  my ($self, $request) = @_;
+  my $matches = sub {
+    my ($ev) = @_;
+    return 0 unless ref($ev) eq 'HASH';
+    if (my $ids = $request->{api_key_ids}) {
+      my $id = $ev->{api_key_id} // '';
+      return 0 unless grep { $_ eq $id } @$ids;
+    }
+    return 0 if defined($request->{before}) && !(($ev->{created_at} // '') lt $request->{before});
+    return 1;
+  };
+
+  if ($self->mode eq 'dir') {
+    my ($matched, $deleted) = (0, 0);
+    for my $file (sort glob(File::Spec->catfile($self->path, '*.json'))) {
+      my $text = eval { Langertha::Skeid::UsageStore::read_text_file($file) };
+      next unless defined $text;
+      my $ev = eval { decode_json($text) };
+      next unless $matches->($ev);
+      $matched++;
+      next if $request->{dry_run};
+      unlink($file) or return { ok => 0, error => "Cannot remove $file: $!", matched => $matched, deleted => $deleted };
+      $deleted++;
+    }
+    return { ok => 1, matched => $matched, deleted => $deleted };
+  }
+
+  my $path = $self->path;
+  return { ok => 1, matched => 0, deleted => 0 } unless -e $path;
+  # The lock must be on the file at $path: another purge may have renamed a rewritten copy over
+  # it while this one waited, and a lock on the replaced file guards nothing.
+  my $lock;
+  for (1 .. $CREATE_ATTEMPTS) {
+    open $lock, '>>', $path or return { ok => 0, error => "Cannot open $path: $!" };
+    flock($lock, LOCK_EX) or return { ok => 0, error => _io_error('lock', $path, "$!") };
+    my @held = stat $lock;
+    my @now  = stat $path;
+    last if @now && $held[0] == $now[0] && $held[1] == $now[1];
+    close $lock;
+    undef $lock;
+  }
+  return { ok => 0, error => "Cannot purge $path: it kept being replaced" } unless $lock;
+  my $mode = (stat $lock)[2] & 07777;
+  open my $in, '<', $path or return { ok => 0, error => "Cannot read $path: $!" };
+  my ($matched, @keep) = (0);
+  while (my $line = <$in>) {
+    my $text = $line;
+    chomp $text;
+    my $ev = length($text) ? eval { decode_json($text) } : undef;
+    if ($matches->($ev)) { $matched++; next }
+    push @keep, $line;
+  }
+  close $in;
+  return { ok => 1, matched => $matched, deleted => 0 } if $request->{dry_run} || !$matched;
+
+  my $tmp = "$path.purge-$$";
+  # The rewritten file keeps the old one's permissions: a 0600 usage log stays 0600.
+  sysopen(my $out, $tmp, O_WRONLY | O_CREAT | O_EXCL, 0600)
+    or return { ok => 0, error => "Cannot write $tmp: $!" };
+  chmod $mode, $tmp;
+  my $error;
+  print {$out} @keep or $error = _io_error('write', $tmp, "$!");
+  if (!$error && $self->fsync) {
+    ($out->flush && $out->sync) or $error = _io_error('sync', $tmp, "$!");
+  }
+  close($out) or $error ||= _io_error('close', $tmp, "$!");
+  if ($error) { unlink $tmp; return { ok => 0, error => $error } }
+  unless (rename $tmp, $path) {
+    my $err = "Cannot replace $path: $!";
+    unlink $tmp;
+    return { ok => 0, error => $err };
+  }
+  close $lock;
+  return { ok => 1, matched => $matched, deleted => $matched };
 }
 
 
@@ -250,6 +340,7 @@ sub report {
         id => ($_->{id} // ''), created_at => ($_->{created_at} // ''), api_format => ($_->{api_format} // ''),
         endpoint => ($_->{endpoint} // ''), api_key_id => ($_->{api_key_id} // ''), model => ($_->{model} // ''),
         requested_model => ($_->{requested_model} // $_->{model} // ''),
+        (defined($_->{routed_model}) && length($_->{routed_model}) ? (routed_model => $_->{routed_model}) : ()),
         node_id => ($_->{node_id} // ''), status_code => $num->($_->{status_code}), ok => ($_->{ok} ? 1 : 0),
         input_tokens => $num->($_->{input_tokens}), output_tokens => $num->($_->{output_tokens}),
         total_tokens => $num->($_->{total_tokens}), cached_tokens => $num->($_->{cached_tokens}),
@@ -276,7 +367,7 @@ Langertha::Skeid::UsageStore::JsonLog - Append-only JSON usage store - one file 
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 DESCRIPTION
 
@@ -328,6 +419,16 @@ Writes one event and returns C<< { ok => 1, id => $id } >>, or C<< { ok => 0, er
 A write failure is reported, never thrown: losing a usage event must not also fail the request
 that was already served. The proxy logs such an answer at C<error> level as a lost usage event.
 
+=head2 purge
+
+  my $result = $store->purge({ api_key_ids => [ 'k_...' ], dry_run => 1 });
+
+Deletes the events a request from L<Langertha::Skeid::UsageStore/purge_request> matches; see
+L<Langertha::Skeid::UsageStore/The store contract> for the answer. In directory mode each
+matching event's file is removed. In file mode the file is rewritten without them under the
+same lock appends take, to a temporary file renamed over it, so no event appended meanwhile is
+lost and a crash leaves either the old file or the new one. An unreadable line is kept.
+
 =head2 report
 
   my $report = $store->report(\%filters);
@@ -347,7 +448,7 @@ L<Langertha::Skeid::UsageStore>, L<Langertha::Skeid::UsageStore::DBI>
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-skeid/issues>.
 
 =head2 IRC
@@ -360,11 +461,11 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

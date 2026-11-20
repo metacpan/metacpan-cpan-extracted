@@ -6,7 +6,7 @@ use namespace::autoclean;
 
 with 'Langertha::Holmgang::Role::AnswerWorld';
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 our %TOOLS = (
@@ -125,7 +125,7 @@ Langertha::Holmgang::Sim::Roost - The answer world roost — an invented dragon 
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

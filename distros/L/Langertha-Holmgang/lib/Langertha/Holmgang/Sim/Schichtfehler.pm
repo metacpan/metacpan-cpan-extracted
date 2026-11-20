@@ -7,7 +7,7 @@ use utf8;
 
 with 'Langertha::Holmgang::Role::AnswerWorld';
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 our $MAX_SPAN = 30;
@@ -236,7 +236,7 @@ Langertha::Holmgang::Sim::Schichtfehler - The answer world schichtfehler — a w
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

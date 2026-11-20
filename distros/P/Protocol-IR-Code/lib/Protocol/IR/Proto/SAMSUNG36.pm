@@ -2,8 +2,9 @@ package Protocol::IR::Proto::SAMSUNG36;
 use strict;
 use warnings;
 
-our $VERSION = '1.3';
+our $VERSION = '1.5';
 use Protocol::IR::Code;
+use Math::BigInt;
 
 # Protocol::IR::Proto::SAMSUNG36 is the SAMSUNG36 protocol handler (36-bit),
 # ported from IRremoteESP8266 (Copyright David Conran et al., GPLv2,
@@ -33,7 +34,7 @@ sub _parse_int {
         # 36-bit hex strings exceed the 32-bit range that triggers Perl's
         # "portable" warning; the modules here handle them by design.
         no warnings 'portable';
-        return hex($val);
+        return Math::BigInt->from_hex($val);
     }
     return $val + 0;
 }
@@ -61,7 +62,7 @@ sub _reverse_bits {
 # the transmitted 36-bit word.
 sub _encode_data {
     my ($addr, $cmd) = @_;
-    return (($addr & 0xFFFF) * $BLOCK1_SHIFT) + ($cmd & ($BLOCK1_SHIFT - 1));
+    return (Math::BigInt->new($addr & 0xFFFF) * Math::BigInt->new($BLOCK1_SHIFT)) + Math::BigInt->new($cmd & ($BLOCK1_SHIFT - 1));
 }
 
 # decode_raw expects the display form (the "Code" column / IRremoteESP8266
@@ -211,7 +212,7 @@ Protocol::IR::Proto::SAMSUNG36 - SAMSUNG36 protocol handler (36-bit)
 
 =head1 VERSION
 
-version 1.3
+version 1.5
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 # Generated from Makefile.PL using makefilepl2cpanfile
 
-requires 'perl', '5.010';
+requires 'perl', '5.026';
 
 requires 'Carp';
 requires 'Config::Abstraction', '0.38';
@@ -8,7 +8,7 @@ requires 'File::Spec';
 requires 'File::stat';
 requires 'IPC::System::Simple';   # Needed by autodie's :system (via :all)
 requires 'List::Util', '1.33';   # any()
-requires 'Log::Abstraction', '0.26';
+requires 'Log::Abstraction', '0.41';
 requires 'POSIX';
 requires 'Params::Get', '0.13';
 requires 'Readonly';
@@ -37,6 +37,7 @@ on 'test' => sub {
 	requires 'Test::Without::Module';
 	requires 'YAML::XS';
 	recommends 'Test::Memory::Cycle';   # t/function.t skips without it
+	recommends 'Test::Permissions';   # t/edge_cases.t skips one subtest without it
 };
 
 on 'develop' => sub {

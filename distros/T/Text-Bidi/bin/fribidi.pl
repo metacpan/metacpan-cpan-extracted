@@ -57,7 +57,7 @@ fribidi.pl - Convert logical text to visual, via the unicode bidi algorithm
 
 =head1 VERSION
 
-version 3.01
+version 3.02
 
 =head1 SYNOPSIS
 

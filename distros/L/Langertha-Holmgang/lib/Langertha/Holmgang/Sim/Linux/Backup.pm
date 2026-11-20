@@ -10,7 +10,7 @@ use JSON::MaybeXS ();
 use POSIX ();
 use Time::Local ();
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 my $T = JSON::MaybeXS::true();
@@ -624,7 +624,7 @@ Langertha::Holmgang::Sim::Linux::Backup - Backup and restore on a simulated Linu
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

@@ -7,7 +7,7 @@ use Scalar::Util qw( blessed );
 use overload '""' => sub { $_[0]->field.': '.$_[0]->reason }, fallback => 1;
 use namespace::autoclean;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 has field => ( is => 'ro', required => 1 );
 
@@ -41,7 +41,7 @@ Langertha::Holmgang::Error - A loud refusal of input: the field path and the rea
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 DESCRIPTION
 

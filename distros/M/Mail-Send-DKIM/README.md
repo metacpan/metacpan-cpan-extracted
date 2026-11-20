@@ -6,7 +6,7 @@ Mail::Send::DKIM - sign a message with DKIM and hand it to sendmail
 
 ## Version
 
-0.001.0
+0.002.0
 
 ## Synopsis
 
@@ -112,6 +112,9 @@ mail it signs, and the weekly one sends its own report through it.
 - `keydir`
 
     Where the private keys are.  Defaults to `$ENV{DKIM_KEYDIR}`, or `~/dkim`.
+    The value is used as it stands: a relative path is taken from the working
+    directory, and `~` is not expanded - the shell does that, and only when the
+    assignment is written unquoted.
 
 - `selector`
 
@@ -151,6 +154,21 @@ message, sendmail's exit status when it did not, and `1` when sendmail cannot
 be run at all.  The message is normalised to LF first, so nothing that arrived
 with CRLF - signed or passed through unsigned - carries a carriage return to
 the MTA.
+
+### **Log\_Send** $Message, @Arguments
+
+Records in syslog, under the identity `mail-dkim` and the `mail` facility,
+the sender, the recipients and the subject of a message that has been sent.
+The arguments are those given to **send**.  The sender is the address after
+`-f` when there is one, and the address in the `From:` header otherwise.  The
+recipients are the arguments that are not options and, when `-t` was given,
+the addresses in the `To:`, `Cc:` and `Bcc:` headers too.  A value that is
+missing is logged as `-`, and control characters in the subject are replaced
+by spaces so that a message cannot forge a log line.
+
+Returns true when the line was written.  Logging never stands between a message
+and its recipient: a syslog that cannot be reached is a warning, and a false
+return.
 
 ### **From\_Domain** $Message
 

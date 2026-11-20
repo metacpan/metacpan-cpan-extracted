@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -61,7 +62,7 @@ sub app_for {
   return $t;
 }
 
-my $NODES = [ { id => 'n1', url => 'http://127.0.0.1:1/v1', model => 'm' } ];
+my $NODES = [ { id => 'n1', trust => 'internal', url => 'http://127.0.0.1:1/v1', model => 'm' } ];
 
 # --- off: no UI path, no fetch, the document is there ---
 {

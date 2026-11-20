@@ -19,14 +19,14 @@ use Langertha::Holmgang::Target ();
 use Langertha::Holmgang::ToolSchema qw( check_schema );
 use Langertha::Holmgang::World;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 # true constants: the vocabulary of format 2
 our @RULE_KINDS = qw( state unchanged_except calls not_called only_tools check packet login );
 our @MATCHERS   = @Langertha::Holmgang::Expectation::MATCHERS;
 our @MODIFIERS  = @Langertha::Holmgang::Expectation::MODIFIERS;
 our @OPS        = @Langertha::Holmgang::World::OPS;
-our @CASE_KEYS  = qw( id title tags difficulty system messages state observe rules solution
+our @CASE_KEYS  = qw( id title tags difficulty scenario system messages state observe rules solution
   alternatives wrong_solutions temperature max_tokens max_turns source weight );
 our @SUITE_KEYS = qw( format id version title description license defaults source tools topic threshold repeat );
 
@@ -434,6 +434,9 @@ sub case {
   my $difficulty = $data->{difficulty};
   $self->_refuse( $f.': difficulty', 'leicht, mittel or schwer' )
     if defined $difficulty && !grep { $difficulty eq $_ } qw( leicht mittel schwer );
+  my $scenario = $data->{scenario};
+  $self->_refuse( $f.': scenario', 'an id of [a-z0-9-]' )
+    if defined $scenario && ( ref $scenario || $scenario !~ /\A[a-z0-9][a-z0-9-]*\z/ );
 
   my $defaults = $o{defaults} || {};
   my %range = ( temperature => [ 0, 2 ], max_tokens => [ 1, 200_000 ], max_turns => [ 1, 50 ] );
@@ -755,7 +758,7 @@ Langertha::Holmgang::Structure - The shape checks of suite format 2, shared by t
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

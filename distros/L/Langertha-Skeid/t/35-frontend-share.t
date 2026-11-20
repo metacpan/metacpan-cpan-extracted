@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -12,7 +13,7 @@ use Langertha::Skeid;
 # --- default: no divisor, today's behaviour unchanged ---
 {
   my $skeid = Langertha::Skeid->new;
-  $skeid->add_node(id => 'n1', url => 'http://x/v1', model => 'm', max_conns => 8);
+  $skeid->add_node(id => 'n1', trust => 'internal', url => 'http://x/v1', model => 'm', max_conns => 8);
   my $node = $skeid->nodes->[0];
 
   is $skeid->frontend_count, 1, 'one frontend by default -- an existing deployment is unchanged';
@@ -23,7 +24,7 @@ use Langertha::Skeid;
 # --- a frontend divisor partitions max_conns, same as worker_count ---
 {
   my $skeid = Langertha::Skeid->new;
-  $skeid->add_node(id => 'n1', url => 'http://x/v1', model => 'm', max_conns => 8);
+  $skeid->add_node(id => 'n1', trust => 'internal', url => 'http://x/v1', model => 'm', max_conns => 8);
   my $node = $skeid->nodes->[0];
 
   $skeid->frontend_count(2);
@@ -34,14 +35,14 @@ use Langertha::Skeid;
   is $skeid->worker_max_conns($node), 2,
     'an uneven split rounds down: the group of frontends must never exceed what was configured';
 
-  $skeid->add_node(id => 'unlimited', url => 'http://x/v1', model => 'm', max_conns => 0);
+  $skeid->add_node(id => 'unlimited', trust => 'internal', url => 'http://x/v1', model => 'm', max_conns => 0);
   is $skeid->worker_max_conns($skeid->nodes->[-1]), 0, 'unlimited stays unlimited';
 }
 
 # --- what cannot be honoured has to be said out loud at startup ---
 {
   my $skeid = Langertha::Skeid->new(frontend_count => 4);
-  $skeid->add_node(id => 'tiny', url => 'http://x/v1', model => 'm', max_conns => 2);
+  $skeid->add_node(id => 'tiny', trust => 'internal', url => 'http://x/v1', model => 'm', max_conns => 2);
 
   is $skeid->worker_max_conns($skeid->nodes->[0]), 1,
     'a frontend that may admit nothing is a frontend that does nothing, so the floor is 1';
@@ -57,7 +58,7 @@ use Langertha::Skeid;
 # --- admission actually uses the frontend share ---
 {
   my $skeid = Langertha::Skeid->new(frontend_count => 4);
-  $skeid->add_node(id => 'n1', url => 'http://x/v1', model => 'm', max_conns => 8, healthy => 1);
+  $skeid->add_node(id => 'n1', trust => 'internal', url => 'http://x/v1', model => 'm', max_conns => 8, healthy => 1);
 
   ok $skeid->start_request('n1'), 'first request admitted';
   ok $skeid->start_request('n1'), 'second admitted';
@@ -71,7 +72,7 @@ use Langertha::Skeid;
 # --- the two divisors compose: first frontends, then workers ---
 {
   my $skeid = Langertha::Skeid->new(frontend_count => 2, worker_count => 2);
-  $skeid->add_node(id => 'gpu', url => 'http://x/v1', model => 'm', max_conns => 8, healthy => 1);
+  $skeid->add_node(id => 'gpu', trust => 'internal', url => 'http://x/v1', model => 'm', max_conns => 8, healthy => 1);
   my $node = $skeid->nodes->[0];
 
   is $skeid->worker_max_conns($node), 2,
@@ -84,7 +85,7 @@ use Langertha::Skeid;
 
   # The combined divisor is what the warning reports, too.
   $skeid->remove_node('gpu');
-  $skeid->add_node(id => 'tiny', url => 'http://x/v1', model => 'm', max_conns => 3, healthy => 1);
+  $skeid->add_node(id => 'tiny', trust => 'internal', url => 'http://x/v1', model => 'm', max_conns => 3, healthy => 1);
   my $warnings = $skeid->worker_share_warnings;
   is scalar(@$warnings), 1, 'max_conns 3 under 2 x 2 = 4 processes cannot be honoured';
   like $warnings->[0], qr/frontend/, 'and the message names the frontends';
@@ -104,7 +105,7 @@ use Langertha::Skeid;
   ) {
     my ($max, $f, $w, $want) = @$case;
     my $skeid = Langertha::Skeid->new(frontend_count => $f, worker_count => $w);
-    $skeid->add_node(id => 'n', url => 'http://x/v1', model => 'm', max_conns => $max);
+    $skeid->add_node(id => 'n', trust => 'internal', url => 'http://x/v1', model => 'm', max_conns => $max);
     is $skeid->worker_max_conns($skeid->nodes->[0]), $want,
       "max_conns $max across $f frontends x $w workers = $want per process";
   }
@@ -118,7 +119,7 @@ use Langertha::Skeid;
     config_loader => sub {
       return {
         routing => { frontend_count => $frontends },
-        nodes   => [ { id => 'n1', url => 'http://x/v1', model => 'm', max_conns => 8, healthy => 1 } ],
+        nodes   => [ { id => 'n1', trust => 'internal', url => 'http://x/v1', model => 'm', max_conns => 8, healthy => 1 } ],
       };
     },
   );

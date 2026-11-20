@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 my $L = 'Langertha::Holmgang::Sim::Linux';
@@ -311,7 +311,7 @@ Langertha::Holmgang::Sim::Linux::Logrotate - logrotate 3.21 (Debian 12) for the 
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

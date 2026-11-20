@@ -26,120 +26,122 @@ no_index:
 provides:
   Protocol::IR::Code:
     file: lib/Protocol/IR/Code.pm
-    version: '1.3'
+    version: '1.5'
   Protocol::IR::Converter:
     file: lib/Protocol/IR/Converter.pm
-    version: '1.3'
+    version: '1.5'
   Protocol::IR::Format::CSV:
     file: lib/Protocol/IR/Format/CSV.pm
-    version: '1.3'
+    version: '1.5'
   Protocol::IR::Format::JSON:
     file: lib/Protocol/IR/Format/JSON.pm
-    version: '1.3'
+    version: '1.5'
   Protocol::IR::Format::LIRC:
     file: lib/Protocol/IR/Format/LIRC.pm
-    version: '1.3'
+    version: '1.5'
   Protocol::IR::Format::Mode2:
     file: lib/Protocol/IR/Format/Mode2.pm
-    version: '1.3'
+    version: '1.5'
   Protocol::IR::Format::Pronto:
     file: lib/Protocol/IR/Format/Pronto.pm
-    version: '1.3'
+    version: '1.5'
   Protocol::IR::Format::Tasmota:
     file: lib/Protocol/IR/Format/Tasmota.pm
-    version: '1.3'
+    version: '1.5'
   Protocol::IR::Format::Wig:
     file: lib/Protocol/IR/Format/Wig.pm
-    version: '1.3'
+    version: '1.5'
   Protocol::IR::Proto::Aiwa:
     file: lib/Protocol/IR/Proto/Aiwa.pm
-    version: '1.3'
+    version: '1.5'
   Protocol::IR::Proto::Denon:
     file: lib/Protocol/IR/Proto/Denon.pm
-    version: '1.3'
+    version: '1.5'
   Protocol::IR::Proto::Denon1:
     file: lib/Protocol/IR/Proto/Denon.pm
   Protocol::IR::Proto::DenonK:
     file: lib/Protocol/IR/Proto/Denon.pm
   Protocol::IR::Proto::Dish:
     file: lib/Protocol/IR/Proto/Dish.pm
-    version: '1.3'
+    version: '1.5'
   Protocol::IR::Proto::GICable:
     file: lib/Protocol/IR/Proto/GICable.pm
-    version: '1.3'
+    version: '1.5'
   Protocol::IR::Proto::JVC:
     file: lib/Protocol/IR/Proto/JVC.pm
-    version: '1.3'
+    version: '1.5'
   Protocol::IR::Proto::JVC48:
     file: lib/Protocol/IR/Proto/JVC48.pm
-    version: '1.3'
+    version: '1.5'
   Protocol::IR::Proto::MWM:
     file: lib/Protocol/IR/Proto/MWM.pm
-    version: '1.3'
+    version: '1.5'
   Protocol::IR::Proto::Mitsubishi:
     file: lib/Protocol/IR/Proto/Mitsubishi.pm
-    version: '1.3'
+    version: '1.5'
   Protocol::IR::Proto::NEC:
     file: lib/Protocol/IR/Proto/NEC.pm
-    version: '1.3'
+    version: '1.5'
   Protocol::IR::Proto::NEC2:
     file: lib/Protocol/IR/Proto/NEC2.pm
-    version: '1.3'
+    version: '1.5'
   Protocol::IR::Proto::NEC48:
     file: lib/Protocol/IR/Proto/NEC48.pm
-    version: '1.3'
+    version: '1.5'
   Protocol::IR::Proto::NEC482:
     file: lib/Protocol/IR/Proto/NEC482.pm
-    version: '1.3'
+    version: '1.5'
   Protocol::IR::Proto::NECX1:
     file: lib/Protocol/IR/Proto/NECX1.pm
-    version: '1.3'
+    version: '1.5'
   Protocol::IR::Proto::NECX2:
     file: lib/Protocol/IR/Proto/NECX2.pm
-    version: '1.3'
+    version: '1.5'
   Protocol::IR::Proto::Panasonic:
     file: lib/Protocol/IR/Proto/Panasonic.pm
-    version: '1.3'
+    version: '1.5'
   Protocol::IR::Proto::Pioneer:
     file: lib/Protocol/IR/Proto/Pioneer.pm
-    version: '1.3'
+    version: '1.5'
   Protocol::IR::Proto::RC5:
     file: lib/Protocol/IR/Proto/RC5.pm
-    version: '1.3'
+    version: '1.5'
   Protocol::IR::Proto::RC6:
     file: lib/Protocol/IR/Proto/RC6.pm
-    version: '1.3'
+    version: '1.5'
   Protocol::IR::Proto::SAMSUNG:
     file: lib/Protocol/IR/Proto/SAMSUNG.pm
-    version: '1.3'
+    version: '1.5'
   Protocol::IR::Proto::SAMSUNG20:
     file: lib/Protocol/IR/Proto/SAMSUNG20.pm
-    version: '1.3'
+    version: '1.5'
   Protocol::IR::Proto::SAMSUNG36:
     file: lib/Protocol/IR/Proto/SAMSUNG36.pm
-    version: '1.3'
+    version: '1.5'
   Protocol::IR::Proto::Sharp:
     file: lib/Protocol/IR/Proto/Sharp.pm
-    version: '1.3'
+    version: '1.5'
   Protocol::IR::Proto::Sony:
     file: lib/Protocol/IR/Proto/Sony.pm
-    version: '1.3'
+    version: '1.5'
   Protocol::IR::Proto::Sony12:
     file: lib/Protocol/IR/Proto/Sony.pm
-    version: '1.3'
+    version: '1.5'
   Protocol::IR::Proto::Sony15:
     file: lib/Protocol/IR/Proto/Sony.pm
   Protocol::IR::Proto::Sony20:
     file: lib/Protocol/IR/Proto/Sony.pm
 requires:
+  File::Spec: '0'
   HTTP::Tiny: '0.017'
   JSON::PP: '2.00'
+  Math::BigInt: '0'
   perl: '5.010'
 resources:
   bugtracker: https://github.com/bwarden/perl-protocol-ir/issues
   homepage: https://github.com/bwarden/perl-protocol-ir
   repository: https://github.com/bwarden/perl-protocol-ir.git
-version: '1.3'
+version: '1.5'
 x_contributors:
   - 'Brett T. Warden <brett.warden@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

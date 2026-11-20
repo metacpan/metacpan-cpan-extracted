@@ -228,7 +228,7 @@ use FindBin qw($Script $Bin);
 use Getopt::Long qw(GetOptions);
 use Fcntl qw(LOCK_EX LOCK_NB);
 
-our $VERSION = "0.047";
+our $VERSION = "0.048";
 
 my @invoked = ($0, @ARGV);
 my %initial_ENV = %ENV;
@@ -245,8 +245,6 @@ our $maxpatience = undef;
 my $identities = [];
 my $notify = undef;
 my $ver = undef;
-my $deploying_version = 0;
-my $maxdelayrecommended = 0;
 # If $GIT_SSH is used, then $GIT_SSH_COMMAND was ignored (git < 2.3.x) so emulate it for backward compatibility.
 exec sh => -c => $ENV{GIT_SSH_COMMAND}.' "$@"' => ssh => @ARGV or die "exec: $!\n" if $0 eq($ENV{GIT_SSH}||"") and $ENV{GIT_SSH_COMMAND}||="ssh";
 Getopt::Long::Configure("no_ignore_case");
@@ -263,6 +261,10 @@ GetOptions
     "max-delay=i" => \$maxpatience,
     "identity|i=s@" => $identities,
     or exec perldoc => $0;
+
+my $deploying_version = undef;
+my $quick_pull = 0;
+my $maxdelayrecommended = 0;
 
 $ENV{HOME} ||= [getpwnuid $<]->[7];
 if (my $sep = eval { require Config; $Config::Config{path_sep} }) {
@@ -338,7 +340,7 @@ if (my $full = abs_path $0) {
 }
 
 if ($ver) {
-    print "[git-deploy v$VERSION] ";
+    print "[$Script v$VERSION] ";
     exec "git --version" or die "Unable to view git --version";
 }
 
@@ -463,11 +465,12 @@ sub push_notify {
 # Pull new changes or else block waiting until the next push before updating.
 sub pull_push_notification {
     my $deploy_branch = checkout_branch();
+    my $deploy_patience = $quick_pull ? 1 : $maxpatience;
     # Generate XMODIFIERS based on checkout_branch and $maxpatience and $opts:
     $ENV{XMODIFIERS} = join "\n", @$opts,
         "pull_branch=$deploy_branch",
         "client=".abs_path($invoked[0])."\@v$VERSION",
-        ($maxpatience ? ("deploy_patience=$maxpatience") : ()),
+        ($deploy_patience ? ("deploy_patience=$deploy_patience") : ()),
         ($initial_ENV{XMODIFIERS} ? ($initial_ENV{XMODIFIERS}) : ()),
         ;
     # Generate GIT_SSH_COMMAND to ensure XMODIFIERS is provided to the git server:
@@ -477,10 +480,15 @@ sub pull_push_notification {
         $ENV{GIT_SSH_COMMAND} .= " -o IdentitiesOnly=yes";
         $ENV{GIT_SSH_COMMAND} .= " -i $_" foreach @$identities;
     }
-    local $ENV{GIT_SSH} = $invoked[0]; # Use $GIT_SSH in case $GIT_SSH_COMMAND is ignored.
-    $0 = "$Script - $cwd: Waiting for push notification [$deploy_branch]";
+    $ENV{GIT_SSH} = $invoked[0]; # Use $GIT_SSH in case $GIT_SSH_COMMAND is ignored.
+    $0 = "$Script - $cwd: Waiting for "
+        .(!defined $deploying_version ? "git server deploy support pre-check" : $deploying_version ? "push notification v$deploying_version" : "NON-deploy repo updates")
+        ." [$deploy_branch]";
     # Run "fetch" to call "git-upload-pack" causing the git-server to wait for the "push_notification" to release the update:
-    return run_output_include_err(qw[git fetch]);
+    my $update = run_output_include_err(qw[git fetch]);
+    $deploying_version ||= $update =~ / git-server(?: v([\d.]+):)?.*waiting for notification/ ? $1 || "OLD" : 0 or
+        $maxpatience or $maxdelayrecommended ||= warn localtime().": [$$] $Script: Warning: Missing recommended [ --max-delay <INTERVAL_SECONDS> ] for NON-deploy repo: ".run_output_ignore_err("git","config","remote.$origin.url");
+    return $update;
 }
 
 my $cache_agent_pub_file = {};
@@ -666,10 +674,11 @@ if (!$maxpatience) {
     }
 }
 
+my $update = "";
 if (sleep 1) {
     # Run quick pre-flight sanity test before entering loop
-    local $maxpatience = 1;
-    my $update = pull_push_notification;
+    $quick_pull++;
+    $update = pull_push_notification;
     $0 = "$Script - $cwd: Scanning updates";
     die localtime().": [$$] $Script: Fatal crash while attempting to pull from ".run_output_ignore_err("git","config","remote.$origin.url")."\n$update\n\n".localtime().": [$$] $Script: Manual intervention required.\n" if $update =~ /^fatal:/m;
 }
@@ -679,9 +688,6 @@ background if $background;
 sleep 1;
 
 while (1) {
-    my $update = pull_push_notification;
-    $deploying_version ||= $update =~ / git-server(?: v([\d.]+):)?.*waiting for notification/ ? $1 || "OLD" : 0 or
-        $maxpatience or $maxdelayrecommended ||= warn localtime().": [$$] $Script: Warning: Missing recommended [ --max-delay <INTERVAL_SECONDS> ] for NON-deploy repo: ".run_output_ignore_err("git","config","remote.$origin.url");
     my $branch = checkout_branch;
     $update .= run_output_include_err "git", "checkout", $branch;
     $update .= run_output_include_err "git", "rebase", "$origin/$branch";
@@ -727,18 +733,75 @@ while (1) {
         my $running = getps;
         last if $running =~ /\Q$Script - $cwd\E: Waiting/;
         my $monkey = "";
-        $monkey = ": $1" if $update =~ /^M\s+(\S+)/m;
+        my $clean = [];
+        my $report = $update;
+        while ($report =~ s/^M\s+(\S.*)//m) {
+            my $file = $1;
+            if (-f $file) {
+                # XXX: Would it be better to check if the local modifications avoid any conflicts up to the branch tip, and if it's clean, then "autostash" and UNstash to pop the changes back after updating?
+                # XXX: Or is this lazy exact match check good enough? It would be inappropriate for git-deploy to automatically commit any changes teetering in the working directory, but also inapproriate to have merge conflicts left over from autostash and "git stash pop" leaving ugly "<<<<" ">>>>" markers sprayed all over the files.
+                my $diff_tip = run_output_include_err "git", "diff", "$origin/$branch", $file;
+                if ($diff_tip) {
+                    warn $diff_tip;
+                    $monkey = ": $file";
+                }
+                else {
+                    # Monkey file already matches exactly with upstream tip, so safe to clear any changes.
+                    warn localtime().": [$$] $Script: Local file already matches upstream changes [$file]\n";
+                    push @$clean, $file;
+                }
+            }
+            else {
+                $monkey = ": [NON-FILE] $file";
+            }
+        }
+        if (!$monkey and @$clean) {
+            # Looks like every file is safe to update now. (The files will end up being exactly how they already are, so technically they won't actually be modified except for a few nanoseconds, and then the timestamp will update.)
+            warn localtime().": [$$] $Script: Proceeding with rebase since all files already matched upstream ...\n";
+            $0 = "$Script - $cwd: Clearing local modifications: $clean->[0]";
+            my $clear = "";
+            $clear .= run_output_include_err "git", "restore",  @$clean;
+            warn $clear;
+            $update .= $clear;
+            $quick_pull++; # Quickly deploy upstream once "git restore" removes local changes.
+            $0 = "$Script - $cwd: Checking to ensure monkey update was clean";
+            next;
+        }
         $0 = "$Script - $cwd: Waiting because of local modifications$monkey";
-        print run_output_ignore_err qw(sleep 10);
+        print run_output_ignore_err qw(sleep 60);
         $0 = "$Script - $cwd: Checking if changes still exist$monkey";
     }
     elsif ($update =~ /Your branch.*diverged/) {
-        # Rebase can't work if there are local divergents.
+        # Rebase may not succeed cleanly if there are local divergents.
         warn $update;
-        warn localtime().": [$$] $Script: Detected local divergence off [$branch] so doing HARD RESET ...\n";
-        my $hard = "";
-        $hard .= run_output_include_err "git", "checkout", $branch;
-        $hard .= run_output_include_err "git", "reset", "--hard", "$origin/$branch";
+        if ($update =~ /\n(Current.*up.*date|Success.*rebase).*$/im) {
+            warn localtime().": [$$] $Script: Local commits appear to have cleanly leap-frogged to the tip.\n";
+            # Just leave the local commits since they didn't conflict anything. They shouldn't report "diverged" next time.
+            $quick_pull++;
+        }
+        elsif ($update =~ /^CONFLICT(.*\n)+^error:/im) {
+            warn localtime().": [$$] $Script: Detected dangerous local divergence off [$branch] so waiting a moment in case someone is working on it ...\n";
+            $0 = "$Script - $cwd: Waiting one last time before destroying upstream-conflicting local commits";
+            print run_output_include_err qw(sleep 600);
+            $quick_pull++;
+            my $hard = "";
+            $hard .= run_output_include_err "git", "rebase", "$origin/$branch";
+            if ($hard =~ /^(Current.*up.*date|Success.*rebase)/im and $hard !~ /^CONFLICT(.*\n)+^error:/im) {
+                # Everything suddenly looks clean? Great! Let's give it another try.
+                warn $hard;
+                next;
+            }
+            # STILL spewing even after waiting a few minutes for someone to repair it? Just hard reset!
+            warn localtime().": [$$] $Script: Detected dangerous local divergence off [$branch] so doing HARD RESET ...\n";
+            $hard .= run_output_include_err "git", "rebase", "--abort";
+            $hard .= run_output_include_err "git", "checkout", $branch;
+            $hard .= run_output_include_err "git", "reset", "--hard", "$origin/$branch";
+            warn $hard;
+            $update .= $hard;
+        }
+        else {
+            warn localtime().": [$$] $Script: Strange local divergence off [$branch] so manual intervention required ...\n";
+        }
         my $running = getps;
         last if $running =~ /\Q$Script - $cwd\E: Waiting/;
         $0 = "$Script - $cwd: Waiting because of local divergence";
@@ -750,10 +813,10 @@ while (1) {
         my $running = getps;
         last if $running =~ /\Q$Script - $cwd\E: Waiting/;
         my $monkey = "";
-        $monkey = ": $1" if $update =~ /would be overwritten.*\n\s*(\S.*?)\s*\n/;
+        $monkey = ": $1" if $update =~ /would be overwritten.*\n\t(\S.*?)\s*\n/;
         $0 = "$Script - $cwd: Waiting because someone created file locally$monkey";
         print run_output_ignore_err qw(sleep 20);
-        $monkey =~ s/:\s+// and system "mv","-v","-n",$monkey,"$monkey-PLEASE-REMOVE-MANUALLY-CREATED-FILE-FOR-DEPLOY-$$";
+        $monkey =~ s/^:\s+// and 0 == system "mv","-v","-n",$monkey,"$monkey-PLEASE-REMOVE-MANUALLY-CREATED-FILE-FOR-DEPLOY-$$" and $quick_pull++;
         $0 = "$Script - $cwd: Checking if file still exist$monkey";
     }
     elsif ($update =~ m{fatal: Unable to create '(.+?)': File exists.}) {
@@ -767,6 +830,7 @@ while (1) {
             # No other conflicting git process running
             # So lock file is safe enough to be removed
             unlink $broken_lock;
+            $quick_pull++;
         }
         else {
             print run_output_include_err qw(sleep 60);
@@ -784,6 +848,7 @@ while (1) {
             # No other conflicting git process running
             # So rebase progress is safe to be removed
             print run_output_include_err "rm","-rfv",$choked_rebase;
+            $quick_pull++;
         }
         else {
             print run_output_include_err qw(sleep 60);
@@ -803,19 +868,23 @@ while (1) {
         next;
     }
     # If repo isn't via git-server, then we can't rely on the server to regulate any other git-deploy running, so we have to take care of everything ourselves. So either he goes, or I go.
-    warn localtime().": [$$] $Script: Aborting other git-deploy process still running on NON-deploy repo:\n$1\n" and kill TERM => $2 or last if !$deploying_version and getps() =~ /^(\w+\s+(\d+).*\Q$Script - $cwd\E: Waiting.*)/m;
-    # Get out of here if someone is monkeying a local file "error: cannot rebase: You have unstaged changes."
-    warn localtime().": [$$] $Script: Deployable git-server v$deploying_version wants me to leave.\n$update" and last if $deploying_version and $update !~ /rewinding head to replay|fast-forward|but expected|Unpacking objects|Cannot rebase|ecent commit/;
+    warn localtime().": [$$] $Script: Aborting other git-deploy process still running on NON-deploy repo:\n$1\n" and kill TERM => $2 or last if !$deploying_version and getps() =~ /^(\w+\s+(\d+).*\Q$Script - $cwd\E: Waiting.*NON-deploy repo)/m;
+    # Get out of here if nothing was updated after waiting on a deployable server:
+    warn localtime().": [$$] $Script: Deployable git-server v$deploying_version wants me to leave.\n$update" and last if $deploying_version and !$quick_pull and $update !~ /rewinding head to replay|fast-forward|but expected|Unpacking objects|Cannot rebase|ecent commit/;
     if ($update =~ /Current branch.*is up to date/) {
         my $pause_because_done = $deploying_version ? 5 + int(55 * rand()) : ($maxpatience || (305 + int(115 * rand())));
         my $why_wait = $deploying_version ? "since everything had already been deployed ..." : "for NON-deploy repo ...";
         $0 = "$Script - $cwd: Waiting $pause_because_done seconds $why_wait";
         print "Everything was already updated. Sleeping $pause_because_done seconds $why_wait\n";
         print run_output_ignore_err sleep => $pause_because_done;
+        $quick_pull-- if $quick_pull > 0; # Decrement counter, if exists.
     }
     $0 = "$Script - $cwd: Update complete";
     sleep 1;
     rebuild;
+}
+continue {
+    $update = pull_push_notification;
 }
 
 rebuild;

@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -34,7 +35,7 @@ $app->routes->post('/__up/v1/chat/completions' => sub {
     usage => { prompt_tokens => 1, completion_tokens => 1, total_tokens => 2 } });
 });
 my $t = Test::Mojo->new($app);
-$skeid->add_node(id => 'n1', url => $t->ua->server->nb_url->clone->path('/__up/v1')->to_string,
+$skeid->add_node(id => 'n1', trust => 'internal', url => $t->ua->server->nb_url->clone->path('/__up/v1')->to_string,
   model => 'm', engine => 'openaibase', max_conns => 4);
 
 sub row { return (grep { $_->{id} eq 'n1' } @{ $skeid->registry_snapshot->{nodes} })[0] }

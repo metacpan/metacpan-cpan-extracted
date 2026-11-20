@@ -1,5 +1,5 @@
 package Configd::Language;
-$Configd::Language::VERSION = '0.005';
+$Configd::Language::VERSION = '0.007';
 #ABSTRACT: Base class for the languages: how one config file format is read, merged and written back.
 
 use 5.034;
@@ -281,6 +281,8 @@ HEADER
 sub write {
     my ( $self, $file ) = @_;
 
+    $self->take_package_update($file);
+
     my $target = $self->path( $file->{path} );
     my $wanted = $self->header($file) . $self->build($file);
 
@@ -293,6 +295,34 @@ sub write {
     spew( $target, $wanted, $file->{mode}, $file->{owner} );
 
     return 1;
+}
+
+
+sub take_package_update {
+    my ( $self, $file ) = @_;
+
+    my $target   = $self->path( $file->{path} );
+    my $original = $self->fragment_dir($file) . '/00-original';
+    return () unless -f $original;    ## no critic (ValuesAndExpressions::ProhibitFiletest_f) -- whether the file was adopted, not whether it can be read
+
+    my @taken;
+    foreach my $suffixes ( [qw{.dpkg-dist .dpkg-old}], [qw{.rpmnew .rpmsave}] ) {
+        my ( $new_suffix, $old_suffix ) = @$suffixes;
+        my $new = "$target$new_suffix";
+        next unless -f $new;          ## no critic (ValuesAndExpressions::ProhibitFiletest_f) -- whether the package manager left one, which slurp then reads or dies on
+
+        my @was = stat $original;
+        spew( "$original$old_suffix", slurp($original), $was[2] & 0o7777 );
+        chown( $was[4], $was[5], "$original$old_suffix" ) if $> == 0;
+
+        # spew keeps the mode and owner of a file that is already there.
+        spew( $original, slurp($new) );
+        unlink $new or die "Cannot remove $new: $!\n";
+
+        warn "configd: $file->{path}$new_suffix is the new 00-original of $file->{path}, and the one before it is 00-original$old_suffix.\n";
+        push @taken, $new;
+    }
+    return @taken;
 }
 
 
@@ -374,7 +404,7 @@ Configd::Language - Base class for the languages: how one config file format is 
 
 =head1 VERSION
 
-version 0.005
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -446,12 +476,13 @@ point it at contains something it would reject.
 
 =back
 
-What the four here answered:
+What the ones here answered:
 
     postfix     nothing at all                                     -> ours
     opendmarc   Include is not a directive it knows                -> ours
     redis       include of one file; a glob is a fatal error       -> ours
     opendkim    Include of one file; glob refused, directory ignored -> ours
+    ossec       one file for every daemon; include for rules only  -> ours
     chrony      confdir, shipped and supported since 4.0           -> NOT ours
 
 chrony had a language here and lost it.  The fleet's own template was
@@ -734,6 +765,28 @@ changed.
 Written through a temporary file in the same directory and renamed over the
 target, so that a service reading it at that moment sees the old file or the
 new one and never half of either.
+
+=head2 @taken = $language->take_package_update($file)
+
+Make the new version of an adopted file that the package manager left beside
+it the new C<00-original>, and return the paths that it took.
+
+The file that configd generates is not the one that the package installed.  So
+when an upgrade brings a new version of a file that the package marks as
+configuration, dpkg keeps the generated file and writes the new one beside it as
+F<.dpkg-dist>, and rpm writes it as F<.rpmnew>.  Without this, C<00-original>
+stays at the version from the day the file was adopted, and the defaults of
+every later release never reach the service.
+
+The old C<00-original> is kept beside the new one as F<00-original.dpkg-old>,
+or F<00-original.rpmsave>, which C<fragments> leaves out of the merge.  So an
+edit that somebody made to the file before configd adopted it is not lost, but
+it stops taking part: it belongs in a fragment of its own.  The new
+C<00-original> keeps the mode of the old one, for the reason that C<adopt>
+gives.  Each file taken is reported on standard error, which reaches the
+journal of the service when the drop-in runs this.
+
+Does nothing to a file that is not adopted.
 
 =head2 $language->adopt()
 

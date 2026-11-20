@@ -14,6 +14,9 @@ service and handing it all back
 
 use Test::More;
 use Test::Fatal qw{exception};
+use Capture::Tiny();
+use File::Temp();
+use File::Path();
 
 use FindBin::libs;
 
@@ -286,6 +289,62 @@ subtest 'status says whether this is actually in effect' => sub {
         [ '00-original', '50-domain.cf' ],
         'listing the fragments in the order they are merged'
     );
+};
+
+subtest 'a new version from the package becomes the new 00-original' => sub {
+    my $root = scratch();
+    chmod 0o600, "$root/etc/postfix/main.cf";
+    Configd->adopt( 'postfix', root => $root );
+    my $dir = "$root/etc/postfix/main.cf.d";
+    my $was = Configd::Language::slurp("$dir/00-original");
+    fragment( $root, 'main.cf', '50-domain.cf', "mydestination = first.example.com\n" );
+
+    # What dpkg does on an upgrade, because main.cf is no longer what it
+    # installed.
+    Configd::Language::spew( "$root/etc/postfix/main.cf.dpkg-dist", "myhostname = mail.example.com\nmydestination = \$myhostname, localhost\ncompatibility_level = 3.6\n" );
+
+    my ( $err, @changed ) = Capture::Tiny::capture_stderr( sub { Configd->build( 'postfix', root => $root ) } );
+    my $generated = Configd::Language::slurp("$root/etc/postfix/main.cf");
+    like( $generated, qr/^compatibility_level = 3[.]6$/m,            'the generated file has what the new version added' );
+    like( $generated, qr/^mydestination = .*first[.]example[.]com/m, 'and still what the fragments add to it' );
+    ok( scalar( grep { $_ eq '/etc/postfix/main.cf' } @changed ), 'and the build says that it changed' );
+
+    is( Configd::Language::slurp("$dir/00-original.dpkg-old"), $was, 'the old 00-original is kept beside it' );
+    ok( !-e "$root/etc/postfix/main.cf.dpkg-dist", 'the file that dpkg left is taken, not copied' );
+    is( ( stat "$dir/00-original" )[2] & 0o7777,          0o600, 'the new 00-original is as secret as the old one' );
+    is( ( stat "$dir/00-original.dpkg-old" )[2] & 0o7777, 0o600, 'and so is the old one' );
+    like( $err, qr{main[.]cf[.]dpkg-dist is the new 00-original}, 'and it says so, for the journal' );
+
+    my ( $quiet, @again ) = Capture::Tiny::capture_stderr( sub { Configd->build( 'postfix', root => $root ) } );
+    is_deeply( \@again, [], 'the next build changes nothing' );
+    is( $quiet, q{}, 'and says nothing' );
+
+    # rpm names its two files differently.
+    Configd::Language::spew( "$root/etc/postfix/main.cf.rpmnew", "myhostname = mail.example.com\n" );
+    Capture::Tiny::capture_stderr( sub { Configd->build( 'postfix', root => $root ) } );
+    is( Configd::Language::slurp("$dir/00-original"), "myhostname = mail.example.com\n", 'an .rpmnew is taken the same way' );
+    ok( -e "$dir/00-original.rpmsave", 'and the one before it kept as .rpmsave' );
+};
+
+subtest 'a new version beside a file that is not adopted is left alone' => sub {
+    my $root = scratch();
+    Configd::Language::spew( "$root/etc/postfix/main.cf.dpkg-dist", "myhostname = new.example.com\n" );
+    my $language = Configd->language( 'postfix', root => $root );
+    my ($file) = grep { $_->{path} eq '/etc/postfix/main.cf' } $language->files();
+    is_deeply( [ $language->take_package_update($file) ], [], 'nothing is taken' );
+    ok( -e "$root/etc/postfix/main.cf.dpkg-dist", 'and the file stays for whoever adopts it, or for dpkg' );
+};
+
+subtest 'a language that is installed and does not load says why' => sub {
+    my $lib = File::Temp::tempdir( CLEANUP => 1 );
+    File::Path::make_path("$lib/Configd/Language");
+    Configd::Language::spew( "$lib/Configd/Language/brokenlang.pm", "package Configd::Language::brokenlang;\nuse Bogus::Missing::Module;\n1;\n" );
+    local @INC = ( $lib, @INC );
+
+    my $error = exception { Configd->language('brokenlang') };
+    $error //= q{};
+    like( $error, qr/The[ ]language[ ]'brokenlang'[ ]does[ ]not[ ]load/, 'it says that the language is there and does not load' );
+    like( $error, qr{Bogus/Missing/Module[.]pm},                         'and gives the reason of perl' );
 };
 
 subtest 'a language nobody has says so, and says what there is' => sub {

@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -114,13 +115,13 @@ my $skeid = Langertha::Skeid->new(
     };
   },
 );
-$skeid->add_node(id => "n-$_", url => $up, model => $_, max_conns => 4)
+$skeid->add_node(id => "n-$_", trust => 'internal', url => $up, model => $_, max_conns => 4)
   for qw(ok-model bad-model boom-model cut-model errchunk-model ratechunk-model);
-$skeid->add_node(id => "n-$_", url => "http://127.0.0.1:$raw_port{$_}/v1", model => $_, max_conns => 4)
+$skeid->add_node(id => "n-$_", trust => 'internal', url => "http://127.0.0.1:$raw_port{$_}/v1", model => $_, max_conns => 4)
   for keys %raw_port;
-$skeid->add_node(id => 'n-busy', url => $up, model => 'busy-model', max_conns => 1);
-$skeid->add_node(id => 'n-dead', url => "http://127.0.0.1:$dead_port/v1", model => 'dead-model', max_conns => 4);
-$skeid->add_node(id => 'n-forbidden', url => $up, model => 'forbidden-model', max_conns => 4,
+$skeid->add_node(id => 'n-busy', trust => 'internal', url => $up, model => 'busy-model', max_conns => 1);
+$skeid->add_node(id => 'n-dead', trust => 'internal', url => "http://127.0.0.1:$dead_port/v1", model => 'dead-model', max_conns => 4);
+$skeid->add_node(id => 'n-forbidden', trust => 'internal', url => $up, model => 'forbidden-model', max_conns => 4,
   tags => ['forbidden']);
 ok $skeid->start_request('n-busy'), 'occupy the only slot of busy-model';
 

@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -30,7 +31,7 @@ sub engine_sum {
 # --- vLLM ---
 {
   my $skeid = Langertha::Skeid->new;
-  $skeid->add_node(id => 'vllm', url => 'http://gpu/v1', model => 'm');
+  $skeid->add_node(id => 'vllm', trust => 'internal', url => 'http://gpu/v1', model => 'm');
   my $probe = Langertha::Skeid::CapacityProbe::Prometheus->new(skeid => $skeid, node_id => 'vllm');
 
   my $values = $probe->parse_metrics(<<'METRICS');
@@ -68,7 +69,7 @@ METRICS
 # --- SGLang ---
 {
   my $skeid = Langertha::Skeid->new;
-  $skeid->add_node(id => 'sglang', url => 'http://gpu/v1', model => 'm');
+  $skeid->add_node(id => 'sglang', trust => 'internal', url => 'http://gpu/v1', model => 'm');
   my $probe = Langertha::Skeid::CapacityProbe::Prometheus->new(skeid => $skeid, node_id => 'sglang');
 
   my $values = $probe->parse_metrics(<<'METRICS');
@@ -103,7 +104,7 @@ METRICS
 # --- TGI ---
 {
   my $skeid = Langertha::Skeid->new;
-  $skeid->add_node(id => 'tgi', url => 'http://gpu/v1', model => 'm');
+  $skeid->add_node(id => 'tgi', trust => 'internal', url => 'http://gpu/v1', model => 'm');
   my $probe = Langertha::Skeid::CapacityProbe::Prometheus->new(skeid => $skeid, node_id => 'tgi');
 
   my $values = $probe->parse_metrics(<<'METRICS');
@@ -139,7 +140,7 @@ METRICS
 # --- a wrong engine is the same kind of unknown as the wrong URL ---
 {
   my $skeid = Langertha::Skeid->new;
-  $skeid->add_node(id => 'mixed', url => 'http://gpu/v1', model => 'm');
+  $skeid->add_node(id => 'mixed', trust => 'internal', url => 'http://gpu/v1', model => 'm');
   my $probe = Langertha::Skeid::CapacityProbe::Prometheus->new(
     skeid  => $skeid,
     node_id => 'mixed',

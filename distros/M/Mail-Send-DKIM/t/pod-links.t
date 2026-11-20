@@ -35,7 +35,9 @@ sub slurp
 	return $text;
 }
 
-my ($repository) = slurp($MAKEFILE) =~ /'?repository'?\s*=>\s*\{/;
+# The POD links are https URLs, so take the web URL from the repository block
+# rather than the git:// clone URL beside it.
+my ($repository) = slurp($MAKEFILE) =~ /repository\s*=>\s*\{[^}]*?\bweb\s*=>\s*'([^']+)'/;
 ok(defined($repository), 'Makefile.PL names the repository') or BAIL_OUT('no repository URL to compare the links with');
 $repository =~ s{/+$}{};
 

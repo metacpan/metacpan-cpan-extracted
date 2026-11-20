@@ -117,6 +117,7 @@ OpenBao in dev mode.
 |---|---|---|
 | `OPENBAO_ADDR` | broker | default `http://127.0.0.1:8200` |
 | `OPENBAO_ROLE_ID` / `OPENBAO_SECRET_ID` | broker | AppRole credentials; both present ⇒ broker is wired |
+| `OPENBAO_TOKEN_FILE` | broker | instead of AppRole (k127): token from a file a starter keeps current; read at start (missing/empty dies), again on change and every `renew_secs`; never renewed by Skeid; both modes set ⇒ `build_app` dies |
 | `OPENBAO_VERIFY_SSL` | broker | `0` disables TLS verification — dev vault only |
 | `SKEID_ADMIN_API_KEY` | control plane | bearer token for `/skeid/*` |
 | `SKEID_USAGE_DB` | control plane | sqlite path, used only when the config has no `usage_store` |

@@ -1,6 +1,6 @@
 package Suricata::Monitoring;
 
-use 5.006;
+use 5.010;
 use strict;
 use warnings;
 use JSON;
@@ -19,11 +19,11 @@ Suricata::Monitoring - LibreNMS JSON SNMP extend and Nagios style check for Suri
 
 =head1 VERSION
 
-Version 1.0.0
+Version 1.1.0
 
 =cut
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.1.0';
 
 =head1 SYNOPSIS
 
@@ -44,8 +44,8 @@ our $VERSION = '1.0.0';
 
     my $sm=Suricata::Monitoring->new( $args );
     my $returned=$sm->run;
-    $sm->print;
-    exit $returned->{alert};
+    $sm->print_output;
+    exit $returned->{data}{alert};
 
 =head1 METHODS
 
@@ -61,10 +61,12 @@ The only must have is 'files'.
       - value :: 'librenms' or 'nagios'
       - Default :: librenms
 
-    - drop_percent_warn :: Drop percent warning threshold.
+    - drop_percent_warn :: Drop percent warning threshold. In percent, so
+      .75 means 0.75% of packets.
       - Default :: .75
 
-    - drop_percent_crit :: Drop percent critical threshold.
+    - drop_percent_crit :: Drop percent critical threshold. In percent, so
+      1 means 1% of packets.
       - Default :: 1
 
     - error_delta_warn :: Error delta warning threshold. In errors/second.
@@ -120,7 +122,7 @@ sub new {
 	for my $num_arg (@num_args) {
 		if ( defined( $args{$num_arg} ) ) {
 			$self->{$num_arg} = $args{$num_arg};
-			if ( $args{$num_arg} !~ /[0-9\.]+/ ) {
+			if ( $args{$num_arg} !~ /^(?:[0-9]+\.?[0-9]*|\.[0-9]+)$/ ) {
 				confess( '"' . $num_arg . '" with a value of "' . $args{$num_arg} . '" is not numeric' );
 			}
 		}
@@ -315,40 +317,65 @@ sub run {
 	# process error deltas and and look for alerts
 	#
 	#
-	my @totals     = keys( %{ $to_return->{data}{totals} } );
+	# Since Suricata 8.0, eve stats can be configured with "null-values: false", which leaves out
+	# any counter that is zero. So a missing key is treated as 0 for both the current and previous
+	# totals below.
+	my $totals          = $to_return->{data}{totals};
+	my $have_previous   = defined( $previous->{data}{totals} );
+	my $previous_totals = $have_previous ? $previous->{data}{totals} : {};
+
+	# This expects to be ran every 5 minutes, so deltas are divided by this to get per second rates.
+	my $interval = 300;
+
+	# error counters...
+	#   file_store__fs_errors :: errors writing files to disk
+	#   app_layer__error__$proto__gap :: app layer gaps, protos on TCP and UDP get a _tcp suffix
+	#   exception_policy__* :: times a exception policy was applied, meaning a memcap or error was hit
 	my @error_keys = ('file_store__fs_errors');
-	foreach my $item (@totals) {
-		if ( $item =~ /app_layer__error__[a-zA-Z0-9\-\_]+__gap/ ) {
+	foreach my $item ( keys( %{$totals} ) ) {
+		if ( $item =~ /^app_layer__error__[a-zA-Z0-9\-\_]+__gap$/ || $item =~ /^exception_policy__/ ) {
 			push( @error_keys, $item );
 		}
 	}
-	foreach my $item (@error_keys) {
-		my $delta = $previous->{data}{totals}{$item} - $to_return->{data}{totals}{$item};
-		# if less than zero, then it has been restarted or clicked over
-		if ( $delta < 0 ) {
-			$delta = $to_return->{data}{totals}{$item};
-		}
-		$to_return->{data}{totals}{error_delta} = $to_return->{data}{totals}{error_delta} + $delta;
-		# this expects to work in 5 minute increments so convert to errors per second
-		if ( $delta != 0 ) {
-			$to_return->{data}{totals}{error_delta} = $to_return->{data}{totals}{error_delta} + $delta;
-		}
-		if ( $delta >= $self->{error_delta_crit} ) {
-			if ( $to_return->{data}{alert} < 2 ) {
-				$to_return->{data}{alert} = 2;
+	my $error_count = 0;
+	# with no previous totals there is nothing to compute a delta against
+	if ($have_previous) {
+		foreach my $item (@error_keys) {
+			my $current = $totals->{$item} // 0;
+			my $delta   = $current - ( $previous_totals->{$item} // 0 );
+			# if less than zero, then it has been restarted or clicked over
+			if ( $delta < 0 ) {
+				$delta = $current;
 			}
-			push( @alerts, 'CRITICAL - ' . $item . ' has a error delta greater than ' . $self->{error_delta_crit} );
-		} elsif ( $delta >= $self->{error_delta_warn} ) {
-			if ( $to_return->{data}{alert} < 1 ) {
-				$to_return->{data}{alert} = 1;
-			}
-			push( @alerts, 'WARNING - ' . $item . ' has a error delta greater than ' . $self->{error_delta_warn} );
-		}
-	} ## end foreach my $item (@error_keys)
-	# this expects to work in 5 minute increments so convert to errors per second
-	if ( $to_return->{data}{totals}{error_delta} != 0 ) {
-		$to_return->{data}{totals}{error_delta} = $to_return->{data}{totals}{error_delta} / 300;
-	}
+			$error_count = $error_count + $delta;
+
+			my $per_second = $delta / $interval;
+			if ( $per_second >= $self->{error_delta_crit} ) {
+				if ( $to_return->{data}{alert} < 2 ) {
+					$to_return->{data}{alert} = 2;
+				}
+				push( @alerts,
+						  'CRITICAL - '
+						. $item
+						. ' has a error delta of '
+						. $per_second
+						. '/s, greater than '
+						. $self->{error_delta_crit} );
+			} elsif ( $per_second >= $self->{error_delta_warn} ) {
+				if ( $to_return->{data}{alert} < 1 ) {
+					$to_return->{data}{alert} = 1;
+				}
+				push( @alerts,
+						  'WARNING - '
+						. $item
+						. ' has a error delta of '
+						. $per_second
+						. '/s, greater than '
+						. $self->{error_delta_warn} );
+			} ## end elsif ( $per_second >= $self->{error_delta_warn...})
+		} ## end foreach my $item (@error_keys)
+	} ## end if ($have_previous)
+	$to_return->{data}{totals}{error_delta} = $error_count / $interval;
 	if ( $to_return->{data}{totals}{error_delta} >= $self->{error_delta_crit} ) {
 		if ( $to_return->{data}{alert} < 2 ) {
 			$to_return->{data}{alert} = 2;
@@ -374,68 +401,102 @@ sub run {
 	# process drop precent and and look for alerts
 	#
 	#
-	my @drop_keys = ( 'capture__kernel_drops', 'capture__kernel_ifdrops', 'capture__kernel_drops_any' );
-	# if this previous greater than or equal, almost certain it rolled over or restarted, so detla is zero
-	my $delta = $to_return->{data}{totals}{capture__kernel_packets};
-	if ( defined( $previous->{data}{totals}{capture__kernel_packets} ) ) {
-		$delta
-			= $to_return->{data}{totals}{capture__kernel_packets} - $previous->{data}{totals}{capture__kernel_packets};
+	# packet counters, which one is present depends on the capture method...
+	#   capture__kernel_packets :: AF_PACKET, pcap, netmap, nflog, PF_RING
+	#   capture__afxdp_packets :: AF_XDP
+	#   capture__packets :: DPDK
+	#   capture__dag_packets :: DAG
+	#   napa_total__pkts :: Napatech
+	# If none are present, such as with NFQ, fall back to decoder__pkts.
+	my @packet_keys = (
+		'capture__kernel_packets', 'capture__afxdp_packets', 'capture__packets', 'capture__dag_packets',
+		'napa_total__pkts',
+	);
+	# unwanted drops, again depending on the capture method, plus IPS drops caused by errors or
+	# memcaps... drops intentionally caused by rules or config are left out
+	my @drop_keys = (
+		'capture__kernel_drops',                      'capture__kernel_ifdrops',
+		'capture__dag_drops',                         'capture__dpdk__imissed',
+		'capture__dpdk__no_mbufs',                    'napa_total__overflow_drop_pkts',
+		'ips__drop_reason__decode_error',             'ips__drop_reason__defrag_error',
+		'ips__drop_reason__defrag_memcap',            'ips__drop_reason__flow_memcap',
+		'ips__drop_reason__exception_policy_flow_drop', 'ips__drop_reason__stream_error',
+		'ips__drop_reason__stream_memcap',            'ips__drop_reason__stream_reassembly',
+		'ips__drop_reason__applayer_error',           'ips__drop_reason__applayer_memcap',
+		'ips__drop_reason__nfq_error',
+	);
+
+	$totals->{capture__packets_any} = 0;
+	foreach my $item (@packet_keys) {
+		$totals->{capture__packets_any} = $totals->{capture__packets_any} + ( $totals->{$item} // 0 );
 	}
-	$to_return->{data}{totals}{capture__kernel_drops_any} = 0;
-	if (defined($to_return->{data}{totals}{capture__kernel_drops})) {
-		$to_return->{data}{totals}{capture__kernel_drops_any} += $to_return->{data}{totals}{capture__kernel_drops};
+	if ( $totals->{capture__packets_any} == 0 ) {
+		$totals->{capture__packets_any} = $totals->{decoder__pkts} // 0;
 	}
-	if (defined($to_return->{data}{totals}{capture__kernel_ifdrops})) {
-		$to_return->{data}{totals}{capture__kernel_drops_any} += $to_return->{data}{totals}{capture__kernel_ifdrops};
-	}
-	# if delta is 0, then there previous is zero
+	$totals->{capture__kernel_drops_any} = 0;
 	foreach my $item (@drop_keys) {
-		my $drop_delta = 0;
-		if ( $delta > 0 ) {
-			if ( defined( $previous->{data}{totals}{$item} ) ) {
-				$drop_delta = $to_return->{data}{totals}{$item} - $previous->{data}{totals}{$item};
-			} else {
-				$drop_delta = $to_return->{data}{totals}{$item};
+		$totals->{capture__kernel_drops_any} = $totals->{capture__kernel_drops_any} + ( $totals->{$item} // 0 );
+	}
+
+	# If the packet count went backwards, Suricata restarted or it rolled over, so the current
+	# counts are all since then. With no previous totals, the current counts are used as is.
+	my $packets_delta = $totals->{capture__packets_any} - ( $previous_totals->{capture__packets_any} // 0 );
+	my $restarted     = 0;
+	if ( $packets_delta < 0 ) {
+		$restarted     = 1;
+		$packets_delta = $totals->{capture__packets_any};
+	}
+
+	# drop_percent is stored as a fraction, 0.01 being 1%, while the thresholds are in percent
+	my $drop_fraction_warn = $self->{drop_percent_warn} / 100;
+	my $drop_fraction_crit = $self->{drop_percent_crit} / 100;
+	# no packets, nothing to compute a percent against
+	if ( $packets_delta > 0 ) {
+		foreach my $item ( @drop_keys, 'capture__kernel_drops_any' ) {
+			my $drop_delta = $totals->{$item} // 0;
+			if ( !$restarted ) {
+				$drop_delta = $drop_delta - ( $previous_totals->{$item} // 0 );
 			}
-		} else {
-			if (defined($to_return->{data}{totals}{$item})) {
-				# delta is zero, it has restarted or rolled over
-				$drop_delta = $to_return->{data}{totals}{$item};
-			}
-		}
-		if ( $drop_delta > 0 ) {
-			my $drop_percent = $drop_delta / $delta;
-			if ( $to_return->{data}{totals}{drop_percent} < $drop_percent ) {
-				$to_return->{data}{totals}{drop_percent} = $drop_percent;
-			}
-			if ( $drop_percent >= $self->{drop_percent_crit} ) {
-				if ( $to_return->{data}{alert} < 2 ) {
-					$to_return->{data}{alert} = 2;
+			if ( $drop_delta > 0 ) {
+				my $drop_fraction = $drop_delta / $packets_delta;
+				if ( $totals->{drop_percent} < $drop_fraction ) {
+					$totals->{drop_percent} = $drop_fraction;
 				}
-				push( @alerts,
-						  'CRITICAL - '
-						. $item
-						. ' for totals has a drop percent greater than '
-						. $self->{drop_percent_crit} );
-			} elsif ( $drop_percent >= $self->{drop_percent_warn} ) {
-				if ( $to_return->{data}{alert} < 1 ) {
-					$to_return->{data}{alert} = 1;
-				}
-				push( @alerts,
-						  'WARNING - '
-						. $item
-						. ' for totals has a drop percent greater than '
-						. $self->{drop_percent_warn} );
-			} ## end elsif ( $drop_percent >= $self->{drop_percent_warn...})
-		} ## end if ( $drop_delta > 0 )
-	} ## end foreach my $item (@drop_keys)
+				if ( $drop_fraction >= $drop_fraction_crit ) {
+					if ( $to_return->{data}{alert} < 2 ) {
+						$to_return->{data}{alert} = 2;
+					}
+					push( @alerts,
+							  'CRITICAL - '
+							. $item
+							. ' for totals has a drop percent of '
+							. ( $drop_fraction * 100 )
+							. '%, greater than '
+							. $self->{drop_percent_crit}
+							. '%' );
+				} elsif ( $drop_fraction >= $drop_fraction_warn ) {
+					if ( $to_return->{data}{alert} < 1 ) {
+						$to_return->{data}{alert} = 1;
+					}
+					push( @alerts,
+							  'WARNING - '
+							. $item
+							. ' for totals has a drop percent of '
+							. ( $drop_fraction * 100 )
+							. '%, greater than '
+							. $self->{drop_percent_warn}
+							. '%' );
+				} ## end elsif ( $drop_fraction >= $drop_fraction_warn)
+			} ## end if ( $drop_delta > 0 )
+		} ## end foreach my $item ( @drop_keys, 'capture__kernel_drops_any')
+	} ## end if ( $packets_delta > 0 )
 
 	#
 	#
-	# create the error string
+	# create the alert string
 	#
 	#
-	$to_return->{alertString} = join( "\n", @alerts );
+	$to_return->{data}{alertString} = join( "\n", @alerts );
 
 	#
 	#
@@ -463,12 +524,11 @@ sub run {
 		$to_return->{data}{alert} = '3';
 		$to_return->{errorString} = 'Failed to write new cache JSON and SNMP return files.... ' . $@;
 
-		# set the nagious style alert stuff
-		$to_return->{alert} = '3';
+		# put the error first in the alert string so it shows for nagios
 		if ( $to_return->{data}{alertString} eq '' ) {
 			$to_return->{data}{alertString} = $to_return->{errorString};
 		} else {
-			$to_return->{data}{alertString} = $to_return->{errorString} . "\n" . $to_return->{alertString};
+			$to_return->{data}{alertString} = $to_return->{errorString} . "\n" . $to_return->{data}{alertString};
 		}
 	} ## end if ($@)
 
@@ -483,26 +543,47 @@ Prints the output.
 
     $sm->print_output;
 
+For nagios mode, perfdata is included for the following.
+
+    - drop_percent :: Highest drop percent for the totals, in percent.
+    - error_delta :: Total errors per second.
+    - packets :: Total packets, as a counter.
+    - drops :: Total unwanted drops, as a counter.
+
 =cut
 
 sub print_output {
 	my $self = $_[0];
 
 	if ( $self->{mode} eq 'nagios' ) {
-		if ( $self->{results}{alert} eq '0' ) {
-			print "OK - no alerts\n";
-			return;
-		} elsif ( $self->{results}{alert} eq '1' ) {
-			print 'WARNING - ';
-		} elsif ( $self->{results}{alert} eq '2' ) {
-			print 'CRITICAL - ';
-		} elsif ( $self->{results}{alert} eq '3' ) {
-			print 'UNKNOWN - ';
-		}
-		my $alerts = $self->{results}{alertString};
+		my $data         = $self->{results}{data};
+		my %status_names = ( 0 => 'OK', 1 => 'WARNING', 2 => 'CRITICAL', 3 => 'UNKNOWN' );
+		my $status       = $status_names{ $data->{alert} } // 'UNKNOWN';
+
+		my $alerts = $data->{alertString};
 		chomp($alerts);
-		$alerts = s/\n/\, /g;
-		print $alerts. "\n";
+		$alerts =~ s/\n/\, /g;
+		if ( $alerts eq '' ) {
+			$alerts = 'no alerts';
+		}
+
+		# drop_percent is stored as a fraction, so convert it to percent for perfdata
+		my $perfdata
+			= 'drop_percent='
+			. ( $data->{totals}{drop_percent} * 100 ) . '%;'
+			. $self->{drop_percent_warn} . ';'
+			. $self->{drop_percent_crit}
+			. ';0;100'
+			. ' error_delta='
+			. $data->{totals}{error_delta} . ';'
+			. $self->{error_delta_warn} . ';'
+			. $self->{error_delta_crit} . ';0'
+			. ' packets='
+			. ( $data->{totals}{capture__packets_any} // 0 ) . 'c'
+			. ' drops='
+			. ( $data->{totals}{capture__kernel_drops_any} // 0 ) . 'c';
+
+		print $status . ' - ' . $alerts . ' | ' . $perfdata . "\n";
 	} else {
 		print encode_json( $self->{results} ) . "\n";
 	}
@@ -510,11 +591,24 @@ sub print_output {
 
 =head1 LibreNMS HASH
 
-    + $hash{'alert'} :: Alert status.
+    + $hash{data}{alert} :: Alert status.
       - 0 :: OK
       - 1 :: WARNING
       - 2 :: CRITICAL
       - 3 :: UNKNOWN
+
+    + $hash{data}{alertString} :: Newline separated alerts.
+
+    + $hash{data}{totals}{drop_percent} :: Highest drop percent for the
+      totals as a fraction, so 0.01 is 1%.
+
+    + $hash{data}{totals}{error_delta} :: Errors per second.
+
+    + $hash{data}{totals}{capture__packets_any} :: Total packets seen,
+      from whichever capture counter is present.
+
+    + $hash{data}{totals}{capture__kernel_drops_any} :: Total unwanted
+      drops, from capture drop counters and IPS drop reasons.
 
 =head1 AUTHOR
 
@@ -552,19 +646,15 @@ L<https://cpanratings.perl.org/d/Suricata-Monitoring>
 
 L<https://metacpan.org/release/Suricata-Monitoring>
 
-=back
+=item * Git
 
-
-=head * Git
-
-L<git@github.com:VVelox/Suricata-Monitoring.git>
+C<git@github.com:VVelox/Suricata-Monitoring.git>
 
 =item * Web
 
 L<https://github.com/VVelox/Suricata-Monitoring>
 
-=head1 ACKNOWLEDGEMENTS
-
+=back
 
 =head1 LICENSE AND COPYRIGHT
 

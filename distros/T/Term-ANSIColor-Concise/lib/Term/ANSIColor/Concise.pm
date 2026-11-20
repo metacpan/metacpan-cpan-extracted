@@ -2,7 +2,7 @@
 
 package Term::ANSIColor::Concise;
 
-our $VERSION = "3.05";
+our $VERSION = "3.06";
 
 use v5.14;
 use warnings;
@@ -180,6 +180,7 @@ my $colorspec_re = qr{
     | (?<c256>   [0-5][0-5][0-5]         # 216 (6x6x6) colors
              | L([01][0-9]|[2][0-5]) )   # 24 gray levels + B/W
     | (?<c16>  [KRGYBMCWT] )             # 16 colors, and the default
+    | (?<value> V (?<values> :[\d:]*\d ) ) # color by the values after it
     # Effects and controls
     | (?<efct>   ~[DPIUFQSHX]            # ~effect
              | [DPIUFQSHX]:[\d:]*        # effect:style
@@ -253,6 +254,9 @@ sub ansi_numbers {
         }
         elsif ($+{c16}) {
             push @numbers, $numbers{$+{c16}} + $toggle->value;
+        }
+        elsif ($+{value}) {
+            push @numbers, (38 + $toggle->value) . $+{values};
         }
         elsif ($+{efct}) {
             my $efct = uc $+{efct};
@@ -508,7 +512,7 @@ Term::ANSIColor::Concise - Produce ANSI terminal sequence by concise notation
 
 =head1 VERSION
 
-Version 3.05
+Version 3.06
 
 
 =head1 DESCRIPTION
@@ -618,7 +622,7 @@ foreground and background.  So C<R/W> is red text on white.
 Modifiers described in L</COLOR ADJUSTMENT> can follow a color given
 in RGB, other color spaces or names.
 
-=head2 BASIC 8+8
+=head2 BASIC 8+8 (+2)
 
 Single uppercase character representing 8 colors, and alternative
 (usually brighter) colors in lowercase:
@@ -631,13 +635,24 @@ Single uppercase character representing 8 colors, and alternative
     Y  y  Yellow
     K  k  Black
     W  w  White
+    T     Terminal (default color)
+    V     Values (SGR 38 and 48)
 
 C<T> stands for the default color of the Terminal: C<T> sets the
 foreground to the default (SGR 39), and C</T> sets the background to
-the default (SGR 49).  It has no brighter variant; C<t> is the same
-as C<T>.
+the default (SGR 49).
 
-    T  t  Terminal (default color)
+C<V> is a color given by its Values.  The colon after it, with the
+digits and colons that follow, is put after SGR 38, or 48 for the
+background: C<V:5:224> produces C<ESC[38:5:224m>, the color 224 of
+the 256 colors (a light pink, C<544>), and C</V:2::255:0:0> produces
+C<ESC[48:2::255:0:0m>, a background of red in RGB (C</#FF0000>).  The
+values are required and are not checked, and the color is not
+converted for the terminal.  This letter is here because every number
+from 30 to 39 has one; the colors in the following sections are easier
+to use.
+
+C<t> and C<v> are the same as C<T> and C<V>.
 
 =head2 6x6x6 216 COLORS
 
@@ -744,7 +759,7 @@ indicate SGR (Select Graphic Rendition) parameter values:
     ~    Cancel following effect
 
 C<Z> resets everything.  To reset the color alone, use C<T> (see
-L</BASIC 8+8>).
+L</BASIC 8+8 (+2)>).
 
 Tilde (C<~>) negates the following effect; C<~S> resets the effect of
 C<S>.  The negation of C<D> is discussed in the Wikipedia page in

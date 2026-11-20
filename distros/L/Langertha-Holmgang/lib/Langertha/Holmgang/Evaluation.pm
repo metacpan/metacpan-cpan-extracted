@@ -8,7 +8,7 @@ use JSON::MaybeXS ();
 use Langertha::Holmgang::Report ();
 use Scalar::Util qw( blessed );
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 #### Constants
 
@@ -89,6 +89,7 @@ sub _build__runs {
           weight      => defined $c->{weight} ? $c->{weight} : 1,
           tier        => $c->{tier},
           difficulty  => $c->{difficulty},
+          scenario    => $c->{scenario},
           hard        => defined $c->{hard} ? ( $c->{hard} ? 1 : 0 )
                        : ( grep { $hard_tag{$_} } @{ $c->{tags} || [] } ) ? 1 : 0,
           repetitions => $c->{repetitions},
@@ -97,6 +98,24 @@ sub _build__runs {
     };
   }
   return \@runs;
+}
+
+# Szenarien (AppWorld SGC): Faelle mit gleichem scenario sind Varianten einer Aufgabe; ein
+# Szenario gilt als geloest, wenn jede Variante in allen k Wiederholungen bestanden hat. Ein Fall
+# ohne scenario ist sein eigenes. undef, wenn kein Fall der Suite ein scenario traegt.
+sub _scenarios {
+  my ( $self, $cases, $k ) = @_;
+  return undef unless grep { defined $_->{_scenario} } @$cases;
+  my ( %ok, @order );
+  for my $c ( @$cases ) {
+    my $s = $c->{_scenario} // "\0".$c->{case_id};
+    push @order, $s unless exists $ok{$s};
+    $ok{$s} //= 1;
+    $ok{$s} = 0 unless $c->{passed} >= $k;
+  }
+  my $solved = grep { $ok{$_} } @order;
+  return { total => scalar @order, solved => $solved, rate => $self->_round( $solved / @order ),
+    unsolved => [ map { s/\A\0//r } grep { !$ok{$_} } @order ] };
 }
 
 sub _target_label {
@@ -305,7 +324,8 @@ sub _build_verdicts {
       my @reps = @{ $c->{repetitions} };
       next unless @reps;
       my $passed = grep { $_->{status} eq 'passed' } @reps;
-      push @{ $v->{cases} }, { case_id => $c->{case_id}, passed => $passed, repetitions => scalar @reps, _w => $c->{weight} };
+      push @{ $v->{cases} }, { case_id => $c->{case_id}, passed => $passed, repetitions => scalar @reps, _w => $c->{weight},
+        _scenario => $c->{scenario} };
       for my $rep ( @reps ) {
         $self->_add( $v->{tally}, $rep, $c->{weight} );
         my $n = $rep->{forbidden_calls} // 0;
@@ -344,11 +364,13 @@ sub _build_verdicts {
       pass_k       => $share->( sub { $_[0]{passed} >= $k } ),
       pass_any     => $share->( sub { $_[0]{passed} > 0 } ),
       pass_k_min   => $th->{pass_k},
+      scenarios    => $self->_scenarios( $v->{cases}, $k ),
       case_results => [ map { { case_id => $_->{case_id}, passed => $_->{passed}, repetitions => $_->{repetitions} } } @{ $v->{cases} } ],
       hard_failed  => [ map { $v->{hard}{$_} } sort keys %{ $v->{hard} } ],
       repetitions_error => scalar( grep { !$v->{measured}{$_} } 1 .. $k ),
       unfinished   => $v->{unfinished},
     };
+    delete $out->{scenarios} unless defined $out->{scenarios};
     my $below = ( defined $out->{pass_rate} && ( !defined $out->{rate} || $out->{rate} < $out->{pass_rate} ) )
       || ( defined $out->{pass_k_min} && ( !defined $out->{pass_k} || $out->{pass_k} < $out->{pass_k_min} ) );
     # a suite without any measured repetition is not ok; unmeasured repetitions
@@ -450,6 +472,8 @@ sub _tables {
         ? 'run '.$v->{unfinished}{status}.( defined $v->{unfinished}{error} ? ': '.$self->_line( $v->{unfinished}{error} ) : '' ) : () ),
       ( $v->{repetitions_error}
         ? 'no result but error in '.$v->{repetitions_error}.' of '.$v->{k}.' repetition(s): nothing measured' : () ),
+      ( $v->{scenarios}
+        ? 'scenarios: '.$v->{scenarios}{solved}.'/'.$v->{scenarios}{total}.' solved in every variant ('.$self->_pct( $v->{scenarios}{rate} ).')' : () ),
       map {
         'hard: '.$_->{case_id}.' - '.$_->{forbidden_calls}.' forbidden call(s) in '.$_->{repetitions}.' of '.$v->{k}
       } @{ $v->{hard_failed} } ];
@@ -531,7 +555,7 @@ Langertha::Holmgang::Evaluation - Per-topic evaluation of Holmgang reports: weig
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -622,7 +646,7 @@ difficulty (and reports written before the field) are not on a curve.
 =head2 verdicts
 
     # [ { target, variant, suite_id, results, counts => { … }, passed, rate,
-    #     pass_rate, k, pass_k, pass_any, pass_k_min,
+    #     pass_rate, k, pass_k, pass_any, pass_k_min, scenarios (optional),
     #     case_results => [ { case_id, passed, repetitions } ],
     #     hard_failed  => [ { case_id, forbidden_calls, repetitions } ],
     #     repetitions_error, unfinished => { status, error } | undef, ok }, … ]
@@ -659,6 +683,13 @@ Only C<passed> counts as passed: a repetition that is missing (a cancelled run)
 or ended C<error>, C<context_exceeded>, C<no_vision>, C<turn_limit> or
 C<uncertain> has not passed. C<case_results> lists per case in how many
 repetitions it passed and how many it has.
+
+B<Scenarios:> when a case of the suite carries C<scenario>, C<scenarios> is
+C<{ total, solved, rate, unsolved => [ ids ] }>: cases with the same
+C<scenario> are variants of one task, and a scenario counts as solved only when
+every variant passed in all C<k> repetitions (AppWorld's scenario goal
+completion); a case without C<scenario> is a scenario of its own. Absent when
+no case carries one. It does not decide C<ok>.
 
 =head2 comparison
 

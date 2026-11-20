@@ -17,7 +17,7 @@ Requires Perl 5.22 or newer. [Mojolicious](https://metacpan.org/dist/Mojolicious
 
 ## Usage
 
-**No API key needed to start.** Unlimited, the free plan, answers `ip`, `is_vpn`, Tor and relay detection, `location` and `asn`, with no daily or monthly cap, with a key or without one.
+**No API key needed to start.** Unlimited, the free plan, answers `ip`, `is_vpn`, Tor and relay detection, `is_anycast`, `hostname` (the reverse DNS name), country-level `location` and `asn` with the AS's country and RPKI status, with no daily or monthly cap, with a key or without one.
 
 ```perl
 use VPNDetection;
@@ -32,7 +32,7 @@ print $result->asn->{name};          # who runs the announcing network
 
 ### With an API key
 
-Every paid plan answers every field: `is_hosting`, `is_cdn` and the four proxy flags as well, and the provider (its ID and its name), confidence and last-seen detail behind each flag. The plans differ only in how many lookups they include, and a free account tries every field, 100 lookups a day. Create a key in the [console](https://app.vpndetection.io), then pass it in:
+Every paid plan answers every field: `is_hosting`, `is_cdn` and the four proxy flags as well, the carrier and satellite flags, the five service flags (SSH, SMTP, web, DNS resolver and BitTorrent), city-level `location`, the `company` and the `abuse` contact, and the provider (its ID and its name), confidence and last-seen detail behind each flag. The plans differ only in how many lookups they include, and a free account tries every field. Create a key in the [console](https://app.vpndetection.io), then pass it in:
 
 ```perl
 my $client = VPNDetection->new(api_key => $ENV{VPNDETECTION_API_KEY});
@@ -62,7 +62,7 @@ print $acct->{usage}{requests};    # 580
 print $acct->{usage}{window_end};  # when the allowance resets
 ```
 
-Usage counts against the anniversary of your subscription on a paid plan, not the calendar month and not the billing period, and against the UTC day on the free plan; it is the same number a lookup is gated on. `hard_limit` is `undef` on an uncapped plan, which is not the same as zero.
+Usage counts against the anniversary of your subscription on a paid plan, not the calendar month and not the billing period, and against its organization's trial of every field on the free plan; it is the same number a lookup is gated on. `hard_limit` is `undef` on an uncapped plan, which is not the same as zero.
 
 Show `plan.name` and compare against `plan.key`: a plan's name can change, and its key never does. A value the API adds later to a plan's `tier`, a database's `standing` or `license_type`, a format or a download's `outcome` comes back as the string it served, so check for the values you know rather than assuming the list is complete.
 
@@ -252,7 +252,7 @@ die "no API key came back: none was picked, or it can't be shown again\n"
 my $keyed = VPNDetection->new(api_key => $token->{apikey});
 ```
 
-A denied sign-in dies with `VPNDetection::OauthAccessDeniedError` and a code that ran out with `VPNDetection::OauthExpiredTokenError`. Client IDs are issued on request from support@vpndetection.io, and `$client->oauth->revoke('your-client-id', $token->{refresh_token})` signs the machine out again.
+A denied sign-in dies with `VPNDetection::OauthAccessDeniedError` and a code that ran out with `VPNDetection::OauthExpiredTokenError`. `$client->oauth->revoke('your-client-id', $token->{refresh_token})` signs the machine out again. Only a client we registered, such as our CLI, can use the device flow: an app of your own signs people in with the authorization code flow below.
 
 ### Sign in with OAuth (authorization code)
 
@@ -286,12 +286,12 @@ Each redirect URI must be https on a public host name, or http on a loopback add
 
 ### Absent is not false
 
-Unlimited leaves out `is_hosting`, `is_cdn` and the four proxy flags, and of the detail behind each flag it answers only Tor's and relay's; a free-plan key's answer carries `trial_expired`, true once its daily trial is spent, and a paid key's carries `cap_reached`, true once its organization's overage cap is reached and the answer has Unlimited's. A field your plan does not include is absent, which never means "we checked and found nothing". Perl makes that easy to miss, since `undef` and `0` are both false.
+Unlimited leaves out `is_hosting`, `is_cdn`, the four proxy flags, the carrier, satellite and service flags, `company` and `abuse`, and of the detail behind each flag it answers only Tor's and relay's; a free-plan key's answer carries `trial_expired`, true once its trial is spent, and a paid key's carries `cap_reached`, true once its organization's overage cap is reached and the answer has Unlimited's. A field your plan does not include is absent, which never means "we checked and found nothing". Perl makes that easy to miss, since `undef` and `0` are both false.
 
 ```perl
 if ($result->is_hosting // 0) { ... }     # absent counts as false
 if ($result->has('is_hosting')) { ... }   # is this field in my plan? Not without a key
-if ($result->trial_expired) { ... }      # a free-plan key's daily trial is spent
+if ($result->trial_expired) { ... }      # a free-plan key's trial is spent
 if ($result->cap_reached) { ... }        # a paid key past its overage cap
 ```
 

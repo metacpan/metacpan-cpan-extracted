@@ -1,4 +1,7 @@
 Revision history for Perl-Critic-Policy-Performance-ProhibitRegexForSimpleSubstring
 
+0.02 2026-11-20
+    - Various improvements
+
 0.01 2026-07-16
     - Initial release

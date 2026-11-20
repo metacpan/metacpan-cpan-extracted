@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -12,7 +13,7 @@ use Langertha::Skeid::CapacityProbe::Custom;
 # --- the arithmetic ---
 {
   my $skeid = Langertha::Skeid->new;
-  $skeid->add_node(id => 'n1', url => 'http://x/v1', model => 'm', max_conns => 8);
+  $skeid->add_node(id => 'n1', trust => 'internal', url => 'http://x/v1', model => 'm', max_conns => 8);
   my $node = $skeid->nodes->[0];
 
   is $skeid->worker_count, 1, 'one worker by default -- an existing deployment is unchanged';
@@ -27,14 +28,14 @@ use Langertha::Skeid::CapacityProbe::Custom;
     'an uneven split rounds down: the group must never exceed what was configured, and idle '
     . 'capacity is cheaper than a queued GPU';
 
-  $skeid->add_node(id => 'unlimited', url => 'http://x/v1', model => 'm', max_conns => 0);
+  $skeid->add_node(id => 'unlimited', trust => 'internal', url => 'http://x/v1', model => 'm', max_conns => 0);
   is $skeid->worker_max_conns($skeid->nodes->[-1]), 0, 'unlimited stays unlimited';
 }
 
 # --- what cannot be honoured has to be said out loud ---
 {
   my $skeid = Langertha::Skeid->new(worker_count => 4);
-  $skeid->add_node(id => 'tiny', url => 'http://x/v1', model => 'm', max_conns => 2);
+  $skeid->add_node(id => 'tiny', trust => 'internal', url => 'http://x/v1', model => 'm', max_conns => 2);
 
   is $skeid->worker_max_conns($skeid->nodes->[0]), 1,
     'a worker that may admit nothing is a worker that does nothing, so the floor is 1';
@@ -50,7 +51,7 @@ use Langertha::Skeid::CapacityProbe::Custom;
 # --- admission actually uses the share ---
 {
   my $skeid = Langertha::Skeid->new(worker_count => 4);
-  $skeid->add_node(id => 'n1', url => 'http://x/v1', model => 'm', max_conns => 8, healthy => 1);
+  $skeid->add_node(id => 'n1', trust => 'internal', url => 'http://x/v1', model => 'm', max_conns => 8, healthy => 1);
 
   ok $skeid->start_request('n1'), 'first request admitted';
   ok $skeid->start_request('n1'), 'second admitted';
@@ -71,7 +72,7 @@ use Langertha::Skeid::CapacityProbe::Custom;
   # A probe reads the node itself, so it already includes the other workers' traffic. Dividing
   # it too would count them twice.
   my $skeid = Langertha::Skeid->new(worker_count => 4, capacity_max_age_ms => 60_000);
-  $skeid->add_node(id => 'gpu', url => 'http://x/v1', model => 'm', max_conns => 32, healthy => 1);
+  $skeid->add_node(id => 'gpu', trust => 'internal', url => 'http://x/v1', model => 'm', max_conns => 32, healthy => 1);
 
   $skeid->set_capacity_reading('gpu', used => 4, limit => 32, source => 'prometheus');
   is $skeid->route_state(model => 'm')->{has_available}, 1, 'room on the node, room in the share';
@@ -91,7 +92,7 @@ use Langertha::Skeid::CapacityProbe::Custom;
 # --- background work is spread, so the node sees the configured rate from the group ---
 {
   my $skeid = Langertha::Skeid->new(worker_count => 4);
-  $skeid->add_node(id => 'gpu', url => 'http://x:8000/v1', model => 'm',
+  $skeid->add_node(id => 'gpu', trust => 'internal', url => 'http://x:8000/v1', model => 'm',
     capacity => { probe => 'custom', interval_ms => 2000, code => sub { } });
 
   my $probe = Langertha::Skeid::CapacityProbe->for_node($skeid, $skeid->nodes->[0]);

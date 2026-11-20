@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -264,9 +265,9 @@ my $skeid = Langertha::Skeid->new(
     };
   },
 );
-$skeid->add_node(id => 'local-1', url => "http://127.0.0.1:$local_port/v1",
+$skeid->add_node(id => 'local-1', trust => 'internal', url => "http://127.0.0.1:$local_port/v1",
   model => 'qwen3-32b', tags => ['local'], max_conns => 1);
-$skeid->add_node(id => 'cloud-1', url => "http://127.0.0.1:$cloud_port/v1",
+$skeid->add_node(id => 'cloud-1', trust => 'internal', url => "http://127.0.0.1:$cloud_port/v1",
   model => 'llama-3.3-70b', tags => ['cloud'], max_conns => 4);
 
 my $proxy = Langertha::Skeid::Proxy->build_app(skeid => $skeid);

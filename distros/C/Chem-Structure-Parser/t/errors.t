@@ -363,4 +363,109 @@ SKIP: {
 	is($any, 0, 'and it died before the surface was computed and stored');
 }
 
+#--------
+# convert()
+#--------
+# What can go wrong in the call; what cannot be written is t/convert.t's.
+{
+	my $dir = tempdir(CLEANUP => 1);
+	throws_ok { convert() } qr/^convert: no structure given; the first argument is a file name or a reference to its text at /,
+		'convert() with nothing dies';
+	throws_ok { convert('') } qr/^convert: no structure given/, 'and with an empty name';
+	throws_ok { convert("$data/mini.pdb") }
+		qr/^convert: nowhere to write it; the second argument is a file name, a file handle or a reference to a scalar at /,
+		'with nowhere to write it';
+	throws_ok { convert("$data/mini.pdb", '') } qr/^convert: nowhere to write it/, 'or an empty name for it';
+	throws_ok { convert("$data/mini.pdb", \my $t, 'to') }
+		qr/^convert: the options after the output come in name => value pairs, and these are an odd number at /,
+		'an option without its value dies';
+	throws_ok { convert("$data/mini.pdb", \my $t, to => 'pdb', hydrogen => 0) }
+		qr/^convert: unknown option 'hydrogen'; known options are: anisou, chains, from, header, hetatm, hydrogens, model, to, waters at /,
+		'an option convert() does not have dies, and lists the ones it has';
+	throws_ok { convert("$data/mini.pdb", \my $t, to => 'pdb', model => undef) }
+		qr/^convert: model is undef; leave it out for the default, 'all'/, 'model => undef dies';
+	throws_ok { convert("$data/mini.pdb", \my $t, to => 'pdb', model => 'first') }
+		qr/^convert: model must be a whole number or 'all', not 'first'/, 'a model that is not a number dies';
+	throws_ok { convert("$data/mini.pdb", \my $t, to => 'pdb', model => '99999999999999999999999') }
+		qr/^convert: model 99999999999999999999999 is larger than any model number this perl can hold/,
+		'and so does one no IV can hold';
+	throws_ok { convert("$data/mini.pdb", \my $t, to => 'pdb', chains => 'A') }
+		qr/^convert: chains must be an array reference/, 'chains as a string dies';
+	throws_ok { convert("$data/mini.pdb", \my $t, to => 'pdb', chains => []) }
+		qr/^convert: chains is empty/, 'and as an empty list';
+	throws_ok { convert([], \my $t, to => 'pdb') }
+		qr/^convert: the structure is a file name or a reference to its text, not a ARRAY reference/,
+		'a structure that is neither a name nor text dies';
+	throws_ok { convert(\undef, \my $t, to => 'pdb') } qr/^convert: the text to convert is undefined/,
+		'and one that is undefined text';
+	throws_ok { convert("$data/no.such.file.pdb", \my $t, to => 'pdb') }
+		qr/^convert: '[^']*no\.such\.file\.pdb' does not exist/, 'a file that is not there dies';
+	throws_ok { convert($data, \my $t, to => 'pdb') } qr/^convert: '[^']*' is a directory/,
+		'a directory dies';
+	open my $z, '>:raw', "$dir/mini.pdb.Z" or die "Can't open '$dir/mini.pdb.Z' with mode '>:raw': '$!'";
+	print {$z} "\x1f\x9d\x90" or die "Can't write to '$dir/mini.pdb.Z': '$!'";
+	close $z or die "Can't close '$dir/mini.pdb.Z': '$!'";
+	throws_ok { convert("$dir/mini.pdb.Z", \my $t, to => 'cif') }
+		qr/^convert: '[^']*mini\.pdb\.Z' is compressed with compress, which this module does not unpack/,
+		'a .Z dies';
+	throws_ok { convert("$data/mini.pdb", \my $t, to => 'pdb', from => 'mol2') }
+		qr/^convert: cannot read '[^']*mini\.pdb': Tripos MOL2 \(\.mol2\) is not implemented yet; formats read today: mmcif, pdb/,
+		'a format with no reader yet dies, and says so';
+	throws_ok { convert("$data/mini.pdb", \my $t, to => 'pdb', from => 'xyz') }
+		qr/^convert: cannot read '[^']*mini\.pdb': unrecognized format 'xyz'/, 'as does one never heard of';
+	throws_ok { convert("$data/mini.pdb", \my $t) }
+		qr/^convert: say which format to write, with to => 'pdb' or to => 'mmcif': a handle or a scalar has no name to tell it by/,
+		'a scalar to write to, with no format named, dies';
+	throws_ok { convert("$data/mini.pdb", "$dir/mini.txt") }
+		qr/^convert: say which format to write, with to => 'pdb' or to => 'mmcif': '[^']*mini\.txt' has no suffix that names one/,
+		'and so does a file name that names none';
+	throws_ok { convert("$data/mini.pdb", "$dir/mini.mol2") } qr/^convert: cannot write 'mol2'; formats written: mmcif, pdb/,
+		'a format convert() does not write dies';
+	throws_ok { convert("$data/mini.pdb", "$dir/x.pdb", to => 'sdf') } qr/^convert: cannot write 'sdf'/,
+		'named or not';
+	throws_ok { convert("$data/mini.pdb", [], to => 'pdb') }
+		qr/^convert: the output is a file name, a file handle or a reference to a scalar, not a ARRAY reference/,
+		'an output that is none of the three dies';
+	throws_ok { convert("$data/mini.pdb", "$dir/no/such/dir/x.cif") }
+		qr/^Can't open '[^']*x\.cif' with mode '>:raw': '/, 'a file that cannot be written dies in autodie\'s words';
+	{
+		package Unprintable;
+		sub TIEHANDLE { return bless {}, shift }
+		sub PRINT     { $! = 28; return 0 }
+	}
+	tie *FULL, 'Unprintable';
+	throws_ok { convert("$data/mini.pdb", \*FULL, to => 'pdb') }
+		qr/^Can't write to the output handle: '/, 'a handle that will not take the text dies';
+	untie *FULL;
+}
+
+#--------
+# the assembly and structure_atoms(), in the XS
+#--------
+{
+	# what the Perl half never hands them, reachable only through the internal
+	# entry points, where the message only has to be true
+	throws_ok { Chem::Structure::Parser::_assemble([], 1, {}) }
+		qr/the parse must be a hash reference/, 'XS assembly: a parse that is not a hash';
+	throws_ok { Chem::Structure::Parser::_assemble({}, 1, []) }
+		qr/stats must be a hash reference/, 'XS assembly: stats that are not a hash';
+	throws_ok { Chem::Structure::Parser::_assemble({}, 1, {}) }
+		qr/the parse has no 'res_first' array/, 'XS assembly: a parse with nothing in it';
+	throws_ok { Chem::Structure::Parser::_structure_atoms([], []) }
+		qr/^structure_atoms: chains must be a hash reference/, 'XS atoms: chains not a hash';
+	throws_ok { Chem::Structure::Parser::_structure_atoms({}, {}) }
+		qr/^structure_atoms: the chain ids must be an array reference/, 'XS atoms: ids not a list';
+
+	# a residue whose atom_order names an atom its atoms hash does not have,
+	# which the Perl this replaced died on too, less helpfully: "Can't use an
+	# undefined value as a HASH reference"
+	my $info = structure_info("$data/mini.pdb", features => 0);
+	my $c = $info->{chains}{ $info->{chain_order}[0] };
+	my $rk = $c->{residue_order}[0];
+	push @{ $c->{residues}{$rk}{atom_order} }, 'NOPE';
+	throws_ok { structure_atoms($info) }
+		qr/^structure_atoms: residue '\Q$rk\E' lists an atom 'NOPE' it does not have/,
+		'structure_atoms: an atom_order naming a missing atom dies and says which';
+}
+
 done_testing();

@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -15,7 +16,7 @@ use Langertha::Skeid::CapacityProbe::Prometheus;
 # --- parsing, without a server ---
 {
   my $skeid = Langertha::Skeid->new;
-  $skeid->add_node(id => 'gpu-1', url => 'http://gpu-1:8000/v1', model => 'm');
+  $skeid->add_node(id => 'gpu-1', trust => 'internal', url => 'http://gpu-1:8000/v1', model => 'm');
   my $probe = Langertha::Skeid::CapacityProbe::Prometheus->new(skeid => $skeid, node_id => 'gpu-1');
 
   my $values = $probe->parse_metrics(<<'METRICS');
@@ -72,7 +73,7 @@ METRICS
 
   my $skeid = Langertha::Skeid->new(capacity_max_age_ms => 60_000);
   $skeid->add_node(
-    id => 'gpu-1', url => "http://127.0.0.1:$port/v1", model => 'm', max_conns => 8,
+    id => 'gpu-1', trust => 'internal', url => "http://127.0.0.1:$port/v1", model => 'm', max_conns => 8,
     capacity => { probe => 'prometheus', url => "http://127.0.0.1:$port/metrics", interval_ms => 100 },
   );
 
@@ -128,7 +129,7 @@ METRICS
   };
 
   my $skeid2 = Langertha::Skeid->new;
-  $skeid2->add_node(id => 'gpu-2', url => "http://127.0.0.1:$port/v1", model => 'm', max_conns => 4,
+  $skeid2->add_node(id => 'gpu-2', trust => 'internal', url => "http://127.0.0.1:$port/v1", model => 'm', max_conns => 4,
     capacity => { probe => 'prometheus', url => "http://127.0.0.1:$port/metrics",
                   running => 'nothing:like:this', waiting => 'nor:this' });
   Langertha::Skeid::CapacityProbe->for_node($skeid2, $skeid2->nodes->[0])->poll;
@@ -139,7 +140,7 @@ METRICS
   # differently usually still spells "waiting" the normal way.
   ($running, $waiting) = (2, 5);
   my $skeid3 = Langertha::Skeid->new;
-  $skeid3->add_node(id => 'gpu-3', url => "http://127.0.0.1:$port/v1", model => 'm', max_conns => 4,
+  $skeid3->add_node(id => 'gpu-3', trust => 'internal', url => "http://127.0.0.1:$port/v1", model => 'm', max_conns => 4,
     capacity => { probe => 'prometheus', url => "http://127.0.0.1:$port/metrics",
                   running => 'vllm:num_requests_running' });
   Langertha::Skeid::CapacityProbe->for_node($skeid3, $skeid3->nodes->[0])->poll;
@@ -156,22 +157,22 @@ METRICS
 {
   my $skeid = Langertha::Skeid->new;
 
-  $skeid->add_node(id => 'plain', url => 'http://x/v1', model => 'm');
+  $skeid->add_node(id => 'plain', trust => 'internal', url => 'http://x/v1', model => 'm');
   ok !Langertha::Skeid::CapacityProbe->for_node($skeid, $skeid->nodes->[-1]),
     'a node with no capacity block gets no probe -- that is plain inflight admission, not a '
     . 'probe that reports the same thing';
 
-  $skeid->add_node(id => 'explicit', url => 'http://x/v1', model => 'm',
+  $skeid->add_node(id => 'explicit', trust => 'internal', url => 'http://x/v1', model => 'm',
     capacity => { probe => 'inflight' });
   ok !Langertha::Skeid::CapacityProbe->for_node($skeid, $skeid->nodes->[-1]),
     'nor does asking for inflight by name';
 
-  $skeid->add_node(id => 'cloud', url => 'http://x/v1', model => 'm',
+  $skeid->add_node(id => 'cloud', trust => 'internal', url => 'http://x/v1', model => 'm',
     capacity => { probe => 'ratelimit' });
   ok !Langertha::Skeid::CapacityProbe->for_node($skeid, $skeid->nodes->[-1]),
     'and ratelimit needs nothing running: it is read off responses the proxy already has';
 
-  $skeid->add_node(id => 'bogus', url => 'http://x/v1', model => 'm',
+  $skeid->add_node(id => 'bogus', trust => 'internal', url => 'http://x/v1', model => 'm',
     capacity => { probe => 'telepathy' });
   ok !eval { Langertha::Skeid::CapacityProbe->for_node($skeid, $skeid->nodes->[-1]); 1 },
     'an unknown probe name is a config error, not a silent fallback to counting';
@@ -181,7 +182,7 @@ METRICS
 {
   my $skeid = Langertha::Skeid->new;
   my $calls = 0;
-  $skeid->add_node(id => 'weird', url => 'http://x/v1', model => 'm', max_conns => 10,
+  $skeid->add_node(id => 'weird', trust => 'internal', url => 'http://x/v1', model => 'm', max_conns => 10,
     capacity => {
       probe => 'custom',
       code  => sub {
@@ -200,12 +201,12 @@ METRICS
   is $skeid->capacity_reading('weird')->{used}, 9, 'and reported through the same contract';
   is $skeid->capacity_reading('weird')->{source}, 'custom', 'tagged as custom';
 
-  $skeid->add_node(id => 'broken', url => 'http://x/v1', model => 'm',
+  $skeid->add_node(id => 'broken', trust => 'internal', url => 'http://x/v1', model => 'm',
     capacity => { probe => 'custom' });
   ok !eval { Langertha::Skeid::CapacityProbe->for_node($skeid, $skeid->nodes->[-1]); 1 },
     'custom without code or class is a config error';
 
-  $skeid->add_node(id => 'inject', url => 'http://x/v1', model => 'm',
+  $skeid->add_node(id => 'inject', trust => 'internal', url => 'http://x/v1', model => 'm',
     capacity => { probe => 'custom', class => 'Foo/../../etc/passwd' });
   ok !eval { Langertha::Skeid::CapacityProbe->for_node($skeid, $skeid->nodes->[-1]); 1 },
     'a class name out of a config file has to look like one before it is loaded';
@@ -214,7 +215,7 @@ METRICS
 # --- a dying probe must not take the process with it ---
 {
   my $skeid = Langertha::Skeid->new;
-  $skeid->add_node(id => 'crashy', url => 'http://x/v1', model => 'm', max_conns => 2,
+  $skeid->add_node(id => 'crashy', trust => 'internal', url => 'http://x/v1', model => 'm', max_conns => 2,
     capacity => { probe => 'custom', interval_ms => 100, code => sub { die "probe exploded\n" } });
 
   $skeid->set_capacity_reading('crashy', used => 2, limit => 2);

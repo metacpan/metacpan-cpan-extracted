@@ -1,3 +1,6 @@
+4.26 2026-11-19
+- fix defining "bool" that broke on GCC 15 (#10,#11) - thanks @sebastic
+
 4.25 2025-01-23
 - also use nc-config to find NetCDF (#8,#9) - thanks @wwlwpd
 

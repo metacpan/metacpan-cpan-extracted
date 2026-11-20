@@ -22,7 +22,7 @@ my $claude = Langertha::Engine::Anthropic->new(
 # Self-hosted: url required, no api_key
 my $local = Langertha::Engine::OllamaOpenAI->new( url => 'http://localhost:11434/v1' );
 
-# Proxy (hi-proto pattern — the proxy routes the model)
+# Proxy (an OpenAI-compatible proxy routes the model)
 my $proxy = Langertha::Engine::OpenAI->new(
     url => 'http://127.0.0.1:5000/api/v1', model => $model_key, api_key => 'proxy' );
 ```

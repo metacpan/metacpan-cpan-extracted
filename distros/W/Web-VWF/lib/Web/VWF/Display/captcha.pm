@@ -3,7 +3,7 @@ package Web::VWF::Display::captcha;
 use strict;
 use warnings;
 
-use version; our $VERSION = version->declare('0.003.0');
+use version; our $VERSION = version->declare('0.003.1');
 use parent 'Web::VWF::Display';
 
 sub html {
@@ -55,7 +55,7 @@ Web::VWF::Display::captcha - The page that asks a client to prove it is a person
 
 =head1 VERSION
 
-Version 0.003.0
+Version 0.003.1
 
 =head1 DESCRIPTION
 

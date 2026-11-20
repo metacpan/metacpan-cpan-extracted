@@ -1,4 +1,4 @@
-use 5.006;
+use 5.010;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
@@ -9,7 +9,7 @@ my %WriteMakefileArgs = (
 	VERSION_FROM       => 'lib/Suricata/Monitoring.pm',
 	ABSTRACT_FROM      => 'lib/Suricata/Monitoring.pm',
 	LICENSE            => 'artistic_2',
-	MIN_PERL_VERSION   => '5.006',
+	MIN_PERL_VERSION   => '5.010',
 	INST_SCRIPT        => 'bin',
 	EXE_FILES          => ['src_bin/suricata_stat_check'],
 	CONFIGURE_REQUIRES => {

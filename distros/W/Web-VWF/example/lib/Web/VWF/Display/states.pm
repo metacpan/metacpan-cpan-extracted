@@ -7,7 +7,7 @@ package Web::VWF::Display::states;
 use strict;
 use warnings;
 
-use version; our $VERSION = version->declare('0.003.0');
+use version; our $VERSION = version->declare('0.003.1');
 
 use Carp;
 use Web::VWF::Display;
@@ -39,7 +39,7 @@ Web::VWF::Display::states - The example site's page of U.S. states
 
 =head1 VERSION
 
-Version 0.003.0
+Version 0.003.1
 
 =head1 DESCRIPTION
 

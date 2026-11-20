@@ -10,7 +10,7 @@ use Exporter qw( import );
 use JSON::MaybeXS ();
 use Scalar::Util qw( looks_like_number );
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 our @EXPORT_OK = qw( condition check_value element_match path get flat same_scalar near interp_text filter_value );
 
@@ -227,7 +227,7 @@ Langertha::Holmgang::Expectation - The expectations on a value, shared by rules,
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

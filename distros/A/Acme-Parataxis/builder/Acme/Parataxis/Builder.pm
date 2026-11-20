@@ -54,12 +54,29 @@ class    #
         my $arch_dir = catdir(qw[blib arch auto Acme Parataxis]);
         mkpath( $arch_dir, $verbose );
         my @extra_cflags = ( '-fno-lto', ( $^O eq 'openbsd' ? '-fno-ret-protector' : () ) );
-        my @extra_ldflags
-            = ( $^O eq 'MSWin32' ) ?
-            ( '-L' .
-                File::Spec->catdir( $Config::Config{archlibexp}, 'CORE' ) . ' -l' .
-                ( $Config::Config{libperl} =~ s/^lib//r =~ s/\.a$//r =~ s/\.lib$//r ) .
-                ' -lws2_32' ) : ( $^O eq 'darwin' ? ('-undefined dynamic_lookup') : ( $^O eq 'openbsd' ? ('-Wl,-z,nobtcfi') : () ) );
+        my @extra_ldflags;
+
+        if ( $^O eq 'MSWin32' ) {
+            push @extra_ldflags, '-L' . File::Spec->catdir( $Config::Config{archlibexp}, 'CORE' ),
+                '-l' . ( $Config::Config{libperl} =~ s/^lib//r =~ s/\.a$//r =~ s/\.lib$//r ), '-lws2_32';
+        }
+        elsif ( $^O eq 'darwin' ) {
+            push @extra_ldflags, '-undefined dynamic_lookup';
+        }
+        else {
+            push @extra_ldflags, '-Wl,-z,nobtcfi' if $^O eq 'openbsd';
+            #
+            # Affix builds the library with perl's compiler but does not add perl's own link flags. A perl built with
+            # -Duseshrplib keeps its API in libperl.so, so the DSO must record that dependency explicitly or dlopen()
+            # fails at load time (Bionic is especially unforgiving about unresolved data symbols). Termux is the smoker
+            # case; carry its ldflags too so -L/-rpath and its extra libraries are present.
+            if ( $Config::Config{useshrplib} && $Config::Config{useshrplib} ne 'false' ) {
+                my $core = File::Spec->catdir( $Config::Config{archlibexp}, 'CORE' );
+                push @extra_ldflags, "-L$core", "-Wl,-rpath,$core";
+                push @extra_ldflags, grep {length} split ' ', ( $Config::Config{ldflags} // '' ) if $^O eq 'android';
+                push @extra_ldflags, '-lperl';
+            }
+        }
 
         #~ Escape hatch for platform triage in CI (e.g. -mno-retpoline on OpenBSD). Keep these out of normal builds;
         #~ the shipped flags above are the ones we support.

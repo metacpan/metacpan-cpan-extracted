@@ -3,17 +3,18 @@ abstract: 'Forward and reverse geocoding with the OpenCage Geocoding API'
 author:
   - 'Ed Freyfogle <cpan@opencagedata.com>'
 build_requires:
-  LWP::Protocol::https: '6.10'
-  LWP::UserAgent: '6.55'
-  Mozilla::CA: '20240313'
-  Net::Ping: '2.73'
-  Test::Exception: '0.32'
-  Test::More: '0.92'
+  LWP::Protocol::https: '6.17'
+  LWP::UserAgent: '6.83'
+  Mozilla::CA: '20261105'
+  Net::Ping: '2.77'
+  Test::Exception: '0.43'
+  Test::More: '1.302226'
+  Test::Perl::Critic: '1.04'
   Test::Warn: '0.37'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,19 +23,19 @@ name: Geo-Coder-OpenCage
 provides:
   Geo::Coder::OpenCage:
     file: lib/Geo/Coder/OpenCage.pm
-    version: '0.43'
+    version: '0.44'
 requires:
   Carp: '1.50'
-  Cpanel::JSON::XS: '4.40'
-  HTTP::Tiny: '0.083'
-  IO::Socket::SSL: '2.068'
-  JSON::MaybeXS: '1.004003'
-  Scalar::Util: '1.63'
-  URI: '5.19'
+  Cpanel::JSON::XS: '4.82'
+  HTTP::Tiny: '0.096'
+  IO::Socket::SSL: '2.099'
+  JSON::MaybeXS: '1.004008'
+  Scalar::Util: '1.70'
+  URI: '5.40'
 resources:
   homepage: https://github.com/OpenCageData/perl-Geo-Coder-OpenCage
   repository: https://github.com/OpenCageData/perl-Geo-Coder-OpenCage.git
-version: '0.43'
-x_generated_by_perl: v5.34.1
-x_serialization_backend: 'YAML::Tiny version 1.73'
+version: '0.44'
+x_generated_by_perl: v5.38.2
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -74,7 +74,8 @@ sub skeid_virtual {
     my ( $pid, $url ) = Langertha::Virtual::Server->spawn( engine => $engine, debug => 1 );
     $pid{ $node{id} } = $pid;
     $url{ $node{id} } = $url;
-    push @nodes, { engine => 'openai', %node, url => $url };
+    # A virtual node is local, the test's own: internal unless the scenario says otherwise.
+    push @nodes, { engine => 'openai', trust => 'internal', %node, url => $url };
   }
 
   my %ids = map { $_ => Langertha::Skeid->key_id_for_key( $opt{clients}{$_} ) } keys %{ $opt{clients} // {} };

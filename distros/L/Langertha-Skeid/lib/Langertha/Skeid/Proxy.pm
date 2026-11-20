@@ -1,5 +1,5 @@
 package Langertha::Skeid::Proxy;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 # ABSTRACT: Multi-format LLM proxy (OpenAI, Anthropic, Ollama) powered by Langertha::Skeid routing
 use strict;
 use warnings;
@@ -40,9 +40,19 @@ my $UPLOAD_HEAD_ALLOWANCE = 1048576;
 sub build_app {
   my ($class, %opts) = @_;
 
-  # Auto-detect OpenBao KeyBroker if OPENBAO_ROLE_ID is set
+  # Auto-detect OpenBao KeyBroker: a token file (skeid k127), or AppRole credentials.
   my @skeid_opts = ($opts{config_file} ? (config_file => $opts{config_file}) : ());
-  if ($ENV{OPENBAO_ROLE_ID} && $ENV{OPENBAO_SECRET_ID}) {
+  if (defined($ENV{OPENBAO_TOKEN_FILE}) && length($ENV{OPENBAO_TOKEN_FILE})) {
+    # Loud, not a warning: a process told to take its token from a file that does not work must
+    # not start without keys, and must not quietly use AppRole values someone also left set.
+    die "OPENBAO_TOKEN_FILE and OPENBAO_ROLE_ID/OPENBAO_SECRET_ID are both set; set one\n"
+      if $ENV{OPENBAO_ROLE_ID} || $ENV{OPENBAO_SECRET_ID};
+    require Langertha::Skeid::KeyBroker::OpenBao;
+    push @skeid_opts, key_broker => Langertha::Skeid::KeyBroker::OpenBao->new(
+      addr       => $ENV{OPENBAO_ADDR} // 'http://127.0.0.1:8200',
+      token_file => $ENV{OPENBAO_TOKEN_FILE},
+    );
+  } elsif ($ENV{OPENBAO_ROLE_ID} && $ENV{OPENBAO_SECRET_ID}) {
     eval {
       require Langertha::Skeid::KeyBroker::OpenBao;
       push @skeid_opts, key_broker => Langertha::Skeid::KeyBroker::OpenBao->new(
@@ -358,6 +368,15 @@ sub _build_route_table {
     tag => 'Ollama', request => 'OllamaGenerateRequest', stream => 1, summary => 'Ollama generate',
     handler => sub { _handle_ollama($_[0], 'generate') });
 
+  # Ollama embeddings (skeid k116): translated to the node's OpenAI /embeddings, like the chat face.
+  $add->(id => 'ollama_embed', group => 'ollama', methods => ['POST'], paths => ['/api/embed'],
+    tag => 'Ollama', request => 'OllamaEmbedRequest', summary => 'Ollama embeddings',
+    handler => sub { _handle_ollama_embeddings($_[0], 'embed') });
+
+  $add->(id => 'ollama_embeddings', group => 'ollama', methods => ['POST'], paths => ['/api/embeddings'],
+    tag => 'Ollama', request => 'OllamaEmbeddingsRequest', summary => 'Ollama embeddings, one prompt (older route)',
+    handler => sub { _handle_ollama_embeddings($_[0], 'embeddings') });
+
   $add->(id => 'ollama_tags', group => 'ollama', paths => ['/api/tags'], tag => 'Ollama',
     summary => 'The models this key may use, Ollama shaped',
     handler => sub {
@@ -435,8 +454,16 @@ sub _build_route_table {
       my ($c) = @_;
       my $reload = $c->skeid->call_function('config.status', {});
       my $source = $c->skeid->customer_source_status;
+      my $node_files = $c->skeid->node_files_status;
+      my $catch_all = $c->skeid->catch_all;
       $c->render(json => {
         reload => $reload,
+        # The catch-all in effect (ADR 0033): the kinds configured, absent when there is none.
+        (%$catch_all ? (catch_all => {%$catch_all}) : ()),
+        # Each node's trust zone (ADR 0032): which nodes hear the client's headers.
+        nodes  => [ map { +{ id => $_->{id}, trust => ($_->{trust} // 'external') } }
+          @{$c->skeid->nodes} ],
+        ($node_files ? (node_files => $node_files) : ()),
         ($source ? (
           customer_source => $source,
           customer_names  => $c->skeid->customer_names,
@@ -450,6 +477,30 @@ sub _build_route_table {
     handler => sub {
       my ($c) = @_;
       $c->render(json => { metrics => $c->skeid->node_metrics });
+    });
+
+  $add->(id => 'admin_metrics_keys', group => 'admin', paths => ['/skeid/metrics/keys'],
+    document => 'admin', tag => 'Admin', summary => 'Per-key counters: requests refused for the key\'s rate',
+    handler => sub {
+      my ($c) = @_;
+      $c->render(json => { metrics => $c->skeid->key_metrics });
+    });
+
+  # Erasure and retention (skeid k122): delete the usage events of a set of key ids, or before a
+  # time. Synchronous like the usage report: it is an operator call, not a request path.
+  $add->(id => 'admin_usage_purge', group => 'admin', methods => ['POST'], paths => ['/skeid/usage/purge'],
+    document => 'admin', tag => 'Admin', summary => 'Delete usage events of key ids, or before a time',
+    handler => sub {
+      my ($c) = @_;
+      my $body = $c->req->json;
+      $body = {} unless ref($body) eq 'HASH';
+      my ($request, $error) = Langertha::Skeid::UsageStore->purge_request($body);
+      unless ($request) {
+        $c->render(json => { ok => 0, error => $error }, status => 400);
+        return;
+      }
+      my $result = $c->skeid->purge_usage(%$request);
+      $c->render(json => $result, status => ($result->{ok} ? 200 : 503));
     });
 
   $add->(id => 'admin_usage', group => 'admin', paths => ['/skeid/usage'], document => 'admin',
@@ -750,7 +801,7 @@ sub _handle_openai_chat {
     return;
   }
 
-  my $model = $body->{model} // '';
+  my ($model, %names) = _catch_all($c, $body->{model} // '', 'chat');
   my $api_key_id = _request_api_key_id($c);
   _begin_route_async($c, $model, $api_key_id, sub {
     my ($route, $node_id, $started, $tier) = @_;
@@ -770,7 +821,7 @@ sub _handle_openai_chat {
       provider   => 'skeid',
       engine     => ($route->{engine} // 'openaibase'),
       model            => $served_model,
-      requested_model  => $model,
+      %names,
       route_url        => ($route->{url} // ''),
     };
 
@@ -787,7 +838,7 @@ sub _handle_openai_chat {
       return if $err;
       _render_upstream_response($c, $res, $node_id);
     }, undef, $relay);
-  });
+  }, %names);
 }
 
 sub _handle_openai_embeddings {
@@ -799,7 +850,7 @@ sub _handle_openai_embeddings {
     return;
   }
 
-  my $model = $body->{model} // '';
+  my ($model, %names) = _catch_all($c, $body->{model} // '', 'embeddings');
   my $api_key_id = _request_api_key_id($c);
   _begin_route_async($c, $model, $api_key_id, sub {
     my ($route, $node_id, $started, $tier) = @_;
@@ -819,7 +870,7 @@ sub _handle_openai_embeddings {
       provider   => 'skeid',
       engine     => ($route->{engine} // 'openaibase'),
       model            => $served_model,
-      requested_model  => $model,
+      %names,
       route_url        => ($route->{url} // ''),
     };
     $c->render_later;
@@ -828,7 +879,7 @@ sub _handle_openai_embeddings {
       return if $err;
       _render_upstream_response($c, $res, $node_id);
     }, undef, _verbatim_relay($c, $served_model));
-  });
+  }, %names);
 }
 
 # Runs once per request, when its head is parsed and its body is still on the wire (the request
@@ -1144,7 +1195,7 @@ sub _handle_openai_realtime {
     # What the client sent for the handshake of its own connection is not the node's: its
     # Sec-WebSocket-* headers (the subprotocol list may carry the browser's key -- never passed
     # on, ADR 0003), its Origin and its cookies stay here. The user agent makes the node's own.
-    my %fwd_headers = _forward_headers($c);
+    my %fwd_headers = _forward_headers($c, $node_id);
     delete @fwd_headers{ grep { /\A(?:sec-websocket-|origin\z|cookie\z)/i } keys %fwd_headers };
 
     _inject_node_auth_async(\%fwd_headers, $c->skeid, $node_id, sub {
@@ -1376,7 +1427,7 @@ sub _handle_anthropic_messages {
     _render_error($c, 400, $msg, 'invalid_request_error');
     return;
   }
-  my $model = $openai_body->{model} // '';
+  my ($model, %names) = _catch_all($c, $openai_body->{model} // '', 'chat');
   my $api_key_id = _request_api_key_id($c);
 
   _begin_route_async($c, $model, $api_key_id, sub {
@@ -1397,7 +1448,7 @@ sub _handle_anthropic_messages {
       provider   => 'skeid',
       engine     => ($route->{engine} // 'openaibase'),
       model            => $served_model,
-      requested_model  => $model,
+      %names,
       route_url        => ($route->{url} // ''),
     };
 
@@ -1426,7 +1477,7 @@ sub _handle_anthropic_messages {
       # raw Mojo $res would read as all-undef and yield a well-formed but empty envelope (karr #26).
       return Langertha::Skeid::Protocol::Anthropic->response_from_openai($_[0], $model);
     }, _schema_relay($c, $openai_body, 'input_schema'));
-  });
+  }, %names);
 }
 
 # Serves both Ollama completion routes. /api/chat and /api/generate differ only at the edge --
@@ -1471,7 +1522,7 @@ sub _handle_ollama {
     _render_error($c, 400, 'Invalid request', 'invalid_request_error');
     return;
   }
-  my $model = $openai_body->{model} // '';
+  my ($model, %names) = _catch_all($c, $openai_body->{model} // '', 'chat');
   my $api_key_id = _request_api_key_id($c);
 
   _begin_route_async($c, $model, $api_key_id, sub {
@@ -1492,7 +1543,7 @@ sub _handle_ollama {
       provider        => 'skeid',
       engine          => ($route->{engine} // 'openaibase'),
       model           => $served_model,
-      requested_model => $model,
+      %names,
       route_url       => ($route->{url} // ''),
     };
 
@@ -1519,7 +1570,89 @@ sub _handle_ollama {
       my $response_method = $face->{response};
       return Langertha::Skeid::Protocol::Ollama->$response_method($_[0]);
     }, _schema_relay($c, $openai_body, 'function', 'parameters'));
-  });
+  }, %names);
+}
+
+# POST /api/embed and /api/embeddings (skeid k116). Both go to the node's OpenAI /embeddings and
+# come back in Ollama's shape; they differ only at the edge, like /api/chat and /api/generate.
+my %OLLAMA_EMBED_FACE = (
+  embed => {
+    endpoint => '/api/embed',
+    request  => 'embed_request_to_openai',
+    response => 'embed_response_from_openai',
+  },
+  embeddings => {
+    endpoint => '/api/embeddings',
+    request  => 'embeddings_request_to_openai',
+    response => 'embeddings_response_from_openai',
+  },
+);
+
+sub _handle_ollama_embeddings {
+  my ($c, $kind) = @_;
+  _extend_client_timeout($c);
+  my $face = $OLLAMA_EMBED_FACE{$kind};
+  my $body = $c->req->json;
+  unless (ref($body) eq 'HASH') {
+    _render_error($c, 400, 'Invalid JSON body', 'invalid_request_error');
+    return;
+  }
+
+  # As on /api/chat: a body the translator cannot read is the client's 400, before anything is
+  # routed or metered, and the exception's text stays out of the answer.
+  my $request_method = $face->{request};
+  my $openai_body = eval { Langertha::Skeid::Protocol::Ollama->$request_method($body) };
+  unless (ref($openai_body) eq 'HASH') {
+    _render_error($c, 400, 'Invalid request', 'invalid_request_error');
+    return;
+  }
+  my ($model, %names) = _catch_all($c, $openai_body->{model} // '', 'embeddings');
+  my $api_key_id = _request_api_key_id($c);
+
+  _begin_route_async($c, $model, $api_key_id, sub {
+    my ($route, $node_id, $started, $tier) = @_;
+    return unless $route;
+
+    my $served_model = _served_model($tier, $model);
+    $openai_body->{model} = $served_model;
+
+    my $url = _endpoint_url_for_node($route->{url}, '/embeddings');
+    my $meta = {
+      api_format      => 'ollama',
+      endpoint        => $face->{endpoint},
+      api_key_id      => $api_key_id,
+      provider        => 'skeid',
+      engine          => ($route->{engine} // 'openaibase'),
+      model           => $served_model,
+      %names,
+      route_url       => ($route->{url} // ''),
+    };
+
+    $c->render_later;
+    _proxy_openai_json_async($c, $url, $openai_body, $node_id, $started, $meta, sub {
+      my ($res, $err, $status, $upstream, $payload) = @_;
+      return if $err;
+      $c->res->code($status || 200);
+      $c->res->headers->header('x-skeid-node' => $node_id);
+      $c->render(json => $payload);
+    }, sub {
+      my $response_method = $face->{response};
+      return Langertha::Skeid::Protocol::Ollama->$response_method($_[0], $model);
+    });
+  }, %names);
+}
+
+# The catch-all (skeid k129, ADR 0033): on a chat or an embeddings route -- $route_kind, the kind
+# of the route and not a node kind -- an unknown model name is bent to the configured target,
+# once, before anything is planned. Returns the name to route under and the names the usage event
+# carries: requested_model is what the client sent, routed_model the target and only there on a
+# bent request. From here on the request is an ordinary request for the target, so the policy,
+# the rate, admission and the answer all see the target.
+sub _catch_all {
+  my ($c, $requested, $route_kind) = @_;
+  my $target = $c->skeid->catch_all_target($requested, $route_kind);
+  return ($requested, requested_model => $requested) unless defined $target;
+  return ($target, requested_model => $requested, routed_model => $target);
 }
 
 # Walks the tiers of a requested model (ADR 0008) until one admits the request.
@@ -1537,7 +1670,8 @@ sub _begin_route_async {
   my ($c, $model, $api_key_id, $cb, %route) = @_;
   $cb ||= sub { };
   # What the route is over besides a model name: `documents` plans over the nodes of that kind
-  # (ADR 0028). Chat routes pass nothing.
+  # (ADR 0028). Chat routes pass nothing. A route the catch-all can bend passes the names of
+  # its usage event (see _catch_all), for the one event that is written here.
   my @kind = length($route{kind} // '') ? (kind => $route{kind}) : ();
   my $wait_poll_ms = 0 + ($c->skeid->route_wait_poll_ms // 25);
   $wait_poll_ms = 1 if $wait_poll_ms < 1;
@@ -1553,6 +1687,14 @@ sub _begin_route_async {
   # reported as a capacity problem.
   if (!$decision->{permitted}) {
     _render_error($c, 403, "Model '$model' is not available for this key", 'permission_error');
+    $cb->();
+    return;
+  }
+
+  # The key's request rate (skeid k125): over it, refused before anything is routed or admitted.
+  my $rate = $c->skeid->rate_admit($api_key_id);
+  unless ($rate->{ok}) {
+    _refuse_rate_limited($c, $model, $api_key_id, $rate->{retry_after}, \%route);
     $cb->();
     return;
   }
@@ -1742,7 +1884,7 @@ sub _proxy_openai_json_async {
   $cb ||= sub { };
   $relay ||= {};
 
-  my %fwd_headers = _forward_headers($c);
+  my %fwd_headers = _forward_headers($c, $node_id);
   _inject_node_auth_async(\%fwd_headers, $c->skeid, $node_id, sub {
   my ($no_key) = @_;
 
@@ -1887,6 +2029,7 @@ sub _proxy_openai_json_async {
       ok           => ($status < 500) ? 1 : 0,
       duration_ms  => $duration_ms,
       metrics      => $metrics,
+      finish_reason => _payload_finish_reason($payload),
       ($relay->{units} ? $relay->{units}->($payload, $res) : ()),
     });
 
@@ -1907,7 +2050,7 @@ sub _proxy_openai_stream {
   $meta ||= {};
   $relay ||= {};
 
-  my %fwd_headers = _forward_headers($c);
+  my %fwd_headers = _forward_headers($c, $node_id);
 
   # render_later before the key resolution, not after: a cold cache means the callback runs on
   # a later tick, and Mojolicious would have rendered an empty response by then.
@@ -1952,6 +2095,11 @@ sub _proxy_openai_stream {
   # call as a non-streamed answer (skeid #41). undef until a frame carries one.
   my $upstream_usage;
   my $accumulated_content_bytes = 0;
+  # The usage contract (skeid k121): how the answer ended, and when its first token came.
+  my ($finish_reason, $ttft_ms);
+  my $answer_facts = sub {
+    return (finish_reason => $finish_reason, (defined($ttft_ms) ? (ttft_ms => $ttft_ms) : ()));
+  };
   # UTF-8 bytes of the content this stream relayed or translated, for the usage event (skeid #36).
   # A relayed stream counts off the OpenAI deltas it read along; a translated one takes its
   # translator's own count -- the text it actually wrote in the client's format. An observation
@@ -2027,6 +2175,7 @@ sub _proxy_openai_stream {
       error_type    => 'translation_error',
       error_message => 'Stream translation failed',
       content_bytes => $content_bytes->(),
+      $answer_facts->(),
       metrics       => _stream_metrics($c, $meta, $body, $duration_ms, $upstream_usage),
       $units->(),
     });
@@ -2096,15 +2245,24 @@ sub _proxy_openai_stream {
       my $json = eval { decode_json($payload) };
       next unless $json && ref($json) eq 'HASH';
 
-      if (my $delta = $json->{choices}[0]{delta}) {
+      my $choice = ref($json->{choices}) eq 'ARRAY' ? $json->{choices}[0] : undef;
+      if (ref($choice) eq 'HASH' && (my $delta = $choice->{delta})) {
         if (my $delta_content = $delta->{content}) {
           $accumulated_content_bytes += Langertha::Skeid::Protocol::utf8_length($delta_content);
         }
+        $ttft_ms //= _duration_ms($started)
+          if ref($delta) eq 'HASH' && grep { defined($_) && length($_) }
+            $delta->{content}, $delta->{reasoning_content}, $delta->{reasoning},
+            (ref($delta->{tool_calls}) eq 'ARRAY' && @{$delta->{tool_calls}} ? 'tool_calls' : undef);
       }
+      $finish_reason = $choice->{finish_reason}
+        if ref($choice) eq 'HASH' && defined($choice->{finish_reason}) && !ref($choice->{finish_reason});
       if ($relay->{delta_text}) {
         my $text = $relay->{delta_text}->($json);
-        $accumulated_content_bytes += Langertha::Skeid::Protocol::utf8_length($text)
-          if defined($text) && length($text);
+        if (defined($text) && length($text)) {
+          $accumulated_content_bytes += Langertha::Skeid::Protocol::utf8_length($text);
+          $ttft_ms //= _duration_ms($started);
+        }
       }
 
       if (ref($json->{usage}) eq 'HASH') {
@@ -2163,6 +2321,7 @@ sub _proxy_openai_stream {
       node_id       => $node_id,
       duration_ms   => $duration_ms,
       content_bytes => $content_bytes->(),
+      $answer_facts->(),
       metrics       => _stream_metrics($c, $meta, $body, $duration_ms, $upstream_usage),
       $units->(),
     });
@@ -2205,6 +2364,7 @@ sub _proxy_openai_stream {
           error_type    => 'upstream_error',
           error_message => ($err->{message} // 'unknown'),
           content_bytes => $content_bytes->(),
+          $answer_facts->(),
           metrics       => _stream_metrics($c, $meta, $body, _duration_ms($started), $upstream_usage),
           $units->(),
         });
@@ -2288,6 +2448,7 @@ sub _proxy_openai_stream {
       ok           => ($had_error || $status >= 500) ? 0 : 1,
       duration_ms  => $duration_ms,
       content_bytes => $content_bytes->(),
+      $answer_facts->(),
       metrics      => _stream_metrics($c, $meta, $body, $duration_ms, $upstream_usage),
       $units->(),
     });
@@ -2440,27 +2601,69 @@ sub _skip_response_header {
   return $HOP_BY_HOP{$lc} || $lc eq 'content-length' || $lc eq 'content-encoding' ? 1 : 0;
 }
 
+# The client headers an external node is sent (skeid k128, ADR 0032): how the body is framed,
+# what answer is wanted, and the provider protocol headers that change what the provider does.
+# An allowlist, because the headers a deployment adds in front of Skeid are not known here.
+my %EXTERNAL_HEADER = map { $_ => 1 } qw(
+  content-type
+  accept
+  anthropic-version
+  anthropic-beta
+  openai-beta
+);
+
+# What an external node is told about the software calling it -- and nothing about the client's.
+my $EXTERNAL_USER_AGENT = 'Langertha-Skeid';
+
+# The client headers that go to the node $node_id, by the node's trust (ADR 0032). The node's
+# own key is not here: _inject_node_auth_async sets it on what this returns. A node that left
+# the inventory is treated as external -- what it was cannot be known, and the narrower set is
+# the one that leaks nothing (its key resolution refuses the request anyway).
 sub _forward_headers {
-  my ($c) = @_;
+  my ($c, $node_id) = @_;
+  my $node = _node_by_id($c->skeid, $node_id);
+  my $internal = $node && ($node->{trust} // '') eq 'internal';
   my %fwd_headers;
+  # The correlation header (skeid k121) is the caller's id for Skeid's usage row; a node --
+  # possibly a cloud provider's -- has no use for it and is not told.
+  my $correlation = lc($c->skeid->correlation_header // '');
   for my $name (@{$c->req->headers->names}) {
     my $lc = lc($name);
-    next if $HOP_BY_HOP{$lc};
-    next if $lc eq 'host' || $lc eq 'content-length' || $lc eq 'accept-encoding';
-    # The body is in hand, so nothing is expected of the node. A node that answered `Expect:
-    # 100-continue` with its `100 Continue` would have the user agent start a fresh response
-    # object, one the stream relay is not listening on (skeid k96).
-    next if $lc eq 'expect';
+    next if length($correlation) && $lc eq $correlation;
+    if ($internal) {
+      next if $HOP_BY_HOP{$lc};
+      next if $lc eq 'host' || $lc eq 'content-length' || $lc eq 'accept-encoding';
+      # The body is in hand, so nothing is expected of the node. A node that answered `Expect:
+      # 100-continue` with its `100 Continue` would have the user agent start a fresh response
+      # object, one the stream relay is not listening on (skeid k96).
+      next if $lc eq 'expect';
+      # Who the client is and where it called from is not the node's to know, even an internal
+      # one's: its address in any spelling, and its cookies.
+      next if $lc =~ /\Ax-forwarded-/ || $lc eq 'forwarded' || $lc eq 'x-real-ip' || $lc eq 'cookie';
+    }
+    else {
+      next unless $EXTERNAL_HEADER{$lc};
+    }
     $fwd_headers{$name} = $c->req->headers->header($name);
   }
+  # Without a User-Agent Mojo::UserAgent names itself; an external node gets Skeid's name instead.
+  $fwd_headers{'User-Agent'} = $EXTERNAL_USER_AGENT unless $internal;
   return %fwd_headers;
+}
+
+# The node of the inventory with this id, or undef.
+sub _node_by_id {
+  my ($skeid, $node_id) = @_;
+  return unless defined $node_id;
+  my ($node) = grep { ($_->{id} // '') eq $node_id } @{$skeid->nodes};
+  return $node;
 }
 
 # Sets the upstream Authorization header for the selected node, from the KeyBroker
 # (api_key_ref) or from the environment (api_key_env), overriding whatever the client sent.
 # The callback runs exactly once, and always. It is called with nothing when the request may go
-# upstream: the node's key is in place, or the node names no key source and forwards the
-# client's header untouched. It is called with a reason when the node names a key source and
+# upstream: the node's key is in place, or the node names no key source -- an internal node then
+# forwards the client's header untouched, any other goes without one. It is called with a reason when the node names a key source and
 # none produced a key, or when the node is no longer in the inventory and what it named cannot
 # be known -- the caller must then refuse the request (_refuse_unkeyed_node) rather than call
 # the node, because the only credential left in the headers is the customer's own, and the
@@ -2478,7 +2681,7 @@ sub _inject_node_auth_async {
   my ($headers_ref, $skeid, $node_id, $cb) = @_;
   $cb ||= sub { };
 
-  my ($node) = grep { ($_->{id} // '') eq $node_id } @{$skeid->nodes};
+  my $node = _node_by_id($skeid, $node_id);
   unless ($node) {
     _drop_client_credentials($headers_ref);
     return $cb->("node '$node_id' is no longer in the inventory, its key source is unknown");
@@ -2496,8 +2699,16 @@ sub _inject_node_auth_async {
       return $cb->();
     }
 
-    # A node with no key of its own: the documented pass-through.
-    return $cb->() unless defined $reason;
+    # A node with no key of its own: the documented pass-through, for an internal node only
+    # (ADR 0032) -- an external one cannot load without a key source, and one put into the
+    # inventory past that check still never gets the client's credential. Nor does a node from a
+    # node file (ADR 0031): its URL was chosen by a less trusted writer, and the client's
+    # credential (with client_auth, the customer's Skeid key) is not that writer's to collect.
+    unless (defined $reason) {
+      _drop_client_credentials($headers_ref)
+        if length($node->{node_file} // '') || ($node->{trust} // '') ne 'internal';
+      return $cb->();
+    }
 
     # A key source was named and produced nothing. Take the client's credentials out of what
     # would go upstream as well, so a caller that ignored the reason still could not leak them.
@@ -2596,6 +2807,35 @@ sub _refuse_unkeyed_node {
   });
   _render_error($c, 503, 'The upstream key for this model is not available',
     'upstream_key_unavailable');
+  return;
+}
+
+# A request over its key's rate (skeid k125): 429 with Retry-After in the face's shape, and one
+# usage event without content, so the refusals of a runaway caller show where its usage does.
+# No node was picked, so there is no slot to give back.
+sub _refuse_rate_limited {
+  my ($c, $model, $api_key_id, $retry_after, $names) = @_;
+  $names ||= {};
+  my $format = $c->stash('skeid.error_format') // '';
+  _record_usage_event($c, {
+    api_format      => (length($format) ? $format : 'openai'),
+    endpoint        => $c->req->url->path->to_string,
+    api_key_id      => $api_key_id,
+    provider        => 'skeid',
+    model           => ($model // ''),
+    # A bent request (ADR 0033) keeps the name the client sent and says what it was routed under.
+    requested_model => ($names->{requested_model} // $model // ''),
+    (defined($names->{routed_model}) ? (routed_model => $names->{routed_model}) : ()),
+    status_code     => 429,
+    ok              => 0,
+    duration_ms     => 0,
+    error_type      => 'key_rate_limited',
+    error_message   => 'Request rate of the key exceeded',
+    metrics         => {},
+  });
+  $c->res->headers->header('Retry-After' => $retry_after);
+  _render_error($c, 429, "Request rate limit of this key exceeded; retry after ${retry_after}s",
+    'rate_limit_exceeded', 'key_rate_limited');
   return;
 }
 
@@ -2986,6 +3226,51 @@ sub _request_id {
   return 'req_' . int(time * 1000) . '_' . int(rand(1_000_000));
 }
 
+# finish_reason in the usage contract's words (skeid k121): stop, length, content_filter,
+# tool_calls, error or other. A failed request is `error`, whatever came before; a request whose
+# answer has no finish reason (embeddings, audio, rerank, documents) has none. A client that hung
+# up is not a failed answer: it keeps the reason the stream had reached, else `other`, so the
+# error rate counts what went wrong upstream, not callers that left.
+my %FINISH_REASON = (
+  stop => 'stop', length => 'length', content_filter => 'content_filter',
+  tool_calls => 'tool_calls', function_call => 'tool_calls',
+);
+
+sub _finish_reason_field {
+  my ($args) = @_;
+  if (($args->{error_type} // '') eq 'client_abort') {
+    my $raw = $args->{finish_reason};
+    return (finish_reason => (defined($raw) && !ref($raw) && length($raw)
+      ? ($FINISH_REASON{lc $raw} // 'other') : 'other'));
+  }
+  return (finish_reason => 'error')
+    if !$args->{ok} && (($args->{status_code} // 0) >= 400 || length($args->{error_type} // ''));
+  my $raw = $args->{finish_reason};
+  return () unless defined($raw) && !ref($raw) && length($raw);
+  return (finish_reason => ($FINISH_REASON{lc $raw} // 'other'));
+}
+
+# The finish reason of a non-streamed OpenAI answer, if it has one.
+sub _payload_finish_reason {
+  my ($payload) = @_;
+  return undef unless ref($payload) eq 'HASH' && ref($payload->{choices}) eq 'ARRAY';
+  my $choice = $payload->{choices}[0];
+  return undef unless ref($choice) eq 'HASH';
+  my $reason = $choice->{finish_reason};
+  return (defined($reason) && !ref($reason)) ? $reason : undef;
+}
+
+# The caller's correlation id (skeid k121): the header routing.correlation_header names, passed
+# through unchanged when it is 8 to 64 of [A-Za-z0-9._-]; anything else is not recorded.
+sub _correlation_field {
+  my ($c) = @_;
+  my $header = $c->skeid->correlation_header;
+  return () unless defined($header) && length($header);
+  my $value = $c->req->headers->header($header);
+  return () unless defined($value) && $value =~ /\A[A-Za-z0-9._-]{8,64}\z/;
+  return (correlation_id => $value);
+}
+
 sub _record_usage_event {
   my ($c, $args) = @_;
   $args ||= {};
@@ -3031,6 +3316,13 @@ sub _record_usage_event {
       (defined($args->{documents}) ? (documents => 0 + $args->{documents}) : ()),
       # The documents routes, when the answer carried a page count (skeid k94, ADR 0028).
       (defined($args->{pages}) ? (pages => 0 + $args->{pages}) : ()),
+      # The usage contract (skeid k121): how the answer ended, when its first token came (streams
+      # only), and the caller's correlation id when the config names its header.
+      _finish_reason_field($args),
+      # Only a request the catch-all bent: the target it was routed under (skeid k129, ADR 0033).
+      (defined($args->{routed_model}) ? (routed_model => $args->{routed_model}) : ()),
+      (defined($args->{ttft_ms}) ? (ttft_ms => 0 + $args->{ttft_ms}) : ()),
+      _correlation_field($c),
       metrics       => $safe_metrics,
     });
   };
@@ -3225,7 +3517,7 @@ Langertha::Skeid::Proxy - Multi-format LLM proxy (OpenAI, Anthropic, Ollama) pow
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -3254,8 +3546,9 @@ blocks the loop.
 =head2 Client routes
 
 No Skeid credential is needed on these unless the config has a C<client_auth> section; then
-every one but C</health> answers C<401> to a key not on its list. See L</Customer identity>.
-The MCP routes exist only with an C<mcp> section and always need a key; see L</MCP routes>.
+every one but C</health> and the Swagger UI under C</docs> answers C<401> to a key not on its
+list. See L</Customer identity>. The MCP routes exist only with an C<mcp> section and always
+need a key; see L</MCP routes>.
 
   GET  /health                     {status: ok, proxy: skeid, config_reload: {...},
                                     customer_source: {...} with a customer_source}
@@ -3266,11 +3559,15 @@ The MCP routes exist only with an C<mcp> section and always need a key; see L</M
   POST /v1/audio/transcriptions    OpenAI audio: multipart upload, relayed as the node answers
   POST /v1/audio/translations      the same, to the node's translations endpoint
   POST /v1/rerank                  rerank: relayed as the node answers, translated for a TEI node
-  GET  /v1/realtime                realtime transcription: a WebSocket relayed as a session
   POST /rerank                     the same route under its other name
+  POST /v1/convert/file            docling-serve document conversion, multipart, relayed
+  POST /v1/convert/source          the same with sources in a JSON body
+  GET  /v1/realtime                realtime transcription: a WebSocket relayed as a session
   POST /v1/messages                Anthropic Messages, streamed or not
   POST /api/chat                   Ollama chat; streams unless "stream": false
   POST /api/generate               Ollama generate; streams unless "stream": false
+  POST /api/embed                  Ollama embeddings, to the node's /v1/embeddings
+  POST /api/embeddings             Ollama's older one-prompt embeddings, the same way
   GET  /api/tags                   Ollama: the same names as /v1/models
   GET  /api/ps                     Ollama: always an empty list
   GET  /openapi.json               OpenAPI 3.1 description of the routes this config enables
@@ -3287,9 +3584,23 @@ node models and the alias names, each once, so a client can discover what it may
 C<model>. The list follows the policy of the key presented (no key: the default policy): a name
 the key's C<models> do not grant, an alias with every tier denied and a model only denied nodes
 serve are left out. Unhealthy nodes are included. A node without a C<model> is not listed -- it matches any
-requested name, so no name reaches it in particular. The manifest route answers C<404> unless
+requested name, so no name reaches it in particular. The catch-all (below) is not a name and is
+not listed. The manifest route answers C<404> unless
 the config enables it, C<401> without a key and C<403> for a key without a grant; see
 L<Langertha::Skeid/Provider Manifest>.
+
+=head2 Catch-all
+
+With C<routing.catch_all> (L<Langertha::Skeid/routing>, ADR 0033) a model name that is neither
+an alias nor the C<model> of a chat-kind node is routed to the target of the route's kind
+instead of ending as C<503>: C<chat> on C</v1/chat/completions>, C</v1/messages>, C</api/chat>
+and C</api/generate>, C<embeddings> on C</v1/embeddings>, C</api/embed> and C</api/embeddings>.
+A request without C<model> is bent as well. The name is replaced once, before the request is
+routed, and from there the request is the request for the target: the key's policy, its rate and
+admission judge the target, the answer's C<model> is the one a request for the target gets, and
+an error names the target. The usage event keeps the name the client sent as C<requested_model>
+and carries the target as C<routed_model>, which only a bent request has. No other route is
+bent: the audio, rerank, documents, realtime and MCP routes answer an unknown name as before.
 
 =head2 Audio routes
 
@@ -3431,7 +3742,7 @@ node says. See L<Langertha::Skeid/Pluggable Usage Storage>.
 =head2 Documents routes
 
 C<POST /v1/convert/file> and C<POST /v1/convert/source> are the synchronous calls of docling-serve
-under its own paths (skeid k94, ADR 0028), so a docling client only changes its base URL. They
+under its own paths (ADR 0028), so a docling client only changes its base URL. They
 are relayed like the audio routes: the multipart form goes upstream part for part, a source body
 (JSON, files as base64) is decoded once and written again, and the node's answer -- JSON, or a
 zip when several documents or outputs come back -- is relayed byte for byte, whatever its
@@ -3461,7 +3772,7 @@ nothing priced. See L<Langertha::Skeid::Protocol::Documents>.
 
 =head2 MCP routes
 
-The MCP gateway (skeid k103, ADR 0022): a customer reaches the MCP servers the config assigned
+The MCP gateway (ADR 0022): a customer reaches the MCP servers the config assigned
 to its key (L<Langertha::Skeid/mcp>) with that key, one route per server. Skeid relays MCP's
 Streamable HTTP transport and reads none of it -- no JSON-RPC, no tool list, no session. What it
 knows of the wire is in L<Langertha::Skeid::Protocol::MCP>.
@@ -3566,8 +3877,15 @@ C</skeid/*> route answers C<404>; a missing or wrong token answers C<401>.
                                    {customer_source}: the customer source status, with its message;
                                    {customer_names}: customer key id => name of the source's rows;
                                    {customer_report}: rows accepted, rejected, shadowed (labels, reasons)
+                                   {nodes}: per node, its id and trust (internal, external)
+                                   {node_files}: per node file, nodes accepted, rejected (position, rule)
+                                   {catch_all}: the routing.catch_all in effect, the kinds configured
+                                   only; absent when there is none
   GET  /skeid/metrics/nodes        {metrics}: per-node counters, never billed
+  GET  /skeid/metrics/keys         {metrics}: per customer key id, requests refused for its rate
   GET  /skeid/usage                ?since=&api_key_id=&model=&limit= (default 50) -> the report
+  POST /skeid/usage/purge          body: {api_key_ids: [...], before: ISO, dry_run: bool} ->
+                                   {ok, matched, deleted, ...}; 400 bad request, 503 store failed
   GET  /skeid/openapi.json         OpenAPI 3.1 description of the admin routes
 
 Changes made here live in this process only: a changed C<nodes> section in the config replaces
@@ -3584,14 +3902,15 @@ instead.
 
 With C<client_auth>, that key id has to be on the section's list. Every client route checks it
 first -- C</v1/models>, C</v1/chat/completions>, C</v1/embeddings>, the C</v1/audio/*> routes,
-C</v1/rerank> and C</rerank>, C</v1/messages>, every C</api/*> route, C</.well-known/langertha.json> and,
-with an C<mcp> section, the MCP routes -- after picking up a
-changed config
+C</v1/rerank> and C</rerank>, the C</v1/convert/*> routes, C</v1/realtime> (at the handshake),
+C</openapi.json>, C</v1/messages>, every C</api/*> route, C</.well-known/langertha.json> and,
+with an C<mcp> section, the MCP routes -- after picking up a changed config
 (L<Langertha::Skeid/maybe_reload_config>), so a list change holds from the next request.
 No key is C<401> C<Missing API key>, a key whose id is not listed C<401> C<Invalid API key>,
 both with C<WWW-Authenticate: Bearer realm="skeid">, and nothing else happens for that request:
 the body is not parsed, no node is admitted or called, no usage event is written, and Skeid logs
-nothing about it. The answer names neither the key nor its id. C</health> and the C</skeid/*> routes are not checked;
+nothing about it. The answer names neither the key nor its id. C</health>, the Swagger UI under
+C</docs> and the C</skeid/*> routes are not checked;
 they have their own rules. Being let in widens nothing: the key's routing policy still applies.
 
 =head2 The upstream call
@@ -3600,11 +3919,17 @@ The node URL gets C</v1> added unless it ends in it, then C</chat/completions> o
 C</embeddings> (an audio route: C</audio/transcriptions> or C</audio/translations>, see
 L</Audio routes>; rerank: C</rerank>, for a TEI node without the C</v1>, see L</Rerank route>);
 the body carries the served model (an alias tier's C<model>), everything else
-as the client sent it or as translated. The client's headers go upstream except the hop-by-hop
-ones, C<Host>, C<Content-Length> and C<Accept-Encoding>. When the node has a key of its own --
+as the client sent it or as translated. Which of the client's headers go upstream depends on
+the node's C<trust> (ADR 0032, L<Langertha::Skeid/nodes>), on every route that calls a node: an
+external node gets C<Content-Type>, C<Accept>, C<anthropic-version>, C<anthropic-beta> and
+C<OpenAI-Beta> and nothing else, and C<User-Agent: Langertha-Skeid>; an internal node gets them
+all except the hop-by-hop ones, C<Host>, C<Content-Length>, C<Accept-Encoding>, C<Expect>,
+C<X-Forwarded-*>, C<Forwarded>, C<X-Real-IP> and C<Cookie>. The correlation header goes to
+neither. When the node has a key of its own --
 C<api_key_ref> through the key broker, else C<api_key_env> -- it replaces C<Authorization> and
-the client's C<Authorization> and C<x-api-key> are dropped, however the client spelled them. A
-node that names neither forwards the client's own key. A node that names one and gets no key
+the client's C<Authorization> and C<x-api-key> are dropped, however the client spelled them. An
+internal node that names neither forwards the client's own key (unless it came from a node
+file); an external node must name one. A node that names one and gets no key
 from it -- the broker fails or is not running, the variable is unset or empty -- is not called
 at all, and neither is one that left the inventory after it was selected: the request is
 refused with C<503> (see L</Errors>), so the client's key never stands in for the node's. An answer that came from a node carries
@@ -3636,7 +3961,11 @@ code C<invalid_api_key>; Anthropic: C<authentication_error>; see L</Customer ide
 upload over C<uploads.max_bytes> is C<413 invalid_request_error>; an audio request that is not a
 multipart form, or whose form has no usable C<model> field, is C<400 invalid_request_error>, as
 is a rerank request without a C<model>, a string C<query> or C<documents>. A
-request no node may serve for this key is C<403 permission_error>; a model no healthy node
+request no node may serve for this key is C<403 permission_error>; a key over its C<rate>
+(L<Langertha::Skeid/Per-Key Routing Policy>) is C<429> with C<Retry-After> (OpenAI: type
+C<rate_limit_exceeded>, code C<key_rate_limited>) before anything is routed, on every routed
+route but not on the MCP routes, and is recorded as a usage event with C<error_type>
+C<key_rate_limited>; a model no healthy node
 serves is C<503 model_not_found>; eligible nodes that stay full past the wait are
 C<429 rate_limit_error>; an upstream failure is its status (or C<502>) with type
 C<upstream_error>; a node whose own key cannot be resolved is
@@ -3687,7 +4016,10 @@ failed. An embedding application that wants its own hook sets it after C<build_a
 
 With both C<OPENBAO_ROLE_ID> and C<OPENBAO_SECRET_ID> set, a
 L<Langertha::Skeid::KeyBroker::OpenBao> at C<OPENBAO_ADDR> (default C<http://127.0.0.1:8200>)
-becomes the key broker; if its login fails the proxy warns and runs without one. A broker that
+becomes the key broker; if its login fails the proxy warns and runs without one. With
+C<OPENBAO_TOKEN_FILE> set instead, the broker takes its token from that file (see
+L<Langertha::Skeid::KeyBroker::OpenBao/token_file>); a missing or empty file, or the AppRole
+variables set as well, stops C<build_app> with an error. A broker that
 can renew its token starts renewing on a timer. The capacity probes of every node are started
 and restarted whenever the probed part of the inventory changes, and the customer source of the
 config, if it has one, starts fetching (L<Langertha::Skeid/start_customer_source>).
@@ -3762,7 +4094,7 @@ and the session of the realtime route
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-skeid/issues>.
 
 =head2 IRC
@@ -3775,11 +4107,11 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

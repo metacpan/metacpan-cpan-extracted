@@ -14,7 +14,7 @@ use Carp;
 
 use parent 'Data::Identifier::Interface::Simple';
 
-our $VERSION = v0.01;
+our $VERSION = v0.02;
 
 
 
@@ -119,7 +119,7 @@ Data::TagDB::Plugin::Gamebook::Exit - Work with Gamebook data in TagDBs, contain
 
 =head1 VERSION
 
-version v0.01
+version v0.02
 
 =head1 SYNOPSIS
 

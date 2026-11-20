@@ -23,6 +23,14 @@
 # STRUCTURE_INFO_TEST_CIF_DIR, the same directories the rest of the suite
 # reads.  Set STRUCTURE_INFO_PYTHON to a python that has gemmi.
 #
+# convert()'s output is held to it the same way.  Every structure in t/data is
+# written in both formats, and this module's reading of each converted file is
+# compared with gemmi's frozen answer for the file it came from, so the frozen
+# half runs over those too.  Where gemmi is here, it also reads the converted
+# files itself, which is the test of the writing that matters: that a reader
+# nobody here wrote finds in the converted file the atoms it found in the
+# original.
+#
 # Two differences are expected and are not failures, because both readings are
 # defensible and this module documents which it takes:
 #
@@ -40,6 +48,7 @@ use warnings FATAL => 'all';
 use Cwd 'abs_path';
 use File::Basename 'dirname';
 use File::Spec;
+use File::Temp 'tempdir';
 use Chem::Structure::Parser;
 use Test::More;
 
@@ -235,6 +244,18 @@ is_deeply([ sort keys %frozen ], \@here,
 diag(sprintf 'comparing %d structures against gemmi\'s frozen answer', scalar @here);
 compare("$data/$_", $frozen{$_}) for @here;
 
+# --- and each of them converted, against gemmi's answer for the original
+my $converted = tempdir(CLEANUP => 1);
+my @converted;
+for my $f (@here) {
+	for my $ext ('pdb', 'cif') {
+		my $out = "$converted/$f.$ext";
+		convert("$data/$f", $out);
+		push @converted, $out;
+		compare($out, $frozen{$f});
+	}
+}
+
 # --- and against gemmi itself, where there is one
 if (!$live) {
 	note("$py cannot import gemmi; the frozen answers above are all of it");
@@ -257,6 +278,13 @@ for my $f (@here) {
 	is_deeply($now, $frozen{$f}, "$f: t/data/oracle.txt is still what gemmi says")
 		or diag('  run t/data/oracle.pl');
 }
+
+# gemmi's own reading of what convert() wrote.  bare.cif and quirks.cif write
+# their atom names in auth_atom_id alone, which gemmi reads none of, so the
+# frozen comparison above has nothing to say about them; converted, they have a
+# label_atom_id, and gemmi reads every atom.
+diag(sprintf 'comparing %d converted structures against gemmi itself', scalar @converted);
+compare($_, gemmi_read($_)) for @converted;
 
 sub spread {
 	my ($dir, $want, $re) = @_;

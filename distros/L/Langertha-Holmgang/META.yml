@@ -23,179 +23,183 @@ name: Langertha-Holmgang
 provides:
   Langertha::Holmgang:
     file: lib/Langertha/Holmgang.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Batch:
     file: lib/Langertha/Holmgang/Batch.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::CLI:
     file: lib/Langertha/Holmgang/CLI.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Case:
     file: lib/Langertha/Holmgang/Case.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Error:
     file: lib/Langertha/Holmgang/Error.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Evaluation:
     file: lib/Langertha/Holmgang/Evaluation.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Excerpt:
     file: lib/Langertha/Holmgang/Excerpt.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Expectation:
     file: lib/Langertha/Holmgang/Expectation.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Grader:
     file: lib/Langertha/Holmgang/Grader.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Haystack:
     file: lib/Langertha/Holmgang/Haystack.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Lint:
     file: lib/Langertha/Holmgang/Lint.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Loader:
     file: lib/Langertha/Holmgang/Loader.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Random:
     file: lib/Langertha/Holmgang/Random.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Report:
     file: lib/Langertha/Holmgang/Report.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Role::AnswerWorld:
     file: lib/Langertha/Holmgang/Role/AnswerWorld.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Role::Simulator:
     file: lib/Langertha/Holmgang/Role/Simulator.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Runner:
     file: lib/Langertha/Holmgang/Runner.pm
-    version: '0.001'
+    version: '0.002'
+  Langertha::Holmgang::Sandbox::Docker:
+    file: lib/Langertha/Holmgang/Sandbox/Docker.pm
+    version: '0.002'
   Langertha::Holmgang::Shell:
     file: lib/Langertha/Holmgang/Shell.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Shell::Filter:
     file: lib/Langertha/Holmgang/Shell/Filter.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Sim::Denken:
     file: lib/Langertha/Holmgang/Sim/Denken.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Sim::IOS:
     file: lib/Langertha/Holmgang/Sim/IOS.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Sim::Kueche:
     file: lib/Langertha/Holmgang/Sim/Kueche.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Sim::Linux:
     file: lib/Langertha/Holmgang/Sim/Linux.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Sim::Linux::Accounts:
     file: lib/Langertha/Holmgang/Sim/Linux/Accounts.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Sim::Linux::Backup:
     file: lib/Langertha/Holmgang/Sim/Linux/Backup.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Sim::Linux::Calendar:
     file: lib/Langertha/Holmgang/Sim/Linux/Calendar.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Sim::Linux::Dns:
     file: lib/Langertha/Holmgang/Sim/Linux/Dns.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Sim::Linux::Docker:
     file: lib/Langertha/Holmgang/Sim/Linux/Docker.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Sim::Linux::Git:
     file: lib/Langertha/Holmgang/Sim/Linux/Git.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Sim::Linux::Helm:
     file: lib/Langertha/Holmgang/Sim/Linux/Helm.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Sim::Linux::Http:
     file: lib/Langertha/Holmgang/Sim/Linux/Http.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Sim::Linux::Kubernetes:
     file: lib/Langertha/Holmgang/Sim/Linux/Kubernetes.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Sim::Linux::Logrotate:
     file: lib/Langertha/Holmgang/Sim/Linux/Logrotate.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Sim::Linux::MariaDB:
     file: lib/Langertha/Holmgang/Sim/Linux/MariaDB.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Sim::Linux::Monitoring:
     file: lib/Langertha/Holmgang/Sim/Linux/Monitoring.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Sim::Linux::Nft:
     file: lib/Langertha/Holmgang/Sim/Linux/Nft.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Sim::Linux::Nginx:
     file: lib/Langertha/Holmgang/Sim/Linux/Nginx.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Sim::Linux::Pki:
     file: lib/Langertha/Holmgang/Sim/Linux/Pki.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Sim::Linux::Postfix:
     file: lib/Langertha/Holmgang/Sim/Linux/Postfix.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Sim::Linux::Postgres:
     file: lib/Langertha/Holmgang/Sim/Linux/Postgres.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Sim::Linux::Redis:
     file: lib/Langertha/Holmgang/Sim/Linux/Redis.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Sim::Linux::RedisService:
     file: lib/Langertha/Holmgang/Sim/Linux/RedisService.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Sim::Linux::SshAccess:
     file: lib/Langertha/Holmgang/Sim/Linux/SshAccess.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Sim::Linux::Sshd:
     file: lib/Langertha/Holmgang/Sim/Linux/Sshd.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Sim::Linux::Storage:
     file: lib/Langertha/Holmgang/Sim/Linux/Storage.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Sim::Roost:
     file: lib/Langertha/Holmgang/Sim/Roost.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Sim::RouterOS:
     file: lib/Langertha/Holmgang/Sim/RouterOS.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Sim::Schichtfehler:
     file: lib/Langertha/Holmgang/Sim/Schichtfehler.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Sim::Sehen:
     file: lib/Langertha/Holmgang/Sim/Sehen.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Sim::Uebersetzung:
     file: lib/Langertha/Holmgang/Sim/Uebersetzung.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Simulators:
     file: lib/Langertha/Holmgang/Simulators.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Structure:
     file: lib/Langertha/Holmgang/Structure.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Suite:
     file: lib/Langertha/Holmgang/Suite.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Target:
     file: lib/Langertha/Holmgang/Target.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::Template:
     file: lib/Langertha/Holmgang/Template.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::ToolSchema:
     file: lib/Langertha/Holmgang/ToolSchema.pm
-    version: '0.001'
+    version: '0.002'
   Langertha::Holmgang::World:
     file: lib/Langertha/Holmgang/World.pm
-    version: '0.001'
+    version: '0.002'
 recommends:
   IO::Async: '0'
   Net::Async::HTTP: '0'
 requires:
+  Archive::Tar: '0'
   B: '0'
   Carp: '0'
   Compress::Zlib: '0'
@@ -204,12 +208,14 @@ requires:
   Encode: '0'
   Exporter: '0'
   File::ShareDir: '0'
+  File::Temp: '0'
   Future: '0'
   Future::AsyncAwait: '0'
   Getopt::Long: '0'
   IO::Compress::Gzip: '0'
   IO::Uncompress::Gunzip: '0'
   JSON::MaybeXS: '0'
+  JSON::PP: '0'
   Langertha: '0.504'
   MIME::Base64: '0'
   Math::BigInt: '0'
@@ -220,6 +226,7 @@ requires:
   Path::Tiny: '0'
   Scalar::Util: '0'
   Socket: '0'
+  Text::ParseWords: '0'
   Text::Xslate: '0'
   Time::HiRes: '0'
   Time::Local: '0'
@@ -234,7 +241,7 @@ resources:
   bugtracker: https://github.com/Getty/langertha-holmgang/issues
   homepage: https://github.com/Getty/langertha-holmgang
   repository: https://github.com/Getty/langertha-holmgang.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.040001'
@@ -299,12 +306,16 @@ x_Dist_Zilla:
       name: '@Author::GETTY/@Filter/TestRelease'
       version: '6.040'
     -
-      class: Dist::Zilla::Plugin::ConfirmRelease
-      name: '@Author::GETTY/@Filter/ConfirmRelease'
-      version: '6.040'
-    -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Author::GETTY/@Filter/UploadToCPAN'
+      version: '6.040'
+    -
+      class: Dist::Zilla::Plugin::Author::GETTY::InstallCheck
+      name: '@Author::GETTY/Author::GETTY::InstallCheck'
+      version: '0.328'
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@Author::GETTY/ConfirmRelease'
       version: '6.040'
     -
       class: Dist::Zilla::Plugin::LicenseFile
@@ -518,7 +529,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.001'
+          tag: '0.002'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

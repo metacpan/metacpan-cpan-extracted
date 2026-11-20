@@ -1,6 +1,6 @@
 use v5.40;
 
-package Acme::Parataxis::Blocking v0.1.4 {
+package Acme::Parataxis::Blocking v0.1.5 {
     use Config;
     use Exporter        qw[import];
     use Carp            qw[croak];
@@ -201,7 +201,15 @@ package Acme::Parataxis::Blocking v0.1.4 {
             ( defined $Config{d_fork} ? $Config{d_fork} : 'undef' ) . ')'
             unless $Config{d_fork} && $Config{d_fork} eq 'define';
         croak 'spawn_blocking_fork() is not available on MSWin32, where perl\'s fork() is a threads.pm emulation' if $^O eq 'MSWin32';
-        croak 'spawn_blocking_fork() must be called from inside a scheduled fiber (inside run())'                 if Acme::Parataxis->current_fid < 0;
+
+        # Cygwin's fork() cannot be called from a fiber stack. It fails with "can't commit memory for stack"
+        # (Win32 error 87), and forks attempted from the main stack leave the child unable to resume the
+        # suspended ucontext. The whole process then exits 0 with no diagnostic, which is far worse than a
+        # clear refusal. Cygwin perls are built with ithreads, so spawn_blocking() is the supported offload
+        # path there; this entry point exists for perls that cannot use it.
+        croak 'spawn_blocking_fork() is not available on Cygwin (fork() cannot be called from a fiber stack); use spawn_blocking() instead'
+            if $^O eq 'cygwin';
+        croak 'spawn_blocking_fork() must be called from inside a scheduled fiber (inside run())' if Acme::Parataxis->current_fid < 0;
         croak 'spawn_blocking_fork() is wall-clock only and cannot be driven by the mock clock of run(virtual => 1)'
             if defined Acme::Parataxis->virtual_now;
         state $have_marshal = do { require POSIX; require Storable; 1 };

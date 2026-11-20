@@ -40,9 +40,10 @@ Audit:
 3. **`$VERSION` consistency** across `lib/**/*.pm` and against `Changes`.
 4. **`Changes`** has a real entry for the pending version — not just `{{$NEXT}}`.
 5. **dist.ini**: `[@Author::GETTY]` options intact, `copyright_year`, and the
-   `gather_exclude_match` rules that keep `.claude/`, `bench/` and `docs/` out of the tarball.
-   `Git::GatherDir` ships tracked files, so a newly committed directory silently joins the
-   distribution unless excluded.
+   `gather_exclude_match` rules that keep `bench/`, `docs/` and `assets/` out of the tarball.
+   `Git::GatherDir` ships tracked files, so a newly committed directory joins the
+   distribution unless it gets its own rule. `.claude/`, `CLAUDE.md`, `CONTEXT.md` and
+   `misc/agent-context/` ship on purpose (the bundle default) — not a finding.
 6. **`dzil build`** dry run: clean, and the resulting `MANIFEST` contains what you expect and
    nothing else. Check the shipped `share/sql/*` are present — the usage store reads them at
    runtime through `File::ShareDir`.

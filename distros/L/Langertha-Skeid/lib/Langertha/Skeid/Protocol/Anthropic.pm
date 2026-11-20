@@ -1,5 +1,5 @@
 package Langertha::Skeid::Protocol::Anthropic;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 # ABSTRACT: Translate between the Anthropic Messages format and the upstream OpenAI call
 use strict;
 use warnings;
@@ -356,7 +356,7 @@ Langertha::Skeid::Protocol::Anthropic - Translate between the Anthropic Messages
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 DESCRIPTION
 
@@ -423,7 +423,7 @@ array (image parts) gets it as a text part of its own.
 A later system message is never moved into the leading one: that would change the start of the
 prompt on every turn and with it the node's prefix cache. A request without a system message in
 C<messages> is translated exactly as before. An empty top-level C<system> (C<"">) is dropped
-like an empty block array: no empty system message goes upstream (k101).
+like an empty block array: no empty system message goes upstream.
 
 Content block arrays
 fold to text, unless a user message carries an C<image> block: then its text and image blocks
@@ -498,7 +498,7 @@ it and raise the matching exception.
   my $spec = Langertha::Skeid::Protocol::Anthropic->manifest_endpoint;
   # { dialect => 'anthropic-compat', path => '', capabilities => [ ... ] }
 
-How this face appears in the provider manifest (skeid #29): C<anthropic-compat> at the public
+How this face appears in the provider manifest (skeid k29): C<anthropic-compat> at the public
 root, and the capability flags L</request_to_openai> actually carries to the upstream --
 C<system>, function C<tools>, C<tool_choice> (auto, any, none, a named tool), C<max_tokens>,
 C<temperature>, C<stream> and C<image> blocks (C<image_input>). A model is published here
@@ -518,7 +518,7 @@ L<Langertha::Skeid::Proxy>
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-skeid/issues>.
 
 =head2 IRC
@@ -531,11 +531,11 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

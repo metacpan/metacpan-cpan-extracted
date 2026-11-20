@@ -2,8 +2,9 @@ package Protocol::IR::Proto::JVC48;
 use strict;
 use warnings;
 
-our $VERSION = '1.3';
+our $VERSION = '1.5';
 use Protocol::IR::Code;
+use Math::BigInt;
 
 # Protocol::IR::Proto::JVC48 is the JVC-48 protocol handler (48-bit,
 # Kaseikyo family OEM code 3/1), from the DecodeIR definition:
@@ -26,7 +27,7 @@ sub _parse_int {
         # 48-bit hex strings exceed the 32-bit range that triggers Perl's
         # "portable" warning; the modules here handle them by design.
         no warnings 'portable';
-        return hex($val);
+        return Math::BigInt->from_hex($val);
     }
     return $val + 0;
 }
@@ -52,8 +53,8 @@ sub _encode_data {
     my $a = $addr & 0xFF;
     my $s = $subaddr & 0xFF;
     my $f = $cmd & 0xFF;
-    return (3 << 40) | (1 << 32) | ($a << 24) | ($s << 16) |
-           ($f << 8) | ($a ^ $s ^ $f);
+    return (Math::BigInt->new(3) << 40) | (Math::BigInt->new(1) << 32) | (Math::BigInt->new($a) << 24) | (Math::BigInt->new($s) << 16) |
+           (Math::BigInt->new($f) << 8) | Math::BigInt->new($a ^ $s ^ $f);
 }
 
 # True when the accumulated word (Tasmota DataLSB) is the form decode_raw
@@ -134,8 +135,8 @@ sub decode_timing {
                         ($stop_space == 0 || $stop_space >= 4000);
 
     my ($b0, $b1, $b2, $b3, $b4, $b5) = @bytes;
-    my $data = ($b0 << 40) | ($b1 << 32) | ($b2 << 24) |
-               ($b3 << 16) | ($b4 << 8) | $b5;
+    my $data = (Math::BigInt->new($b0) << 40) | (Math::BigInt->new($b1) << 32) | (Math::BigInt->new($b2) << 24) |
+               (Math::BigInt->new($b3) << 16) | (Math::BigInt->new($b4) << 8) | Math::BigInt->new($b5);
 
     return Protocol::IR::Code->new(
         protocol   => 'JVC-48',
@@ -200,7 +201,7 @@ Protocol::IR::Proto::JVC48 - JVC-48 protocol handler (48-bit Kaseikyo, OEM 3/1)
 
 =head1 VERSION
 
-version 1.3
+version 1.5
 
 =head1 SYNOPSIS
 

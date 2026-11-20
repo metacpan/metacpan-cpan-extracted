@@ -1,5 +1,5 @@
 package Configd::Syntax::Spaced;
-$Configd::Syntax::Spaced::VERSION = '0.005';
+$Configd::Syntax::Spaced::VERSION = '0.007';
 #ABSTRACT: Config files that are a directive, some whitespace and a value.
 
 use 5.034;
@@ -72,7 +72,7 @@ Configd::Syntax::Spaced - Config files that are a directive, some whitespace and
 
 =head1 VERSION
 
-version 0.005
+version 0.007
 
 =head1 SYNOPSIS
 

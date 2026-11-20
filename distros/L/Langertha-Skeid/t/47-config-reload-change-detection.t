@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -25,8 +26,8 @@ my $NOW = 1_000_000;
 
 sub nodes_cfg {
   return [
-    { id => 'n1', url => 'http://n1/v1', model => 'm', healthy => 1 },
-    { id => 'n2', url => 'http://n2/v1', model => 'm', healthy => 1 },
+    { id => 'n1', trust => 'internal', url => 'http://n1/v1', model => 'm', healthy => 1 },
+    { id => 'n2', trust => 'internal', url => 'http://n2/v1', model => 'm', healthy => 1 },
   ];
 }
 
@@ -93,7 +94,7 @@ sub nodes_cfg {
   is $skeid->_inventory_generation, $generation, 'but identical nodes keep their generation';
   is $skeid->list_nodes->[1]{healthy}, 0, 'and their admin-set health';
 
-  $cfg = { nodes => [ @{nodes_cfg()}, { id => 'n3', url => 'http://n3/v1', model => 'm' } ],
+  $cfg = { nodes => [ @{nodes_cfg()}, { id => 'n3', trust => 'internal', url => 'http://n3/v1', model => 'm' } ],
            pricing => { m => { input_per_million => 7 } } };
   is $skeid->maybe_reload_config, 1, 'a changed nodes section is applied';
   isnt $skeid->_inventory_generation, $generation, 'and that does move the generation';
@@ -109,7 +110,7 @@ sub nodes_cfg {
     config_reload_interval => 0,
     config_loader => sub {
       $calls++;
-      return ({ nodes => [ { id => 'n1', url => "http://n1:$port/v1", model => 'm' } ] }, $version);
+      return ({ nodes => [ { id => 'n1', trust => 'internal', url => "http://n1:$port/v1", model => 'm' } ] }, $version);
     },
   );
   $port = 2;
@@ -124,7 +125,7 @@ sub nodes_cfg {
 # --- a config file touched without a change ---
 {
   my ($fh, $path) = tempfile();
-  print $fh "nodes:\n  - id: f1\n    url: http://f1/v1\n";
+  print $fh "nodes:\n  - id: f1\n    url: http://f1/v1\n    trust: internal\n";
   close $fh;
   my $skeid = Langertha::Skeid->new(config_file => $path);
   $skeid->set_node_health('f1', 0);
@@ -149,7 +150,7 @@ sub nodes_cfg {
       return {
         admin => { api_key => 'adm' },
         nodes => [
-          { id => 'p1', url => "http://p1:$nodes_version/v1", model => 'm',
+          { id => 'p1', trust => 'internal', url => "http://p1:$nodes_version/v1", model => 'm',
             capacity => { probe => 'custom', interval_ms => 600_000, code => $probe_code } },
         ],
       };

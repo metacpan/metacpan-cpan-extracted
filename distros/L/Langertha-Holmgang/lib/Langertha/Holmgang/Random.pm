@@ -6,7 +6,7 @@ use namespace::autoclean;
 
 use Carp qw( croak );
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 my $M32 = 0xFFFFFFFF;
@@ -123,7 +123,7 @@ Langertha::Holmgang::Random - The seeded private random source for case generato
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

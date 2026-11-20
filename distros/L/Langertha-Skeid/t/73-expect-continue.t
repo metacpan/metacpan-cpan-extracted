@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -48,7 +49,7 @@ my $port = Mojo::IOLoop->acceptor($node)->port;
 
 my @usage_events;
 my $skeid = Langertha::Skeid->new(store_usage_event => sub { push @usage_events, $_[1]; return { ok => 1 } });
-$skeid->add_node(id => 'n1', url => 'http://127.0.0.1:' . $port . '/v1', model => 'm', max_conns => 4);
+$skeid->add_node(id => 'n1', trust => 'internal', url => 'http://127.0.0.1:' . $port . '/v1', model => 'm', max_conns => 4);
 
 my $proxy = Langertha::Skeid::Proxy->build_app(skeid => $skeid);
 $proxy->log->level('fatal');

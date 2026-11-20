@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -28,7 +29,7 @@ sub probed_skeid {
   for my $id (qw(p1 p2)) {
     # One callback per node, reused, so an unchanged capacity block digests alike.
     $skeid->add_node(
-      id => $id, url => "http://$id/v1", model => 'm',
+      id => $id, trust => 'internal', url => "http://$id/v1", model => 'm',
       capacity => { probe => 'custom', interval_ms => 600_000, code => $args{code}{$id} },
     );
   }
@@ -68,13 +69,13 @@ sub probed_skeid {
   is $skeid->route_state(model => 'm')->{eligible_count}, 2, 'and comes back';
 
   # A node without a probe changes nothing a probe polls either.
-  $skeid->add_node(id => 'plain', url => 'http://plain/v1', model => 'm');
+  $skeid->add_node(id => 'plain', trust => 'internal', url => 'http://plain/v1', model => 'm');
   $t->get_ok('/skeid/nodes' => $ADMIN)->status_is(200);
   is_deeply \%polls, { p1 => 1, p2 => 1 }, 'adding an unprobed node restarts no probe';
 
   # --- the probed node set changes: probes restart ---
   $skeid->add_node(
-    id => 'p3', url => 'http://p3/v1', model => 'm',
+    id => 'p3', trust => 'internal', url => 'http://p3/v1', model => 'm',
     capacity => { probe => 'custom', interval_ms => 600_000,
       code => sub { $polls{p3}++ } },
   );
@@ -90,7 +91,7 @@ sub probed_skeid {
 
   # Same id, different machine: a reading about the old URL must not carry over.
   $skeid->add_node(
-    id => 'p2', url => 'http://p2-moved/v1', model => 'm',
+    id => 'p2', trust => 'internal', url => 'http://p2-moved/v1', model => 'm',
     capacity => { probe => 'custom', interval_ms => 600_000, code => $code{p2} },
   );
   $t->get_ok('/skeid/nodes' => $ADMIN)->status_is(200);
@@ -117,7 +118,7 @@ sub probed_skeid {
 
   my $skeid = Langertha::Skeid->new(capacity_max_age_ms => 600_000);
   $skeid->add_node(
-    id => 'gpu-1', url => "http://127.0.0.1:$port/v1", model => 'm', max_conns => 8,
+    id => 'gpu-1', trust => 'internal', url => "http://127.0.0.1:$port/v1", model => 'm', max_conns => 8,
     capacity => { probe => 'prometheus', url => "http://127.0.0.1:$port/metrics", interval_ms => 600_000 },
   );
   my $probe = Langertha::Skeid::CapacityProbe->for_node($skeid, $skeid->nodes->[0]);

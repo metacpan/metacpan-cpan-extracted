@@ -7,7 +7,7 @@ use utf8;
 
 use JSON::MaybeXS ();
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 my $JSON = JSON::MaybeXS->new( utf8 => 0, canonical => 1, allow_nonref => 1 );
@@ -432,7 +432,7 @@ Langertha::Holmgang::Sim::Linux::Http - HTTP between simulated devices: curl, ap
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

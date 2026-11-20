@@ -2,7 +2,7 @@ package Protocol::IR::Proto::NEC482;
 use strict;
 use warnings;
 
-our $VERSION = '1.3';
+our $VERSION = '1.5';
 
 use parent 'Protocol::IR::Proto::NEC48';
 
@@ -21,7 +21,7 @@ Protocol::IR::Proto::NEC482 - 48-NEC2 protocol handler (48-bit NEC, whole-frame 
 
 =head1 VERSION
 
-version 1.3
+version 1.5
 
 =head1 SYNOPSIS
 

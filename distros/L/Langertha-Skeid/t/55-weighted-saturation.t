@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -27,10 +28,10 @@ sub weighted_skeid {
   my ($weight_a, $weight_b) = @_;
   my $skeid = Local::CountingSkeid->new;
   $skeid->add_node(
-    id => 'a', url => 'http://a/v1', model => 'm', weight => $weight_a, max_conns => 1,
+    id => 'a', trust => 'internal', url => 'http://a/v1', model => 'm', weight => $weight_a, max_conns => 1,
   );
   $skeid->add_node(
-    id => 'b', url => 'http://b/v1', model => 'm', weight => $weight_b, max_conns => 1,
+    id => 'b', trust => 'internal', url => 'http://b/v1', model => 'm', weight => $weight_b, max_conns => 1,
   );
   return $skeid;
 }

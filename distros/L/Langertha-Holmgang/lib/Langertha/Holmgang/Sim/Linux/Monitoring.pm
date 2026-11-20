@@ -5,12 +5,13 @@ use strict;
 use warnings;
 use utf8;
 
+use Digest::MD5 ();
 use Encode ();
 use JSON::MaybeXS ();
 use Text::ParseWords ();
 use YAML::XS ();
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 our @GAPS;
@@ -179,18 +180,36 @@ sub service_check {
 
 
 sub http {
-    my ( $dev, $method, $port, $path, $run ) = @_;
+    my ( $dev, $method, $port, $path, $run, $probe ) = @_;
     my $kind = $port == 9090 ? 'prometheus' : $port == 9093 ? 'alertmanager' : return;
     my ( $name, $svc ) = map { ( $_, $dev->{services}{$_} ) }
         grep { ( $dev->{services}{$_}{config_check} // '' ) eq $kind } sort keys %{ $dev->{services} || {} };
     return ( '', 0 ) unless $svc && $svc->{active};
     my $run_cfg = ref $svc->{running} eq 'HASH' ? $svc->{running} : {};
     my $main    = $svc->{config_main} // ( ref $svc->{config} ? $svc->{config}[0] : $svc->{config} );
-    $path =~ s/\?.*//;
+    my %qs;
+    if ( $path =~ s/\?(.*)//s ) {
+        for my $kv ( split /&/, $1 ) {
+            my ( $k, $v ) = map { my $x = $_ // ''; $x =~ tr/+/ /; $x =~ s/%([0-9A-Fa-f]{2})/chr hex $1/ge; $x } split /=/, $kv, 2;
+            $qs{$k} = $v;
+        }
+    }
     my $js = sub { JSON::MaybeXS->new( canonical => 1 )->encode( { status => 'success', data => $_[0] } ) };
     if ( $kind eq 'prometheus' ) {
         return ( 'Prometheus Server is Healthy.', 200 ) if $path eq '/-/healthy';
         return ( 'Prometheus Server is Ready.',   200 ) if $path eq '/-/ready';
+        if ( $path eq '/api/v1/targets' ) {
+            my $t = _prom_targets( $dev, $svc, $run_cfg, $main, $probe ) or return;
+            my @want = grep { ( $qs{state} // 'any' ) =~ /\A(?:any|active)\z/ } @$t;
+            return ( $js->( { activeTargets => \@want, droppedTargets => [], droppedTargetCounts => {} } ), 200 );
+        }
+        if ( $path eq '/api/v1/query' ) {
+            return ( JSON::MaybeXS->new( canonical => 1 )->encode( { status => 'error', errorType => 'bad_data',
+                error => 'invalid parameter "query": 1:1: parse error: no expression found in input' } ), 400 )
+                unless defined $qs{query} && $qs{query} =~ /\S/;
+            my $r = _prom_query( $dev, $svc, $run_cfg, $main, $probe, $qs{query} ) or return;
+            return ( $js->( { resultType => 'vector', result => $r } ), 200 );
+        }
         if ( $path eq '/-/reload' ) {
             return ( 'Only POST or PUT requests allowed', 405 ) if $method ne 'POST';
             my $args = join ' ', map { $run_cfg->{$_} // '' } grep { m{\A/etc/default/} } keys %$run_cfg;
@@ -227,10 +246,133 @@ sub http {
         my ( $o, $ok ) = $run->("systemctl reload $name");
         return ( $ok ? '' : "failed to reload config: $o", $ok ? 200 : 500 );
     }
+    my $raw = sub { JSON::MaybeXS->new( canonical => 1 )->encode( $_[0] ) };
     if ( $path eq '/api/v2/status' ) {
-        return ( JSON::MaybeXS->new( canonical => 1 )->encode( { config => { original => $run_cfg->{$main} // '' }, cluster => { status => 'disabled' } } ), 200 );
+        return ( $raw->( { config => { original => $run_cfg->{$main} // '' }, cluster => { status => 'disabled' } } ), 200 );
+    }
+    if ( $path eq '/api/v2/receivers' ) {
+        my ($d) = _yaml( $run_cfg->{$main} // '' );
+        return ( $raw->( [ map { { name => $_->{name} } } grep { ref $_ eq 'HASH' } @{ ( ref $d eq 'HASH' ? $d->{receivers} : undef ) || [] } ] ), 200 );
+    }
+    my $now = now_epoch($dev);
+    my $sil = $svc->{silences} || [];
+    $_ = _am_silence_view( $svc, $_, $now ) for @$sil;
+    if ( $path eq '/api/v2/silences' ) {
+        my @l = map {
+            my $s = $_;
+            { id => $s->{id}, createdBy => $s->{author}, comment => $s->{comment}, startsAt => $s->{starts}, endsAt => $s->{ends},
+              updatedAt => _iso( $s->{_start} ), status => { state => $s->{state} },
+              matchers => [ map { { name => $_->{name}, value => $_->{value}, isRegex => ( $_->{op} =~ /~/ ? \1 : \0 ), isEqual => ( $_->{op} =~ /!/ ? \0 : \1 ) } } @{ $s->{_matchers} || [] } ] }
+        } @$sil;
+        return ( $raw->( \@l ), 200 );
+    }
+    if ( $path eq '/api/v2/alerts' ) {
+        my $t = $svc->{alert_targets} || {};
+        my @l;
+        for my $a ( @{ $svc->{alerts} || [] } ) {
+            my $lab = { %{ $t->{ $a->{target} // '' } || {} }, alertname => $a->{alertname} };
+            my @by = map { $_->{id} } grep { $_->{state} eq 'active' && _am_matches( $_->{_matchers}, $lab ) } @$sil;
+            next if @by && ( $qs{silenced} // 'true' ) eq 'false';
+            my ( $slug, $ok ) = _amtool_routes( $dev, [ 'test', map {"$_=$lab->{$_}"} sort keys %$lab ] );
+            return unless $ok;
+            my $since = $a->{since} // '2026-10-24 06:58:12 UTC';
+            $since =~ s/\A(\S+) (\S+) UTC\z/$1T$2Z/;
+            push @l, { labels => $lab, annotations => { defined $a->{summary} ? ( summary => $a->{summary} ) : () },
+                startsAt => $since, endsAt => _iso( $now + 240 ), updatedAt => _iso( $now - 60 ),
+                receivers => [ map { { name => $_ } } split /,/, $slug ],
+                status => { state => @by ? 'suppressed' : 'active', silencedBy => \@by, inhibitedBy => [] },
+                fingerprint => substr( Digest::MD5::md5_hex( join ',', map {"$_=$lab->{$_}"} sort keys %$lab ), 0, 16 ) };
+        }
+        return ( $raw->( \@l ), 200 );
     }
     return;
+}
+
+# Ziele der laufenden Konfiguration wie /api/v1/targets: nur static_configs; Gesundheit aus der
+# Verbindungsprobe des Simulators ($probe->(host, port): open|refused|timeout|unreach|nohost|noname).
+# undef, wenn ein Ziel nicht sicher zu beurteilen ist (andere Discovery, relabel, unbekannte Probe).
+sub _prom_targets {
+    my ( $dev, $svc, $run_cfg, $main, $probe ) = @_;
+    my $known = ref $svc->{scrape_health} eq q{HASH} ? $svc->{scrape_health} : {};
+    my ($d) = _yaml( $run_cfg->{$main} // '' );
+    return unless ref $d eq 'HASH';
+    my $g = ref $d->{global} eq 'HASH' ? $d->{global} : {};
+    my $now = now_epoch($dev);
+    my @t;
+    for my $sc ( grep { ref $_ eq 'HASH' } @{ $d->{scrape_configs} || [] } ) {
+        return if grep { /_sd_configs\z|\Arelabel_configs\z/ } keys %$sc;
+        my $job    = $sc->{job_name} // return;
+        my $scheme = $sc->{scheme} // 'http';
+        my $mpath  = $sc->{metrics_path} // '/metrics';
+        my $int    = $sc->{scrape_interval} // $g->{scrape_interval} // '1m';
+        my $to     = $sc->{scrape_timeout} // $g->{scrape_timeout} // '10s';
+        for my $s ( grep { ref $_ eq 'HASH' } @{ $sc->{static_configs} || [] } ) {
+            for my $inst ( @{ $s->{targets} || [] } ) {
+                my ( $h, $p ) = $inst =~ /\A\[?([^\]\s]+?)\]?:(\d+)\z/ or return;
+                my $url = "$scheme://$inst$mpath";
+                my $st = exists $known->{$inst} ? ( $known->{$inst} eq q{up} ? q{open} : q{given} ) : $probe ? $probe->( $h, $p ) : undef;
+                return unless defined $st;
+                my $err = $st eq q{given} ? qq{Get "$url": $known->{$inst}} : $st eq 'open' ? '' : $st eq 'timeout' ? qq{Get "$url": context deadline exceeded}
+                    : $st eq 'noname' ? qq{Get "$url": dial tcp: lookup $h on 127.0.0.53:53: no such host}
+                    : qq{Get "$url": dial tcp $inst: connect: } . { refused => 'connection refused', unreach => 'network is unreachable', nohost => 'no route to host' }->{$st};
+                my %lab = ( %{ ref $s->{labels} eq 'HASH' ? $s->{labels} : {} }, instance => $inst, job => $job );
+                push @t, { discoveredLabels => { __address__ => $inst, __metrics_path__ => $mpath, __scheme__ => $scheme,
+                        __scrape_interval__ => $int, __scrape_timeout__ => $to, job => $job },
+                    labels => \%lab, scrapePool => $job, scrapeUrl => $url, globalUrl => $url, lastError => $err,
+                    lastScrape => _iso( $now - 7 ), lastScrapeDuration => $st eq 'open' ? 0.004 : 0, health => $st eq 'open' ? 'up' : 'down',
+                    scrapeInterval => $int, scrapeTimeout => $to };
+            }
+        }
+    }
+    return \@t;
+}
+
+# Eine Sofortabfrage: nur ein Selektor NAME{matcher,…} mit optionalem Vergleich gegen eine Zahl.
+# up aus den Zielen; ALERTS leer (keine Regel feuert); sonst die Reihen aus C<metrics> des Dienstes
+# (Exposition: name{label="wert"} wert je Zeile). Ohne C<metrics>, bei anderer PromQL: undef (Luecke).
+sub _prom_query {
+    my ( $dev, $svc, $run_cfg, $main, $probe, $q ) = @_;
+    $q =~ s/\A\s+|\s+\z//g;
+    my ( $age, $name, $sel, $cmp, $num ) = $q =~ /\A(time\(\)\s*-\s*)?([a-zA-Z_:][\w:]*)?\s*(?:\{(.*)\})?\s*(?:(==|!=|>=|<=|>|<)\s*(-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?))?\z/s or return;
+    my @m;
+    if ( defined $sel ) {
+        my $rest = $sel;
+        while ( $rest =~ s/\A\s*([A-Za-z_]\w*)\s*(=~|!~|!=|=)\s*"((?:[^"\\]|\\.)*)"\s*(?:,|\z)// ) { push @m, { name => $1, op => $2, value => $3 } }
+        return if $rest =~ /\S/;
+    }
+    push @m, { name => '__name__', op => '=', value => $name } if defined $name;
+    my ($nm) = map { $_->{value} } grep { $_->{name} eq '__name__' && $_->{op} eq '=' } @m;
+    return unless defined $nm;
+    my @series;    # [ labels, wert ]
+    if ( $nm eq 'up' ) {
+        my $t = _prom_targets( $dev, $svc, $run_cfg, $main, $probe ) or return;
+        @series = map { [ { %{ $_->{labels} }, __name__ => 'up' }, $_->{health} eq 'up' ? 1 : 0 ] } @$t;
+    }
+    elsif ( $nm =~ /\AALERTS(?:_FOR_STATE)?\z/ ) { }
+    else {
+        return unless defined $svc->{metrics};
+        for my $line ( split /\n/, $svc->{metrics} ) {
+            next if $line =~ /\A\s*(?:#|\z)/;
+            my ( $n, $l, $v ) = $line =~ /\A\s*([a-zA-Z_:][\w:]*)\s*(?:\{(.*)\})?\s+(\S+)\s*\z/ or return;
+            my %lab = ( __name__ => $n );
+            $lab{$1} = $2 while ( $l // '' ) =~ /([A-Za-z_]\w*)\s*=\s*"((?:[^"\\]|\\.)*)"/g;
+            push @series, [ \%lab, $v ];
+        }
+        return unless grep { $_->[0]{__name__} eq $nm } @series;    # eine Reihe, die der Fall nicht nennt
+    }
+    my $now = now_epoch($dev);
+    my %op = ( '==' => sub { $_[0] == $_[1] }, '!=' => sub { $_[0] != $_[1] }, '>' => sub { $_[0] > $_[1] },
+        '<' => sub { $_[0] < $_[1] }, '>=' => sub { $_[0] >= $_[1] }, '<=' => sub { $_[0] <= $_[1] } );
+    my @r;
+    for my $s ( sort { join( ',', map {"$_=$a->[0]{$_}"} sort keys %{ $a->[0] } ) cmp join( ',', map {"$_=$b->[0]{$_}"} sort keys %{ $b->[0] } ) } @series ) {
+        next unless _am_matches( \@m, $s->[0] );
+        my $v = $age ? $now - $s->[1] : $s->[1];    # time() - x: Alter, ohne Namen
+        next if defined $cmp && !$op{$cmp}->( $v, $num );
+        my %lab = %{ $s->[0] };
+        delete $lab{__name__} if $age;
+        push @r, { metric => \%lab, value => [ $now, "$v" ] };
+    }
+    return \@r;
 }
 
 # Startoptionen, mit denen Prometheus laeuft (ARGS aus /etc/default/*), ueber den
@@ -604,7 +746,7 @@ Langertha::Holmgang::Sim::Linux::Monitoring - Monitoring on a simulated Linux se
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -672,10 +814,22 @@ The HTTP interface of Prometheus (9090) and Alertmanager (9093) on the
 device, from the running configuration: C</-/healthy>, C</-/ready>,
 C</api/v1/status/config>, C</api/v1/status/flags> (from the running start
 options), C</api/v1/rules>, C</api/v1/alerts> (empty: no rule fires), C<POST /-/reload> (only with
-C<--web.enable-lifecycle>, otherwise 403), Alertmanager C</api/v2/status> and
-C<POST /-/reload>. Without a
-running service C<$status> is 0 (connection refused); anything else is a gap
-(C<undef>).
+C<--web.enable-lifecycle>, otherwise 403), C</api/v1/targets> and C</api/v1/query>
+(below), Alertmanager C</api/v2/status>, C</api/v2/receivers>, C</api/v2/silences>,
+C</api/v2/alerts> (receivers by the running route, C<suppressed> under an active
+silence, C<?silenced=false>) and C<POST /-/reload>. Without a running service
+C<$status> is 0 (connection refused); anything else is a gap (C<undef>).
+
+B<Targets> are the C<static_configs> of the running configuration. A target's
+health comes from the service's C<scrape_health> (C<< { 'host:port' => 'up' | error text } >>)
+or else from C<$probe> (the simulator's connection probe); a target neither can
+judge, another discovery or C<relabel_configs> make the answer a gap.
+
+B<Queries> answer one selector C<name{label="v",…}>, optionally C<time() -> before
+it and a comparison with a number after it. C<up> comes from the targets,
+C<ALERTS> is empty (as C</api/v1/alerts>), every other name only from the
+service's C<metrics> (exposition text, one C<name{labels} value> per line); a
+name C<metrics> does not list, and any other PromQL, is a gap.
 
 =head2 promtool
 

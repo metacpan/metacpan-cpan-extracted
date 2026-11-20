@@ -4,7 +4,7 @@ package Langertha::Holmgang::Suite;
 use Moose;
 use namespace::autoclean;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 has id => ( is => 'ro', required => 1 );
@@ -50,7 +50,7 @@ Langertha::Holmgang::Suite - A suite: head, tools, defaults and its cases in loa
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

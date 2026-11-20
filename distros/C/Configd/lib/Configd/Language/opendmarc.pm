@@ -1,5 +1,5 @@
 package Configd::Language::opendmarc;
-$Configd::Language::opendmarc::VERSION = '0.005';
+$Configd::Language::opendmarc::VERSION = '0.007';
 #ABSTRACT: opendmarc.conf, which has never had a conf.d.
 
 use 5.034;
@@ -41,7 +41,7 @@ Configd::Language::opendmarc - opendmarc.conf, which has never had a conf.d.
 
 =head1 VERSION
 
-version 0.005
+version 0.007
 
 =head1 SYNOPSIS
 

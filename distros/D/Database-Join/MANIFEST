@@ -53,6 +53,7 @@ t/lib/Database/test2.pm
 t/lib/Database/xljoin_a.pm
 t/lib/Database/xljoin_b.pm
 t/logic.t
+t/nested-dj-result.t
 t/mariadb.t
 t/mariadb_live.t
 t/path.t

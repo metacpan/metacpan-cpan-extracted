@@ -1,5 +1,22 @@
 Revision history for Geo-Coder-OpenCage
 
+0.44    2026-11-19
+        security:
+        - default HTTP::Tiny UA always verifies TLS certificates, even if
+          PERL_HTTP_TINY_SSL_INSECURE_BY_DEFAULT is set
+        - API key masking in warnings also works for keys that get URL-encoded
+        - remove control characters from unknown parameter names in warnings
+        code fixes:
+        - warn and return undef if the response isn't a JSON object
+        - connection, timeout and TLS errors now warn with the HTTP client's
+          error message instead of a JSON decode error
+        dependencies:
+        - raise minimum versions, e.g. Cpanel::JSON::XS 4.82 and HTTP::Tiny 0.096
+        tests:
+        - allow 5 km distance to the expected coordinates in case source data changed
+        - also test against Perl 5.44
+        - fix Perl::Critic failure in the built distribution ($VERSION before 'use strict')
+
 0.43    2026-06-07
         - dependency Carp version 1.54 doesn't exist (yet), use 1.50 -- thanks blb8
 

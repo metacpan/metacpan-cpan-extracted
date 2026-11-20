@@ -1,5 +1,13 @@
 Revision history for Linode-API
 
+0.004 2026-11-20 TEODESIAN
+    - Refuse user_data over 16384 bytes after base64 decoding, which is what
+      Linode enforces.  Its specification says 65535, so such a payload was
+      sent, and Linode refused it with a 400.
+    - Add encode_user_data, which compresses a cloud-config with gzip and
+      encodes it in base64 for the user_data of metadata.  cloud-init
+      uncompresses it, so more cloud-config fits in the same 16384 bytes.
+
 0.003 2026-10-25 TEODESIAN
     - Send a value in a format that JSON::Validator does not know without a
       warning.  Linode names formats of its own, and JSON::Validator warned on

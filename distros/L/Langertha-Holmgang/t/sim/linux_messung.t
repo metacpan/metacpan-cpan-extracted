@@ -326,7 +326,7 @@ subtest '2>/dev/null: Fehlermeldungen des Befehls verschwinden' => sub {
 # Runde 2: ping -c1 schickt ein Paket, nicht vier
 subtest 'ping -cN zusammengeschrieben' => sub {
     $state = { h => { type => 'linux', interfaces => { eth0 => { addr => ['10.0.0.2/24'], state => 'UP' } },
-        routes => [ { dst => '10.0.0.0/24', dev => 'eth0', proto => 'kernel', scope => 'link', src => '10.0.0.2' } ] } };
+        routes => [ { dst => 'default', via => '10.0.0.1', dev => 'eth0' }, { dst => '10.0.0.0/24', dev => 'eth0', proto => 'kernel', scope => 'link', src => '10.0.0.2' } ] } };
     like( sh( 'ping -c1 -W2 10.0.0.1', 'h' ), qr/^1 packets transmitted, 1 received/m, 'ping -c1' );
     like( sh( 'ping -c 2 10.0.0.1', 'h' ), qr/^2 packets transmitted/m, 'ping -c 2' );
     my ( $o, $ok ) = sh( 'nft list ruleet', 'h' );
@@ -439,7 +439,8 @@ subtest 'TCP-Probe: nc, /dev/tcp, wget, curl zwischen Geraeten' => sub {
     ( $o, $ok ) = sh( 'nc -z 10.0.0.4 22', 'a' );
     ok( $ok && $o eq '', 'nc -z ohne -v: still' );
     ( $o, $ok, $gap ) = sh( 'nc -zv 10.0.0.99 22', 'a' );
-    ok( defined $gap, 'unbekannter Rechner: Luecke' );
+    like( $o, qr/failed: No route to host\z/, 'unbekannter Rechner im eigenen Netz: es gibt ihn nicht (ADR 0012)' );
+    ok( !$ok && !defined $gap, '… gescheitert, ohne Luecke' );
     ( $o, $ok, $gap ) = sh( 'nc -zv 10.0.0.5 4711', 'a' );
     ok( defined $gap, 'Rechner mit Dienst unbekannter Ports: Luecke' );
     ( $o, $ok, $gap ) = sh( 'nc -zv 10.0.0.3 22', 'c' );

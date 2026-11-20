@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use utf8;
@@ -163,7 +164,7 @@ sub node_url { return $UP->clone->path('/__up/' . $_[0])->to_string }
 
 sub add_node {
   my ($skeid, $id, %extra) = @_;
-  return $skeid->add_node(id => $id, url => node_url($id), kind => 'documents', max_conns => 4, %extra);
+  return $skeid->add_node(id => $id, trust => 'internal', url => node_url($id), kind => 'documents', max_conns => 4, %extra);
 }
 
 sub field {
@@ -624,7 +625,7 @@ subtest 'upstream error: one failed event, a free slot, no pages' => sub {
 
   my ($t2, $skeid2) = proxy();
   my $dead = Mojo::IOLoop::Server->generate_port;
-  $skeid2->add_node(id => 'dead', url => "http://127.0.0.1:$dead", kind => 'documents', max_conns => 1);
+  $skeid2->add_node(id => 'dead', trust => 'internal', url => "http://127.0.0.1:$dead", kind => 'documents', max_conns => 1);
   upload($t2, $F, file_part($SMALL));
   $t2->status_is(502)->json_is('/error/type' => 'upstream_error');
   is scalar(@USAGE), 1, 'one event for the unreachable node';
@@ -718,7 +719,7 @@ subtest 'key policy: documents is grantable like a model; a restricted key is re
   $t->status_is(200, 'a key with no restriction passes');
 
   $CFG = { policies => { no_cloud => { deny_tags => ['cloud'] } }, default_policy => 'no_cloud' };
-  $skeid->add_node(id => 'docling-cloud', url => node_url('docling-cloud'), kind => 'documents', tags => ['cloud']);
+  $skeid->add_node(id => 'docling-cloud', trust => 'internal', url => node_url('docling-cloud'), kind => 'documents', tags => ['cloud']);
   $skeid->set_node_health('docling-1', 0);
   upload($t, $F, file_part($SMALL));
   $t->status_is(403, 'only a denied-tag node serves it: 403, not 503');
@@ -728,7 +729,7 @@ subtest 'key policy: documents is grantable like a model; a restricted key is re
 subtest 'kind keeps chat and documents nodes apart; an alias named documents tiers them' => sub {
   my ($t, $skeid) = proxy();
   # A chat node that matches any model, and a documents node that carries no model at all.
-  $skeid->add_node(id => 'chat-any', url => node_url('chat-any'), model => '', max_conns => 4);
+  $skeid->add_node(id => 'chat-any', trust => 'internal', url => node_url('chat-any'), model => '', max_conns => 4);
   upload($t, $F, file_part($SMALL));
   $t->status_is(503, 'documents with only a chat node: 503, the chat node is never sent a document')
     ->json_is('/error/type' => 'model_not_found');
@@ -747,7 +748,7 @@ subtest 'kind keeps chat and documents nodes apart; an alias named documents tie
 
   $t->get_ok('/v1/models')->status_is(200);
   is_deeply [ map { $_->{id} } @{ $t->tx->res->json->{data} } ], [], 'a documents node lists no model';
-  $skeid->add_node(id => 'chat-q', url => node_url('chat-q'), model => 'qwen');
+  $skeid->add_node(id => 'chat-q', trust => 'internal', url => node_url('chat-q'), model => 'qwen');
   $t->get_ok('/v1/models');
   is_deeply [ map { $_->{id} } @{ $t->tx->res->json->{data} } ], ['qwen'], 'only the chat model is listed';
 
@@ -756,8 +757,8 @@ subtest 'kind keeps chat and documents nodes apart; an alias named documents tie
   is $UPSTREAM[-1]{tag}, 'docling-1', 'and no other';
 
   # An alias with tiers over tags: the documents route plans by the alias of its routing key.
-  $skeid->add_node(id => 'docling-local', url => node_url('docling-local'), kind => 'documents', tags => ['local']);
-  $skeid->add_node(id => 'docling-cloud', url => node_url('docling-cloud'), kind => 'documents', tags => ['cloud']);
+  $skeid->add_node(id => 'docling-local', trust => 'internal', url => node_url('docling-local'), kind => 'documents', tags => ['local']);
+  $skeid->add_node(id => 'docling-cloud', trust => 'internal', url => node_url('docling-cloud'), kind => 'documents', tags => ['cloud']);
   $skeid->remove_node('docling-1');
   $CFG = { aliases => { documents => { tiers => [ { tags => ['cloud'] }, { tags => ['local'] } ] } } };
   upload($t, $F, file_part($SMALL)) for 1 .. 3;
@@ -773,16 +774,16 @@ subtest 'kind keeps chat and documents nodes apart; an alias named documents tie
 
 subtest 'config: kind and api_key_header are checked at load, the old node stays' => sub {
   my $skeid = Langertha::Skeid->new(config_loader => sub { {} });
-  $skeid->add_node(id => 'docling-1', url => 'http://d:5001', kind => 'documents', api_key_header => 'X-Api-Key');
+  $skeid->add_node(id => 'docling-1', trust => 'internal', url => 'http://d:5001', kind => 'documents', api_key_header => 'X-Api-Key');
   my ($node) = grep { $_->{id} eq 'docling-1' } @{ $skeid->list_nodes };
   is $node->{kind}, 'documents', 'kind is kept';
   is $node->{api_key_header}, 'X-Api-Key', 'api_key_header is kept';
 
-  $skeid->add_node(id => 'chat-1', url => 'http://c:8000/v1', model => 'qwen', kind => 'chat');
+  $skeid->add_node(id => 'chat-1', trust => 'internal', url => 'http://c:8000/v1', model => 'qwen', kind => 'chat');
   ($node) = grep { $_->{id} eq 'chat-1' } @{ $skeid->list_nodes };
   ok !exists($node->{kind}), 'chat is the default and is not written';
   ok !exists($node->{api_key_header}), 'no header option, none kept';
-  $skeid->add_node(id => 'chat-2', url => 'http://c:8000/v1', api_key_header => 'Authorization');
+  $skeid->add_node(id => 'chat-2', trust => 'internal', url => 'http://c:8000/v1', api_key_header => 'Authorization');
   ($node) = grep { $_->{id} eq 'chat-2' } @{ $skeid->list_nodes };
   ok !exists($node->{api_key_header}), 'Authorization is the default spelled out';
 
@@ -793,7 +794,7 @@ subtest 'config: kind and api_key_header are checked at load, the old node stays
   ) {
     my ($field, $value) = @$bad;
     my $ok = eval {
-      $skeid->add_node(id => 'docling-1', url => 'http://other:5001', kind => 'documents', $field => $value);
+      $skeid->add_node(id => 'docling-1', trust => 'internal', url => 'http://other:5001', kind => 'documents', $field => $value);
       1;
     };
     ok !$ok, "bad $field " . (ref $value ? 'ref' : "<$value>") . ' croaks';
@@ -801,8 +802,8 @@ subtest 'config: kind and api_key_header are checked at load, the old node stays
     my ($kept) = grep { $_->{id} eq 'docling-1' } @{ $skeid->list_nodes };
     is $kept->{url}, 'http://d:5001', 'and the working node is still there';
   }
-  ok eval { $skeid->add_node(id => 'd', url => 'http://d', kind => ' Documents '); 1 }, 'kind is trimmed and lowercased';
-  ok !eval { Langertha::Skeid->new(config_loader => sub { { nodes => [ { id => 'x', url => 'http://x', kind => 'nope' } ] } }); 1 },
+  ok eval { $skeid->add_node(id => 'd', trust => 'internal', url => 'http://d', kind => ' Documents '); 1 }, 'kind is trimmed and lowercased';
+  ok !eval { Langertha::Skeid->new(config_loader => sub { { nodes => [ { id => 'x', trust => 'internal', url => 'http://x', kind => 'nope' } ] } }); 1 },
     'a config with an unknown kind fails to load';
 };
 

@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use utf8;
@@ -57,7 +58,7 @@ $upstream_daemon->start;
 my $upstream_port = $upstream_daemon->ports->[0];
 
 my $skeid = Langertha::Skeid->new(route_wait_poll_ms => 5, store_usage_event => sub { return { ok => 1 } });
-$skeid->add_node(id => 'n1', url => "http://127.0.0.1:$upstream_port/v1", model => 'm1', max_conns => 4);
+$skeid->add_node(id => 'n1', trust => 'internal', url => "http://127.0.0.1:$upstream_port/v1", model => 'm1', max_conns => 4);
 my $proxy = Langertha::Skeid::Proxy->build_app(skeid => $skeid);
 $proxy->log->level('fatal');
 my $proxy_daemon = Mojo::Server::Daemon->new(app => $proxy, listen => ['http://127.0.0.1'], silent => 1);

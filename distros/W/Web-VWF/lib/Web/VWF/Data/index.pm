@@ -7,7 +7,7 @@ use warnings;
 
 use Database::Abstraction;
 
-use version; our $VERSION = version->declare('0.003.0');
+use version; our $VERSION = version->declare('0.003.1');
 
 our @ISA = ('Database::Abstraction');
 
@@ -21,7 +21,7 @@ Web::VWF::Data::index - The database behind the index page
 
 =head1 VERSION
 
-Version 0.003.0
+Version 0.003.1
 
 =head1 DESCRIPTION
 

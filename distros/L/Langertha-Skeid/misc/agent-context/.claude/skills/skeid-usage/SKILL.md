@@ -18,6 +18,11 @@ Reference: `docs/adr/0004-usage-events-are-the-billing-unit.md`,
 
 - **Requested vs served model**: the event carries `model` (served — what costs money) *and*
   `requested_model` (what the customer bought). Dropping either breaks cost attribution silently.
+- **Routed model**: an event of a request the catch-all bent (`routing.catch_all`, ADR 0033,
+  skill `skeid-routing`) also carries `routed_model`, the target it was routed under;
+  `requested_model` stays what the client sent. Only a bent request has the key — that is what
+  tells it from an alias request. Nullable `routed_model` column, a key `jsonlog` writes only
+  when set; not a unit, so no sum in the reports.
 - **Cache rates** price the provider-verbatim usage block through `Langertha::Usage`/`Pricing`
   into `cost_cache_read_usd` / `cost_cache_write_usd` (part of `cost_total_usd`; ADR 0013 update).
 - **A stream** keeps the upstream usage block verbatim (frames merged key by key, later wins —

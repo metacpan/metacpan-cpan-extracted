@@ -3,15 +3,19 @@ package InternetData::Cache;
 use strict;
 use warnings;
 
+use Scalar::Util ();
 use Time::HiRes ();
 
-our $VERSION = '1.16.1';
+our $VERSION = '1.17.0';
 
 # A node is [key, value, expires_at, older, newer]. The hash finds a node, the
 # links order them by recency, so a get, a set and an eviction are each O(1). A
 # recency ARRAY would be O(n) per touch, and once the cache is full that is every
 # single insert.
 use constant { KEY => 0, VALUE => 1, EXPIRES => 2, OLDER => 3, NEWER => 4 };
+
+# The longest a spent trial's or a reached cap's answer is held, in seconds.
+use constant REDUCED_TTL => 60;
 
 sub new {
     my ($class, %args) = @_;
@@ -41,7 +45,7 @@ sub set {
     my ($self, $key, $value) = @_;
     return unless $self->{max} > 0;
 
-    my $expires = Time::HiRes::time() + $self->{ttl};
+    my $expires = Time::HiRes::time() + $self->_life_of($value);
     if (my $node = $self->{nodes}{$key}) {
         @{$node}[VALUE, EXPIRES] = ($value, $expires);
         $self->_promote($node);
@@ -56,6 +60,24 @@ sub set {
 
 sub size {
     return scalar keys %{ $_[0]{nodes} };
+}
+
+# When the answer held for $key goes stale, as Time::HiRes::time() reads, or undef.
+sub expiry {
+    my ($self, $key) = @_;
+    my $node = $self->{nodes}{$key};
+    return $node ? $node->[EXPIRES] : undef;
+}
+
+# A reduced answer, a spent trial's or a reached cap's, ends with a new UTC day
+# or a raised cap, so it stays a minute at most rather than the TTL. It is still
+# cached, or a busy process would send every repeat of an address to the API.
+sub _life_of {
+    my ($self, $value) = @_;
+    my $reduced = Scalar::Util::blessed($value) && $value->can('trial_expired')
+        && ($value->trial_expired || $value->cap_reached);
+    return $self->{ttl} unless $reduced;
+    return $self->{ttl} < REDUCED_TTL ? $self->{ttl} : REDUCED_TTL;
 }
 
 sub _promote {

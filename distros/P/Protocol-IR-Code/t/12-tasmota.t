@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
+no warnings 'portable';
 use Test::More;
 use JSON::PP;
 use File::Basename qw(dirname);
@@ -198,7 +199,7 @@ for my $cap (@wide_captures) {
     if ($proto eq 'SAMSUNG36') {
         my $via_struct = $converter->import_format('Tasmota',
             'Protocol = SAMSUNG36, Bits = 36, Data = 0x7004E50F3')->[0];
-        is($via_struct->data, hex('0x7004E50F3'), "$label structured Data decode");
+        is($via_struct->data, 0x7004E50F3, "$label structured Data decode");
     }
 }
 

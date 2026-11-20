@@ -1,5 +1,5 @@
 package Langertha::Skeid::UsageStore;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 # ABSTRACT: Usage event sink - config normalization and backend factory
 use strict;
 use warnings;
@@ -34,6 +34,7 @@ sub normalize_config {
       auto_migrate => exists($cfg->{auto_migrate}) ? ($cfg->{auto_migrate} ? 1 : 0) : 1,
       flush_interval_ms => $class->_flush_interval_ms($cfg),
       spool_dir    => $class->_spool_dir($cfg),
+      $class->_retention($cfg),
     };
   }
 
@@ -59,6 +60,7 @@ sub normalize_config {
       auto_migrate => exists($cfg->{auto_migrate}) ? ($cfg->{auto_migrate} ? 1 : 0) : 1,
       flush_interval_ms => $class->_flush_interval_ms($cfg),
       spool_dir    => $class->_spool_dir($cfg),
+      $class->_retention($cfg),
     };
   }
 
@@ -74,6 +76,7 @@ sub normalize_config {
       path    => $path,
       mode    => $mode,
       fsync   => ($cfg->{fsync} ? 1 : 0),
+      $class->_retention($cfg),
     };
   }
 
@@ -89,6 +92,43 @@ sub _flush_interval_ms {
   croak 'usage_store.flush_interval_ms must be a whole number of milliseconds (0 = write each event at once)'
     unless $ms =~ /\A\d+\z/;
   return 0 + $ms;
+}
+
+# How long usage events are kept (skeid k122): whole days, or absent for "until deleted". Read by
+# `skeid usage-purge --retention`, never on the request path.
+sub _retention {
+  my ($class, $cfg) = @_;
+  my $days = $cfg->{retention_days};
+  return () unless defined $days;
+  croak 'usage_store.retention_days must be a whole number of days, at least 1'
+    unless !ref($days) && $days =~ /\A[0-9]+\z/ && $days >= 1;
+  return (retention_days => 0 + $days);
+}
+
+
+sub purge_request {
+  my ($class, $args) = @_;
+  return (undef, 'a purge needs arguments') unless ref($args) eq 'HASH';
+  my ($ids, $before);
+  if (defined $args->{api_key_ids}) {
+    my $list = $args->{api_key_ids};
+    return (undef, 'api_key_ids must be a non-empty list of key ids')
+      unless ref($list) eq 'ARRAY' && @$list
+        && !grep { !defined($_) || ref($_) || !length($_) || length($_) > 256 } @$list;
+    my %seen;
+    $ids = [ grep { !$seen{$_}++ } map { "$_" } @$list ];
+  }
+  if (defined $args->{before}) {
+    $before = $args->{before};
+    return (undef, 'before must be an ISO 8601 UTC timestamp (YYYY-MM-DDTHH:MM:SSZ)')
+      if ref($before) || $before !~ /\A\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ\z/;
+  }
+  return (undef, 'a purge needs api_key_ids, before, or both') unless $ids || defined $before;
+  return ({
+    ($ids ? (api_key_ids => $ids) : ()),
+    (defined($before) ? (before => "$before") : ()),
+    dry_run => ($args->{dry_run} ? 1 : 0),
+  });
 }
 
 # The usage spool of the DBI backends (skeid k110, ADR 0027). Empty -- the default -- keeps the
@@ -162,7 +202,7 @@ Langertha::Skeid::UsageStore - Usage event sink - config normalization and backe
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 DESCRIPTION
 
@@ -210,10 +250,19 @@ returns
                     total_cost_usd }, ... ],
     recent   => [ { id, created_at, api_format, endpoint, api_key_id, model, requested_model,
                     node_id, status_code, ok, input_tokens, output_tokens, total_tokens,
-                    cached_tokens, cache_write_tokens, tool_calls, cost_total_usd }, ... ],
+                    cached_tokens, cache_write_tokens, tool_calls, cost_total_usd,
+                    routed_model }, ... ],     # routed_model: only a bent request (catch-all)
   }
 
-or C<< { ok => 0, enabled => 0, error => $message } >>. The breakdowns are ordered by cost,
+or C<< { ok => 0, enabled => 0, error => $message } >>.
+
+A store that can delete events (skeid k122) also answers C<purge(\%request)>, the request
+checked by L</purge_request>: it deletes the events matching it, or with C<dry_run> only counts
+them, and answers C<< { ok => 1, matched => N, deleted => N } >> (C<deleted> 0 on a dry run) or
+C<< { ok => 0, error => $message } >>. A second purge of the same request matches nothing, so
+it can be repeated until it answered C<ok>. Both built-in stores do.
+
+The breakdowns are ordered by cost,
 highest first; C<recent> is newest first. C<audio_seconds> sums what the events of the audio
 routes carry, C<documents> what those of the rerank and documents routes carry and C<pages> what
 those of the documents routes read off their answers
@@ -255,11 +304,25 @@ and C<dbname> or C<database> (C<skeid>); C<user>; C<password>, or C<password_env
 variable that holds it; C<schema_file>; C<auto_migrate> (default on); C<flush_interval_ms> and
 C<spool_dir>, as for sqlite.
 
+=item * every backend -- C<retention_days> (default none: kept until deleted), a whole number of
+days of at least 1: the cut-off C<skeid usage-purge --retention> deletes before
+(L<Langertha::Skeid/usage_retention_before>). Nothing purges on its own.
+
 =back
 
 Croaks on a config that is not a hashref, a missing path, an unknown backend, a
-C<flush_interval_ms> that is not a whole number of milliseconds, or a C<spool_dir> that is not
-a plain string.
+C<flush_interval_ms> that is not a whole number of milliseconds, a C<spool_dir> that is not
+a plain string, or a C<retention_days> that is not a whole number of at least 1.
+
+=head2 purge_request
+
+  my ($request, $error) = Langertha::Skeid::UsageStore->purge_request(\%args);
+
+Checks what a purge (L</The store contract>) was asked to delete: C<api_key_ids> (a list of
+customer key ids), C<before> (an ISO 8601 UTC timestamp, C<YYYY-MM-DDTHH:MM:SSZ>: events created
+before it), or both, which must both match; and C<dry_run>. At least one of the two filters is
+required -- a purge of everything is not a request this takes. Returns the request, or undef
+and why not.
 
 =head2 for_config
 
@@ -296,7 +359,7 @@ Slurps a file, dying with the path on failure.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-skeid/issues>.
 
 =head2 IRC
@@ -309,11 +372,11 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

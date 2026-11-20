@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -88,7 +89,7 @@ $app->routes->post('/__up/v1/chat/completions' => sub {
 
 my $t = Test::Mojo->new($app);
 my $up = $t->ua->server->nb_url->clone->path('/__up/v1');
-ok $skeid->add_node(id => 'n1', url => "$up", model => 'm', engine => 'openai', healthy => 1, max_conns => 2),
+ok $skeid->add_node(id => 'n1', trust => 'internal', url => "$up", model => 'm', engine => 'openai', healthy => 1, max_conns => 2),
   'node added';
 
 sub reset_state {

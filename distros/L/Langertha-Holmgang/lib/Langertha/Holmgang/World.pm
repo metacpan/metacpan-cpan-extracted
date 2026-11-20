@@ -14,7 +14,7 @@ use Langertha::Holmgang::Target ();
 use Langertha::Holmgang::Template ();
 use Langertha::Holmgang::ToolSchema qw( schema_errors );
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 # the state changes of a handler's apply, in format 2; a true constant
 our @OPS = qw( set push insert delete remove move );
@@ -184,6 +184,69 @@ sub _observe {
     my $with = $self->_fits( $h, $args ) or next;
     my $out = $self->_pipe_filters( $self->_render( $h->{output}, $with ), $args->{command} );
     return ( $out, $h->{error} ? 0 : 1 );
+  }
+  return $self->_observe_wget($args);
+}
+
+# wget as a client of the curl observations (ADR 0013): a case answers an HTTP
+# request for curl; the same request through wget gets the same answer in wget's
+# words. Only the forms whose answer follows from the curl answer: the body to
+# standard output. ( undef, 0 ) when the command is no such wget or no
+# observation answers its curl form.
+sub _observe_wget {
+  my ( $self, $args ) = @_;
+  my $command = $args->{command};
+  return ( undef, 0 ) unless defined $command && !ref $command
+    && $command =~ /\A\s*(?:sudo\s+)?wget\s/ && $command !~ /[;&`]|\$\(|\|\|/;
+  my @w = eval { Langertha::Holmgang::Shell::shell_words($command) } or return ( undef, 0 );
+  my ( @cmd, @tail );
+  for ( @w ) {
+    if ( @tail || ( ref $_ && $_->{op} eq '|' ) ) { push @tail, $_; next }
+    return ( undef, 0 ) if ref $_;    # a redirection: the simulator's business
+    push @cmd, $_;
+  }
+  shift @cmd while @cmd && $cmd[0] eq 'sudo';
+  shift @cmd;
+  my ( $url, $out, $quiet, $insecure, @headers );
+  while ( @cmd ) {
+    my $x = shift @cmd;
+    if    ( my ( $fl, $to ) = $x =~ /\A-([qSv]*)O(.*)\z/ ) { $quiet = 1 if $fl =~ /q/; return ( undef, 0 ) if $fl =~ /S/; $out = length $to ? $to : shift @cmd }
+    elsif ( $x =~ /\A--output-document=(.*)\z/ ) { $out = $1 }
+    elsif ( $x eq '--output-document' ) { $out = shift @cmd }
+    elsif ( $x eq '-q' || $x eq '--quiet' || $x eq '-nv' || $x eq '--no-verbose' ) { $quiet = 1 }
+    elsif ( $x eq '--no-check-certificate' ) { $insecure = 1 }
+    elsif ( $x =~ /\A--header=(.*)\z/s ) { push @headers, $1 }
+    elsif ( $x eq '--header' ) { push @headers, shift(@cmd) // '' }
+    elsif ( $x =~ /\A(?:-T|-t|--timeout|--tries|--connect-timeout|--read-timeout)\z/ ) { shift @cmd }
+    elsif ( $x =~ /\A(?:--timeout|--tries|--connect-timeout|--read-timeout)=|\A-[Tt]\d/ ) { }
+    elsif ( $x =~ /\A-/ ) { return ( undef, 0 ) }    # -S, --spider, --post-data …: the answer needs more than the body
+    elsif ( defined $url ) { return ( undef, 0 ) }
+    else { $url = $x }
+  }
+  return ( undef, 0 ) unless defined $url && defined $out && $out eq '-';
+  my $q = sub { my ( $s ) = @_; $s =~ s/'/'\\''/g; return "'$s'" };
+  my $curl = join ' ', 'curl', '-s', ( $insecure ? '-k' : () ), ( map { ( '-H', $q->($_) ) } @headers ), $q->($url);
+  for my $form ( $curl, $curl =~ s/'([^' ]+)'\z/$1/r ) {
+    for my $h ( @{ $self->observe } ) {
+      my $with = $self->_fits( $h, { %$args, command => $form } ) or next;
+      my $body = $self->_render( $h->{output}, $with );
+      my ( $host, $port ) = $url =~ m{\A(?:https?://)?([^/:]+)(?::(\d+))?};
+      $port //= $url =~ m{\Ahttps://} ? 443 : 80;
+      my $fail = sub { my ( $text ) = @_; return ( $quiet ? '' : $text, 0 ) };
+      if ( $body =~ /\Acurl: \((\d+)\) (.*)/ ) {
+        my ( $code, $msg ) = ( $1, $2 );
+        return $fail->("Connecting to $host:$port... failed: Connection refused.")  if $code == 7;
+        return $fail->("Connecting to $host:$port... failed: Connection timed out.") if $code == 28;
+        return $fail->("wget: unable to resolve host address \x{2018}$host\x{2019}") if $code == 6;
+        if ( $code == 22 && ( my ( $st ) = $msg =~ /error:? (\d{3})/ ) ) { return $fail->("HTTP request sent, awaiting response... $st\nERROR $st: Error.") }
+        return ( undef, 0 );
+      }
+      return ( undef, 0 ) if $h->{error};
+      # an error page: wget prints no body for a status from 400 on
+      if ( my ( $st, $why ) = $body =~ m{<title>\s*([45]\d\d) ([^<]+?)\s*</title>}i ) { return $fail->("HTTP request sent, awaiting response... $st $why\nERROR $st: $why.") }
+      my $tail = @tail ? $command =~ s/\A[^|]*//r : '';
+      return ( $self->_pipe_filters( $body, 'wget'.$tail ), 1 );
+    }
   }
   return ( undef, 0 );
 }
@@ -418,7 +481,7 @@ Langertha::Holmgang::World - The simulated world of a case — state, tool dispa
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

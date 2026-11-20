@@ -4,7 +4,7 @@
       "Graham Barr <gbarr@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.038, CPAN::Meta::Converter version 2.150013",
+   "generated_by" : "Dist::Zilla version 6.040, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -49,12 +49,12 @@
          "web" : "https://github.com/gbarr/perl-Convert-ASN1"
       }
    },
-   "version" : "0.36",
-   "x_generated_by_perl" : "v5.42.0",
+   "version" : "0.37",
+   "x_generated_by_perl" : "v5.42.2",
    "x_maintainers" : [
       "Timothy Legge <timlegge@gmail.com>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.82",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

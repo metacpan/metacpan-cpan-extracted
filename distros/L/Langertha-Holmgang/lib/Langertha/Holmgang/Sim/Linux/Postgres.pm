@@ -10,7 +10,7 @@ use JSON::MaybeXS ();
 use Langertha::Holmgang::Sim::Linux::Calendar ();
 use Time::Local ();
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 my $JSON = JSON::MaybeXS->new( canonical => 1 );
@@ -48,6 +48,7 @@ pg_stat_activity datid datname pid leader_pid usesysid usename application_name 
 pg_stat_user_tables relid schemaname relname seq_scan seq_tup_read idx_scan idx_tup_fetch n_tup_ins n_tup_upd n_tup_del n_tup_hot_upd n_live_tup n_dead_tup n_mod_since_analyze n_ins_since_vacuum last_vacuum last_autovacuum last_analyze last_autoanalyze vacuum_count autovacuum_count analyze_count autoanalyze_count
 pg_settings name setting unit category short_desc extra_desc context vartype source min_val max_val enumvals boot_val reset_val sourcefile sourceline pending_restart
 pg_replication_slots slot_name plugin slot_type datoid database temporary active active_pid xmin catalog_xmin restart_lsn confirmed_flush_lsn wal_status safe_wal_size two_phase
+pg_stat_replication pid usesysid usename application_name client_addr client_hostname client_port backend_start backend_xmin state sent_lsn write_lsn flush_lsn replay_lsn write_lag flush_lag replay_lag sync_priority sync_state reply_time
 pg_roles rolname rolsuper rolinherit rolcreaterole rolcreatedb rolcanlogin rolreplication rolconnlimit rolpassword rolvaliduntil rolbypassrls rolconfig oid
 pg_file_settings sourcefile sourceline seqno name setting applied error
 pg_authid oid rolname rolsuper rolinherit rolcreaterole rolcreatedb rolcanlogin rolreplication rolbypassrls rolconnlimit rolpassword rolvaliduntil
@@ -361,6 +362,7 @@ sub psql {
         elsif ( $x =~ /\A-p(\d+)\z/ || $x =~ /\A--port=(\d+)\z/ ) { $o{port} = $1 }
         elsif ( $x eq '-l' || $x eq '--list' )     { $list = 1 }
         elsif ( $x eq '-f' || $x eq '--file' )     { push @GAPS, 'psql -f'; return ( '', 0 ) }
+        elsif ( $x =~ /\A-([tAxXqwW]+)c\z/ )       { $fmt{$_} = 1 for split //, $1; push @cmds, shift(@a) // q{} }    # -Atc 'sql'
         elsif ( $x =~ /\A-([tAxXqwW]+)\z/ )        { $fmt{$_} = 1 for split //, $1 }
         elsif ( $x =~ /\A--(?:tuples-only|no-align|expanded|no-psqlrc|quiet)\z/ ) { $fmt{ { 'tuples-only' => 't', 'no-align' => 'A', expanded => 'x' }->{ substr $x, 2 } // 'X' } = 1 }
         elsif ( $x =~ /\A-v\z|\A--set\z/ )         { shift @a }
@@ -519,8 +521,17 @@ sub _view {
         return [ map { my $s = $pg->{slots}{$_};
             { slot_name => $_, slot_type => $s->{type} // 'physical', active => $s->{active} ? 't' : 'f',
               active_pid => $s->{active} ? $s->{active_pid} // 3121 : undef, temporary => 'f', safe_wal_size => undef,
+              # ein physischer Slot hat kein Plugin, keine Datenbank und kein confirmed_flush_lsn (NULL)
+              ( ( $s->{type} // q{physical} ) eq q{physical}
+                ? ( plugin => undef, datoid => undef, database => undef, confirmed_flush_lsn => undef )
+                : ( ( map { exists $s->{$_} ? ( $_ => $s->{$_} ) : () } qw( plugin database ) ), confirmed_flush_lsn => $s->{confirmed_flush_lsn} // $s->{restart_lsn} // q{0/3000000} ) ),
+              xmin => undef, catalog_xmin => undef, two_phase => q{f},
               restart_lsn => $s->{restart_lsn} // '0/3000000', wal_status => $s->{invalidated} ? 'lost' : _bytes( $s->{retained} ) > 10 * 1024**3 ? 'extended' : 'reserved',
               _retained => _bytes( $s->{retained} ) } } sort keys %{ $pg->{slots} || {} } ];
+    }
+    if ( $name eq q{pg_stat_replication} ) {    # ohne aktiven Slot haengt kein Replikat an: keine Zeile; sonst nicht nachgebildet
+        die "gap\n" if grep { ref eq q{HASH} && $_->{active} } values %{ $pg->{slots} || {} };
+        return [];
     }
     if ( $name eq 'pg_stat_user_tables' || $name eq 'pg_tables' ) {
         my @t;
@@ -845,8 +856,8 @@ sub _fn {
     my ( $name, $args, $row, $env ) = @_;
     my @v = map { _ev( $_, $row, $env ) } grep { $_->[0] ne 'star' } @$args;
     my ( $pg, $sess ) = @{$env}{qw( pg sess )};
-    return _pretty( $v[0] // 0 ) if $name eq 'pg_size_pretty';
-    return $row->{_retained} // 0 if $name eq 'pg_wal_lsn_diff';
+    return defined $v[0] ? _pretty( $v[0] ) : undef if $name eq q{pg_size_pretty};    # NULL bleibt NULL
+    if ( $name eq q{pg_wal_lsn_diff} ) { return undef if @v >= 2 && grep { !defined } @v[ 0, 1 ]; return $row->{_retained} // 0 }
     return '0/9A000000' if $name eq 'pg_current_wal_lsn';
     return 'PostgreSQL 15.8 (Debian 15.8-0+deb12u1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14) 12.2.0, 64-bit' if $name eq 'version';
     return $sess->{user} if $name eq 'current_user' || $name eq 'session_user';
@@ -1000,6 +1011,8 @@ sub _statement {
         return _err($err) if $err;
         return ( "$verb ROLE", 1 );
     }
+    # DROP REPLICATION SLOT ist ein Befehl des Replikationsprotokolls, kein SQL
+    return _err(qq{syntax error at or near "REPLICATION"\nLINE 1: $st\n             ^}) if $u =~ /\ADROP\s+REPLICATION\b/i;
     if ( $u =~ /\ADROP (?:ROLE|USER) (IF EXISTS )?(\S+)\z/i ) {
         return _err('permission denied to drop role') unless $super;
         delete $pg->{roles}{$2} or ( $1 ? return ( 'DROP ROLE', 1 ) : return _err(qq{role "$2" does not exist}) );
@@ -1499,7 +1512,7 @@ Langertha::Holmgang::Sim::Linux::Postgres - PostgreSQL on a simulated Linux serv
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

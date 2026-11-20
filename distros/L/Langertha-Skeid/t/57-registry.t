@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -47,8 +48,8 @@ sub downstream_config {
   return {
     admin => { api_key => 'adm' },
     nodes => [
-      { id => 'gpu-hot',  url => 'http://127.0.0.1:1/v1', model => 'm', max_conns => 4, tags => ['local'] },
-      { id => 'gpu-cool', url => 'http://127.0.0.1:1/v1', model => 'm', max_conns => 4, tags => ['local'] },
+      { id => 'gpu-hot', trust => 'internal', url => 'http://127.0.0.1:1/v1', model => 'm', max_conns => 4, tags => ['local'] },
+      { id => 'gpu-cool', trust => 'internal', url => 'http://127.0.0.1:1/v1', model => 'm', max_conns => 4, tags => ['local'] },
     ],
     %extra,
   };
@@ -119,7 +120,7 @@ sub downstream_config {
 
   my $probe_node = sub {
     my (%cap) = @_;
-    return { nodes => [ { id => 'peer', url => 'http://peer/v1', model => 'm',
+    return { nodes => [ { id => 'peer', trust => 'internal', url => 'http://peer/v1', model => 'm',
       capacity => { probe => 'registry', %cap } } ] };
   };
   like $load->($probe_node->(admin_key_env => $ADMIN_ENV)), qr/secret_env is required/,
@@ -134,14 +135,14 @@ sub downstream_config {
     qr/absolute http/, 'nor with a non-http url';
   is $load->($probe_node->(secret_env => $SECRET_ENV, admin_key_env => $ADMIN_ENV)), '',
     'a complete block loads';
-  is $load->({ nodes => [ { id => 'peer', url => 'http://peer/v1', model => 'm',
+  is $load->({ nodes => [ { id => 'peer', trust => 'internal', url => 'http://peer/v1', model => 'm',
       capacity => { type => 'registry', secret_env => $SECRET_ENV, admin_key_env => $ADMIN_ENV } } ] }), '',
     'type: registry is accepted as well as probe: registry';
 
   # The admin API adds nodes too; a bad block is a 400 there, not a silently forgetting probe.
   my $skeid = Langertha::Skeid->new(admin_api_key => 'adm');
   Test::Mojo->new(quiet_app($skeid))
-    ->post_ok('/skeid/nodes' => $ADMIN => json => { id => 'peer', url => 'http://peer/v1',
+    ->post_ok('/skeid/nodes' => $ADMIN => json => { id => 'peer', trust => 'internal', url => 'http://peer/v1',
       capacity => { probe => 'registry', admin_key_env => $ADMIN_ENV } })
     ->status_is(400);
 }
@@ -235,7 +236,7 @@ sub downstream_config {
 # --- readings from two sources: the tighter one wins, and forgetting is per source ---
 {
   my $skeid = Langertha::Skeid->new;
-  $skeid->add_node(id => 'peer', url => 'http://peer/v1', model => 'm', max_conns => 8);
+  $skeid->add_node(id => 'peer', trust => 'internal', url => 'http://peer/v1', model => 'm', max_conns => 8);
   $skeid->observe_response_headers('peer', {}, status => 429);
   $skeid->set_capacity_reading('peer', source => 'registry', used => 0, limit => 8);
   is $skeid->capacity_reading('peer')->{source}, 'ratelimit',
@@ -288,7 +289,7 @@ sub downstream_config {
 # probe that later said "empty" out for good, and the node was never admitted again.
 {
   my $skeid = Langertha::Skeid->new(capacity_max_age_ms => 0);
-  $skeid->add_node(id => 'n', url => 'http://n/v1', model => 'm', max_conns => 10);
+  $skeid->add_node(id => 'n', trust => 'internal', url => 'http://n/v1', model => 'm', max_conns => 10);
   $skeid->observe_response_headers('n',
     { 'x-ratelimit-remaining-requests' => 0, 'x-ratelimit-limit-requests' => 10 });
   ok !$skeid->_capacity_allows('n'), 'a used-up ratelimit reading stops admission';
@@ -326,7 +327,7 @@ sub downstream_config {
 {
   require Langertha::Skeid::CapacityProbe::Prometheus;
   my $skeid = Langertha::Skeid->new(capacity_max_age_ms => 60_000);
-  $skeid->add_node(id => 'n', url => 'http://127.0.0.1:1/v1', model => 'm', max_conns => 4);
+  $skeid->add_node(id => 'n', trust => 'internal', url => 'http://127.0.0.1:1/v1', model => 'm', max_conns => 4);
   for my $class (qw(Langertha::Skeid::CapacityProbe::Prometheus Langertha::Skeid::CapacityProbe::Registry)) {
     my $probe = $class->new(skeid => $skeid, node_id => 'n',
       config => { secret_env => $SECRET_ENV, admin_key_env => $ADMIN_ENV });
@@ -360,7 +361,7 @@ sub downstream_config {
 # --- a probe that polls no more often than readings live is reported (review M8) ---
 {
   my $skeid = Langertha::Skeid->new(capacity_max_age_ms => 1000);
-  $skeid->add_node(id => 'n', url => 'http://127.0.0.1:1/v1', model => 'm', max_conns => 4);
+  $skeid->add_node(id => 'n', trust => 'internal', url => 'http://127.0.0.1:1/v1', model => 'm', max_conns => 4);
   my @warnings;
   local $SIG{__WARN__} = sub { push @warnings, $_[0] };
   my $slow = Langertha::Skeid::CapacityProbe::Registry->new(skeid => $skeid, node_id => 'n',
@@ -380,8 +381,8 @@ sub downstream_config {
 # --- a reload that drops a node drops its reading and error history (re-review) ---
 {
   my $cfg = { nodes => [
-    { id => 'keep', url => 'http://keep/v1', model => 'm', max_conns => 4 },
-    { id => 'gone', url => 'http://gone/v1', model => 'm', max_conns => 4 },
+    { id => 'keep', trust => 'internal', url => 'http://keep/v1', model => 'm', max_conns => 4 },
+    { id => 'gone', trust => 'internal', url => 'http://gone/v1', model => 'm', max_conns => 4 },
   ] };
   my $skeid = Langertha::Skeid->new(config_loader => sub { $cfg });
   for my $id (qw(keep gone)) {
@@ -389,7 +390,7 @@ sub downstream_config {
     $skeid->start_request($id);
     $skeid->finish_request($id, ok => 0);
   }
-  $cfg = { nodes => [ { id => 'keep', url => 'http://keep/v1', model => 'm', max_conns => 4 } ] };
+  $cfg = { nodes => [ { id => 'keep', trust => 'internal', url => 'http://keep/v1', model => 'm', max_conns => 4 } ] };
   $skeid->reload_config;
   ok !exists $skeid->_capacity->{gone}, 'the dropped node\'s reading is gone';
   ok !exists $skeid->_failures->{gone}, 'and so is its failure history';
@@ -399,13 +400,13 @@ sub downstream_config {
 # --- removing a node drops its error history with its reading (review M5) ---
 {
   my $skeid = Langertha::Skeid->new;
-  $skeid->add_node(id => 'n', url => 'http://n/v1', model => 'm', max_conns => 4);
+  $skeid->add_node(id => 'n', trust => 'internal', url => 'http://n/v1', model => 'm', max_conns => 4);
   $skeid->start_request('n');
   $skeid->finish_request('n', ok => 0);
   ok $skeid->_failures->{n}, 'a failed request is recorded';
   $skeid->remove_node('n');
   ok !exists $skeid->_failures->{n}, 'removal forgets it';
-  $skeid->add_node(id => 'n', url => 'http://other/v1', model => 'm', max_conns => 4);
+  $skeid->add_node(id => 'n', trust => 'internal', url => 'http://other/v1', model => 'm', max_conns => 4);
   my ($node) = @{$skeid->registry_snapshot->{nodes}};
   is_deeply [@{$node}{qw(errors_in_window last_failure_at)}], [0, undef],
     'a node re-added under the same id starts without the old machine\'s errors';
@@ -469,7 +470,7 @@ sub downstream_config {
   my $port = $daemon->ports->[0];
 
   my $front = Langertha::Skeid->new(capacity_max_age_ms => 60_000);
-  $front->add_node(id => 'peer', url => "http://127.0.0.1:$port/v1", model => 'm', max_conns => 16,
+  $front->add_node(id => 'peer', trust => 'internal', url => "http://127.0.0.1:$port/v1", model => 'm', max_conns => 16,
     capacity => { probe => 'registry', secret_env => $SECRET_ENV,
       read_key_env => 'SKEID_T57_READ', admin_key_env => $ADMIN_ENV });
   my $probe = Langertha::Skeid::CapacityProbe->for_node($front, $front->nodes->[0]);
@@ -506,7 +507,7 @@ sub downstream_config {
   my $port = $daemon->ports->[0];
 
   my $skeid = Langertha::Skeid->new(capacity_max_age_ms => 60_000);
-  $skeid->add_node(id => 'peer', url => "http://127.0.0.1:$port/v1", model => 'm', max_conns => 16,
+  $skeid->add_node(id => 'peer', trust => 'internal', url => "http://127.0.0.1:$port/v1", model => 'm', max_conns => 16,
     capacity => { probe => 'registry', secret_env => $SECRET_ENV, admin_key_env => $ADMIN_ENV });
   my $probe = Langertha::Skeid::CapacityProbe->for_node($skeid, $skeid->nodes->[0]);
   isa_ok $probe, 'Langertha::Skeid::CapacityProbe::Registry';
@@ -642,7 +643,7 @@ sub downstream_config {
   my $front = Langertha::Skeid->new(route_wait_timeout_ms => 200, route_wait_poll_ms => 10);
   for my $name (qw(hot cool)) {
     $front->add_node(
-      id => "peer-$name", url => "http://127.0.0.1:$downstream{$name}{port}/v1", model => 'm',
+      id => "peer-$name", trust => 'internal', url => "http://127.0.0.1:$downstream{$name}{port}/v1", model => 'm',
       max_conns => 16,
       capacity => { probe => 'registry', secret_env => $SECRET_ENV, admin_key_env => $ADMIN_ENV,
                     interval_ms => 200 },

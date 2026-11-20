@@ -3,18 +3,20 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: MIDI and music utilities
 
-our $VERSION = '0.1309';
+our $VERSION = '0.1312';
 
 use strict;
 use warnings;
 
 use File::Slurper qw(write_text);
-use List::Util qw(first);
+use List::Util qw(any first);
 use MIDI ();
 use MIDI::Simple ();
 use Music::Tempo qw(bpm_to_ms);
 use Music::Scales qw(%original_modes);
 use Exporter 'import';
+
+use constant TICKS => 96; # nb: used internally when a score is not given
 
 our @EXPORT = qw(
     midi_dump
@@ -31,9 +33,9 @@ our @EXPORT = qw(
     get_microseconds
     score2events
     scale_names
+    remove_notes
+    TICKS
 );
-
-use constant TICKS => 96; # nb: used internally when a score is not given
 
 
 sub setup_score {
@@ -318,6 +320,17 @@ sub scale_names {
     return [ sort keys %original_modes ];
 }
 
+
+sub remove_notes {
+    my ($indices, $notes) = @_;
+    my @notes;
+    for my $n (0 .. @$notes - 1) {
+        next if any { $n == $_ } @$indices;
+        push @notes, $notes->[$n];
+    }
+    return \@notes;
+}
+
 1;
 
 __END__
@@ -332,7 +345,7 @@ MIDI::Util - MIDI and music utilities
 
 =head1 VERSION
 
-version 0.1309
+version 0.1312
 
 =head1 SYNOPSIS
 
@@ -384,6 +397,9 @@ version 0.1309
   my $events = score2events($score);
 
   my $name = scale_names();
+
+  my $new_notes = remove_notes([1,2], [qw(Gs5 C5 Ds5)]);
+  # [Gs5]
 
 =head1 DESCRIPTION
 
@@ -551,6 +567,12 @@ Return the B<score> as array reference of events.
   $name = scale_names();
 
 Return the scale names as known to the L<Music::Scales> module.
+
+=head2 remove_notes
+
+  @new_notes = remove_notes(\@indices, \@notes);
+
+Remove the given indices from the given chord or list of notes.
 
 =head1 SEE ALSO
 

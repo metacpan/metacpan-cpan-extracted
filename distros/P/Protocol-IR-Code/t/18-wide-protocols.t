@@ -5,6 +5,7 @@ use warnings;
 # "portable" warning; the wide protocols use them by design.
 no warnings 'portable';
 use Test::More;
+use Math::BigInt;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 use TestData qw(pronto_to_pairs);
@@ -36,7 +37,7 @@ is($n->bits,       48,          '48-NEC2 bits');
 is($n->address,    77,          '48-NEC2 address');
 is($n->subaddress, 178,         '48-NEC2 subaddress');
 is($n->command,    222,         '48-NEC2 command');
-is($n->data,       0x4DB2DE2100FF, '48-NEC2 packs D:S:F:~F:E:~E');
+is($n->data,       Math::BigInt->from_hex('0x4DB2DE2100FF'), '48-NEC2 packs D:S:F:~F:E:~E');
 
 # The accumulated (DataLSB) form decodes the same fields.
 my $nl = Protocol::IR::Proto::NEC482->decode_raw('0x4DB2DE2100FF');
@@ -45,9 +46,9 @@ is($nl->subaddress, 178, '48-NEC2 raw decode subaddress');
 is($nl->command,    222, '48-NEC2 raw decode command');
 
 # The display (Data) form is the per-byte bit reversal of the accumulated
-# word (0x4DB2DE2100FF <-> 0xB24D7B8400FF).
+# word (Math::BigInt->from_hex('0x4DB2DE2100FF') <-> Math::BigInt->from_hex('0xB24D7B8400FF')).
 my $nm = Protocol::IR::Proto::NEC48->decode_byte_order('0xB24D7B8400FF', 0);
-is($nm->data, 0x4DB2DE2100FF, '48-NEC1 display form translates to accumulated');
+is($nm->data, Math::BigInt->from_hex('0x4DB2DE2100FF'), '48-NEC1 display form translates to accumulated');
 is($nm->protocol, '48-NEC1', '48-NEC1 keeps its identity on by-name import');
 
 # 48-NEC2 keeps its identity too.
@@ -64,7 +65,7 @@ my $n_back = $converter->import_format('Pronto', $n_pronto);
 # differ only in repeat structure), so the base variant absorbs the timing
 # decode just as NEC absorbs NEC2.
 is($n_back->protocol,   '48-NEC1', 'timing decode identifies the 48-bit NEC framing');
-is($n_back->data,       0x4DB2DE2100FF, '48-NEC timing roundtrip preserves the word');
+is($n_back->data,       Math::BigInt->from_hex('0x4DB2DE2100FF'), '48-NEC timing roundtrip preserves the word');
 is($n_back->address,    77,  '48-NEC timing roundtrip preserves address');
 is($n_back->subaddress, 178, '48-NEC timing roundtrip preserves subaddress');
 is($n_back->command,    222, '48-NEC timing roundtrip preserves command');
@@ -83,12 +84,12 @@ is($j->bits,       48,       'JVC-48 bits');
 is($j->address,    34,       'JVC-48 address');
 is($j->subaddress, 33,       'JVC-48 subaddress');
 is($j->command,    3,        'JVC-48 command');
-is($j->data,       0x030122210300, 'JVC-48 packs OEM 3/1 then D:S:F:checksum');
+is($j->data,       Math::BigInt->from_hex('0x030122210300'), 'JVC-48 packs OEM 3/1 then D:S:F:checksum');
 
 # A missing subdevice sends a zero field (there is no Default S rule).
 my $jo = Protocol::IR::Proto::JVC48->decode_params(address => 34, command => 3);
 is($jo->subaddress, -1, 'JVC-48 omitted subaddress stays -1');
-is($jo->data,       0x030122000321, 'JVC-48 wire subdevice defaults to 0');
+is($jo->data,       Math::BigInt->from_hex('0x030122000321'), 'JVC-48 wire subdevice defaults to 0');
 
 my $jl = Protocol::IR::Proto::JVC48->decode_raw('0x030122210300');
 is($jl->address,    34,  'JVC-48 raw decode address');
@@ -96,14 +97,14 @@ is($jl->subaddress, 33,  'JVC-48 raw decode subaddress');
 is($jl->command,    3,   'JVC-48 raw decode command');
 
 my $jm = Protocol::IR::Proto::JVC48->decode_byte_order('0xC0804484C000', 0);
-is($jm->data, 0x030122210300, 'JVC-48 display form translates to accumulated');
+is($jm->data, Math::BigInt->from_hex('0x030122210300'), 'JVC-48 display form translates to accumulated');
 
 # Pronto roundtrip: 37 kHz word (0x0070), 50 pairs.
 my $j_pronto = $converter->export_code($j, 'Pronto');
 like($j_pronto, qr/^0000 0070/, 'JVC-48 Pronto carries 37 kHz word');
 my $j_back = $converter->import_format('Pronto', $j_pronto);
 is($j_back->protocol,   'JVC-48', 'timing decode identifies JVC-48');
-is($j_back->data,       0x030122210300, 'JVC-48 timing roundtrip preserves the word');
+is($j_back->data,       Math::BigInt->from_hex('0x030122210300'), 'JVC-48 timing roundtrip preserves the word');
 is($j_back->address,    34,  'JVC-48 timing roundtrip preserves address');
 is($j_back->subaddress, 33,  'JVC-48 timing roundtrip preserves subaddress');
 is($j_back->command,    3,   'JVC-48 timing roundtrip preserves command');
@@ -158,17 +159,17 @@ is($s36->bits,       36,          'SAMSUNG36 bits');
 is($s36->address,    0x7004,      'SAMSUNG36 address');
 is($s36->subaddress, -1,          'SAMSUNG36 has no subaddress');
 is($s36->command,    0xF023E,     'SAMSUNG36 command');
-is($s36->data,       0x7004F023E, 'SAMSUNG36 packs block1 (16) and block2 (20)');
+is($s36->data,       Math::BigInt->from_hex('0x7004F023E'), 'SAMSUNG36 packs block1 (16) and block2 (20)');
 
 # decode_raw expects the display form: the word read MSB-first.
 my $s36raw = Protocol::IR::Proto::SAMSUNG36->decode_raw('0x7004F023E');
 is($s36raw->address, 0x7004, 'SAMSUNG36 raw decode address');
 is($s36raw->command, 0xF023E, 'SAMSUNG36 raw decode command');
-is($s36raw->data,    0x7004F023E, 'SAMSUNG36 raw decode data');
+is($s36raw->data,    Math::BigInt->from_hex('0x7004F023E'), 'SAMSUNG36 raw decode data');
 
 # The "LSB" column is the whole word read end to end in reverse.
 my $s36lsb = Protocol::IR::Proto::SAMSUNG36->decode_byte_order('0x7C40F200E', 1);
-is($s36lsb->data, 0x7004F023E, 'SAMSUNG36 LSB form reverses end to end to display');
+is($s36lsb->data, Math::BigInt->from_hex('0x7004F023E'), 'SAMSUNG36 LSB form reverses end to end to display');
 
 # Pronto roundtrip: two blocks, so 1 + 16 + 1 + 20 + 1 = 39 pairs.
 my $s36_pronto = $converter->export_code($s36, 'Pronto');
@@ -180,7 +181,7 @@ is($s36_pairs[17][0] >= 400 && $s36_pairs[17][0] <= 900, 1, 'SAMSUNG36 mid-block
 is($s36_pairs[17][1] >= 3800 && $s36_pairs[17][1] <= 5200, 1, 'SAMSUNG36 mid-block space');
 my $s36_back = $converter->import_format('Pronto', $s36_pronto);
 is($s36_back->protocol, 'SAMSUNG36', 'timing decode identifies SAMSUNG36');
-is($s36_back->data,     0x7004F023E, 'SAMSUNG36 timing roundtrip preserves the word');
+is($s36_back->data,     Math::BigInt->from_hex('0x7004F023E'), 'SAMSUNG36 timing roundtrip preserves the word');
 is($s36_back->address,  0x7004, 'SAMSUNG36 timing roundtrip preserves address');
 is($s36_back->command,  0xF023E, 'SAMSUNG36 timing roundtrip preserves command');
 
@@ -197,23 +198,23 @@ my $codes = $converter->import_format('CSV', $csv);
 is(scalar(@$codes), 5, 'all wide-protocol rows decode');
 my %by_alias = map { $_->alias => $_ } @$codes;
 is($by_alias{'KEY_POWER'}->protocol,  '48-NEC1',  '48-NEC1 row keeps protocol');
-is($by_alias{'KEY_POWER'}->data,      0x4DB2DE2100FF, '48-NEC1 row data');
+is($by_alias{'KEY_POWER'}->data,      Math::BigInt->from_hex('0x4DB2DE2100FF'), '48-NEC1 row data');
 is($by_alias{'KEY_TEMPUP'}->protocol, '48-NEC2',  '48-NEC2 row keeps protocol');
 is($by_alias{'KEY_PLAY'}->protocol,   'JVC-48',   'JVC-48 row keeps protocol');
-is($by_alias{'KEY_PLAY'}->data,       0x030122210300, 'JVC-48 row data');
+is($by_alias{'KEY_PLAY'}->data,       Math::BigInt->from_hex('0x030122210300'), 'JVC-48 row data');
 is($by_alias{'KEY_AC'}->protocol,     'SAMSUNG20', 'SAMSUNG20 row keeps protocol');
 is($by_alias{'KEY_AC'}->data,         0x27201,    'SAMSUNG20 row data');
 is($by_alias{'KEY_BLURAY'}->protocol, 'SAMSUNG36', 'SAMSUNG36 row keeps protocol');
-is($by_alias{'KEY_BLURAY'}->data,     0x7004F023E, 'SAMSUNG36 row data');
+is($by_alias{'KEY_BLURAY'}->data,     Math::BigInt->from_hex('0x7004F023E'), 'SAMSUNG36 row data');
 
 # --- end-to-end: IRDB CSV to HAIR wig and back -------------------------------
 my $wig = $converter->export_codes('wig', $codes, name => 'Wide Protocols');
 my $back = $converter->import_format('wig', $wig);
 is(scalar(@$back), 5, 'wig roundtrip decodes all five signals');
 my %back_by_alias = map { $_->alias => $_ } @$back;
-is($back_by_alias{'KEY_POWER'}->data,  0x4DB2DE2100FF, '48-NEC1 wig roundtrip data');
-is($back_by_alias{'KEY_PLAY'}->data,   0x030122210300, 'JVC-48 wig roundtrip data');
+is($back_by_alias{'KEY_POWER'}->data,  Math::BigInt->from_hex('0x4DB2DE2100FF'), '48-NEC1 wig roundtrip data');
+is($back_by_alias{'KEY_PLAY'}->data,   Math::BigInt->from_hex('0x030122210300'), 'JVC-48 wig roundtrip data');
 is($back_by_alias{'KEY_AC'}->data,     0x27201,        'SAMSUNG20 wig roundtrip data');
-is($back_by_alias{'KEY_BLURAY'}->data, 0x7004F023E,    'SAMSUNG36 wig roundtrip data');
+is($back_by_alias{'KEY_BLURAY'}->data, Math::BigInt->from_hex('0x7004F023E'),    'SAMSUNG36 wig roundtrip data');
 
 done_testing;

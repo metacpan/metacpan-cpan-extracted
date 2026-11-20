@@ -1,5 +1,5 @@
 package Langertha::Skeid::OpenAPI;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 # ABSTRACT: OpenAPI 3.1 description built from the proxy's route table
 use strict;
 use warnings;
@@ -147,6 +147,23 @@ my %SCHEMA = (
     },
     required => [ 'model', 'prompt' ],
   },
+  OllamaEmbedRequest => {
+    type       => 'object',
+    properties => {
+      model      => { type => 'string' },
+      input      => { oneOf => [ { type => 'string' }, { type => 'array', items => { type => 'string' } } ] },
+      dimensions => { type => 'integer' },
+    },
+    required => [ 'model', 'input' ],
+  },
+  OllamaEmbeddingsRequest => {
+    type       => 'object',
+    properties => {
+      model  => { type => 'string' },
+      prompt => { type => 'string' },
+    },
+    required => [ 'model', 'prompt' ],
+  },
   NodeList => {
     type       => 'object',
     properties => { nodes => { type => 'array', items => { type => 'object' } } },
@@ -163,6 +180,8 @@ my %EXAMPLE = (
   AnthropicMessagesRequest => sub { +{ model => $_[0], max_tokens => 256, messages => [ { role => 'user', content => 'Hello' } ] } },
   OllamaChatRequest        => sub { +{ model => $_[0], stream => \0, messages => [ { role => 'user', content => 'Hello' } ] } },
   OllamaGenerateRequest    => sub { +{ model => $_[0], stream => \0, prompt => 'Hello' } },
+  OllamaEmbedRequest       => sub { +{ model => $_[0], input => 'The quick brown fox' } },
+  OllamaEmbeddingsRequest  => sub { +{ model => $_[0], prompt => 'The quick brown fox' } },
 );
 
 # --- path templates ---------------------------------------------------------------------------
@@ -309,7 +328,7 @@ Langertha::Skeid::OpenAPI - OpenAPI 3.1 description built from the proxy's route
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -353,7 +372,7 @@ when the config requires a key on the client routes), C<version>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-skeid/issues>.
 
 =head2 IRC
@@ -366,11 +385,11 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

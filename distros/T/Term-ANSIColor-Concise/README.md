@@ -25,7 +25,7 @@ Term::ANSIColor::Concise - Produce ANSI terminal sequence by concise notation
 
 # VERSION
 
-Version 3.05
+Version 3.06
 
 # DESCRIPTION
 
@@ -127,7 +127,7 @@ foreground and background.  So `R/W` is red text on white.
 Modifiers described in ["COLOR ADJUSTMENT"](#color-adjustment) can follow a color given
 in RGB, other color spaces or names.
 
-## BASIC 8+8
+## BASIC 8+8 (+2)
 
 Single uppercase character representing 8 colors, and alternative
 (usually brighter) colors in lowercase:
@@ -140,13 +140,24 @@ Single uppercase character representing 8 colors, and alternative
     Y  y  Yellow
     K  k  Black
     W  w  White
+    T     Terminal (default color)
+    V     Values (SGR 38 and 48)
 
 `T` stands for the default color of the Terminal: `T` sets the
 foreground to the default (SGR 39), and `/T` sets the background to
-the default (SGR 49).  It has no brighter variant; `t` is the same
-as `T`.
+the default (SGR 49).
 
-    T  t  Terminal (default color)
+`V` is a color given by its Values.  The colon after it, with the
+digits and colons that follow, is put after SGR 38, or 48 for the
+background: `V:5:224` produces `ESC[38:5:224m`, the color 224 of
+the 256 colors (a light pink, `544`), and `/V:2::255:0:0` produces
+`ESC[48:2::255:0:0m`, a background of red in RGB (`/#FF0000`).  The
+values are required and are not checked, and the color is not
+converted for the terminal.  This letter is here because every number
+from 30 to 39 has one; the colors in the following sections are easier
+to use.
+
+`t` and `v` are the same as `T` and `V`.
 
 ## 6x6x6 216 COLORS
 
@@ -248,7 +259,7 @@ indicate SGR (Select Graphic Rendition) parameter values:
     ~    Cancel following effect
 
 `Z` resets everything.  To reset the color alone, use `T` (see
-["BASIC 8+8"](#basic-8-8)).
+["BASIC 8+8 (+2)"](#basic-8-8-2)).
 
 Tilde (`~`) negates the following effect; `~S` resets the effect of
 `S`.  The negation of `D` is discussed in the Wikipedia page in

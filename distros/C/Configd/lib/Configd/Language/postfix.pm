@@ -1,5 +1,5 @@
 package Configd::Language::postfix;
-$Configd::Language::postfix::VERSION = '0.005';
+$Configd::Language::postfix::VERSION = '0.007';
 #ABSTRACT: main.cf and master.cf, which postfix has never had a conf.d for.
 
 use 5.034;
@@ -254,7 +254,7 @@ Configd::Language::postfix - main.cf and master.cf, which postfix has never had 
 
 =head1 VERSION
 
-version 0.005
+version 0.007
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 package Configd;
-$Configd::VERSION = '0.005';
+$Configd::VERSION = '0.007';
 #ABSTRACT: Give software without a conf.d one anyway.
 
 use 5.034;
@@ -41,7 +41,13 @@ sub language {
 
     my $module = "Configd::Language::$name";
     eval { Module::Load::load($module); 1 } or do {
+        my $error = $@;
         my @known = $class->languages();
+
+        # A language that is here and does not load is not a typo.  The ossec
+        # language needs XML::LibXML, and "no language" would send whoever
+        # reads it looking for the wrong thing.
+        die "The language '$name' does not load: $error" if grep { $_ eq $name } @known;
         die "No language '$name'. This installation knows: " . join( ', ', @known ) . "\n";
     };
 
@@ -131,7 +137,7 @@ Configd - Give software without a conf.d one anyway.
 
 =head1 VERSION
 
-version 0.005
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -214,6 +220,14 @@ value that has since been replaced tells the reader something untrue.  They stay
 in the fragment they were written in, and C<00-original> keeps every one the file
 arrived with.
 
+B<A package upgrade replaces C<00-original>.>  The generated file is not the
+one that the package installed, so dpkg leaves the new version beside it as
+F<.dpkg-dist>, and rpm as F<.rpmnew>.  The next build makes that the new
+C<00-original> and keeps the old one as F<00-original.dpkg-old> or
+F<00-original.rpmsave>, out of the merge.  So the defaults of a new release
+reach the service at its next restart, and an edit made to the file before it
+was adopted stops taking part.  Put such an edit in a fragment.
+
 B<Editing the generated file works until the next restart.>  That is deliberate:
 long enough to test something, short enough that nobody comes to rely on it.  The
 header on the file says so.
@@ -224,6 +238,12 @@ Core perl 5.34 or newer, and nothing else.  Deliberately: this runs from
 C<ExecStartPre>, so it stands between a service and starting, and it has to work
 on whatever perl the guest already has rather than one somebody installed first.
 Ubuntu 24.04 ships 5.38 and 22.04 ships 5.34.
+
+One language is the exception.  L<Configd::Language::ossec> reads XML, which
+core perl has no parser for, so it needs L<XML::LibXML>.  Only a host that
+installs OSSEC has its file to adopt, and the same install can bring the parser
+from the packages of the distribution.  F<metamerge.yml> declares it, and the
+other languages load without it.
 
 L<Configd::Language> is where the design is written down and what you subclass
 to teach it a new format.  Read the part about checking for a native C<conf.d>
@@ -251,7 +271,8 @@ is how C<root> gets there.
 
 Dies naming what is available when there is no such language, because the
 alternative is a typo looking exactly like a language that does not handle the
-file you expected.
+file you expected.  Dies with the error of perl when the language is installed
+and does not load, such as the ossec language without L<XML::LibXML>.
 
 =head2 build($name, %opts)
 
@@ -324,11 +345,21 @@ George S. Baugh <george@troglodyne.net>
 
 =back
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords troglodyne-bot
+=for stopwords troglodyne-bot troglodyne-robot
+
+=over 4
+
+=item *
 
 troglodyne-bot <morpheus@troglodyne.net>
+
+=item *
+
+troglodyne-robot <trogbot@troglodyne.net>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

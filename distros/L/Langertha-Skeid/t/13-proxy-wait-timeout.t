@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -44,6 +45,7 @@ sub route_sync {
 
   ok $skeid->add_node(
     id        => 'sat-1',
+    trust     => 'internal',
     url       => 'http://127.0.0.1:21001/v1',
     model     => 'qwen2.5',
     healthy   => 1,
@@ -87,6 +89,7 @@ sub route_sync {
 
   ok $skeid->add_node(
     id        => 'async-1',
+    trust     => 'internal',
     url       => 'http://127.0.0.1:21002/v1',
     model     => 'qwen2.5',
     healthy   => 1,

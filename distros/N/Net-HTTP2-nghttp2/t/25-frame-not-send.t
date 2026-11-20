@@ -124,15 +124,19 @@ subtest 'a discarded DATA frame is not reported' => sub {
     );
 
     $server->submit_response($stream_id, status => 200, body => BODY);
-    pump_sessions($client, $server);
+    # Server to client only: the client's WINDOW_UPDATE for what it has read
+    # must not reach the server, or the window would let the whole body out.
+    $client->mem_recv($server->mem_send);
 
     is($received, PEER_WINDOW, 'the peer window bounded what was delivered');
+    is(scalar @closed, 0, 'the stream is still open, the rest of the body queued');
 
     $server->submit_rst_stream($stream_id, NGHTTP2_CANCEL);
     pump_sessions($client, $server);
 
     is($received, PEER_WINDOW, 'the rest of the body was discarded');
     is(scalar @closed, 1, 'the stream closed');
+    is($closed[0][1], NGHTTP2_CANCEL, 'by the reset');
     is_deeply(\@not_sent, [], 'the discarded DATA produced no report');
 };
 

@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use utf8;
@@ -231,7 +232,7 @@ sub node_url { my ($flavour, $tag, $v1) = @_; return $UP->clone->path("/__up/$fl
 sub add_node {
   my ($skeid, $id, $flavour, %extra) = @_;
   return $skeid->add_node(
-    id => $id, url => node_url($flavour, $id), model => 'bge-reranker', engine => 'openai',
+    id => $id, trust => 'internal', url => node_url($flavour, $id), model => 'bge-reranker', engine => 'openai',
     max_conns => 4, %extra,
   );
 }
@@ -240,7 +241,7 @@ sub add_tei {
   my ($skeid, $id, %extra) = @_;
   my $v1 = exists $extra{v1} ? delete $extra{v1} : '/v1';
   return $skeid->add_node(
-    id => $id, url => node_url('tei', $id, $v1), model => 'bge-reranker',
+    id => $id, trust => 'internal', url => node_url('tei', $id, $v1), model => 'bge-reranker',
     max_conns => 4, rerank_format => 'tei', %extra,
   );
 }
@@ -666,28 +667,28 @@ subtest 'a TEI answer Skeid cannot translate, and a TEI error' => sub {
 
 subtest 'rerank_format is kept by add_node and an unknown one is refused' => sub {
   my $skeid = Langertha::Skeid->new;
-  $skeid->add_node(id => 'tei-1', url => 'http://tei:8080', model => 'bge', rerank_format => ' TEI ');
-  $skeid->add_node(id => 'gpu-1', url => 'http://gpu:8000/v1', model => 'bge');
-  $skeid->add_node(id => 'gpu-2', url => 'http://gpu:8000/v1', model => 'bge', rerank_format => '');
+  $skeid->add_node(id => 'tei-1', trust => 'internal', url => 'http://tei:8080', model => 'bge', rerank_format => ' TEI ');
+  $skeid->add_node(id => 'gpu-1', trust => 'internal', url => 'http://gpu:8000/v1', model => 'bge');
+  $skeid->add_node(id => 'gpu-2', trust => 'internal', url => 'http://gpu:8000/v1', model => 'bge', rerank_format => '');
   my %node = map { $_->{id} => $_ } @{ $skeid->list_nodes };
   is $node{'tei-1'}{rerank_format}, 'tei', 'kept on the node, normalised';
   ok !exists($node{'gpu-1'}{rerank_format}), 'a node without one has no such field';
   ok !exists($node{'gpu-2'}{rerank_format}), 'nor has one that left it empty';
   is $skeid->call_function('nodes.list', {})->{nodes}[0]{rerank_format}, 'tei', 'shown by nodes.list';
 
-  ok !eval { $skeid->add_node(id => 'tei-1', url => 'http://tei:8080', rerank_format => 'cohere'); 1 },
+  ok !eval { $skeid->add_node(id => 'tei-1', trust => 'internal', url => 'http://tei:8080', rerank_format => 'cohere'); 1 },
     'an unknown rerank_format croaks';
   like $@, qr/unknown rerank_format 'cohere' \(expected one of: tei\)/, 'naming the value and the known ones';
   is scalar(grep { $_->{id} eq 'tei-1' && ($_->{rerank_format} // '') eq 'tei' } @{ $skeid->list_nodes }), 1,
     'and the node it would have replaced is still there';
 
   # At config load: the load fails, as for an unknown engine.
-  my $bad = { nodes => [ { id => 'tei-1', url => 'http://tei:8080', model => 'bge', rerank_format => 'huggingface' } ] };
+  my $bad = { nodes => [ { id => 'tei-1', trust => 'internal', url => 'http://tei:8080', model => 'bge', rerank_format => 'huggingface' } ] };
   ok !eval { Langertha::Skeid->new(config_loader => sub { $bad }); 1 }, 'a config with an unknown rerank_format does not load';
   like $@, qr/unknown rerank_format 'huggingface'/, 'and says why';
 
   # On a reload the running config stays, and the failure is reported.
-  my $cfg = { nodes => [ { id => 'tei-1', url => 'http://tei:8080', model => 'bge', rerank_format => 'tei' } ] };
+  my $cfg = { nodes => [ { id => 'tei-1', trust => 'internal', url => 'http://tei:8080', model => 'bge', rerank_format => 'tei' } ] };
   my $live = Langertha::Skeid->new(config_loader => sub { $cfg }, config_reload_interval => 0);
   is $live->list_nodes->[0]{rerank_format}, 'tei', 'a config node carries its rerank_format';
   $cfg = $bad;
@@ -698,7 +699,7 @@ subtest 'rerank_format is kept by add_node and an unknown one is refused' => sub
   like $live->reload_status->{error} // '', qr/unknown rerank_format/, 'a reload with an unknown one fails';
   is $live->list_nodes->[0]{rerank_format}, 'tei', 'and the running node is kept';
 
-  my $over_admin = eval { $skeid->call_function('nodes.add', { id => 'x', url => 'http://x', rerank_format => 'nope' }) };
+  my $over_admin = eval { $skeid->call_function('nodes.add', { id => 'x', trust => 'internal', url => 'http://x', rerank_format => 'nope' }) };
   like $@, qr/unknown rerank_format 'nope'/, 'nodes.add refuses it too';
 };
 
@@ -858,7 +859,7 @@ subtest 'an upstream error is one failed event and a free slot' => sub {
   $MODE = '';
   my ($t2, $skeid2) = proxy();
   my $dead = Mojo::IOLoop::Server->generate_port;
-  $skeid2->add_node(id => 'dead', url => "http://127.0.0.1:$dead/v1", model => 'bge-reranker', max_conns => 1);
+  $skeid2->add_node(id => 'dead', trust => 'internal', url => "http://127.0.0.1:$dead/v1", model => 'bge-reranker', max_conns => 1);
   rerank($t2, $R, request());
   $t2->status_is(502)->json_is('/error/type' => 'upstream_error');
   is scalar(@USAGE), 1, 'one usage event for the unreachable node';

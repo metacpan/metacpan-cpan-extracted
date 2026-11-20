@@ -1,5 +1,5 @@
 package Langertha::Skeid::CustomerSource::DBI;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 # ABSTRACT: Customer source fetcher on DBI - connect and query in a child process, LISTEN in another
 use Moo;
 use strict;
@@ -26,7 +26,8 @@ our $KILL_MARGIN_S = 2;
 
 sub statement {
   my ($self) = @_;
-  return Langertha::Skeid::CustomerSource->statement($self->config->{relation});
+  return Langertha::Skeid::CustomerSource->statement($self->config->{relation},
+    rate => $self->config->{rate_column});
 }
 
 
@@ -265,7 +266,7 @@ Langertha::Skeid::CustomerSource::DBI - Customer source fetcher on DBI - connect
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -283,7 +284,7 @@ another (L<Langertha::Skeid/customer_source_fetcher>). It runs
 L<Langertha::Skeid::CustomerSource/statement> through plain, blocking L<DBI> and
 L<DBD::Pg> -- B<in a child process> (L<Mojo::IOLoop/subprocess>), never on the event loop:
 DBD::Pg has no non-blocking connect, and a connect that blocks the loop stalls every stream in
-flight in the worker for up to C<connect_timeout_s> (ADR 0026, k109). The parent sees only the
+flight in the worker for up to C<connect_timeout_s> (ADR 0026). The parent sees only the
 finished rows, or an error.
 
 Each fetch forks a child that connects, runs the statement, disconnects and returns the rows.
@@ -350,7 +351,7 @@ calls it before the prefork manager forks.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-skeid/issues>.
 
 =head2 IRC
@@ -363,11 +364,11 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

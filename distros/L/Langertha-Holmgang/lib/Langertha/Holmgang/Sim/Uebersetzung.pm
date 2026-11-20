@@ -9,7 +9,7 @@ use Unicode::Normalize ();
 
 with 'Langertha::Holmgang::Role::AnswerWorld';
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 # Die Werkzeuge dieser Welt mit ihren Pflichtparametern (fuer den Lader).
@@ -190,7 +190,7 @@ Langertha::Holmgang::Sim::Uebersetzung - The answer world uebersetzung — a tra
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

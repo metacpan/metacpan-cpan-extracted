@@ -3,7 +3,7 @@
 # modify it under the same terms as Perl itself.
 
 package Convert::ASN1;
-$Convert::ASN1::VERSION = '0.36';
+$Convert::ASN1::VERSION = '0.37';
 use strict;
 use Socket;
 
@@ -11,6 +11,10 @@ BEGIN {
   local $SIG{__DIE__};
   eval { require bytes } and 'bytes'->import
 }
+
+# Largest single read, so the buffer perl allocates tracks the data
+# received and not the length an element declares
+my $MAX_READ = 65536;
 
 sub asn_recv { # $socket, $buffer, $flags
 
@@ -46,7 +50,7 @@ sub asn_recv { # $socket, $buffer, $flags
 
     # If we can decode a tag and length we can determine the length
     ($tb,$tmp) = asn_decode_tag(substr($buf,$pos));
-    unless ($tb || $pos+$tb < length $buf) {
+    unless ($tb && ($pos+$tb < length $buf)) {
       next MORE if $n == length $buf;
       last MORE;
     }
@@ -70,21 +74,40 @@ sub asn_recv { # $socket, $buffer, $flags
 	last MORE;
       }
     }
+    else {
+      next MORE if $n == length $buf;
+      last MORE;
+    }
   }
 
   if (defined $peer) {
+    my $type = getsockopt($_[0], SOL_SOCKET, SO_TYPE);
+    my $discard = defined $type && unpack('i', $type) == SOCK_DGRAM
+                  && !($_[2] & MSG_PEEK);
+
     if ($len > length $buf) {
-      # Check we can read the whole element
-      goto error
-	unless defined($peer = recv($_[0],$buf,$len,MSG_PEEK));
+      # Check we can read the whole element. Peek in doubling steps so the
+      # buffer perl allocates is bounded by the data available, not by the
+      # declared length
+      my $ask = length($buf) || 64;
+      while ($len > length $buf) {
+        $ask *= 2;
+        $ask = $len if $ask > $len;
+        goto error
+          unless defined($peer = recv($_[0],$buf,$ask,MSG_PEEK));
+        last if length($buf) < $ask;
+      }
 
       if ($len > length $buf) {
-	# Cannot get whole element
+	# Cannot get whole element; discard the datagram so it doesn't wedge the queue
+	recv($_[0], my $junk, length $buf, 0) if $discard;
 	$_[1]='';
 	return $peer;
       }
     }
     elsif ($len == 0) {
+      # Discard the datagram so it doesn't wedge the queue
+      recv($_[0], my $junk, length($buf) || 1, 0) if $discard;
       $_[1] = '';
       return $peer;
     }
@@ -134,7 +157,7 @@ sub asn_read { # $fh, $buffer, $offset
     $need = ($pos + ($depth * 2)) || 2;
 
     while(($n = $need - length $_[1]) > 0) {
-      $e = sysread($_[0],$_[1],$n,length $_[1]) or
+      $e = sysread($_[0],$_[1],($n > $MAX_READ ? $MAX_READ : $n),length $_[1]) or
 	goto READ_ERR;
     }
 
@@ -145,7 +168,7 @@ sub asn_read { # $fh, $buffer, $offset
       do {
         $need++;
 	while(($n = $need - length $_[1]) > 0) {
-	  $e = sysread($_[0],$_[1],$n,length $_[1]) or
+	  $e = sysread($_[0],$_[1],($n > $MAX_READ ? $MAX_READ : $n),length $_[1]) or
 	      goto READ_ERR;
 	}
 	$ch = unpack("C",substr($_[1],$pos++,1));
@@ -155,7 +178,7 @@ sub asn_read { # $fh, $buffer, $offset
     $need = $pos + 1;
 
     while(($n = $need - length $_[1]) > 0) {
-      $e = sysread($_[0],$_[1],$n,length $_[1]) or
+      $e = sysread($_[0],$_[1],($n > $MAX_READ ? $MAX_READ : $n),length $_[1]) or
 	  goto READ_ERR;
     }
 
@@ -169,7 +192,7 @@ sub asn_read { # $fh, $buffer, $offset
       $need = $pos + $len;
 
       while(($n = $need - length $_[1]) > 0) {
-	$e = sysread($_[0],$_[1],$n,length $_[1]) or
+	$e = sysread($_[0],$_[1],($n > $MAX_READ ? $MAX_READ : $n),length $_[1]) or
 	    goto READ_ERR;
       }
 
@@ -189,7 +212,7 @@ sub asn_read { # $fh, $buffer, $offset
   }
 
   while(($n = $pos - length $_[1]) > 0) {
-    $e = sysread($_[0],$_[1],$n,length $_[1]) or
+    $e = sysread($_[0],$_[1],($n > $MAX_READ ? $MAX_READ : $n),length $_[1]) or
       goto READ_ERR;
   }
 
@@ -234,6 +257,7 @@ sub asn_get { # $fh
     }
 
     my $get = $need > 1024 ? $need : 1024;
+    $get = $MAX_READ if $get > $MAX_READ;
 
     sysread($_[0], $href->{'asn_buffer'}, $get, length $href->{'asn_buffer'})
       or return undef;

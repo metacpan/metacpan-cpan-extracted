@@ -1,5 +1,9 @@
 Revision history for Browser-OIDC
 
+0.005     2026-11-19 22:22:41+0100
+          - Split out Browser::OAuth2
+          - Add support for form_post response mode
+
 0.004     2026-11-12 15:22:01+0100
           - Switch to using Mojolicious
           - Check iss response parameter before checking error/code

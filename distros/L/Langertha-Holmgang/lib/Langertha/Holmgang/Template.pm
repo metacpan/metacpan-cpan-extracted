@@ -10,7 +10,7 @@ use Text::Xslate ();
 use Langertha::Holmgang::Expectation qw( same_scalar );
 use Langertha::Holmgang::Simulators;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 our @EXPORT_OK = qw( render );
 
@@ -65,7 +65,7 @@ Langertha::Holmgang::Template - Kolon output templates of handlers and observati
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

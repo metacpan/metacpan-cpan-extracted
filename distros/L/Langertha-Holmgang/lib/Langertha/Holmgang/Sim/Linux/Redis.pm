@@ -9,7 +9,7 @@ use JSON::MaybeXS ();
 use Langertha::Holmgang::Shell ();
 use Langertha::Holmgang::Sim::Linux ();
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 our @GAPS;
@@ -603,7 +603,7 @@ Langertha::Holmgang::Sim::Linux::Redis - Redis on a simulated Linux server — r
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

@@ -34,7 +34,7 @@ print $result->is_anycast;           # 0
 
 ### With an API key
 
-Every paid plan answers every field: the VPN, proxy, hosting and CDN flags as well, the detail behind each flag, the city and coordinates, WHOIS and RWHOIS, and the domains hosted on the address. The plans differ only in how many lookups they include, and a free account tries every field, 100 lookups a day. Create a key in the [console](https://app.internetdata.io), then pass it in:
+Every paid plan answers every field: the VPN, proxy, hosting and CDN flags as well, the detail behind each flag, the city and coordinates, WHOIS and RWHOIS, and the domains hosted on the address. The plans differ only in how many lookups they include, and a free account tries every field. Create a key in the [console](https://app.internetdata.io), then pass it in:
 
 ```perl
 my $client = InternetData->new(api_key => $ENV{INTERNETDATA_API_KEY});
@@ -79,7 +79,7 @@ print $acct->{usage}{requests};    # 4
 print $acct->{usage}{window_end};  # when the allowance resets
 ```
 
-Usage counts against the anniversary of your subscription on a paid plan, not the calendar month and not the billing period, and against the UTC day on the free plan; it is the same number a lookup is gated on. `hard_limit` is `undef` on an uncapped plan, which is not the same as zero.
+Usage counts against the anniversary of your subscription on a paid plan, not the calendar month and not the billing period; it is the same number a lookup is gated on. `hard_limit` is `undef` on an uncapped plan, which is not the same as zero.
 
 `my_ip` returns an `InternetData::Result` like `lookup` does; `my_entitlement` returns the decoded hashref. `my_ip_p` and `my_entitlement_p` are the non-blocking forms.
 
@@ -295,7 +295,7 @@ die "no API key came back: none was picked, or it can't be shown again\n"
 my $keyed = InternetData->new(api_key => $token->{apikey});
 ```
 
-A denied sign-in dies with `InternetData::OauthAccessDeniedError` and a code that ran out with `InternetData::OauthExpiredTokenError`. Client IDs are issued on request from support@internetdata.io, and `$client->oauth->revoke('your-client-id', $token->{refresh_token})` signs the machine out again.
+A denied sign-in dies with `InternetData::OauthAccessDeniedError` and a code that ran out with `InternetData::OauthExpiredTokenError`. `$client->oauth->revoke('your-client-id', $token->{refresh_token})` signs the machine out again. Only a client we registered, such as our CLI, can use the device flow: an app of your own signs people in with the authorization code flow below.
 
 ### Sign in with OAuth (authorization code)
 
@@ -329,13 +329,13 @@ Each redirect URI must be https on a public host name, or http on a loopback add
 
 ### Absent is not false
 
-Unlimited leaves out `is_vpn`, `is_hosting`, `is_cdn` and the four proxy flags, the detail behind them, and the paid members inside `location`, `asn`, `company` and `abuse`, such as `location->{city}`; a free-plan key's answer carries `trial_expired`, true once its daily trial is spent. A paid key's carries `cap_reached`, true once its organization's overage cap is reached, when the answer has Unlimited's fields and isn't billed. A field your plan does not include is absent, which never means "we checked and found nothing". Perl makes that easy to miss, since `undef` and `0` are both false.
+Unlimited leaves out `is_vpn`, `is_hosting`, `is_cdn` and the four proxy flags, the detail behind them, and the paid members inside `location`, `asn`, `company` and `abuse`, such as `location->{city}`; a free-plan key's answer carries `trial_expired`, true once its trial is spent. A paid key's carries `cap_reached`, true once its organization's overage cap is reached, when the answer has Unlimited's fields and isn't billed. A field your plan does not include is absent, which never means "we checked and found nothing". Perl makes that easy to miss, since `undef` and `0` are both false.
 
 ```perl
 if ($result->is_hosting // 0) { ... }          # absent counts as false
 if ($result->has('is_hosting')) { ... }        # is this field in my plan? Not without a key
 if (exists $result->location->{city}) { ... }  # and a member inside an object
-if ($result->trial_expired) { ... }            # a free-plan key's daily trial is spent
+if ($result->trial_expired) { ... }            # a free-plan key's trial is spent
 if ($result->cap_reached) { ... }              # a paid key is past its overage cap
 ```
 

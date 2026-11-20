@@ -15,6 +15,10 @@ BEGIN {
         skip_all => 'spawn_blocking_fork is not available on MSWin32 (perl\'s fork() is a threads.pm emulation)',
         1
         if $^O eq 'MSWin32';
+    plan
+        skip_all => 'Cygwin fork() cannot be called from a fiber stack (the process exits silently); use spawn_blocking() there',
+        1
+        if $^O eq 'cygwin';
 }
 use blib;
 use Acme::Parataxis qw[run fiber await_sleep with_timeout];

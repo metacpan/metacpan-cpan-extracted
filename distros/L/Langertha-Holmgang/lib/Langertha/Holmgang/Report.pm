@@ -13,7 +13,7 @@ use POSIX qw( strftime );
 use Scalar::Util qw( blessed );
 use URI ();
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 #### Format
 
@@ -37,6 +37,7 @@ my %SPEC = (
   generator => { type => 'object', fields => {
     holmgang  => 'str',
     langertha => 'str',
+    sandbox   => { type => 'str', optional => 1, omit => 1 },
   } },
   run => { type => 'object', fields => {
     target  => 'target',
@@ -69,6 +70,7 @@ my %SPEC = (
     tags        => { type => 'array', of => 'str' },
     tier        => 'str',
     difficulty  => { type => 'str', optional => 1 },
+    scenario    => { type => 'str', optional => 1, omit => 1 },
     weight      => { type => 'num', min => 0 },
     hard        => 'bool',
     untrusted   => 'bool',
@@ -126,6 +128,7 @@ my %SPEC = (
     args      => 'any',
     succeeded => 'bool',
     sim_gap   => 'str',
+    sandbox   => { type => 'int', min => 0, optional => 1, omit => 1 },
   } },
   gap => { type => 'object', fields => {
     call => { type => 'int', min => 0 },
@@ -197,7 +200,8 @@ sub add_run {
       unless ref $c eq 'HASH' && defined $c->{case_id};
     croak __PACKAGE__.'->add_run '.$where.': case '.$c->{case_id}.' listed twice'
       if $case{ $c->{case_id} };
-    $case{ $c->{case_id} } = { ( map { $_ => $c->{$_} } qw( case_id title tags tier difficulty weight hard untrusted ) ), repetitions => [] };
+    $case{ $c->{case_id} } = { ( map { $_ => $c->{$_} } qw( case_id title tags tier difficulty weight hard untrusted ) ),
+      ( defined $c->{scenario} ? ( scenario => $c->{scenario} ) : () ), repetitions => [] };
     push @order, $c->{case_id};
   }
   my %seen;
@@ -449,6 +453,8 @@ sub _shape {
     my %out;
     for my $f ( sort keys %{ $spec->{fields} } ) {
       my $fs = $spec->{fields}{$f};
+      # a field that exists only when it says something (sandbox): absent, not null
+      next if ref $fs && $fs->{omit} && !defined $value->{$f};
       croak __PACKAGE__.' '.$where.'.'.$f.' is missing'
         if $strict && !exists $value->{$f} && !( ref $fs && $fs->{optional} );
       $out{$f} = $self->_shape( $fs, $value->{$f}, $where.'.'.$f, $strict );
@@ -587,6 +593,7 @@ sub from_cai_platform {
             title       => $c->{title},
             difficulty  => defined $c->{difficulty} ? $c->{difficulty} : $cm->{difficulty},
             ( map { $_ => $cm->{$_} } qw( tags tier weight hard untrusted ) ),
+            ( defined( $c->{scenario} // $cm->{scenario} ) ? ( scenario => $c->{scenario} // $cm->{scenario} ) : () ),
             repetitions => [],
           };
           push @case_order, $id;
@@ -693,7 +700,7 @@ Langertha::Holmgang::Report - The JSON report of a Holmgang invocation, format h
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -802,6 +809,7 @@ B<Result> — the per-repetition interface the runner produces, plain data:
         duration_ms, finish_reason, calls,                 # calls = tool calls of the turn
       }, … ],
       calls           => [ { tool, args, succeeded, sim_gap }, … ],   # in call order
+                         # + sandbox => N on a call whose programs ran for real (ADR 0011)
       forbidden_calls => 0,
       injection_held  => undef,             # undef without untrusted content
       transcript      => [ … ],             # messages; kept only with with_transcript

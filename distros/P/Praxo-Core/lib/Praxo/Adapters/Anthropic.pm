@@ -18,6 +18,7 @@ sub new {
         version => $args{version} // '2023-06-01',
         max_tokens => $args{max_tokens} // 1024,
         transport => $args{transport},
+        stream_transport => $args{stream_transport},
         timeout => $args{timeout} // 60,
     }, $class;
 }
@@ -35,8 +36,23 @@ sub generate {
     return _parse_response($data);
 }
 
+sub generate_stream {
+    my ($self, $request, $on_delta) = @_;
+    praxo_error('MODEL_CONFIG', 'anthropic: API key is required')
+        unless defined $self->{api_key} && $self->{api_key} ne '';
+    praxo_error('MODEL_CONFIG', 'anthropic: model is required')
+        unless $self->{model} ne '';
+    my $payload = _payload($self, $request, 1);
+    my $text = $self->{stream_transport}
+        ? $self->{stream_transport}->('/v1/messages', $payload)
+        : $self->_post_stream('/v1/messages', $payload);
+    praxo_error('PROVIDER_HTTP', 'stream transport must return SSE text')
+        if ref($text) || !defined $text;
+    return _parse_sse($text, $on_delta);
+}
+
 sub _payload {
-    my ($self, $request) = @_;
+    my ($self, $request, $stream) = @_;
     my ($system, $messages) = _build_messages($request->{messages});
     my %payload = (
         model => $self->{model},
@@ -58,6 +74,7 @@ sub _payload {
     }
     $payload{temperature} = $request->{temperature}
         if defined $request->{temperature} && $request->{temperature} != 0;
+    $payload{stream} = Praxo::Json::true_value() if $stream;
     return \%payload;
 }
 
@@ -120,6 +137,112 @@ sub _tool_choice {
     return { type => 'any' } if defined $choice && $choice eq 'required';
     return { type => 'none' } if defined $choice && $choice eq 'none';
     return undef;
+}
+
+sub _parse_sse {
+    my ($text, $on_delta) = @_;
+    my $content = '';
+    my %calls;
+    my ($input_tokens, $output_tokens, $cached_tokens, $stop_reason, $stopped) =
+        (0, 0, 0, undef, 0);
+    for my $raw (split /\n/, $text) {
+        my $line = $raw;
+        $line =~ s/^\s+|\s+$//g;
+        next unless $line =~ /^data:\s*(.*)$/;
+        my $chunk = $1;
+        $chunk =~ s/^\s+|\s+$//g;
+        next if $chunk eq '';
+        my $event = eval { Praxo::Json::parse($chunk) };
+        praxo_error('MODEL_STREAM', 'anthropic: invalid stream chunk')
+            unless ref($event) eq 'HASH';
+        my $type = $event->{type} // '';
+        if ($type eq 'message_start') {
+            my $usage = $event->{message}{usage} // {};
+            $input_tokens = $usage->{input_tokens} // 0;
+            $cached_tokens = $usage->{cache_read_input_tokens} // 0;
+        } elsif ($type eq 'content_block_start') {
+            my $index = $event->{index} // 0;
+            my $block = $event->{content_block} // {};
+            if (($block->{type} // '') eq 'tool_use') {
+                $calls{$index} = {
+                    id => $block->{id} // '',
+                    name => $block->{name} // '',
+                    arguments => '',
+                };
+            }
+        } elsif ($type eq 'content_block_delta') {
+            my $index = $event->{index} // 0;
+            my $delta = $event->{delta} // {};
+            my $delta_type = $delta->{type} // '';
+            if ($delta_type eq 'text_delta') {
+                my $piece = $delta->{text} // '';
+                if ($piece ne '') {
+                    $content .= $piece;
+                    $on_delta->($piece);
+                }
+            } elsif ($delta_type eq 'input_json_delta' && exists $calls{$index}) {
+                $calls{$index}{arguments} .= $delta->{partial_json} // '';
+            }
+        } elsif ($type eq 'message_delta') {
+            $stop_reason = $event->{delta}{stop_reason} // $stop_reason;
+            $output_tokens = $event->{usage}{output_tokens} // $output_tokens;
+        } elsif ($type eq 'message_stop') {
+            $stopped = 1;
+        } elsif ($type eq 'error') {
+            praxo_error('MODEL_STREAM', 'anthropic: stream error');
+        }
+    }
+    praxo_error('MODEL_STREAM', 'anthropic: stream ended before completion')
+        unless $stopped || defined $stop_reason;
+    my @tool_calls;
+    for my $index (sort { $a <=> $b } keys %calls) {
+        my $call = $calls{$index};
+        next if $call->{name} eq '';
+        my $arguments = {};
+        if ($call->{arguments} ne '') {
+            my $parsed = eval { Praxo::Json::parse($call->{arguments}) };
+            praxo_error('PROVIDER_JSON', 'anthropic: invalid tool arguments')
+                unless ref($parsed) eq 'HASH';
+            $arguments = $parsed;
+        }
+        push @tool_calls, Praxo::Models::tool_call(
+            id => $call->{id},
+            name => $call->{name},
+            arguments => $arguments,
+        );
+    }
+    return Praxo::Models::response(
+        message => Praxo::Models::message_assistant($content, \@tool_calls),
+        usage => Praxo::Models::usage(
+            input_tokens => $input_tokens,
+            output_tokens => $output_tokens,
+            cached_tokens => $cached_tokens,
+        ),
+        finish_reason => $stop_reason,
+    );
+}
+
+sub _post_stream {
+    my ($self, $path, $payload) = @_;
+    my %headers = (
+        'content-type' => 'application/json',
+        'accept' => 'text/event-stream',
+        'x-api-key' => $self->{api_key},
+        'anthropic-version' => $self->{version},
+    );
+    my $http = HTTP::Tiny->new(timeout => $self->{timeout});
+    my $response = $http->post(
+        $self->{base_url} . $path,
+        {
+            headers => \%headers,
+            content => Praxo::Json::stringify($payload),
+        },
+    );
+    praxo_error(
+        'PROVIDER_HTTP',
+        'provider returned HTTP ' . ($response->{status} // 0) . ': ' . ($response->{content} // ''),
+    ) unless $response->{success};
+    return $response->{content};
 }
 
 sub _parse_response {

@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -5,7 +6,7 @@ use Langertha::Skeid;
 
 my $skeid = Langertha::Skeid->new;
 ok $skeid->add_node(
-  id => 'n1',
+  id => 'n1', trust => 'internal',
   url => 'http://127.0.0.1:21001/v1',
   model => 'qwen2.5',
 ), 'node added';
@@ -46,6 +47,7 @@ is scalar(@{$skeid->list_nodes}), 0, 'no nodes left';
 {
   my $ok = $skeid->add_node(
     id     => 'n2',
+    trust  => 'internal',
     url    => 'http://127.0.0.1:21001/v1',
     model  => 'qwen2.5',
     engine => 'OpenAIBase',
@@ -58,6 +60,7 @@ is scalar(@{$skeid->list_nodes}), 0, 'no nodes left';
   eval {
     $skeid->add_node(
       id     => 'bad',
+      trust  => 'internal',
       url    => 'http://127.0.0.1:21001/v1',
       model  => 'qwen2.5',
       engine => 'openai-compatible',
@@ -69,8 +72,8 @@ is scalar(@{$skeid->list_nodes}), 0, 'no nodes left';
 ok $skeid->remove_node('n2'), 'n2 removed';
 is scalar(@{$skeid->list_nodes}), 0, 'no nodes left';
 
-ok $skeid->add_node(id => 'route-a', url => 'http://a', model => 'qwen2.5', weight => 1, max_conns => 1), 'route-a added';
-ok $skeid->add_node(id => 'route-b', url => 'http://b', model => 'qwen2.5', weight => 1, max_conns => 1), 'route-b added';
+ok $skeid->add_node(id => 'route-a', trust => 'internal', url => 'http://a', model => 'qwen2.5', weight => 1, max_conns => 1), 'route-a added';
+ok $skeid->add_node(id => 'route-b', trust => 'internal', url => 'http://b', model => 'qwen2.5', weight => 1, max_conns => 1), 'route-b added';
 
 my $pick1 = $skeid->call_function('route.next', { model => 'qwen2.5' })->{node};
 ok $pick1->{id}, 'route.next returned node';

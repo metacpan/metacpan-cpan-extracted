@@ -7,7 +7,7 @@ use utf8;
 
 use JSON::MaybeXS ();
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 my %YESNO = map { $_ => 1 } qw( passwordauthentication pubkeyauthentication kbdinteractiveauthentication
@@ -328,7 +328,7 @@ Langertha::Holmgang::Sim::Linux::Sshd - OpenSSH server on a simulated Linux serv
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

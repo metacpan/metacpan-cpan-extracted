@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test2::V0;
@@ -190,7 +191,7 @@ sub inject {
 {
   # A node with no key of its own forwards whatever the client sent, untouched.
   my $skeid = Langertha::Skeid->new;
-  $skeid->add_node(id => 'bare-node', url => 'http://test');
+  $skeid->add_node(id => 'bare-node', trust => 'internal', url => 'http://test');
 
   my %headers = (Authorization => 'Bearer client-key');
   ok inject(\%headers, $skeid, 'bare-node'), 'still calls back';
@@ -269,7 +270,7 @@ sub refusal {
 
 {
   my $skeid = Langertha::Skeid->new;
-  $skeid->add_node(id => 'bare-node', url => 'http://test');
+  $skeid->add_node(id => 'bare-node', trust => 'internal', url => 'http://test');
   my %headers = (Authorization => 'Bearer client-key');
   my ($reason) = refusal(\%headers, $skeid, 'bare-node');
   is $reason, undef, 'a node with no key source has nothing to refuse';

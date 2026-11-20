@@ -43,10 +43,12 @@
       },
       "runtime" : {
          "recommends" : {
+            "Filesys::Df" : "0",
             "Mail::DKIM" : "0"
          },
          "requires" : {
             "CGI::ACL" : "0.06",
+            "CGI::Alert" : "0",
             "CGI::Carp" : "0",
             "CGI::IDS" : "0",
             "CGI::Info" : "1.14",
@@ -74,7 +76,6 @@
             "File::Slurp" : "0",
             "File::Spec" : "0",
             "File::pfopen" : "0",
-            "Filesys::Df" : "0",
             "HTML::D3" : "0.3",
             "HTML::SocialMedia" : "0",
             "HTTP::Date" : "0",
@@ -141,6 +142,6 @@
          "web" : "https://github.com/nigelhorne/Web-VWF"
       }
    },
-   "version" : "0.003.0",
+   "version" : "0.003.1",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

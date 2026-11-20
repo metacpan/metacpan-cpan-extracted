@@ -3,6 +3,7 @@
 requires 'perl', '5.20.0';
 
 requires 'CGI::ACL', '0.06';   # For deny_cloud
+requires 'CGI::Alert';
 requires 'CGI::Carp';
 requires 'CGI::IDS';   # Intrusion detection, used by Allow.pm and Display.pm
 requires 'CGI::Info', '1.14';   # 1.14 for is_ai()
@@ -30,7 +31,6 @@ requires 'File::HomeDir';
 requires 'File::Slurp';   # Display/table.pm
 requires 'File::Spec';
 requires 'File::pfopen';
-requires 'Filesys::Df';
 requires 'HTML::D3', '0.30';   # Display/meta_data.pm; 0.23 and earlier take positional arguments, not the hashes it passes
 requires 'HTML::SocialMedia';
 requires 'HTTP::Date';   # For the Last-Modified header

@@ -1,6 +1,11 @@
 Revision history for Mail::Send::DKIM - Sign mail with DKIM, and summarise DMARC reports
 
-0.001	Tue Nov 17 12:40:18 PM EST 2026
+0.002.0 Thu Nov 19 08:12:25 PM EST 2026
+	- mail-dkim: log the sender, recipients and subject of each message
+	  sendmail accepts to syslog (identity mail-dkim, facility mail), through
+	  the new Mail::Send::DKIM::log_send.
+
+0.001.0	Tue Nov 17 12:40:18 PM EST 2026
 	First release.
 	- dmarc-report: summarise the DMARC aggregate reports in a directory,
 	  one row per sending source, and flag the ones that were not expected:

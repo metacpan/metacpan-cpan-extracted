@@ -85,6 +85,7 @@ sub new {
         max_tokens => 0,
         tool_choice => undef,
         allowed_tools => [],
+        on_delta => undef,
         require_policy => 0,
         require_tool_scope => 0,
         interrupt_on => [],
@@ -153,7 +154,9 @@ sub run {
                 tools => $options->{tools} ? $options->{tools}->specs() : [],
                 tool_choice => $options->{tool_choice},
             );
-            my $response = $options->{model}->generate($request);
+            my $response = $options->{on_delta} && $options->{model}->can('generate_stream')
+                ? $options->{model}->generate_stream($request, $options->{on_delta})
+                : $options->{model}->generate($request);
             $usage = Praxo::Models::usage_plus($usage, $response->{usage} // {});
             my $total = ($usage->{inputTokens} // 0) + ($usage->{outputTokens} // 0);
             Praxo::Errors::praxo_error('AGENT_MAX_TOKENS', 'token budget')

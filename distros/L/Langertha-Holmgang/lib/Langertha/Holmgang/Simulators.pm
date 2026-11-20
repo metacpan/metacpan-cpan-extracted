@@ -7,7 +7,7 @@ use Carp qw( croak );
 use Module::Runtime qw( module_notional_filename use_module );
 use Moose::Util qw( find_meta );
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 my %BUILTIN = (
@@ -39,6 +39,14 @@ has register_classes => (
   default => sub { [] },
 );
 
+
+has sandbox => ( is => 'rw', predicate => 'has_sandbox', clearer => 'clear_sandbox' );
+
+
+sub _ctx {
+  my ( $self, $host, $state ) = @_;
+  return { host => $host, state => $state, ( $self->has_sandbox && $self->sandbox ? ( sandbox => $self->sandbox ) : () ) };
+}
 
 sub BUILD {
   my ( $self ) = @_;
@@ -135,7 +143,7 @@ sub run_command {
   my $sim = $self->simulator( $dev->{type} );
   return ( 'ssh: connect to host '.$host.' port 22: Connection refused', 0 )
     unless $sim && $sim->can('run_command');
-  return $sim->run_command( $dev, $command // '', { host => $host, state => $state } );
+  return $sim->run_command( $dev, $command // '', $self->_ctx( $host, $state ) );
 }
 
 
@@ -145,7 +153,7 @@ sub write_file {
   my $sim = $self->simulator( $dev->{type} );
   return ( 'scp: '.$host.': Datei schreiben auf diesem Gerät nicht möglich (nur Konsole über run_command)', 0 )
     unless $sim && $sim->can('write_file');
-  return $sim->write_file( $dev, $path // '', $content // '', { host => $host, state => $state } );
+  return $sim->write_file( $dev, $path // '', $content // '', $self->_ctx( $host, $state ) );
 }
 
 
@@ -201,7 +209,7 @@ Langertha::Holmgang::Simulators - Registry of simulators by device type, and dis
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -255,6 +263,16 @@ through the device's simulator: the caller passes a copy and keeps it.
 Optional. Class names to L</register> at construction.
 
   Langertha::Holmgang::Simulators->new( register_classes => [ 'My::Sim::Switch' ] );
+
+=head2 sandbox
+
+Optional, read-write. An object with C<run> like
+L<Langertha::Holmgang::Sandbox::Docker>. With it, a simulator may run a real
+program it does not model instead of reporting a gap
+(L<Langertha::Holmgang::Sim::Linux/SANDBOX>); it reaches the simulator in the
+context of L</run_command> and L</write_file> as C<sandbox>. Unset in every
+registry a loader, lint or a test builds: without it no simulator leaves its
+state (ADR 0011).
 
 =head2 register
 

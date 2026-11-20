@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -20,10 +21,10 @@ my %bad = (
 
 for my $case (sort keys %bad) {
   my $skeid = Langertha::Skeid->new;
-  $skeid->add_node(id => 'n1', url => 'http://good/v1', model => 'm1', tags => ['local']);
+  $skeid->add_node(id => 'n1', trust => 'internal', url => 'http://good/v1', model => 'm1', tags => ['local']);
   ok(_routable($skeid, 'n1'), $case.': node routable before the bad re-add');
 
-  ok(!eval { $skeid->add_node(id => 'n1', url => 'http://bad/v1', model => 'm1', %{$bad{$case}}); 1 },
+  ok(!eval { $skeid->add_node(id => 'n1', trust => 'internal', url => 'http://bad/v1', model => 'm1', %{$bad{$case}}); 1 },
     $case.': the re-add croaks');
   my $nodes = $skeid->list_nodes;
   is(scalar(@$nodes), 1, $case.': the old node is still in the inventory');

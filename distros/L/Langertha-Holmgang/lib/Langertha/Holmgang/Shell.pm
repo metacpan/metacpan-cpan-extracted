@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 # --- Glieder -------------------------------------------------------------------
@@ -891,7 +891,7 @@ Langertha::Holmgang::Shell - The bash grammar of the simulators — words, items
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

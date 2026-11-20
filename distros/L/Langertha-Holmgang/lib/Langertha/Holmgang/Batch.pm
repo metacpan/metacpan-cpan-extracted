@@ -13,7 +13,7 @@ use Langertha::Holmgang::Report;
 use Langertha::Holmgang::Runner;
 use Langertha::Holmgang::Target;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 has suites => ( is => 'ro', required => 1 );
@@ -26,6 +26,10 @@ has repeat => ( is => 'ro' );
 
 
 has resume => ( is => 'ro' );
+
+
+has sandbox       => ( is => 'ro' );
+has sandbox_label => ( is => 'ro' );
 
 
 has on_event => ( is => 'ro' );
@@ -237,7 +241,7 @@ async sub _case_f {
     engine   => $self->_engine( $t, $job->{case}, $slot ),
     settings => $run->{variant}{settings},
   );
-  my $runner = $self->runner_class->new( target => $target );
+  my $runner = $self->runner_class->new( target => $target, ( $self->sandbox ? ( sandbox => $self->sandbox ) : () ) );
   return await $runner->run_case_f( $job->{case}, repetition => $job->{n}, no_vision => $no_vision );
 }
 
@@ -366,6 +370,7 @@ sub report {
       } @{ $suite->cases } ],
     );
   }
+  $report->generator->{sandbox} = $self->sandbox_label // ref $self->sandbox if $self->sandbox;
   $report->finish if $self->{_finished};
   return $report;
 }
@@ -387,7 +392,7 @@ Langertha::Holmgang::Batch - Suites against targets and their variants, repeated
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -491,6 +496,16 @@ C<repeat>, else 1.
 
 Optional. An earlier L<Langertha::Holmgang::Report> of the same batch (see
 L</DESCRIPTION>).
+
+=head2 sandbox
+
+Optional. A sandbox like L<Langertha::Holmgang::Sandbox::Docker>, handed to
+every runner (L<Langertha::Holmgang::Runner/sandbox>, ADR 0011).
+
+=head2 sandbox_label
+
+Optional. What the report notes as C<generator.sandbox> when L</sandbox> is
+set: runtime, image and image id.
 
 =head2 on_event
 

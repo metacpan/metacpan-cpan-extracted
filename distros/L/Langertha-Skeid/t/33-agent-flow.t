@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -86,7 +87,7 @@ my $skeid = Langertha::Skeid->new(
   route_wait_poll_ms => 5,
   store_usage_event  => sub { push @usage_events, $_[1]; return { ok => 1 } },
 );
-$skeid->add_node(id => 'agent-1', url => "http://127.0.0.1:$up_port/v1", model => 'agent-m', max_conns => 2);
+$skeid->add_node(id => 'agent-1', trust => 'internal', url => "http://127.0.0.1:$up_port/v1", model => 'agent-m', max_conns => 2);
 
 my $proxy = Langertha::Skeid::Proxy->build_app(skeid => $skeid);
 $proxy->log->level('fatal');
@@ -222,7 +223,7 @@ is $mdelta3->[1]{delta}{stop_reason}, 'end_turn',
     route_wait_poll_ms => 5,
     store_usage_event  => sub { push @usage_events, $_[1]; return { ok => 1 } },
   );
-  $tuskeid->add_node(id => 'tu-1', url => "http://127.0.0.1:$tu_port/v1", model => 'tu-m', max_conns => 2);
+  $tuskeid->add_node(id => 'tu-1', trust => 'internal', url => "http://127.0.0.1:$tu_port/v1", model => 'tu-m', max_conns => 2);
   my $tup = Langertha::Skeid::Proxy->build_app(skeid => $tuskeid);
   $tup->log->level('fatal');
   my $tupd = Mojo::Server::Daemon->new(app => $tup, listen => ['http://127.0.0.1'], silent => 1);

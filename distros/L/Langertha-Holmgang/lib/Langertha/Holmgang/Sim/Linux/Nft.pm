@@ -7,7 +7,7 @@ use utf8;
 
 use Socket qw( inet_pton AF_INET AF_INET6 );
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 my %PRIO = ( raw => -300, mangle => -150, dstnat => -100, filter => 0, security => 50, srcnat => 100 );
@@ -488,7 +488,7 @@ Langertha::Holmgang::Sim::Linux::Nft - Evaluates the nftables ruleset of a simul
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

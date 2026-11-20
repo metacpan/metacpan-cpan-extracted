@@ -2,9 +2,10 @@ package Protocol::IR::Proto::Aiwa;
 use strict;
 use warnings;
 
-our $VERSION = '1.3';
+our $VERSION = '1.5';
 
 use Protocol::IR::Code;
+use Math::BigInt;
 
 my $PRE_DATA = 0x1D8113F;
 my $PRE_BITS = 26;
@@ -23,7 +24,7 @@ sub _reverse_bits {
 
 sub decode_raw {
     my ($class, $raw) = @_;
-    my $val = $raw =~ /^0x/i ? hex($raw) : $raw + 0;
+    my $val = $raw =~ /^0x/i ? Math::BigInt->from_hex($raw) : Math::BigInt->new($raw);
     return Protocol::IR::Code->new(
         protocol   => 'Aiwa',
         bits       => $DATA_BITS,
@@ -42,7 +43,7 @@ sub decode_params {
     $cmd = hex($cmd) if $cmd =~ /^0x/i;
     $addr &= 0x7f;
     $cmd &= 0xff;
-    my $data = ($addr << 8) | $cmd;
+    my $data = (Math::BigInt->new($addr) << 8) | Math::BigInt->new($cmd);
     return Protocol::IR::Code->new(
         protocol   => 'Aiwa',
         bits       => $DATA_BITS,
@@ -59,7 +60,7 @@ sub decode_timing {
     my ($hdr_mark, $hdr_space) = @{$pairs->[0]};
     return undef unless $hdr_mark >= 7500 && $hdr_mark <= 10500 && $hdr_space >= 3500 && $hdr_space <= 5500;
 
-    my $data = 0;
+    my $data = Math::BigInt->bzero();
     for my $i (0 .. $TOTAL_BITS - 1) {
         my $space = $pairs->[$i + 1][1];
         my $bit = $space > 1100 ? 1 : 0;
@@ -68,7 +69,7 @@ sub decode_timing {
     my $prefix = ($data >> ($DATA_BITS + $POST_BITS)) & ((1 << $PRE_BITS) - 1);
     my $postfix = $data & 1;
     return undef unless $prefix == $PRE_DATA && $postfix == 1;
-    my $var = ($data >> $POST_BITS) & ((1 << $DATA_BITS) - 1);
+    my $var = ($data >> $POST_BITS) & Math::BigInt->new((1 << $DATA_BITS) - 1);
     return Protocol::IR::Code->new(
         protocol   => 'Aiwa',
         bits       => $DATA_BITS,
@@ -81,8 +82,8 @@ sub decode_timing {
 
 sub to_pronto {
     my ($class, $code) = @_;
-    my $var = $code->{data} & 0x7fff;
-    my $full = ($PRE_DATA << ($DATA_BITS + $POST_BITS)) | ($var << $POST_BITS) | 1;
+    my $var = $code->{data} & Math::BigInt->new('0x7fff');
+    my $full = (Math::BigInt->new($PRE_DATA) << ($DATA_BITS + $POST_BITS)) | ($var << $POST_BITS) | 1;
     my $carrier_hz = 38000;
     my $freq_word = int(1000000.0 / ($carrier_hz * 0.241246) + 0.5);
     my $period_us = $freq_word * 0.241246;
@@ -111,6 +112,6 @@ Protocol::IR::Proto::Aiwa - IR protocol handler
 
 =head1 VERSION
 
-version 1.3
+version 1.5
 
 =cut

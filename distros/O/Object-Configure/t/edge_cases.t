@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 use Test::Most;
+use Test::Needs;
 use Test::Mockingbird 0.10;
 use File::Temp qw(tempdir tempfile);
 use File::Spec;
@@ -748,30 +749,38 @@ subtest 'Filesystem: dangling symlink as config_file' => sub {
 # =============================================================================
 # Filesystem hostility: unreadable config file (no config_dirs supplied).
 # configure() checks -r and, if it fails and no config_dirs is given, croaks
-# with the OS error string (EACCES / ENOENT — locale-independent via $!).
+# with the OS error string (EACCES, locale-independent via $!).
+#
+# "$> == 0" is not a reliable test for whether chmod 0000 makes a file
+# unreadable (Cygwin Administrators, CAP_DAC_OVERRIDE, fakeroot, mounts
+# that ignore modes), so Test::Permissions probes it.  It is optional:
+# without it this subtest is skipped.
 # =============================================================================
 subtest 'Filesystem: unreadable config file without config_dirs croaks' => sub {
+	test_needs 'Test::Permissions';
 	plan tests => 1;
 
-	SKIP: {
-		skip 'Running as root — cannot create unreadable files', 1 if $> == 0;
+	my $dir = tempdir(CLEANUP => 1);
 
-		my ($fh, $path) = tempfile(SUFFIX => '.yml', UNLINK => 1);
-		close $fh;
-		chmod(0000, $path) or skip "Cannot chmod file: $!", 1;
+	SKIP: {
+		skip Test::Permissions::why_not('read', $dir), 1
+			unless Test::Permissions::can_revoke_read($dir);
+
+		my $path = create_test_config($dir, 'unreadable.yml', "---\n");
 
 		# Derive the expected OS error string from Perl's own $! layer (locale-safe).
 		local $! = EACCES;
 		my $expected_msg = "$!";
 
-		throws_ok {
-			Object::Configure::configure('Test::Unreadable', {
-				config_file => $path,
-			});
-		} qr/\Q$expected_msg\E/,
-			'Unreadable config file without config_dirs croaks with OS error';
-
-		chmod(0644, $path);	# restore so UNLINK can delete
+		# with_revoked restores the mode even if the block dies
+		Test::Permissions::with_revoked(read => $path, sub {
+			throws_ok {
+				Object::Configure::configure('Test::Unreadable', {
+					config_file => $path,
+				});
+			} qr/\Q$expected_msg\E/,
+				'Unreadable config file without config_dirs croaks with OS error';
+		});
 	}
 };
 

@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use utf8;
@@ -115,7 +116,7 @@ sub add_node {
   my ($skeid, $id, %extra) = @_;
   my $flavour = delete($extra{flavour}) // 'vllm';
   return $skeid->add_node(
-    id => $id, url => $UP->clone->path("/__up/$flavour/$id/v1")->to_string,
+    id => $id, trust => 'internal', url => $UP->clone->path("/__up/$flavour/$id/v1")->to_string,
     model => $MODEL, engine => 'openaibase', max_conns => 2, %extra,
   );
 }
@@ -303,7 +304,7 @@ subtest 'an upstream error or an unreachable node is one failed event and no lea
 
   my ($t2, $skeid2) = proxy();
   my $port = Mojo::IOLoop::Server->generate_port;
-  $skeid2->add_node(id => 'gone', url => "http://127.0.0.1:$port/v1", model => $MODEL, max_conns => 2);
+  $skeid2->add_node(id => 'gone', trust => 'internal', url => "http://127.0.0.1:$port/v1", model => $MODEL, max_conns => 2);
   embed($t2);
   cmp_ok $t2->tx->res->code, '>=', 500, 'an unreachable node is a server-side failure for the client';
   is scalar(@USAGE), 1, 'one event';

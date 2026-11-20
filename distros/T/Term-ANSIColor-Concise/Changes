@@ -1,5 +1,10 @@
 Revision history for Perl extension Term-ANSIColor-Concise
 
+3.06 2026-11-20T03:19:45Z
+
+    - V is a color by the values written after it: V:5:224 gives
+      SGR 38:5:224, and /V:5:224 gives 48:5:224
+
 3.05 2026-11-19T03:41:13Z
 
     - T (and t) is the default color of the terminal: T gives SGR 39,

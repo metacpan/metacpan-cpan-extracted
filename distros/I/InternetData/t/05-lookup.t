@@ -546,6 +546,17 @@ subtest 'a member of the wrong type or a null is a retried server_error' => sub 
         ['lookup_domain, a range of no name', 'lookup_domain', InternetDataTest::domain(ip_ranges => {
             domain => 'd', redirects_to => '', total => 1, ipv4 => 256, ranges => [{ range => 'r', country => 'US' }],
         })],
+        ['lookup_domain, a host without its asn', 'lookup_domain', InternetDataTest::domain(hosting => [{ ip => '192.0.2.10' }])],
+        ['lookup_domain, a host asn of "64496"', 'lookup_domain', InternetDataTest::domain(hosting => [{ ip => '192.0.2.10', asn => '64496' }])],
+        ['lookup_domain, hosting of [null]', 'lookup_domain', InternetDataTest::domain(hosting => [undef])],
+        ['lookup_domain, a cohosted total of "3"', 'lookup_domain', InternetDataTest::domain(cohosted_domains => { ip => '', total => '3', domains => [] })],
+        ['lookup_domain, cohosted domains of null', 'lookup_domain', InternetDataTest::domain(cohosted_domains => { ip => '', total => 3, domains => undef })],
+        ['lookup_domain, a web without links', 'lookup_domain', InternetDataTest::domain(web => { url => '', title => '', description => '', last_seen => '' })],
+        ['lookup_domain, a web last_seen of 20261118', 'lookup_domain', InternetDataTest::domain(web => {
+            url => '', title => '', description => '', last_seen => 20261118, links => { total => 0, hosts => [] },
+        })],
+        ['lookup_domain, redirects of [1]', 'lookup_domain', InternetDataTest::domain(redirects => { total => 1, domains => [1] })],
+        ['lookup_domain, backlinks without total', 'lookup_domain', InternetDataTest::domain(backlinks => { domains => [] })],
         ['my_entitlement, requests of "1"', 'my_entitlement', { %$entitlement, usage => { %{ $entitlement->{usage} }, requests => '1' } }],
         ['my_entitlement, a null CIDR', 'my_entitlement', { %$entitlement, apikey => { %{ $entitlement->{apikey} }, allowed_cidrs => [undef] } }],
         ['my_entitlement, an empty object', 'my_entitlement', {}],

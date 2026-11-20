@@ -4,7 +4,7 @@ Convert::ASN1 - ASN.1 Encode/Decode library
 
 =head1 VERSION
 
-version 0.36
+version 0.37
 
 =head1 SYNOPSIS
 
@@ -126,6 +126,34 @@ converted into a big integer object. This option controls the big
 integer class into which the objects will be blessed. The default
 is to use Math::BigInt
 
+=item max_int_len
+
+Maximum number of content bytes permitted for an INTEGER or ENUMERATED value
+greater than 32 bits before encoding is aborted with an error. Prevents
+application code that forwards an untrusted integer (such as a search
+size-limit or paged-results count) from triggering quadratic CPU usage in the
+bigint conversion loop. Defaults to C<1025> (enough for an RSA-8192 modulus,
+which requires a leading sign byte). Set to C<0> to disable the limit; negative
+values are rejected as invalid. The check is applied to the final
+two's-complement byte count, consistent with the decode-side C<max_int_len>
+limit.
+
+  $asn->configure(encode => { max_int_len => 4096 });   # allow up to 32767-bit
+  $asn->configure(encode => { max_int_len => 0    });   # no limit (not recommended)
+
+=item max_oid_arc_len
+
+Maximum size, in encoded bytes, of a single OBJECT IDENTIFIER or RELATIVE-OID
+arc before encoding is aborted with an error. ASN.1 places no upper bound on
+an arc, but the time to encode one grows with the square of its length.
+Defaults to C<32> (224 bits; a 128-bit UUID arc needs 19 bytes). The check is
+made on the number of decimal digits, so an arc within a few bits of the limit
+may be rejected. Set to C<0> to disable the limit; negative values are
+rejected as invalid.
+
+  $asn->configure(encode => { max_oid_arc_len => 64 });   # allow up to 448-bit arcs
+  $asn->configure(encode => { max_oid_arc_len => 0  });   # no limit (not recommended)
+
 =back
 
 Decode options
@@ -164,6 +192,43 @@ If during decoding any big integers are discovered (integers greater
 than 32 bits), they will be decoded into big integer objects. This option
 controls the big integer class into which the objects will be blessed.
 The default is to use Math::BigInt.
+
+=item max_int_len
+
+Maximum number of content bytes accepted for an INTEGER or ENUMERATED element
+greater than 32 bits before decoding is aborted with an error. Prevents a
+remote peer from causing quadratic CPU usage by sending a very large integer
+value. Defaults to C<1025> (enough for an RSA-8192 modulus, which requires a
+leading sign byte). Set to C<0> to disable the limit; negative values are
+rejected as invalid.
+
+  $asn->configure(decode => { max_int_len => 4096 });   # allow up to 32767-bit
+  $asn->configure(decode => { max_int_len => 0    });   # no limit (not recommended)
+
+=item max_depth
+
+Maximum number of nested C<_decode> calls permitted before decoding is aborted
+with an error. Each SEQUENCE, SET, EXPLICIT tag, constructed string, or CHOICE
+without a tag adds one level. Prevents a remote peer from causing unbounded
+stack growth by sending deeply nested structures. Defaults to C<99>, which is
+sufficient for any real-world X.509 certificate, LDAP message, or SNMP PDU,
+and stays below Perl's built-in deep-recursion warning threshold of 100.
+Set to C<0> to disable the limit; negative values are rejected as invalid.
+
+  $asn->configure(decode => { max_depth => 256 });   # allow deeper nesting
+  $asn->configure(decode => { max_depth => 0   });   # no limit (not recommended)
+
+=item max_oid_arc_len
+
+Maximum size, in encoded bytes, of a single OBJECT IDENTIFIER or RELATIVE-OID
+arc before decoding is aborted with an error. ASN.1 places no upper bound on
+an arc, but the time to decode one grows with the square of its length, so a
+remote peer could otherwise consume unbounded CPU with a single large arc.
+Defaults to C<32> (224 bits; a 128-bit UUID arc needs 19 bytes). Set to C<0>
+to disable the limit; negative values are rejected as invalid.
+
+  $asn->configure(decode => { max_oid_arc_len => 64 });   # allow up to 448-bit arcs
+  $asn->configure(decode => { max_oid_arc_len => 0  });   # no limit (not recommended)
 
 =item null
 
@@ -230,6 +295,13 @@ or undef if there was an error. Some systems do not support the return
 of the peer address when the socket is a connected socket, in these
 cases the empty string will be returned. This is the same behaviour
 as the C<recv> function in perl itself.
+
+If the available data does not contain a complete, decodable BER element
+(truncated tag, incomplete length field, or declared length exceeding the
+datagram), BUFFER is set to the empty string and the sender address is
+returned. On a SOCK_DGRAM socket the offending datagram is also removed
+from the queue, so it cannot block the datagrams behind it, unless FLAGS
+includes MSG_PEEK, in which case it is left in place.
 
 It is recommended that if the socket is of type SOCK_DGRAM then C<recv>
 be called directly instead of calling C<asn_recv>.

@@ -273,4 +273,28 @@ subtest 'Indizes' => sub {
     is_deeply( $pg->()->{tables}{'appdb.app.orders'}{indexes}, [], 'DROP INDEX' );
 };
 
+# Nahe Verwandte der Abfrage, die die Loesung nimmt: Modelle fragten die Slots ueber
+# confirmed_flush_lsn, mit plugin, mit -Atc und per DROP REPLICATION SLOT ab — alles war eine
+# Luecke (bzw. "unrecognized option"), und der Fall damit auf dem naheliegenden Weg nicht loesbar.
+subtest 'Slots: die naheliegenden Abfragen antworten wahr' => sub {
+    fresh();
+    my ( $o, $ok, $gap ) = sh( db1 => q{sudo -u postgres psql -c "SELECT slot_name, plugin, slot_type, active, confirmed_flush_lsn FROM pg_replication_slots"} );
+    ok( $ok && !defined $gap, 'plugin und confirmed_flush_lsn: keine Luecke' );
+    like( $o, qr/^ replica_b \|\s+\| physical\s+\| f\s+\| \s*$/m, '… bei einem physischen Slot NULL' );
+    ( $o, $ok, $gap ) = sh( db1 => q{sudo -u postgres psql -Atc "select slot_name, pg_size_pretty(pg_wal_lsn_diff(pg_current_wal_lsn(), confirmed_flush_lsn)) from pg_replication_slots"} );
+    is( $o, "replica_a|\nreplica_b|", 'Differenz zu einem NULL-LSN ist NULL, nicht die zurueckgehaltene Menge; -Atc zusammengeschrieben' );
+    ok( $ok && !defined $gap, '… keine Luecke' );
+    is( scalar sh( db1 => q{sudo -u postgres psql -Atc "select slot_name, pg_size_pretty(pg_wal_lsn_diff(pg_current_wal_lsn(), restart_lsn)) from pg_replication_slots"} ),
+        "replica_a|120 MB\nreplica_b|43 GB", 'ueber restart_lsn die zurueckgehaltene Menge' );
+    ( $o, $ok, $gap ) = sh( db1 => q{sudo -u postgres psql -c "DROP REPLICATION SLOT replica_b"} );
+    like( $o, qr/\AERROR:  syntax error at or near "REPLICATION"/, 'DROP REPLICATION SLOT: Syntaxfehler wie in einer SQL-Sitzung' );
+    ok( !$ok && !defined $gap && $pg->()->{slots}{replica_b}, '… gescheitert, keine Luecke, der Slot bleibt' );
+    ( $o, $ok, $gap ) = sh( db1 => q{sudo -u postgres psql -c "select count(*) from pg_stat_replication"} );
+    ok( defined $gap, 'pg_stat_replication mit aktivem Slot: nicht nachgebildet (Luecke)' );
+    $pg->()->{slots}{replica_a}{active} = JSON::MaybeXS::false();
+    ( $o, $ok, $gap ) = sh( db1 => q{sudo -u postgres psql -Atc "select count(*) from pg_stat_replication"} );
+    is( $o, '0', '… ohne aktiven Slot haengt kein Replikat an: 0' );
+    ok( $ok && !defined $gap, '… keine Luecke' );
+};
+
 done_testing;

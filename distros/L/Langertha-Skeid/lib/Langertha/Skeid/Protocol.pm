@@ -1,5 +1,5 @@
 package Langertha::Skeid::Protocol;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 # ABSTRACT: Shared helpers for Skeid wire-format translation
 use strict;
 use warnings;
@@ -103,7 +103,7 @@ Langertha::Skeid::Protocol - Shared helpers for Skeid wire-format translation
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 DESCRIPTION
 
@@ -191,7 +191,7 @@ C<$media_type>, or with L</image_media_type> when none is given.
   my $spec = Langertha::Skeid::Protocol->openai_manifest_endpoint;
   # { dialect => 'openai-chat', path => '/v1', capabilities => [ ... ] }
 
-How the OpenAI face (C</v1/chat/completions>) appears in the provider manifest (skeid #29).
+How the OpenAI face (C</v1/chat/completions>) appears in the provider manifest (skeid k29).
 That face is the upstream call shape itself: its body goes to the node untranslated, apart from
 the model name, so it carries every OpenAI-chat request field a model entry may claim.
 C<capabilities> is the list of those flags; a model is published on this face with the
@@ -219,7 +219,7 @@ L<Langertha::Skeid::Protocol::Ollama/manifest_endpoint>).
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-skeid/issues>.
 
 =head2 IRC
@@ -232,11 +232,11 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

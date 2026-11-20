@@ -41,6 +41,7 @@ on 'test' => sub {
 
 on 'configure' => sub {
   requires "ExtUtils::MakeMaker" => "0";
+  requires "FFI::CheckLib" => "0.28";
 };
 
 on 'develop' => sub {

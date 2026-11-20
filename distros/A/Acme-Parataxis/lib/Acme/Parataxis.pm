@@ -2,7 +2,7 @@ use v5.40;
 no warnings 'recursion';    # fibers run on separate heap stacks; Perl's C-stack-depth heuristic misfires there
 use experimental qw[class try];
 
-package Acme::Parataxis v0.1.4 {
+package Acme::Parataxis v0.1.5 {
     use Affix qw[affix :types];
     use Config;
     use File::Spec;
@@ -207,7 +207,12 @@ package Acme::Parataxis v0.1.4 {
                 last if $lib;
             }
         }
-        die 'Could not find or load ' . $lib_name unless $lib;
+        if ( !$lib ) {
+            my $why = eval { Affix::get_last_error_message() };
+            $why = '' unless defined $why;
+            $why =~ s/\s+\z//;
+            die 'Could not find or load ' . $lib_name . ( length $why ? ": $why" : '' ) . ' (tried ' . scalar(@paths) . ' paths)';
+        }
         _bind_functions($lib);
     }
 
@@ -398,6 +403,11 @@ package Acme::Parataxis v0.1.4 {
                 my $now  = _now_ms();
                 my $left = $eff->{abs} - $now;
                 if ( $left <= 0 || $eff->{tok}->cancelled ) {
+
+                    # This bound is being delivered to this fiber right now. Remember that so with_timeout's boundary
+                    # backstop does not synthesise a second Timeout after the user catches this one and the block
+                    # returns normally.
+                    $eff->{served} = 1;
                     my ( $pfile, $pline ) = ( caller($level) )[ 1, 2 ];
                     delete $PARKED{$fid};
                     if ( my $old = delete $PARK_REGS{$fid} ) { $old->() }
@@ -444,6 +454,14 @@ package Acme::Parataxis v0.1.4 {
         $PARK_REGS{$fid}        = $dereg if defined $dereg;
         my $res = yield('WAITING');
         if ( defined( my $kind = $fiber->[F_INTERRUPT] ) ) {
+            if ( $kind eq 'timeout' ) {
+
+                # The timer cancelled its bound token before waking us. Mark every fired deadline scope on this fiber
+                # as served: if the block catches this Timeout and keeps going, the boundary check must not fire again.
+                for my $sc ( @{ $fiber->[F_DEADLINE_SCOPES] // [] } ) {
+                    $sc->{served} = 1 if $sc->{tok} && $sc->{tok}->cancelled;
+                }
+            }
             my $wsite = $fiber->[F_WAIT_REASON] // [ 'undef', 'undef', 'undef' ];
             warn sprintf "PARATAXIS_TRACE t=%.0fms fid=%d re-entry interrupt consumed kind=%s wait_reason=%s wait_site=%s park_site=%s\n",
                 ( time - $^T ) * 1000, $fid, $kind, $wsite->[0] // 'undef', $wsite->[1] . ':' . $wsite->[2],
@@ -599,7 +617,8 @@ package Acme::Parataxis v0.1.4 {
         # The absolute (ms-clock) bound this block's parks must respect, and a shallow copy of the spawning fiber's
         # enclosing scopes to seed the child's stack with (marked as inherited so the child never arms a helper for a
         # token it is not registered on - the owning ancestor enforces those).
-        my $scope_abs = $ms > 0 ? _now_ms() + $ms : undef;
+        my $scope_abs = $ms > 0            ? _now_ms() + $ms                                                : undef;
+        my $scope     = defined $scope_abs ? { abs => $scope_abs, tok => $deadline, own => 1, served => 0 } : undef;
         my $inherited = do {
             my $pfid = Acme::Parataxis->current_fid;
             my $pf   = $pfid >= 0                      ? Acme::Parataxis->by_id($pfid) : undef;
@@ -614,18 +633,31 @@ package Acme::Parataxis v0.1.4 {
         };
         my $child = fiber {
             my $cf = Acme::Parataxis->by_id( Acme::Parataxis->current_fid );
-            $cf->[F_DEADLINE_SCOPES] = defined $scope_abs ? [ @$inherited, { abs => $scope_abs, tok => $deadline, own => 1 } ] : $inherited;
+            $cf->[F_DEADLINE_SCOPES] = $scope ? [ @$inherited, $scope ] : $inherited;
             $deadline->register;
             $tok->register if $tok ne $deadline;
             my $val;
             my $err;
-            try { $val = $code->() } catch ($e) {
+            my $done_at;
+            try {
+                $val     = $code->();
+                $done_at = defined $scope_abs ? _now_ms() : undef;
+            }
+            catch ($e) {
                 $err = $e
             }
+
+            # A deadline helper can fire late on a busy host (or the awaited result can land just after the bound
+            # without any park being re-entered). Record the completion time at the boundary so an overdue block still
+            # fails, rather than reporting success merely because its timer had not woken us yet. A bound already
+            # delivered at a park (and therefore catchable inside the block) is not overdue here: rethrowing would
+            # turn a handled timeout into a second, uncatchable one at with_timeout's own boundary.
+            my $overdue = $scope && defined $done_at && $done_at > $scope->{abs} && !$scope->{served};
             $deadline->unregister;
             $tok->unregister                  if $tok ne $deadline;
             pop @{ $cf->[F_DEADLINE_SCOPES] } if defined $scope_abs;    # leave the stack for any enclosing scope
             die $err                          if $err;                  # the ::Timeout/::Cancelled throw (or any real error) unwinds out of the child
+            die Acme::Parataxis::Error::Timeout->new if $overdue;
             return $val;
         };
 
@@ -1535,10 +1567,11 @@ package Acme::Parataxis v0.1.4 {
     sub new ( $class, %args ) {
         my $self = bless [ $args{code}, 0, undef, undef, undef, 0, [], undef, undef, 0, undef, undef, undef, [] ], $class;
         my $fid  = Acme::Parataxis::create_fiber( $args{code}, $self );
-        croak 'could not allocate a fiber: ' . $fid == -3 ?
-            'this platform has no MAP_NORESERVE and the process has hit its address-space / data-segment budget (raise RLIMIT_DATA or lower set_max_fibers)'
+        croak 'could not allocate a fiber: ' .
+            ( $fid == -3 ?
+                'this platform has no MAP_NORESERVE and the process has hit its address-space / data-segment budget (raise RLIMIT_DATA or lower set_max_fibers)'
             :
-            'the fiber table is full (destroy some fibers first, or raise the limit with set_max_fibers)'
+                'the fiber table is full (destroy some fibers first, or raise the limit with set_max_fibers)' )
             if $fid < 0;
         $self->[F_FID] = $fid;
         return $self;

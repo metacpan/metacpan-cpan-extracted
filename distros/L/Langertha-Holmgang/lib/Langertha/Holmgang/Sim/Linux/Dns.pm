@@ -7,7 +7,7 @@ use utf8;
 
 use JSON::MaybeXS ();
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 my $T = JSON::MaybeXS::true();
@@ -819,7 +819,7 @@ Langertha::Holmgang::Sim::Linux::Dns - BIND 9 on a simulated Linux server — na
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

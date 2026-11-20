@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -40,6 +41,10 @@ subtest 'upstream_url: ws scheme, the served model, the rest as sent' => sub {
     'http becomes ws, the served model replaces the asked one';
   like $P->upstream_url('https://node/v1/realtime', 'm', Mojo::Parameters->new('model=m')),
     qr{\Awss://node/v1/realtime\?model=m\z}, 'https becomes wss';
+  is $P->upstream_url('http://node/v1/realtime', 'm',
+      Mojo::Parameters->new('model=m&autoload=true&AutoLoad=1&intent=transcription')),
+    'ws://node/v1/realtime?model=m&intent=transcription',
+    'autoload never reaches a node: a llama.cpp router would load the model past --no-models-autoload';
 };
 
 subtest 'subprotocol_key: the browser convention, first entry' => sub {

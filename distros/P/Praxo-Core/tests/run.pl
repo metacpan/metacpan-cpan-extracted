@@ -259,6 +259,69 @@ is($adapter_response->{usage}{inputTokens}, 3, 'openai input tokens');
 is($adapter_response->{usage}{outputTokens}, 2, 'openai output tokens');
 is($adapter_response->{finishReason}, 'tool_calls', 'openai finish reason');
 
+my $stream_payload;
+my $stream_adapter = Praxo::Adapters::OpenAICompatible->new(
+    base_url => 'http://example.test/v1',
+    model => 'test-model',
+    stream_transport => sub {
+        my ($path, $payload) = @_;
+        is($path, '/chat/completions', 'openai stream path');
+        $stream_payload = $payload;
+        return <<'SSE';
+data: {"choices":[{"delta":{"content":"he"}}]}
+
+data: {"choices":[{"delta":{"content":"llo"}}]}
+
+data: {"choices":[{"delta":{"tool_calls":[{"index":0,"id":"call-1","function":{"name":"ec","arguments":"{\"text\":"}}]}}]}
+
+data: {"choices":[{"delta":{"tool_calls":[{"index":0,"function":{"name":"ho","arguments":"\"hi\"}"}}]}}],"usage":{"prompt_tokens":4,"completion_tokens":2}}
+
+data: {"choices":[{"delta":{},"finish_reason":"tool_calls"}]}
+
+data: [DONE]
+SSE
+    },
+);
+my @stream_deltas;
+my $stream_response = $stream_adapter->generate_stream(
+    $adapter_request,
+    sub { push @stream_deltas, $_[0] },
+);
+is($stream_payload->{stream}, 1, 'openai stream flag');
+is_deeply(\@stream_deltas, ['he', 'llo'], 'openai stream deltas');
+is($stream_response->{message}{content}, 'hello', 'openai stream content');
+is($stream_response->{message}{toolCalls}[0]{id}, 'call-1', 'openai stream call id');
+is($stream_response->{message}{toolCalls}[0]{name}, 'echo', 'openai stream call name');
+is_deeply($stream_response->{message}{toolCalls}[0]{arguments}, { text => 'hi' },
+    'openai stream arguments');
+is($stream_response->{usage}{inputTokens}, 4, 'openai stream input tokens');
+is($stream_response->{usage}{outputTokens}, 2, 'openai stream output tokens');
+is($stream_response->{finishReason}, 'tool_calls', 'openai stream finish reason');
+
+my @agent_stream_deltas;
+my $agent_stream_adapter = Praxo::Adapters::OpenAICompatible->new(
+    base_url => 'http://example.test/v1',
+    model => 'test-model',
+    stream_transport => sub {
+        return <<'SSE';
+data: {"choices":[{"delta":{"content":"ok"}}]}
+
+data: {"choices":[{"delta":{},"finish_reason":"stop"}]}
+
+data: [DONE]
+SSE
+    },
+);
+my $agent_stream_options = Praxo::Agent::AgentOptions->new($agent_stream_adapter);
+$agent_stream_options->{on_delta} = sub { push @agent_stream_deltas, $_[0] };
+my $agent_stream_result = Praxo::Agent::run_agent(
+    $agent_stream_options,
+    Praxo::Models::session(id => 's1'),
+    'go',
+);
+is($agent_stream_result->{output}, 'ok', 'openai agent stream output');
+is_deeply(\@agent_stream_deltas, ['ok'], 'openai agent stream deltas');
+
 my $assistant = Praxo::Models::message_assistant(
     '',
     [Praxo::Models::tool_call(id => 'call-2', name => 'echo', arguments => { text => 'bye' })],
@@ -350,6 +413,45 @@ is($anthropic_response->{message}{content}, 'hello', 'anthropic content');
 is($anthropic_response->{message}{toolCalls}[0]{id}, 'tool-1', 'anthropic call id');
 is($anthropic_response->{usage}{cachedTokens}, 2, 'anthropic cached tokens');
 
+my @anthropic_events = (
+    { type => 'message_start', message => { usage => { input_tokens => 4, cache_read_input_tokens => 1 } } },
+    { type => 'content_block_start', index => 0, content_block => { type => 'text', text => '' } },
+    { type => 'content_block_delta', index => 0, delta => { type => 'text_delta', text => 'he' } },
+    { type => 'content_block_delta', index => 0, delta => { type => 'text_delta', text => 'llo' } },
+    { type => 'content_block_start', index => 1, content_block => { type => 'tool_use', id => 'call-1', name => 'echo', input => {} } },
+    { type => 'content_block_delta', index => 1, delta => { type => 'input_json_delta', partial_json => '{"text":' } },
+    { type => 'content_block_delta', index => 1, delta => { type => 'input_json_delta', partial_json => '"hi"}' } },
+    { type => 'message_delta', delta => { stop_reason => 'tool_use' }, usage => { output_tokens => 2 } },
+    { type => 'message_stop' },
+);
+my $anthropic_stream_text = join("\n\n", map {
+    'data: ' . Praxo::Json::stringify($_)
+} @anthropic_events);
+my $anthropic_stream = Praxo::Adapters::Anthropic->new(
+    model => 'claude-test',
+    api_key => 'ak',
+    stream_transport => sub {
+        my ($path, $payload) = @_;
+        is($path, '/v1/messages', 'anthropic stream path');
+        ok($payload->{stream}, 'anthropic stream flag');
+        return $anthropic_stream_text;
+    },
+);
+my @anthropic_deltas;
+my $anthropic_stream_response = $anthropic_stream->generate_stream(
+    Praxo::Models::request(messages => [Praxo::Models::message_text('user', 'hi')]),
+    sub { push @anthropic_deltas, $_[0] },
+);
+is_deeply(\@anthropic_deltas, ['he', 'llo'], 'anthropic stream deltas');
+is($anthropic_stream_response->{message}{content}, 'hello', 'anthropic stream content');
+is($anthropic_stream_response->{message}{toolCalls}[0]{id}, 'call-1', 'anthropic stream call id');
+is_deeply($anthropic_stream_response->{message}{toolCalls}[0]{arguments}, { text => 'hi' },
+    'anthropic stream args');
+is($anthropic_stream_response->{usage}{inputTokens}, 4, 'anthropic stream input tokens');
+is($anthropic_stream_response->{usage}{outputTokens}, 2, 'anthropic stream output tokens');
+is($anthropic_stream_response->{usage}{cachedTokens}, 1, 'anthropic stream cached');
+is($anthropic_stream_response->{finishReason}, 'tool_use', 'anthropic stream finish');
+
 my $gemini_captured;
 my $gemini = Praxo::Adapters::Gemini->new(
     model => 'gemini-test',
@@ -384,6 +486,41 @@ is($gemini_captured->[1]{toolConfig}{functionCallingConfig}{mode}, 'AUTO', 'gemi
 is($gemini_response->{message}{content}, 'hello', 'gemini content');
 is($gemini_response->{message}{toolCalls}[0]{name}, 'echo', 'gemini call name');
 is($gemini_response->{usage}{inputTokens}, 3, 'gemini usage');
+
+my $gemini_stream_captured;
+my $gemini_stream = Praxo::Adapters::Gemini->new(
+    model => 'gemini-test',
+    api_key => 'gk',
+    stream_transport => sub {
+        my ($path, $payload) = @_;
+        $gemini_stream_captured = [$path, $payload];
+        return join("\n\n",
+            'data: {"candidates":[{"content":{"parts":[{"text":"he"}]}}]}',
+            'data: {"candidates":[{"content":{"parts":[{"text":"llo"},'
+                . '{"functionCall":{"name":"echo","args":{"text":"hi"}}}]},'
+                . '"finishReason":"STOP"}],"usageMetadata":{"promptTokenCount":4,'
+                . '"candidatesTokenCount":2,"cachedContentTokenCount":1}}',
+        );
+    },
+);
+my @gemini_deltas;
+my $gemini_stream_response = $gemini_stream->generate_stream(
+    Praxo::Models::request(
+        messages => [Praxo::Models::message_text(Praxo::Models::USER(), 'hi')],
+    ),
+    sub { push @gemini_deltas, $_[0] },
+);
+like($gemini_stream_captured->[0], qr/:streamGenerateContent/, 'gemini stream path');
+like($gemini_stream_captured->[0], qr/alt=sse/, 'gemini stream alt');
+is(join('', @gemini_deltas), 'hello', 'gemini stream deltas');
+is($gemini_stream_response->{message}{content}, 'hello', 'gemini stream content');
+is($gemini_stream_response->{message}{toolCalls}[0]{name}, 'echo', 'gemini stream call');
+is($gemini_stream_response->{usage}{inputTokens}, 4, 'gemini stream usage');
+is($gemini_stream_response->{usage}{outputTokens}, 2, 'gemini stream output');
+is($gemini_stream_response->{usage}{cachedTokens}, 1, 'gemini stream cached');
+is($gemini_stream_response->{finishReason}, 'STOP', 'gemini stream finish');
+ok($gemini_stream_captured->[1]{contents}, 'gemini stream payload');
+
 
 my $mcp = Praxo::Adapters::MCP->new(
     transport => sub {

@@ -4,13 +4,6 @@ use PDL::Core::Dev;            # Pick up development utilities
 use ExtUtils::MakeMaker;
 use Devel::CheckLib qw(check_lib);
 
-# Check if compiled under gcc/Linux.  In which case, define bool for the compiler
-my $define_bool = '';
-if ($^O =~ /linux/) {
-  $define_bool = '-Dbool=int';
-  print "Defining bool=int (linux seems to need this)\n";
-}
-
 my $package = [qw(netcdf.pd NetCDF PDL::NetCDF)];
 my %hash = pdlpp_stdargs($package);
 my %more_items = (
@@ -43,7 +36,6 @@ my %more_items = (
   },
 );
 %hash = (%hash, %more_items);
-$hash{INC} .= " $define_bool" if $define_bool;
 
 if (check_lib( header => 'netcdf.h', lib => 'netcdf',)) {
   $hash{LIBS}[0] .= " -lnetcdf";

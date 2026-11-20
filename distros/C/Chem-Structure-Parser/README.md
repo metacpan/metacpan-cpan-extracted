@@ -78,6 +78,14 @@ Theobald's quaternion characteristic polynomial, which agrees with gemmi's
 `superpose_positions` to 5.65e-12 over 5,598 real superpositions — see
 `structure_rmsd`.
 
+And a structure is written out in the other format by the same reader, in C:
+
+    convert('2mnz.cif', '2mnz.pdb');
+    convert('1a22.pdb', '1a22.cif');
+
+What it writes reads back as what it read, to the last digit, and gemmi reads
+the same atoms from it — see `convert`.
+
 The coordinate section is parsed in C, because across a directory of
 structures it is millions of lines: the largest entry in PDBbind v2020 is
 33 MB and 411,648 atom records, and it reads in about a second. The header
@@ -106,7 +114,10 @@ it was.
     	== $b->{chains}{A}{residues}{54}{atoms}{CA}{x};                  # true
 
 So no calling code branches on the format, and a script written against a
-directory of `.pdb` files works unchanged on a directory of `.cif` ones.
+directory of `.pdb` files works unchanged on a directory of `.cif` ones. A file
+that has to be in the other format for some other program is one call away,
+`convert('1a22.cif', '1a22.pdb')`, and the same equality holds of that: the
+converted file reads back as the structure the original read as.
 
 Equality here means equality rather than approximately: `t/cif.t` reads
 fixture pairs both ways and compares the whole coordinate half of the returned
@@ -172,6 +183,9 @@ second structure — is not read into the first. An mmCIF file is its first data
 block, and a second `data_` ends it. An mmCIF loop whose last row has fewer
 values than the loop has columns was cut short, and that row is left out; every
 whole row before it is read, as the whole lines of a cut-short PDB file are.
+An `_atom_site` loop with no `pdbx_PDB_model_num` column is model 1, as a PDB
+file with no `MODEL` record is; a row whose model number is `.`, `?` or not a
+number is model 0, a model of its own, which is where gemmi files it.
 
 # Installing
 
@@ -2040,6 +2054,194 @@ Jacobi rotations of the 4x4 matrix instead, and the answer is
 three along another, where gemmi's `superpose_positions` answers NaN. Before
 0.039 this module took the identity rotation there and answered 1.732 A.
 
+## convert
+
+    convert('2mnz.cif', '2mnz.pdb');               # mmCIF to PDB, by the names
+    convert('1a22.pdb', '1a22.cif.gz');            # PDB to mmCIF, gzipped
+
+    my $r = convert('2ll7.pdb', \my $text, to => 'mmcif', model => 1, hydrogens => 0);
+    print "$r->{atoms} atoms written, $r->{rounded} numbers rounded\n";
+
+A structure written out in the other format — or in its own, with the options
+applied. The first argument is the structure: a file name, which may be
+`.gz` or `.bz2`, or a reference to its text. The second is where it goes: a
+file name, which is gzipped or bzipped when its name says so, a file handle, or
+a reference to a scalar to hold the text. Each end's format comes from its name
+as `structure_info()` works one out, or from `from` and `to`; a handle or a
+scalar has no name, so writing to one needs `to`.
+
+The coordinates are converted in C, by the same reader `structure_info()` uses:
+it hands each atom it keeps to a writer for the other format rather than
+building it. So the options mean what they mean to `structure_info()`, an
+element the file does not give is worked out the same way, and nothing is kept
+per atom but the text written — converting the largest entry in PDBbind v2020
+takes a third of a second and the memory of the file and its conversion, where
+reading it with `structure_info()` takes a second and half a gigabyte (see *What
+it costs*, below).
+
+**A converted file reads back as the structure it was read from.** Every chain,
+residue, atom, model and count `structure_info()` finds in it compares equal,
+`is_deeply`, with what it found in the original — `t/convert.t` holds every
+structure in `t/data` to that by every path, there and back, and `t/real_cif.t`
+a spread of real entries. And another reader agrees: gemmi reads every atom of
+the converted fixtures as it read the originals, which `t/oracle.t` checks, and
+read every one of 63 PDBbind entries the same from its own mmCIF, from the PDB
+this made of that, and from the mmCIF this made of it again.
+
+### What goes across
+
+Every atom of every model, ATOM and HETATM, with every alternate location, its
+occupancy, B-factor, element and charge; the anisotropic displacements, as
+ANISOU records or the `_atom_site_anisotrop` table; and the models, as MODEL
+records or `pdbx_PDB_model_num`. Of the header, the facts both formats have a
+place for, read and written through the keys `structure_info()` files them under:
+
+| `$info` key | PDB record | mmCIF category |
+| --- | --- | --- |
+| `header` (id, classification, deposition date) | `HEADER` | `_entry`, `_struct_keywords`, `_pdbx_database_status` |
+| `title` | `TITLE` | `_struct` |
+| `keywords` | `KEYWDS` | `_struct_keywords` |
+| `experiment` | `EXPDTA` | `_exptl` |
+| `resolution` | `REMARK 2` | `_refine`, or `_em_3d_reconstruction` for a map |
+| `compound` (each molecule and its chains) | `COMPND` | `_entity`, `_entity_poly` |
+| `seqres` | `SEQRES` | `_entity_poly_seq` |
+| `helix` | `HELIX` | `_struct_conf` |
+| `sheet` | `SHEET` | `_struct_sheet`, `_struct_sheet_order`, `_struct_sheet_range` |
+| `ssbond`, `link` | `SSBOND`, `LINK` | `_struct_conn` |
+| `cryst1` | `CRYST1` | `_cell`, `_symmetry` |
+
+The rest of a header — the other REMARKs, the citation, the sources, the
+heterogen names, the sites, CONECT, the database references — stays behind.
+`header => 0` leaves all of it behind and writes the coordinates alone.
+
+A header fact the other format has no room for is left out, and said so in the
+`notes` that come back: a HEADER id longer than four characters, a chain in
+SEQRES whose id is longer than one, a bond length to more decimals than SSBOND's
+two (rounded, and counted). It does not end the conversion; the coordinates are
+the structure, and a header fact is one line about it.
+
+### Numbers
+
+A number goes across as the characters the file wrote it in wherever the other
+format has room for them, so that it reads back as the same number to the last
+bit and not to within a rounding. mmCIF has room for anything a PDB column
+holds. A PDB column has eight characters for a coordinate and six for an
+occupancy or a B-factor, and an mmCIF value longer than that — `-123.45678`, or
+one written with its standard uncertainty, `12.3456(7)` — is written to the
+decimals the format gives the column, three and two. `$r->{rounded}` counts the
+numbers that are no longer the number they were; it is 0 for every entry of
+PDBbind v2020 and for the 63 of them gemmi wrote as mmCIF above, whose
+coordinates have three decimals already.
+
+### What a PDB file cannot hold
+
+PDB is fixed columns, and some of what an mmCIF file can say does not fit in
+them. An atom with such a field ends the conversion, and the message names it:
+
+    convert: the chain id 'AB' has no PDB spelling: a PDB record has one column
+    for it (atom 7, 'CA' of GLY 1 in chain 'AB', model 1)
+
+because the two other things to do are a record whose every later column is out
+by one, and a chain id made up for it. What will not fit:
+
+| field | room in a PDB record |
+| --- | --- |
+| chain id | one character |
+| residue name | three characters — the five-character names the CCD has given new ligands since 2023 have none |
+| atom name | four characters |
+| alternate location | one character |
+| a coordinate | eight columns: -999.999 to 9999.999 |
+| occupancy, B-factor | six columns: -99.99 to 999.99 |
+| serial number | 99,999 in decimal, and on in hybrid-36 to 87,440,031 |
+| residue number | -999 to 9,999 in decimal, and on in hybrid-36 to 2,436,111 |
+| model number | -999 to 9999, when there is more than one model |
+| anisotropic factor | seven columns, in units of 10⁻⁴ Å² |
+
+`chains` writes a structure some of whose chains have long ids by leaving those
+chains out, and mmCIF holds all of it.
+
+### How the PDB file is written
+
+Every record is 80 columns, at the columns the wwPDB's format description v3.3
+gives. The atom name goes back to the column a PDB file had it in; from mmCIF,
+where a name has no columns, a name shorter than four characters starts in
+column 14 when it begins with a letter and its element is one letter — `" CA "`
+is a carbon alpha — and in column 13 otherwise — `"CA  "` is a calcium. That is
+Biopython's rule, and the one the element guess reads back.
+
+A TER record follows the last atom of each run of polymer — ATOM records, and
+HETATM records of a residue the residue table knows as an amino acid or a
+nucleotide, so that a selenomethionine is inside its chain's TER and the waters
+after it outside. MODEL and ENDMDL go round every model when there is more than
+one, and round the one there is when it is not model 1, which is what a file
+without MODEL records reads as. A serial or residue number past its decimal
+columns is written in hybrid-36 — `A0000` is serial 100,000 — which is what
+cctbx, phenix and gemmi write and what this module reads. The file ends with
+END.
+
+### How the mmCIF file is written
+
+The `auth_*` columns of `_atom_site` carry the chain ids and residue numbers,
+as the PDB record did and as every reader takes them. The `label_*` columns are
+the archive's own numbering — an asym id per entity instance, a position in
+the entity's sequence — and a PDB file has none of it: `label_asym_id` repeats
+the chain id, as Biopython's and PyMOL's writers do, and `label_seq_id` and
+`label_entity_id` are `?` for a polymer residue and `.` for a HETATM one rather
+than numbers made up to look like the archive's. `label_atom_id` and
+`label_comp_id` repeat the names, as the archive's files do; gemmi reads the
+atom name from there.
+
+COMPND's molecules are the polymer entities, and SEQRES is each entity's
+sequence; a chain with a SEQRES and no COMPND is an entity of its own, shared
+with every other chain whose sequence is the same. A value that needs quoting
+is quoted: `'P 1 21 1'`, `"O5' X"`.
+
+### What comes back
+
+| key | what it holds |
+| --- | --- |
+| `from`, `to` | the two formats, as `formats()` names them |
+| `atoms` | how many atoms were written |
+| `anisou` | how many of them with their anisotropic displacements |
+| `models` | the model numbers written, in the order the file first gave them |
+| `rounded` | how many numbers were written to fewer places than they were read with |
+| `notes` | what of the header could not be written, one sentence each |
+
+### Options
+
+| option | default | what it does |
+| --- | --- | --- |
+| `from` | from the name | the input's format: `pdb` or `mmcif` (`cif` and `ent` will do) |
+| `to` | from the name | the output's format, likewise |
+| `model` | `'all'` | the model to write, or `'all'`. Unlike `structure_info()`, a model the file does not have is an error, not model 1 |
+| `hydrogens`, `waters`, `hetatm` | 1 | write those atoms |
+| `chains` | — | array reference: write only these chains |
+| `anisou` | 1 | write the anisotropic displacements |
+| `header` | 1 | write the header facts above; 0 for the coordinates alone |
+
+Options that leave nothing of a structure with atoms in it are an error rather
+than an empty file. Every alternate location is written; `altloc` is not an
+option here, because choosing among them is reading, not converting.
+
+### What it costs
+
+The largest entry in PDBbind v2020, 2wy2, is 33 MB and 411,648 atoms, and
+4fqr is 15 MB and 90,792. Best of five on this machine, warm cache, gcc `-O2`,
+perl 5.44.0, against gemmi 0.7.5 from Python
+(`gemmi.read_structure(f).make_mmcif_document().write_file(g)` and
+`write_pdb()`) and against reading the same file with `structure_info()`:
+
+| | `convert()` | gemmi | `structure_info(features => 0)` |
+| --- | --- | --- | --- |
+| 2wy2, PDB to mmCIF | 0.32 s, 74 MB | 0.44 s, 332 MB | 0.96 s, 530 MB |
+| 2wy2, mmCIF to PDB | 0.27 s, 75 MB | 0.72 s, 331 MB | |
+| 4fqr, PDB to mmCIF | 0.18 s, 37 MB | 0.18 s, 118 MB | 0.31 s, 147 MB |
+| 4fqr, mmCIF to PDB | 0.20 s, 58 MB | 0.28 s, 141 MB | |
+
+The memory is the peak of the whole process, 10 MB of which is perl and the
+module before anything is read: what is left is the file and the text it
+becomes, which are 33 MB and 32 MB for 2wy2.
+
 ## aa3to1
 
     aa3to1('ALA');    # 'A'
@@ -2287,6 +2489,13 @@ residue boundaries and counts, so everything downstream of it, in C and in
 Perl, is written once. `_atom_site` goes through that path; every other
 category is handed to Perl as tags and loops, which is the same place the line
 between the two languages falls for PDB.
+
+`convert()` is the same pass with a writer on the end of it. The reader for the
+input's format reads and filters every atom as it does for `structure_info()`,
+and hands each one it keeps to a writer for the output's format instead of
+building it into the atom hashes — so a conversion holds the file and the text
+it becomes, and nothing per atom besides. The header is converted in Perl, out
+of what the header reader makes of it, for the reason it is read in Perl.
 
 On 200 structures from PDBbind v2020, the parse runs at about 2.8 times the
 speed of the same parse written in Perl. `structure_info()` as a whole comes

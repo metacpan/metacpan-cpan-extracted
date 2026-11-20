@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -126,7 +127,7 @@ sub config_for {
   my (%pricing) = @_;
   return {
     pricing => \%pricing,
-    nodes => [ map { +{ id => "n-$_", url => $UP_URL, model => $_, engine => 'openai',
+    nodes => [ map { +{ id => "n-$_", trust => 'internal', url => $UP_URL, model => $_, engine => 'openai',
       healthy => 1, max_conns => 4 } } sort keys %USAGE ],
   };
 }

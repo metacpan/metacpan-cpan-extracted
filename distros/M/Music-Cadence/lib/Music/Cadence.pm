@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Generate musical cadence chords
 
-our $VERSION = '0.1511';
+our $VERSION = '0.1513';
 
 use Moo;
 use strictures 2;
@@ -296,17 +296,6 @@ sub _generate_chord {
     return \@notes;
 }
 
-
-sub remove_notes {
-    my ($self, $indices, $chord) = @_;
-    my @chord;
-    for my $n (0 .. @$chord - 1) {
-        next if any { $n == $_ } @$indices;
-        push @chord, $chord->[$n];
-    }
-    return \@chord;
-}
-
 1;
 
 __END__
@@ -321,7 +310,7 @@ Music::Cadence - Generate musical cadence chords
 
 =head1 VERSION
 
-version 0.1511
+version 0.1513
 
 =head1 SYNOPSIS
 
@@ -382,9 +371,6 @@ version 0.1511
     octave => 4,
   );
   # [F4 G5 B5 D5], [E4 G4 A#4 C5]
-
-  my $altered = $mc->remove_notes([1,2], [qw(Gs5 C5 Ds5)]);
-  # [Gs5]
 
 =head1 DESCRIPTION
 
@@ -596,12 +582,6 @@ second by the first inversion.
 
  6. Plagal -> IV-I
 
-=head2 remove_notes
-
-  $altered = $mc->remove_notes(\@indices, \@chord);
-
-Remove the given indices from the given chord.
-
 =head1 SEE ALSO
 
 The F<eg/*> and F<t/*> programs in this distribution
@@ -632,7 +612,7 @@ Gene Boggs <gene.boggs@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2025 by Gene Boggs.
+This software is copyright (c) 2019-2026 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

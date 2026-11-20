@@ -8,7 +8,7 @@ sub _compile { eval $_[0]; return $@ }
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Carp qw( croak );
 use Moose::Exporter;
@@ -450,7 +450,7 @@ Langertha::Holmgang - Deterministic tool-use benchmarks for language models via 
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

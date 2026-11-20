@@ -2,6 +2,24 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 1.6.1 are described by their release commits.
 
+## 1.17.0 - 2026-11-20
+
+### Features
+
+- Read a paid domain answer's hosting, co-hosted domains, home page, redirects and backlinks ([`0cdf445`](https://github.com/internetdata/sdk-perl/commit/0cdf44564ffbdaade0aaa6ed61c762ce5f68fba0))
+
+## 1.16.3 - 2026-11-20
+
+### Fixes
+
+- Re-pin the spec to 2026.11.20: the trial without a count, and no per-minute limit ([`230bc5b`](https://github.com/internetdata/sdk-perl/commit/230bc5b3c51dfa445252a55d284f538ecf2c5df2))
+
+## 1.16.2 - 2026-11-19
+
+### Fixes
+
+- Cache a spent trial's or a reached cap's answer for a minute at most ([`71623ba`](https://github.com/internetdata/sdk-perl/commit/71623bace765545943aa9126cdeb512c3900d5d4))
+
 ## 1.16.1 - 2026-11-18
 
 ### Fixes

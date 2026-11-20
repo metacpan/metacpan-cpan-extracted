@@ -31,6 +31,11 @@ eval {
             my $core = $Config{archlib} . '/CORE';
             diag 'Linking embedded perl against ' . $core . '/' . $Config{libperl};
             $ldflags .= '-L' . $core . ' -l' . ( $Config{libperl} =~ s/^(?:lib)?([^.]+).*$/$1/r );
+
+            # libperl often lives only in this CORE dir (e.g. NetBSD pkgsrc),
+            # which is not on the dynamic loader's default search path. Without
+            # an rpath dlopen() of the shim fails to find it.
+            $ldflags .= ' -Wl,-rpath,' . $core;
         }
     }
     diag $cflags;

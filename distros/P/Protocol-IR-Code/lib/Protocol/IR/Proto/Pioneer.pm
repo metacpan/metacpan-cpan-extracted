@@ -2,9 +2,10 @@ package Protocol::IR::Proto::Pioneer;
 use strict;
 use warnings;
 
-our $VERSION = '1.3';
+our $VERSION = '1.5';
 
 use Protocol::IR::Code;
+use Math::BigInt;
 use Protocol::IR::Proto::NEC;
 
 sub new { bless {}, shift }
@@ -18,8 +19,9 @@ sub _nec_encode {
 
 sub decode_raw {
     my ($class, $raw) = @_;
-    my $val = $raw =~ /^0x/i ? hex($raw) : $raw + 0;
-    # val is 64-bit bundle
+    my $val;
+    if ($raw =~ /^0x/i) { $val = Math::BigInt->from_hex($raw); }
+    else { $val = Math::BigInt->new($raw); }
     my $first = ($val >> 32) & 0xffffffff;
     my $second = $val & 0xffffffff;
     my $address = ($first >> 8) & 0xff;
@@ -44,7 +46,7 @@ sub decode_params {
     $command &= 0xff;
     my $first = _nec_encode(0, $address);
     my $second = _nec_encode(0, $command);
-    my $data = ($first << 32) | $second;
+    my $data = (Math::BigInt->new($first) << 32) | Math::BigInt->new($second);
     return Protocol::IR::Code->new(
         protocol   => 'Pioneer',
         bits       => 64,
@@ -64,7 +66,7 @@ sub decode_timing {
     return undef unless defined $second;
     my $address = ($first->{data} >> 8) & 0xff;
     my $command = ($second->{data} >> 8) & 0xff;
-    my $data = ($first->{data} << 32) | $second->{data};
+    my $data = (Math::BigInt->new($first->{data}) << 32) | Math::BigInt->new($second->{data});
     return Protocol::IR::Code->new(
         protocol   => 'Pioneer',
         bits       => 64,
@@ -105,6 +107,6 @@ Protocol::IR::Proto::Pioneer - IR protocol handler
 
 =head1 VERSION
 
-version 1.3
+version 1.5
 
 =cut

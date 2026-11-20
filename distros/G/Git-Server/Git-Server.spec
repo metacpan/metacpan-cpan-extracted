@@ -16,7 +16,7 @@
 
 name:      perl-Git-Server
 summary:   Git-Server - Secure Git Server with more granular hooks capabilities than default git.
-version:   0.047
+version:   0.048
 release:   1
 vendor:    Rob Brown <bbb@cpan.org>
 packager:  Arix International <cpan2rpm@arix.com>
@@ -132,11 +132,13 @@ find %{buildroot}%{_prefix}             \
 %defattr(-,root,root)
 
 %changelog
-* Wed Jul 01 2026 hookbot@almalinux9
-: Changes for v0.047  2026-07-01 14:00:00
- - Default webhook for only push operations.
- - Default logfile for only push operations.
- - SECURITY: Make proxy sync honor write hooks
-   including ACLs and deploy triggers.
- - Add emergency safety check to block illegal
-   writes even if pushed outside of git-server.
+* Wed Nov 18 2026 hookbot@almalinux9
+: Changes for v0.048  2026-11-17 12:00:00
+ - git-deploy enhancements:
+ * Optimize to avoid double slapping server.
+ * Fix ProcTitle for initial pre-flight check.
+ * Preserve local commits if not conflicting.
+ * Allow pre-deployed changes gracefully.
+ * Handle pre-deployed changes gracefully.
+ - git-server enhancements:
+ * Support: git-server {-v|--version}

@@ -11,6 +11,15 @@
 #      residues account for every chain atom, the sequence is as long as the
 #      polymer.  Any .pdb sitting beside a .cif is compared against it.
 #
+#   3. Both of those through convert(), into each format and back.  The test
+#      of a writer is that what it wrote reads back as what was read, and
+#      the two readers have just been shown to agree; so the structure read
+#      from what convert() wrote is held to be the structure read from the
+#      original, is_deeply, every chain, residue, atom and count, in either
+#      format.  An mmCIF entry with a field a PDB record has no room for --
+#      a chain id of two characters, which a large assembly has -- cannot be
+#      written as PDB, and is counted as that rather than as a failure.
+#
 #   2. The PDB corpus t/real.t reads, converted to mmCIF a file at a time and
 #      read back.  This is the one that finds things: those files carry every
 #      quirk thirty years of a format collects -- altlocs, insertion codes,
@@ -193,10 +202,9 @@ sub adds_up {
 	return undef;
 }
 
-#---------------------------------------------------------------------------
-# 1. real .cif files
-#---------------------------------------------------------------------------
-{
+# cif_corpus() -- the real .cif files there are, in a flat directory or one
+# directory per structure, the first of the places it looks that has any
+sub cif_corpus {
 	my @dirs = grep { defined && -d } (
 		$ENV{STRUCTURE_INFO_TEST_CIF_DIR},
 		defined $home ? "$home/ui/pep-priml/metad/systems" : undef,
@@ -220,6 +228,38 @@ sub adds_up {
 			closedir $sh;
 		}
 	}
+	return @files;
+}
+
+# pdb_corpus() -- the directory of real PDB structures, and their names in it
+sub pdb_corpus {
+	my @dirs = grep { defined && -d } (
+		$ENV{STRUCTURE_INFO_TEST_DIR},
+		defined $home ? "$home/ui/pepPriML/PPB/PDB/PDBbind.v2020" : undef,
+		"$here/real",
+	);
+	my @all;
+	if (@dirs && opendir(my $dh, $dirs[0])) {
+		@all = sort grep { /\.(pdb|ent)(\.(gz|bz2))?\z/i && can_read($_) } readdir $dh;
+		closedir $dh;
+	}
+	return ($dirs[0], @all);
+}
+
+# a spread of $want across a sorted list rather than its first $want, which
+# in a directory named by PDB id would be all the same vintage
+sub spread {
+	my ($want, @all) = @_;
+	my $step = @all > $want ? int(@all / $want) : 1;
+	my @f = @all[ grep { $_ % $step == 0 } 0 .. $#all ];
+	return @f > $want ? @f[0 .. $want - 1] : @f;
+}
+
+#---------------------------------------------------------------------------
+# 1. real .cif files
+#---------------------------------------------------------------------------
+{
+	my @files = cif_corpus();
 
 	SKIP: {
 		skip 'no directory of real mmCIF structures found; '
@@ -381,26 +421,12 @@ sub to_cif {
 }
 
 {
-	my @dirs = grep { defined && -d } (
-		$ENV{STRUCTURE_INFO_TEST_DIR},
-		defined $home ? "$home/ui/pepPriML/PPB/PDB/PDBbind.v2020" : undef,
-		"$here/real",
-	);
-	my @all;
-	if (@dirs && opendir(my $dh, $dirs[0])) {
-		@all = sort grep { /\.(pdb|ent)(\.(gz|bz2))?\z/i && can_read($_) } readdir $dh;
-		closedir $dh;
-	}
+	my ($dir, @all) = pdb_corpus();
 
 	SKIP: {
 		skip 'no directory of real PDB structures found; set STRUCTURE_INFO_TEST_DIR', 1
 			unless @all;
-		# a spread across the directory rather than the first N, which in a
-		# directory named by PDB id would be all the same vintage
-		my $want = $ENV{STRUCTURE_INFO_TEST_ALL} ? scalar @all : 40;
-		my $step = @all > $want ? int(@all / $want) : 1;
-		my @files = map { "$dirs[0]/$all[$_]" } grep { $_ % $step == 0 } 0 .. $#all;
-		@files = @files[0 .. $want - 1] if @files > $want;
+		my @files = map { "$dir/$_" } spread($ENV{STRUCTURE_INFO_TEST_ALL} ? scalar @all : 40, @all);
 		diag(sprintf('converting %d of %d real structures to mmCIF and back',
 			scalar @files, scalar @all));
 
@@ -427,6 +453,73 @@ sub to_cif {
 			"$checked real structures survive the trip through mmCIF unchanged");
 		diag("  $_") for @bad[0 .. ($#bad < 9 ? $#bad : 9)];
 	}
+}
+
+#---------------------------------------------------------------------------
+# 3. both, through convert()
+#---------------------------------------------------------------------------
+{
+	my ($dir, @all) = pdb_corpus();
+	# The comparison is eq_deeply_ish() over every atom of every model, in
+	# Perl, and that is what costs: the conversions of a 159,091-atom
+	# solvated box (3c3o in the maintainer's metad/systems) take 0.1 s each
+	# way and the two readings 0.7 s, and the comparisons forty more.  So by
+	# default a smaller spread, and files of more than 2 MB -- a box of water
+	# rather than an entry -- are left to STRUCTURE_INFO_TEST_ALL.
+	my $all  = $ENV{STRUCTURE_INFO_TEST_ALL};
+	my $want = $all ? 1e9 : 20;
+	my @files = grep { $all || -s $_ <= 2_000_000 }
+	            (map { "$dir/$_" } spread($want, @all)), spread($want, cif_corpus());
+
+	SKIP: {
+		skip 'no directory of real structures found; set STRUCTURE_INFO_TEST_DIR '
+		     . 'or STRUCTURE_INFO_TEST_CIF_DIR', 1 unless @files;
+		diag(sprintf('converting %d real structures with convert(), each to both formats',
+			scalar @files));
+		my ($checked, $no_room, @bad) = (0, 0);
+		for my $file (@files) {
+			my $name = join '/', (split m{/}, $file)[-2, -1];
+			# every model: a converted file is every model of the original
+			my $orig = eval { structure_info($file, model => 'all', features => 0) };
+			unless ($orig) { push @bad, "$name: reading it: $@"; next }
+			for my $to ('mmcif', 'pdb') {
+				my $text;
+				unless (eval { convert($file, \$text, to => $to); 1 }) {
+					if ($to eq 'pdb' && $@ =~ /^convert: the \S+(?: \S+)? '[^']*' has no PDB spelling/) {
+						$no_room++;
+						next;
+					}
+					push @bad, "$name to $to: $@";
+					next;
+				}
+				my $back = eval { structure_info_string($text, model => 'all', features => 0, format => $to) };
+				unless ($back) { push @bad, "$name to $to: reading it back: $@"; next }
+				my ($x, $y) = (coords($orig), coords($back));
+				$x->{models} = coords_models($orig);
+				$y->{models} = coords_models($back);
+				if (!eq_deeply_ish($x, $y, \my $where)) {
+					push @bad, "$name to $to: $where";
+					next;
+				}
+				$checked++;
+			}
+		}
+		is(scalar @bad, 0, "$checked conversions of real structures read back as the original");
+		diag("  $_") for @bad[0 .. ($#bad < 9 ? $#bad : 9)];
+		diag("$no_room had a field a PDB record has no room for, and were not written as PDB")
+			if $no_room;
+	}
+}
+
+# every model's chains, for a structure read with model => 'all', which coords()
+# leaves out because the two halves above read model 1
+sub coords_models {
+	my ($i) = @_;
+	return {} unless $i->{models};
+	return { map { my $m = $_; ($m => { chain_order => $i->{models}{$m}{chain_order},
+	                                    chains => coords({ chains => $i->{models}{$m}{chains},
+	                                                       chain_order => [], stats => {} })->{chains} }) }
+	         keys %{ $i->{models} } };
 }
 
 # is_deeply's message is not useful when the difference is one atom in four

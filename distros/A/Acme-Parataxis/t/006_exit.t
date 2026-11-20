@@ -53,6 +53,11 @@ subtest 'exit(0) from a nested fiber' => sub {
     my ( $rc, $out, $trusted ) = run_exit_code('use Acme::Parataxis qw[async yield fiber]; async { fiber { exit 0 }; yield; }');
     is_exit_code $rc, 0, 'nested fiber exit(0) terminates cleanly with status 0', $out, $trusted;
 };
+subtest 'exit(9) from a nested fiber resumed after a sleep' => sub {
+    my ( $rc, $out, $trusted )
+        = run_exit_code('use Acme::Parataxis qw[async fiber await_sleep]; async { fiber { await_sleep(10); exit(9); }; fiber { await_sleep(50); } }');
+    is_exit_code $rc, 9, 'nested fiber exit(9) propagates the requested status', $out, $trusted;
+};
 subtest 'exit(7) from the top-level async block' => sub {
     my ( $rc, $out, $trusted ) = run_exit_code('use Acme::Parataxis qw[async]; async { exit 7; }');
     is_exit_code $rc, 7, 'async top-level exit(7) propagates the requested status', $out, $trusted;

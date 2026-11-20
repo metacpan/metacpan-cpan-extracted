@@ -7,7 +7,7 @@ use utf8;
 
 with 'Langertha::Holmgang::Role::Simulator';
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 my @FLAGS = ( [ X => 'disabled' ], [ I => 'invalid' ], [ D => 'dynamic' ] );
@@ -61,6 +61,8 @@ _menu '/ip address', props => [qw( address network interface )], required => [qw
 _menu '/ip route', props => [qw( dst-address gateway distance scope target-scope routing-table routing-mark
     pref-src check-gateway type blackhole vrf-interface suppress-hw-offload )];
 _menu '/ip pool', props => [qw( name ranges next-pool )], autoname => 'pool';
+# belegte Adressen der Pools: abgeleitet aus den DHCP-Leases (nur lesen)
+_menu '/ip pool used', props => [qw( pool address owner info )], flags => [], derived => 1, noadd => 1;
 _menu '/ip dhcp-server',
     props => [qw( name interface address-pool lease-time authoritative add-arp bootp-support always-broadcast
         conflict-detection lease-script relay server-address use-radius )],
@@ -161,7 +163,7 @@ our $GAP_RE = qr{
     \A\s*/?\s*(?:
         log\b | tool\s+(?!traceroute\b|ping\b)\S | ppp\b | routing\b | queue\b | certificate\b | snmp\b | ipv6\b | user\b | file\b | caps-man\b
       | system\s+(?:script|scheduler|logging|package|clock|history|ntp|routerboard|health|license|note|backup|upgrade)\b
-      | ip\s+(?:service|neighbor|firewall\s+connection|pool\s+used|cloud|ssh|socks|proxy|traffic-flow|upnp|ipsec|hotspot|smb|settings|kid-control)\b
+      | ip\s+(?:service|neighbor|firewall\s+connection|cloud|ssh|socks|proxy|traffic-flow|upnp|ipsec|hotspot|smb|settings|kid-control)\b
       | interface\s+(?:monitor-traffic|ethernet\s+monitor|wireless|wifi|lte|sstp-client|l2tp-client|ovpn-client|bonding|eoip|gre)\b
     )
   | \bprint\b.*\b(?:stats|interval|follow|follow-only|oid|without-paging|brief|value-list|as-value|stats-detail)\b
@@ -325,7 +327,8 @@ sub _commands {
     my $kind = _kind( $s, $path );
     my $m    = _spec( $s, $path );
     my @c;
-    if ( $kind eq 'list' ) {
+    if ( $kind eq 'list' && $m->{derived} ) { push @c, qw( print find ) }
+    elsif ( $kind eq 'list' ) {
         push @c, qw( print export find set disable enable comment );
         push @c, qw( add remove ) unless $m->{noadd};
         push @c, 'move'        if $m->{move};
@@ -471,11 +474,35 @@ sub _yes {
 sub _list {
     my ( $s, $path, $create ) = @_;
     my $dev = $s->{dev};
+    return _pool_used($s) if $path eq '/ip pool used';
     if ($create) {
         $dev->{menus} = {} unless ref $dev->{menus} eq 'HASH';
         return $dev->{menus}{$path} //= [];
     }
     return ref $dev->{menus} eq 'HASH' && ref $dev->{menus}{$path} eq 'ARRAY' ? $dev->{menus}{$path} : [];
+}
+
+# /ip pool used: je Lease eines DHCP-Servers, deren Adresse im Pool des Servers liegt (nicht abgeschaltet)
+sub _pool_used {
+    my ($s) = @_;
+    my $n2 = sub { my @o = split /\./, $_[0] // ''; @o == 4 ? ( ( $o[0] * 256 + $o[1] ) * 256 + $o[2] ) * 256 + $o[3] : undef };
+    my %range;
+    for my $p ( @{ _list( $s, '/ip pool' ) } ) {
+        for my $r ( split /,/, $p->{ranges} // '' ) {
+            my ( $a, $b ) = split /-/, $r;
+            push @{ $range{ $p->{name} // '' } }, [ $n2->($a), $n2->( $b // $a ) ];
+        }
+    }
+    my %pool = map { ( $_->{name} // '' ) => $_->{'address-pool'} } @{ _list( $s, '/ip dhcp-server' ) };
+    my @u;
+    for my $l ( @{ _list( $s, '/ip dhcp-server lease' ) } ) {
+        next if _yes( $l->{disabled} );
+        my $pn = $pool{ $l->{server} // '' } // next;
+        my $a  = $n2->( $l->{address} ) // next;
+        next unless grep { defined $_->[0] && $a >= $_->[0] && $a <= $_->[1] } @{ $range{$pn} || [] };
+        push @u, { pool => $pn, address => $l->{address}, owner => $l->{server}, info => $l->{'mac-address'} // '' };
+    }
+    return \@u;
 }
 
 sub _index_of {
@@ -658,9 +685,9 @@ sub _c_print {
             _rtrim( sprintf '%2d %-2s %s', $_, _flags( $spec, $it ), join ' ', @c, _pairs( $spec, $it ) );
         } @idx;
     }
-    my $head = 'Flags: ' . join ', ', map {"$_->[0] - $_->[1]"} @{ $spec->{flags} };
-    return $head unless @idx;
-    return join "\n", $head, join( "\n\n", map { _entry( $spec, $_, $list->[$_] ) } @idx );
+    my @head = @{ $spec->{flags} } ? ( 'Flags: ' . join ', ', map {"$_->[0] - $_->[1]"} @{ $spec->{flags} } ) : ();
+    return join "\n", @head unless @idx;
+    return join "\n", @head, join( "\n\n", map { _entry( $spec, $_, $list->[$_] ) } @idx );
 }
 
 sub _export_block {
@@ -1045,7 +1072,7 @@ Langertha::Holmgang::Sim::RouterOS - The simulator of device type routeros — a
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,11 @@
 Revision history for Music-Cadence
 
+0.1513 2026-11-19 14:57:22
+    - Oof - don't requre MIDI::Util. UGH
+
+0.1512 2026-11-19 14:52:27
+    - Remove the ->remove_notes method.
+
 0.1511 2025-02-15 16:13:21
     - Add the verbose attribute.
 

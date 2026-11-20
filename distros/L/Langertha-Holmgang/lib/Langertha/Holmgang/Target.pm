@@ -13,7 +13,7 @@ use Langertha::Holmgang::Error;
 use Langertha::Role::HTTP ();
 use Scalar::Util qw( blessed );
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 has engine => (
@@ -345,7 +345,7 @@ Langertha::Holmgang::Target - A Langertha engine as a benchmark target: variant 
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

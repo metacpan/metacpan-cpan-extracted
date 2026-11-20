@@ -4,7 +4,7 @@ Web::VWF - Versatile Web Framework - easily build a website to support different
 
 ## Version
 
-Version 0.003.0
+Version 0.003.1
 
 ## Synopsis
 

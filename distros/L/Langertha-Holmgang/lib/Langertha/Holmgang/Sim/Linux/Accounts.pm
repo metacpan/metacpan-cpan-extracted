@@ -8,7 +8,7 @@ use utf8;
 use JSON::MaybeXS ();
 use Time::Local ();
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 sub _today { return int( Time::Local::timegm( 0, 0, 12, 20, 9, 2026 ) / 86400 ) }
@@ -300,7 +300,7 @@ Langertha::Holmgang::Sim::Linux::Accounts - Accounts and sudo on a simulated Lin
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

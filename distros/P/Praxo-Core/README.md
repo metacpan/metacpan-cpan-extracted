@@ -131,11 +131,14 @@ my $model = Praxo::Adapters::OpenAICompatible->new(
 my $options = Praxo::Agent::AgentOptions->new($model);
 ```
 
-The adapter uses non-streaming `POST /chat/completions`, maps tool calls and
-usage, and passes `tool_choice`, `response_format`, and `temperature` through.
-It uses core `HTTP::Tiny` and `JSON::PP`; no provider SDK is required.
+The adapter uses `POST /chat/completions`, maps tool calls and usage, and
+passes `tool_choice`, `response_format`, and `temperature` through. It uses core
+`HTTP::Tiny` and `JSON::PP`; no provider SDK is required. `generate_stream` sets
+`stream: true`, parses SSE, reassembles content, fragmented tool calls, usage,
+and `finish_reason`, and calls the delta callback. Inject `stream_transport`
+returning raw SSE text; set `on_delta` in the agent options to use it.
 
-## Anthropic and Gemini Models
+## Anthropic and Gemini Models\n\n`Praxo::Adapters::Anthropic` supports `generate_stream` with Anthropic SSE\nreassembly; `Gemini` supports `generate_stream` with Gemini SSE reassembly.
 
 ```perl
 use Praxo::Adapters::Anthropic ();

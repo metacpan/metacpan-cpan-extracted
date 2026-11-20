@@ -85,17 +85,27 @@ subtest 'a bogon is answered locally in the widest shape' => sub {
         ok($result->has($object), "$object is present");
         is_deeply($result->$object, {}, "$object is empty");
     }
-    for my $object (qw(location asn)) {
+    for my $object (qw(location asn company abuse web hostname)) {
         ok($result->has($object), "$object is present");
         is_deeply($result->$object, $corpus->{bogonResponse}{$object}, "$object carries every key, empty");
     }
 };
+
+# Every member a lookup case's `expect` may compare whole. A key the runner reads
+# nowhere fails the case rather than passing it unread.
+my @COMPARED = qw(
+    vpn hosting dcproxy pubproxy carrier satellite ssh smtp web dns_resolver bittorrent location
+    asn company hostname abuse
+);
+my %READ = map { $_ => 1 } qw(ip isBogon present absent emptyPresent), @COMPARED;
 
 subtest 'lookup preserves absent-versus-false across every plan shape' => sub {
     for my $case (@{ $corpus->{lookup} }) {
         serve({ ip => $case->{body}{ip}, status => $case->{status}, body => $case->{body} });
         my $result = client()->lookup($case->{body}{ip});
         my $expect = $case->{expect};
+        my @unread = sort grep { !$READ{$_} } keys %$expect;
+        is_deeply(\@unread, [], "$case->{name}: the runner reads every key it expects");
 
         is($result->ip, $expect->{ip}, "$case->{name}: ip");
         is($result->is_bogon, $expect->{isBogon} ? 1 : 0, "$case->{name}: is_bogon");
@@ -114,8 +124,9 @@ subtest 'lookup preserves absent-versus-false across every plan shape' => sub {
             ok($result->has($field), "$case->{name}: $field was served");
             is_deeply($result->$field, {}, "$case->{name}: $field is present and empty");
         }
-        for my $object (qw(vpn hosting dcproxy pubproxy location asn)) {
-            next unless $expect->{$object};
+        for my $object (@COMPARED) {
+            next unless exists $expect->{$object};
+            ok($result->has($object), "$case->{name}: $object was served");
             is_deeply($result->$object, $expect->{$object}, "$case->{name}: $object");
         }
     }

@@ -1,4 +1,8 @@
 Revision history for Perl module Text::Bidi
+3.02      2026-11-19 13:02:02+02:00 Asia/Jerusalem
+        * Check for the FriBidi shared library before generating a Makefile
+          so missing system dependencies do not cause CPAN Testers failures.
+
 3.01      2026-11-15 09:36:22+02:00 Asia/Jerusalem
         * Load the distribution's own modules in ffi.t and pin subprocesses
           to those exact frontend and backend files, so an older installed

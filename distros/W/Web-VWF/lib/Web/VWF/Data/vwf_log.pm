@@ -6,7 +6,7 @@ package Web::VWF::Data::vwf_log;
 use strict;
 use warnings;
 
-use version; our $VERSION = version->declare('0.003.0');
+use version; our $VERSION = version->declare('0.003.1');
 
 use Database::Abstraction;
 use DBD::CSV;
@@ -31,7 +31,7 @@ Web::VWF::Data::vwf_log - The access log, as a database
 
 =head1 VERSION
 
-Version 0.003.0
+Version 0.003.1
 
 =head1 DESCRIPTION
 

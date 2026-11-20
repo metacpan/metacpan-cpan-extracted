@@ -8,14 +8,16 @@ This distribution ships its own agent skills (`.claude/skills/skeid-*`), agents
 (`.claude/agents/`), and house rules (`.claude/rules/`); every `skeid-*` skill and `skeid-*`
 agent named here refers to those. Shared skills (`getty-*`, `perl-*`, the karr skills) are
 installed by skilletor from `.claude/skilletor.json` and gitignored — change them in their
-source, then `skilletor sync` (ADR 0018). The discipline, event-loop, secrets, benchmark and release rules live in
-`.claude/rules/skeid-rules.md` — loaded automatically by Claude Code, for the main agent and
+source, then `skilletor sync` (ADR 0018). The discipline, delegation, publish and release rules are
+shared house rules (skilletor bundle `getty-cpan-dist@getty`); the event-loop, secrets,
+benchmark and repo-specific release rules live in `.claude/rules/skeid-rules.md` — loaded automatically by Claude Code, for the main agent and
 all subagents. The domain vocabulary is `CONTEXT.md`; use its words in code, tickets and ADRs.
 
 ## Delegation
 
-Delegate behavior-relevant code to the right agent instead of touching it yourself —
-principle and lane are in `.claude/rules/skeid-rules.md`. Agents in this repo:
+Delegate behavior-relevant code to the right agent instead of touching it yourself — the
+principle is a shared house rule (bundle `getty-cpan-dist@getty`), the lane is in
+`.claude/rules/skeid-rules.md`. Agents in this repo:
 
 | Task | Agent |
 |---|---|
@@ -64,8 +66,9 @@ duplicate skill content here — reference it.
 
 `[@Author::GETTY]` with `include_readme = 0` (default): `README.md` is a hand-maintained
 GitHub file, excluded from the tarball, and never generated from POD. `Git::GatherDir` ships
-only git-tracked files — `.claude/`, `bench/` and `docs/` are excluded via
-`gather_exclude_match` in `dist.ini`.
+only git-tracked files — `bench/`, `docs/` and `assets/` are excluded via
+`gather_exclude_match` in `dist.ini`; `.claude/`, `CLAUDE.md` and `CONTEXT.md` ship with the
+dist (the bundle default).
 
 Releasing also pushes Docker images and creates the GitHub release, both through the bundle
 (`docker_image`, `GitHub::CreateRelease`); `dist.ini` has no `run_after_release`. See the

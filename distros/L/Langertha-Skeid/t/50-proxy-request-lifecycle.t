@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -95,6 +96,7 @@ for my $node (
   my ($id, $model, $max_conns) = @$node;
   ok $skeid->add_node(
     id        => $id,
+    trust     => 'internal',
     url       => "$upstream",
     model     => $model,
     engine    => 'openai',

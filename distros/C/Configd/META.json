@@ -4,7 +4,7 @@
       "George S. Baugh <george@troglodyne.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013",
+   "generated_by" : "Dist::Zilla version 6.040, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "mit"
    ],
@@ -48,6 +48,9 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "XML::LibXML" : "0"
+         },
          "requires" : {
             "File::Basename" : "0",
             "File::Path" : "0",
@@ -66,6 +69,7 @@
       },
       "test" : {
          "requires" : {
+            "Capture::Tiny" : "0",
             "Exporter" : "0",
             "File::Spec" : "0",
             "FindBin::libs" : "0",
@@ -80,35 +84,39 @@
    "provides" : {
       "Configd" : {
          "file" : "lib/Configd.pm",
-         "version" : "0.005"
+         "version" : "0.007"
       },
       "Configd::Language" : {
          "file" : "lib/Configd/Language.pm",
-         "version" : "0.005"
+         "version" : "0.007"
       },
       "Configd::Language::opendkim" : {
          "file" : "lib/Configd/Language/opendkim.pm",
-         "version" : "0.005"
+         "version" : "0.007"
       },
       "Configd::Language::opendmarc" : {
          "file" : "lib/Configd/Language/opendmarc.pm",
-         "version" : "0.005"
+         "version" : "0.007"
+      },
+      "Configd::Language::ossec" : {
+         "file" : "lib/Configd/Language/ossec.pm",
+         "version" : "0.007"
       },
       "Configd::Language::postfix" : {
          "file" : "lib/Configd/Language/postfix.pm",
-         "version" : "0.005"
+         "version" : "0.007"
       },
       "Configd::Language::redis" : {
          "file" : "lib/Configd/Language/redis.pm",
-         "version" : "0.005"
+         "version" : "0.007"
       },
       "Configd::Syntax::Spaced" : {
          "file" : "lib/Configd/Syntax/Spaced.pm",
-         "version" : "0.005"
+         "version" : "0.007"
       },
       "Configd::Unit" : {
          "file" : "lib/Configd/Unit.pm",
-         "version" : "0.005"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
@@ -123,12 +131,20 @@
          "web" : "https://github.com/teodesian/perl-configd"
       }
    },
-   "version" : "0.005",
+   "version" : "0.007",
    "x_contributors" : [
-      "troglodyne-bot <morpheus@troglodyne.net>"
+      "troglodyne-bot <morpheus@troglodyne.net>",
+      "troglodyne-robot <trogbot@troglodyne.net>"
    ],
    "x_generated_by_perl" : "v5.44.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.43",
-   "x_spdx_expression" : "MIT"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.82",
+   "x_spdx_expression" : "MIT",
+   "x_system_packages" : {
+      "XML::LibXML" : {
+         "deb" : "libxml-libxml-perl",
+         "rpm" : "perl-XML-LibXML",
+         "test" : "/usr/bin/perl -MXML::LibXML -e 1"
+      }
+   }
 }
 

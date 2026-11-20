@@ -39,7 +39,7 @@ and out. Not negotiable:
 | OpenAI, relayed (ADR 0021) | `POST /v1/rerank`, `POST /rerank` (one route) | no |
 | OpenAI, relayed session (ADR 0029) | `GET /v1/realtime` (WebSocket upgrade; `model` in the query) | yes — frames both ways, the node's own events |
 | Anthropic | `POST /v1/messages` | yes — OpenAI SSE re-chunked into Anthropic events (`Protocol::Anthropic::Stream`) |
-| Ollama | `POST /api/chat`, `POST /api/generate`, `GET /api/tags`, `GET /api/ps` | yes — NDJSON (`Protocol::Ollama::Stream`, `shape => 'generate'` for `/api/generate`) |
+| Ollama | `POST /api/chat`, `POST /api/generate`, `POST /api/embed`, `POST /api/embeddings`, `GET /api/tags`, `GET /api/ps` | yes — NDJSON (`Protocol::Ollama::Stream`, `shape => 'generate'` for `/api/generate`) |
 | API description, not a face (ADR 0025) | `GET /openapi.json` (client routes the config enables, behind the client gate), `GET /skeid/openapi.json` (admin key), `GET /docs` + `/docs/*` (Swagger UI, `openapi.swagger_ui`, fetched on first use and cached, else 404) | no |
 | Relayed, docling's own paths (ADR 0028) | `POST /v1/convert/file`, `POST /v1/convert/source` (sync only) | no — JSON or zip answer as the node gave it |
 | MCP gateway, not a face (ADR 0022) | `POST|GET|DELETE /mcp/<name>[/<path>]`, `GET /v1/mcp/servers` | yes — whatever the MCP server sends, unbuffered |
@@ -86,6 +86,9 @@ and out. Not negotiable:
   JSON `true` (not `1` — typed clients reject it), `done_reason` from `finish_reason`, token
   counts as `prompt_eval_count` / `eval_count`; `/api/generate` answers in generate's shape
   (`response`, …).
+- `/api/embed` / `/api/embeddings` (`_handle_ollama_embeddings`, `embed*_request_to_openai`):
+  to the node's `/embeddings`, answered as `embeddings` (input order by `index`) +
+  `prompt_eval_count`, resp. one `embedding`; not streamed.
 - `/api/tags` synthesises a model list from the node inventory; `/api/ps` is a stub `[]`.
 
 Errors take the client's shape: `_render_error` reads stash key `skeid.error_format` (set by the

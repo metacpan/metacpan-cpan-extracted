@@ -12,7 +12,7 @@ use JSON::MaybeXS ();
 use MIME::Base64 ();
 use YAML::XS ();
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 our @GAPS;
@@ -2254,7 +2254,7 @@ Langertha::Holmgang::Sim::Linux::Kubernetes - Kubernetes cluster behind kubectl 
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

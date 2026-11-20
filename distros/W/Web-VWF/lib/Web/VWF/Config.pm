@@ -30,11 +30,11 @@ Web::VWF::Config - Site-independent configuration file for the Versatile Web Fra
 
 =head1 VERSION
 
-Version 0.003.0
+Version 0.003.1
 
 =cut
 
-use version; our $VERSION = version->declare('0.003.0');
+use version; our $VERSION = version->declare('0.003.1');
 
 # Where the server keeps one configuration directory per site, named after the
 # site - see Web::VWF::directory()

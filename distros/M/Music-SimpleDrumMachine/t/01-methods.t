@@ -5,28 +5,30 @@ ok lives { require Music::SimpleDrumMachine }, 'Music::SimpleDrumMachine loads'
 
 {
     package Test::FakeLoop;
-    our @ADDED; # timers handed to the loop, so tests can drive them by hand
-    sub new { bless {}, shift }
-    sub add { push @ADDED, $_[1]; 1 }
-    sub run { 1 } # return immediately instead of blocking forever
+    our @ADDED;   # timers handed to the loop, so tests can drive them by hand
+    our @SIGNALS; # signal names watched
+    sub new          { bless {}, shift }
+    sub add          { push @ADDED, $_[1]; 1 }
+    sub watch_signal { push @SIGNALS, $_[1]; 1 }
+    sub run          { 1 } # return immediately instead of blocking forever
+    sub stop         { 1 }
 }
 
 {
     package Test::FakeMidi;
-    sub new      { bless {}, shift }
-    sub clock    { 1 }
-    sub note_on  { 1 }
-    sub note_off { 1 }
+    our @CALLS; # [ method, @args ] for every message "sent"
+    sub new { bless {}, shift }
+    for my $method (qw(clock note_on note_off cc stop)) {
+        no strict 'refs';
+        *{$method} = sub { shift; push @CALLS, [ $method, @_ ]; 1 };
+    }
 }
-
-# typeglob, symbol-table entry for the name _loop in the package
-no warnings 'redefine';
-local *Music::SimpleDrumMachine::_loop = sub { Test::FakeLoop->new };
 
 sub new_obj {
     my (%args) = @_;
     my $obj;
-    ok lives { $obj = Music::SimpleDrumMachine->new(%args) }, 'new() lives'
+    # autoplay is off by default so new() returns instead of running a loop
+    ok lives { $obj = Music::SimpleDrumMachine->new( autoplay => 0, %args ) }, 'new() lives'
         or diag $@;
     isa_ok $obj, ['Music::SimpleDrumMachine'], 'object';
     return $obj;
@@ -54,6 +56,8 @@ subtest defaults => sub {
     ref_ok $obj->drums, 'HASH', 'drums';
     ref_ok $obj->parts, 'HASH', 'parts';
     ref_ok $obj->fills, 'HASH', 'fills';
+    ref_ok $obj->loop,  'IO::Async::Loop', 'loop defaults to a real loop'
+        if 0; # skipped: the default loop is not constructed in tests
 
     is $obj->parts, hash { field _default_part => D(); etc }, 'default parts exist';
     is $obj->fills, hash { field _default_fill => D(); etc }, 'default fills exist';
@@ -135,12 +139,12 @@ subtest bars => sub {
     is new_obj(port_name => 'test', bars => 2)->bars, 2, 'bars accepts 2';
 
     for my $bad (0, -1, 2.5, 'abc') {
-        ok dies { Music::SimpleDrumMachine->new( port_name => 'test', bars => $bad ) },
+        ok dies { Music::SimpleDrumMachine->new( port_name => 'test', bars => $bad, autoplay => 0 ) },
             "'$bad' is rejected";
     }
 
-    # Drive the timer's on_tick by hand. One bar is 96 clock ticks
-    # (ppqn 24 x 4 quarter-notes), and a step (16th-note) is every 6 ticks.
+    # Drive tick() by hand. One bar is 96 clock ticks (ppqn 24 x 4
+    # quarter-notes), and a step (16th-note) is every 6 ticks.
     my $ticks_per_bar = 96;
     my $measures      = 4;
 
@@ -148,9 +152,8 @@ subtest bars => sub {
         my ($bars, $want_parts, $want_fills) = @$case;
 
         my ($parts, $fills) = (0, 0);
-        local @Test::FakeLoop::ADDED = ();
 
-        new_obj(
+        my $dm = new_obj(
             port_name => 'test',
             bars      => $bars,
             filling   => 1,
@@ -161,11 +164,7 @@ subtest bars => sub {
             _midi_out => Test::FakeMidi->new,
         );
 
-        my ($timer) = @Test::FakeLoop::ADDED;
-        ok $timer, "bars => $bars: a timer added to the loop"
-            or next;
-
-        $timer->invoke_event('on_tick') for 1 .. $measures * $ticks_per_bar;
+        $dm->tick for 1 .. $measures * $ticks_per_bar;
 
         is $parts, $want_parts,
             "bars: $bars - a part chosen $want_parts time(s) in $measures measures";
@@ -191,14 +190,13 @@ subtest weighted_parts => sub {
     like dies { $obj->_choose_part({ A => 0, B => -2 }) },
         qr/positive weight/, 'dies when no part has a positive weight';
 
-    # Drive the timer by hand: one bar is 96 ticks and bars => 1 means
+    # Drive tick() by hand: one bar is 96 ticks and bars => 1 means
     # a part is chosen every bar, so 4 measures choose a part 4 times.
     my $pats = sub { +{ kick => [ (1) x 16 ] } };
     my $play = sub {
         my ($next_part, $returns) = @_;
         my %count;
-        local @Test::FakeLoop::ADDED = ();
-        new_obj(
+        my $dm = new_obj(
             port_name => 'test',
             bars      => 1,
             filling   => 0,
@@ -208,8 +206,7 @@ subtest weighted_parts => sub {
             },
             _midi_out => Test::FakeMidi->new,
         );
-        my ($timer) = @Test::FakeLoop::ADDED;
-        $timer->invoke_event('on_tick') for 1 .. 4 * 96;
+        $dm->tick for 1 .. 4 * 96;
         return \%count;
     };
 
@@ -220,17 +217,116 @@ subtest weighted_parts => sub {
     is $play->( 'a', { a => { b => 1 }, b => { b => 1 } } ), { a => 1, b => 3 },
         'a part can return a weighted hash as its next part';
 
-    local @Test::FakeLoop::ADDED = ();
-    new_obj(
+    my $dm = new_obj(
         port_name => 'test',
         bars      => 1,
         filling   => 0,
         next_part => 'nope',
         _midi_out => Test::FakeMidi->new,
     );
-    my ($timer) = @Test::FakeLoop::ADDED;
-    like dies { $timer->invoke_event('on_tick') for 1 .. 6 },
+    like dies { $dm->tick },
         qr/Unknown part: nope/, 'an unknown part name dies with a clear message';
+};
+
+subtest tick => sub {
+    local @Test::FakeMidi::CALLS = ();
+    my $dm = new_obj(
+        port_name => 'test',
+        bars      => 1,
+        filling   => 0,
+        next_part => 'p',
+        parts     => { p => sub { return 'p', { kick => [ (1) x 16 ] } } },
+        _midi_out => Test::FakeMidi->new,
+    );
+
+    $dm->tick;
+    my @on = grep { $_->[0] eq 'note_on' } @Test::FakeMidi::CALLS;
+    is scalar(@on), 1, 'the very first tick plays the first step';
+    is [ @{ $on[0] }[1, 2] ], [ 9, 36 ], 'on the shared channel, with the kick number';
+
+    $dm->tick;
+    my @off = grep { $_->[0] eq 'note_off' } @Test::FakeMidi::CALLS;
+    is scalar(@off), 1, 'the next tick releases the note';
+
+    ok !( grep { $_->[0] eq 'clock' } @Test::FakeMidi::CALLS ),
+        'tick() does not send MIDI clock';
+};
+
+subtest ppqn => sub {
+    local @Test::FakeMidi::CALLS = ();
+    my $dm = new_obj(
+        port_name => 'test',
+        ppqn      => 96,
+        bars      => 1,
+        filling   => 0,
+        next_part => 'p',
+        parts     => { p => sub { return 'p', { kick => [ (1) x 16 ] } } },
+        _midi_out => Test::FakeMidi->new,
+    );
+
+    # a step is a 16th-note: 96 / 4 = 24 ticks, so 4 steps per quarter-note
+    $dm->tick for 1 .. 96;
+    my @on = grep { $_->[0] eq 'note_on' } @Test::FakeMidi::CALLS;
+    is scalar(@on), 4, 'ppqn => 96 plays four 16th-note steps per quarter-note';
+};
+
+subtest clock => sub {
+    local @Test::FakeMidi::CALLS = ();
+    my $dm = new_obj( port_name => 'test', _midi_out => Test::FakeMidi->new );
+    $dm->clock;
+    is [ map { $_->[0] } @Test::FakeMidi::CALLS ], ['clock'], 'clock() sends one MIDI clock';
+};
+
+subtest stop => sub {
+    local @Test::FakeMidi::CALLS = ();
+    my $dm = new_obj( port_name => 'test', _midi_out => Test::FakeMidi->new );
+    $dm->stop;
+    is [ grep { $_->[0] eq 'cc' } @Test::FakeMidi::CALLS ], [ ['cc', 9, 123, 0] ],
+        'all-notes-off (CC 123) on the shared channel';
+    ok( (grep { $_->[0] eq 'stop' } @Test::FakeMidi::CALLS), 'a MIDI stop is sent' );
+
+    @Test::FakeMidi::CALLS = ();
+    $dm = new_obj( port_name => 'test', chan => -1, _midi_out => Test::FakeMidi->new );
+    $dm->stop;
+    my @cc = grep { $_->[0] eq 'cc' } @Test::FakeMidi::CALLS;
+    is [ map { $_->[1] } @cc ], [ 0 .. 8, 10 .. 15 ],
+        'multi-timbral: CC 123 on each used channel, none above 15';
+    ok !( grep { $_->[2] != 123 || $_->[3] != 0 } @cc ), 'always controller 123, value 0';
+};
+
+subtest autoplay => sub {
+    local @Test::FakeLoop::ADDED   = ();
+    local @Test::FakeLoop::SIGNALS = ();
+    local @Test::FakeMidi::CALLS   = ();
+
+    my $dm = new_obj(
+        port_name => 'test',
+        autoplay  => 1,
+        loop      => Test::FakeLoop->new,
+        _midi_out => Test::FakeMidi->new,
+    );
+    is scalar(@Test::FakeLoop::ADDED), 1, 'autoplay: new() adds a timer to the loop';
+    is [ @Test::FakeLoop::SIGNALS ], ['INT'], 'autoplay: new() watches SIGINT on the loop';
+
+    my ($timer) = @Test::FakeLoop::ADDED;
+    $timer->invoke_event('on_tick');
+    is $Test::FakeMidi::CALLS[0][0], 'clock', 'the timer sends clock, then ticks';
+
+    # autoplay defaults to on
+    @Test::FakeLoop::ADDED = ();
+    ok lives {
+        Music::SimpleDrumMachine->new(
+            port_name => 'test',
+            loop      => Test::FakeLoop->new,
+            _midi_out => Test::FakeMidi->new,
+        )
+    }, 'new() without autoplay lives with a fake loop' or diag $@;
+    is scalar(@Test::FakeLoop::ADDED), 1, 'autoplay defaults to on';
+
+    # and off means nothing is started
+    @Test::FakeLoop::ADDED = ();
+    new_obj( port_name => 'test', loop => Test::FakeLoop->new );
+    is scalar(@Test::FakeLoop::ADDED), 0, 'autoplay => 0 starts nothing';
 };
 
 done_testing;

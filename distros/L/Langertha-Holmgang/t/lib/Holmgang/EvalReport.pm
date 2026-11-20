@@ -39,6 +39,7 @@ sub report {
         case_id => $_->{id}, title => 'T '.$_->{id}, tags => $_->{tags} // [],
         tier    => $_->{tier}, difficulty => $_->{difficulty}, weight => exists $_->{weight} ? $_->{weight} : 1,
         hard    => $_->{hard}, untrusted => 0,
+        ( defined $_->{scenario} ? ( scenario => $_->{scenario} ) : () ),
       } } @cases ],
       results => [ map { my ( $c, $n, $st, $fc, $in ) = @$_; {
         case_id => $c, repetition => $n, status => $st, forbidden_calls => $fc // 0,

@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -50,7 +51,7 @@ my $skeid = Langertha::Skeid->new(
              default_policy => 'standard' };
   },
 );
-$skeid->add_node(id => "n-$_", url => "http://127.0.0.1:$raw_port{$_}/v1", model => $_, max_conns => 4)
+$skeid->add_node(id => "n-$_", trust => 'internal', url => "http://127.0.0.1:$raw_port{$_}/v1", model => $_, max_conns => 4)
   for keys %raw_port;
 
 my $proxy = Langertha::Skeid::Proxy->build_app(skeid => $skeid);

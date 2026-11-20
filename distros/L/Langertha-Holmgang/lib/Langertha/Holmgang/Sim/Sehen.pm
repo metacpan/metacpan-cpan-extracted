@@ -10,7 +10,7 @@ use Unicode::Normalize qw( NFC );
 
 with 'Langertha::Holmgang::Role::AnswerWorld';
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 # Die Werkzeuge dieser Welt mit ihren Pflichtparametern (fuer den Lader).
@@ -472,7 +472,7 @@ Langertha::Holmgang::Sim::Sehen - The answer world sehen — hand in what an ima
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

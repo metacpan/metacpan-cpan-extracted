@@ -1,6 +1,9 @@
 #!/usr/bin/env perl
 # PODNAME: skeid
 # ABSTRACT: Skeid control-plane CLI and proxy launcher
+
+our $VERSION = '0.005';
+
 use strict;
 use warnings;
 use Getopt::Long qw(GetOptions GetOptionsFromArray);
@@ -20,6 +23,15 @@ if (@ARGV && defined($ARGV[0]) && $ARGV[0] !~ /^-/) {
 if ($cmd eq 'usage') {
   exit _run_usage(@ARGV);
 }
+if ($cmd eq 'capabilities') {
+  print "$_\n" for Langertha::Skeid->capabilities;
+  exit 0;
+}
+
+if ($cmd eq 'usage-purge') {
+  exit _run_usage_purge(@ARGV);
+}
+
 if ($cmd eq 'keyid') {
   exit _run_keyid(@ARGV);
 }
@@ -298,6 +310,41 @@ sub _config_file {
 
 # Prints the key id a customer key routes and bills under. Needed because a config names
 # customers in keys:, and must be able to do that without holding their keys.
+# skeid usage-purge (skeid k122): delete usage events of key ids, or past the retention, through
+# the config's usage store. Meant for an erasure step and for a cron job; prints the result as
+# JSON so the caller can record it. Exit 0 when it succeeded, 2 when not.
+sub _run_usage_purge {
+  my (@argv) = @_;
+  my ($config, @ids, $before, $retention, $dry_run);
+  GetOptionsFromArray(
+    \@argv,
+    'config|c=s'     => \$config,
+    'api-key-id=s'   => \@ids,
+    'before=s'       => \$before,
+    'retention'      => \$retention,
+    'dry-run'        => \$dry_run,
+  ) or die _usage_text();
+  push @ids, @argv;
+  die "skeid usage-purge: --before and --retention exclude each other\n" if defined($before) && $retention;
+
+  my $config_file = _config_file($config);
+  my $skeid = Langertha::Skeid->new(defined($config_file) ? (config_file => $config_file) : ());
+  if ($retention) {
+    $before = $skeid->usage_retention_before;
+    die "skeid usage-purge: --retention needs usage_store.retention_days in the config\n"
+      unless defined $before;
+  }
+
+  my $result = $skeid->purge_usage(
+    (@ids ? (api_key_ids => \@ids) : ()),
+    (defined($before) ? (before => $before) : ()),
+    dry_run => ($dry_run ? 1 : 0),
+  );
+  $skeid->flush_usage;
+  print JSON::MaybeXS->new(utf8 => 1, canonical => 1, pretty => 1)->encode($result);
+  return $result->{ok} ? 0 : 2;
+}
+
 sub _run_keyid {
   my (@argv) = @_;
 
@@ -325,6 +372,11 @@ Usage:
               [--db /path/to.sqlite] [--dsn dbi:Pg:...]
               [--db-user USER] [--db-pass PASS|--db-pass-env ENV]
               [--api-key-id ID] [--model NAME]
+  skeid usage-purge [--config skeid.yaml] [--api-key-id ID ...] [ID ...]
+              [--before ISO8601 | --retention] [--dry-run]
+                               delete usage events of key ids and/or before a time
+                               (--retention: usage_store.retention_days); prints JSON
+  skeid capabilities           what this Skeid can do, one name per line
   skeid keyid [KEY ...]        the key id to use in the config's keys: section
                                (reads stdin when given no argument)
 USAGE
@@ -342,7 +394,7 @@ skeid - Skeid control-plane CLI and proxy launcher
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -352,12 +404,15 @@ version 0.004
               [--db /path/to.sqlite] [--dsn dbi:Pg:...]
               [--db-user USER] [--db-pass PASS | --db-pass-env VAR]
               [--api-key-id ID] [--model NAME]
+  skeid usage-purge [--config skeid.yaml] [--api-key-id ID ...] [ID ...]
+              [--before ISO8601 | --retention] [--dry-run]
+  skeid capabilities
   skeid keyid [KEY ...]
 
 =head1 DESCRIPTION
 
-Runs the Skeid proxy (L<Langertha::Skeid::Proxy>), reports recorded usage, and prints the
-customer key id a key routes and bills under. With no command, or when the first argument is an
+Runs the Skeid proxy (L<Langertha::Skeid::Proxy>), reports and purges recorded usage, prints
+what this Skeid can do, and prints the customer key id a key routes and bills under. With no command, or when the first argument is an
 option, the command is C<serve>. An unknown command prints the usage text and exits non-zero.
 
 The config file is described in L<Langertha::Skeid/CONFIGURATION>.
@@ -480,6 +535,51 @@ Only events of this customer key id.
 
 Only events for this served model.
 
+=head2 usage-purge
+
+  skeid usage-purge --config skeid.yaml --dry-run k_5f0e... k_9c8b...
+  skeid usage-purge --config skeid.yaml --retention
+
+Deletes usage events through the config's usage store (L<Langertha::Skeid/purge_usage>): those
+of the customer key ids given (as arguments or C<--api-key-id>) -- an organisation's, for an
+erasure request -- and/or those created before C<--before>, or before the retention cut-off of
+C<usage_store.retention_days> with C<--retention>, the purge run a cron job makes. C<--dry-run>
+only counts. Prints the result as JSON, for the caller to record, and exits 0 when it succeeded,
+2 when not (the spool still holds events, the database is down) -- run it again then, it is
+idempotent. C<--before> together with C<--retention>, and C<--retention> without a
+C<retention_days>, end the command with a message before anything is deleted.
+
+=head2 --config, -c
+
+As for C<serve>: a missing file is an error; without the option, F<skeid.yaml> is read when it
+exists. The config's C<usage_store> is the store purged.
+
+=head2 --api-key-id
+
+A customer key id whose events are deleted; repeat it for several. Ids given as arguments are
+added to these.
+
+=head2 --before
+
+Only events with C<created_at> before this ISO 8601 UTC timestamp; with key ids, only those
+keys' events before it.
+
+=head2 --retention
+
+C<--before> the cut-off of C<usage_store.retention_days>
+(L<Langertha::Skeid/usage_retention_before>).
+
+=head2 --dry-run
+
+Counts what would be deleted and deletes nothing.
+
+=head2 capabilities
+
+  skeid capabilities | grep -qx openbao_token_file
+
+Prints what this Skeid can do, one name per line (L<Langertha::Skeid/capabilities>), so a
+deployment can check a feature before it relies on it.
+
 =head2 keyid
 
   echo -n "$CUSTOMER_KEY" | skeid keyid
@@ -492,15 +592,21 @@ shell history. With no key at all it prints the usage text and exits non-zero.
 
 =head1 ENVIRONMENT
 
-C<serve> and C<usage> build a L<Langertha::Skeid>, which reads C<SKEID_ROUTE_WAIT_TIMEOUT_MS>,
-C<SKEID_ROUTE_WAIT_POLL_MS>, C<SKEID_TRUST_KEY_ID_HEADER>, C<SKEID_FRONTEND_COUNT>,
-C<SKEID_ADMIN_API_KEY>, C<SKEID_USAGE_DB>, C<SKEID_CAPACITY_MAX_AGE_MS> and
-C<SKEID_CONFIG_RELOAD_INTERVAL> (L<Langertha::Skeid/ENVIRONMENT>), and whatever variables the
-config names. C<serve> also reads:
+C<serve>, C<usage> and C<usage-purge> build a L<Langertha::Skeid>, which reads
+C<SKEID_ROUTE_WAIT_TIMEOUT_MS>, C<SKEID_ROUTE_WAIT_POLL_MS>, C<SKEID_TRUST_KEY_ID_HEADER>,
+C<SKEID_CORRELATION_HEADER>, C<SKEID_FRONTEND_COUNT>, C<SKEID_ADMIN_API_KEY>, C<SKEID_USAGE_DB>,
+C<SKEID_CAPACITY_MAX_AGE_MS> and C<SKEID_CONFIG_RELOAD_INTERVAL>
+(L<Langertha::Skeid/ENVIRONMENT>), and whatever variables the config names. C<serve> also reads:
 
 =head2 OPENBAO_ROLE_ID, OPENBAO_SECRET_ID
 
 Both set: upstream keys (C<api_key_ref>) are resolved from OpenBao through AppRole.
+
+=head2 OPENBAO_TOKEN_FILE
+
+Instead of AppRole: a file a starter keeps a current OpenBao token in, read at start and again
+when it changes (L<Langertha::Skeid::KeyBroker::OpenBao/token_file>). A missing or empty file,
+or C<OPENBAO_ROLE_ID>/C<OPENBAO_SECRET_ID> set as well, stops C<serve>.
 
 =head2 OPENBAO_ADDR
 
@@ -529,7 +635,7 @@ L<Langertha::Skeid>, L<Langertha::Skeid::Proxy>
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-skeid/issues>.
 
 =head2 IRC
@@ -542,11 +648,11 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

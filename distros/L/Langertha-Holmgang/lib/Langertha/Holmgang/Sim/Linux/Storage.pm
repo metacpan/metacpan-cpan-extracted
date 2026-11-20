@@ -7,7 +7,7 @@ use utf8;
 
 use JSON::MaybeXS ();
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 my $T = JSON::MaybeXS::true();
@@ -964,7 +964,7 @@ Langertha::Holmgang::Sim::Linux::Storage - Disks and file systems on a simulated
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

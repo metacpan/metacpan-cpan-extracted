@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -44,7 +45,7 @@ my $skeid = Langertha::Skeid->new(
   route_wait_poll_ms => 5,
   store_usage_event  => sub { push @usage_events, $_[0]; return { ok => 1 } },
 );
-$skeid->add_node(id => 'n1', url => "http://127.0.0.1:$upstream_port/v1", model => 'm1', max_conns => 4);
+$skeid->add_node(id => 'n1', trust => 'internal', url => "http://127.0.0.1:$upstream_port/v1", model => 'm1', max_conns => 4);
 
 my $proxy = Langertha::Skeid::Proxy->build_app(skeid => $skeid);
 $proxy->log->level('fatal');

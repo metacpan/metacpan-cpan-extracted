@@ -2,7 +2,7 @@ package Protocol::IR::Proto::RC5;
 use strict;
 use warnings;
 
-our $VERSION = '1.3';
+our $VERSION = '1.5';
 
 use Protocol::IR::Code;
 
@@ -148,6 +148,6 @@ Protocol::IR::Proto::RC5 - IR protocol handler
 
 =head1 VERSION
 
-version 1.3
+version 1.5
 
 =cut

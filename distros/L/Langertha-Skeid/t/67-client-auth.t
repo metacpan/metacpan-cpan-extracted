@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -92,7 +93,7 @@ sub proxy {
   });
   my $t = Test::Mojo->new($app);
   my $up = $t->ua->server->nb_url->clone->path('/__up/v1');
-  $skeid->add_node(id => 'n1', url => "$up", model => 'm', engine => 'openai', max_conns => 2);
+  $skeid->add_node(id => 'n1', trust => 'internal', url => "$up", model => 'm', engine => 'openai', max_conns => 2);
   return ($t, $skeid);
 }
 

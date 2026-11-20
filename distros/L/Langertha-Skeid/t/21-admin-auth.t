@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -33,6 +34,7 @@ sub _request {
   my $skeid = Langertha::Skeid->new;
   $skeid->add_node(
     id    => 'n1',
+    trust => 'internal',
     url   => 'http://127.0.0.1:21001/v1',
     model => 'qwen2.5',
   );
@@ -64,7 +66,7 @@ sub _request {
       return {
         admin => { api_key => $admin_key },
         nodes => [
-          { id => 'dyn-1', url => 'http://127.0.0.1:22001/v1', model => 'qwen2.5' },
+          { id => 'dyn-1', trust => 'internal', url => 'http://127.0.0.1:22001/v1', model => 'qwen2.5' },
         ],
       };
     },
@@ -97,7 +99,7 @@ sub _request {
       return {
         admin => { api_key_env => 'SKEID_ADMIN_API_KEY' },
         nodes => [
-          { id => 'env-1', url => 'http://127.0.0.1:22002/v1', model => 'qwen2.5' },
+          { id => 'env-1', trust => 'internal', url => 'http://127.0.0.1:22002/v1', model => 'qwen2.5' },
         ],
       };
     },

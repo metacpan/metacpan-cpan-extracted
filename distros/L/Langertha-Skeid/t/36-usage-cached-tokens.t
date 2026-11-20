@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -194,7 +195,7 @@ SKIP: {
   my $skeid = Langertha::Skeid->new(
     store_usage_event => sub { push @events, $_[1]; return { ok => 1 } },
   );
-  $skeid->add_node(id => 'json-1', url => "http://127.0.0.1:$up_port/v1",
+  $skeid->add_node(id => 'json-1', trust => 'internal', url => "http://127.0.0.1:$up_port/v1",
     model => 'cache-model', engine => 'openai', healthy => 1, max_conns => 4);
 
   my $proxy = Langertha::Skeid::Proxy->build_app(skeid => $skeid);
@@ -252,7 +253,7 @@ SKIP: {
   my $skeid = Langertha::Skeid->new(
     store_usage_event => sub { push @events, $_[1]; return { ok => 1 } },
   );
-  $skeid->add_node(id => 'stream-1', url => "http://127.0.0.1:$up_port/v1",
+  $skeid->add_node(id => 'stream-1', trust => 'internal', url => "http://127.0.0.1:$up_port/v1",
     model => 'stream-model', engine => 'openai', healthy => 1, max_conns => 4);
 
   my $proxy = Langertha::Skeid::Proxy->build_app(skeid => $skeid);

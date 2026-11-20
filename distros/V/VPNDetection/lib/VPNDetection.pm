@@ -19,7 +19,7 @@ use VPNDetection::Error;
 use VPNDetection::Oauth;
 use VPNDetection::Result;
 
-our $VERSION = '3.16.1';
+our $VERSION = '3.17.0';
 our @EXPORT_OK = ('is_bogon');
 
 use constant DEFAULT_BASE_URL => 'https://api.vpndetection.io';
@@ -57,18 +57,72 @@ my $PUBPROXY_DETAIL = [fields => [
     [num_ports => ['integer']], [num_proxies => ['integer']], [last_seen => ['date']],
     [last_usable => ['string']],
 ]];
+my $CARRIER_DETAIL = [fields => [map { [$_ => ['string']] } qw(name mcc mnc country confidence)]];
+my $SATELLITE_DETAIL = [fields => [
+    (map { [$_ => ['string']] } qw(provider provider_name orbit segment country confidence)),
+    [asn => ['integer']],
+]];
+my $SSH_DETAIL = [fields => [
+    [port => ['integer']], (map { [$_ => ['string']] } qw(banner host_key_fp first_seen last_seen)),
+    [session_ok => ['boolean']],
+]];
+my $SMTP_DETAIL = [fields => [
+    [port => ['integer']], (map { [$_ => ['string']] } qw(banner first_seen last_seen)),
+    [session_ok => ['boolean']],
+]];
+my $WEB_ROW = [fields => [
+    (map { [$_ => ['integer'], 1] } qw(port status_code)),
+    (map { [$_ => ['boolean'], 1] } qw(tls_ok session_ok cert_browser_trusted)),
+    (map { [$_ => ['string'], 1] } qw(
+        server location title cert_subject_cn cert_subject_o cert_issuer_dn tls_version first_seen
+        last_seen
+    )),
+]];
+my $DNS_RESOLVER_DETAIL = [fields => [
+    (map { [$_ => ['integer']] } qw(port rcode)), (map { [$_ => ['boolean']] } qw(recursion_available answer_correct)),
+    (map { [$_ => ['string']] } qw(first_seen last_seen)),
+]];
+my $BITTORRENT_DETAIL = [fields => [
+    (map { [$_ => ['boolean']] } qw(verified id_matches_ip indexer)),
+    (map { [$_ => ['string']] } qw(first_seen last_seen last_reachable)),
+    (map { [$_ => ['integer']] } qw(days_seen num_ports peak_num_ports)),
+    [clients => [list => ['string']]],
+]];
 # Where the address is and the AS announcing it carry every member whenever they
-# are present.
-my $LOCATION = [fields => [map { [$_ => ['string'], 1] } @VPNDetection::Result::LOCATION]];
-my $ASN = [fields => [[asn => ['integer'], 1], map { [$_ => ['string'], 1] } qw(name domain type prefix)]];
+# are present, bar the ones a plan may leave out.
+my $LOCATION = [fields => [
+    (map { [$_ => ['string'], 1] } qw(
+        continent continent_name country country_name timezone currency_code currency_name
+        currency_symbol flag_emoji flag_unicode
+    )),
+    (map { [$_ => ['string']] } qw(region region_code city postal_code geoname_id dma_code last_changed)),
+    (map { [$_ => ['number']] } qw(latitude longitude)), [accuracy_radius => ['integer']],
+]];
+my $ASN = [fields => [
+    [asn => ['integer'], 1], (map { [$_ => ['string'], 1] } qw(name domain type prefix)),
+    (map { [$_ => ['string']] } qw(country rpki_status)),
+]];
+my $COMPANY = [fields => [(map { [$_ => ['string'], 1] } qw(name domain)), (map { [$_ => ['string']] } qw(type country))]];
+my $ABUSE = [fields => [
+    [email => ['string'], 1], (map { [$_ => ['string']] } qw(name phone address country network unvalidated_since)),
+    [validated => ['boolean']],
+]];
 our $LOOKUP = [fields => [
     [ip => ['string'], 1], [is_vpn => ['boolean'], 1], [is_bogon => ['boolean']],
-    (map { [$_ => ['boolean']] } qw(is_hosting is_relay is_tor is_cdn is_resproxy is_dcproxy is_mobproxy is_pubproxy trial_expired cap_reached)),
+    (map { [$_ => ['boolean']] } qw(
+        is_hosting is_relay is_tor is_cdn is_resproxy is_dcproxy is_mobproxy is_pubproxy
+        is_anycast is_carrier is_satellite is_ssh is_smtp is_web is_dns_resolver is_bittorrent
+        trial_expired cap_reached
+    )),
     [vpn => $VPN_DETAIL],
     (map { [$_ => $CLASS_DETAIL] } qw(hosting relay tor cdn)),
     (map { [$_ => $PROXY_DETAIL] } qw(resproxy dcproxy mobproxy)),
     [pubproxy => $PUBPROXY_DETAIL],
-    [location => $LOCATION], [asn => $ASN],
+    [carrier => $CARRIER_DETAIL], [satellite => $SATELLITE_DETAIL], [ssh => $SSH_DETAIL],
+    [smtp => $SMTP_DETAIL], [web => [list => $WEB_ROW]], [dns_resolver => $DNS_RESOLVER_DETAIL],
+    [bittorrent => $BITTORRENT_DETAIL],
+    [location => $LOCATION], [asn => $ASN], [company => $COMPANY], [hostname => ['string']],
+    [abuse => $ABUSE],
 ]];
 our $BATCH_ERROR = [fields => [[status => ['integer'], 1], [error => ['string'], 1]]];
 # Each entry is judged alone, by _lookup_chunk_p.
@@ -511,6 +565,10 @@ sub _nonconforming {
         return !ref $value && !VPNDetection::Oauth::_is_string($value) && $value =~ /\A-?[0-9]+\z/
             ? undef : $wrong->();
     }
+    if ($kind eq 'number') {
+        return !ref $value && !VPNDetection::Oauth::_is_string($value)
+            && Scalar::Util::looks_like_number($value) ? undef : $wrong->();
+    }
     if ($kind eq 'boolean') {
         return Scalar::Util::blessed($value) && $value->isa('JSON::PP::Boolean') ? undef : $wrong->();
     }
@@ -883,7 +941,8 @@ without an API key gets an unauthorized error rather than a partial one.
 
 Usage counts against the allowance window - on a paid plan the anniversary of
 the subscription, not the calendar month and not the billing period, and on a
-free plan the UTC day - and it is the same number a lookup is gated on.
+free plan its trial of every field - and it is the same number a lookup is gated
+on.
 C<hard_limit> is C<undef> when we never stop serving, which is not the same as a
 limit of zero.
 

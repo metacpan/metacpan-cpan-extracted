@@ -10,7 +10,7 @@ use Encode ();
 use Path::Tiny qw( path );
 use Langertha::Holmgang::Error;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 # the file of an excerpt, relative to the suite directory; a true constant
 my $FILE_RE = qr{\Aquellen/[a-z0-9][a-z0-9-]*\.txt\z};
@@ -146,7 +146,7 @@ Langertha::Holmgang::Excerpt - Excerpts from a suite's statute texts under quell
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

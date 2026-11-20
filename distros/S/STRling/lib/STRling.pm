@@ -9,7 +9,7 @@ use STRling::NativeClient ();
 use STRling::Requests ();
 use STRling::StdlibGenerated ();
 
-our $VERSION = '4.0.1';
+our $VERSION = '4.0.3';
 our @EXPORT_OK = qw(
     load_native source_compile_request stdlib_helper simply_builder_request
     date_time email ip url uuid

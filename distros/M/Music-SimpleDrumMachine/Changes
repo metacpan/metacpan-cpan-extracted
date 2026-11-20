@@ -1,5 +1,15 @@
 Revision history for Music-SimpleDrumMachine
 
+0.0802 2026-11-19 20:04:05
+    - Add the `virtual` attribute and open a virtual MIDI port when building the `$midi_out` object.
+
+0.0801 2026-11-19 19:14:04
+    - Improve documentation.
+
+0.0800 2026-11-19 18:59:13
+    - Exposed the loop and added an `autoplay` attribute.
+    - Improve tests.
+
 0.0702 2026-10-05 10:28:34
     - Fix the duplicated instrument numbers.
     - Fix documentation.

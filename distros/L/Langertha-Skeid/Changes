@@ -1,5 +1,74 @@
 Revision history for Langertha-Skeid
 
+0.005     2026-11-19 18:38:03Z
+
+    - routing.catch_all { chat, embeddings }: a model name that is neither an alias nor a
+      node model goes to the configured target of the route's kind instead of a 503
+      model_not_found (ADR 0033). chat covers /v1/chat/completions, /v1/messages,
+      /api/chat and /api/generate; embeddings covers /v1/embeddings, /api/embed and
+      /api/embeddings. Off without the key. The key's policy judges the target, so a 403
+      stays a 403; the answer names the real target. The usage event of a bent request
+      carries routed_model beside requested_model (new nullable column, added on start
+      with auto_migrate; the jsonlog key only when set). Model lists are unchanged. GET
+      /skeid/config shows the catch-all.
+    - Nodes take trust: internal | external, default external (ADR 0032). An external
+      node gets only Content-Type, Accept, anthropic-version, anthropic-beta and
+      OpenAI-Beta of the client's headers, plus its own key and User-Agent:
+      Langertha-Skeid; an internal node no longer gets X-Forwarded-*, Forwarded,
+      X-Real-IP or Cookie. Only an internal node passes the client's credential
+      through. A node_files entry sets trust for its nodes (rejection rules trust and
+      key_required). GET /skeid/config lists each node's trust.
+      INCOMPATIBLE: a node with neither api_key_env nor api_key_ref and no
+      trust: internal now fails the config load, and a reload keeps the old config;
+      add a key or trust: internal before upgrading.
+    - OpenBao key broker: OPENBAO_TOKEN_FILE instead of AppRole credentials, for many
+      processes behind one starter that keeps a token current in a file (an AppRole
+      secret_id is single use). Read at start -- missing or empty stops it -- and again
+      when it changes and on every renewal tick; the starter renews, Skeid does not. Both
+      modes set at once stop the start.
+    - skeid capabilities (and Langertha::Skeid->capabilities) print what this Skeid can
+      do, one name per line, for a deployment to check before it relies on a feature.
+    - Customer source: with rate_column: true a fifth column, rate (JSON), gives a key its
+      own request rate. It may only tighten the rate of the row's policy; a row asking for
+      more is rejected with a reason. Langertha::Skeid::Rate holds the rate's shape.
+    - Usage purge: POST /skeid/usage/purge and skeid usage-purge delete the usage events
+      of a set of customer key ids (an organisation's, on an erasure request) and/or those
+      created before a time, with a dry-run count; idempotent, answered with what matched
+      and was deleted, by which store and when. Both built-in stores purge; a DBI store
+      refuses while its spool holds events. usage_store.retention_days sets a retention,
+      and skeid usage-purge --retention deletes what is past it, run on a schedule.
+    - Usage contract: every usage event records finish_reason (stop, length,
+      content_filter, tool_calls, error, other), ttft_ms for streamed answers and
+      correlation_id from the header routing.correlation_header names (8-64 of
+      [A-Za-z0-9._-], passed through unchanged; the header is not sent on to the node). The DBI stores add the three nullable
+      columns to an existing table.
+    - Key rate: a policy (or a keys entry) may carry rate: { per_s, burst, per_min }. A
+      customer key over it is answered 429 with Retry-After in its face's shape before
+      anything is routed, and the refusal is a usage event with error_type
+      key_rate_limited and no content. Token buckets in memory per process, divided like
+      max_conns across workers and frontends; a key of a customer source takes its
+      policy's rate. Without client_auth, keys the config does not list share one bucket. GET /skeid/metrics/keys counts the refusals per key id.
+    - Node files: node_files in the main config names further YAML files of nodes that
+      someone else writes (a GPU manager), each with constraints -- allowed URL hosts, an
+      api_key_env pattern, api_key_ref on or off (default off), allowed kinds. A node that
+      breaks one is left out and the rest of the file loads; GET /skeid/config lists per
+      file the nodes accepted and each rejection by position and rule, never the value. A
+      file is re-read when it changes and kept at its last good version when it does not
+      parse or is gone. A keyless node from a node file never gets the client's
+      credentials; a file over 1 MiB, nested deeper than 16 levels or using YAML aliases is
+      refused. ADR 0031.
+    - Realtime: the client's autoload query parameter is no longer passed to the node. A
+      llama.cpp router loads a model on ?autoload=true even when started with
+      --no-models-autoload. The HTTP routes never forwarded the client's query.
+    - Ollama embeddings: POST /api/embed (input as a string or a list) and the older
+      POST /api/embeddings (one prompt) are translated to the node's OpenAI /v1/embeddings
+      and answered in Ollama's shape, routed, admitted and metered like /api/chat. Both
+      answered 404 before.
+    - Aliases: the last tier of an alias that sets no wait_ms now waits
+      routing.wait_timeout_ms, like a model without an alias, instead of 0. A saturated alias
+      answered 429 at once while its raw model name waited; write wait_ms: 0 on the last tier
+      to keep refusing at once. Earlier tiers still default to 0.
+
 0.004     2026-10-24 04:04:43Z
 
   [Status]

@@ -4,7 +4,7 @@ Protocol::IR::Code - Intermediate representation of an IR remote control code
 
 # VERSION
 
-version 1.3
+version 1.5
 
 # SYNOPSIS
 

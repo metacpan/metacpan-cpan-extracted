@@ -5,7 +5,7 @@ use warnings;
 
 use Carp ();
 
-our $VERSION = '1.16.1';
+our $VERSION = '1.17.0';
 
 our @FLAGS = qw(
     is_vpn is_tor is_relay is_resproxy is_dcproxy is_mobproxy is_pubproxy is_hosting is_cdn
@@ -34,8 +34,8 @@ our %MEMBERS = (
     rwhois => [qw(id name country source domain abuse_email)],
 );
 # On answers to a key on the free plan only, and so never on a bogon's: false
-# while its organization's daily trial lasts (every field for the first 100
-# lookups each UTC day), true once the answer has Unlimited's. cap_reached is
+# while its organization's trial of every field lasts, true once the answer has
+# Unlimited's. cap_reached is
 # its paid-plan twin: false while the answer has every field, true once the
 # organization's overage cap is reached.
 our @MARKERS = qw(trial_expired cap_reached);
@@ -169,8 +169,8 @@ answers C<tor> and C<relay>; every paid plan answers them all.
 On every answer, with a key or without one. C<location>, C<asn>, C<company> and
 C<abuse> are plain hash references whose paid members are absent on Unlimited:
 C<location> carries the country there and the city, coordinates and the rest on a
-paid plan, C<asn> its C<country> and C<rpki_status>, C<company> its C<type> and
-C<country>, and C<abuse> everything past C<email>. C<hostname> is the reverse-DNS
+paid plan, C<company> its C<type> and C<country>, and C<abuse> everything past
+C<email>. C<hostname> is the reverse-DNS
 name, an empty string where there is none.
 
 =head2 whois, rwhois, hosted_domains
@@ -181,9 +181,9 @@ C<undef> when your plan omits them.
 
 =head2 trial_expired
 
-On answers to a key on the free plan only: C<0> while its organization's daily
-trial lasts (every field for the first 100 lookups each UTC day), C<1> once the
-answer has Unlimited's, and C<undef> on any other answer.
+On answers to a key on the free plan only: C<0> while its organization's trial of
+every field lasts, C<1> once the answer has Unlimited's, and C<undef> on any other
+answer.
 
 =head2 cap_reached
 

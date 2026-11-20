@@ -10,6 +10,7 @@ requires 'Mail::DKIM';
 requires 'Object::Configure';
 requires 'Params::Get';
 requires 'Readonly';
+requires 'Sys::Syslog';
 requires 'XML::PP';
 
 on 'configure' => sub {

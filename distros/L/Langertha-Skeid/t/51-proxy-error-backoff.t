@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -97,6 +98,7 @@ my @cases = (
 for my $case (@cases) {
   ok $skeid->add_node(
     id        => $case->{id},
+    trust     => 'internal',
     url       => "$upstream",
     model     => $case->{model},
     engine    => 'openai',

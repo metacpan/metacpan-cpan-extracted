@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -10,9 +11,9 @@ use Langertha::Skeid::Proxy;
 # shown a name its policy would refuse. No key means the default policy; the route stays open.
 
 my $skeid = Langertha::Skeid->new(store_usage_event => sub { return { ok => 1 } });
-$skeid->add_node(id => 'l1', url => 'http://127.0.0.1:9/v1', model => 'qwen', tags => ['local']);
-$skeid->add_node(id => 'c1', url => 'http://127.0.0.1:9/v1', model => 'llama', tags => ['cloud']);
-$skeid->add_node(id => 'wild', url => 'http://127.0.0.1:9/v1');
+$skeid->add_node(id => 'l1', trust => 'internal', url => 'http://127.0.0.1:9/v1', model => 'qwen', tags => ['local']);
+$skeid->add_node(id => 'c1', trust => 'internal', url => 'http://127.0.0.1:9/v1', model => 'llama', tags => ['cloud']);
+$skeid->add_node(id => 'wild', trust => 'internal', url => 'http://127.0.0.1:9/v1');
 $skeid->set_model_alias('house-model', { tiers => [{ tags => ['local'], model => 'qwen' }] });
 $skeid->set_model_alias('qwen', { tiers => [{ tags => ['local'], model => 'qwen' }] });
 $skeid->set_model_alias('cloud-product', { tiers => [{ tags => ['cloud'], model => 'llama' }] });

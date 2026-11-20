@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -70,7 +71,7 @@ my $skeid = Langertha::Skeid->new(
       pricing  => { '*' => { input_per_million => 3, output_per_million => 15 } },
       policies => { narrow => { models => ['something-else'] } },
       keys     => { $NARROW_ID => 'narrow' },
-      nodes    => [ map { +{ id => "n-$_", url => $UP_URL, model => $_, healthy => 1, max_conns => 4 } } qw(m1 m401) ],
+      nodes    => [ map { +{ id => "n-$_", trust => 'internal', url => $UP_URL, model => $_, healthy => 1, max_conns => 4 } } qw(m1 m401) ],
     };
   },
 );

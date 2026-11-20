@@ -1,5 +1,5 @@
 package Langertha::Skeid::Protocol::Ollama::Stream;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 # ABSTRACT: Rewrites an OpenAI SSE stream as Ollama newline-delimited JSON
 use strict;
 use warnings;
@@ -216,7 +216,7 @@ Langertha::Skeid::Protocol::Ollama::Stream - Rewrites an OpenAI SSE stream as Ol
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 DESCRIPTION
 
@@ -260,7 +260,7 @@ both stream translators answer the same three calls.
 
 One decoded OpenAI chunk becomes one Ollama line when it carries text or completed tool calls,
 or nothing for a role-only chunk or the final usage-only one. OpenAI tool-call fragments are
-fed to L<Langertha::Engine::OpenAIBase/parse_stream_chunk> with state private to this stream;
+fed to L<Langertha::Role::OpenAICompatible/parse_stream_chunk> with state private to this stream;
 only its completed L<Langertha::ToolCall> objects are rendered, through C<to_ollama>. Usage and
 finish reason are recorded for the closing line. A top-level OpenAI error object ends the stream
 with L</error_event>; a parser rejection does the same with a generic message rather than
@@ -308,7 +308,7 @@ L<Langertha::Skeid::Protocol::Ollama>, L<Langertha::Skeid::Protocol::Anthropic::
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-skeid/issues>.
 
 =head2 IRC
@@ -321,11 +321,11 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -2733,6 +2733,7 @@ XS_INTERNAL(Affix_affix) {
     const char * rename_str = nullptr;
     infix_library_t * lib_handle_for_symbol = nullptr;
     bool created_implicit_handle = false;
+    infix_error_details_t open_error = {0};
 
     // We only process names/libraries if we don't already have a raw pointer address
     if (!is_raw_ptr_target) {
@@ -2793,6 +2794,8 @@ XS_INTERNAL(Affix_affix) {
                 lib_handle_for_symbol = _get_lib_from_registry(aTHX_ path);
                 if (lib_handle_for_symbol)
                     created_implicit_handle = true;
+                else
+                    open_error = infix_get_last_error();    // dlopen() failed: keep the reason
             }
 
             if (lib_handle_for_symbol && symbol_name_str)
@@ -2800,7 +2803,10 @@ XS_INTERNAL(Affix_affix) {
         }
 
         if (symbol == nullptr) {
-            const infix_error_details_t load_err = created_implicit_handle ? infix_get_last_error() : (infix_error_details_t){0};
+            // A failed dlopen() sets an error we must report; a failed dlsym()
+            // does not set one, so prefer the open failure when we have it.
+            const infix_error_details_t load_err = open_error.message[0] != '\0' ? open_error :
+                                                   ( created_implicit_handle ? infix_get_last_error() : open_error );
             if (created_implicit_handle) {
                 const char * lookup_path = SvOK(target_sv) ? SvPV_nolen(target_sv) : "";
                 SV ** entry_sv_ptr = hv_fetch(MY_CXT.lib_registry, lookup_path, strlen(lookup_path), 0);

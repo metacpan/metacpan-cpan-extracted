@@ -4,57 +4,63 @@ use warnings;
 use 5.010000;
 
 use ExtUtils::MakeMaker;
+use FFI::CheckLib 0.28 qw(check_lib_or_exit);
+
+# A missing system dependency makes the distribution inapplicable to CPAN
+# Testers. Exit successfully before generating a Makefile in that case.
+check_lib_or_exit(lib => 'fribidi') unless $ENV{TEXT_BIDI_FRIBIDI_LIB};
 
 my %WriteMakefileArgs;
 %WriteMakefileArgs = (
-                       'MIN_PERL_VERSION' => '5.010000',
-                       'VERSION' => '3.01',
-                       'NAME' => 'Text::Bidi',
-                       'TEST_REQUIRES' => {
-                                            'utf8' => '0',
-                                            'File::Temp' => '0',
-                                            'ExtUtils::MakeMaker' => '0',
-                                            'File::Basename' => '0',
-                                            'IO::Handle' => '0',
-                                            'IPC::Open3' => '0',
-                                            'Cwd' => '0',
-                                            'Symbol' => '0',
-                                            'charnames' => '0',
-                                            'Test::More' => '0',
-                                            'Data::Dumper' => '0',
-                                            'File::Spec' => '0',
-                                            'lib' => '0'
-                                          },
-                       'PREREQ_PM' => {
-                                        'Tie::Array' => '0',
-                                        'open' => '0',
-                                        'integer' => '0',
-                                        'version' => '0.77',
-                                        'warnings' => '0',
-                                        'FFI::CheckLib' => '0.28',
-                                        'FFI::Platypus::Buffer' => '0',
-                                        'overload' => '0',
-                                        'Encode' => '0',
-                                        'Exporter' => '0',
-                                        'Getopt::Long' => '0',
-                                        'Carp' => '0',
-                                        'strict' => '0',
-                                        'base' => '0',
-                                        'FFI::Platypus' => '2.00'
-                                      },
                        'CONFIGURE_REQUIRES' => {
+                                                 'FFI::CheckLib' => '0.28',
                                                  'ExtUtils::MakeMaker' => '0'
                                                },
+                       'ABSTRACT' => 'Unicode bidi algorithm using libfribidi',
+                       'VERSION' => '3.02',
                        'DISTNAME' => 'Text-Bidi',
-                       'LICENSE' => 'perl',
-                       'AUTHOR' => 'Moshe Kamensky <kamensky@cpan.org>',
                        'EXE_FILES' => [
                                         'bin/fribidi.pl'
                                       ],
-                       'ABSTRACT' => 'Unicode bidi algorithm using libfribidi',
+                       'TEST_REQUIRES' => {
+                                            'Test::More' => '0',
+                                            'File::Spec' => '0',
+                                            'Symbol' => '0',
+                                            'File::Temp' => '0',
+                                            'ExtUtils::MakeMaker' => '0',
+                                            'lib' => '0',
+                                            'Cwd' => '0',
+                                            'utf8' => '0',
+                                            'charnames' => '0',
+                                            'IO::Handle' => '0',
+                                            'Data::Dumper' => '0',
+                                            'IPC::Open3' => '0',
+                                            'File::Basename' => '0'
+                                          },
+                       'AUTHOR' => 'Moshe Kamensky <kamensky@cpan.org>',
+                       'MIN_PERL_VERSION' => '5.010000',
                        'test' => {
                                    'TESTS' => 't/*.t'
-                                 }
+                                 },
+                       'PREREQ_PM' => {
+                                        'version' => '0.77',
+                                        'Encode' => '0',
+                                        'warnings' => '0',
+                                        'Getopt::Long' => '0',
+                                        'FFI::Platypus::Buffer' => '0',
+                                        'Carp' => '0',
+                                        'Tie::Array' => '0',
+                                        'integer' => '0',
+                                        'Exporter' => '0',
+                                        'overload' => '0',
+                                        'open' => '0',
+                                        'FFI::Platypus' => '2.00',
+                                        'base' => '0',
+                                        'FFI::CheckLib' => '0.28',
+                                        'strict' => '0'
+                                      },
+                       'LICENSE' => 'perl',
+                       'NAME' => 'Text::Bidi'
                      );
 
 
@@ -63,6 +69,7 @@ my %WriteMakefileArgs;
     NAME => 'Text::Bidi',
     VERSION => '0.00',
     MIN_PERL_VERSION => '5.010000',
+    CONFIGURE_REQUIRES => { 'FFI::CheckLib' => '0.28' },
     PREREQ_PM => {
         'FFI::CheckLib' => '0.28',
         'FFI::Platypus' => '2.00',

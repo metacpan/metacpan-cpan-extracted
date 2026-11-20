@@ -1,7 +1,7 @@
 ---
 abstract: 'Dynamic routing control-plane for multi-node LLM serving with normalized metrics and cost accounting'
 author:
-  - 'Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>'
+  - 'Torsten Raudssus <getty@cpan.org>'
 build_requires:
   Test2::Suite: '0'
   Test::File::ShareDir: '0'
@@ -10,7 +10,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.040, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,97 +19,103 @@ name: Langertha-Skeid
 provides:
   Langertha::Skeid:
     file: lib/Langertha/Skeid.pm
-    version: '0.004'
+    version: '0.005'
   Langertha::Skeid::CapacityProbe:
     file: lib/Langertha/Skeid/CapacityProbe.pm
-    version: '0.004'
+    version: '0.005'
   Langertha::Skeid::CapacityProbe::Custom:
     file: lib/Langertha/Skeid/CapacityProbe/Custom.pm
-    version: '0.004'
+    version: '0.005'
   Langertha::Skeid::CapacityProbe::Prometheus:
     file: lib/Langertha/Skeid/CapacityProbe/Prometheus.pm
-    version: '0.004'
+    version: '0.005'
   Langertha::Skeid::CapacityProbe::Registry:
     file: lib/Langertha/Skeid/CapacityProbe/Registry.pm
-    version: '0.004'
+    version: '0.005'
   Langertha::Skeid::CustomerSource:
     file: lib/Langertha/Skeid/CustomerSource.pm
-    version: '0.004'
+    version: '0.005'
   Langertha::Skeid::CustomerSource::DBI:
     file: lib/Langertha/Skeid/CustomerSource/DBI.pm
-    version: '0.004'
+    version: '0.005'
   Langertha::Skeid::KeyBroker:
     file: lib/Langertha/Skeid/KeyBroker.pm
-    version: '0.004'
+    version: '0.005'
   Langertha::Skeid::KeyBroker::OpenBao:
     file: lib/Langertha/Skeid/KeyBroker/OpenBao.pm
-    version: '0.004'
+    version: '0.005'
+  Langertha::Skeid::NodeFiles:
+    file: lib/Langertha/Skeid/NodeFiles.pm
+    version: '0.005'
   Langertha::Skeid::OpenAPI:
     file: lib/Langertha/Skeid/OpenAPI.pm
-    version: '0.004'
+    version: '0.005'
   Langertha::Skeid::Protocol:
     file: lib/Langertha/Skeid/Protocol.pm
-    version: '0.004'
+    version: '0.005'
   Langertha::Skeid::Protocol::Anthropic:
     file: lib/Langertha/Skeid/Protocol/Anthropic.pm
-    version: '0.004'
+    version: '0.005'
   Langertha::Skeid::Protocol::Anthropic::Stream:
     file: lib/Langertha/Skeid/Protocol/Anthropic/Stream.pm
-    version: '0.004'
+    version: '0.005'
   Langertha::Skeid::Protocol::Audio:
     file: lib/Langertha/Skeid/Protocol/Audio.pm
-    version: '0.004'
+    version: '0.005'
   Langertha::Skeid::Protocol::Documents:
     file: lib/Langertha/Skeid/Protocol/Documents.pm
-    version: '0.004'
+    version: '0.005'
   Langertha::Skeid::Protocol::MCP:
     file: lib/Langertha/Skeid/Protocol/MCP.pm
-    version: '0.004'
+    version: '0.005'
   Langertha::Skeid::Protocol::Ollama:
     file: lib/Langertha/Skeid/Protocol/Ollama.pm
-    version: '0.004'
+    version: '0.005'
   Langertha::Skeid::Protocol::Ollama::Stream:
     file: lib/Langertha/Skeid/Protocol/Ollama/Stream.pm
-    version: '0.004'
+    version: '0.005'
   Langertha::Skeid::Protocol::RawBody:
     file: lib/Langertha/Skeid/Protocol/RawBody.pm
-    version: '0.004'
+    version: '0.005'
   Langertha::Skeid::Protocol::Realtime:
     file: lib/Langertha/Skeid/Protocol/Realtime.pm
-    version: '0.004'
+    version: '0.005'
   Langertha::Skeid::Protocol::Refusal:
     file: lib/Langertha/Skeid/Protocol/Refusal.pm
-    version: '0.004'
+    version: '0.005'
   Langertha::Skeid::Protocol::Rerank:
     file: lib/Langertha/Skeid/Protocol/Rerank.pm
-    version: '0.004'
+    version: '0.005'
   Langertha::Skeid::Proxy:
     file: lib/Langertha/Skeid/Proxy.pm
-    version: '0.004'
+    version: '0.005'
   Langertha::Skeid::Proxy::Realtime:
     file: lib/Langertha/Skeid/Proxy/Realtime.pm
-    version: '0.004'
+    version: '0.005'
   Langertha::Skeid::Proxy::RelayContent:
     file: lib/Langertha/Skeid/Proxy/RelayContent.pm
-    version: '0.004'
+    version: '0.005'
+  Langertha::Skeid::Rate:
+    file: lib/Langertha/Skeid/Rate.pm
+    version: '0.005'
   Langertha::Skeid::Registry:
     file: lib/Langertha/Skeid/Registry.pm
-    version: '0.004'
+    version: '0.005'
   Langertha::Skeid::Secret:
     file: lib/Langertha/Skeid/Secret.pm
-    version: '0.004'
+    version: '0.005'
   Langertha::Skeid::SwaggerUI:
     file: lib/Langertha/Skeid/SwaggerUI.pm
-    version: '0.004'
+    version: '0.005'
   Langertha::Skeid::UsageStore:
     file: lib/Langertha/Skeid/UsageStore.pm
-    version: '0.004'
+    version: '0.005'
   Langertha::Skeid::UsageStore::DBI:
     file: lib/Langertha/Skeid/UsageStore/DBI.pm
-    version: '0.004'
+    version: '0.005'
   Langertha::Skeid::UsageStore::JsonLog:
     file: lib/Langertha/Skeid/UsageStore/JsonLog.pm
-    version: '0.004'
+    version: '0.005'
 recommends:
   Cpanel::JSON::XS: '4.20'
   DBD::Pg: '0'
@@ -131,7 +137,7 @@ resources:
   bugtracker: https://github.com/Getty/langertha-skeid/issues
   homepage: https://github.com/Getty/langertha-skeid
   repository: https://github.com/Getty/langertha-skeid.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.040001'
@@ -144,9 +150,6 @@ x_Dist_Zilla:
             - .karr
             - README.md
           exclude_match:
-            - ^CLAUDE\.md$
-            - ^CONTEXT\.md$
-            - ^\.claude/
             - ^assets/
             - ^bench/
             - ^docs/
@@ -161,54 +164,58 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GatherAgentContext
       name: '@Author::GETTY/GatherAgentContext'
-      version: '0.001'
+      version: '0.002'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Author::GETTY/@Filter/ManifestSkip'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::GETTY/@Filter/MetaYAML'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::Readme
       name: '@Author::GETTY/@Filter/Readme'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@Author::GETTY/@Filter/ExtraTests'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::GETTY/@Filter/ExecDir'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Author::GETTY/@Filter/ShareDir'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@Author::GETTY/@Filter/MakeMaker'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Author::GETTY/@Filter/Manifest'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@Author::GETTY/@Filter/TestRelease'
-      version: '6.037'
-    -
-      class: Dist::Zilla::Plugin::ConfirmRelease
-      name: '@Author::GETTY/@Filter/ConfirmRelease'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Author::GETTY/@Filter/UploadToCPAN'
-      version: '6.037'
+      version: '6.040'
+    -
+      class: Dist::Zilla::Plugin::Author::GETTY::InstallCheck
+      name: '@Author::GETTY/Author::GETTY::InstallCheck'
+      version: '0.328'
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@Author::GETTY/ConfirmRelease'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::LicenseFile
       name: '@Author::GETTY/LicenseFile'
@@ -216,15 +223,15 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::GETTY/MetaConfig'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::GETTY/MetaJSON'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::GETTY/PodSyntaxTests'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::Test::ChangesHasContent
       name: '@Author::GETTY/Test::ChangesHasContent'
@@ -237,7 +244,7 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: '@Author::GETTY/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-              version: '6.037'
+              version: '6.040'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
@@ -256,7 +263,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: '@Author::GETTY/MetaResources'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::InstallRelease
       name: '@Author::GETTY/InstallRelease'
@@ -290,75 +297,75 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::EnsurePod5
               name: '@CorePrep/EnsurePod5'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@CorePrep/H1Nester'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Plugin::SingleEncoding
               name: '@GETTY/SingleEncoding'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Name
               name: '@GETTY/Name'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Version
               name: '@GETTY/Version'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Region
               name: '@GETTY/Prelude'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Generic
               name: '@GETTY/Synopsis'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Generic
               name: '@GETTY/Description'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Generic
               name: '@GETTY/Overview'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Generic
               name: '@GETTY/Stability'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Leftovers
               name: '@GETTY/Leftovers'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Region
               name: '@GETTY/postlude'
-              version: '4.020'
+              version: '4.022'
             -
-              class: Pod::Weaver::Section::GenerateSection
+              class: Pod::Weaver::Section::Author::GETTY::Support
               name: '@GETTY/Support'
-              version: '4.020'
+              version: '0.328'
             -
               class: Pod::Weaver::Section::GenerateSection
               name: '@GETTY/Contributing'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Authors
               name: '@GETTY/Authors'
-              version: '4.020'
+              version: '4.022'
             -
-              class: Pod::Weaver::Section::Legal
+              class: Pod::Weaver::Section::Author::GETTY::Legal
               name: '@GETTY/Legal'
-              version: '4.020'
+              version: '0.328'
             -
               class: Pod::Weaver::Plugin::Transformer
               name: '@GETTY/List'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Plugin::Transformer
               name: '@GETTY/GETTY'
-              version: '4.020'
+              version: '4.022'
       name: '@Author::GETTY/PodWeaver'
       version: '4.010'
     -
@@ -368,7 +375,7 @@ x_Dist_Zilla:
           phase: develop
           type: recommends
       name: '@Author::GETTY/@Git::VersionManager/pluginbundle version'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::RewriteVersion::Transitional
       config:
@@ -421,7 +428,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.004'
+          tag: '0.005'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -446,7 +453,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@Author::GETTY/@Git::VersionManager/NextRelease'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -483,62 +490,62 @@ x_Dist_Zilla:
       name: '@Author::GETTY/Git::Push'
       version: '2.052'
     -
-      class: Dist::Zilla::Plugin::GitHub::CreateRelease
-      name: '@Author::GETTY/GitHub::CreateRelease'
-      version: '0.0012'
+      class: Dist::Zilla::Plugin::Author::GETTY::GitHubRelease
+      name: '@Author::GETTY/Author::GETTY::GitHubRelease'
+      version: '0.328'
     -
       class: Dist::Zilla::Plugin::Docker::API
       name: '@Author::GETTY/@Author::GETTY::Docker/Docker::API'
-      version: '0.104'
+      version: '0.108'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: '@Author::GETTY/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-      version: '6.037'
+      version: '6.040'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: 0
-    version: '6.037'
+    version: '6.040'
 x_authority: cpan:GETTY
 x_generated_by_perl: v5.40.1
 x_serialization_backend: 'YAML::Tiny version 1.76'

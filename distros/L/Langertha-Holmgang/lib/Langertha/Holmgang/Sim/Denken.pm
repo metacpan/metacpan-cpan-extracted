@@ -11,7 +11,7 @@ use Math::BigRat ();
 
 with 'Langertha::Holmgang::Role::AnswerWorld';
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 our %TOOLS = ( antwort_abgeben => ['antwort'] );
@@ -593,7 +593,7 @@ Langertha::Holmgang::Sim::Denken - The answer world denken — reasoning tasks, 
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

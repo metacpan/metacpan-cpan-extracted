@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -38,7 +39,7 @@ my $skeid = Langertha::Skeid->new(
   config_loader => sub { +{
     client_auth => { keys => [$ID] },
     aliases     => { 'live-asr' => { tiers => [ { model => $MODEL } ] } },
-    nodes       => [ { id => 'speaches-live', url => "$URL/v1", engine => 'openai', model => $MODEL, max_conns => 2,
+    nodes       => [ { id => 'speaches-live', trust => 'internal', url => "$URL/v1", engine => 'openai', model => $MODEL, max_conns => 2,
       ( defined $ENV{SKEID_LIVE_SPEACHES_KEY} ? ( api_key_env => 'SKEID_LIVE_SPEACHES_KEY' ) : () ) } ],
   } },
   store_usage_event => sub { push @usage, $_[1]; return { ok => 1 } },

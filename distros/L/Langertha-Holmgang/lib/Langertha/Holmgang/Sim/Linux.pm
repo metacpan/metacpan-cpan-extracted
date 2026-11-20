@@ -15,7 +15,7 @@ use Module::Runtime ();
 
 with 'Langertha::Holmgang::Role::Simulator';
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 # --- IPv4 ------------------------------------------------------------------------
@@ -1982,6 +1982,133 @@ sub _su {
     return ( $o, $ok );
 }
 
+# --- Sandbox: ein echtes Programm statt einer Luecke (ADR 0011) -----------------------
+
+
+our %SANDBOX = map { $_ => 1 } qw( python3 python perl awk gawk mawk sed jq sha256sum sha1sum md5sum realpath basename
+    dirname seq column od xxd hexdump head tail wc sort uniq cut tr fold nl tac rev paste comm join expr bc diff cmp );
+
+# was nur die Simulation weiss: andere Prozesse, Netz, Datenbanken, Konten, Platten, Kernel
+my $SANDBOX_REFUSE = qr{
+    \bsubprocess\b | \bos\.(?:system|popen|exec\w*|spawn\w*|kill|getpid|getuid|geteuid|statvfs|uname|getloadavg)\b
+  | \bPopen\b | \bpty\b | \bshutil\.(?:disk_usage|chown|which)\b | \bpsutil\b | \bplatform\.
+  | \bsystem\s*\( | \bexec\s*\( | \bqx\b | ` | \|\s*getline | \bopen\s*\([^)]*[|]
+  | \bsocket\b | \burllib\b | \brequests\b | \bhttp\.client\b | \bhttpx\b | \baiohttp\b | \bsmtplib\b | \bftplib\b | \bparamiko\b
+  | \bIO::Socket\b | \bLWP\b | \bHTTP::Tiny\b | \bNet:: | \bDBI\b | \bpsycopg\w*\b | \bpymysql\b | \bMySQLdb\b | \bredis\b | \bsqlite3\b
+  | \bpwd\b | \bgrp\b | \bgetpw\w+ | \bgetgr\w+ | \bgetlogin\b | \bsignal\b | \bdocker\b | \bkubernetes\b | \bdbus\b | \bsystemd\b
+  | /proc(?:/|\b) | /sys(?:/|\b) | /run(?:/|\b) | /dev/(?!null\b|stdin\b|stdout\b|stderr\b)
+}x;
+
+# Darf diese Befehlszeile in die Sandbox? ( argv fuer die Sandbox ) oder die leere Liste
+sub _sandbox_argv {
+    my ( $dev, $argv, $stdin ) = @_;
+    return if defined $AS_USER && $AS_USER ne 'root';
+    return if $dev->{pod} || ref $dev->{files} ne 'HASH' && defined $dev->{files};
+    my @a = @$argv;
+    ( my $prog = $a[0] ) =~ s{\A.*/}{};
+    my $text = join( "\n", @a, $stdin // '' );
+    if ( $a[0] =~ m{/} && !$SANDBOX{$prog} || !$SANDBOX{$prog} ) {
+        # ein Programm aus dem Zustand: nur mit einem Interpreter aus %SANDBOX in der ersten Zeile
+        my $path = $a[0] =~ m{/} ? _absp( $a[0] ) : _prog_file( $dev, $a[0] ) // return;
+        my $src = _file_text( $dev, $path ) // return;
+        my ($interp) = $src =~ m{\A\#!\s*(?:/usr/bin/env\s+|\S*/)([\w.+-]+)} or return;
+        return unless $SANDBOX{$interp};
+        $text .= "\n" . $src;
+        $a[0] = $path;
+    }
+    # das Skript hinter dem Interpreter (python3 /opt/x.py) gehoert zum Text
+    if ( $prog =~ /\A(?:python3?|perl|[gm]?awk|sed|jq)\z/ ) {
+        for my $x ( grep { !/\A-/ } @a[ 1 .. $#a ] ) {
+            my $t = _file_text( $dev, _absp($x) );
+            $text .= "\n" . $t if defined $t && length $t < 200_000;
+        }
+    }
+    return if $text =~ $SANDBOX_REFUSE;
+    # genannte Pfade: nichts, dessen Inhalt der Zustand nur beschreibt oder der Simulator ableitet
+    my @named = map { s{[*?\[].*\z}{}sr =~ s{/+\z}{}r } $text =~ m{(/[\w.\@+*?\[\]-]+(?:/[\w.\@+*?\[\]-]+)*)}g;
+    my $files = $dev->{files} || {};
+    for my $p ( keys %$files ) {
+        my $e = $files->{$p};
+        next unless ref $e eq 'HASH' && !defined $e->{link} && ( defined $e->{size} || defined $e->{open_by} );
+        return if grep { length && ( $p eq $_ || index( $p, "$_/" ) == 0 ) } @named;
+        return if grep { $_ eq '' } @named;    # "/" selbst
+    }
+    for my $m ( grep {length} @named ) {
+        next if exists $files->{$m} || grep { index( $_, "$m/" ) == 0 } keys %$files;
+        return if defined _file_text( $dev, $m );    # abgeleitet: nftables.conf, wg0.conf, .git, /proc/sys
+        return if $m =~ m{\A/etc/(?:passwd|group|shadow|gshadow|hostname|hosts|resolv\.conf|fstab|mtab|os-release)\z};
+    }
+    return @a;
+}
+
+# Die Dateien des Geraets fuer die Sandbox; undef, wenn es zu viel ist
+sub _sandbox_files {
+    my ($dev) = @_;
+    my ( %f, %d );
+    my $total = 0;
+    my $uid = sub { my $u = ( $dev->{users}  || {} )->{ $_[0] // 'root' }; ref $u eq 'HASH' ? $u->{uid} // 0 : 0 };
+    my $gid = sub { my $g = ( $dev->{groups} || {} )->{ $_[0] // 'root' }; ref $g eq 'HASH' ? $g->{gid} // 0 : 0 };
+    for my $p ( sort keys %{ $dev->{files} || {} } ) {
+        next unless $p =~ m{\A/};
+        my $e = _file_entry( $dev, $p ) or next;
+        if ( defined $e->{link} ) { $f{$p} = { link => $e->{link} }; next }
+        next if defined $e->{size} || defined $e->{open_by};
+        my $t = _file_text( $dev, $p ) // next;
+        $total += length $t;
+        return undef if $total > 8 * 1024 * 1024;
+        $f{$p} = { content => $t, mode => _mode_of($e), uid => $uid->( $e->{owner} ), gid => $gid->( $e->{group} ), mtime => _mtime($e) };
+    }
+    for my $p ( sort keys %{ $dev->{dirs} || {} } ) {
+        my $e = $dev->{dirs}{$p};
+        $e = {} unless ref $e eq 'HASH';
+        $d{$p} = { mode => oct( $e->{mode} // '0755' ), uid => $uid->( $e->{owner} ), gid => $gid->( $e->{group} ) };
+    }
+    return ( \%f, \%d );
+}
+
+# Ein echter Befehl ohne Nachbildung: in der Sandbox, sonst die Luecke (neutrale Antwort)
+sub _real {
+    my ( $dev, $ctx, $argv, $stdin ) = @_;
+    my $gap = sub { push @GAPS, join( ' ', @$argv ); return ( '', 0 ) };
+    my $sandbox = ( $ctx || {} )->{sandbox} // ( $CTX || {} )->{sandbox} or return $gap->();
+    my @a = _sandbox_argv( $dev, $argv, $stdin ) or return $gap->();
+    my ( $files, $dirs ) = _sandbox_files($dev);
+    return $gap->() unless $files;
+    my $host = ( $ctx || $CTX || {} )->{host};
+    my ( $r, $why ) = $sandbox->run(
+        argv => \@a, files => $files, dirs => $dirs, stdin => $stdin, cwd => $CWD_DIR // '/root',
+        env => { %{ $SHENV || {} } }, now => _pki_now($dev) // _sim_now(), tz => $DATE_TZ // $dev->{timezone} // 'Europe/Berlin',
+        host => $dev->{hostname} // $host // 'localhost',
+    );
+    unless ($r) {    # versucht und nicht brauchbar: die Luecke nennt den Grund
+        push @GAPS, join( q{ }, @$argv ) . q{ (sandbox: } . ( $why // q{no result} ) . q{)};
+        return ( q{}, 0 );
+    }
+    for my $p ( sort keys %{ $r->{changed} || {} } ) {
+        next if $p =~ m{/__pycache__/|\.pyc\z};
+        my $c = $r->{changed}{$p};
+        if ( defined $c->{link} ) { $dev->{files}{$p} = { link => $c->{link} }; next }
+        my $old = $dev->{files}{$p};
+        my $mode = sprintf '%04o', $c->{mode} // 0644;
+        if ( defined $old ) {
+            _file_set( $dev, $p, $c->{content} );
+            if ( ref $old eq 'HASH' ? _mode_of($old) != oct $mode : $mode ne '0644' ) {
+                $dev->{files}{$p} = { content => $c->{content} } unless ref $dev->{files}{$p} eq 'HASH';
+                $dev->{files}{$p}{mode} = $mode;
+            }
+        }
+        else { $dev->{files}{$p} = $mode eq '0644' ? $c->{content} : { content => $c->{content}, mode => $mode } }
+    }
+    for my $p ( @{ $r->{deleted} || [] } ) {
+        ( my $dir = $p ) =~ s{/[^/]+\z}{};
+        delete $dev->{files}{$p};
+        $dev->{_dirs}{$dir} = 1 if length $dir && !_is_dir( $dev, $dir );
+    }
+    ( my $out = $r->{output} // '' ) =~ s/\n\z//;
+    $SH->{code} = $r->{exit} if $SH && $r->{exit} > 1;
+    return ( $out, $r->{exit} ? 0 : 1 );
+}
+
 sub _command {
     my ( $class, $dev, $argv, $ctx, $stdin ) = @_;
     local $AS_USER = $LOGIN_USER;
@@ -2102,14 +2229,12 @@ sub _command {
         else {
             my $e = _file_entry( $dev, _absp($cmd) ) or return ( "bash: $cmd: No such file or directory", 0 );
             return ( "bash: $cmd: Permission denied", 0 ) unless _mode_of($e) & 0111;
-            push @GAPS, join( ' ', $cmd, @a );    # Skript/Programm aus dem Zustand: nicht nachgebildet
-            return ( '', 0 );
+            return _real( $dev, $ctx, [ $cmd, @a ], $stdin );    # Skript/Programm aus dem Zustand: nicht nachgebildet
         }
     }
     my $f   = $web_cmd // $CMD{$cmd};
     if ( !$f && !$FILTER{$cmd} && !$REAL{$cmd} && ( my $prog = _prog_file( $dev, $cmd ) ) ) {
-        push @GAPS, join( ' ', $prog, @a );    # installiertes Programm ohne Nachbildung
-        return ( '', 0 );
+        return _real( $dev, $ctx, [ $prog, @a ], $stdin );    # installiertes Programm ohne Nachbildung
     }
     if ( !$f && $FILTER{$cmd} ) {
         # Filter mit Datei-Argument: head -n 5 /etc/x, awk '{print $1}' datei, …
@@ -2160,20 +2285,17 @@ sub _command {
         my ( $t, $k ) = Langertha::Holmgang::Shell::Filter::filter_output( $text, [ $cmd, @rest ] );
         $t .= " $files[0]" if defined $t && $cmd eq 'wc' && @files == 1;    # wc -c datei: "123 datei"
         return ( $t, $k ) if defined $t;
-        push @GAPS, join( ' ', $cmd, @a );
-        return ( '', 0 );
+        return _real( $dev, $ctx, [ $cmd, @a ], $stdin );
     }
     if ( !$f ) {
         if ( $cmd =~ m{/} ) {    # Programm mit Pfad: gibt es die Datei, laeuft es (Luecke), sonst wie bash
             return ( "bash: $cmd: No such file or directory", 0 ) unless _file_entry( $dev, $cmd );
-            push @GAPS, join( ' ', $cmd, @a );
-            return ( '', 0 );
+            return _real( $dev, $ctx, [ $cmd, @a ], $stdin );
         }
         return ( "bash: $cmd: command not found", 0 ) if $NOT_INSTALLED{$cmd} || !$REAL{$cmd};
-        # Echter Befehl ohne Simulation: neutrale Antwort, als Luecke vermerkt
-        push @GAPS, join( ' ', $cmd, @a );
-        return ( 'Error opening terminal: unknown.', 0 ) if $INTERACTIVE{$cmd};
-        return ( '', 0 );
+        # Echter Befehl ohne Simulation: neutrale Antwort, als Luecke vermerkt — oder echt in der Sandbox (_real)
+        if ( $INTERACTIVE{$cmd} ) { push @GAPS, join( ' ', $cmd, @a ); return ( 'Error opening terminal: unknown.', 0 ) }
+        return _real( $dev, $ctx, [ $cmd, @a ], $stdin );
     }
     my ( $out, $ok ) = eval { $f->( $dev, \@a, $ctx, $stdin ) };
     if ( my $e = $@ ) {
@@ -6640,7 +6762,7 @@ sub _dev_tcp {
     return ( '', 1 ) if $st eq 'open';
     return ( "bash: $h: Name or service not known\nbash: $path: Invalid argument", 0 ) if $st eq 'noname';
     if ( $st eq 'timeout' && $IN_TIMEOUT ) { $SH->{code} = 124 if $SH; return ( '', 0 ) }
-    my $m = { refused => 'Connection refused', timeout => 'Connection timed out', unreach => 'Network is unreachable' }->{$st};
+    my $m = { refused => 'Connection refused', timeout => 'Connection timed out', unreach => 'Network is unreachable', nohost => 'No route to host' }->{$st};
     return ( "bash: connect: $m\nbash: $path: $m", 0 );
 }
 
@@ -6868,8 +6990,34 @@ sub _nft_verdict {
     return 'accept';
 }
 
-# Neue TCP-Verbindung von diesem Geraet zu HOST:PORT (beide im Zustand): 'open', 'refused',
-# 'timeout', 'unreach' oder undef (Ziel oder Regel nicht nachgebildet)
+# Geschlossene Welt im eigenen Netz (ADR 0012): Eine Adresse in einem direkt angeschlossenen
+# Netz, die kein Geraet des Zustands traegt und die der Zustand nirgends nennt (Datei, Route,
+# Nameserver, Gegenstelle), gibt es nicht: 'nohost'. Hinter einem Gateway weiss die Welt es
+# nicht (undef), ebenso bei einer Adresse, die irgendwo im Zustand steht.
+# Liegt die Adresse in einem Netz, an dem das Geraet selbst haengt? (auch ohne Eintrag in routes:
+# die Route des Kerns fuer das eigene Netz gibt es immer)
+sub _onlink {
+    my ( $dev, $ip ) = @_;
+    return scalar grep { m{/} && _in( $ip, $_ ) } map { @{ $_->{addr} || [] } } grep { ref eq 'HASH' && ( $_->{state} // 'UP' ) ne 'DOWN' } values %{ $dev->{interfaces} || {} };
+}
+
+sub _absent {
+    my ( $dev, $ip ) = @_;
+    return undef unless defined $ip && defined _ip2n($ip);
+    if ( !_onlink( $dev, $ip ) ) {
+        my ( $r ) = _lookup( $dev, $ip );
+        # keine Route, obwohl das Geraet Routen hat: nicht erreichbar; sonst weiss die Welt es nicht
+        return !$r && @{ $dev->{routes} || [] } ? 'unreach' : undef;
+    }
+    my $state = $CTX ? $CTX->{state} : undef;
+    return undef unless ref $state eq 'HASH';
+    return undef if $CLONE_JSON->encode($state) =~ /(?<![0-9.])\Q$ip\E(?![0-9.])/;
+    return 'nohost';
+}
+
+# Neue TCP-Verbindung von diesem Geraet zu HOST:PORT: 'open', 'refused', 'timeout',
+# 'unreach', 'nohost' (im eigenen Netz gibt es die Adresse nicht, _absent) oder undef (Ziel
+# oder Regel nicht nachgebildet)
 sub _tcp_probe {
     my ( $dev, $host, $port ) = @_;
     my $state = $CTX ? $CTX->{state} || {} : {};
@@ -6892,12 +7040,12 @@ sub _tcp_probe {
     if ( !$tgt && !_ip2n($host) ) {    # Name: wie getent hosts (/etc/hosts, Nameserver); unbekannt: nicht aufloesbar
         my ($r) = _resolve( $dev, $host );
         return 'noname' unless defined $r;
-        $tgt = $find->($r) or return undef;
+        $tgt = $find->($r) or return _absent( $dev, $r );
         $ip = $r;
     }
-    return undef unless $tgt;
+    return _absent( $dev, $host ) unless $tgt;
     $ip //= _ip2n($host) ? $host : ( _own_addrs($tgt) )[0] // return undef;
-    return 'unreach' unless _lookup( $dev, $ip );
+    return 'unreach' unless _lookup( $dev, $ip ) || _onlink( $dev, $ip );
     my ($src) = grep { my $s = $_; grep { _in( $s, $_ ) } map { @{ $_->{addr} || [] } } values %{ $tgt->{interfaces} || {} } } @own;
     $src //= $own[0] // return undef;
     my ($iif) = grep { grep { m{/} && _in( $src, $_ ) } @{ $tgt->{interfaces}{$_}{addr} || [] } } sort keys %{ $tgt->{interfaces} || {} };
@@ -6934,7 +7082,7 @@ sub _nc {
         if ( $st eq 'open' ) { $any = 1; push @out, "Connection to $host $p port [tcp/" . ( $svc{$p} // '*' ) . '] succeeded!' if $v; next }
         if ( $st eq 'noname' ) { push @out, qq{nc: getaddrinfo for host "$host" port $p: Name or service not known}; last }
         push @out, "nc: connect to $host port $p (tcp) "
-            . { refused => 'failed: Connection refused', timeout => 'timed out: Operation now in progress', unreach => 'failed: Network is unreachable' }->{$st};
+            . { refused => 'failed: Connection refused', timeout => 'timed out: Operation now in progress', unreach => 'failed: Network is unreachable', nohost => 'failed: No route to host' }->{$st};
     }
     return ( join( "\n", @out ), $any ? 1 : 0 );
 }
@@ -6965,6 +7113,7 @@ sub _curl {
     if ( $st ne 'open' ) {
         my ( $code, $msg ) = $st eq 'noname' ? ( 6, "Could not resolve host: $h" ) : $st eq 'timeout' ? ( 28, "Failed to connect to $h port $port after 130000 ms: Couldn't connect to server" )
             : $st eq 'unreach' ? ( 7, "Failed to connect to $h port $port after 0 ms: Couldn't connect to server" )
+            : $st eq 'nohost' ? ( 7, "Failed to connect to $h port $port after 3066 ms: Couldn't connect to server" )
             : ( 7, "Failed to connect to $h port $port after 0 ms: Couldn't connect to server" );
         $SH->{code} = $code if $SH;
         my @o;
@@ -7072,7 +7221,7 @@ sub _wget {
         if ( defined $st && $st ne 'open' ) {
             require POSIX;
             my $stamp = POSIX::strftime( '%Y-%m-%d %H:%M:%S', _local_tm( _dev_now($dev) ) );
-            my $why = { refused => 'Connection refused', timeout => 'Connection timed out', unreach => 'Network is unreachable' }->{$st};
+            my $why = { refused => 'Connection refused', timeout => 'Connection timed out', unreach => 'Network is unreachable', nohost => 'No route to host' }->{$st};
             $SH->{code} = 4 if $SH;
             return ( '', 0 ) if $quiet || $st eq 'timeout' && $IN_TIMEOUT;
             return ( "wget: unable to resolve host address '$h80'", 0 ) if $st eq 'noname';
@@ -7085,11 +7234,12 @@ sub _wget {
     if ( !$local || ( $out // '' ) ne '-' ) { push @GAPS, join( ' ', 'wget', @$av ); return ( '', 0 ) }
     _part('Monitoring');
     my ( $body, $st ) = Langertha::Holmgang::Sim::Linux::Monitoring::http( $dev, $post ? 'POST' : 'GET', $port, $path // '/',
-        sub { my ( $o, $k ) = __PACKAGE__->_run_inner( $dev, $_[0], $ctx ); return ( $o, $k ) } );
+        sub { my ( $o, $k ) = __PACKAGE__->_run_inner( $dev, $_[0], $ctx ); return ( $o, $k ) },
+        sub { _tcp_probe( $dev, @_ ) } );
     if ( !defined $st ) { push @GAPS, join( ' ', 'wget', @$av ); return ( '', 0 ) }
     return ( "failed: Connection refused.", 0 ) if !$st;
     return ( $body, 1 ) if $st == 200;
-    my %reason = ( 403 => 'Forbidden', 405 => 'Method Not Allowed', 500 => 'Internal Server Error' );
+    my %reason = ( 400 => 'Bad Request', 403 => 'Forbidden', 405 => 'Method Not Allowed', 500 => 'Internal Server Error' );
     return ( "ERROR $st: " . ( $reason{$st} // 'Error' ) . '.', 0 );
 }
 
@@ -7685,6 +7835,12 @@ sub _systemd_start {
         # Startmeldungen des Dienstes (Kolon, duerfen vom Zustand abhaengen)
         _log( $dev, $n, $svc, map { ( $svc->{exec} // $n ) . "[$pid]: " . _render( $_, $CTX ? $CTX->{state} : {} ) =~ s/\s+\z//r }
             @{ $svc->{start_log} || [] } );
+        if ( $n eq 'systemd-journald' && exists $svc->{_journald_flushed} ) {    # der neue journald meldet, wohin er schreibt
+            my $flush = delete $svc->{_journald_flushed};
+            my ($id) = map { m{\A/var/log/journal/([0-9a-f]{32})/} ? $1 : () } _under( $dev, '/var/log/journal' );
+            _log( $dev, $n, $svc, map {"systemd-journald[$pid]: $_"} 'Journal started', _journald_msgs($dev),
+                $flush && defined $id ? "Time spent on flushing to /var/log/journal/$id is 9.871ms for 1520 entries." : () );
+        }
     }
     _reopen_logs( $dev, $n ) unless $verb eq 'start' && $was;
     _pg_event( $dev, $n, $verb =~ /restart/ ? 'restart' : $verb ) unless $verb eq 'start' && $was;
@@ -7726,7 +7882,8 @@ sub _journal_lines {
     my ( $dev, $n, $svc, $host ) = @_;
     $host //= $dev->{hostname} // 'localhost';
     my $u = _uname($n);
-    my @l = ( @{ $svc->{journal} || [] }, @{ $svc->{_log} || [] } );
+    _journald_boot( $dev, $svc, $host ) if $n eq 'systemd-journald';
+    my @l = ( @{ $svc->{journal} || $svc->{_boot} || [] }, @{ $svc->{_log} || [] } );
     # eigene Simulation (nginx): Meldung des letzten gescheiterten Starts bzw. reload
     push @l, map {"Oct 24 09:12:03 $host $n\[2210]: $_"} split /\n/, $svc->{last_error} if defined $svc->{last_error};
     push @l, @{ $dev->{bind}{log} || [] } if $dev->{bind} && $n eq ( $dev->{bind}{service} // 'named' );
@@ -7758,7 +7915,7 @@ sub _journalctl {
     my ( $dev, $av, $ctx ) = @_;
     my $host = $ctx->{host};
     my @a = @$av;
-    my ( @units, $n, $grep, $since, $until, $out, $reverse, $file, $boots, $all_units, $kernel );
+    my ( @units, $n, $grep, $since, $until, $out, $reverse, $file, $boots, $all_units, $kernel, @ident, $header );
     my $val = sub { my ($x) = @_; $x =~ /=(.*)\z/s ? $1 : shift(@a) };
     while (@a) {
         my $x = shift @a;
@@ -7776,7 +7933,11 @@ sub _journalctl {
         elsif ( $x eq '-r' || $x eq '--reverse' ) { $reverse = 1 }
         elsif ( $x eq '--list-boots' )          { $boots = 1 }
         elsif ( $x eq '-k' || $x eq '--dmesg' ) { $kernel = 1 }    # Kernel-Meldungen: der Zustand kennt keine (wie dmesg)
-        elsif ( $x eq '-p' || $x eq '--priority' || $x eq '-t' || $x eq '--identifier' ) { shift @a }    # Prioritaeten nicht nachgebildet: alles
+        elsif ( $x eq '-p' || $x eq '--priority' ) { shift @a }    # Prioritaeten nicht nachgebildet: alles
+        elsif ( $x =~ /\A(?:-t|--identifier)(?:=.*)?\z/ ) { push @ident, [ SYSLOG_IDENTIFIER => $val->($x) // '' ] }
+        elsif ( $x =~ /\A_SYSTEMD_UNIT=(.+)\z/ ) { push @units, _unit($1) }
+        elsif ( $x =~ /\A(_COMM|SYSLOG_IDENTIFIER)=(.*)\z/ ) { push @ident, [ $1, $2 ] }
+        elsif ( $x eq '--header' ) { $header = 1 }
         elsif ( $x =~ /\A-(?:b|-boot)\z/ ) {    # nachgebildet ist nur der laufende Start (--list-boots: einer)
             return ( "Data from the specified boot ($a[0]) is not available: No such boot ID in journal.", 0 ) if @a && $a[0] =~ /\A-[1-9]\d*\z/;
             shift @a if @a && $a[0] =~ /\A-?\d+\z|\A[0-9a-f]{32}\z/;
@@ -7805,7 +7966,7 @@ sub _journalctl {
             return ( 'Vacuuming done, freed ' . _human($freed) . ' of archived journals from /var/log/journal.', 1 );
         }
         elsif ( $x =~ /\A-(?:x|-no-pager|-no-hostname|-quiet|q|-catalog|a|-all|-merge|m|-system|-utc|-no-full|l|-full)\z/ ) { }
-        elsif ( $x =~ /\A(?:-F|--field|--facility|--cursor|--after-cursor|--cursor-file|-D|--directory|--header|--namespace|-M|--machine|--output-fields|--show-cursor|--user|--user-unit|-I|-N|--fields)(?:=.*)?\z/ ) {
+        elsif ( $x =~ /\A(?:-F|--field|--facility|--cursor|--after-cursor|--cursor-file|-D|--directory|--namespace|-M|--machine|--output-fields|--show-cursor|--user|--user-unit|-I|-N|--fields)(?:=.*)?\z/ ) {
             push @GAPS, join( ' ', 'journalctl', @$av );    # echte Optionen ohne Nachbildung
             return ( '', 0 );
         }
@@ -7814,6 +7975,7 @@ sub _journalctl {
         else { push @GAPS, join( ' ', 'journalctl', @$av ); return ( '', 0 ) }    # Treffer wie _SYSTEMD_UNIT=…
     }
     return ( '-- No entries --', 1 ) if $kernel;
+    return _journal_header( $dev, $host ) if $header;
     # Zeilen mit Zeitpunkt: [ epoche, text ]
     my @l;
     if ( defined $file ) {
@@ -7829,6 +7991,13 @@ sub _journalctl {
     else {
         @l = ( ( map { my $s = $_; map { [ _jtime($_), $_ ] } _journal_lines( $dev, $s, $dev->{services}{$s}, $host ) } sort keys %{ $dev->{services} || {} } ),
             _journal_file_lines( $dev, $host ) );
+    }
+    # _COMM= (Prozessname, vom Kernel auf 15 Zeichen gekuerzt), SYSLOG_IDENTIFIER=/-t: der Name vor [pid]:
+    if (@ident) {
+        @l = grep {
+            my ($id) = $_->[1] =~ /\A\w{3}\s+\d+ \d\d:\d\d:\d\d \S+ ([^\s\[:]+)(?:\[\d+\])?:/;
+            defined $id && grep { $_->[1] eq ( $_->[0] eq '_COMM' ? substr( $id, 0, 15 ) : $id ) } @ident
+        } @l;
     }
     @l = sort { $a->[0] <=> $b->[0] } @l;
     if ($boots) {
@@ -7914,6 +8083,69 @@ sub _journal_file_lines {
         push @r, [ $lt - Langertha::Holmgang::Sim::Linux::Calendar::offset( $lt - 3600 ), "$stamp $host $m", $p ];
     }
     return @r;
+}
+
+# Was journald beim Start ueber seine Dateien meldet: "Runtime Journal (/run/log/journal/ID) is
+# 24.0M, max 195.2M, 171.2M free." bzw. "System Journal (/var/log/journal/ID) …" — Groesse aus den
+# Dateien, max aus SystemMaxUse=/RuntimeMaxUse= oder der Vorgabe (10 % des Dateisystems, hoechstens 4G)
+sub _journald_msgs {
+    my ($dev) = @_;
+    my $svc = ( $dev->{services} || {} )->{'systemd-journald'} || {};
+    my $t = $svc->{running} // _file_text( $dev, '/etc/systemd/journald.conf' ) // '';
+    $t = '' if ref $t;
+    my $fmt = sub { my $b = shift; for my $u (qw( G M K )) { return sprintf '%.1f%s', $b / $UNIT{$u}, $u if $b >= $UNIT{$u} } return "${b}B" };
+    my @m;
+    for my $k ( [ 'System', '/var/log/journal', 'SystemMaxUse' ], [ 'Runtime', '/run/log/journal', 'RuntimeMaxUse' ] ) {
+        my @f = grep { m{\A\Q$k->[1]\E/[0-9a-f]{32}/[^/]+\.journal~?\z} } _under( $dev, $k->[1] );
+        next unless @f;
+        my ($id) = $f[0] =~ m{/([0-9a-f]{32})/};
+        my $size = 0;
+        $size += _file_size( _file_entry( $dev, $_ ) ) for @f;
+        my ($max) = $t =~ /^\s*$k->[2]\s*=\s*(\S+)\s*$/m;
+        my $mb = defined $max ? _bytes($max) : undef;
+        if ( !defined $mb && $k->[0] eq 'System' ) {
+            my $fs = ( ( $dev->{mounts} || {} )->{'/'} || {} )->{size};
+            $mb = defined $fs ? _bytes($fs) / 10 : 4 * $UNIT{G};
+            $mb = 4 * $UNIT{G} if $mb > 4 * $UNIT{G};
+        }
+        $mb //= 195.2 * $UNIT{M};
+        push @m, "$k->[0] Journal ($k->[1]/$id) is " . $fmt->($size) . ', max ' . $fmt->($mb) . ', ' . $fmt->( $mb > $size ? $mb - $size : 0 ) . ' free.';
+    }
+    return @m;
+}
+
+# Die Meldungen von journald beim Start des Systems (einmal festgehalten, unter _boot)
+sub _journald_boot {
+    my ( $dev, $svc, $host ) = @_;
+    return if !$svc || $svc->{journal} || $svc->{_boot};
+    $host //= $dev->{hostname} // 'localhost';
+    require POSIX;
+    my $st = POSIX::strftime( '%b %e %H:%M:%S', _local_tm( _boot_epoch($dev) ) );    # der laufende Start (wie uptime, last)
+    $svc->{_boot} = [ map {"$st $host systemd-journald[231]: $_"} 'Journal started', _journald_msgs($dev) ];
+    return;
+}
+
+# journalctl --header: der Kopf jeder Journaldatei (die Felder, die eine Fachkraft liest: Pfad,
+# Zustand, Zeitraum, Groesse); IDs aus dem Pfad abgeleitet
+sub _journal_header {
+    my ( $dev, $host ) = @_;
+    require Digest::MD5;
+    my %t = map { $_->[2] => $_->[0] } _journal_file_lines( $dev, $host );
+    my @out;
+    for my $p ( grep {/\.journal~?\z/} _under( $dev, '/var/log/journal' ), _under( $dev, '/run/log/journal' ) ) {
+        my ($mid) = $p =~ m{/([0-9a-f]{32})/};
+        my $h = Digest::MD5::md5_hex($p);
+        my $size = _file_size( _file_entry( $dev, $p ) );
+        my $from = Langertha::Holmgang::Sim::Linux::Calendar::format_local( $p =~ m{\A/run/} ? _boot_epoch($dev) : $t{$p} // _dev_now($dev) );
+        my $to = Langertha::Holmgang::Sim::Linux::Calendar::format_local( _dev_now($dev) );
+        push @out, join( "\n", "File path: $p", 'File ID: ' . substr( $h, 0, 32 ), 'Machine ID: ' . ( $mid // '' ),
+            'Boot ID: 7f3e9c2b5a1d4e8f9b0c6a2d4e8f1a3c', 'Sequential number ID: ' . substr( Digest::MD5::md5_hex("seq$p"), 0, 32 ),
+            'State: ' . ( $p =~ /~\z/ ? 'OFFLINE' : 'ONLINE' ), 'Compatible flags: TAIL_ENTRY_BOOT_ID', 'Incompatible flags: COMPRESSED-ZSTD KEYED-HASH',
+            'Header size: 256', 'Arena size: ' . ( $size > 256 ? $size - 256 : 0 ), 'Rotate suggested: no',
+            "Head realtime timestamp: $from", "Tail realtime timestamp: $to", 'Disk usage: ' . _human($size) );
+    }
+    return ( 'No journal files were found.', 0 ) unless @out;
+    return ( join( "\n\n", @out ), 1 );
 }
 
 # Speichert journald dauerhaft? (Storage=persistent, oder auto mit /var/log/journal)
@@ -8250,7 +8482,10 @@ sub _restart_effect {
         # dauerhaft (Storage=persistent, oder auto mit /var/log/journal): legt das Verzeichnis
         # an und uebernimmt das Laufzeit-Journal aus /run/log/journal
         my ($st) = ( $t // '' ) =~ /^\s*Storage\s*=\s*(\S+)\s*$/m;
-        _journal_flush($dev) if ( $st // 'auto' ) eq 'persistent' || ( $st // 'auto' ) eq 'auto' && _is_dir( $dev, '/var/log/journal' );
+        _journald_boot( $dev, $svc, $CTX ? $CTX->{host} : undef );    # was beim Systemstart galt, vor dem Umzug
+        my $flush = ( $st // 'auto' ) eq 'persistent' || ( $st // 'auto' ) eq 'auto' && _is_dir( $dev, '/var/log/journal' );
+        _journal_flush($dev) if $flush;
+        $svc->{_journald_flushed} = $flush if $svc && $verb =~ /start/;    # Meldungen nach "Started" (_journald_started)
     }
     if ( $dev->{bind} && $name eq ( $dev->{bind}{service} // 'named' ) && !( $verb eq 'start' && $svc->{active} ) ) {
         _part('Dns');
@@ -8867,7 +9102,15 @@ sub _ping {
     $count = 4 unless defined $count && $count =~ /\A\d+\z/ && $count > 0 && $count < 20;
     my $src = defined $from && defined _ip2n($from) ? $from : undef;
     my ($r) = _lookup( $dev, $to, $src );
-    return ( "ping: connect: Network is unreachable", 0 ) unless $r;
+    return ( "ping: connect: Network is unreachable", 0 ) unless $r || _onlink( $dev, $to );
+    if ( ( _absent( $dev, $to ) // q{} ) eq 'nohost' ) {    # im eigenen Netz gibt es die Adresse nicht (ADR 0012)
+        my ( $own ) = defined $src ? $src : map { s{/\d+\z}{}r } grep { m{/} && _in( $to, $_ ) } map { @{ $_->{addr} || [] } } values %{ $dev->{interfaces} || {} };
+        $own //= ( _own_addrs($dev) )[0] // $to;
+        my @l = ( "PING " . ( $name // $to ) . " ($to) 56(84) bytes of data." );
+        push @l, "From $own icmp_seq=$_ Destination Host Unreachable" for 1 .. $count;
+        push @l, q{}, "--- $to ping statistics ---", "$count packets transmitted, 0 received, +$count errors, 100% packet loss, time " . ( $count - 1 ) . '057ms';
+        return ( join( "\n", @l ), 0 );
+    }
     my @l = ( "PING " . ( $name // $to ) . " ($to) 56(84) bytes of data." );
     push @l, "64 bytes from $to: icmp_seq=$_ ttl=64 time=0.4" . $_ . ' ms' for 1 .. $count;
     push @l, '', "--- $to ping statistics ---", "$count packets transmitted, $count received, 0% packet loss, time " . ( $count - 1 ) . '003ms';
@@ -8888,7 +9131,7 @@ Langertha::Holmgang::Sim::Linux - The simulator of device type linux — a Debia
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -9108,9 +9351,12 @@ between devices>: C<nc -z>, C</dev/tcp>, C<wget> and C<curl> (where installed) c
 a connection to a device in the state against its firewall (nft, chains with hook
 input: first matching rule, else policy; drop: timed out, reject: refused) and its
 listeners (C<listen>, defaults per program like sshd 22, postgres 5432); a device with
-services on unknown ports, a target outside the state or a rule that is not modelled
-are a gap; a name the resolver does not know (like C<getent hosts>) does
-not resolve.
+services on unknown ports or a rule that is not modelled are a gap; a name the resolver
+does not know (like C<getent hosts>) does not resolve. B<A target outside the state>
+(ADR 0012): an address in a directly connected network that the state names nowhere
+does not exist — C<No route to host>, and C<ping> reports C<Destination Host
+Unreachable>; an address the state names somewhere (a file, a gateway, a name server)
+or one beyond a gateway is a gap for TCP and answers C<ping>.
 
 B<Round 4>: C<flock [-n] FD|FILE [-c COMMAND|COMMAND]> (succeeds, creates the lock file),
 C<exec NE<gt>file> (only opens), C<${PIPESTATUS[@]}>, C<done E<lt> E<lt>( … )> also over
@@ -9329,6 +9575,42 @@ Initial state: Redis and MariaDB run with the values of their files
 (C<redis.running>, C<mariadb.variables>) unless the case sets them itself;
 BIND and Postfix have loaded what a freshly booted system would have loaded
 (zones, parameters).
+
+=head2 SANDBOX
+
+A real program the simulator does not model is a gap: empty output, failed, a
+C<sim_gap>. With a sandbox in the call's context (C<< $ctx->{sandbox} >>, an
+object with C<run> like L<Langertha::Holmgang::Sandbox::Docker>) such a command
+runs for real instead, on a copy of the device's files, and what it changed
+comes back into the state. Without one — in every load, lint and test — nothing
+changes.
+
+Only a command that cannot know more than the files goes there. All of these
+must hold, otherwise the gap stays:
+
+=over
+
+=item * The program is one of C<%SANDBOX> (interpreters and text tools:
+C<python3>, C<perl>, C<awk>, C<sed>, C<jq>, C<sort> …) or a file of the device
+whose first line names such an interpreter. Never a shell, never a program the
+simulator models, never one that speaks to a service (C<openssl>, C<tar>,
+C<mysql>, C<curl>).
+
+=item * It runs as root on the device itself — not under C<sudo -u>, not in a
+pod.
+
+=item * Its arguments, its input and its script name nothing only the
+simulation knows: no other process (C<subprocess>, C<system>, backticks), no
+network or database client, no C</proc>, C</sys>, C</run>, no account or disk
+query, no file whose content the state only describes by its size, and no file
+the simulator derives (C</etc/nftables.conf> from the ruleset, a C<.git>).
+
+=back
+
+The program sees the simulation's clock and the device's host name. Files it
+wrote, changed or removed are the device's afterwards; C<__pycache__> is not.
+A program missing from the image, or a result past the sandbox's bounds, leaves
+the gap as it was.
 
 =head2 write
 

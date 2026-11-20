@@ -15,7 +15,7 @@ use Params::Get;
 use Params::Validate::Strict;
 use Readonly;
 
-use version; our $VERSION = version->declare('0.003.0');
+use version; our $VERSION = version->declare('0.003.1');
 
 # Used when the configuration file has no blacklist_countries entry
 Readonly my @DEFAULT_COUNTRIES => qw(
@@ -33,7 +33,7 @@ Web::VWF::Blacklist - Country-based access control for VWF pages
 
 =head1 VERSION
 
-Version 0.003.0
+Version 0.003.1
 
 =head1 SYNOPSIS
 

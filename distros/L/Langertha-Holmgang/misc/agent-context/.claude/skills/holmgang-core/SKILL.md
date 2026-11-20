@@ -72,6 +72,12 @@ segments (for keys with dots); in `unchanged_except`, `*` matches one segment.
   `daemon-reload`, `wg-quick@`), as on a real system.
 - A simulator touches nothing but its state: no shell-out, no socket, no host filesystem.
   It executes model output — delegating to the host would run that output for real.
+- **Sandbox (ADR 0011):** with `holmgang run --sandbox docker` the registry carries a
+  sandbox, and the Linux simulator hands it the one real program that would be a gap
+  (`python3 -c`, `perl -e`, `awk` past the filters) — in a container without network or host
+  mounts, on a copy of the device's files; changes come back into the state. Never in
+  loading, lint or tests. What only the simulation knows (services, network, accounts, disks,
+  files described by size) never goes there: `Sim::Linux` "SANDBOX" has the list.
 
 ## Grading (Grader)
 

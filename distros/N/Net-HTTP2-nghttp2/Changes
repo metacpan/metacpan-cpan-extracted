@@ -1,5 +1,19 @@
 Revision history for Net-HTTP2-nghttp2
 
+0.013   2026-11-19
+        - CRITICAL FIX, upgrade recommended. Every earlier release truncates
+          a body larger than one DATA frame (16384 bytes by default): the
+          peer gets only the first frame, the stream ends normally, and
+          nothing reports an error, so clients accept the cut-short body as
+          complete. This hits submit_response with a static body and any
+          data callback returning more than $max_length. Bodies are now
+          sent whole.
+        - Large bodies are sent without copying per frame (32 MB
+          submit_data: 7.2s to 0.05s). submit_data now appends to data
+          still unsent instead of replacing it.
+        - Fix t/25-frame-not-send.t, which passed only because of the
+          truncation.
+
 0.012   2026-10-16
         - submit_headers queues a HEADERS block on a stream, wrapping
           nghttp2_submit_headers, so a server can send a 1xx response such

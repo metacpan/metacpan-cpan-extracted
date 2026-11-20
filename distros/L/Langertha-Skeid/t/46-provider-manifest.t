@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -37,9 +38,9 @@ sub base_config {
       bob => { manifest => { models => ['house-model'] } },
     },
     nodes => [
-      { id => 'gpu01', url => $NODE_URL, model => 'qwen3-32b', tags => ['local'],
+      { id => 'gpu01', trust => 'internal', url => $NODE_URL, model => 'qwen3-32b', tags => ['local'],
         api_key_ref => 'secret/skeid/nodes/gpu01' },
-      { id => 'cloud1', url => 'https://api.cloud.example/v1', model => 'gpt-cloud', tags => ['cloud'],
+      { id => 'cloud1', trust => 'internal', url => 'https://api.cloud.example/v1', model => 'gpt-cloud', tags => ['cloud'],
         api_key_env => 'UPSTREAM_CLOUD_KEY' },
     ],
     (%manifest ? (manifest => { %manifest }) : ()),
@@ -269,7 +270,7 @@ unless ($HAS_MANIFEST) {
   $cfg = base_config(%ENABLED);
   $cfg->{keys}{alice}{policy} = 'standard';
   $cfg->{aliases}{'house-model'} = { tiers => [{ tags => ['cloud'], model => 'gpt-cloud' }] };
-  push @{$cfg->{nodes}}, { id => 'gpu02', url => 'http://10.13.37.6:8000/v1', model => 'qwen3-32b', tags => ['local'] };
+  push @{$cfg->{nodes}}, { id => 'gpu02', trust => 'internal', url => 'http://10.13.37.6:8000/v1', model => 'qwen3-32b', tags => ['local'] };
   $cfg->{keys}{bob}{manifest}{models} = ['gpt-cloud'];    # bob is denied cloud: load error
 
   {

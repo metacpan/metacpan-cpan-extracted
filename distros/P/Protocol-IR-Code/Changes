@@ -1,5 +1,22 @@
 Revision history for Protocol::IR::Code
 
+1.5 2026-11-19T20:38:10Z
+
+    - Fix integer overflow on 32-bit Perl in the wide-protocol handlers
+      (NEC48/482, JVC-48, SAMSUNG36, Aiwa, Pioneer) by using Math::BigInt
+      for frame data; remove overflow-warning suppression from tests.
+    - Conversion fixtures now use a 12-column layout (added manufacturer
+      and device columns) and compare decoded fields rather than exact Pronto
+      hex, so timing variations and toggle bits do not break tests.
+    - Registration order documented: decode tries protocols in registration
+      order, so more specific / longer frames must come first.
+
+
+1.4 2026-11-19T17:46:49Z
+
+    - List File::Spec and Math::BigInt in META.yml requires (CPANTS).
+
+
 1.3 2026-11-19T01:29:30Z
 
     - Repeat count for JSON dump imports now comes from the device's

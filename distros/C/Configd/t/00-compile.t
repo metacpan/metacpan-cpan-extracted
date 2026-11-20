@@ -5,13 +5,14 @@ use warnings;
 
 use Test::More;
 
-plan tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 10 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Configd.pm',
     'Configd/Language.pm',
     'Configd/Language/opendkim.pm',
     'Configd/Language/opendmarc.pm',
+    'Configd/Language/ossec.pm',
     'Configd/Language/postfix.pm',
     'Configd/Language/redis.pm',
     'Configd/Syntax/Spaced.pm',

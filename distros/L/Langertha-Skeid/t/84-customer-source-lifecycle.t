@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -59,7 +60,7 @@ sub source { return { dsn => 'dbi:Pg:dbname=console', relation => 'skeid.custome
 sub cfg {
   my (%source) = @_;
   return {
-    nodes           => [ { id => 'n1', url => 'http://n1/v1', model => 'm' } ],
+    nodes           => [ { id => 'n1', trust => 'internal', url => 'http://n1/v1', model => 'm' } ],
     policies        => { standard => {}, narrow => { models => ['m'] } },
     client_auth     => { keys => [ $FILE ] },
     customer_source => source(%source),

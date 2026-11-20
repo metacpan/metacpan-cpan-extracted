@@ -1,5 +1,22 @@
 Revision history for Web-VWF
 
+0.003.1	Thu Nov 19 08:14:20 PM EST 2026
+	[ Enhancements ]
+	- Web::VWF loads CGI::Alert, so an error that stops a page script is emailed
+	to the server administrator (the SERVER_ADMIN setting, or webmaster@localhost
+	when the web server has not set one).
+	- example/cgi-bin/page.fcgi shows how a site that keeps its modules in a
+	private directory (cpanm -l ~/perl5, local::lib) sets @INC: in a BEGIN block
+	that comes first in the script, with lib->import, so that the compiled
+	modules in the architecture directory are found and autodie cannot load the
+	system List::Util before the newer one.
+
+	[ Bug fixes ]
+	- A site with no SERVER_ADMIN, such as a FastCGI worker started by
+	mod_fcgid, no longer logs "Use of uninitialized value" warnings from
+	CGI::Alert every time it starts, which also made the B::Lint and
+	warnings::unused checks of page.fcgi fail.
+
 0.003.0	Tue Nov 17 12:05:14 PM EST 2026
 	[ Enhancements ]
 	- The pages a site serves are declared in <display>, one <page> element for

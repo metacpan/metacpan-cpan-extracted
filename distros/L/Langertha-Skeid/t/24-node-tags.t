@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -11,9 +12,9 @@ use Langertha::Skeid;
 
 sub _skeid_with_nodes {
   my $skeid = Langertha::Skeid->new;
-  $skeid->add_node(id => 'local-a', url => 'http://l1/v1', model => 'm1', tags => ['local', 'gb10']);
-  $skeid->add_node(id => 'local-b', url => 'http://l2/v1', model => 'm1', tags => ['local', 'gb10']);
-  $skeid->add_node(id => 'cloud-a', url => 'http://c1/v1', model => 'm1', tags => ['cloud', 'groq']);
+  $skeid->add_node(id => 'local-a', trust => 'internal', url => 'http://l1/v1', model => 'm1', tags => ['local', 'gb10']);
+  $skeid->add_node(id => 'local-b', trust => 'internal', url => 'http://l2/v1', model => 'm1', tags => ['local', 'gb10']);
+  $skeid->add_node(id => 'cloud-a', trust => 'internal', url => 'http://c1/v1', model => 'm1', tags => ['cloud', 'groq']);
   return $skeid;
 }
 
@@ -26,7 +27,7 @@ sub _skeid_with_nodes {
   is_deeply(Langertha::Skeid->normalize_tags(undef), [], 'no tags is an empty list, never undef');
 
   my $skeid = Langertha::Skeid->new;
-  $skeid->add_node(id => 'n1', url => 'http://n1/v1');
+  $skeid->add_node(id => 'n1', trust => 'internal', url => 'http://n1/v1');
   is_deeply($skeid->list_nodes->[0]{tags}, [], 'a node without tags still carries an empty list');
 }
 
@@ -108,7 +109,7 @@ sub _skeid_with_nodes {
   $skeid->remove_node('local-b');
   ok(!defined $skeid->pick_node(model => 'm1', tags => ['local']), 'removed nodes stop receiving traffic');
 
-  $skeid->add_node(id => 'local-c', url => 'http://l3/v1', model => 'm1', tags => ['local']);
+  $skeid->add_node(id => 'local-c', trust => 'internal', url => 'http://l3/v1', model => 'm1', tags => ['local']);
   is($skeid->pick_node(model => 'm1', tags => ['local'])->{id}, 'local-c', 'a new node is picked up immediately');
 }
 
@@ -117,7 +118,7 @@ sub _skeid_with_nodes {
   ok($skeid->pick_node(model => 'm1'), 'warm the cache');
 
   # The public accessor can replace the whole inventory without going through add_node.
-  $skeid->nodes([{ id => 'raw-1', url => 'http://r1/v1', model => 'm1', engine => 'openaibase', healthy => 1 }]);
+  $skeid->nodes([{ id => 'raw-1', trust => 'internal', url => 'http://r1/v1', model => 'm1', engine => 'openaibase', healthy => 1 }]);
   is($skeid->pick_node(model => 'm1')->{id}, 'raw-1', 'assigning the node list directly invalidates the cache');
 }
 
@@ -131,10 +132,12 @@ sub _skeid_with_nodes {
 nodes:
   - id: cfg-local
     url: http://l/v1
+    trust: internal
     model: m1
     tags: [Local, GB10]
   - id: cfg-cloud
     url: http://c/v1
+    trust: internal
     model: m1
     tags: cloud, groq
 YAML
@@ -152,6 +155,7 @@ YAML
 nodes:
   - id: cfg-local
     url: http://l/v1
+    trust: internal
     model: m1
     tags: [cloud]
 YAML

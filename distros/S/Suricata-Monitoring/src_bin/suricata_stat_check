@@ -169,6 +169,8 @@ Default: 2
 
 Run as a nagios check style instead of LibreNMS.
 
+Perfdata is included for drop_percent, error_delta, packets, and drops.
+
 =head2 -h
 
 Print help info.

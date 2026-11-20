@@ -37,7 +37,7 @@ WriteMakefile(
 		'File::stat' => 0,
 		'IPC::System::Simple' => 0,	# Needed by autodie's :system (via :all)
 		'List::Util' => 1.33,	# any()
-		'Log::Abstraction' => 0.26,
+		'Log::Abstraction' => 0.41,
 		'mro' => 0,
 		'Params::Get' => 0.13,
 		'POSIX' => 0,
@@ -67,6 +67,7 @@ WriteMakefile(
 			test => {
 				recommends => {
 					'Test::Memory::Cycle' => 0,	# t/function.t skips without it
+					'Test::Permissions' => 0,	# t/edge_cases.t skips one subtest without it
 				},
 			},
 		},
@@ -86,5 +87,5 @@ WriteMakefile(
 			}
 		},
 	},
-	MIN_PERL_VERSION => '5.010'	# The // operator needs 5.10
+	MIN_PERL_VERSION => '5.026'	# Log::Abstraction and Params::Validate::Strict need 5.26
 );

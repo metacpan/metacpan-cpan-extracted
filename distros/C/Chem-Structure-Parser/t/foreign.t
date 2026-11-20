@@ -465,6 +465,83 @@ CIF
 	is(scalar @{ $cod->{chain_order} }, 0, 'and no chains come out of it');
 }
 
+# --- an _atom_site row with no model number ----------
+#
+# pdbx_PDB_model_num written as '.' or '?' on some rows.  gemmi 0.7.5
+# (read_structure(), asked from /home/con/.pyenv/versions/3.14.2/bin/python3)
+# files those rows under model 0, a model of their own, after models 1 and 2;
+# it files a file whose every row is null as model 0 alone, a file with no such
+# column as model 1, and refuses one whose number is not a number, 'not an
+# integer: x'.  Until 0.040 a null row was in whatever model the row before it
+# was: here, model 2.
+{
+	my $head = <<'CIF';
+data_NULM
+loop_
+_atom_site.group_PDB
+_atom_site.id
+_atom_site.type_symbol
+_atom_site.label_atom_id
+_atom_site.label_comp_id
+_atom_site.label_asym_id
+_atom_site.label_seq_id
+_atom_site.Cartn_x
+_atom_site.Cartn_y
+_atom_site.Cartn_z
+_atom_site.occupancy
+_atom_site.B_iso_or_equiv
+_atom_site.auth_seq_id
+_atom_site.auth_asym_id
+_atom_site.pdbx_PDB_model_num
+CIF
+	my @rows = (
+		'ATOM 1 C CA ALA A 1 1.0 1.0 1.0 1.00 10.00 1 A',
+		'ATOM 2 C CA GLY A 2 2.0 1.0 1.0 1.00 10.00 2 A',
+		'ATOM 3 C CA ALA A 1 1.5 1.0 1.0 1.00 10.00 1 A',
+		'ATOM 4 C CA GLY A 2 2.5 1.0 1.0 1.00 10.00 2 A',
+		'ATOM 5 C CA SER A 3 3.5 1.0 1.0 1.00 10.00 3 A',
+	);
+	my $cif = sub { my @m = @_; $head . join('', map { "$rows[$_] $m[$_]\n" } 0 .. $#rows) };
+	my $serials = sub {
+		my ($i) = @_;
+		my $c = $i->{chains}{A} or return [];
+		return [ sort { $a <=> $b }
+		         map { $_->{serial} } map { values %{ $_->{atoms} } } values %{ $c->{residues} } ];
+	};
+
+	my $mixed = $cif->(1, 1, 2, '.', '?');
+	my $all = structure_info_string($mixed, model => 'all');
+	is($all->{n_models}, 3, "a null model number is a third model, as gemmi's 0");
+	is_deeply([ sort { $a <=> $b } keys %{ $all->{models} } ], [ 0, 1, 2 ], 'numbered 0');
+	is_deeply($serials->(structure_info_string($mixed, model => 1)), [ 1, 2 ],
+		'model 1 is the rows numbered 1');
+	is_deeply($serials->(structure_info_string($mixed, model => 2)), [ 3 ],
+		'model 2 does not take the null rows that follow it');
+	is_deeply($serials->(structure_info_string($mixed, model => 0)), [ 4, 5 ],
+		"model 0 is the rows that said '.' and '?'");
+
+	my $nulls = structure_info_string($cif->(('.') x 5));
+	is($nulls->{n_models}, 1, 'a file whose every model number is null has one model');
+	is($nulls->{model}, 0, "and it is model 0, as gemmi's is");
+	# rows 1 and 3 are one atom twice over once they are in one model, so the
+	# count is of records, as n_atoms counts them
+	is($nulls->{stats}{n_atoms}, 5, 'and the default read has every row of it');
+
+	(my $nocol = $cif->(('') x 5)) =~ s/^_atom_site\.pdbx_PDB_model_num\n//m;
+	$nocol =~ s/ +$//mg;
+	my $none = structure_info_string($nocol);
+	is($none->{model}, 1, 'a loop with no model column is model 1, as gemmi has it');
+	is($none->{stats}{n_atoms}, 5, 'and every row is in it');
+
+	# gemmi refuses this file; this module reads on, and files the row where it
+	# files a null rather than in the model before it
+	my $junk = $cif->(1, 1, 2, 'x', 2);
+	is_deeply($serials->(structure_info_string($junk, model => 0)), [ 4 ],
+		'a model number that is not a number is model 0 too');
+	is_deeply($serials->(structure_info_string($junk, model => 2)), [ 3, 5 ],
+		'and not the model of the row before it');
+}
+
 # --- what a chain of one residue is ------------------
 #
 # gemmi's tests/5wkd.pdb and ions.pdb in Biopython's suite are both mostly

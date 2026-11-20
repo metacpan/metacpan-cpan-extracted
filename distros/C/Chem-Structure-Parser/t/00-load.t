@@ -13,6 +13,8 @@ ok(defined &Chem::Structure::Parser::_parse_file,       'XS _parse_file is boots
 ok(defined &Chem::Structure::Parser::_parse_string,     'XS _parse_string is bootstrapped');
 ok(defined &Chem::Structure::Parser::_parse_cif_file,   'XS _parse_cif_file is bootstrapped');
 ok(defined &Chem::Structure::Parser::_parse_cif_string, 'XS _parse_cif_string is bootstrapped');
+ok(defined &Chem::Structure::Parser::_convert_file,     'XS _convert_file is bootstrapped');
+ok(defined &Chem::Structure::Parser::_convert_string,   'XS _convert_string is bootstrapped');
 
 for my $f (qw(
 	structure_info structure_info_string
@@ -20,7 +22,7 @@ for my $f (qw(
 	chain_sequence structure_summary is_single_ion
 	structure_features structure_sasa structure_pi_stacking structure_disulfides
 	structure_base_pairs structure_base_stacks structure_contacts structure_hbonds
-	structure_dssp
+	structure_dssp structure_interface structure_rmsd convert
 	aa3to1 aa1to3 res1 res_type formats h
 )) {
 	can_ok('Chem::Structure::Parser', $f);

@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use utf8;
@@ -252,7 +253,7 @@ sub node_url { my ($flavour, $tag) = @_; return $UP->clone->path("/__up/$flavour
 sub add_node {
   my ($skeid, $id, $flavour, %extra) = @_;
   return $skeid->add_node(
-    id => $id, url => node_url($flavour, $id), model => 'whisper', engine => 'openai',
+    id => $id, trust => 'internal', url => node_url($flavour, $id), model => 'whisper', engine => 'openai',
     max_conns => 4, %extra,
   );
 }
@@ -748,7 +749,7 @@ subtest 'uploads.max_bytes: 413 without touching a node, hot reloaded' => sub {
 
   # The JSON routes do not take their limit from uploads.
   $CFG = { uploads => { max_bytes => 10 } };
-  $skeid->add_node(id => 'chat-1', url => node_url('vllm', 'chat-1'), model => 'chat', max_conns => 2);
+  $skeid->add_node(id => 'chat-1', trust => 'internal', url => node_url('vllm', 'chat-1'), model => 'chat', max_conns => 2);
   $t->post_ok('/v1/chat/completions' => json => { model => 'none', messages => [{ role => 'user', content => 'x' x 4000 }] });
   $t->status_is(503, 'a chat request far over uploads.max_bytes is routed as ever (no such model here)');
   paired($skeid, 'gpu-1', 'upload limit');
@@ -776,7 +777,7 @@ subtest 'the default limit lets through what the server alone would not' => sub 
   });
   my $daemon = Mojo::Server::Daemon->new(app => $node, listen => ['http://127.0.0.1'], silent => 1);
   $daemon->start;
-  $skeid->add_node(id => 'big', url => 'http://127.0.0.1:' . $daemon->ports->[0] . '/v1', model => 'whisper',
+  $skeid->add_node(id => 'big', trust => 'internal', url => 'http://127.0.0.1:' . $daemon->ports->[0] . '/v1', model => 'whisper',
     max_conns => 1);
 
   my $big = $AUDIO x 58;   # 17 MiB
@@ -884,7 +885,7 @@ subtest 'an upstream error is one failed event and a free slot' => sub {
   $MODE = '';
   my ($t2, $skeid2) = proxy();
   my $dead = Mojo::IOLoop::Server->generate_port;
-  $skeid2->add_node(id => 'dead', url => "http://127.0.0.1:$dead/v1", model => 'whisper', max_conns => 1);
+  $skeid2->add_node(id => 'dead', trust => 'internal', url => "http://127.0.0.1:$dead/v1", model => 'whisper', max_conns => 1);
   upload($t2, $T, field(model => 'whisper'), file_part($AUDIO));
   $t2->status_is(502)->json_is('/error/type' => 'upstream_error');
   is scalar(@USAGE), 1, 'one usage event for the unreachable node';

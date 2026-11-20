@@ -11,7 +11,7 @@ use Langertha::Holmgang::Grader;
 use Langertha::Holmgang::Template ();
 use Langertha::Holmgang::World ();
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 has grader => (
@@ -158,7 +158,7 @@ Langertha::Holmgang::Lint - The self-check every case passes on every load
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

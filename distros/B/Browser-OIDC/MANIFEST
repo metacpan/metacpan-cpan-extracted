@@ -7,5 +7,6 @@ META.json
 META.yml
 README
 dist.json
+lib/Browser/OAuth2.pm
 lib/Browser/OIDC.pm
 lib/Browser/OIDC/TokenResponse.pm

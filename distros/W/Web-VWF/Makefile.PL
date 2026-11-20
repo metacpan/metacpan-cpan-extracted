@@ -26,6 +26,7 @@ WriteMakefile(
 		'Carp' => 0,
 		'Carp::Always' => 0,
 		'CGI::ACL' => 0.06,		# For deny_cloud
+		'CGI::Alert' => 0,
 		'CGI::Carp' => 0,
 		'CGI::IDS' => 0,		# Intrusion detection, used by Allow.pm and Display.pm
 		'CGI::Info' => 1.14,		# 1.14 for is_ai()
@@ -51,13 +52,7 @@ WriteMakefile(
 		'File::pfopen' => 0,
 		'File::Slurp' => 0,		# Display/table.pm
 		'File::Spec' => 0,
-		# Filesys::Df refuses to configure for MSWin32 - its own Makefile.PL says
-		# "This module does not support Windows" and points at
-		# Filesys::DfPortable - so it cannot be a prerequisite there.  Declaring
-		# it would make `cpanm --installdeps` fail and stop Web::VWF from
-		# installing at all.  Display/meta_data.pm leaves the disk figure out
-		# when it is missing.
-		(($^O ne 'MSWin32') ? ('Filesys::Df' => 0) : ()),
+		# Filesys::Df is a recommendation, not a prerequisite: see META_MERGE.
 		'HTML::D3' => 0.30,	# Display/meta_data.pm; 0.23 and earlier take positional arguments, not the hashes it passes
 		'HTML::SocialMedia' => 0,
 		'HTTP::Date' => 0,		# For the Last-Modified header
@@ -126,9 +121,14 @@ WriteMakefile(
 					# and sends unsigned without Mail::DKIM, so a site that does
 					# not sign does not have to install it.
 					'Mail::DKIM' => 0,
-					# On Windows Filesys::Df is not required, because it cannot be
-					# installed there - so say what it is for instead (see PREREQ_PM).
-					(($^O eq 'MSWin32') ? ('Filesys::Df' => 0) : ()),
+					# Filesys::Df refuses to configure for MSWin32 - its own Makefile.PL
+					# says "This module does not support Windows" - so it cannot be a
+					# prerequisite: it would make `cpanm --installdeps` fail there.  It is
+					# a recommendation on every platform, and not a conditional
+					# prerequisite, because makefilepl2cpanfile and App::GHGen evaluate
+					# this file on Linux and would write the Windows condition away.
+					# Display/meta_data.pm leaves the disk figure out when it is missing.
+					'Filesys::Df' => 0,
 				},
 			},
 		},

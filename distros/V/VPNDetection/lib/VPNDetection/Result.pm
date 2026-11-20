@@ -5,25 +5,37 @@ use warnings;
 
 use Carp ();
 
-our $VERSION = '3.16.1';
+our $VERSION = '3.17.0';
 
 our @FLAGS = qw(
     is_vpn is_hosting is_relay is_tor is_cdn is_resproxy is_dcproxy is_mobproxy
-    is_pubproxy
+    is_pubproxy is_anycast is_carrier is_satellite is_ssh is_smtp is_web is_dns_resolver
+    is_bittorrent
 );
-our @DETAILS = qw(vpn hosting relay tor cdn resproxy dcproxy mobproxy pubproxy);
+# Each flag's detail: an object, or for `web` a list of the ports that answered.
+# `is_anycast` has none.
+our @DETAILS = qw(
+    vpn hosting relay tor cdn resproxy dcproxy mobproxy pubproxy carrier satellite ssh smtp
+    web dns_resolver bittorrent
+);
 # Where the address is and the AS announcing it, on every answer, with or without
 # a key, each with every member present: an empty string, or AS 0, where nothing
-# is known.
-our @OBJECTS = qw(location asn);
+# is known. The reverse DNS hostname is on every answer too, and company and abuse
+# on a paid plan's.
+our @OBJECTS = qw(location asn company hostname abuse);
+# The members of each object. Those after flag_unicode in location, and after
+# prefix in asn, are absent from an answer whose plan leaves them out.
 our @LOCATION = qw(
     continent continent_name country country_name timezone currency_code currency_name
-    currency_symbol flag_emoji flag_unicode
+    currency_symbol flag_emoji flag_unicode region region_code city postal_code latitude
+    longitude accuracy_radius geoname_id dma_code last_changed
 );
-our @ASN = qw(asn name domain type prefix);
+our @ASN = qw(asn name domain type prefix country rpki_status);
+our @COMPANY = qw(name domain type country);
+our @ABUSE = qw(email name phone address country network validated unvalidated_since);
 # On answers to a key on the free plan only, and so never on a bogon's: false
-# while its organization's daily trial lasts (every field for the first 100
-# lookups each UTC day), true once the answer has Unlimited's. cap_reached is the
+# while its organization's trial of every field lasts, true once the answer has
+# Unlimited's. cap_reached is the
 # same on a paid plan's answers: false while the answer has every field, true
 # once its organization's overage cap is reached.
 our @MARKERS = qw(trial_expired cap_reached);
@@ -102,6 +114,7 @@ VPNDetection::Result - what a lookup answers
     $result->vpn->{provider};       # 'mullvad'
     $result->location->{country};   # the ISO 3166 country code
     $result->asn->{name};           # who runs the announcing network
+    $result->hostname;              # the reverse DNS name, '' where it has none
 
     $result->is_hosting;            # 1, 0, or undef when your plan omits it
     $result->is_hosting // 0;       # read an absent field as false
@@ -144,6 +157,15 @@ back beside C<is_vpn>; every paid plan answers every flag. C<is_pubproxy> is whe
 public proxy, one anyone can connect through, listens on the address or sends
 its traffic out from it.
 
+=head2 is_anycast, is_carrier, is_satellite, is_ssh, is_smtp, is_web, is_dns_resolver, is_bittorrent
+
+C<is_anycast> is on every answer, with or without a key: whether the address is
+announced from many places at once, as a public DNS resolver's or a CDN's edge
+is. The rest are on a paid plan's answers: whether the address is a mobile
+carrier's or a satellite operator's, and whether an SSH server, a mail server, a
+web server, an open DNS resolver or a BitTorrent client answered on it. Each is
+C<1>, C<0>, or C<undef> when your plan omits it.
+
 =head2 vpn, hosting, relay, tor, cdn, resproxy, dcproxy, mobproxy, pubproxy
 
 The detail objects, as plain hash references, or C<undef> when your plan omits
@@ -154,20 +176,56 @@ C<num_ports> is 0 when the address is only an exit and C<num_proxies> 0 when it
 is only an entry; C<last_usable> is an empty string when no request through a
 proxy on the address was answered.
 
+=head2 carrier, satellite, ssh, smtp, web, dns_resolver, bittorrent
+
+The detail behind each of those flags, on a paid plan's answers, or C<undef> when
+your plan omits it. Each is a plain hash reference, C<{}> when its flag is false,
+except C<web>, an array reference with one hash per port that answered, C<[]>
+when C<is_web> is false. C<carrier> carries C<name>, C<mcc>, C<mnc>, C<country>
+and C<confidence>; C<satellite> C<provider>, C<provider_name>, C<orbit>,
+C<segment>, C<country>, C<asn> and C<confidence>; C<ssh> C<port>, C<banner>,
+C<host_key_fp>, C<session_ok>, C<first_seen> and C<last_seen>; C<smtp> C<port>,
+C<banner>, C<session_ok>, C<first_seen> and C<last_seen>; each row of C<web>
+C<port>, C<tls_ok>, C<session_ok>, C<status_code>, C<server>, C<location>,
+C<title>, C<cert_subject_cn>, C<cert_subject_o>, C<cert_issuer_dn>,
+C<cert_browser_trusted>, C<tls_version>, C<first_seen> and C<last_seen>;
+C<dns_resolver> C<port>, C<recursion_available>, C<rcode>, C<answer_correct>,
+C<first_seen> and C<last_seen>; C<bittorrent> C<verified>, C<id_matches_ip>,
+C<first_seen>, C<last_seen>, C<last_reachable>, C<days_seen>, C<num_ports>,
+C<peak_num_ports>, C<indexer> and C<clients> (an array reference).
+
 =head2 location, asn
 
 Where the address is and the AS announcing it, as plain hash references, on every
 answer, with or without a key. C<location> carries C<continent>,
 C<continent_name>, C<country>, C<country_name>, C<timezone>, C<currency_code>,
 C<currency_name>, C<currency_symbol>, C<flag_emoji> and C<flag_unicode>; C<asn>
-carries C<asn>, C<name>, C<domain>, C<type> and C<prefix>. Every key is present
-whenever the object is: an empty string, and C<asn> 0, where nothing is known.
+carries C<asn>, C<name>, C<domain>, C<type>, C<prefix>, C<country> and
+C<rpki_status>. Every key is present whenever the object is: an empty string,
+and C<asn> 0, where nothing is known. A paid plan's C<location> also carries
+C<region>, C<region_code>, C<city>, C<postal_code>, C<latitude>, C<longitude>,
+C<accuracy_radius>, C<geoname_id>, C<dma_code> and C<last_changed>, which are
+absent on a plan without them.
+
+=head2 hostname
+
+The name the address's reverse DNS record points to, on every answer, with or
+without a key: an empty string where it has none.
+
+=head2 company, abuse
+
+On a paid plan's answers, as plain hash references, or C<undef> when your plan
+omits them. C<company> is who uses the address: C<name>, C<domain>, C<type> and
+C<country>. C<abuse> is where to report abuse from it: C<email>, C<name>,
+C<phone>, C<address>, C<country>, C<network>, C<validated> and
+C<unvalidated_since>. Every key is present whenever the object is: empty strings
+where no record covers the address.
 
 =head2 trial_expired
 
-On answers to a key on the free plan only: C<0> while its organization's daily
-trial lasts (every field for the first 100 lookups each UTC day), C<1> once the
-answer has Unlimited's, and C<undef> on any other answer.
+On answers to a key on the free plan only: C<0> while its organization's trial
+of every field lasts, C<1> once the answer has Unlimited's, and C<undef> on any
+other answer.
 
 =head2 cap_reached
 

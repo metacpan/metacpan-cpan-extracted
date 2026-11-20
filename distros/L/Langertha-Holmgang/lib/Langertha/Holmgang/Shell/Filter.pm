@@ -1,5 +1,5 @@
 package Langertha::Holmgang::Shell::Filter;
-# ABSTRACT: The text filters behind a pipe — grep, head, tail, wc, sort, uniq, cut, awk, tr, fold
+# ABSTRACT: The text filters behind a pipe — grep, head, tail, wc, sort, uniq, cut, awk, tr, fold, python3 -m json.tool
 
 use strict;
 use warnings;
@@ -7,7 +7,7 @@ use utf8;
 
 use Encode ();
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 # cut -d X -f N[,M|N-M] | cut -c N-M
@@ -583,7 +583,108 @@ sub filter_output {
         return ( join( "\n", @o ), 1 );
     }
     return ( $text, 1 ) if $cmd eq 'cat' && !@a;
+    return _json_tool( $text, @a[ 2 .. $#a ] ) if $cmd =~ m{\A(?:/usr/bin/)?python3\z} && @a >= 2 && "@a[0,1]" eq '-m json.tool';
     return (undef);
+}
+
+# python3 -m json.tool [--sort-keys] [--indent N] [--no-ensure-ascii]: Reihenfolge der Schluessel
+# bleibt, Einrueckung 4, Nicht-ASCII als \uXXXX. Was nicht als JSON lesbar ist: undef (ausser leer).
+sub _json_tool {
+    my ( $text, @o ) = @_;
+    my ( $sort, $ind, $ascii ) = ( 0, 4, 1 );
+    while (@o) {
+        my $x = shift @o;
+        if    ( $x eq '--sort-keys' )       { $sort  = 1 }
+        elsif ( $x eq '--no-ensure-ascii' ) { $ascii = 0 }
+        elsif ( $x eq '--indent' && ( $o[0] // '' ) =~ /\A\d+\z/ ) { $ind = shift @o }
+        elsif ( $x =~ /\A--indent=(\d+)\z/ ) { $ind = $1 }
+        else  { return (undef) }
+    }
+    return ( 'Expecting value: line 1 column 1 (char 0)', 0 ) if $text !~ /\S/;
+    my $ws = sub { $text =~ /\G\s*/gc };
+    my $val;
+    $val = sub {
+        $ws->();
+        if ( $text =~ /\G\{/gc ) {
+            my @kv;
+            $ws->();
+            return [ obj => \@kv ] if $text =~ /\G\}/gc;
+            while (1) {
+                my $k = $val->() // return;
+                return unless $k->[0] eq 'str';
+                $ws->();
+                $text =~ /\G:/gc or return;
+                my $v = $val->() // return;
+                push @kv, [ $k, $v ];
+                $ws->();
+                next if $text =~ /\G,/gc;
+                last if $text =~ /\G\}/gc;
+                return;
+            }
+            return [ obj => \@kv ];
+        }
+        if ( $text =~ /\G\[/gc ) {
+            my @l;
+            $ws->();
+            return [ arr => \@l ] if $text =~ /\G\]/gc;
+            while (1) {
+                push @l, $val->() // return;
+                $ws->();
+                next if $text =~ /\G,/gc;
+                last if $text =~ /\G\]/gc;
+                return;
+            }
+            return [ arr => \@l ];
+        }
+        if ( $text =~ /\G"((?:[^"\\\x00-\x1f]|\\["\\\/bfnrt]|\\u[0-9a-fA-F]{4})*)"/gc ) {
+            my $s = $1;
+            $s =~ s/\\u([dD][89abAB][0-9a-fA-F]{2})\\u([dD][c-fC-F][0-9a-fA-F]{2})/chr( 0x10000 + ( hex($1) - 0xD800 ) * 0x400 + hex($2) - 0xDC00 )/ge;
+            my %esc = ( b => "\b", f => "\f", n => "\n", r => "\r", t => "\t" );
+            $s =~ s/\\(?:u([0-9a-fA-F]{4})|(.))/defined $1 ? chr hex $1 : $esc{$2} \/\/ $2/ge;
+            return [ str => $s ];
+        }
+        return [ lit => $1 ] if $text =~ /\G(-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?|true|false|null)/gc;
+        return;
+    };
+    my $doc = $val->() // return (undef);
+    $ws->();
+    return (undef) if ( pos($text) // 0 ) != length $text;
+    my $q = sub {
+        my $s = shift;
+        $s =~ s/(["\\])/\\$1/g;
+        $s =~ s/\n/\\n/g;
+        $s =~ s/\r/\\r/g;
+        $s =~ s/\t/\\t/g;
+        $s =~ s/\x08/\\b/g;
+        $s =~ s/\f/\\f/g;
+        $s =~ s/([\x00-\x1f])/sprintf '\\u%04x', ord $1/ge;
+        $s =~ s/([^\x00-\x7f])/_u16( ord $1 )/ge if $ascii;
+        return qq{"$s"};
+    };
+    my $out;
+    $out = sub {
+        my ( $n, $d ) = @_;
+        my $pad = ' ' x ( $ind * ( $d + 1 ) );
+        my $end = ' ' x ( $ind * $d );
+        return $n->[1] if $n->[0] eq 'lit';
+        return $q->( $n->[1] ) if $n->[0] eq 'str';
+        if ( $n->[0] eq 'arr' ) {
+            return '[]' unless @{ $n->[1] };
+            return "[\n" . join( ",\n", map { $pad . $out->( $_, $d + 1 ) } @{ $n->[1] } ) . "\n$end]";
+        }
+        my @kv = @{ $n->[1] };
+        return '{}' unless @kv;
+        @kv = sort { $a->[0][1] cmp $b->[0][1] } @kv if $sort;
+        return "{\n" . join( ",\n", map { $pad . $q->( $_->[0][1] ) . ': ' . $out->( $_->[1], $d + 1 ) } @kv ) . "\n$end}";
+    };
+    return ( $out->( $doc, 0 ), 1 );
+}
+
+sub _u16 {
+    my ($c) = @_;
+    return sprintf '\\u%04x', $c if $c <= 0xFFFF;
+    $c -= 0x10000;
+    return sprintf '\\u%04x\\u%04x', 0xD800 + ( $c >> 10 ), 0xDC00 + ( $c & 0x3FF );
 }
 
 1;
@@ -596,11 +697,11 @@ __END__
 
 =head1 NAME
 
-Langertha::Holmgang::Shell::Filter - The text filters behind a pipe — grep, head, tail, wc, sort, uniq, cut, awk, tr, fold
+Langertha::Holmgang::Shell::Filter - The text filters behind a pipe — grep, head, tail, wc, sort, uniq, cut, awk, tr, fold, python3 -m json.tool
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 package Langertha::Skeid::Protocol::Realtime;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 # ABSTRACT: The OpenAI realtime route -- what a session's handshake and frames say, relayed untranslated
 use strict;
 use warnings;
@@ -48,7 +48,7 @@ sub upstream_url {
   if ($query) {
     my $all = $query->pairs;
     for (my $i = 0; $i < @$all; $i += 2) {
-      next if $all->[$i] eq 'model';
+      next if $all->[$i] eq 'model' || lc($all->[$i]) eq 'autoload';
       push @pairs, $all->[$i], $all->[$i + 1];
     }
   }
@@ -204,7 +204,7 @@ Langertha::Skeid::Protocol::Realtime - The OpenAI realtime route -- what a sessi
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 DESCRIPTION
 
@@ -267,7 +267,9 @@ model and is refused (ADR 0029): a slot is promised to a client that has said wh
 
 The WebSocket URL of the node's realtime endpoint: C<http> becomes C<ws>, C<https> C<wss>, the
 C<model> is the one that was served, and every other query parameter of the client goes on as it
-was sent.
+was sent -- except C<autoload>. A llama.cpp router reads C<?autoload=true> as "load this model
+now", even when its operator started it with C<--no-models-autoload>; whether a node loads a
+model is the operator's decision, not the client's, so the parameter never reaches a node.
 
 =head2 subprotocol_key
 
@@ -348,7 +350,7 @@ L<Langertha::Skeid::Protocol::Audio>
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-skeid/issues>.
 
 =head2 IRC
@@ -361,11 +363,11 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

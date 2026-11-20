@@ -54,6 +54,23 @@
 #define _DARWIN_C_SOURCE
 #endif
 #endif
+/*
+ * Solaris/OmniOS perl is built with -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 and reports HAS_OFF64_T, so perl.h
+ * aliases Off_t to off64_t. Its <sys/types.h> only declares off64_t when _LARGEFILE64_SOURCE is requested, and the
+ * _XOPEN_SOURCE we set above turns that announcement off. Define it explicitly before any system header is pulled in.
+ */
+#if (defined(__sun) || defined(__sun__)) && !defined(_LARGEFILE64_SOURCE)
+#define _LARGEFILE64_SOURCE 1
+#endif
+#endif
+
+/*
+ * GNU/Hurd (unlike Linux) has no working MAP_NORESERVE and charges every anonymous mmap to RLIMIT_DATA, whose default
+ * is small enough that a tableful of 64 MiB (or even 8 MiB) stacks cannot be reserved. Treat it like OpenBSD below:
+ * use a smaller stack and clamp the default fiber count to what the data-segment budget actually holds.
+ */
+#if (defined(__gnu_hurd__) || defined(__HURD__)) && !defined(PARA_GNU_HURD)
+#define PARA_GNU_HURD 1
 #endif
 
 /*
@@ -117,11 +134,14 @@ typedef CRITICAL_SECTION para_mutex_t;
 #define LOCK_INIT(m) InitializeCriticalSection(&m)
 #else
 #include <pthread.h>
+#ifdef __CYGWIN__
+#include <windows.h>
+#endif
 #include <sched.h>
 #include <signal.h>
 #include <sys/select.h>
 #include <sys/socket.h>
-#ifndef __HAIKU__
+#if !defined(__HAIKU__) && !defined(__CYGWIN__)
 #include <sys/syscall.h>
 #endif
 #include <sys/time.h>
@@ -515,10 +535,10 @@ typedef struct para_fiber_t {
     /* exit() interception. perl's exit() longjmps up the JMPENV chain. The coro_call guard lives on the
      * caller's (parent) stack and is popped after every resume, so a fiber resumed a second time runs with a
      * stale top_env pointing at the popped guard: an exit() then longjmps to freed stack memory and dies in
-     * __longjmp (unreadable jump target). It must be captured on the fiber's own stack and re-raised on the
-     * caller's stack instead (see parataxis_pp_exit / para_entry_point / coro_call). exit_pending is set when
-     * exit() was called by this fiber or a fiber it called; exit_status carries the requested exit code.
-     * (On x64 Windows there is the extra constraint that the CRT longjmp cannot cross stacks at all.) */
+     * __longjmp (unreadable jump target). It must be captured on the fiber's own stack and handed to the main
+     * stack for re-raising (see parataxis_pp_exit / coro_call). exit_pending is set when exit() was called by
+     * this fiber or a fiber it called; exit_status carries the requested exit code. (On x64 Windows there is
+     * the extra constraint that the CRT longjmp cannot cross stacks at all.) */
     int exit_pending;
     int exit_status;
 } para_fiber_t;
@@ -595,6 +615,16 @@ static int free_slot_count = 0;
 static para_fiber_t main_context;
 /** @brief ID of the currently executing fiber (-1 for Main) */
 static int current_fiber_id = -1;
+/** @brief Exit status requested by exit() inside a fiber.
+ *
+ * An exit unwinds one stack at a time: the fiber that called exit() records the status on its own record, then
+ * my_exit() is re-raised on its caller's stack, where para_entry_point marks the caller pending. The caller's own
+ * exit_status is still zero, so propagating only the pending flag loses the requested code (the Cygwin exit tests
+ * saw 0 instead of 3/7). Keep the status in process-wide storage for the duration of the unwind, which is terminal,
+ * and consult it at every handoff. */
+static int para_fiber_exit_status = 0;
+/** @brief Whether a fiber-originated exit is currently unwinding toward my_exit(). */
+static int para_fiber_exit_in_flight = 0;
 
 /** @brief Size of the background job queue */
 #define MAX_JOBS 1024
@@ -654,14 +684,20 @@ static size_t fiber_guard_sz;
  * anonymous mapping counts against the process memory budget at full size but a 64 MB stack times a tableful of fibers
  * gets the process SIGKILLed on Apple Silicon. For macOS we use a small reservation instead (depth - 20000).
  * OpenBSD defines MAP_NORESERVE as 0 too, so it also gets an 8 MiB reservation; its RLIMIT_DATA counts every
- * anonymous mmap at full size and rightsize_fiber_limit clamps the limit to fit. DragonFly has no MAP_NORESERVE
- * either but charges only brk/sbrk to RLIMIT_DATA, so 8 MiB is safe there too.
+ * anonymous mmap at full size and rightsize_fiber_limit clamps the limit to fit. GNU/Hurd has no MAP_NORESERVE and a
+ * much smaller default RLIMIT_DATA than OpenBSD, so an 8 MiB frame only fits a few dozen fibers; it gets a 2 MiB stack
+ * (still twice the ~1 MB that fits Perl recursion on Windows) plus the same clamp. DragonFly has no MAP_NORESERVE
+ * either but charges only brk/sbrk to RLIMIT_DATA, so 8 MiB is safe there too. Cygwin allocates its stacks with
+ * VirtualAlloc(MEM_COMMIT), which charges the entire frame to the process commit limit up front; 8 MiB caps a runner
+ * at ~515 fibers, so it uses the same 2 MiB frame as GNU/Hurd.
  *
- * Perl recursion fits in a ~1 MB OS fiber on Windows, so 8 MB leaves ample headroom even in a DEBUGGING build. The
- * bottom fiber_guard_sz bytes are PROT_NONE; hitting them means genuine >FIBER_STACK_SZ C-stack usage, which the
+ * The bottom fiber_guard_sz bytes are PROT_NONE; hitting them means genuine >FIBER_STACK_SZ C-stack usage, which the
  * SIGSEGV guard handler reports instead of corrupting the heap.
  */
-#ifdef __linux__
+#if defined(PARA_GNU_HURD) || defined(__CYGWIN__)
+#define FIBER_STACK_SZ   (2 * 1024 * 1024)
+#define FIBER_MMAP_FLAGS (MAP_PRIVATE | MAP_ANON | MAP_STACK)
+#elif defined(__linux__)
 #define FIBER_STACK_SZ   (64 * 1024 * 1024)
 #define FIBER_MMAP_FLAGS (MAP_PRIVATE | MAP_ANON | MAP_NORESERVE | MAP_STACK)
 #elif defined(__APPLE__)
@@ -2470,14 +2506,18 @@ static void free_perl_stacks(pTHX_ para_fiber_t * c) {
 /** @brief Original perl OP_EXIT handler, saved when parataxis_pp_exit installs. */
 static Perl_ppaddr_t parataxis_saved_pp_exit = NULL;
 
+/** @brief Low-level context switch (defined below); needed by the fiber-aware exit handler. */
+void perform_switch(int target_id, int set_last_sender);
+
 /** @brief Fiber-aware replacement for perl's pp_exit (OP_EXIT).
  *
  * perl's exit() longjmps up the JMPENV chain. A fiber resumed after a yield runs with a stale top_env
  * (the coro_call guard from its previous resume was popped), so a raw longjmp would jump to freed stack
  * memory and crash in __longjmp; on x64 Windows the CRT longjmp cannot jump across stacks at all
  * (0xC0000028 / STATUS_BAD_STACK). To keep exit() working inside fibers we capture the exit code at the
- * opcode, record it on the current fiber, and hand control back to perl's exit machinery on the caller's
- * stack (see para_entry_point / coro_call).
+ * opcode, record it on the current fiber, switch straight to the main Perl stack, and re-enter perl's exit
+ * machinery there (see coro_call). This never longjmps across a fiber stack and preserves the code through
+ * any number of nested/resumed fibers.
  *
  * Outside of a running fiber this delegates to the original pp_exit, so normal program exits are byte-for-byte
  * unchanged.
@@ -2499,10 +2539,15 @@ static OP * parataxis_pp_exit(pTHX) {
     para_fiber_t * c = fibers[current_fiber_id];
     c->exit_pending = 1;
     c->exit_status = (int)anum;
-    /* Same as pp_exit: rethrow the exit within this fiber's own stack, so the JMPENV pushed by para_entry_point catches
-     * it. */
-    my_exit((U32)anum);
-    /* NOTREACHED */
+    /* The status has to survive the per-fiber records being cleared as each stack hands the exit upward. */
+    para_fiber_exit_status = (int)anum;
+    para_fiber_exit_in_flight = 1;
+    /* Never longjmp across fiber stacks. A resumed fiber's JMPENV belongs to its first resume and may be stale, and
+     * the Windows CRT cannot longjmp between CreateFiber stacks at all. Hand control to the main Perl stack instead:
+     * the coro_call post-switch hook below re-enters perl's exit machinery there with the process-wide status, so the
+     * requested code survives any number of nested or resumed fibers. */
+    c->finished = 1;
+    perform_switch(-1, 0);
     return 0;
 }
 
@@ -2527,6 +2572,8 @@ DLLEXPORT int init_system() {
         if (max_thread_pool_size > MAX_THREADS)
             max_thread_pool_size = MAX_THREADS;
     }
+    para_fiber_exit_status = 0;
+    para_fiber_exit_in_flight = 0;
     main_context.si = PL_curstackinfo;
     main_context.mainstack = PL_mainstack;
     main_context.transfer_data = &PL_sv_undef;
@@ -2556,6 +2603,16 @@ DLLEXPORT int init_system() {
 #ifndef _WIN32
     install_stack_guard();
     rightsize_fiber_limit();
+#endif
+#ifdef __CYGWIN__
+    /* Cygwin/Berkeley sockets initialize Winsock lazily and that first call must run on the process's main stack.
+     * If a fiber makes it while executing on its own ucontext stack, IO::Socket::INET->new() fails with EINVAL and
+     * the run then stalls. Warm the layer here, while init_system() is still on the main stack. */
+    {
+        int warm_fd = socket(AF_INET, SOCK_STREAM, 0);
+        if (warm_fd >= 0)
+            close(warm_fd);
+    }
 #endif
 #ifdef _WIN32
     /* Convert the main thread into a fiber so it can be switched out */
@@ -2683,8 +2740,13 @@ PARA_HIDDEN void para_entry_point(para_fiber_t * c) {
              * coro_call sees exit_pending and re-enters perl's exit machinery on the caller's stack, where
              * the whole JMPENV chain lives on one stack. */
             int fid = current_fiber_id;
-            if (fid >= 0 && fid < fiber_capacity && fibers[fid])
+            if (fid >= 0 && fid < fiber_capacity && fibers[fid]) {
                 fibers[fid]->exit_pending = 1;
+                /* When the jump came from a child fiber, this fiber's own exit_status is zero. Carry the
+                 * original request up so its coro_call guard can re-raise my_exit() with the right code. */
+                if (para_fiber_exit_in_flight)
+                    fibers[fid]->exit_status = para_fiber_exit_status;
+            }
             JMPENV_POP;
             para_fiber_t * fc = (fid >= 0 && fid < fiber_capacity) ? fibers[fid] : c;
             if (fc) {
@@ -2795,7 +2857,29 @@ PARA_HIDDEN void para_entry_point(para_fiber_t * c) {
 static void WINAPI fiber_entry(void * param) { para_entry_point((para_fiber_t *)param); }
 #else
 /** @brief POSIX makecontext callback wrapper. */
-static void posix_entry(int fiber_id) { para_entry_point(fibers[fiber_id]); }
+static void __attribute__((noinline, used)) posix_entry(int fiber_id) { para_entry_point(fibers[fiber_id]); }
+#endif
+
+#if defined(__CYGWIN__) && defined(__x86_64__)
+/*
+ * Cygwin's makecontext() restores uc_link instead of returning when it is called while a ucontext is active, so a
+ * fiber created from inside another fiber never starts. Build the initial machine context by hand instead: Cygwin
+ * x86-64 uses the Microsoft ABI (RCX for the first integer argument, 32-byte home space), and swapcontext() restores
+ * RIP/RSP from uc_mcontext. posix_entry is the C entry point; the assembler stub only adapts the ABI.
+ */
+static void para_cygwin_return(void) {
+    setcontext(&main_context.context);
+    abort();
+}
+__asm__(
+    ".globl para_cygwin_trampoline\n"
+    "para_cygwin_trampoline:\n"
+    "  subq $40, %rsp\n"          /* 32-byte home space plus alignment for the nested call */
+    "  call posix_entry\n"
+    "  addq $40, %rsp\n"
+    "  ret\n"
+);
+extern void para_cygwin_trampoline(void);
 #endif
 
 #ifndef _WIN32
@@ -2804,13 +2888,42 @@ static void posix_entry(int fiber_id) { para_entry_point(fibers[fiber_id]); }
  *
  * The usable stack is FIBER_STACK_SZ with a PROT_NONE guard page below it. The mapping uses FIBER_MMAP_FLAGS:
  * MAP_NORESERVE as a real flag (Linux, FreeBSD), so a 64 MB reservation is free until touched, and a small
- * FIBER_STACK_SZ where it is missing or a 0-valued legacy no-op (macOS, OpenBSD), so a tableful of fibers stays
- * under the process memory budget. No
+ * FIBER_STACK_SZ where it is missing or a 0-valued legacy no-op (macOS, OpenBSD, GNU/Hurd), so a tableful of fibers
+ * stays under the process memory budget. No
  * physical pages are consumed until they are used.
  *
  * @param sz Requested usable size (ignored; all stacks are FIBER_STACK_SZ).
  * @return void* Pointer to the usable stack (guard page below it), or NULL.
  */
+#ifdef __CYGWIN__
+/* Cygwin's mmap() cannot commit pages when called from inside a ucontext, which is exactly where nested fibers are
+ * created. Reserve and commit through the Win32 API instead (Cygwin is a PE target and links cygwin1.dll, which
+ * forwards the kernel32 calls). The first page stays PAGE_NOACCESS as the overflow guard. */
+static void * alloc_fiber_stack(size_t sz) {
+    (void)sz;
+    init_guard_sz();
+    if (stack_cache_count > 0)
+        return stack_cache[--stack_cache_count];
+    size_t total = FIBER_STACK_SZ + fiber_guard_sz;
+    void * base = VirtualAlloc(NULL, total, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+    if (!base)
+        return NULL;
+    DWORD old_protect;
+    VirtualProtect(base, fiber_guard_sz, PAGE_NOACCESS, &old_protect);
+    return (char *)base + fiber_guard_sz;
+}
+
+/** @brief Returns a fiber stack to the reuse cache or releases it. */
+static void free_fiber_stack(void * p, size_t sz) {
+    (void)sz;
+    if (p && stack_cache_count < MAX_CACHED_STACKS) {
+        stack_cache[stack_cache_count++] = p;
+        return;
+    }
+    if (p)
+        VirtualFree((char *)p - fiber_guard_sz, 0, MEM_RELEASE);
+}
+#else
 static void * alloc_fiber_stack(size_t sz) {
     (void)sz;
     init_guard_sz();
@@ -2834,6 +2947,7 @@ static void free_fiber_stack(void * p, size_t sz) {
     if (p)
         munmap((char *)p - fiber_guard_sz, FIBER_STACK_SZ + fiber_guard_sz);
 }
+#endif
 
 /** @brief Previous SIGSEGV disposition, restored when a fault is not ours. */
 static struct sigaction prev_sigsegv_act;
@@ -2872,7 +2986,7 @@ static void stack_guard_handler(int sig, siginfo_t * si, void * uc) {
             prev_sigsegv_act.sa_handler(sig);
         return;
     }
-    static const char msg[] = "Parataxis: fatal: fiber C-stack overflow (> 64MB used); aborting\n";
+    static const char msg[] = "Parataxis: fatal: fiber C-stack overflow; aborting\n";
     (void)!write(2, msg, sizeof(msg) - 1);
     signal(SIGSEGV, SIG_DFL);
 }
@@ -2891,18 +3005,19 @@ static void stack_guard_handler(int sig, siginfo_t * si, void * uc) {
  * Every fiber reserves FIBER_STACK_SZ plus one guard page of anonymous memory. Where MAP_NORESERVE is a real flag
  * (Linux, FreeBSD) the mapping is a free reservation and RLIMIT_DATA does not count it, so this is a no-op. OpenBSD
  * defines MAP_NORESERVE as 0, a legacy no-op the preprocessor sees but that reserves nothing, and its RLIMIT_DATA
- * counts every anonymous mmap at full size, so the generous DEFAULT_FIBER_LIMIT would let the very first big spawn
- * explode the process budget; the failing mmap then surfaces as a confusing table-full message. DragonFly has no
- * MAP_NORESERVE but charges only brk/sbrk to RLIMIT_DATA, so it never clamps. The clamp raises the soft limit
- * to the hard limit when permitted and cuts max_fibers to the number of full frames that actually fit: each
- * frame is the stack plus the per-fiber charge FIBER_CHARGED_OVERHEAD, and four frames stay free as headroom for
- * perl, the tables, the worker pool and the guard handler's alt stack. Keying on the
- * MAP_NORESERVE macro itself would compile this OUT on OpenBSD (defined as 0) and IN on DragonFly (undefined), the
- * exact inversion of the intent, so the guard names __OpenBSD__ directly.
+ * counts every anonymous mmap at full size; GNU/Hurd has no MAP_NORESERVE at all and likewise counts every mapping
+ * against a much smaller default data-segment limit. On both, the generous DEFAULT_FIBER_LIMIT would let the very
+ * first big spawn explode the process budget; the failing mmap then surfaces as a confusing table-full message.
+ * DragonFly has no MAP_NORESERVE but charges only brk/sbrk to RLIMIT_DATA, so it never clamps. The clamp raises the
+ * soft limit to the hard limit when permitted and cuts max_fibers to the number of full frames that actually fit:
+ * each frame is the stack plus the per-fiber charge FIBER_CHARGED_OVERHEAD, and four frames stay free as headroom
+ * for perl, the tables, the worker pool and the guard handler's alt stack. Keying on the MAP_NORESERVE macro itself
+ * would compile this OUT on OpenBSD (defined as 0) and IN on DragonFly (undefined), the exact inversion of the
+ * intent, so the guard names the affected platforms directly.
  */
 static void rightsize_fiber_limit(void) {
 #ifndef _WIN32
-#if defined(__OpenBSD__)
+#if defined(__OpenBSD__) || defined(PARA_GNU_HURD)
     struct rlimit rl;
     if (getrlimit(RLIMIT_DATA, &rl) != 0 || rl.rlim_cur == RLIM_INFINITY)
         return;
@@ -3001,6 +3116,17 @@ static void arm_fiber_context(para_fiber_t * c, int idx) {
     slot[6] = (void *)&para_trampoline;
     slot[7] = c;
     c->rsp = slot;
+#elif defined(__CYGWIN__) && defined(__x86_64__)
+    /* See the trampoline near posix_entry: Cygwin's makecontext() jumps to uc_link when called from a fiber. */
+    getcontext(&c->context);
+    c->context.uc_stack.ss_sp = c->stack_p;
+    c->context.uc_stack.ss_size = c->stack_sz;
+    c->context.uc_link = &main_context.context;
+    uint64_t * top = (uint64_t *)((char *)c->stack_p + c->stack_sz) - 1;
+    *top = (uint64_t)(uintptr_t)para_cygwin_return; /* fake return address for the trampoline */
+    c->context.uc_mcontext.rsp = (uint64_t)(uintptr_t)top;
+    c->context.uc_mcontext.rip = (uint64_t)(uintptr_t)para_cygwin_trampoline;
+    c->context.uc_mcontext.rcx = (uint64_t)idx;     /* Microsoft ABI: first integer argument */
 #else
     getcontext(&c->context);
     c->context.uc_stack.ss_sp = c->stack_p;
@@ -3181,7 +3307,9 @@ DLLEXPORT SV * coro_call(int fiber_id, SV * args) {
             para_fiber_t * caller = fibers[current_fiber_id];
             if (caller) {
                 caller->exit_pending = 1;
-                caller->exit_status = fibers[fiber_id]->exit_status;
+                caller->exit_status = para_fiber_exit_in_flight
+                    ? para_fiber_exit_status
+                    : fibers[fiber_id]->exit_status;
             }
         }
         JMPENV_JUMP(ret);
@@ -3190,11 +3318,17 @@ DLLEXPORT SV * coro_call(int fiber_id, SV * args) {
         fibers[fiber_id]->top_env = &cur_env;
     perform_switch(fiber_id, 1);
     JMPENV_POP;
+    /* A fiber that called exit() switched straight to the main stack (see parataxis_pp_exit) to avoid longjmp-ing
+     * across stacks. Re-enter perl's exit machinery here, where the whole JMPENV chain lives on one stack. */
+    if (para_fiber_exit_in_flight && current_fiber_id == -1)
+        my_exit((U32)para_fiber_exit_status);
     if (fibers[fiber_id] && fibers[fiber_id]->exit_pending) {
         /* The fiber's exit() was caught on the fiber stack (see para_entry_point). We are back on the caller's stack,
          * so perl's exit machinery (which longjmps up the JMPENV chain) is safe here: every env it will hit lives on
          * this same stack. */
-        int exit_status = fibers[fiber_id]->exit_status;
+        int exit_status = para_fiber_exit_in_flight
+            ? para_fiber_exit_status
+            : fibers[fiber_id]->exit_status;
         fibers[fiber_id]->exit_pending = 0;
         fibers[fiber_id]->exit_status = 0;
         my_exit((U32)exit_status);
@@ -3741,9 +3875,9 @@ DLLEXPORT void cleanup() {
         if (fibers[i])
             destroy_coro(i);
 #ifndef _WIN32
-#ifdef __linux__
+#ifdef __CYGWIN__
     while (stack_cache_count > 0)
-        munmap((char *)stack_cache[--stack_cache_count] - fiber_guard_sz, FIBER_STACK_SZ + fiber_guard_sz);
+        VirtualFree((char *)stack_cache[--stack_cache_count] - fiber_guard_sz, 0, MEM_RELEASE);
 #else
     while (stack_cache_count > 0)
         munmap((char *)stack_cache[--stack_cache_count] - fiber_guard_sz, FIBER_STACK_SZ + fiber_guard_sz);

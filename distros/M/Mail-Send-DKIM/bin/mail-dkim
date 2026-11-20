@@ -28,7 +28,10 @@ my $message = do { local $/; <STDIN> } // '';
 my $signed = $dkim->sign($message);
 $message = $signed if(defined($signed));
 
-exit($dkim->send($message, @ARGV));
+my $status = $dkim->send($message, @ARGV);
+$dkim->log_send($message, @ARGV) if($status == 0);
+
+exit($status);
 
 __END__
 
@@ -83,7 +86,10 @@ C<example.org>.
 
 =item B<DKIM_KEYDIR>
 
-The directory holding the private keys.  Defaults to F<~/dkim>.
+The directory holding the private keys.  Defaults to F<~/dkim>.  The value is
+used as it stands: a relative path is taken from the working directory, and
+C<~> is not expanded - the shell does that, and only when the assignment is
+written unquoted.
 
 =item B<DKIM_SELECTOR>
 
@@ -110,6 +116,20 @@ The home directory the default B<DKIM_KEYDIR> of F<~/dkim> is taken from.  When
 it is unset the home directory in the password file entry is used instead.
 
 =back
+
+=head1 LOGGING
+
+When sendmail accepts a message, one line is written to syslog, under the
+identity C<mail-dkim> and the C<mail> facility, giving the sender, the
+recipients and the subject:
+
+	mail-dkim[1234]: sender=alerts@example.org recipient=admin@example.net subject=Disk nearly full
+
+The sender is the address given to C<-f>, or else the one in the C<From:>
+header.  The recipients are the addresses on the command line and, with C<-t>,
+those in the C<To:>, C<Cc:> and C<Bcc:> headers.  Nothing is logged for a
+message sendmail refused.  A syslog that cannot be written to is a warning on
+standard error and nothing more: the message has gone.
 
 =head1 BEHAVIOUR WHEN IT CANNOT SIGN
 

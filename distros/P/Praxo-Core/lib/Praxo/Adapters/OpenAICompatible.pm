@@ -16,6 +16,7 @@ sub new {
         model => $args{model} // '',
         api_key => $args{api_key},
         transport => $args{transport},
+        stream_transport => $args{stream_transport},
         timeout => $args{timeout} // 60,
     }, $class;
 }
@@ -27,6 +28,18 @@ sub generate {
         ? $self->{transport}->('/chat/completions', $payload)
         : $self->_post('/chat/completions', $payload);
     return _parse_response($data);
+}
+
+sub generate_stream {
+    my ($self, $request, $on_delta) = @_;
+    my $payload = _payload($self->{model}, $request);
+    $payload->{stream} = Praxo::Json::true_value();
+    my $text = $self->{stream_transport}
+        ? $self->{stream_transport}->('/chat/completions', $payload)
+        : $self->_post_stream('/chat/completions', $payload);
+    praxo_error('PROVIDER_HTTP', 'stream transport must return SSE text')
+        if ref($text) || !defined $text;
+    return _parse_sse($text, $on_delta);
 }
 
 sub _payload {
@@ -109,6 +122,110 @@ sub _parse_response {
         ),
         finish_reason => $choice->{finish_reason},
     );
+}
+
+sub _parse_sse {
+    my ($text, $on_delta) = @_;
+    my $content = '';
+    my %calls;
+    my ($input_tokens, $output_tokens, $finish_reason, $done) = (0, 0, undef, 0);
+    for my $raw (split /\n/, $text) {
+        my $line = $raw;
+        $line =~ s/^\s+|\s+$//g;
+        next unless $line =~ /^data:\s*(.*)$/;
+        my $chunk = $1;
+        $chunk =~ s/^\s+|\s+$//g;
+        next if $chunk eq '';
+        if ($chunk eq '[DONE]') {
+            $done = 1;
+            last;
+        }
+        my $event = eval { Praxo::Json::parse($chunk) };
+        praxo_error('MODEL_STREAM', 'invalid SSE packet')
+            unless ref($event) eq 'HASH';
+        if (ref($event->{usage}) eq 'HASH') {
+            $input_tokens = $event->{usage}{prompt_tokens} // 0;
+            $output_tokens = $event->{usage}{completion_tokens} // 0;
+        }
+        my $choices = ref($event->{choices}) eq 'ARRAY' ? $event->{choices} : [];
+        for my $choice (@$choices) {
+            next unless ref($choice) eq 'HASH';
+            my $delta = ref($choice->{delta}) eq 'HASH' ? $choice->{delta} : {};
+            my $piece = $delta->{content};
+            if (defined $piece && !ref($piece) && $piece ne '') {
+                $content .= $piece;
+                $on_delta->($piece);
+            }
+            my $items = ref($delta->{tool_calls}) eq 'ARRAY' ? $delta->{tool_calls} : [];
+            for my $item (@$items) {
+                next unless ref($item) eq 'HASH';
+                my $index = defined $item->{index} ? $item->{index} : scalar(keys %calls);
+                my $slot = $calls{$index} //= { id => '', name => '', arguments => '' };
+                $slot->{id} .= $item->{id}
+                    if defined $item->{id} && !ref($item->{id});
+                my $function = ref($item->{function}) eq 'HASH' ? $item->{function} : {};
+                $slot->{name} .= $function->{name}
+                    if defined $function->{name} && !ref($function->{name});
+                $slot->{arguments} .= $function->{arguments}
+                    if defined $function->{arguments} && !ref($function->{arguments});
+            }
+            if (exists $choice->{finish_reason} && defined $choice->{finish_reason}) {
+                $finish_reason = $choice->{finish_reason};
+                $done = 1;
+            }
+        }
+    }
+    praxo_error('MODEL_STREAM', 'stream ended before completion') unless $done;
+    my @tool_calls;
+    for my $index (sort { $a <=> $b } keys %calls) {
+        my $slot = $calls{$index};
+        next if $slot->{name} eq '';
+        my $arguments = {};
+        if ($slot->{arguments} ne '') {
+            my $parsed = eval { Praxo::Json::parse($slot->{arguments}) };
+            praxo_error('PROVIDER_JSON', 'provider returned invalid tool arguments')
+                unless ref($parsed) eq 'HASH';
+            $arguments = $parsed;
+        }
+        push @tool_calls, Praxo::Models::tool_call(
+            id => $slot->{id},
+            name => $slot->{name},
+            arguments => $arguments,
+        );
+    }
+    return Praxo::Models::response(
+        message => Praxo::Models::message_assistant($content, \@tool_calls),
+        usage => Praxo::Models::usage(
+            input_tokens => $input_tokens,
+            output_tokens => $output_tokens,
+        ),
+        finish_reason => $finish_reason,
+    );
+}
+
+sub _post_stream {
+    my ($self, $path, $payload) = @_;
+    praxo_error('PROVIDER_HTTP', 'provider base URL is required')
+        unless $self->{base_url} ne '';
+    my %headers = (
+        'content-type' => 'application/json',
+        'accept' => 'text/event-stream',
+    );
+    $headers{authorization} = 'Bearer ' . $self->{api_key}
+        if defined $self->{api_key} && $self->{api_key} ne '';
+    my $http = HTTP::Tiny->new(timeout => $self->{timeout});
+    my $response = $http->post(
+        $self->{base_url} . $path,
+        {
+            headers => \%headers,
+            content => Praxo::Json::stringify($payload),
+        },
+    );
+    praxo_error(
+        'PROVIDER_HTTP',
+        'provider returned HTTP ' . ($response->{status} // 0) . ': ' . ($response->{content} // ''),
+    ) unless $response->{success};
+    return $response->{content};
 }
 
 sub _post {

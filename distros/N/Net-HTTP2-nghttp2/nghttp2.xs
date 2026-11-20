@@ -21,6 +21,10 @@ typedef struct {
     int no_end_stream;      /* Suppress END_STREAM at EOF */
     int deferred;           /* Currently deferred */
     int released;           /* Stream closed; awaiting free, do not touch Perl data */
+    SV *pending;            /* Bytes handed over and not yet sent: a static body,
+                               submit_data's, or what a callback returned past
+                               the room in its frame */
+    STRLEN pending_off;     /* How much of pending has been sent */
 } nghttp2_perl_data_provider;
 
 /* Session wrapper structure */
@@ -215,6 +219,7 @@ static void add_data_provider(pTHX_ nghttp2_perl_session *ps, nghttp2_perl_data_
 static void free_data_provider(pTHX_ nghttp2_perl_data_provider *dp) {
     if (dp->callback) SvREFCNT_dec(dp->callback);
     if (dp->user_data) SvREFCNT_dec(dp->user_data);
+    if (dp->pending) SvREFCNT_dec(dp->pending);
     Safefree(dp);
 }
 
@@ -342,36 +347,42 @@ static ssize_t perl_data_source_read_callback(
         return 0;
     }
 
-    /* Special case: if callback is NULL but user_data contains body, use it directly */
-    if (!dp->callback && dp->user_data && SvOK(dp->user_data)) {
+    /* Bytes handed over and not yet sent go first, as much as this frame has
+       room for (length): a static body, data given to submit_data, or what a
+       callback returned past the room in its frame. An offset walks them, so
+       each frame costs only its own bytes, however large the body. The EOF
+       they were handed over with is signalled after the last of them. */
+    if (dp->pending) {
         STRLEN full_len;
-        const char *body_ptr = SvPVbyte(dp->user_data, full_len);
-        STRLEN send_len = (full_len > length) ? length : full_len;
+        const char *bytes = SvPVbyte(dp->pending, full_len);
+        STRLEN send_len = full_len - dp->pending_off;
 
+        if (send_len > length) {
+            send_len = length;
+        }
         if (send_len > 0) {
-            memcpy(buf, body_ptr, send_len);
+            memcpy(buf, bytes + dp->pending_off, send_len);
+        }
+        dp->pending_off += send_len;
+        if (dp->pending_off < full_len) {
+            return (ssize_t)send_len;
         }
 
-        if (send_len >= full_len) {
-            /* All data consumed */
-            SvREFCNT_dec(dp->user_data);
-            dp->user_data = NULL;
-            if (dp->eof) {
-                *data_flags |= NGHTTP2_DATA_FLAG_EOF;
-                if (dp->no_end_stream) {
-                    *data_flags |= NGHTTP2_DATA_FLAG_NO_END_STREAM;
-                }
-            } else {
-                dp->no_end_stream = 0;
+        SvREFCNT_dec(dp->pending);
+        dp->pending = NULL;
+        dp->pending_off = 0;
+        if (dp->eof) {
+            *data_flags |= NGHTTP2_DATA_FLAG_EOF;
+            if (dp->no_end_stream) {
+                *data_flags |= NGHTTP2_DATA_FLAG_NO_END_STREAM;
             }
-        } else {
-            /* Partial send - keep remainder for next call */
-            SV *remaining = newSVpvn(body_ptr + send_len, full_len - send_len);
-            SvREFCNT_dec(dp->user_data);
-            dp->user_data = remaining;
+            return (ssize_t)send_len;
         }
-
-        return (ssize_t)send_len;
+        dp->no_end_stream = 0;
+        if (send_len > 0) {
+            return (ssize_t)send_len;
+        }
+        /* Nothing was pending after all: go on as if nothing had been. */
     }
 
     /* No callback and no pending data */
@@ -430,21 +441,27 @@ static ssize_t perl_data_source_read_callback(
         } else {
             STRLEN data_len;
             const char *data_ptr = SvPVbyte(data_sv, data_len);
+            STRLEN send_len = (data_len > length) ? length : data_len;
+            int eof = (eof_sv && SvTRUE(eof_sv)) ? 1 : 0;
+            int no_end_stream = (eof && no_end_stream_sv && SvTRUE(no_end_stream_sv)) ? 1 : 0;
 
-            /* Copy data to buffer */
-            if (data_len > length) {
-                data_len = length;  /* Truncate if too much */
+            if (send_len > 0) {
+                memcpy(buf, data_ptr, send_len);
             }
-            if (data_len > 0) {
-                memcpy(buf, data_ptr, data_len);
-            }
-            ret = (ssize_t)data_len;
+            ret = (ssize_t)send_len;
+            dp->eof = eof;
 
-            /* Check EOF flag */
-            if (eof_sv && SvTRUE(eof_sv)) {
+            if (send_len < data_len) {
+                /* More than this frame has room for: the rest is kept and sent
+                   before the callback is asked again, and its EOF waits for it.
+                   The copy shares the string's buffer; the offset skips what
+                   this frame took. */
+                dp->pending = newSVsv(data_sv);
+                dp->pending_off = send_len;
+                dp->no_end_stream = no_end_stream;
+            } else if (eof) {
                 *data_flags |= NGHTTP2_DATA_FLAG_EOF;
-                dp->eof = 1;
-                if (no_end_stream_sv && SvTRUE(no_end_stream_sv)) {
+                if (no_end_stream) {
                     *data_flags |= NGHTTP2_DATA_FLAG_NO_END_STREAM;
                 }
             }
@@ -1712,15 +1729,20 @@ submit_data(self, stream_id, data_sv, eof, no_end_stream = 0)
         }
 
         /* Replace the callback with NULL (one-shot static body mode) and
-           store the data in user_data for the read callback to pick up */
+           hand the data over as pending bytes for the read callback to send,
+           after any still unsent */
         if (dp->callback) {
             SvREFCNT_dec(dp->callback);
             dp->callback = NULL;
         }
-        if (dp->user_data) {
-            SvREFCNT_dec(dp->user_data);
+        if (SvOK(data_sv)) {
+            if (dp->pending) {
+                sv_catsv(dp->pending, data_sv);
+            } else {
+                dp->pending = newSVsv(data_sv);
+                dp->pending_off = 0;
+            }
         }
-        dp->user_data = SvOK(data_sv) ? newSVsv(data_sv) : NULL;
         dp->eof = eof ? 1 : 0;
         dp->no_end_stream = (eof && no_end_stream) ? 1 : 0;
         dp->deferred = 0;
@@ -1862,8 +1884,8 @@ _submit_request_xs(self, headers_av, body_sv)
                 dp->stream_id = 0;  /* Will be set after submit */
                 dp->eof = 1;       /* Static bodies always want EOF after sending */
                 dp->deferred = 0;
-                dp->user_data = newSVsv(body_sv);
-                dp->callback = NULL;  /* Use user_data as body */
+                dp->pending = newSVsv(body_sv);   /* sent from pending, a frame at a time */
+                dp->callback = NULL;
 
                 data_prd.source.ptr = dp;
                 data_prd.read_callback = perl_data_source_read_callback;

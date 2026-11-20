@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -17,7 +18,7 @@ sub cursor_keys {
 # derived-route cache without a fixed bound even when no round-robin cursor is ever created.
 {
   my $skeid = Langertha::Skeid->new;
-  $skeid->add_node(id => 'specific', url => 'http://specific/v1', model => 'known');
+  $skeid->add_node(id => 'specific', trust => 'internal', url => 'http://specific/v1', model => 'known');
 
   $skeid->route_state(model => "missing-$_") for 1 .. 400;
 
@@ -30,8 +31,8 @@ sub cursor_keys {
 # and a cursor. Eviction is coupled: no cursor may outlive the entry whose weighted range it tracks.
 {
   my $skeid = Langertha::Skeid->new;
-  $skeid->add_node(id => 'a', url => 'http://a/v1');
-  $skeid->add_node(id => 'b', url => 'http://b/v1');
+  $skeid->add_node(id => 'a', trust => 'internal', url => 'http://a/v1');
+  $skeid->add_node(id => 'b', trust => 'internal', url => 'http://b/v1');
 
   is $skeid->pick_node(model => 'steady')->{id}, 'a', 'the first weighted pick starts at node a';
   my $steady_key = $skeid->_route_key(model => 'steady');
@@ -56,8 +57,8 @@ sub cursor_keys {
 # selection must not inherit a cursor or eligible set from a differently constrained selection.
 {
   my $skeid = Langertha::Skeid->new;
-  $skeid->add_node(id => 'cloud', url => 'http://cloud/v1', tags => ['cloud']);
-  $skeid->add_node(id => 'local', url => 'http://local/v1', tags => ['local']);
+  $skeid->add_node(id => 'cloud', trust => 'internal', url => 'http://cloud/v1', tags => ['cloud']);
+  $skeid->add_node(id => 'local', trust => 'internal', url => 'http://local/v1', tags => ['local']);
 
   my $local = $skeid->pick_node(model => 'shared', tags => ['local']);
   my $policy = $skeid->pick_node(model => 'shared', deny_tags => ['cloud']);
@@ -70,8 +71,8 @@ sub cursor_keys {
 # fairness or make the probe inventory look newer than the nodes it describes.
 {
   my $skeid = Langertha::Skeid->new;
-  $skeid->add_node(id => 'a', url => 'http://a/v1', model => 'm');
-  $skeid->add_node(id => 'b', url => 'http://b/v1', model => 'm');
+  $skeid->add_node(id => 'a', trust => 'internal', url => 'http://a/v1', model => 'm');
+  $skeid->add_node(id => 'b', trust => 'internal', url => 'http://b/v1', model => 'm');
   $skeid->_probe_inventory_key;
 
   is $skeid->pick_node(model => 'm')->{id}, 'a', 'the first pick advances fairness past node a';
@@ -92,8 +93,8 @@ sub cursor_keys {
 # invalidates all of them rather than retaining client-created cursor keys indefinitely.
 {
   my $skeid = Langertha::Skeid->new;
-  $skeid->add_node(id => 'a', url => 'http://a/v1', model => 'm');
-  $skeid->add_node(id => 'b', url => 'http://b/v1', model => 'm');
+  $skeid->add_node(id => 'a', trust => 'internal', url => 'http://a/v1', model => 'm');
+  $skeid->add_node(id => 'b', trust => 'internal', url => 'http://b/v1', model => 'm');
   $skeid->pick_node(model => 'm');
   is scalar(@{cursor_keys($skeid)}), 1, 'routing creates one cursor before the inventory change';
 

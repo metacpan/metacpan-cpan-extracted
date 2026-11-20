@@ -9,7 +9,7 @@ use Langertha::Holmgang::Error;
 use Scalar::Util qw( blessed );
 use Time::Local ();
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 use constant CHARS_PER_TOKEN => 3.5;
@@ -752,7 +752,7 @@ Langertha::Holmgang::Haystack - Long, deterministic operational data for long-co
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

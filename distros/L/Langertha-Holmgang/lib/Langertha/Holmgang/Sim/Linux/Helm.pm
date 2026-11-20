@@ -11,7 +11,7 @@ use JSON::MaybeXS ();
 use MIME::Base64 ();
 use YAML::XS ();
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 our @GAPS;
@@ -654,7 +654,7 @@ Langertha::Holmgang::Sim::Linux::Helm - helm on the admin host of a simulated cl
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

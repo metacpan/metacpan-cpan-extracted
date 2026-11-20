@@ -72,8 +72,9 @@ use warnings;
 use Cwd qw(abs_path);
 use FindBin qw($Bin);
 
-our $VERSION = "0.047";
+our $VERSION = "0.048";
 
+exit 0*print "[git-server v$VERSION] ".`git --version` if @ARGV == 1 and $ARGV[0] =~ /^-*v(?:|ersion)$/i;
 $SIG{PIPE} = sub { exit 1; };
 my $cmd = $ENV{SSH_ORIGINAL_COMMAND} ||= # Standard Method from ~/.ssh/authorized_keys: command="git-server REMOTE_USER=user1" # i.e., "git-upload-pack 'project'"
     @ARGV == 2 && $ARGV[0] eq "-c" && shift && shift || ""; # Advanced Method from /etc/passwd SHELL

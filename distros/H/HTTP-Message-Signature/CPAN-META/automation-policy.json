@@ -1,0 +1,7 @@
+{
+   "automated_actions" : "code_request",
+   "automated_contributions" : "code_request",
+   "code_generation" : "machine_generated",
+   "distribution" : "HTTP-Message-Signature-v0.0.2",
+   "version" : 1
+}

@@ -8,7 +8,7 @@ package Web::VWF::Display::meta_data;
 use strict;
 use warnings;
 
-use version; our $VERSION = version->declare('0.003.0');
+use version; our $VERSION = version->declare('0.003.1');
 
 use parent 'Web::VWF::Display';
 
@@ -433,7 +433,7 @@ Web::VWF::Display::meta_data - The status page: the server and its traffic
 
 =head1 VERSION
 
-Version 0.003.0
+Version 0.003.1
 
 =head1 DESCRIPTION
 

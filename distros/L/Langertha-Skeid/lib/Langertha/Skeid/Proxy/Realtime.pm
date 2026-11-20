@@ -1,5 +1,5 @@
 package Langertha::Skeid::Proxy::Realtime;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 # ABSTRACT: One realtime session -- two WebSockets joined, bounded, ended once
 use Moo;
 use Scalar::Util qw( weaken );
@@ -282,11 +282,11 @@ Langertha::Skeid::Proxy::Realtime - One realtime session -- two WebSockets joine
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 DESCRIPTION
 
-The relay of the realtime route (skeid k95, ADR 0029). C<Langertha::Skeid::Proxy> answers the
+The relay of the realtime route (ADR 0029). C<Langertha::Skeid::Proxy> answers the
 handshake -- the client gate, the model, routing, admission, the node's key, the upstream
 WebSocket, the upgrade -- and then hands both open WebSockets to L</start_session>. From there a
 B<session> is two transactions, the client's and the node's, and this module is everything that
@@ -358,7 +358,7 @@ L<Langertha::Skeid::Proxy/Realtime route>, L<Langertha::Skeid::Protocol::Realtim
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-skeid/issues>.
 
 =head2 IRC
@@ -371,11 +371,11 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

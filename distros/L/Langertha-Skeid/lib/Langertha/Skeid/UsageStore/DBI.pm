@@ -1,5 +1,5 @@
 package Langertha::Skeid::UsageStore::DBI;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 # ABSTRACT: SQLite and PostgreSQL usage store
 use Moo;
 use strict;
@@ -133,6 +133,15 @@ my @ADDED_COLUMNS = (
   # Pages a documents request converted (skeid k94, ADR 0028), read off the answer's
   # json_content. Nullable: only a documents event whose answer carried a page count has one.
   ['pages', 'BIGINT'],
+  # The usage contract (skeid k121): how the answer ended, the time to its first token (streams
+  # only) and the caller's correlation id. Nullable: an old row, or an event without one, reads
+  # NULL.
+  ['finish_reason', 'TEXT'],
+  ['ttft_ms', 'BIGINT'],
+  ['correlation_id', 'TEXT'],
+  # The catch-all target a bent request was routed under (skeid k129, ADR 0033). Nullable: only
+  # a bent request has one, and an old row reads NULL.
+  ['routed_model', 'TEXT'],
 );
 
 sub _add_missing_columns {
@@ -488,7 +497,7 @@ my @EVENT_COLUMNS = qw(
   status_code ok duration_ms input_tokens output_tokens total_tokens cached_tokens tool_calls
   cost_input_usd cost_output_usd cost_total_usd error_type error_message requested_model
   content_bytes cost_cache_read_usd cost_cache_write_usd cache_write_tokens audio_seconds
-  documents pages
+  documents pages finish_reason ttft_ms correlation_id routed_model
 );
 # Nullable, written as NULL when the event has no such key -- "not measured", not a zero:
 #   cached_tokens          an event that carried no cache count
@@ -499,6 +508,10 @@ my @EVENT_COLUMNS = qw(
 #   audio_seconds          only an audio route's event, and only when its node reported it
 #   documents              only a rerank or documents event
 #   pages                  only a documents event whose answer said how many pages it was
+#   finish_reason          an event whose answer had none (embeddings, audio, ...) and no error
+#   ttft_ms                only a streamed event that relayed a token
+#   correlation_id         an event whose caller sent none, or the config names no header
+#   routed_model           only an event of a request the catch-all bent (ADR 0033)
 # requested_model falls back to model, then ''.
 my $INSERT_SQL = 'INSERT INTO usage_events (' . join(', ', @EVENT_COLUMNS) . ') VALUES ('
   . join(', ', ('?') x @EVENT_COLUMNS) . ')';
@@ -760,6 +773,40 @@ sub _schedule_replay {
 }
 
 
+
+sub purge {
+  my ($self, $request) = @_;
+  $self->flush;
+  if (length($self->spool_dir)) {
+    my @waiting = grep { -s File::Spec->catfile($self->spool_dir, $_) } $self->_spool_files('any');
+    return { ok => 0, error => 'the usage spool holds ' . scalar(@waiting) . ' file(s) of events '
+      . 'not yet in the database; purge again once they are replayed' } if @waiting;
+  }
+
+  my (@where, @bind);
+  if (my $ids = $request->{api_key_ids}) {
+    push @where, 'api_key_id IN (' . join(', ', ('?') x @$ids) . ')';
+    push @bind, @$ids;
+  }
+  if (defined $request->{before}) {
+    push @where, 'created_at < ?';
+    push @bind, $request->{before};
+  }
+  return { ok => 0, error => 'a purge needs api_key_ids, before, or both' } unless @where;
+  my $where = join ' AND ', @where;
+
+  return $self->_with_handle(sub {
+    my ($dbh) = @_;
+    my ($matched) = $dbh->selectrow_array("SELECT COUNT(*) FROM usage_events WHERE $where", undef, @bind);
+    my $deleted = 0;
+    unless ($request->{dry_run}) {
+      $deleted = $dbh->do("DELETE FROM usage_events WHERE $where", undef, @bind);
+      $deleted = 0 if !defined($deleted) || $deleted eq '0E0';
+    }
+    return { ok => 1, matched => 0 + ($matched // 0), deleted => 0 + $deleted };
+  });
+}
+
 sub report {
   my ($self, $filters) = @_;
   $filters ||= {};
@@ -849,7 +896,7 @@ sub _report {
 
   my $recent = $dbh->selectall_arrayref(
     "SELECT
-       id, created_at, api_format, endpoint, api_key_id, model, requested_model, node_id, status_code, ok,
+       id, created_at, api_format, endpoint, api_key_id, model, requested_model, routed_model, node_id, status_code, ok,
        input_tokens, output_tokens, total_tokens, cached_tokens, cache_write_tokens, tool_calls, cost_total_usd
      FROM usage_events
      $where_sql
@@ -910,6 +957,8 @@ sub _report {
         api_key_id    => ($_->{api_key_id} // ''),
         model           => ($_->{model} // ''),
         requested_model => ($_->{requested_model} // $_->{model} // ''),
+        # Only a request the catch-all bent (ADR 0033); absent otherwise.
+        (defined($_->{routed_model}) && length($_->{routed_model}) ? (routed_model => $_->{routed_model}) : ()),
         node_id         => ($_->{node_id} // ''),
         status_code   => $num->($_->{status_code}),
         ok            => ($_->{ok} ? 1 : 0),
@@ -940,7 +989,7 @@ Langertha::Skeid::UsageStore::DBI - SQLite and PostgreSQL usage store
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 DESCRIPTION
 
@@ -956,8 +1005,7 @@ event and answers at once, and a L<Mojo::IOLoop> timer writes the queue in one t
 request is answered without waiting for the database, and a burst of events costs one commit
 instead of one each. The flush itself is still a synchronous database call on the loop -- it
 runs once per interval instead of once per request, it is not off the loop. The price is a wider
-loss window: events still queued when the process dies without a flush are lost (ADR 0005,
-Update skeid k78). Off by default.
+loss window: events still queued when the process dies without a flush are lost (ADR 0005). Off by default.
 
 C<spool_dir> keeps the events the database cannot take while it is down: they are appended to a
 local file instead of being reported lost, and written once the database answers again (see
@@ -1169,6 +1217,16 @@ failing query is C<< { ok => 0, enabled => 0, error => … } >>. A dropped conne
 reconnected once, exactly as for L</store>. Queued events are flushed first, so a report counts
 every event recorded before it was asked for.
 
+=head2 purge
+
+  my $result = $store->purge({ api_key_ids => [ 'k_...' ], before => '2026-01-01T00:00:00Z', dry_run => 1 });
+
+Deletes the usage events a request from L<Langertha::Skeid::UsageStore/purge_request> matches,
+in one statement, after writing out what write-behind holds; see
+L<Langertha::Skeid::UsageStore/The store contract> for the answer. Refused while the spool holds
+events: they would be written after the purge and bring the deleted rows back. Replay them
+first (they replay on their own once the database is reachable), then purge again.
+
 =head1 SEE ALSO
 
 L<Langertha::Skeid::UsageStore>, L<Langertha::Skeid::UsageStore::JsonLog>
@@ -1177,7 +1235,7 @@ L<Langertha::Skeid::UsageStore>, L<Langertha::Skeid::UsageStore::JsonLog>
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-skeid/issues>.
 
 =head2 IRC
@@ -1190,11 +1248,11 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

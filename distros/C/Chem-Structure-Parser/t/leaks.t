@@ -157,6 +157,65 @@ for my $case (
 	}
 }
 
+#--------
+# the conversion, which is a parse with a writer that owns a buffer per model,
+# a table of anisotropic rows and a list of written ids -- all of which have to
+# be given back on the croak a field that will not fit ends it with, and on the
+# croak a dying option ends it with before the parse has begun
+#--------
+{
+	my $aniso = "ATOM      1  N   TRP A   5       8.257  -0.414  10.635  1.00 27.01           N  \n"
+	          . "ANISOU    1  N   TRP A   5     1234   2345   3456    -12     34   -567       N  \n";
+	my $cif_head = "data_x\nloop_\n" . join('', map { "_atom_site.$_\n" } qw(group_PDB id
+		type_symbol label_atom_id label_comp_id label_asym_id Cartn_x Cartn_y Cartn_z
+		auth_seq_id pdbx_PDB_model_num));
+	my $two_models = $cif_head . "ATOM 1 C CA GLY A 1.0 2.0 3.0 1 1\nATOM 2 C CA GLY A 1.0 2.0 3.0 1 2\n"
+	               . "loop_\n_atom_site_anisotrop.id\n_atom_site_anisotrop.U[1][1]\n1 0.1\n2 0.2\n";
+	for my $case (
+		[ '_convert_file',   "$data/mini.pdb", 0 ], [ '_convert_file',   "$data/mini.cif", 1 ],
+		[ '_convert_file',   "$data/nmr.cif",  1 ], [ '_convert_string', $aniso,           0 ],
+		[ '_convert_string', $two_models,      1 ],
+	) {
+		my ($fn, $arg, $from_cif) = @$case;
+		my $sub = \&{"Chem::Structure::Parser::$fn"};
+		for my $to_pdb (0, 1) {
+			no_leaks_ok { $sub->($arg, $from_cif, $to_pdb, { model => -1, keep => { _cell => 1, CRYST1 => 1 } }) }
+				"$fn, " . ($from_cif ? 'mmCIF' : 'PDB') . ' to ' . ($to_pdb ? 'PDB' : 'mmCIF') . ': no leak';
+		}
+	}
+	my $wide = $cif_head . "ATOM 1 C CA GLY AB 1.0 2.0 3.0 1 1\nATOM 2 C CA GLY A 1.0 2.0 3.0 1 1\n";
+	my $far  = $cif_head . "ATOM 1 C CA GLY A 1.0 2.0 3.0 1 10000\nATOM 2 C CA GLY A 1.0 2.0 3.0 1 1\n";
+	(my $bad_u = $two_models) =~ s/^1 0\.1$/1 1000.0/m;
+	for my $case ([ $wide, qr/chain id 'AB' has no PDB spelling/ ], [ $far, qr/model 10000 has no PDB spelling/ ],
+	              [ $bad_u, qr/anisotropic displacement '1000\.0' of atom 1 does not fit/ ]) {
+		my ($text, $re) = @$case;
+		eval { Chem::Structure::Parser::_convert_string($text, 1, 1, { model => -1 }) };
+		like($@, $re, 'a field that will not fit ends the conversion');
+		no_leaks_ok { eval { Chem::Structure::Parser::_convert_string($text, 1, 1, { model => -1 }) } }
+			'and leaves nothing behind';
+	}
+	my $bomb = bless {}, 'Bomb';
+	for my $fn ('_convert_file', '_convert_string') {
+		my $sub = \&{"Chem::Structure::Parser::$fn"};
+		my $arg = $fn eq '_convert_file' ? "$data/mini.pdb" : $aniso;
+		no_leaks_ok { eval { $sub->($arg, 0, 1, { model => $bomb }) } }
+			"$fn: an option that dies takes nothing with it";
+		no_leaks_ok { eval { $sub->($arg, 0, 1, { anisou => $bomb }) } }
+			"$fn: nor one the writer reads before the parse";
+	}
+	tie my %keep, 'DyingChains';
+	eval { Chem::Structure::Parser::_convert_string($aniso, 0, 1, { keep => \%keep }) };
+	like($@, qr/keep must be a plain hash reference, not a tied one/, 'a tied keep hash is refused');
+	no_leaks_ok { eval { Chem::Structure::Parser::_convert_string($aniso, 0, 1, { keep => \%keep }) } }
+		'and refusing it leaves nothing behind';
+	no_leaks_ok { eval { Chem::Structure::Parser::_convert_file("$data/no.such.file.pdb", 0, 1, {}) } }
+		'nor does a file that is not there';
+
+	no_leaks_ok { convert("$data/mini.pdb", \my $t, to => 'mmcif') } 'convert() does not leak';
+	no_leaks_ok { convert("$data/mini.cif", \my $t, to => 'pdb') } 'nor the other way';
+	no_leaks_ok { eval { convert(\$wide, \my $t, to => 'pdb') } } 'nor when it dies';
+}
+
 no_leaks_ok { aa3to1('ALA'); aa3to1('NAG'); res1('DA'); res_type('HOH');
               aa1to3('A'); aa1to3('*') }
 	'the residue name lookups do not leak';
@@ -191,6 +250,16 @@ no_leaks_ok { structure_info("$data/empty.cif") } 'nor does an empty one';
 	no_leaks_ok { structure_sequences($info) } 'structure_sequences does not leak';
 	no_leaks_ok { structure_summary($info) }   'structure_summary does not leak';
 	no_leaks_ok { eval { structure_atoms($info, 'Z') } } 'a failed view does not leak';
+	# atoms_flat() croaking with half its list built: the list is mortal, and the
+	# atoms already copied into it go with it
+	my $broken = structure_info("$data/mini.pdb", features => 0);
+	my $c = $broken->{chains}{ $broken->{chain_order}[-1] };
+	push @{ $c->{residues}{ $c->{residue_order}[-1] }{atom_order} }, 'NOPE';
+	no_leaks_ok { eval { structure_atoms($broken) } } 'nor does one that croaks in the XS';
+	# assemble() refusing a parse with an array missing, which it finds before
+	# it has allocated anything of its own
+	no_leaks_ok { eval { Chem::Structure::Parser::_assemble({ res_first => [] }, 1, {}) } }
+		'nor does a refused assembly';
 	no_leaks_ok { is_single_ion($info, 'A'); is_single_ion($info->{chains}{B}) }
 		'is_single_ion does not leak: it reads the hash and takes nothing from it';
 	no_leaks_ok { eval { is_single_ion($info) }; eval { is_single_ion($info, 'Z') } }

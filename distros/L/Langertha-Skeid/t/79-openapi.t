@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -30,7 +31,7 @@ sub config {
   return {
     nodes => [
       { id => 'gpu01', url => 'http://10.0.0.5:8000/v1', model => 'qwen3-32b', api_key_env => 'SKEID_T79_UP' },
-      { id => 'gpu02', url => 'http://10.0.0.6:8000/v1', model => 'llama-3.3-70b' },
+      { id => 'gpu02', trust => 'internal', url => 'http://10.0.0.6:8000/v1', model => 'llama-3.3-70b' },
     ],
     aliases => { 'house-model' => { tiers => [ { model => 'qwen3-32b' } ] } },
     %extra,
@@ -95,7 +96,8 @@ sub all_ops {
   my $ops = all_ops($doc);
   for my $want ('GET /v1/models', 'POST /v1/chat/completions', 'POST /v1/embeddings',
     'POST /v1/audio/transcriptions', 'POST /v1/audio/translations', 'POST /v1/rerank',
-    'POST /rerank', 'POST /v1/messages', 'POST /api/chat', 'POST /api/generate', 'GET /api/tags',
+    'POST /rerank', 'POST /v1/messages', 'POST /api/chat', 'POST /api/generate', 'POST /api/embed',
+    'POST /api/embeddings', 'GET /api/tags',
     'GET /api/ps', 'GET /health', 'GET /openapi.json', 'GET /v1/realtime') {
     ok $ops->{$want}, "$want is documented";
   }
@@ -193,7 +195,8 @@ SKIP: {
   is_deeply [ structural_problems($doc) ], [], 'the admin document is valid in shape';
   my $ops = all_ops($doc);
   ok $ops->{'GET /skeid/nodes'} && $ops->{'POST /skeid/nodes'} && $ops->{'POST /skeid/nodes/{id}/health'}
-    && $ops->{'GET /skeid/usage'} && $ops->{'GET /skeid/config'} && $ops->{'GET /skeid/metrics/nodes'},
+    && $ops->{'GET /skeid/usage'} && $ops->{'GET /skeid/config'} && $ops->{'GET /skeid/metrics/nodes'}
+    && $ops->{'GET /skeid/metrics/keys'},
     'the admin routes are in it';
   ok !grep({ m{/v1/|/api/} } keys %$ops), 'no client route is';
   ok !$ops->{'GET /skeid/registry/snapshot'}, 'the registry snapshot is not there while the registry is off';

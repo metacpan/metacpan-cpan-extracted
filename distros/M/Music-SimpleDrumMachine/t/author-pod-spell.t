@@ -22,6 +22,7 @@ Boggs
 Gene
 Music
 SimpleDrumMachine
+autoplay
 chan
 gene
 iff

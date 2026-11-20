@@ -49,7 +49,9 @@ Mechanism and background: skill `holmgang-core`. These are the locks:
   rules, solutions and the `untrusted` mark never go out. A leak passes every test and voids
   every measurement; check the outgoing request in a test, not the code path.
 - **Simulators touch only their state** — no shell-out, socket or host file. They execute
-  model output; a simulator that delegates to the host runs it for real.
+  model output; a simulator that delegates to the host runs it for real. The one way out is a
+  sandbox handed to it for the run (ADR 0011): a container without network or host mounts,
+  never in loading, lint or tests, and only for a program that knows nothing but the files.
 - **Lint is part of loading.** A case that fails lint does not load. Fix the case or the
   simulator, never loosen lint to make a case load.
 - **Real runs cost GPU time on CitiAI targets** and run from agent-lab, only when the card

@@ -225,6 +225,31 @@ subtest 'the example template prints every placeholder' => sub {
 	}
 };
 
+# Display hands every template the request's CGI::Info and Lingua objects.  The
+# Info and Lingua panels print what they say and are left out, not left blank,
+# when a page has neither, as one rendered from a test or a cache has not.
+subtest 'the example template shows the Info and Lingua panels when it has them' => sub {
+	{
+		package Local::PanelInfo;
+		sub new { return bless {}, shift }
+		sub domain_name { return 'example.test' }
+		sub browser_type { return 'web' }
+		package Local::PanelLingua;
+		sub new { return bless {}, shift }
+		sub country { return 'gb' }
+		sub requested_language { return 'English (United Kingdom)' }
+		sub language_code_alpha2 { return 'en' }
+	}
+
+	my $with = render_example_template({ %chart, info => Local::PanelInfo->new(), lingua => Local::PanelLingua->new() });
+	like($with, qr{<h2>Info</h2>.*?Domain name: example\.test.*?Browser type: web}s, 'the Info panel');
+	like($with, qr{<h2>Lingua</h2>.*?Country: gb.*?Requested language: English \(United Kingdom\).*?Language code: en}s, 'the Lingua panel');
+
+	my $without = render_example_template(\%chart);
+	unlike($without, qr{<h2>(?:Info|Lingua)</h2>}, 'neither panel without the objects');
+	like($without, qr{<h2>Server Metrics</h2>}, 'the rest of the page is unaffected');
+};
+
 # Two requests fill four panels, but ranking an endpoint needs five samples:
 # the slow panel alone must still explain itself, and the other four must not.
 subtest 'a two-request log draws four charts and one placeholder' => sub {

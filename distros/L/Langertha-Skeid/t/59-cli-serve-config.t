@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -77,7 +78,7 @@ my $missing = "$tmp/does/not/exist.yaml";
 # --- A file that vanishes after a good load: the config is kept, and it is said once ---------
 {
   my $file = path($tmp)->child('skeid.yaml');
-  $file->spew("nodes:\n  - id: kept\n    url: http://kept/v1\n");
+  $file->spew("nodes:\n  - id: kept\n    url: http://kept/v1\n    trust: internal\n");
   my $skeid = Langertha::Skeid->new(config_file => "$file");
   is $skeid->list_nodes->[0]{id}, 'kept', 'loaded';
 
@@ -90,7 +91,7 @@ my $missing = "$tmp/does/not/exist.yaml";
   is scalar(grep { /\Q$file\E/ } @warnings), 1, 'the vanished file is reported once, not per request'
     or diag explain \@warnings;
 
-  $file->spew("nodes:\n  - id: back\n    url: http://back/v1\n");
+  $file->spew("nodes:\n  - id: back\n    url: http://back/v1\n    trust: internal\n");
   utime(time + 10, time + 10, "$file");
   $skeid->call_function('nodes.list', {});
   is $skeid->list_nodes->[0]{id}, 'back', 'the file coming back is read again';

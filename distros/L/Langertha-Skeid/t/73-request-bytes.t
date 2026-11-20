@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use utf8;
@@ -82,8 +83,8 @@ my $skeid = Langertha::Skeid->new(
   route_wait_poll_ms => 5,
   store_usage_event  => sub { push @events, $_[1]; return { ok => 1 } },
 );
-$skeid->add_node(id => 'n1', url => "http://127.0.0.1:$upstream_port/v1", model => 'served-model', max_conns => 4);
-$skeid->add_node(id => 'e1', url => "http://127.0.0.1:$upstream_port/v1", model => 'served-embed', max_conns => 4);
+$skeid->add_node(id => 'n1', trust => 'internal', url => "http://127.0.0.1:$upstream_port/v1", model => 'served-model', max_conns => 4);
+$skeid->add_node(id => 'e1', trust => 'internal', url => "http://127.0.0.1:$upstream_port/v1", model => 'served-embed', max_conns => 4);
 $skeid->set_model_alias('house',       { tiers => [{ model => 'served-model' }] });
 $skeid->set_model_alias('house-embed', { tiers => [{ model => 'served-embed' }] });
 

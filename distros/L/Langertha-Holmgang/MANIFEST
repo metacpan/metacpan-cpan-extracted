@@ -33,6 +33,9 @@ docs/adr/0007-case-dsl.md
 docs/adr/0008-evaluation-rates-weights-tiers-verdicts.md
 docs/adr/0009-command-line.md
 docs/adr/0010-shipped-example-suites.md
+docs/adr/0011-sandbox-for-real-programs.md
+docs/adr/0012-closed-world-on-the-own-network.md
+docs/adr/0013-wget-answers-from-curl-observations.md
 lib/Langertha/Holmgang.pm
 lib/Langertha/Holmgang/Batch.pm
 lib/Langertha/Holmgang/CLI.pm
@@ -50,6 +53,7 @@ lib/Langertha/Holmgang/Report.pm
 lib/Langertha/Holmgang/Role/AnswerWorld.pm
 lib/Langertha/Holmgang/Role/Simulator.pm
 lib/Langertha/Holmgang/Runner.pm
+lib/Langertha/Holmgang/Sandbox/Docker.pm
 lib/Langertha/Holmgang/Shell.pm
 lib/Langertha/Holmgang/Shell/Filter.pm
 lib/Langertha/Holmgang/Sim/Denken.pm
@@ -167,6 +171,7 @@ misc/agent-context/.claude/skills/perl-ai-langertha/SKILL.md
 misc/agent-context/.claude/skills/perl-io-async-future/SKILL.md
 misc/agent-context/.claude/skills/perl-release-dist-ini/SKILL.md
 misc/agent-context/CLAUDE.md
+share/sandbox/Dockerfile
 share/suites/demo-beacons/suite.pl
 share/suites/demo-haystack/cases/quota.yaml
 share/suites/demo-haystack/suite.yaml
@@ -205,6 +210,7 @@ t/dsl/state_plain.t
 t/dsl/utf8.t
 t/error.t
 t/evaluation/render.t
+t/evaluation/scenarios.t
 t/evaluation/topics.t
 t/evaluation/verdicts.t
 t/excerpt.t
@@ -235,6 +241,8 @@ t/report/build.t
 t/report/cai_platform.t
 t/report/merge.t
 t/runner.t
+t/runner_sandbox.t
+t/sandbox_docker.t
 t/share_suites.t
 t/sim/backup.t
 t/sim/denken.t
@@ -249,13 +257,16 @@ t/sim/kubernetes.t
 t/sim/kubernetes_adv.t
 t/sim/kueche.t
 t/sim/linux.t
+t/sim/linux_closed_world.t
 t/sim/linux_contract.t
 t/sim/linux_haertung.t
+t/sim/linux_journald_meldungen.t
 t/sim/linux_ls_root.t
 t/sim/linux_messung.t
 t/sim/linux_mv_many.t
 t/sim/linux_read_only.t
 t/sim/linux_reload_config.t
+t/sim/linux_sandbox.t
 t/sim/linux_server.t
 t/sim/linux_shell.t
 t/sim/linux_timer.t
@@ -264,6 +275,7 @@ t/sim/linux_which.t
 t/sim/logrotate.t
 t/sim/mariadb.t
 t/sim/monitoring.t
+t/sim/monitoring_api.t
 t/sim/nft.t
 t/sim/nginx.t
 t/sim/pki.t
@@ -272,6 +284,7 @@ t/sim/pruefwege.t
 t/sim/redis.t
 t/sim/roost.t
 t/sim/routeros.t
+t/sim/routeros_pool_used.t
 t/sim/schichtfehler.t
 t/sim/sed_delim.t
 t/sim/sehen.t
@@ -293,3 +306,4 @@ t/unknown_filter.t
 t/vision_check.t
 t/world.t
 t/world_sim_fault.t
+t/world_wget.t

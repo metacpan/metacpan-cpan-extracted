@@ -30,7 +30,11 @@ CREATE TABLE IF NOT EXISTS usage_events (
   cost_cache_read_usd DOUBLE PRECISION,
   cost_cache_write_usd DOUBLE PRECISION,
   error_type TEXT,
-  error_message TEXT
+  error_message TEXT,
+  finish_reason TEXT,
+  ttft_ms BIGINT,
+  correlation_id TEXT,
+  routed_model TEXT
 );
 
 CREATE INDEX IF NOT EXISTS usage_events_created_at_idx ON usage_events(created_at);

@@ -1,5 +1,5 @@
 package Langertha::Skeid::Protocol::Refusal;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 # ABSTRACT: A translator's deliberate refusal of a request, with a message for the client
 use strict;
 use warnings;
@@ -28,7 +28,7 @@ Langertha::Skeid::Protocol::Refusal - A translator's deliberate refusal of a req
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 DESCRIPTION
 
@@ -52,7 +52,7 @@ The client-facing message of a refusal.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-skeid/issues>.
 
 =head2 IRC
@@ -65,11 +65,11 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

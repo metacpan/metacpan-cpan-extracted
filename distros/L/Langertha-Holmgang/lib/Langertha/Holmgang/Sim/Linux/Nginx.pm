@@ -8,7 +8,7 @@ use utf8;
 use Digest::SHA ();
 use JSON::MaybeXS ();
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 my $JSON = JSON::MaybeXS->new( utf8 => 1, canonical => 1 );
@@ -1149,7 +1149,7 @@ Langertha::Holmgang::Sim::Linux::Nginx - nginx on a simulated Linux server: chec
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

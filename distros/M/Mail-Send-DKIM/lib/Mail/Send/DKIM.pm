@@ -10,9 +10,10 @@ use warnings;
 
 use Mail::DKIM::Signer;
 use Params::Get;
+use Sys::Syslog ();
 use Object::Configure;
 
-use version; our $VERSION = version->declare('0.001.0');
+use version; our $VERSION = version->declare('0.002.0');
 
 =head1 NAME
 
@@ -20,7 +21,7 @@ Mail::Send::DKIM - sign a message with DKIM and hand it to sendmail
 
 =head1 VERSION
 
-0.001.0
+0.002.0
 
 =head1 SYNOPSIS
 
@@ -130,6 +131,9 @@ from any other domain is left alone.
 =item C<keydir>
 
 Where the private keys are.  Defaults to C<$ENV{DKIM_KEYDIR}>, or F<~/dkim>.
+The value is used as it stands: a relative path is taken from the working
+directory, and C<~> is not expanded - the shell does that, and only when the
+assignment is written unquoted.
 
 =item C<selector>
 
@@ -267,6 +271,105 @@ sub send
 	my $status = $? >> 8;
 
 	return $status || 1;
+}
+
+=head2 B<log_send> $message, @arguments
+
+Records in syslog, under the identity C<mail-dkim> and the C<mail> facility,
+the sender, the recipients and the subject of a message that has been sent.
+The arguments are those given to B<send>.  The sender is the address after
+C<-f> when there is one, and the address in the C<From:> header otherwise.  The
+recipients are the arguments that are not options and, when C<-t> was given,
+the addresses in the C<To:>, C<Cc:> and C<Bcc:> headers too.  A value that is
+missing is logged as C<->, and control characters in the subject are replaced
+by spaces so that a message cannot forge a log line.
+
+Returns true when the line was written.  Logging never stands between a message
+and its recipient: a syslog that cannot be reached is a warning, and a false
+return.
+
+=cut
+
+sub log_send
+{
+	my ($self, $message, @args) = @_;
+
+	my $sender;
+	my @recipients;
+	my $tflag;
+	my $skip;	# the argument after an option that takes a value
+	foreach my $arg (@args) {
+		if($skip) {
+			$sender = $arg if($skip eq 'f');
+			$skip = 0;
+			next;
+		}
+		if($arg =~ /\A-f(.+)/s) {
+			$sender = $1;
+		} elsif($arg eq '-f') {
+			$skip = 'f';
+		} elsif($arg =~ /\A-[BboprRVNLXAqFC]\z/) {
+			$skip = 'x';
+		} elsif($arg eq '--') {
+			next;
+		} elsif($arg =~ /\A-/) {
+			$tflag = 1 if($arg =~ /\A-[A-Za-z]*t/);
+		} else {
+			push(@recipients, $arg);
+		}
+	}
+	$sender //= _addresses(_header($message, 'From'));
+	push(@recipients, map { _addresses(_header($message, $_)) } qw(To Cc Bcc)) if($tflag);
+
+	my $subject = _header($message, 'Subject');
+	$subject = '-' unless(defined($subject) && length($subject));
+	$subject =~ s/[[:cntrl:]]/ /g;
+
+	my $line = sprintf('sender=%s recipient=%s subject=%s',
+		$sender || '-', @recipients ? join(',', @recipients) : '-', $subject);
+	$line =~ s/[[:cntrl:]]/ /g;
+
+	my $ok = eval {
+		Sys::Syslog::openlog('mail-dkim', 'pid,ndelay', 'mail');
+		Sys::Syslog::syslog('info', '%s', $line);
+		Sys::Syslog::closelog();
+		1;
+	};
+	warn "Mail::Send::DKIM: cannot write to syslog: $@" unless($ok);
+
+	return $ok ? 1 : 0;
+}
+
+# The unfolded value of the first header of that name, or undef.
+sub _header
+{
+	my ($message, $name) = @_;
+
+	my ($head) = $message =~ /\A(.*?)\r?\n\r?\n/s;
+	$head = $message unless(defined($head));
+	$head =~ s/\r?\n[ \t]+/ /g;
+
+	return $head =~ /^\Q$name\E:[ \t]*(.*?)\s*$/mi ? $1 : undef;
+}
+
+# The addresses in a header value: the one in angle brackets when there is
+# one, else the bare address, for each of the comma separated items.
+sub _addresses
+{
+	my $value = shift;
+
+	return unless(defined($value));
+
+	my @found;
+	foreach my $item (split(/,(?=(?:[^"]*"[^"]*")*[^"]*\z)/, $value)) {
+		if($item =~ /<([^>]*)>/) {
+			push(@found, $1);
+		} elsif($item =~ /([^\s<>()"]+\@[^\s<>()"]+)/) {
+			push(@found, $1);
+		}
+	}
+
+	return wantarray ? @found : $found[0];
 }
 
 #

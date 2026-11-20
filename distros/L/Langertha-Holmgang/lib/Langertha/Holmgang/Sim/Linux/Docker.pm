@@ -14,7 +14,7 @@ use JSON::PP ();
 my $OUT_JSON = JSON::PP->new->canonical->indent->indent_length(4)->space_after;
 use YAML::XS ();
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 my $JSON = JSON::MaybeXS->new( utf8 => 0, canonical => 1, allow_nonref => 1 );
@@ -1814,7 +1814,7 @@ Langertha::Holmgang::Sim::Linux::Docker - Docker Engine with Compose v2 on a sim
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

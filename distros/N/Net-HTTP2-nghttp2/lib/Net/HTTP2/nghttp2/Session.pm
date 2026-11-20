@@ -431,6 +431,10 @@ Defer production until the stream is resumed or C<submit_data()> is called.
 
 =back
 
+C<$max_length> is what the next DATA frame has room for. Data longer than
+that is not lost: the rest is sent first, in as many frames as it takes,
+before the callback is called again, and the EOF waits for the last of it.
+
 This is required for protocols that keep the stream open for bidirectional
 exchange, such as WebSocket over HTTP/2 (RFC 8441 extended CONNECT).
 
@@ -494,6 +498,10 @@ HEADERS block. The third value has no effect unless EOF is true.
 Defer production until the stream is resumed or C<submit_data()> is called.
 
 =back
+
+C<$max_length> is what the next DATA frame has room for. Data longer than
+that is not lost: the rest is sent first, in as many frames as it takes,
+before the callback is called again, and the EOF waits for the last of it.
 
 =back
 

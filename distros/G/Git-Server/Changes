@@ -1,5 +1,15 @@
 Revision History for Git::Server
 
+0.048  2026-11-17 12:00:00
+ - git-deploy enhancements:
+ * Optimize to avoid double slapping server.
+ * Fix ProcTitle for initial pre-flight check.
+ * Preserve local commits if not conflicting.
+ * Allow pre-deployed changes gracefully.
+ * Handle pre-deployed changes gracefully.
+ - git-server enhancements:
+ * Support: git-server {-v|--version}
+
 0.047  2026-07-01 14:00:00
  - Default webhook for only push operations.
  - Default logfile for only push operations.

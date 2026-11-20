@@ -1,0 +1,10 @@
+# Read by [PrereqsFile] in dist.ini, for prerequisites [AutoPrereqs] must not
+# decide.
+#
+# XML::LibXML is recommended and not required.  Only Configd::Language::ossec
+# loads it, and a host installs it from its distribution: see metamerge.yml.
+# Required, it would make cpanm build it from CPAN on every host that installs
+# Configd, OSSEC or not.
+runtime:
+  recommends:
+    XML::LibXML: '0'

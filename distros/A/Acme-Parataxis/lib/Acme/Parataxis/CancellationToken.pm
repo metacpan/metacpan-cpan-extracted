@@ -2,7 +2,7 @@ use v5.40;
 no warnings 'experimental::class', 'recursion';
 use feature 'class';
 #
-class Acme::Parataxis::CancellationToken v0.1.4 {
+class Acme::Parataxis::CancellationToken v0.1.5 {
     use Acme::Parataxis;
     use Carp        qw[croak];
     use Time::HiRes qw[time];

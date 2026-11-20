@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Simple 16th-note-phrase Drummer
 
-our $VERSION = '0.0702';
+our $VERSION = '0.0802';
 
 use v5.36;
 use feature 'try';
@@ -247,6 +247,13 @@ has verbose => (
     default => sub { 0 },
 );
 
+
+has virtual => ( # a virtual port is sometimes needed on the mac
+    is      => 'ro',
+    isa     => sub { croak "$_[0] is not a boolean" unless $_[0] =~ /^[01]$/ },
+    default => sub { 1 },
+);
+
 has _queue => (
     is      => 'rw',
     default => sub { [] },
@@ -259,10 +266,12 @@ has _midi_out => (
 sub _build__midi_out {
     my ($self) = @_;
     my $midi_out = RtMidiOut->new;
-    try { # this will die on windows but is needed on the mac
-        $midi_out->open_virtual_port('RtMidiOut');
+    if ($self->virtual) {
+        try { # this will die on windows but is needed on the mac
+            $midi_out->open_virtual_port('RtMidiOut');
+        }
+        catch ($e) {}
     }
-    catch ($e) {}
     my $name = $self->port_name;
     try {
         $midi_out->open_port_by_name(qr/\Q$name/i);
@@ -311,30 +320,22 @@ for my $is (keys %attrs) {
     }
 }
 
-has _loop => (
+
+has loop => (
     is      => 'ro',
     default => sub { IO::Async::Loop->new },
 );
 
 
+has autoplay => (
+    is      => 'ro',
+    isa     => sub { croak "$_[0] is not a boolean" unless $_[0] =~ /^[01]$/ },
+    default => sub { 1 },
+);
+
+
 sub BUILD {
     my ($self, $args) = @_;
-
-    $SIG{INT} = sub {
-        say "\nStop" if $self->verbose;
-        try {
-            $self->_midi_out->stop;
-            $self->_midi_out->panic;
-        }
-        catch ($e) {
-            warn "Can't halt the MIDI out device: $e\n";
-        }
-        if ($self->save) {
-            $self->score->write_score($self->save);
-            say 'Saved score to ' . $self->save if $self->verbose;
-        }
-        exit;
-    };
 
     # any drums to add?
     my $n = keys $self->drums->%*;
@@ -343,69 +344,115 @@ sub BUILD {
         $self->drums->{ $drum->{drum} } = { num => $drum->{num}, chan => $chan, pat  => [] };
     }
 
-    my $timer = IO::Async::Timer::Periodic->new(
-        interval => $self->_interval,
-        on_tick  => sub {
-            $self->_midi_out->clock; # send a clock tick
-            $self->_ticks($self->_ticks + 1);
+    $self->play if $self->autoplay;
+}
 
-            if ($self->_ticks % $self->_nth == 0) {
-                my $phrase = $self->beats * $self->bars; # steps in a phrase
-                my $pos    = $self->_beat_count % $phrase;
-                # ugly gymnastics - ugh
-                if (($self->filling || (ref($self->next_part) eq 'ARRAY' && $self->next_part->[ $self->_part_inc % $self->next_part->@* ] =~ /fill/))
-                    && $self->bars > 1
-                    && $pos == $phrase - $self->beats # the last bar of the phrase
-                ) {
-                    $self->_adjust_drums(1); # fill!
-                    $self->_filled($self->_filled + 1);
-                }
-                if ($pos == 0) {
-                    $self->_adjust_drums(0); # normal part
-                }
-                my @hits; # for the score, if saving
-                for my $drum (keys $self->drums->%*) { # fill the queue
-                    if ($self->drums->{$drum}{pat}[ $self->_beat_count % scalar($self->drums->{$drum}{pat}->@*) ]) {
-                        push $self->_queue->@*, { drum => $drum, velocity => $self->velocity };
-                        push @hits, $self->drums->{$drum}{num} if $self->save;
-                    }
-                }
-                if ($self->save) {
-                    $self->score->Volume($self->velocity);
-                    if (@hits) {
-                        $self->score->n('sn', @hits); # chord = simultaneous drum hits
-                    }
-                    else {
-                        $self->score->r('sn');
-                    }
-                }
-                for my $drum ($self->_queue->@*) { # play the queue
-                    $self->_midi_out->note_on(
-                        $self->drums->{ $drum->{drum} }{chan},
-                        $self->drums->{ $drum->{drum} }{num},
-                        $drum->{velocity}
-                    );
-                }
-                $self->_beat_count($self->_beat_count + 1);
-            }
-            else { # drain the queue
-                while (my $drum = pop $self->_queue->@*) {
-                    $self->_midi_out->note_off(
-                        $self->drums->{ $drum->{drum} }{chan},
-                        $self->drums->{ $drum->{drum} }{num},
-                        0
-                    );
-                }
-            }
-            if ($self->_ticks % ($self->ppqn * $self->divisions) == 0) {
-                $self->_bar_count($self->_bar_count + 1);
-            }
+
+sub play {
+    my ($self) = @_;
+
+    my $timer = IO::Async::Timer::Periodic->new(
+        interval   => $self->_interval,
+        reschedule => 'hard', # anchor to a fixed schedule
+        on_tick    => sub {
+            $self->clock; # send a clock tick
+            $self->tick;
         },
     );
     $timer->start;
 
-    $self->_loop->add($timer);
-    $self->_loop->run;
+    $self->loop->watch_signal(INT => sub {
+        say "\nStop" if $self->verbose;
+        $timer->stop;
+        $self->stop;
+        $self->loop->stop;
+    });
+
+    $self->loop->add($timer);
+    $self->loop->run;
+}
+
+
+sub tick {
+    my ($self) = @_;
+
+    my $t = $self->_ticks; # zero-based, so the first tick is a step boundary
+    $self->_ticks($t + 1);
+
+    if ($t % $self->_nth == 0) {
+        my $phrase = $self->beats * $self->bars; # steps in a phrase
+        my $pos    = $self->_beat_count % $phrase;
+        # ugly gymnastics - ugh
+        if (($self->filling || (ref($self->next_part) eq 'ARRAY' && $self->next_part->[ $self->_part_inc % $self->next_part->@* ] =~ /fill/))
+            && $self->bars > 1
+            && $pos == $phrase - $self->beats # the last bar of the phrase
+        ) {
+            $self->_adjust_drums(1); # fill!
+            $self->_filled($self->_filled + 1);
+        }
+        if ($pos == 0) {
+            $self->_adjust_drums(0); # normal part
+        }
+        my @hits; # for the score, if saving
+        for my $drum (keys $self->drums->%*) { # fill the queue
+            if ($self->drums->{$drum}{pat}[ $self->_beat_count % scalar($self->drums->{$drum}{pat}->@*) ]) {
+                push $self->_queue->@*, { drum => $drum, velocity => $self->velocity };
+                push @hits, $self->drums->{$drum}{num} if $self->save;
+            }
+        }
+        if ($self->save) {
+            $self->score->Volume($self->velocity);
+            if (@hits) {
+                $self->score->n('sn', @hits); # chord = simultaneous drum hits
+            }
+            else {
+                $self->score->r('sn');
+            }
+        }
+        for my $drum ($self->_queue->@*) { # play the queue
+            $self->_midi_out->note_on(
+                $self->drums->{ $drum->{drum} }{chan},
+                $self->drums->{ $drum->{drum} }{num},
+                $drum->{velocity}
+            );
+        }
+        $self->_beat_count($self->_beat_count + 1);
+    }
+    else { # drain the queue
+        while (my $drum = pop $self->_queue->@*) {
+            $self->_midi_out->note_off(
+                $self->drums->{ $drum->{drum} }{chan},
+                $self->drums->{ $drum->{drum} }{num},
+                0
+            );
+        }
+    }
+    if ($t % ($self->ppqn * $self->divisions) == 0) {
+        $self->_bar_count($self->_bar_count + 1);
+    }
+}
+
+
+sub clock {
+    my ($self) = @_;
+    $self->_midi_out->clock;
+}
+
+
+sub stop {
+    my ($self) = @_;
+    my %chans = map { $_->{chan} => 1 } grep { $_->{chan} <= 15 } values $self->drums->%*; # skip the bogus channels
+    try {
+        $self->_midi_out->cc($_, 123, 0) for sort { $a <=> $b } keys %chans; # all notes off
+        $self->_midi_out->stop;
+    }
+    catch ($e) {
+        warn "Can't halt the MIDI out device: $e\n";
+    }
+    if ($self->save) {
+        $self->score->write_score($self->save);
+        say 'Saved score to ' . $self->save if $self->verbose;
+    }
 }
 
 sub _adjust_cymbals($self) {
@@ -562,7 +609,7 @@ Music::SimpleDrumMachine - Simple 16th-note-phrase Drummer
 
 =head1 VERSION
 
-version 0.0702
+version 0.0802
 
 =head1 SYNOPSIS
 
@@ -621,8 +668,9 @@ version 0.0702
 =head1 DESCRIPTION
 
 C<Music::SimpleDrumMachine> is a simple 16th-note-phrase drummer. By
-invoking this module, your MIDI device will begin playing in
-real-time.
+default, invoking this module, your MIDI device will begin playing in
+real-time. If C<autoplay> is set to C<0>, and an L<IO::Async::Loop>
+object is given, this module waits for the C<loop> to start.
 
 * Triplets are not supported. Boo!
 
@@ -912,6 +960,36 @@ Show progress.
 
 Default: C<0>
 
+=head2 virtual
+
+  $virtual = $dm->virtual;
+
+Open a virtual port, which is sometimes needed on the mac, but will
+make Windows crash, apparently.
+
+Default: C<0>
+
+=head2 loop
+
+  $loop = $dm->loop;
+
+The L<IO::Async::Loop> to use. Pass in your own to share one event
+loop with other timers and signal handlers.
+
+Default: C<IO::Async::Loop-E<gt>new>
+
+=head2 autoplay
+
+  $autoplay = $dm->autoplay;
+
+Start playing (and block in the event loop) as soon as the object is
+constructed.
+
+Set this to C<0> to get the object back from B<new> and drive it
+yourself: call L</tick> from your own timer, or call L</play>.
+
+Default: C<1>
+
 =head1 METHODS
 
 =head2 new
@@ -920,7 +998,49 @@ Default: C<0>
 
 Create a new C<Music::SimpleDrumMachine> object.
 
+By default this also starts playing and blocks until interrupted. Pass
+C<autoplay =E<gt> 0> to get the object back and drive it with L</tick>.
+
 =for Pod::Coverage BUILD
+
+=head2 play
+
+  $dm->play;
+
+Standalone mode. Start a timer on the B<loop> that sends MIDI clock
+and calls L</tick>, install a C<SIGINT> handler that calls L</stop>
+and stops the loop, and run the loop. This blocks until interrupted.
+
+This is what B<new> does by default (see L</autoplay>).
+
+=head2 tick
+
+  $dm->tick;
+
+Advance the drum machine by one clock tick (B<ppqn> ticks per
+quarter-note). Queue and play any drum hits that fall on this tick and
+release the previous ones.
+
+Call this once per tick from your own timer when B<autoplay> is C<0>.
+The very first call plays the first step.
+
+This does B<not> send MIDI clock. See L</clock>.
+
+=head2 clock
+
+  $dm->clock;
+
+Send a MIDI clock message to the drum port. MIDI clock is always 24
+pulses per quarter-note, regardless of B<ppqn>.
+
+=head2 stop
+
+  $dm->stop;
+
+Silence the drums: send "all notes off" on every drum channel and a
+MIDI stop message, and write the score if B<save> is set.
+
+This does not exit or stop the event loop. That is up to the caller.
 
 =head2 write_score
 
@@ -961,6 +1081,8 @@ L<MIDI::Util>
 L<Moo>
 
 L<Music::Duration::Partition>
+
+=cut
 
 =head1 AUTHOR
 

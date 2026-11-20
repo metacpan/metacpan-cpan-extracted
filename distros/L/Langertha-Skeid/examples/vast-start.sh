@@ -42,6 +42,7 @@ nodes:
     engine: vllm
     weight: 1
     max_conns: ${MAX_CONNS}
+    trust: internal
 YAML
   echo "[vast-start] generated config: ${SKEID_CONFIG}"
 fi

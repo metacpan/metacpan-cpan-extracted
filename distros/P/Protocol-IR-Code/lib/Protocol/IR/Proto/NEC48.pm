@@ -2,8 +2,9 @@ package Protocol::IR::Proto::NEC48;
 use strict;
 use warnings;
 
-our $VERSION = '1.3';
+our $VERSION = '1.5';
 use Protocol::IR::Code;
+use Math::BigInt;
 
 # Protocol::IR::Proto::NEC48 is the base class for the 48-bit NEC family
 # (48-NEC1/48-NEC2), from the DecodeIR definitions:
@@ -35,7 +36,7 @@ sub _parse_int {
         # 48-bit hex strings exceed the 32-bit range that triggers Perl's
         # "portable" warning; the modules here handle them by design.
         no warnings 'portable';
-        return hex($val);
+        return Math::BigInt->from_hex($val);
     }
     return $val + 0;
 }
@@ -66,8 +67,8 @@ sub _encode_data {
     my $s = $subaddr & 0xFF;
     my $f = $cmd & 0xFF;
     my $e = $ext & 0xFF;
-    return ($d << 40) | ($s << 32) | ($f << 24) |
-           (((~$f) & 0xFF) << 16) | ($e << 8) | ((~$e) & 0xFF);
+    return (Math::BigInt->new($d) << 40) | (Math::BigInt->new($s) << 32) | (Math::BigInt->new($f) << 24) |
+           (Math::BigInt->new((~$f) & 0xFF) << 16) | (Math::BigInt->new($e) << 8) | Math::BigInt->new((~$e) & 0xFF);
 }
 
 sub decode_raw {
@@ -77,9 +78,9 @@ sub decode_raw {
     return Protocol::IR::Code->new(
         protocol   => $class->_protocol_name,
         bits       => 48,
-        address    => ($val >> 40) & 0xFF,
-        subaddress => ($val >> 32) & 0xFF,
-        command    => ($val >> 24) & 0xFF,
+        address    => int(($val >> 40) & 0xFF),
+        subaddress => int(($val >> 32) & 0xFF),
+        command    => int(($val >> 24) & 0xFF),
         data       => $val,
     );
 }
@@ -141,8 +142,8 @@ sub decode_timing {
                         ($stop_space == 0 || $stop_space >= 3000);
 
     my ($b0, $b1, $b2, $b3, $b4, $b5) = @bytes;
-    my $data = ($b0 << 40) | ($b1 << 32) | ($b2 << 24) |
-               ($b3 << 16) | ($b4 << 8) | $b5;
+    my $data = (Math::BigInt->new($b0) << 40) | (Math::BigInt->new($b1) << 32) | (Math::BigInt->new($b2) << 24) |
+               (Math::BigInt->new($b3) << 16) | (Math::BigInt->new($b4) << 8) | Math::BigInt->new($b5);
 
     return Protocol::IR::Code->new(
         protocol   => $class->_protocol_name,
@@ -211,7 +212,7 @@ Protocol::IR::Proto::NEC48 - 48-NEC1 protocol handler (48-bit NEC family base)
 
 =head1 VERSION
 
-version 1.3
+version 1.5
 
 =head1 SYNOPSIS
 

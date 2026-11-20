@@ -2,6 +2,18 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 3.3.2 are described by their release commits.
 
+## 3.17.0 - 2026-11-20
+
+### Features
+
+- Re-pin the spec to 2026.11.20: the network, service, company and abuse members ([`d23986e`](https://github.com/vpndetection-io/sdk-perl/commit/d23986ef048f463e8e4f770f7ff9f9ec4f47192e))
+- Read the network, service, company and abuse members of an answer ([`8f5349b`](https://github.com/vpndetection-io/sdk-perl/commit/8f5349b91dfd5a7e9a05e50eddf62c9ca35fa6aa))
+
+### Fixes
+
+- Cache a spent trial's or a reached cap's answer for a minute at most ([`3616cfd`](https://github.com/vpndetection-io/sdk-perl/commit/3616cfd6dadfcc8fb7cba78585ce7e0a693a6a02))
+- Describe the free plan's trial without a count or a period ([`6442a10`](https://github.com/vpndetection-io/sdk-perl/commit/6442a10b4f3aa6e5ab702dafccf2e52804143480))
+
 ## 3.16.1 - 2026-11-19
 
 ### Fixes

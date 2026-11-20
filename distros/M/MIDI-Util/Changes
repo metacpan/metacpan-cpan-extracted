@@ -1,5 +1,14 @@
 Revision history for MIDI-Util
 
+0.1312 2026-11-19 14:43:36
+    - Improve tests.
+
+0.1311 2026-11-19 14:32:23
+    - Add the `remove_notes()` function.
+
+0.1310 2026-11-19 10:23:32
+    - Export the TICKS constant.
+
 0.1309 2026-09-02 14:23:36
     - Fix the dependencies!
 

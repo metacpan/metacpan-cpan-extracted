@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -49,7 +50,7 @@ my $skeid = Langertha::Skeid->new(
   route_wait_poll_ms => 5,
   store_usage_event  => sub { push @events, $_[1]; return { ok => 1 } },
 );
-$skeid->add_node(id => 'n1', url => "http://127.0.0.1:$upstream_port/v1", model => 'm1', max_conns => 4);
+$skeid->add_node(id => 'n1', trust => 'internal', url => "http://127.0.0.1:$upstream_port/v1", model => 'm1', max_conns => 4);
 
 my $proxy = Langertha::Skeid::Proxy->build_app(skeid => $skeid);
 $proxy->log->level('fatal');
@@ -163,7 +164,7 @@ sub sse_events {
   my $single_port = $single_daemon->ports->[0];
 
   my $sskeid = Langertha::Skeid->new(route_wait_poll_ms => 5);
-  $sskeid->add_node(id => 'sn1', url => "http://127.0.0.1:$single_port/v1", model => 'm1', max_conns => 2);
+  $sskeid->add_node(id => 'sn1', trust => 'internal', url => "http://127.0.0.1:$single_port/v1", model => 'm1', max_conns => 2);
   my $sproxy = Langertha::Skeid::Proxy->build_app(skeid => $sskeid);
   $sproxy->log->level('fatal');
   my $spd = Mojo::Server::Daemon->new(app => $sproxy, listen => ['http://127.0.0.1'], silent => 1);
@@ -251,7 +252,7 @@ sub sse_events {
   my $split_port = $split_daemon->ports->[0];
 
   my $pskeid = Langertha::Skeid->new(route_wait_poll_ms => 5);
-  $pskeid->add_node(id => 'pn1', url => "http://127.0.0.1:$split_port/v1", model => 'm1', max_conns => 2);
+  $pskeid->add_node(id => 'pn1', trust => 'internal', url => "http://127.0.0.1:$split_port/v1", model => 'm1', max_conns => 2);
   my $pproxy = Langertha::Skeid::Proxy->build_app(skeid => $pskeid);
   $pproxy->log->level('fatal');
   my $ppd = Mojo::Server::Daemon->new(app => $pproxy, listen => ['http://127.0.0.1'], silent => 1);
@@ -329,7 +330,7 @@ sub sse_events {
   my $mixed_port = $mixed_daemon->ports->[0];
 
   my $mskeid = Langertha::Skeid->new(route_wait_poll_ms => 5);
-  $mskeid->add_node(id => 'mn1', url => "http://127.0.0.1:$mixed_port/v1", model => 'm1', max_conns => 2);
+  $mskeid->add_node(id => 'mn1', trust => 'internal', url => "http://127.0.0.1:$mixed_port/v1", model => 'm1', max_conns => 2);
   my $mproxy = Langertha::Skeid::Proxy->build_app(skeid => $mskeid);
   $mproxy->log->level('fatal');
   my $mpd = Mojo::Server::Daemon->new(app => $mproxy, listen => ['http://127.0.0.1'], silent => 1);
@@ -414,7 +415,7 @@ sub sse_events {
   my $parallel_port = $parallel_daemon->ports->[0];
 
   my $rlskeid = Langertha::Skeid->new(route_wait_poll_ms => 5);
-  $rlskeid->add_node(id => 'rln1', url => "http://127.0.0.1:$parallel_port/v1", model => 'm1', max_conns => 2);
+  $rlskeid->add_node(id => 'rln1', trust => 'internal', url => "http://127.0.0.1:$parallel_port/v1", model => 'm1', max_conns => 2);
   my $rlproxy = Langertha::Skeid::Proxy->build_app(skeid => $rlskeid);
   $rlproxy->log->level('fatal');
   my $rlpd = Mojo::Server::Daemon->new(app => $rlproxy, listen => ['http://127.0.0.1'], silent => 1);
@@ -562,7 +563,7 @@ sub sse_events {
   my $len_port = $len_daemon->ports->[0];
 
   my $skeid3 = Langertha::Skeid->new(route_wait_poll_ms => 5);
-  $skeid3->add_node(id => 'len1', url => "http://127.0.0.1:$len_port/v1", model => 'm1', max_conns => 2);
+  $skeid3->add_node(id => 'len1', trust => 'internal', url => "http://127.0.0.1:$len_port/v1", model => 'm1', max_conns => 2);
   my $proxy3 = Langertha::Skeid::Proxy->build_app(skeid => $skeid3);
   $proxy3->log->level('fatal');
   my $pd3 = Mojo::Server::Daemon->new(app => $proxy3, listen => ['http://127.0.0.1'], silent => 1);
@@ -617,7 +618,7 @@ sub sse_events {
   my $flaky_port = $flaky_daemon->ports->[0];
 
   my $skeid2 = Langertha::Skeid->new(route_wait_poll_ms => 5);
-  $skeid2->add_node(id => 'f1', url => "http://127.0.0.1:$flaky_port/v1", model => 'm1', max_conns => 2);
+  $skeid2->add_node(id => 'f1', trust => 'internal', url => "http://127.0.0.1:$flaky_port/v1", model => 'm1', max_conns => 2);
   my $proxy2 = Langertha::Skeid::Proxy->build_app(skeid => $skeid2);
   $proxy2->log->level('fatal');
   my $pd2 = Mojo::Server::Daemon->new(app => $proxy2, listen => ['http://127.0.0.1'], silent => 1);

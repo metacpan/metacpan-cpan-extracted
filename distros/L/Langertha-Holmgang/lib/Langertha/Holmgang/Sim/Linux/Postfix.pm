@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 sub _lx { 'Langertha::Holmgang::Sim::Linux' }
@@ -332,7 +332,7 @@ Langertha::Holmgang::Sim::Linux::Postfix - Postfix on a simulated Linux server â
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

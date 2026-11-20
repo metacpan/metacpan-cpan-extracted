@@ -72,7 +72,7 @@ Readonly::Hash my %MANDATORY_OP_SQL => (
 	contains => 'LIKE',
 );
 
-use version; our $VERSION = version->declare('0.011.3');
+use version; our $VERSION = version->declare('0.011.4');
 
 # Package-level cache for threads availability.  undef = not yet checked;
 # 1 = available; 0 = not available.  Checked lazily on the first parallel
@@ -125,7 +125,7 @@ Database::Join - Read-only combined view across two or more Database::Abstractio
 
 =head1 VERSION
 
-Version 0.011.3
+Version 0.011.4
 
 =head1 SYNOPSIS
 
@@ -4349,8 +4349,11 @@ sub _sqlite_join :Protected {
 	if (defined $create_table) {
 		my $mat_sql = 'SELECT ' . join(', ', @selects)
 		            . ' FROM ' . $from . $join_sql . $where_sql;
-		$tmpdbh->do('DROP TABLE IF EXISTS ' . _sql_quote_identifier($create_table));
-		$tmpdbh->do('CREATE TABLE ' . _sql_quote_identifier($create_table)
+		# Qualify with main: an unqualified name is looked up in the attached
+		# databases too, so the DROP deleted an attached inner join's own
+		# _dj_result (ext0._dj_result) before the SELECT below read it.
+		$tmpdbh->do('DROP TABLE IF EXISTS main.' . _sql_quote_identifier($create_table));
+		$tmpdbh->do('CREATE TABLE main.' . _sql_quote_identifier($create_table)
 		          . ' AS ' . $mat_sql,
 		          undef, @bind_vals);
 		return;

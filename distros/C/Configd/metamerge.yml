@@ -1,0 +1,15 @@
+# Read by [MetaMergeFile] in dist.ini, which merges it into META.json.
+#
+# x_system_packages names each thing that Configd needs from the system, and
+# the package that gives it for each packager.  test is a command that succeeds
+# once the package is installed.
+x_system_packages:
+  # Configd::Language::ossec parses ossec.conf with XML::LibXML.  The rest of
+  # Configd runs on core perl alone, so only a host that adopts ossec.conf
+  # needs it.  It comes from the distribution and not from CPAN, because
+  # configd runs under the perl of the system, and a build from CPAN needs
+  # the headers of libxml2 and a compiler.
+  XML::LibXML:
+    deb: libxml-libxml-perl
+    rpm: perl-XML-LibXML
+    test: /usr/bin/perl -MXML::LibXML -e 1

@@ -16,7 +16,7 @@ use Langertha::Holmgang::Report;
 use Langertha::Holmgang::Runner;
 use Langertha::Holmgang::Target;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 has out => ( is => 'ro', lazy_build => 1 );
@@ -118,6 +118,7 @@ sub help {
     '                    [--model M] [--url U] [--option K=V]... [--label L]',
     '                    [--variant [NAME:]K=V]... [--repeat N] [--concurrency N]',
     '                    [--resume earlier.json] [--report out.json] [--seed ID=N]...',
+    '                    [--sandbox docker|podman [--sandbox-image IMAGE]]',
     '       holmgang report <report.json>... [--by topic] [--format text|markdown|json] [--suite <dir>]...',
     '       holmgang export-yaml <suite-dir>... --out <dir> [--seed ID=N]...',
     '',
@@ -347,7 +348,7 @@ sub cmd_run {
   my ( $self, @argv ) = @_;
   my ( $o, $bad ) = $self->_options( \@argv,
     'suite=s@', 'target=s', 'model=s', 'url=s', 'option=s@', 'label=s', 'variant=s@', 'repeat=i',
-    'concurrency=i', 'resume=s', 'report=s', 'seed=s@' );
+    'concurrency=i', 'resume=s', 'report=s', 'seed=s@', 'sandbox=s', 'sandbox-image=s' );
   return $self->_usage_error($bad) if $bad;
   return $self->_usage_error( 'unexpected argument: '.$argv[0] ) if @argv;
   return $self->_usage_error('run needs at least one --suite') unless @{ $o->{suite} || [] };
@@ -357,6 +358,19 @@ sub cmd_run {
     if defined $o->{concurrency} && ( $o->{concurrency} < 1 || $o->{concurrency} > 64 );
   my ( $variants, $vbad ) = $self->_variants( $o->{variant} );
   return $self->_usage_error($vbad) if $vbad;
+  # --sandbox (ADR 0011): real programs the Linux simulator does not model run in a container
+  my ( $sandbox, $sandbox_label );
+  return $self->_usage_error('--sandbox-image needs --sandbox') if defined $o->{'sandbox-image'} && !defined $o->{sandbox};
+  if ( defined $o->{sandbox} ) {
+    return $self->_usage_error( '--sandbox knows docker and podman, not: '.$o->{sandbox} ) unless $o->{sandbox} =~ /\A(?:docker|podman)\z/;
+    require Langertha::Holmgang::Sandbox::Docker;
+    $sandbox = Langertha::Holmgang::Sandbox::Docker->new( docker => [ $o->{sandbox} ],
+      ( defined $o->{'sandbox-image'} ? ( image => $o->{'sandbox-image'} ) : () ) );
+    my ( $there, $id ) = $sandbox->available;
+    return $self->_usage_error( '--sandbox: '.$id ) unless $there;
+    $sandbox_label = join ' ', $o->{sandbox}, $sandbox->image, $id;
+    $self->_say( 'sandbox: '.$sandbox_label );
+  }
   my ( $engine_for, $target ) = $self->_target($o);
   return $self->_usage_error($target) unless $engine_for;
   my ( $loader, $lbad ) = $self->_seeded_loader( $o->{seed}, [ grep { _is_suite( path($_) ) } @{ $o->{suite} } ] );
@@ -405,6 +419,7 @@ sub cmd_run {
       } ],
       ( defined $o->{repeat} ? ( repeat => $o->{repeat} ) : () ),
       ( $resume ? ( resume => $resume ) : () ),
+      ( $sandbox ? ( sandbox => $sandbox, sandbox_label => $sandbox_label ) : () ),
       on_event => $on_event,
     );
   };
@@ -536,7 +551,7 @@ Langertha::Holmgang::CLI - The holmgang command: lint suites, run them against a
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -629,7 +644,11 @@ C<--model>, C<--url>, C<--option>; or C<mock-solution> / C<mock-text>) and its
 variants (C<--variant>), and plays them through L<Langertha::Holmgang::Batch>:
 every case C<--repeat> times (default the suite's C<repeat>, else 1) under
 every variant, at most C<--concurrency> requests at once (default 1, one
-engine per slot), continuing the report of C<--resume>. It prints a line per
+engine per slot), continuing the report of C<--resume>. With C<--sandbox docker> (or C<podman>, the
+image with C<--sandbox-image>) a real program the Linux simulator does not
+model runs in a container instead of ending as a gap
+(L<Langertha::Holmgang::Sandbox::Docker>, ADR 0011); the command refuses to
+start when the runtime or the image is missing. It prints a line per
 result as it ends (prefixed with the variant when there are several) and the
 evaluation, and writes the report with C<--report> -- at the end, and as a
 checkpoint while the batch runs (L</checkpoint_seconds>). Before the cases of

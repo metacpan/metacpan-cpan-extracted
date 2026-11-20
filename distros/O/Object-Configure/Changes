@@ -1,5 +1,31 @@
 Revision history for Object::Configure - Runtime Configuration for an Object
 
+0.26	Thu Nov 19 09:11:33 AM EST 2026
+	[ Enhancements ]
+	- Perl 5.26 is now the minimum.  Log::Abstraction 0.40 and later,
+	  and Params::Validate::Strict 0.40 and later (needed by
+	  Config::Abstraction), require 5.26, so on older perls the
+	  dependencies could not be installed and installing
+	  Object::Configure failed anyway.  Makefile.PL now says so, so
+	  older perls get a clear "needs 5.26" message (and CPAN Testers
+	  reports NA rather than FAIL).
+
+	[ Bug Fixes ]
+	- Object::Configure now needs Log::Abstraction 0.41.  Earlier versions
+	  set Sub::Private's mode to enforce for the whole process when they
+	  loaded, so loading Object::Configure changed how every other module
+	  using Sub::Private behaved (private subs were wrapped instead of
+	  removed, and code reading the mode saw "enforce").  Object::Configure
+	  itself never set it.  If you cannot upgrade Log::Abstraction, that
+	  is the version to ask for.
+	- t/edge_cases.t no longer fails on Cygwin when run by a user in
+	  the Administrators group (or anywhere chmod 0000 still leaves a
+	  file readable).  The "unreadable config file" test now uses the
+	  optional Test::Permissions to check whether chmod can really make
+	  a file unreadable, and skips if it can't or if Test::Permissions
+	  isn't installed.
+	  Fixes https://matrix.perl-magpie.org/results/702aec9c-d9ff-11f1-a265-ec4270818d2b
+
 0.25	Fri Nov  6 10:54:40 AM EST 2026
 	[ Bug Fixes ]
 	- Tests no longer hard-code a "use lib" path to a local Test::Returns

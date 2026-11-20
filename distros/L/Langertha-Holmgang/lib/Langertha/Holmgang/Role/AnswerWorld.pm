@@ -3,7 +3,7 @@ package Langertha::Holmgang::Role::AnswerWorld;
 
 use Moose::Role;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 requires qw( device_type tools tool );
 
@@ -23,7 +23,7 @@ Langertha::Holmgang::Role::AnswerWorld - The plugin role of a world with its own
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

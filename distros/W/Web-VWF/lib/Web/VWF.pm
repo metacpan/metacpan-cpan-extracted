@@ -6,7 +6,7 @@ use strict;
 use warnings;
 # use diagnostics;
 
-use version; our $VERSION = version->declare('0.003.0');
+use version; our $VERSION = version->declare('0.003.1');
 
 # TODO: Try Log::Any::Adapter::Abstraction instead of Log::Any
 
@@ -30,7 +30,10 @@ use Config::Abstraction;
 use Database::Abstraction;
 # use Devel::Confess;
 use File::Basename;
-# use CGI::Alert $ENV{'SERVER_ADMIN'} || 'you@example.com';
+# The address is always defined: CGI::Alert warns about an undefined one, which
+# fails the B::Lint/warnings::unused check in CI and, in a FastCGI worker where
+# SERVER_ADMIN is not set, fills the log on every start.
+use CGI::Alert $ENV{'SERVER_ADMIN'} || 'webmaster@localhost';
 use FCGI;
 use FCGI::Buffer;
 use File::HomeDir;
@@ -189,7 +192,7 @@ Web::VWF - Versatile Web Framework - easily build a website to support different
 
 =head1 VERSION
 
-Version 0.003.0
+Version 0.003.1
 
 =head1 SYNOPSIS
 

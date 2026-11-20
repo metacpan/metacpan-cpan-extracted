@@ -20,7 +20,7 @@ use Langertha::Holmgang::Simulators;
 use Langertha::Holmgang::Structure;
 use Langertha::Holmgang::Suite;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 has simulators => (
@@ -506,7 +506,7 @@ Langertha::Holmgang::Loader - Loads suite format 2 from search directories, lint
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

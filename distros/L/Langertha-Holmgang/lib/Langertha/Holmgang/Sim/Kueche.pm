@@ -7,7 +7,7 @@ use utf8;
 
 with 'Langertha::Holmgang::Role::AnswerWorld';
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 our @DAYS = qw( Montag Dienstag Mittwoch Donnerstag Freitag Samstag Sonntag );
@@ -334,7 +334,7 @@ Langertha::Holmgang::Sim::Kueche - The answer world kueche — recipe collection
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

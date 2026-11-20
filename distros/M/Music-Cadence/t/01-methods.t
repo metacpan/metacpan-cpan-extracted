@@ -253,20 +253,4 @@ subtest imperfect => sub {
     is_deeply $chords, [ [qw/ 59 50 115 /], [qw/ 52 56 108/] ], 'C# 3 midinum imperfect inversion 1-1,2-1 picardy';
 };
 
-subtest remove_notes => sub {
-    my $mc = new_ok 'Music::Cadence';
-
-    my $got = $mc->remove_notes([1], [qw(Gs5 C5 Ds5)]);
-    is_deeply $got, ['Gs5','Ds5'], 'remove_notes';
-
-    $got = $mc->remove_notes([1,2], [qw(Gs5 C5 Ds5)]);
-    is_deeply $got, ['Gs5'], 'remove_notes';
-
-    $got = $mc->remove_notes([], [qw(Gs5 C5 Ds5)]);
-    is_deeply $got, [qw(Gs5 C5 Ds5)], 'remove_notes';
-
-    $got = $mc->remove_notes([9], [qw(Gs5 C5 Ds5)]);
-    is_deeply $got, [qw(Gs5 C5 Ds5)], 'remove_notes';
-};
-
 done_testing();

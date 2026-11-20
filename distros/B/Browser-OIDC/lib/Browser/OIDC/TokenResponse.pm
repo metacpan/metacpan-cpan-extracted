@@ -7,7 +7,7 @@ use experimental qw/signatures postderef lexical_subs/;
 use Carp;
 use Mojo::Util 'term_escape';
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 sub new($class, %options) {
 	return bless {

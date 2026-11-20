@@ -2036,7 +2036,7 @@
     },
     {
       "name": "trial-full-answer",
-      "why": "A free-plan key within its 100 lookups of the UTC day answers as a paid plan, trial_expired false.",
+      "why": "A free-plan key within its trial answers as a paid plan, trial_expired false.",
       "call": "lookup",
       "target": "146.70.116.130",
       "status": 200,
@@ -3184,7 +3184,7 @@
     },
     {
       "name": "domain-unlimited-answer",
-      "why": "A domain on Unlimited: whether it is registered and which record types it has; the records themselves, its IP ranges and Disposable Domain are absent.",
+      "why": "A domain on Unlimited: whether it is registered and which record types it has; the records themselves, the network on each address, its co-hosted domains, its IP ranges, Disposable Domain, its home page, redirects and backlinks are absent.",
       "call": "lookupDomain",
       "target": "example.com",
       "status": 200,
@@ -3212,15 +3212,20 @@
         "absent": [
           "is_disposable",
           "dns",
+          "hosting",
+          "cohosted_domains",
           "ip_ranges",
           "disposable",
+          "web",
+          "redirects",
+          "backlinks",
           "cap_reached"
         ]
       }
     },
     {
       "name": "domain-paid-answer",
-      "why": "A domain on a paid plan: the records, its organization's IP ranges and is_disposable.",
+      "why": "A domain on a paid plan: the records, the network announcing each address, the other domains on its first IPv4 address, its organization's IP ranges, is_disposable, its home page, and the domains whose home page redirects or links to it.",
       "call": "lookupDomain",
       "target": "example.com",
       "status": 200,
@@ -3265,6 +3270,41 @@
           ],
           "cname": []
         },
+        "hosting": [
+          {
+            "ip": "192.0.2.10",
+            "asn": {
+              "asn": 64496,
+              "name": "EXAMPLE-AS",
+              "domain": "example.net",
+              "type": "hosting",
+              "prefix": "192.0.2.0/24",
+              "country": "US",
+              "rpki_status": "valid"
+            }
+          },
+          {
+            "ip": "2001:db8::10",
+            "asn": {
+              "asn": 64496,
+              "name": "EXAMPLE-AS",
+              "domain": "example.net",
+              "type": "hosting",
+              "prefix": "2001:db8::/32",
+              "country": "US",
+              "rpki_status": "valid"
+            }
+          }
+        ],
+        "cohosted_domains": {
+          "ip": "192.0.2.10",
+          "total": 3,
+          "domains": [
+            "example.net",
+            "example.org",
+            "shop.example"
+          ]
+        },
         "ip_ranges": {
           "domain": "example.com",
           "redirects_to": "",
@@ -3279,6 +3319,33 @@
           ]
         },
         "disposable": {},
+        "web": {
+          "url": "https://example.com/",
+          "title": "Example Domain",
+          "description": "",
+          "last_seen": "2026-11-18",
+          "links": {
+            "total": 1,
+            "hosts": [
+              "www.iana.org"
+            ]
+          }
+        },
+        "redirects": {
+          "total": 2,
+          "domains": [
+            "example.net",
+            "example.org"
+          ]
+        },
+        "backlinks": {
+          "total": 3,
+          "domains": [
+            "docs.example",
+            "news.example",
+            "wiki.example"
+          ]
+        },
         "cap_reached": false
       },
       "expect": {
@@ -3295,8 +3362,13 @@
         },
         "objects": [
           "dns",
+          "hosting",
+          "cohosted_domains",
           "ip_ranges",
-          "disposable"
+          "disposable",
+          "web",
+          "redirects",
+          "backlinks"
         ],
         "empty": [
           "disposable"
@@ -3336,8 +3408,13 @@
         "absent": [
           "is_disposable",
           "dns",
+          "hosting",
+          "cohosted_domains",
           "ip_ranges",
           "disposable",
+          "web",
+          "redirects",
+          "backlinks",
           "trial_expired"
         ]
       }
@@ -13793,6 +13870,231 @@
         }
       ]
     }
+  },
+  "vocabulary": {
+    "why": "A closed vocabulary in an ANSWER (a plan's tier, a database's standing and license type, a format, a download's outcome) is the API's to extend. Each case serves a well-formed answer carrying a value no published list holds, and the call must hand that value back as served, a raw string or an unknown case that carries it, and never fail: a binding that refuses it breaks every installed copy of itself the day the API adds a value, and a release cannot reach the copies already installed. A wrong TYPE (a number, a null where the member is required) is still refused, and refusing an unpublished value in a REQUEST before the network is unchanged. Each `expect` key is a path through the answer's wire names, a number indexing a list; each suite reads it through its own typed result. A binding that still fails the call on one reads none of these cases until its release that hands the value back.",
+    "cases": [
+      {
+        "name": "entitlement-plan-name",
+        "why": "The plan's name is what a client shows, and key is what it compares: the free plan's key is free and its name Unlimited. A binding that drops name leaves a client building one from the key, which a renamed plan then gets wrong.",
+        "call": "myEntitlement",
+        "answer": {
+          "org_id": "85bb51e4-2eb6-4a31-8e4d-02ba8b98fe61",
+          "apikey": {
+            "id": "0ab424cc-7619-4dad-b027-afacdc2cedb0",
+            "expires": null,
+            "allowed_cidrs": []
+          },
+          "plan": {
+            "key": "free",
+            "name": "Unlimited",
+            "tier": "free"
+          },
+          "usage": {
+            "requests": 580,
+            "quota": 5000000,
+            "hard_limit": null,
+            "window_start": "2026-11-01T00:00:00Z",
+            "window_end": "2026-12-01T00:00:00Z"
+          }
+        },
+        "expect": {
+          "plan.key": "free",
+          "plan.name": "Unlimited",
+          "plan.tier": "free"
+        }
+      },
+      {
+        "name": "entitlement-tier-unknown",
+        "why": "A plan whose tier no published list holds: the answer reads, and the tier comes back as served.",
+        "call": "myEntitlement",
+        "answer": {
+          "org_id": "85bb51e4-2eb6-4a31-8e4d-02ba8b98fe61",
+          "apikey": {
+            "id": "0ab424cc-7619-4dad-b027-afacdc2cedb0",
+            "expires": null,
+            "allowed_cidrs": []
+          },
+          "plan": {
+            "key": "data",
+            "name": "Data",
+            "tier": "data"
+          },
+          "usage": {
+            "requests": 580,
+            "quota": 5000000,
+            "hard_limit": null,
+            "window_start": "2026-11-01T00:00:00Z",
+            "window_end": "2026-12-01T00:00:00Z"
+          }
+        },
+        "expect": {
+          "plan.key": "data",
+          "plan.name": "Data",
+          "plan.tier": "data"
+        }
+      },
+      {
+        "name": "database-standing-unknown",
+        "why": "A database whose standing no published list holds: the catalog reads, and the standing comes back as served.",
+        "call": "listDatabases",
+        "answer": {
+          "databases": [
+            {
+              "base": "bogon_asn",
+              "name": "Bogon ASN",
+              "summary": "Every reserved or unallocated AS number.",
+              "standing": "suspended",
+              "open": true,
+              "license_type": "standard",
+              "starts": "2026-01-01T00:00:00Z",
+              "expires": null,
+              "renews_at": null,
+              "notice_due_at": null,
+              "versions": [
+                {
+                  "id": "bogon_asn_v1",
+                  "version": 1,
+                  "summary": "The ASN and its reason.",
+                  "formats": [
+                    "csvgz",
+                    "mmdb"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expect": {
+          "databases.0.base": "bogon_asn",
+          "databases.0.standing": "suspended"
+        }
+      },
+      {
+        "name": "database-license-type-unknown",
+        "why": "A license type no published list holds: the catalog reads, and the license type comes back as served.",
+        "call": "listDatabases",
+        "answer": {
+          "databases": [
+            {
+              "base": "bogon_asn",
+              "name": "Bogon ASN",
+              "summary": "Every reserved or unallocated AS number.",
+              "standing": "licensed",
+              "open": true,
+              "license_type": "oem",
+              "starts": "2026-01-01T00:00:00Z",
+              "expires": null,
+              "renews_at": null,
+              "notice_due_at": null,
+              "versions": [
+                {
+                  "id": "bogon_asn_v1",
+                  "version": 1,
+                  "summary": "The ASN and its reason.",
+                  "formats": [
+                    "csvgz",
+                    "mmdb"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expect": {
+          "databases.0.base": "bogon_asn",
+          "databases.0.license_type": "oem"
+        }
+      },
+      {
+        "name": "database-format-unknown",
+        "why": "A version offered in a format no published list holds: the catalog reads, and the format comes back as served beside the known one. Asking for it is still refused before the network.",
+        "call": "listDatabases",
+        "answer": {
+          "databases": [
+            {
+              "base": "bogon_asn",
+              "name": "Bogon ASN",
+              "summary": "Every reserved or unallocated AS number.",
+              "standing": "licensed",
+              "open": true,
+              "license_type": "standard",
+              "starts": "2026-01-01T00:00:00Z",
+              "expires": null,
+              "renews_at": null,
+              "notice_due_at": null,
+              "versions": [
+                {
+                  "id": "bogon_asn_v1",
+                  "version": 1,
+                  "summary": "The ASN and its reason.",
+                  "formats": [
+                    "csvgz",
+                    "parquet"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expect": {
+          "databases.0.versions.0.formats.0": "csvgz",
+          "databases.0.versions.0.formats.1": "parquet"
+        }
+      },
+      {
+        "name": "download-outcome-unknown",
+        "why": "A download whose outcome no published list holds: the log reads, and the outcome comes back as served.",
+        "call": "listDownloads",
+        "answer": {
+          "downloads": [
+            {
+              "dataset_id": "bogon_asn_v1",
+              "format": "csvgz",
+              "outcome": "throttled",
+              "sample": false,
+              "open": true,
+              "bytes": null,
+              "http_status": 429,
+              "apikey_id": null,
+              "client_ip": null,
+              "user_agent": null,
+              "created": "2026-11-17T10:00:00Z"
+            }
+          ]
+        },
+        "expect": {
+          "downloads.0.dataset_id": "bogon_asn_v1",
+          "downloads.0.outcome": "throttled"
+        }
+      },
+      {
+        "name": "download-format-unknown",
+        "why": "A download in a format no published list holds: the log reads, and the format comes back as served.",
+        "call": "listDownloads",
+        "answer": {
+          "downloads": [
+            {
+              "dataset_id": "bogon_asn_v1",
+              "format": "parquet",
+              "outcome": "ok",
+              "sample": false,
+              "open": true,
+              "bytes": 760,
+              "http_status": 302,
+              "apikey_id": null,
+              "client_ip": null,
+              "user_agent": null,
+              "created": "2026-11-17T10:00:00Z"
+            }
+          ]
+        },
+        "expect": {
+          "downloads.0.dataset_id": "bogon_asn_v1",
+          "downloads.0.format": "parquet"
+        }
+      }
+    ]
   },
   "bogons": {
     "v4": [

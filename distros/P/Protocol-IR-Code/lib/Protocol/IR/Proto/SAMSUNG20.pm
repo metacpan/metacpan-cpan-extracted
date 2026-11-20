@@ -2,8 +2,9 @@ package Protocol::IR::Proto::SAMSUNG20;
 use strict;
 use warnings;
 
-our $VERSION = '1.3';
+our $VERSION = '1.5';
 use Protocol::IR::Code;
+use Math::BigInt;
 
 # Protocol::IR::Proto::SAMSUNG20 is the SAMSUNG20 protocol handler
 # (20-bit), from the MakeHex Samsung20.irp and DecodeIR definitions:
@@ -20,7 +21,7 @@ sub _parse_int {
     my ($val) = @_;
     return 0 unless defined $val;
     $val =~ s/^\s+|\s+$//g;
-    return hex($val) if $val =~ /^0x/i;
+    return Math::BigInt->from_hex($val) if $val =~ /^0x/i;
     return $val + 0;
 }
 
@@ -160,7 +161,7 @@ Protocol::IR::Proto::SAMSUNG20 - SAMSUNG20 protocol handler (20-bit AC)
 
 =head1 VERSION
 
-version 1.3
+version 1.5
 
 =head1 SYNOPSIS
 

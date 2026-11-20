@@ -3,7 +3,7 @@
 # modify it under the same terms as Perl itself.
 
 package Convert::ASN1;
-$Convert::ASN1::VERSION = '0.36';
+$Convert::ASN1::VERSION = '0.37';
 use strict;
 use warnings;
 
@@ -44,6 +44,13 @@ my @ctr;
 
 sub _decode {
   my ($optn, $ops, $stash, $pos, $end, $seqof, $larr) = @_;
+
+  my $max_depth = exists $optn->{decode_max_depth} ? $optn->{decode_max_depth} : 99;
+  local $optn->{_decode_depth} = ($optn->{_decode_depth} || 0) + 1;
+  die "decode: max_depth must not be negative\n" if $max_depth < 0;
+  die "decode error (nesting depth limit exceeded)\n"
+      if $max_depth > 0 && $optn->{_decode_depth} > $max_depth;
+
   my $idx = 0;
 
   # we try not to copy the input buffer at any time
@@ -137,8 +144,16 @@ sub _decode {
               $handler ||= $optn->{handlers}{$op->[cVAR]}{$stash->{$op->[cDEFINE]}};
             }
 
-	    ($seqof ? $seqof->[$idx++] : ref($stash) eq 'SCALAR' ? $$stash : $stash->{$var})
-	      = $handler ? $handler->decode(substr($buf,$pos,$len)) : substr($buf,$pos,$len);
+	    if ($handler) {
+	      local $handler->{options}{_decode_depth} = $optn->{_decode_depth};
+	      local $handler->{options}{decode_max_depth} = $max_depth
+	          unless exists $handler->{options}{decode_max_depth};
+	      ($seqof ? $seqof->[$idx++] : ref($stash) eq 'SCALAR' ? $$stash : $stash->{$var})
+	        = $handler->decode(substr($buf,$pos,$len));
+	    } else {
+	      ($seqof ? $seqof->[$idx++] : ref($stash) eq 'SCALAR' ? $$stash : $stash->{$var})
+	        = substr($buf,$pos,$len);
+	    }
 
 	    $pos += $len;
 
@@ -206,7 +221,11 @@ sub _decode {
 
 		  @{$nstash}{keys %tmp_stash} = values %tmp_stash;
 
-		} or next;
+		} or do {
+		  die $@ if $@ =~ /nesting depth limit exceeded/;
+		  next;
+		};
+
 
 		$pos = $npos+$len+$indef;
 
@@ -281,7 +300,13 @@ sub _dec_integer {
   my $buf = substr($_[4],$_[5],$_[6]);
   my $tmp = unpack("C",$buf) & 0x80 ? pack("C",255) : pack("C",0);
   if ($_[6] > 4) {
-      $_[3] = os2ip($buf, $_[0]->{decode_bigint} || 'Math::BigInt');
+      my $max = ($_[0] && exists $_[0]->{decode_max_int_len})
+                  ? $_[0]->{decode_max_int_len}
+                  : 1025;
+      die "decode: max_int_len must not be negative\n" if $max < 0;
+      die "INTEGER too large (length $_[6] exceeds max_int_len $max)\n"
+          if $max && $_[6] > $max;
+      $_[3] = os2ip($buf, ($_[0] && $_[0]->{decode_bigint}) || 'Math::BigInt');
   } else {
       # N unpacks an unsigned value
       $_[3] = unpack("l",pack("l",unpack("N", $tmp x (4-$_[6]) . $buf)));
@@ -294,6 +319,11 @@ sub _dec_bitstring {
 # 0      1    2       3     4     5     6
 # $optn, $op, $stash, $var, $buf, $pos, $len
 
+  if ($_[6] < 1) {
+    $_[3] = ["", 0];
+    return 1;
+  }
+  die "BIT STRING decode error\n" if unpack("C", substr($_[4],$_[5],1)) > 7;
   $_[3] = [ substr($_[4],$_[5]+1,$_[6]-1), ($_[6]-1)*8-unpack("C",substr($_[4],$_[5],1)) ];
   1;
 }
@@ -320,6 +350,20 @@ sub _dec_null {
 sub _dec_object_id {
 # 0      1    2       3     4     5     6
 # $optn, $op, $stash, $var, $buf, $pos, $len
+
+  # unpack "w" is quadratic in arc length, so bound each arc first
+  my $max = exists $_[0]->{decode_max_oid_arc_len}
+              ? $_[0]->{decode_max_oid_arc_len}
+              : 32;
+  die "decode: max_oid_arc_len must not be negative\n" if $max < 0;
+  if ($max) {
+    my $oid = substr($_[4],$_[5],$_[6]);
+    # every byte of an arc except its last has the high bit set
+    while ($oid =~ /[\x80-\xff]+/g) {
+      die "OBJECT IDENTIFIER decode error (arc too large)\n"
+          if $+[0] - $-[0] >= $max;
+    }
+  }
 
   my @data = unpack("w*",substr($_[4],$_[5],$_[6]));
   if ($_[1]->[cTYPE] == opOBJID and @data > 1) {
@@ -363,10 +407,15 @@ sub _dec_real {
     else {
       $expLen++;
     }
+
+    my $overhead = $estart - $_[5];   # 1 short-form, 2 long-form
+    # an exponent over 4 bytes would become a bigint and make pow() run unbounded
+    die "REAL decode error\n" if $expLen > 4 || $expLen > $_[6] - $overhead;
+
     _dec_integer(undef, undef, undef, $exp, $_[4],$estart,$expLen);
 
     my $mant = 0.0;
-    for (reverse unpack("C*",substr($_[4],$estart+$expLen,$_[6]-1-$expLen))) {
+    for (reverse unpack("C*",substr($_[4],$estart+$expLen,$_[6]-$overhead-$expLen))) {
       $exp +=8, $mant = (($mant+$_) / 256) ;
     }
 

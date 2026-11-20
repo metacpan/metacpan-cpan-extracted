@@ -92,7 +92,7 @@ sub node_url { my ($self, $tag) = @_; return $self->{up}->clone->path("/__up/$ta
 sub add_node {
   my ($self, $id, %extra) = @_;
   return $self->{skeid}->add_node(
-    id => $id, url => $self->node_url($id), model => 'whisper-rt', engine => 'openai',
+    id => $id, trust => 'internal', url => $self->node_url($id), model => 'whisper-rt', engine => 'openai',
     max_conns => 4, %extra,
   );
 }

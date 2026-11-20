@@ -1,5 +1,12 @@
 Revision history for Database::Join
 
+0.011.4	Thu Nov 19 08:54:10 PM EST 2026
+	[ Bug fixes ]
+	- Joining a join (for example merging an already merged table with a third
+	  file) failed with "no such table: ext0._dj_result". The outer join's
+	  DROP TABLE for its own _dj_result also dropped the attached inner join's
+	  table; both statements now name the main database.
+
 0.011.3	Mon Nov 16 02:16:04 PM EST 2026
 	[ Performance ]
 	- mandatory_filters: LIKE patterns are now compiled to a qr// at

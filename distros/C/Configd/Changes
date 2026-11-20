@@ -1,5 +1,28 @@
 Revision history for Configd
 
+0.007 2026-11-20 TEODESIAN
+    - ossec: a language for /var/ossec/etc/ossec.conf, the one XML file that
+      every daemon of OSSEC reads.  A section that appears once, such as
+      <global>, is a set of settings and the later fragment wins.  A section
+      that repeats, such as <localfile>, is a list of blocks that fragments
+      add to.  The <include> list of <rules> keeps the order of the package,
+      which OSSEC needs, because a rule names rules in the files before it.
+      An empty element clears its list, so a fragment can drop the example
+      log files and whitelist that the package ships.  It reads the file with
+      XML::LibXML, the one module outside of core perl, which a host installs
+      from its distribution: metamerge.yml declares it, and prereqs.yml
+      recommends it rather than requiring it.
+    - A language that is installed and does not load says so, with the error
+      of perl.  It said that there was no such language.
+
+0.006 2026-11-20 TEODESIAN
+    - A package upgrade of an adopted file reaches the service.  The file
+      that configd generates is not the one that the package installed, so
+      dpkg writes the new version beside it as .dpkg-dist, and rpm as
+      .rpmnew, and 00-original stayed at the version from the day of the
+      adoption.  The next build now takes that file as 00-original, and
+      keeps the old one as 00-original.dpkg-old or .rpmsave.
+
 0.005 2026-10-24 TEODESIAN
     - postfix: smtp_sasl_password_maps and smtp_tls_policy_maps accumulate.
       A host that sends each mail domain through a relay of its own names a

@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use MIDI::Util qw(setup_score);
+use MIDI::Util qw(setup_score remove_notes);
 use Music::Cadence;
 use Music::Scales;
 use Music::VoiceGen;
@@ -75,7 +75,7 @@ sub clip {
     my ( $mc, $chords ) = @_;
     my @chords;
     for my $chord ( @$chords ) {
-        $chord = $mc->remove_notes( [int rand @$chord], $chord );
+        $chord = remove_notes( [int rand @$chord], $chord );
         push @chords, $chord;
     }
     return \@chords;

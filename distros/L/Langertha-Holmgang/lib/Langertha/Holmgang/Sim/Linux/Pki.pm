@@ -10,7 +10,7 @@ use JSON::MaybeXS ();
 use MIME::Base64 ();
 use Time::Local ();
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 my $JSON = JSON::MaybeXS->new( utf8 => 1, canonical => 1 );
@@ -734,7 +734,7 @@ Langertha::Holmgang::Sim::Linux::Pki - Certificates and keys as data: openssl, u
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

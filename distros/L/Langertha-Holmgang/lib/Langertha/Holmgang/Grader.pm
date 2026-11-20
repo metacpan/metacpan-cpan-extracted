@@ -9,7 +9,7 @@ use Langertha::Holmgang::Expectation qw( condition );
 use Langertha::Holmgang::Simulators;
 use Langertha::Holmgang::World;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 # the rule kinds of format 2, in the order the kind is looked up; a true constant
 our @RULE_KINDS = qw( state unchanged_except calls not_called only_tools check packet login );
@@ -274,7 +274,7 @@ Langertha::Holmgang::Grader - Grades a case deterministically: rules at the end 
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

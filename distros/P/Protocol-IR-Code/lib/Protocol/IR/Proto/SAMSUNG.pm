@@ -2,7 +2,7 @@ package Protocol::IR::Proto::SAMSUNG;
 use strict;
 use warnings;
 
-our $VERSION = '1.3';
+our $VERSION = '1.5';
 use Protocol::IR::Code;
 
 # Timing and bit ordering follow IRremoteESP8266 (Copyright David Conran et al.,
@@ -223,7 +223,7 @@ Protocol::IR::Proto::SAMSUNG - SAMSUNG protocol handler (32-bit)
 
 =head1 VERSION
 
-version 1.3
+version 1.5
 
 =head1 SYNOPSIS
 

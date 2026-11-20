@@ -20,7 +20,10 @@ use Test::File::ShareDir::Dist { 'Linode-API' => 'share' };
 use FindBin::libs;
 
 use Cpanel::JSON::XS();
+use Digest::SHA();
 use File::ShareDir();
+use IO::Uncompress::Gunzip();
+use MIME::Base64();
 use Mojolicious();
 
 use Linode::API();
@@ -140,6 +143,44 @@ subtest '_add_formats' => sub {
     is( $req->json->{authorized_keys}, ['ssh-ed25519 AAAAbogus'], 'a value in a format of Linode\'s own is sent for Linode to check' );
 
     ok( ( grep { $_ eq 'ssh-key' } Linode::API::_formats_in( Linode::API::_specification( File::ShareDir::dist_file( 'Linode-API', 'openapi.json' ), 'v4' ) ) ), 'the formats of the specification are found where they are nested' );
+};
+
+# Bytes that gzip cannot shrink, so that a test chooses the compressed size.
+sub incompressible {
+    my ($length) = @_;
+    my $bytes = q{};
+    $bytes .= Digest::SHA::sha256( length $bytes ) while length $bytes < $length;
+    return substr( $bytes, 0, $length );
+}
+
+subtest 'encode_user_data' => sub {
+    my $cloud_config = "#cloud-config\n" . ( "packages:\n  - bogus\n" x 2000 );
+    my $encoded      = Linode::API->encode_user_data($cloud_config);
+    my $compressed   = MIME::Base64::decode_base64($encoded);
+    IO::Uncompress::Gunzip::gunzip( \$compressed => \my $back ) or die $IO::Uncompress::Gunzip::GunzipError;
+    is( $back, $cloud_config, 'the payload is gzip in base64, and uncompresses to the cloud-config' );
+    ok( length($cloud_config) > $Linode::API::USER_DATA_MAX, 'a cloud-config over the limit before compression' ) or diag length $cloud_config;
+    ok( length($compressed) <= $Linode::API::USER_DATA_MAX,  'fits once compressed' )                             or diag length $compressed;
+
+    my $too_big = incompressible( $Linode::API::USER_DATA_MAX + 1 );
+    like( dies { Linode::API->encode_user_data($too_big) }, qr/16385 bytes, and \d+ bytes compressed[.]  Linode takes at most 16384/, 'one that does not fit even compressed is refused, with both sizes' );
+    like( dies { Linode::API->encode_user_data(undef) },    qr/needs the cloud-config/,                                               'and so is no cloud-config at all' );
+};
+
+subtest '_fix_user_data' => sub {
+    my $linode = client( token => 'token-one' );
+    my $send   = sub {
+        my ($length) = @_;
+        return $linode->post_rebuild_linode_instance( { linodeId => 1 }, json => { image => 'linode/bogus', root_pass => 'bogus-Pass-1234567890', metadata => { user_data => 'A' x $length } } );
+    };
+
+    my $req = last_request( sub { $send->(21848) } );
+    is( length $req->json->{metadata}{user_data}, 21848, 'user_data as long as the base64 of 16384 bytes is sent' );
+
+    @requests = ();
+    my $tx = $send->(21849);
+    is( scalar @requests, 0, 'one character longer is not sent, though the specification allows it' );
+    like( $tx->res->json->{errors}[0]{path}, qr/user_data/, 'it is refused, naming user_data' ) or diag( $tx->res->body );
 };
 
 subtest '_specification' => sub {

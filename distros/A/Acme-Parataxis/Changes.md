@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.1.5] - 2026-11-20
+
+### Fixed
+
+- Request `_LARGEFILE64_SOURCE` before including `perl.h`, so its `off64_t` alias resolves under `-D_FILE_OFFSET_BITS=64`.
+- GNU/Hurd and Cygwin both use 2 MiB fiber stacks and clamp there instead of allowing a handful of 8 MiB stacks to exhaust the data-segment budget.
+- Enforce `with_timeout()` at the block boundary so a result that lands after the deadline throws `Error::Timeout` even when a busy host fires the timer helper late.
+- Don't double-fail a deadline that was already delivered at a park.
+- Several fixes for Cygwin:
+  - Fiber stacks now come from `VirtualAlloc` (with a `PAGE_NOACCESS` guard page) and the initial ucontext is armed directly instead of through `makecontext()`. Cygwin's `mmap()` can't commit pages from inside a ucontext and its `makecontext()` jumps to `uc_link` rather than returning when called from one, which silently prevented nested fibers from ever running.
+  - Warm the socket layer on the main stack at initialization. Cygwin's first `socket()` call initializes Winsock lazily and fails with `EINVAL` when made from a fiber's ucontext, which makes `IO::Socket::INET->new()` return `undef`.
+  - `spawn_blocking_fork()` now croaks with a clear message instead of killing the whole process because Cygwin can't `fork()` from a fiber stack. Cygwin perls have ithreads and should use `spawn_blocking()` anyway.
+
 ## [v0.1.4] - 2026-11-19
 
 ### Added
@@ -232,7 +245,8 @@ Another dist targetting a specific CPAN smoker. I cannot replicate the failure i
 ### Changes
   - It exists! It shouldn't but it does.
 
-[Unreleased]: https://github.com/sanko/Acme-Parataxis.pm/compare/v0.1.4...HEAD
+[Unreleased]: https://github.com/sanko/Acme-Parataxis.pm/compare/v0.1.5...HEAD
+[v0.1.5]: https://github.com/sanko/Acme-Parataxis.pm/compare/v0.1.4...v0.1.5
 [v0.1.4]: https://github.com/sanko/Acme-Parataxis.pm/compare/v0.1.3...v0.1.4
 [v0.1.3]: https://github.com/sanko/Acme-Parataxis.pm/compare/v0.1.2...v0.1.3
 [v0.1.2]: https://github.com/sanko/Acme-Parataxis.pm/compare/v0.1.1...v0.1.2

@@ -11,7 +11,7 @@ Web::VWF::Display - The base class of the pages
 
 =head1 VERSION
 
-Version 0.003.0
+Version 0.003.1
 
 =head1 DESCRIPTION
 
@@ -109,7 +109,7 @@ server-side form handling and do not need CSRF tokens at all:
 
 # -----------------------------------------------------------------------
 
-use version; our $VERSION = version->declare('0.003.0');
+use version; our $VERSION = version->declare('0.003.1');
 
 use v5.20;
 use strict;

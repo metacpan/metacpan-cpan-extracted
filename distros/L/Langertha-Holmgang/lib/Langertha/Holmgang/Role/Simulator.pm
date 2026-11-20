@@ -3,7 +3,7 @@ package Langertha::Holmgang::Role::Simulator;
 
 use Moose::Role;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 requires qw( device_type run_command );
 
@@ -22,7 +22,7 @@ Langertha::Holmgang::Role::Simulator - The plugin role of a device simulator
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

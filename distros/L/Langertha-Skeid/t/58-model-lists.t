@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -12,10 +13,10 @@ use Langertha::Skeid::Proxy;
 # Both lists now hold the same distinct, non-empty model names.
 
 my $skeid = Langertha::Skeid->new(store_usage_event => sub { return { ok => 1 } });
-$skeid->add_node(id => 'a1', url => 'http://127.0.0.1:9/v1', model => 'm1', engine => 'vllm');
-$skeid->add_node(id => 'a2', url => 'http://127.0.0.1:9/v1', model => 'm1', engine => 'vllm');
-$skeid->add_node(id => 'b1', url => 'http://127.0.0.1:9/v1', model => 'm2');
-$skeid->add_node(id => 'wild', url => 'http://127.0.0.1:9/v1');
+$skeid->add_node(id => 'a1', trust => 'internal', url => 'http://127.0.0.1:9/v1', model => 'm1', engine => 'vllm');
+$skeid->add_node(id => 'a2', trust => 'internal', url => 'http://127.0.0.1:9/v1', model => 'm1', engine => 'vllm');
+$skeid->add_node(id => 'b1', trust => 'internal', url => 'http://127.0.0.1:9/v1', model => 'm2');
+$skeid->add_node(id => 'wild', trust => 'internal', url => 'http://127.0.0.1:9/v1');
 
 my $t = Test::Mojo->new(Langertha::Skeid::Proxy->build_app(skeid => $skeid));
 $t->app->log->level('fatal');
@@ -36,7 +37,7 @@ is_deeply [sort @tags], [sort @ids], '/v1/models and /api/tags list the same nam
 
 # Only model-less nodes: nothing to list, and an empty list rather than a nameless entry.
 my $bare = Langertha::Skeid->new(store_usage_event => sub { return { ok => 1 } });
-$bare->add_node(id => 'wild', url => 'http://127.0.0.1:9/v1');
+$bare->add_node(id => 'wild', trust => 'internal', url => 'http://127.0.0.1:9/v1');
 my $tb = Test::Mojo->new(Langertha::Skeid::Proxy->build_app(skeid => $bare));
 $tb->app->log->level('fatal');
 $tb->get_ok('/api/tags')->status_is(200)->json_is('/models' => []);

@@ -7,7 +7,7 @@ use utf8;
 
 use Time::Local ();
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 my @WD = qw( Mon Tue Wed Thu Fri Sat Sun );
@@ -259,7 +259,7 @@ Langertha::Holmgang::Sim::Linux::Calendar - systemd calendar expressions (OnCale
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

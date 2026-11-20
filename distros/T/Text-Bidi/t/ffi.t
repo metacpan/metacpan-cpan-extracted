@@ -113,7 +113,7 @@ sub load_with_library {
     return ($?, $stdout, $stderr);
 }
 
-my $library = find_lib_or_die(lib => 'fribidi');
+my $library = $ENV{TEXT_BIDI_FRIBIDI_LIB} || find_lib_or_die(lib => 'fribidi');
 my ($status, $stdout, $stderr) = load_with_library($library);
 is $status, 0, 'explicit shared-library path loads successfully' or diag $stderr;
 is $stdout, 'abc', 'public API works with explicit library path';

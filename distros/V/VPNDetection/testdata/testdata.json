@@ -1431,7 +1431,7 @@
     }
   ],
   "bogonResponse": {
-    "why": "A bogon is answered locally in the full shape. Every flag is present and false, every detail object is present and empty, location and asn carry every key empty as the API answers a bogon (asn 0, strings empty), and is_bogon is true, as the API answers reserved space; the SDK computes it rather than asking.",
+    "why": "A bogon is answered locally in the full shape. Every flag is present and false, every detail object is present and empty, web is an empty list, location, asn, company and abuse carry every key empty or zero as the API answers a bogon (asn 0, latitude 0, strings empty, validated false), hostname is an empty string, and is_bogon is true, as the API answers reserved space; the SDK computes it rather than asking.",
     "flagsFalse": [
       "is_vpn",
       "is_hosting",
@@ -1441,7 +1441,15 @@
       "is_resproxy",
       "is_dcproxy",
       "is_mobproxy",
-      "is_pubproxy"
+      "is_pubproxy",
+      "is_anycast",
+      "is_carrier",
+      "is_satellite",
+      "is_ssh",
+      "is_smtp",
+      "is_web",
+      "is_dns_resolver",
+      "is_bittorrent"
     ],
     "emptyObjects": [
       "vpn",
@@ -1452,7 +1460,13 @@
       "resproxy",
       "dcproxy",
       "mobproxy",
-      "pubproxy"
+      "pubproxy",
+      "carrier",
+      "satellite",
+      "ssh",
+      "smtp",
+      "dns_resolver",
+      "bittorrent"
     ],
     "location": {
       "continent": "",
@@ -1464,14 +1478,44 @@
       "currency_name": "",
       "currency_symbol": "",
       "flag_emoji": "",
-      "flag_unicode": ""
+      "flag_unicode": "",
+      "region": "",
+      "region_code": "",
+      "city": "",
+      "postal_code": "",
+      "latitude": 0,
+      "longitude": 0,
+      "accuracy_radius": 0,
+      "geoname_id": "",
+      "dma_code": "",
+      "last_changed": ""
     },
     "asn": {
       "asn": 0,
       "name": "",
       "domain": "",
       "type": "",
-      "prefix": ""
+      "prefix": "",
+      "country": "",
+      "rpki_status": ""
+    },
+    "web": [],
+    "hostname": "",
+    "company": {
+      "name": "",
+      "domain": "",
+      "type": "",
+      "country": ""
+    },
+    "abuse": {
+      "email": "",
+      "name": "",
+      "phone": "",
+      "address": "",
+      "country": "",
+      "network": "",
+      "validated": false,
+      "unvalidated_since": ""
     }
   },
   "lookup": [
@@ -1959,7 +2003,7 @@
     },
     {
       "name": "trial-full-answer",
-      "why": "A free-plan key within its UTC day's trial, the first 100 lookups: every field, as a paid plan answers it, and trial_expired false. trial_expired maps on presence like any flag.",
+      "why": "A free-plan key within its trial: every field, as a paid plan answers it, and trial_expired false. trial_expired maps on presence like any flag.",
       "status": 200,
       "body": {
         "ip": "146.70.116.130",
@@ -2062,7 +2106,7 @@
     },
     {
       "name": "trial-expired-answer",
-      "why": "A free-plan key past its UTC day's trial: Unlimited's answer, and trial_expired true. What the day no longer answers is absent, never false.",
+      "why": "A free-plan key past its trial: Unlimited's answer, and trial_expired true. What the trial no longer answers is absent, never false.",
       "status": 200,
       "body": {
         "ip": "146.70.116.130",
@@ -2222,6 +2266,759 @@
           "prefix": "146.70.116.0/24"
         }
       }
+    },
+    {
+      "name": "unlimited-anycast-hostname",
+      "why": "Unlimited's answer, with a key or without one, also carries is_anycast, hostname, and the AS's country and RPKI status. The paid members stay absent, never false or empty.",
+      "status": 200,
+      "body": {
+        "ip": "1.1.1.1",
+        "is_bogon": false,
+        "is_vpn": false,
+        "is_relay": false,
+        "is_tor": false,
+        "is_anycast": true,
+        "relay": {},
+        "tor": {},
+        "location": {
+          "continent": "OC",
+          "continent_name": "Oceania",
+          "country": "AU",
+          "country_name": "Australia",
+          "timezone": "Australia/Sydney",
+          "currency_code": "AUD",
+          "currency_name": "Australian Dollar",
+          "currency_symbol": "$",
+          "flag_emoji": "🇦🇺",
+          "flag_unicode": "U+1F1E6 U+1F1FA"
+        },
+        "asn": {
+          "asn": 13335,
+          "name": "Cloudflare, Inc.",
+          "domain": "cloudflare.com",
+          "type": "hosting",
+          "prefix": "1.1.1.0/24",
+          "country": "US",
+          "rpki_status": "valid"
+        },
+        "hostname": "one.one.one.one"
+      },
+      "expect": {
+        "ip": "1.1.1.1",
+        "isBogon": false,
+        "present": {
+          "is_vpn": false,
+          "is_relay": false,
+          "is_tor": false,
+          "is_anycast": true
+        },
+        "absent": [
+          "is_hosting",
+          "is_cdn",
+          "is_resproxy",
+          "is_dcproxy",
+          "is_mobproxy",
+          "is_pubproxy",
+          "is_carrier",
+          "is_satellite",
+          "is_ssh",
+          "is_smtp",
+          "is_web",
+          "is_dns_resolver",
+          "is_bittorrent",
+          "vpn",
+          "hosting",
+          "cdn",
+          "resproxy",
+          "dcproxy",
+          "mobproxy",
+          "pubproxy",
+          "carrier",
+          "satellite",
+          "ssh",
+          "smtp",
+          "dns_resolver",
+          "bittorrent",
+          "web",
+          "company",
+          "abuse"
+        ],
+        "emptyPresent": [
+          "relay",
+          "tor"
+        ],
+        "location": {
+          "continent": "OC",
+          "continent_name": "Oceania",
+          "country": "AU",
+          "country_name": "Australia",
+          "timezone": "Australia/Sydney",
+          "currency_code": "AUD",
+          "currency_name": "Australian Dollar",
+          "currency_symbol": "$",
+          "flag_emoji": "🇦🇺",
+          "flag_unicode": "U+1F1E6 U+1F1FA"
+        },
+        "asn": {
+          "asn": 13335,
+          "name": "Cloudflare, Inc.",
+          "domain": "cloudflare.com",
+          "type": "hosting",
+          "prefix": "1.1.1.0/24",
+          "country": "US",
+          "rpki_status": "valid"
+        },
+        "hostname": "one.one.one.one"
+      }
+    },
+    {
+      "name": "paid-anycast-web-dns-resolver",
+      "why": "A paid answer carries the network and service flags with their detail, the finer location, the company, the hostname and the abuse contact. web is a row per port that answered, lowest first; a false flag's detail is {} and a false is_web's is [].",
+      "status": 200,
+      "body": {
+        "ip": "1.1.1.1",
+        "is_bogon": false,
+        "is_vpn": false,
+        "is_hosting": false,
+        "is_relay": false,
+        "is_tor": false,
+        "is_cdn": false,
+        "is_resproxy": false,
+        "is_dcproxy": false,
+        "is_mobproxy": false,
+        "is_pubproxy": false,
+        "is_anycast": true,
+        "is_carrier": false,
+        "is_satellite": false,
+        "is_ssh": false,
+        "is_smtp": false,
+        "is_web": true,
+        "is_dns_resolver": true,
+        "is_bittorrent": false,
+        "vpn": {},
+        "hosting": {},
+        "relay": {},
+        "tor": {},
+        "cdn": {},
+        "resproxy": {},
+        "dcproxy": {},
+        "mobproxy": {},
+        "pubproxy": {},
+        "carrier": {},
+        "satellite": {},
+        "ssh": {},
+        "smtp": {},
+        "web": [
+          {
+            "port": 80,
+            "tls_ok": false,
+            "session_ok": true,
+            "status_code": 301,
+            "server": "cloudflare",
+            "location": "https://one.one.one.one/",
+            "title": "",
+            "cert_subject_cn": "",
+            "cert_subject_o": "",
+            "cert_issuer_dn": "",
+            "cert_browser_trusted": false,
+            "tls_version": "",
+            "first_seen": "2026-08-04",
+            "last_seen": "2026-11-15"
+          },
+          {
+            "port": 443,
+            "tls_ok": true,
+            "session_ok": true,
+            "status_code": 200,
+            "server": "cloudflare",
+            "location": "",
+            "title": "1.1.1.1 | The free app that makes your Internet faster.",
+            "cert_subject_cn": "cloudflare-dns.com",
+            "cert_subject_o": "Cloudflare, Inc.",
+            "cert_issuer_dn": "CN=DigiCert Global G2 TLS RSA SHA256 2020 CA1,O=DigiCert Inc,C=US",
+            "cert_browser_trusted": true,
+            "tls_version": "TLS 1.3",
+            "first_seen": "2026-08-04",
+            "last_seen": "2026-11-15"
+          }
+        ],
+        "dns_resolver": {
+          "port": 53,
+          "recursion_available": true,
+          "rcode": 0,
+          "answer_correct": true,
+          "first_seen": "2026-08-04",
+          "last_seen": "2026-11-15"
+        },
+        "bittorrent": {},
+        "location": {
+          "continent": "OC",
+          "continent_name": "Oceania",
+          "country": "AU",
+          "country_name": "Australia",
+          "timezone": "Australia/Sydney",
+          "currency_code": "AUD",
+          "currency_name": "Australian Dollar",
+          "currency_symbol": "$",
+          "flag_emoji": "🇦🇺",
+          "flag_unicode": "U+1F1E6 U+1F1FA",
+          "region": "New South Wales",
+          "region_code": "AU-NSW",
+          "city": "Sydney",
+          "postal_code": "2000",
+          "latitude": -33.86785,
+          "longitude": 151.20732,
+          "accuracy_radius": 20000,
+          "geoname_id": "2147714",
+          "dma_code": "",
+          "last_changed": "2026-09-30"
+        },
+        "asn": {
+          "asn": 13335,
+          "name": "Cloudflare, Inc.",
+          "domain": "cloudflare.com",
+          "type": "hosting",
+          "prefix": "1.1.1.0/24",
+          "country": "US",
+          "rpki_status": "valid"
+        },
+        "company": {
+          "name": "Cloudflare, Inc.",
+          "domain": "cloudflare.com",
+          "type": "hosting",
+          "country": "US"
+        },
+        "hostname": "one.one.one.one",
+        "abuse": {
+          "email": "abuse@cloudflare.com",
+          "name": "Abuse",
+          "phone": "+1-650-319-8930",
+          "address": "101 Townsend Street, San Francisco, CA 94107",
+          "country": "US",
+          "network": "1.1.1.0-1.1.1.255",
+          "validated": true,
+          "unvalidated_since": ""
+        },
+        "cap_reached": false
+      },
+      "expect": {
+        "ip": "1.1.1.1",
+        "isBogon": false,
+        "present": {
+          "is_anycast": true,
+          "is_carrier": false,
+          "is_satellite": false,
+          "is_ssh": false,
+          "is_smtp": false,
+          "is_web": true,
+          "is_dns_resolver": true,
+          "is_bittorrent": false,
+          "cap_reached": false
+        },
+        "absent": [
+          "trial_expired"
+        ],
+        "emptyPresent": [
+          "carrier",
+          "satellite",
+          "ssh",
+          "smtp",
+          "bittorrent"
+        ],
+        "web": [
+          {
+            "port": 80,
+            "tls_ok": false,
+            "session_ok": true,
+            "status_code": 301,
+            "server": "cloudflare",
+            "location": "https://one.one.one.one/",
+            "title": "",
+            "cert_subject_cn": "",
+            "cert_subject_o": "",
+            "cert_issuer_dn": "",
+            "cert_browser_trusted": false,
+            "tls_version": "",
+            "first_seen": "2026-08-04",
+            "last_seen": "2026-11-15"
+          },
+          {
+            "port": 443,
+            "tls_ok": true,
+            "session_ok": true,
+            "status_code": 200,
+            "server": "cloudflare",
+            "location": "",
+            "title": "1.1.1.1 | The free app that makes your Internet faster.",
+            "cert_subject_cn": "cloudflare-dns.com",
+            "cert_subject_o": "Cloudflare, Inc.",
+            "cert_issuer_dn": "CN=DigiCert Global G2 TLS RSA SHA256 2020 CA1,O=DigiCert Inc,C=US",
+            "cert_browser_trusted": true,
+            "tls_version": "TLS 1.3",
+            "first_seen": "2026-08-04",
+            "last_seen": "2026-11-15"
+          }
+        ],
+        "dns_resolver": {
+          "port": 53,
+          "recursion_available": true,
+          "rcode": 0,
+          "answer_correct": true,
+          "first_seen": "2026-08-04",
+          "last_seen": "2026-11-15"
+        },
+        "location": {
+          "continent": "OC",
+          "continent_name": "Oceania",
+          "country": "AU",
+          "country_name": "Australia",
+          "timezone": "Australia/Sydney",
+          "currency_code": "AUD",
+          "currency_name": "Australian Dollar",
+          "currency_symbol": "$",
+          "flag_emoji": "🇦🇺",
+          "flag_unicode": "U+1F1E6 U+1F1FA",
+          "region": "New South Wales",
+          "region_code": "AU-NSW",
+          "city": "Sydney",
+          "postal_code": "2000",
+          "latitude": -33.86785,
+          "longitude": 151.20732,
+          "accuracy_radius": 20000,
+          "geoname_id": "2147714",
+          "dma_code": "",
+          "last_changed": "2026-09-30"
+        },
+        "asn": {
+          "asn": 13335,
+          "name": "Cloudflare, Inc.",
+          "domain": "cloudflare.com",
+          "type": "hosting",
+          "prefix": "1.1.1.0/24",
+          "country": "US",
+          "rpki_status": "valid"
+        },
+        "company": {
+          "name": "Cloudflare, Inc.",
+          "domain": "cloudflare.com",
+          "type": "hosting",
+          "country": "US"
+        },
+        "abuse": {
+          "email": "abuse@cloudflare.com",
+          "name": "Abuse",
+          "phone": "+1-650-319-8930",
+          "address": "101 Townsend Street, San Francisco, CA 94107",
+          "country": "US",
+          "network": "1.1.1.0-1.1.1.255",
+          "validated": true,
+          "unvalidated_since": ""
+        },
+        "hostname": "one.one.one.one"
+      }
+    },
+    {
+      "name": "paid-carrier-ssh-smtp-bittorrent",
+      "why": "A paid answer for a carrier's address with SSH, SMTP and BitTorrent seen on it: each detail maps whole, BitTorrent's clients a list. No web server answered, so is_web is false and web is [], and an unvalidated abuse contact keeps validated false with the date it lapsed.",
+      "status": 200,
+      "body": {
+        "ip": "172.56.10.20",
+        "is_bogon": false,
+        "is_vpn": false,
+        "is_hosting": false,
+        "is_relay": false,
+        "is_tor": false,
+        "is_cdn": false,
+        "is_resproxy": false,
+        "is_dcproxy": false,
+        "is_mobproxy": false,
+        "is_pubproxy": false,
+        "is_anycast": false,
+        "is_carrier": true,
+        "is_satellite": false,
+        "is_ssh": true,
+        "is_smtp": true,
+        "is_web": false,
+        "is_dns_resolver": false,
+        "is_bittorrent": true,
+        "vpn": {},
+        "hosting": {},
+        "relay": {},
+        "tor": {},
+        "cdn": {},
+        "resproxy": {},
+        "dcproxy": {},
+        "mobproxy": {},
+        "pubproxy": {},
+        "carrier": {
+          "name": "T-Mobile US",
+          "mcc": "310",
+          "mnc": "260",
+          "country": "US",
+          "confidence": "high"
+        },
+        "satellite": {},
+        "ssh": {
+          "port": 22,
+          "banner": "SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.5",
+          "host_key_fp": "SHA256:9Bq3Jrm6pVJ7QqV2c8l0pE6f8wJ4sZ4u5tYyH9cXo1E",
+          "session_ok": true,
+          "first_seen": "2026-08-04",
+          "last_seen": "2026-11-15"
+        },
+        "smtp": {
+          "port": 25,
+          "banner": "220 mail.example.com ESMTP Postfix",
+          "session_ok": false,
+          "first_seen": "2026-08-04",
+          "last_seen": "2026-11-15"
+        },
+        "web": [],
+        "dns_resolver": {},
+        "bittorrent": {
+          "verified": true,
+          "id_matches_ip": false,
+          "first_seen": "2026-08-21",
+          "last_seen": "2026-11-15",
+          "last_reachable": "2026-11-14",
+          "days_seen": 37,
+          "num_ports": 4,
+          "peak_num_ports": 2,
+          "indexer": false,
+          "clients": [
+            "qB",
+            "TR"
+          ]
+        },
+        "location": {
+          "continent": "NA",
+          "continent_name": "North America",
+          "country": "US",
+          "country_name": "United States",
+          "timezone": "America/Chicago",
+          "currency_code": "USD",
+          "currency_name": "US Dollar",
+          "currency_symbol": "$",
+          "flag_emoji": "🇺🇸",
+          "flag_unicode": "U+1F1FA U+1F1F8",
+          "region": "Texas",
+          "region_code": "US-TX",
+          "city": "Dallas",
+          "postal_code": "75201",
+          "latitude": 32.78306,
+          "longitude": -96.80667,
+          "accuracy_radius": 100,
+          "geoname_id": "4684888",
+          "dma_code": "623",
+          "last_changed": "2026-10-12"
+        },
+        "asn": {
+          "asn": 21928,
+          "name": "T-Mobile USA, Inc.",
+          "domain": "t-mobile.com",
+          "type": "isp",
+          "prefix": "172.56.0.0/14",
+          "country": "US",
+          "rpki_status": "not_found"
+        },
+        "company": {
+          "name": "T-Mobile USA, Inc.",
+          "domain": "t-mobile.com",
+          "type": "isp",
+          "country": "US"
+        },
+        "hostname": "",
+        "abuse": {
+          "email": "abuse@t-mobile.com",
+          "name": "T-Mobile Abuse",
+          "phone": "",
+          "address": "Bellevue, WA, US",
+          "country": "US",
+          "network": "172.56.0.0-172.59.255.255",
+          "validated": false,
+          "unvalidated_since": "2025-03-01"
+        },
+        "cap_reached": false
+      },
+      "expect": {
+        "ip": "172.56.10.20",
+        "isBogon": false,
+        "present": {
+          "is_anycast": false,
+          "is_carrier": true,
+          "is_satellite": false,
+          "is_ssh": true,
+          "is_smtp": true,
+          "is_web": false,
+          "is_dns_resolver": false,
+          "is_bittorrent": true
+        },
+        "absent": [],
+        "emptyPresent": [
+          "satellite",
+          "dns_resolver"
+        ],
+        "carrier": {
+          "name": "T-Mobile US",
+          "mcc": "310",
+          "mnc": "260",
+          "country": "US",
+          "confidence": "high"
+        },
+        "ssh": {
+          "port": 22,
+          "banner": "SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.5",
+          "host_key_fp": "SHA256:9Bq3Jrm6pVJ7QqV2c8l0pE6f8wJ4sZ4u5tYyH9cXo1E",
+          "session_ok": true,
+          "first_seen": "2026-08-04",
+          "last_seen": "2026-11-15"
+        },
+        "smtp": {
+          "port": 25,
+          "banner": "220 mail.example.com ESMTP Postfix",
+          "session_ok": false,
+          "first_seen": "2026-08-04",
+          "last_seen": "2026-11-15"
+        },
+        "bittorrent": {
+          "verified": true,
+          "id_matches_ip": false,
+          "first_seen": "2026-08-21",
+          "last_seen": "2026-11-15",
+          "last_reachable": "2026-11-14",
+          "days_seen": 37,
+          "num_ports": 4,
+          "peak_num_ports": 2,
+          "indexer": false,
+          "clients": [
+            "qB",
+            "TR"
+          ]
+        },
+        "web": [],
+        "location": {
+          "continent": "NA",
+          "continent_name": "North America",
+          "country": "US",
+          "country_name": "United States",
+          "timezone": "America/Chicago",
+          "currency_code": "USD",
+          "currency_name": "US Dollar",
+          "currency_symbol": "$",
+          "flag_emoji": "🇺🇸",
+          "flag_unicode": "U+1F1FA U+1F1F8",
+          "region": "Texas",
+          "region_code": "US-TX",
+          "city": "Dallas",
+          "postal_code": "75201",
+          "latitude": 32.78306,
+          "longitude": -96.80667,
+          "accuracy_radius": 100,
+          "geoname_id": "4684888",
+          "dma_code": "623",
+          "last_changed": "2026-10-12"
+        },
+        "asn": {
+          "asn": 21928,
+          "name": "T-Mobile USA, Inc.",
+          "domain": "t-mobile.com",
+          "type": "isp",
+          "prefix": "172.56.0.0/14",
+          "country": "US",
+          "rpki_status": "not_found"
+        },
+        "company": {
+          "name": "T-Mobile USA, Inc.",
+          "domain": "t-mobile.com",
+          "type": "isp",
+          "country": "US"
+        },
+        "abuse": {
+          "email": "abuse@t-mobile.com",
+          "name": "T-Mobile Abuse",
+          "phone": "",
+          "address": "Bellevue, WA, US",
+          "country": "US",
+          "network": "172.56.0.0-172.59.255.255",
+          "validated": false,
+          "unvalidated_since": "2025-03-01"
+        },
+        "hostname": ""
+      }
+    },
+    {
+      "name": "paid-satellite",
+      "why": "A paid answer for a satellite operator's address: satellite maps whole, its asn an integer, and every other new detail is empty.",
+      "status": 200,
+      "body": {
+        "ip": "98.97.0.1",
+        "is_bogon": false,
+        "is_vpn": false,
+        "is_hosting": false,
+        "is_relay": false,
+        "is_tor": false,
+        "is_cdn": false,
+        "is_resproxy": false,
+        "is_dcproxy": false,
+        "is_mobproxy": false,
+        "is_pubproxy": false,
+        "is_anycast": false,
+        "is_carrier": false,
+        "is_satellite": true,
+        "is_ssh": false,
+        "is_smtp": false,
+        "is_web": false,
+        "is_dns_resolver": false,
+        "is_bittorrent": false,
+        "vpn": {},
+        "hosting": {},
+        "relay": {},
+        "tor": {},
+        "cdn": {},
+        "resproxy": {},
+        "dcproxy": {},
+        "mobproxy": {},
+        "pubproxy": {},
+        "carrier": {},
+        "satellite": {
+          "provider": "starlink",
+          "provider_name": "Starlink",
+          "orbit": "leo",
+          "segment": "consumer",
+          "country": "US",
+          "asn": 14593,
+          "confidence": "high"
+        },
+        "ssh": {},
+        "smtp": {},
+        "web": [],
+        "dns_resolver": {},
+        "bittorrent": {},
+        "location": {
+          "continent": "NA",
+          "continent_name": "North America",
+          "country": "US",
+          "country_name": "United States",
+          "timezone": "America/Los_Angeles",
+          "currency_code": "USD",
+          "currency_name": "US Dollar",
+          "currency_symbol": "$",
+          "flag_emoji": "🇺🇸",
+          "flag_unicode": "U+1F1FA U+1F1F8",
+          "region": "California",
+          "region_code": "US-CA",
+          "city": "Los Angeles",
+          "postal_code": "90001",
+          "latitude": 34.05223,
+          "longitude": -118.24368,
+          "accuracy_radius": 500,
+          "geoname_id": "5368361",
+          "dma_code": "803",
+          "last_changed": "2026-10-20"
+        },
+        "asn": {
+          "asn": 14593,
+          "name": "Space Exploration Technologies Corporation",
+          "domain": "spacex.com",
+          "type": "isp",
+          "prefix": "98.97.0.0/20",
+          "country": "US",
+          "rpki_status": "valid"
+        },
+        "company": {
+          "name": "Starlink",
+          "domain": "starlink.com",
+          "type": "isp",
+          "country": "US"
+        },
+        "hostname": "customer.lsancax1.isp.starlinkisp.net",
+        "abuse": {
+          "email": "abuse@spacex.com",
+          "name": "SpaceX Abuse",
+          "phone": "",
+          "address": "Hawthorne, CA, US",
+          "country": "US",
+          "network": "98.97.0.0-98.97.15.255",
+          "validated": true,
+          "unvalidated_since": ""
+        },
+        "cap_reached": false
+      },
+      "expect": {
+        "ip": "98.97.0.1",
+        "isBogon": false,
+        "present": {
+          "is_satellite": true,
+          "is_carrier": false,
+          "is_web": false
+        },
+        "absent": [],
+        "emptyPresent": [
+          "carrier",
+          "ssh",
+          "smtp",
+          "dns_resolver",
+          "bittorrent"
+        ],
+        "satellite": {
+          "provider": "starlink",
+          "provider_name": "Starlink",
+          "orbit": "leo",
+          "segment": "consumer",
+          "country": "US",
+          "asn": 14593,
+          "confidence": "high"
+        },
+        "web": [],
+        "location": {
+          "continent": "NA",
+          "continent_name": "North America",
+          "country": "US",
+          "country_name": "United States",
+          "timezone": "America/Los_Angeles",
+          "currency_code": "USD",
+          "currency_name": "US Dollar",
+          "currency_symbol": "$",
+          "flag_emoji": "🇺🇸",
+          "flag_unicode": "U+1F1FA U+1F1F8",
+          "region": "California",
+          "region_code": "US-CA",
+          "city": "Los Angeles",
+          "postal_code": "90001",
+          "latitude": 34.05223,
+          "longitude": -118.24368,
+          "accuracy_radius": 500,
+          "geoname_id": "5368361",
+          "dma_code": "803",
+          "last_changed": "2026-10-20"
+        },
+        "asn": {
+          "asn": 14593,
+          "name": "Space Exploration Technologies Corporation",
+          "domain": "spacex.com",
+          "type": "isp",
+          "prefix": "98.97.0.0/20",
+          "country": "US",
+          "rpki_status": "valid"
+        },
+        "company": {
+          "name": "Starlink",
+          "domain": "starlink.com",
+          "type": "isp",
+          "country": "US"
+        },
+        "abuse": {
+          "email": "abuse@spacex.com",
+          "name": "SpaceX Abuse",
+          "phone": "",
+          "address": "Hawthorne, CA, US",
+          "country": "US",
+          "network": "98.97.0.0-98.97.15.255",
+          "validated": true,
+          "unvalidated_since": ""
+        },
+        "hostname": "customer.lsancax1.isp.starlinkisp.net"
+      }
     }
   ],
   "errors": [
@@ -2313,7 +3110,7 @@
         "Retry-After": "1"
       },
       "body": {
-        "error": "per-minute limit for Unlimited lookups exceeded; retry shortly, or use a paid plan"
+        "error": "rate limit for Unlimited lookups exceeded; retry shortly, or use a paid plan"
       },
       "expect": {
         "kind": "rate_limited",

@@ -1,7 +1,52 @@
 Revision history for Chem-Structure-Parser
 
 
-0.039 2026-10-09 CDT
+0.040 2026-11-19 CST (ChatGPT, Claude Opus 5.5 helped)
+
+ - convert($in, $out, %opt) writes a structure in the other format, mmCIF to
+   PDB or PDB to mmCIF, or in its own with the options applied:
+   convert('2mnz.cif', '2mnz.pdb').  The input is a file name, gzipped or
+   bzipped or not, or a reference to its text; the output a file name
+   (compressed when it is named .gz or .bz2), a file handle or a reference to
+   a scalar.  It is done in C by the readers structure_info() uses, so the
+   model, chains, hydrogens, waters and hetatm options mean what they mean
+   there, and nothing per atom is held but the text written: 2wy2, 411,648
+   atoms, converts in 0.3 s at a 74 MB peak.
+ - A converted file reads back as the structure it was read from, every chain,
+   residue, atom, model and count, and its numbers to the last bit wherever
+   the PDB columns have room for them.  Every alternate location, the
+   ANISOU records or _atom_site_anisotrop table, and the models go across,
+   and of the header the id, classification, date, title, keywords, method,
+   resolution, molecules and their chains, SEQRES, helices, sheets, SSBOND,
+   LINK and the cell.  gemmi reads the same atoms from a converted file as
+   from the original.
+ - A field a PDB record has no room for -- a chain id of two characters, a
+   residue name of five, a coordinate past 9999.999 -- stops a conversion to
+   PDB with a message naming the atom, rather than writing a record whose
+   columns are out of place.  An mmCIF number longer than its PDB column is
+   written to the column's decimals, and convert() returns how many were.
+ - Serial numbers past 99,999 and residue numbers past 9,999 are written in
+   hybrid-36, as the reader has read them since 0.036.
+ - An mmCIF _atom_site row whose pdbx_PDB_model_num is '.' or '?', or is not
+   a number, is model 0, a model of its own, as gemmi files it.  It used to
+   join whatever model the row before it was in, so the same rows in another
+   order were a different structure, and model => 2 could hand back atoms the
+   file never said were model 2.  A file with no model column is model 1, as
+   before.
+ - structure_features() with sasa => 0 no longer allocates the per-atom and
+   per-residue surface arrays of the interface that it then threw away, and
+   the cation-pi search measures only the rings of the other partner's
+   aromatic residues rather than every ring in the structure.  The answers
+   are unchanged.
+ - structure_info() with features => 0 is about a fifth faster: the residues,
+   chains and models are assembled out of the parse in C rather than in Perl,
+   with the same answer to the byte on 202 structures read eight ways.  An
+   ensemble read with model => 'all' peaks lower for it (2wy2: 596 MB to
+   565 MB), and the default read peaks lower because the parse is let go of
+   before the properties are computed (4fqr: 221 MB to 209 MB).
+ - structure_atoms() builds its list in C, a fifth faster, the same list.
+
+0.039 2026-10-09 CDT (Claude Opus 5.5 helped)
 
  - A residue given a number its chain has already used is a residue of its
    own: a water written after TER under the protein's chain and number, or a

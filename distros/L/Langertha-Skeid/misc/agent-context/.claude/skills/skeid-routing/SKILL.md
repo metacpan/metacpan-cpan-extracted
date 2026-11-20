@@ -38,6 +38,27 @@ The two ways a tier fails differ, and that is the whole design:
 Requested vs served model diverge here: the upstream body carries the served model, the usage
 event both (`model`, `requested_model` — skill `skeid-core`, Usage).
 
+## Catch-all
+
+`routing.catch_all: { chat: <name>, embeddings: <name> }` (ADR 0033) routes an **unknown** model
+name to the target of the route's kind. Off unless configured; a routing key like the others
+(`%ROUTING_SETTINGS`, a removed key turns it off), only `chat` and `embeddings`, anything else
+fails the load. The target's existence is not checked.
+
+- The kind is the **route's**, not a node kind: `chat` = `/v1/chat/completions`, `/v1/messages`,
+  `/api/chat`, `/api/generate`; `embeddings` = `/v1/embeddings`, `/api/embed`, `/api/embeddings`.
+  No other route is bent. Never pass it as `kind` to `route_plan` — that one is the node kind.
+- `catch_all_target($name, $route_kind)` answers the target or nothing. Known = an alias or the
+  `model` of a chat-kind node, health and policy ignored; a model-less chat-kind node makes every
+  name known; an empty name is unknown. The node models are cached per inventory generation
+  (`_known_node_models`) — no inventory scan per request.
+- The proxy bends once, before `_begin_route_async` (`_catch_all` in `Proxy.pm`), so nothing sits
+  between `request.start` and `request.finish`. From there it is a request for the target: the
+  policy `403`, the rate, admission, the errors and the translated answer all name the target.
+- Usage: `requested_model` = what the client sent, `routed_model` = the target, only on a bent
+  request (skill `skeid-usage`). `/v1/models`, `/api/tags` and the manifest do not show the
+  catch-all; `GET /skeid/config` does (`catch_all`, only the kinds configured).
+
 ## Node kind and the routing key `documents`
 
 A node's `kind` (`chat` default; `documents` = docling-serve, ADR 0028) is a selector axis beside
@@ -90,6 +111,12 @@ keys:
 - **Identity is derived, never asserted.** The policy hangs off the customer key id, which comes
   from the presented key (`key_id_for_key`), not from `x-skeid-key-id` — unless
   `routing.trust_key_id_header` says a gateway in front authenticated the caller.
+- **Key rate** (k125): a policy or keys entry may carry `rate: { per_s, burst, per_min }`;
+  `rate_admit` (token buckets per key id, in memory per process, divided by
+  `_admission_divisor` like `max_conns`) runs in `_begin_route_async` after the `403` check and
+  before any tier: over it `_refuse_rate_limited` answers `429` + `Retry-After` and records one
+  usage event (`key_rate_limited`, no node, no content). Buckets reset when the rate changes and
+  are pruned at policy load. Counters on `GET /skeid/metrics/keys`. `t/92-key-rate-limit.t`.
 
 ## Customer source
 

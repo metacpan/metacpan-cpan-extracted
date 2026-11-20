@@ -47,6 +47,7 @@ WriteMakefile(
 		'Object::Configure' => 0,
 		'Params::Get' => 0,
 		'Readonly' => 0,
+		'Sys::Syslog' => 0,
 		'XML::PP' => 0,
 	}, 'TEST_REQUIRES' => {
 		'File::Temp' => 0,

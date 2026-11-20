@@ -7,7 +7,7 @@ use utf8;
 
 use Langertha::Holmgang::Sim::Linux::Nft ();
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 my $MAIN = '/etc/ssh/sshd_config';
@@ -341,7 +341,7 @@ Langertha::Holmgang::Sim::Linux::SshAccess - Whether a user can log in over SSH:
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

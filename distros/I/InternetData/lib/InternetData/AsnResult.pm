@@ -5,7 +5,7 @@ use warnings;
 
 use Carp ();
 
-our $VERSION = '1.16.1';
+our $VERSION = '1.17.0';
 
 # Copied as served. Those the spec does not require are paid, and absent from an
 # answer whose plan leaves them out.
