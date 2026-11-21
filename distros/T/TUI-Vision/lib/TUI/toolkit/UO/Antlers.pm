@@ -421,6 +421,8 @@ C<confess>.
 
 =item * L<Exporter>
 
+=item * L<Importer>
+
 =item * L<MRO::Compat> when using perl < v5.10 
 
 =item * L<Scalar::Util>

@@ -24,6 +24,7 @@ subtest 'tb_send / tb_sendf' => sub {
     return TB_OK;
   };
 
+  local $Termbox::global->{initialized} = 1;
   local $Termbox::global->{outbuf} = '';
 
   is(tb_send("abc", 3), TB_OK, 'tb_send OK');

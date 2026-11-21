@@ -1,4 +1,4 @@
-package Dist::Conformance 0.006;
+package Dist::Conformance 0.007;
 
 # ABSTRACT: Whether the development harness of a repository conforms to its standards, and bringing it up to date
 
@@ -144,6 +144,17 @@ sub update ( $self, %options ) {
 }
 
 
+sub adopt ($self) {
+    my $snapshot = $self->snapshot;
+    my %adopted;
+    for my $check ( @{ $self->checks } ) {
+        my $answer = $check->adopt($snapshot) // next;
+        $adopted{ $check->name } = $answer;
+    }
+    return \%adopted;
+}
+
+
 sub failed ($results) {
     return List::Util::any { $_->{status} eq 'fail' } @$results;
 }
@@ -160,7 +171,7 @@ Dist::Conformance - Whether the development harness of a repository conforms to 
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -308,6 +319,13 @@ order: C<check>, the name; C<changes>, what it changed or would change, each
 with an C<action> and a C<path>; and C<manual>, what is left for a person.  A
 check whose update dies has the error in C<manual>, and the other checks still
 run.
+
+=head2 adopt
+
+Asks every check that is not skipped what configuration would accept the
+checkout as it is now, through L<Dist::Conformance::Check/adopt>.  Returns a
+hash reference from the name of each check that has an answer to the answer,
+which is what the check would take under C<checks> in F<.conformance.yml>.
 
 =head1 FUNCTIONS
 

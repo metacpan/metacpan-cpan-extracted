@@ -660,7 +660,7 @@ my $rx_lic = qr/^Provider License Number/;
 #--------
 {
 	my $x = File::Spec->catfile($dir, 'book.xlsx');
-	my $groes = "Gr\xc3\xb6\xc3\x9fe";
+	my $groes = "Gr\xc3\xb6\xc3\x9fe";	# written as these bytes
 	write_table([
 		[ 'NPI', 'Provider License Number_1', 'name', $groes, 'n' ],
 		[ 101, 'A1', 'bob', 180, 5 ],
@@ -668,7 +668,7 @@ my $rx_lic = qr/^Provider License Number/;
 	], $x, quiet => 1);
 	check_all('.xlsx', $x, [qw(NPI name n)], [ [101, 'bob', 5], [102, 'amy', undef] ],
 		[ keep_cols => [qw(NPI name n)] ]);
-	check_all('.xlsx, a pattern and a UTF-8 name', $x, [ 'NPI', 'Provider License Number_1', $groes ],
+	check_all('.xlsx, a pattern and a UTF-8 name', $x, [ 'NPI', 'Provider License Number_1', "Gr\x{f6}\x{df}e" ],
 		[ [101, 'A1', 180], [102, undef, 175] ], [ keep_cols => [ 'NPI', $rx_lic, "Gr\x{f6}\x{df}e" ] ]);
 	check_all('.xlsx, an absent name', $x, [qw(NPI n)], [ [101, 5], [102, undef] ],
 		[ keep_cols => [qw(NPI n N)] ], qr/not all columns named in 'keep_cols' exist in .*: 'N'\n\z/);

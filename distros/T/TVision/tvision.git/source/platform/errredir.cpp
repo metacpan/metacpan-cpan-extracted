@@ -52,17 +52,25 @@ static bool isSameFile(int fd1, int fd2)
         && stat1.st_ino == stat2.st_ino;
 }
 
-static void copyFile(int src, int dst, size_t size)
+static void writeFile(int dst, const char *buf, size_t size)
+{
+    size_t bytesLeft = size;
+    ssize_t w;
+    while ( bytesLeft > 0 &&
+            (w = write(dst, &buf[size - bytesLeft], bytesLeft)) > 0 )
+        bytesLeft -= (size_t) w;
+}
+
+static void dumpPipe(int src, int dst, size_t size)
 {
     static thread_local char buf alignas(4096) [4096];
-    ssize_t r, w;
     size_t bytesLeft = size;
-    lseek(src, 0, SEEK_SET);
-    while (bytesLeft > 0 && (r = read(src, buf, min(bytesLeft, sizeof(buf)))) > 0)
+    ssize_t r;
+    while ( bytesLeft > 0 &&
+            (r = read(src, buf, min(bytesLeft, sizeof(buf)))) > 0 )
     {
+        writeFile(dst, buf, (size_t) r);
         bytesLeft -= (size_t) r;
-        while (r > 0 && (w = write(dst, buf, r)) > 0)
-            r -= w;
     }
 }
 
@@ -70,13 +78,17 @@ StderrRedirector::~StderrRedirector()
 {
     // Restore standard error to the default state as long as it still
     // refers to our buffer, then dump the buffer contents to it.
+    // There are some edge cases that are not being handled here:
+    // - read()/write() and EINTR.
+    // - If the pipe keeps being written to as we read from it.
+    // But this runs during program shutdown and we don't want to get stuck here.
     if (isSameFile(bufFd[1], STDERR_FILENO))
     {
         dup2(ttyFd, STDERR_FILENO);
 
         int size;
         if (ioctl(bufFd[0], FIONREAD, &size) != -1 && size > 0)
-            copyFile(bufFd[0], ttyFd, (size_t) size);
+            dumpPipe(bufFd[0], ttyFd, (size_t) size);
     }
 
     for (int fd : {ttyFd, bufFd[0], bufFd[1]})

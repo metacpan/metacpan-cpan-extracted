@@ -5,10 +5,12 @@ use Test::More;
 use Test::Exception;
 
 BEGIN {
+  use_ok 'TUI::Drivers::Const', qw( evCommand evNothing );
   use_ok 'TUI::Drivers::Event';
   use_ok 'TUI::Objects::Rect';
   use_ok 'TUI::App::Background';
   use_ok 'TUI::App::DeskTop';
+  use_ok 'TUI::Views::Const', qw( :cmXXXX );
 }
 
 # Test object creation
@@ -28,6 +30,15 @@ can_ok( $desktop, 'handleEvent' );
 my $event = TEvent->new();
 lives_ok { $desktop->handleEvent( $event ) }
   'handleEvent works correctly';
+
+# cmNext is handled and the event is cleared afterwards
+my $nextEvent = TEvent->new(
+  what    => evCommand,
+  message => { command => cmNext },
+);
+lives_ok { $desktop->handleEvent( $nextEvent ) }
+  'handleEvent handles cmNext';
+is( $nextEvent->{what}, evNothing, 'handleEvent clears the cmNext event' );
 
 # Test initBackground method
 can_ok( $desktop, 'initBackground' );

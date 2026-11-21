@@ -6,7 +6,7 @@ extends 'Dist::Zilla::Plugin::GitHub::CreateRelease';
 use Config::Identity;
 use Pithub::Repos::Releases;
 
-our $VERSION = '0.328';
+our $VERSION = '0.329';
 
 
 has make_latest => (
@@ -96,7 +96,7 @@ Dist::Zilla::Plugin::Author::GETTY::GitHubRelease - Create a GitHub release as d
 
 =head1 VERSION
 
-version 0.328
+version 0.329
 
 =head1 DESCRIPTION
 

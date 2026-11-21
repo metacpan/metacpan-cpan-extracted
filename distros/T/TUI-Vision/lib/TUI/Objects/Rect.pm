@@ -8,7 +8,7 @@ use warnings;
 use List::Util qw( min max );
 use TUI::Objects::Point;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -39,14 +39,16 @@ our %HAS; BEGIN {
 
 # This method accepts a variable number of arguments:
 #
-# If four arguments I<(ax, ay, bx, by)> are provided, it creates two L<TPoint|TUI::Objects::Point> 
-# objects for points I<a> and I<b> with the specified coordinates.
+# If four arguments I<(ax, ay, bx, by)> are provided, it creates two 
+# L<TPoint|TUI::Objects::Point> objects for points I<a> and I<b> with the 
+# specified coordinates.
 #
 # If two arguments I<(a, b)> are provided, it sets points I<a> and I<b> to the
 # provided L<TPoint|TUI::Objects::Point> objects.
 #
 # If no or any other number of arguments are provided, it initializes points 
-# I<a> and I<b> with new L<TPoint|TUI::Objects::Point> objects with default values.
+# I<a> and I<b> with new L<TPoint|TUI::Objects::Point> objects with default 
+# values.
 sub new {    # \$obj (%args)
   my ( $class, $self );
   if ( @_ < 4 ) {

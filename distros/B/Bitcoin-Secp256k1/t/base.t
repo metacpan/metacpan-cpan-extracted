@@ -73,5 +73,16 @@ subtest 'should clear the object' => sub {
 	is $secp->_signature_schnorr, undef, 'cleared schnorr sig ok';
 };
 
+subtest 'should allow pushing public keys' => sub {
+	$secp->_clear;
+
+	$secp->_pubkey($t{pubkey});
+	$secp->_push_pubkey($t{to_combine}->[0]);
+	$secp->_push_pubkey($t{to_combine}->[1]);
+
+	$secp->_pubkey_combine;
+	is $secp->_pubkey, $t{combined}, 'manually combined ok';
+};
+
 done_testing;
 

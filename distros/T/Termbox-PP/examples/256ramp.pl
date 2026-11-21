@@ -12,9 +12,9 @@ use Termbox qw( :all );
 
 sub draw_ramp { # void ()
   for (my $i = 0; $i < 256; $i++) {
-		my $row = int(($i + 2) / 8) + 3;
-		my $col = (($i + 2) % 8) * 4;
-		my $text = sprintf("%03d", $i);
+    my $row = int(($i + 2) / 8) + 2;
+    my $col = (($i + 2) % 8) * 4;
+    my $text = sprintf("%03d", $i);
     for (my $j = 0; $j < 3; $j++) {
       my $ch = substr($text, $j, 1);
       tb_set_cell($col+$j, $row, $ch, $i+1, TB_DEFAULT);
@@ -47,7 +47,7 @@ exit do {
   GetOptions('help|?' => \my $help, 'man' => \my $man) or pod2usage(2);
   pod2usage(1) if $help;
   pod2usage(-exitval => 0, -verbose => 2) if $man;
-  main($#ARGV, $0, @ARGV);
+  main(@ARGV+1, [ $0, @ARGV ]);
 };
 
 __END__

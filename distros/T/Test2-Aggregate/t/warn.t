@@ -3,15 +3,19 @@ use Test2::Aggregate;
 
 my $root = (grep {/^\.$/i} @INC) ? undef : './';
 
-my $run = Test2::Aggregate::run_tests(
-    dirs          => ['xt/aggregate'],
-    lists         => ['xt/aggregate/aggregate.lst'],
-    root          => './',
-    sort          => 1,
-    test_warnings => 1
-);
+foreach my $abs (0..1) {
+    my $run = Test2::Aggregate::run_tests(
+        dirs          => ['xt/aggregate'],
+        lists         => ['xt/aggregate/aggregate.lst'],
+        root          => './',
+        sort          => 1,
+        absolute      => $abs,
+        test_warnings => 1
+    );
 
-check_output($run, "No warning", './');
+    check_output($run, $abs, "No warning", './');
+
+}
 
 like(
     warnings {
@@ -33,8 +37,9 @@ like(
             slow => 1
         );
         Test2::Aggregate::run_tests(
-            dirs => ['xt/aggregate'],
-            root => '/xx/',
+            dirs          => ['xt/aggregate'],
+            root          => '/xx/',
+            relative_root => 1
         );
     },
     [qr/Root .* does not exist/],
@@ -43,17 +48,21 @@ like(
 
 local $ENV{AGGREGATE_TEST_WARN} = 1;
 
-intercept {
-    $run = Test2::Aggregate::run_tests(
-        dirs          => ['xt/aggregate'],
-        repeat        => 2,
-        sort          => 1,
-        root          => $root,
-        test_warnings => 1
-    );
-};
+my $run;
+foreach my $abs (0..1) {
+    intercept {
+        $run = Test2::Aggregate::run_tests(
+            dirs          => ['xt/aggregate'],
+            repeat        => 2,
+            sort          => 1,
+            root          => $root,
+            absolute      => $abs,
+            test_warnings => 1
+        );
+    };
 
-check_output($run, "including failure");
+    check_output($run, $abs, "including failure");
+}
 
 eval "use Test2::Plugin::BailOnFail";
 
@@ -71,19 +80,22 @@ unless ($@) {
         match(qr#Test warning output:\n<.*check_env.t>\nAGGREGATE_TEST_WARN\nAGGREGATE_TEST_WARNx2\n#),
         "Got expected warning"
     );
-    check_output($run, "including failure on repeat == -1");
+    check_output($run, 0, "including failure on repeat == -1");
 }
 
 done_testing;
 
 sub check_output {
     my $run  = shift;
+    my $abs  = shift || 0;
     my $msg  = shift;
     my $r    = shift || $root || '';
     my %warn = ();
     my $pass = $ENV{AGGREGATE_TEST_WARN} ? 0 : 100;
     $warn{warnings} = "AGGREGATE_TEST_WARN\nAGGREGATE_TEST_WARNx2\n"
         if $ENV{AGGREGATE_TEST_WARN};
+
+    $r = '' unless $abs;
 
     is(
         $run,
@@ -100,6 +112,6 @@ sub check_output {
                 'pass_perc' => 100
             }
         },
-        "Correct output - $msg"
+        "Correct output - abs:$abs $msg"
     );
 }

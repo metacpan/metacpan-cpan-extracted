@@ -16,8 +16,10 @@ is(scalar(keys %$stats), 1, 'Only 1 subtest ran');
 is(
     intercept {
         Test2::Aggregate::run_tests(
-            dirs => ['xt/failing'],
-            root => $root
+            dirs         => ['xt/failing'],
+            root         => $root,
+            stats_output => '-',
+            pass_only    => 1
         )
     },
     array {

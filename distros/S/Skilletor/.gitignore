@@ -1,5 +1,30 @@
-# Perl / Dist::Zilla distribution
-.build/
+node_modules/
+*.tsbuildinfo
+.claude/settings.local.json
+
+# karr materialized task view -- never commit
+tasks/
+config.yml
+
+# Claude Code agent worktrees
+/.claude/worktrees/
+
+# claude plugin eval output
+evals/results/
+
+# throwaway homes of the tests against real Hermes (test/hermes.test.ts)
+/.tmp-hermes/
+
+# a Hermes that loads hermes/skilletor through a symlink compiles it here
+__pycache__/
+
+# Devel::NYTProf profile output
+nytprof.out
+
+# The Perl dist Skilletor (dist.ini): dzil build, its local binary check, make
+/.build/
+/Skilletor-*
+/binary-pp-args.txt
 _build/
 blib/
 /Build
@@ -8,9 +33,7 @@ blib/
 /pm_to_blib
 /MANIFEST.bak
 /MYMETA.*
-/Skilletor-*
-*.tar.gz
-cover_db/
+/cover_db/
 
 # Carton
 /local/

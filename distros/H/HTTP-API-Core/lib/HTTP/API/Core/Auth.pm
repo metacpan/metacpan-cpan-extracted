@@ -61,7 +61,7 @@ sub api_key_auth {
             $fragment = $1;
         }
         my $encoded_name = _uri_escape($name);
-        return if $url =~ /(?:[?&])\Q$encoded_name\E=/;
+        return if _query_has_key($url, $encoded_name);
         my $separator = index($url, '?') >= 0 ? '&' : '?';
         $ctx->{url} = $url . $separator . $encoded_name . '=' . _uri_escape($value) . $fragment;
     };
@@ -72,6 +72,25 @@ sub _set_header_if_absent {
     my $wanted = lc $name;
     return if grep { lc($_) eq $wanted } keys %$headers;
     $headers->{$name} = $value;
+}
+
+# Compare parameter names as percent-decoded bytes. A key without '=' is
+# still present; the URL's original encoding and fragment are left untouched.
+sub _query_has_key {
+    my ($url, $encoded_name) = @_;
+    my $question = index($url, '?');
+    return 0 if $question < 0;
+
+    my $wanted = $encoded_name;
+    $wanted =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/ge;
+
+    my $query = substr($url, $question + 1);
+    for my $pair (split /&/, $query) {
+        my ($key) = split /=/, $pair, 2;
+        $key =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/ge;
+        return 1 if $key eq $wanted;
+    }
+    return 0;
 }
 
 sub _uri_escape {

@@ -28,9 +28,11 @@ WriteMakefile1(
     'Encode'                => 0,
     'Importer'              => 0.026,
     'Import::Into'          => 1.002005,
+    'List::Util'            => 1.36,
     'Module::Loaded'        => 0,
     'Params::Check'         => 0,
-    'Scalar::List::Utils'   => 1.36,
+    'Scalar::Util'          => 0,
+    'Storable'              => 0,
     'Termbox::PP'           => '0.6.0',
     'Terminal::WCWidth'     => 0,
     'UNIVERSAL::Object'     => 0.17,
@@ -74,37 +76,39 @@ WriteMakefile1(
       'PerlX::Assert::PP' 
         => { file => 'lib/PerlX/Assert/PP.pm', version => '0.04' },
       'TUI::Vision' 
-        => { file => 'lib/TUI/Vision.pm', version => '2.0.2' },
+        => { file => 'lib/TUI/Vision.pm', version => '2.0.3' },
       'TUI::App' 
-        => { file => 'lib/TUI/App.pm', version => '2.0.2' },
+        => { file => 'lib/TUI/App.pm', version => '2.0.3' },
       'TUI::ColorSel' 
-        => { file => 'lib/TUI/ColorSel.pm', version => '2.0.2' },
+        => { file => 'lib/TUI/ColorSel.pm', version => '2.0.3' },
       'TUI::Dialogs'
-        => { file => 'lib/TUI/Dialogs.pm', version => '2.0.2' },
+        => { file => 'lib/TUI/Dialogs.pm', version => '2.0.3' },
       'TUI::Drivers'
-        => { file => 'lib/TUI/Drivers.pm', version => '2.0.2' },
+        => { file => 'lib/TUI/Drivers.pm', version => '2.0.3' },
       'TUI::Editors'
-        => { file => 'lib/TUI/Editors.pm', version => '2.0.2' },
+        => { file => 'lib/TUI/Editors.pm', version => '2.0.3' },
       'TUI::Gadgets'
-        => { file => 'lib/TUI/Gadgets.pm', version => '2.0.2' },
+        => { file => 'lib/TUI/Gadgets.pm', version => '2.0.3' },
       'TUI::Help'
-        => { file => 'lib/TUI/Help.pm', version => '2.0.2' },
+        => { file => 'lib/TUI/Help.pm', version => '2.0.3' },
       'TUI::Memory'
-        => { file => 'lib/TUI/Memory.pm', version => '2.0.2' },
+        => { file => 'lib/TUI/Memory.pm', version => '2.0.3' },
       'TUI::MsgBox'
-        => { file => 'lib/TUI/MsgBox.pm', version => '2.0.2' },
+        => { file => 'lib/TUI/MsgBox.pm', version => '2.0.3' },
       'TUI::Objects' 
-        => { file => 'lib/TUI/Objects.pm', version => '2.0.2' },
+        => { file => 'lib/TUI/Objects.pm', version => '2.0.3' },
+      'TUI::Outline'
+        => { file => 'lib/TUI/Outline.pm', version => '2.0.3' },
       'TUI::StdDlg'
-        => { file => 'lib/TUI/StdDlg.pm', version => '2.0.2' },
+        => { file => 'lib/TUI/StdDlg.pm', version => '2.0.3' },
       'TUI::TextView'
-        => { file => 'lib/TUI/TextView.pm', version => '2.0.2' },
+        => { file => 'lib/TUI/TextView.pm', version => '2.0.3' },
       'TUI::Validate'
-        => { file => 'lib/TUI/Validate.pm', version => '2.0.2' },
+        => { file => 'lib/TUI/Validate.pm', version => '2.0.3' },
       'TUI::Views'
-        => { file => 'lib/TUI/Views.pm', version => '2.0.2' },
+        => { file => 'lib/TUI/Views.pm', version => '2.0.3' },
       'TUI::toolkit'
-        => { file => 'lib/TUI/toolkit.pm', version => '2.0.2' },
+        => { file => 'lib/TUI/toolkit.pm', version => '2.0.3' },
     },
     prereqs => {
       runtime => {

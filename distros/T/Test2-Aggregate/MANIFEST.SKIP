@@ -7,7 +7,9 @@ MYMETA.*
 _build/
 cover_db/
 blib/
+.github/
 .git/
+.gitignore
 inc/
 .lwpcookies
 .last_cover_stats

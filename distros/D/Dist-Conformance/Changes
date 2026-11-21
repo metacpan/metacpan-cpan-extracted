@@ -1,5 +1,29 @@
 Revision history for Dist-Conformance
 
+0.007 2026-11-20 TEODESIAN
+    - The perlcritic profile is now the template with the overrides of the
+      repository, and nothing else.  A repository declares each departure
+      in .conformance.yml, under the overrides and the settings of
+      CriticProfile: a parameter, a policy turned off, a policy of its
+      own, or a global setting.  The check fails on every policy, parameter
+      and setting that differs, and the update writes the template with the
+      overrides.  Before, the check compared only which policies a profile
+      named, so a new parameter in the template, a policy that the template
+      turned off, and a hand edit of a profile never reached a check.  The
+      comments of the profile are now those of the template.  The keys
+      replace and retired are accepted and ignored: a policy that the
+      template drops now leaves every profile without a list.
+    - conformance adopt prints, as YAML, the configuration that makes the
+      checks accept a checkout as it is now, such as the overrides that
+      keep what a profile has of its own.  Merge it into .conformance.yml
+      before the first update.
+    - A module name in a flavor must be ASCII.  JSON::Validator compiled
+      the old pattern outside the /a flag of the source file, so \w matched
+      any Unicode letter.  A name such as Foo::Bär passed, and then failed
+      with "does not load".  The pattern is now the rule of
+      Module::Runtime, which spells out its character classes.  Such a name
+      now fails with "is not the name of a module".
+
 0.006 2026-11-17 TEODESIAN
     - The update of GitHooks installs each hook where git runs it from,
       as git rev-parse --git-path hooks says, so it honors

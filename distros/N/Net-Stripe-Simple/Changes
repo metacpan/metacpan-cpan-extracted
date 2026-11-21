@@ -1,5 +1,9 @@
 Revision history for Net::Stripe::Simple
 
+0.006     2026-11-20 12:35:00-00:00 Europe/London
+  * Use uri_escape_utf8 for escaping multi-byte characters
+    (Thanks Colin Kuskie)
+
 0.005     2021-03-23 19:10:21-00:00 Europe/London
   * Add payment intents functionality
   * Remove recipients and transfers functionality (deprecated by Stripe)

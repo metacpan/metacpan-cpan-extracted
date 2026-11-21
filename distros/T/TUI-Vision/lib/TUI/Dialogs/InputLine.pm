@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -16,6 +16,7 @@ our @EXPORT = qw(
 );
 
 use List::Util qw( min max );
+use Storable;
 use TUI::toolkit;
 use TUI::toolkit::Types qw(
   Maybe
@@ -38,6 +39,7 @@ use TUI::Drivers::Const qw(
   meDoubleClick
 );
 use TUI::Drivers::Util qw( ctrlToArrow );
+use TUI::Objects::Rect;
 use TUI::Validate::Const qw( :TVTransfer );
 use TUI::Views::Const qw(
   cmCancel
@@ -601,6 +603,56 @@ $checkValid = sub {   # $bool ($noAutoFill)
     return true;
   } #/ else [ if ( !$self->{validator...})]
 };
+
+sub write :method {    # void ($os)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $os ) = $sig->( @_ );
+  $self->SUPER::write( $os );
+  $os->put(
+    $self->{maxLen},
+    $self->{curPos},
+    $self->{firstPos},
+    $self->{selStart},
+    $self->{selEnd},
+    $self->{data},
+    $self->{validator},
+  );
+  return;
+}
+
+sub read :method {    # $self ($is)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $is ) = $sig->( @_ );
+  $self->SUPER::read( $is );
+  $self->{maxLen}    = $is->get();
+  $self->{curPos}    = $is->get();
+  $self->{firstPos}  = $is->get();
+  $self->{selStart}  = $is->get();
+  $self->{selEnd}    = $is->get();
+  $self->{data}      = $is->get();
+  $self->{oldData}   = '';
+  $self->{state}    |= sfCursorVis;
+  $self->{validator} = $is->get();
+  # $self->{options} |= ofSelectable | ofFirstClick;
+  return $self;
+}
+
+sub build {    # $obj ()
+  my ( $class ) = @_;
+  assert ( @_ == 1 );
+  assert ( is_Str $class );
+  assert ( Storable::is_retrieving );
+  return $class->new(
+    bounds  => TRect->new(), 
+    maxLen  => 0,
+  );
+}
 
 1
 

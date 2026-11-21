@@ -1,4 +1,4 @@
-# PODNAME: TUI::Manual::05
+# PODNAME: TUI::Manual::06
 # ABSTRACT: Windows and Dialogs in TUI::Vision
 
 __END__
@@ -37,10 +37,10 @@ desktop. While it provides a frame, a title and the controls required for
 moving, resizing and managing a window, its primary purpose is to act as a 
 container for other views.
 
-Unlike L<TDesktop|TUI::App::Desktop>, L<TMenuBar|TUI::Menus::MenuBar> and 
-L<TStatusLine|TUI::Views::StatusLine>, which exist as permanent parts of the 
-application framework, windows provide workspaces in which application-specific 
-functionality is assembled from smaller building blocks.
+Unlike L<TDeskTop|TUI::App::DeskTop>, L<TMenuBar|TUI::Menus::MenuBar> and
+L<TStatusLine|TUI::Menus::StatusLine>, which exist as permanent parts of the
+application framework, windows provide workspaces in which
+application-specific functionality is assembled from smaller building blocks.
 
 A typical window might appear as follows:
 
@@ -63,42 +63,42 @@ typically composed from several cooperating views.
 
     TWindow
         |
-        +-- Window Frame
-        |     |
-        |     +-- Title
-        |     +-- Number
-        |     +-- Icon
-        |     +-- Zoom Indicator
+        ├── Window Frame
+        │     │
+        │     ├── Title
+        │     ├── Number
+        │     ├── Icon
+        │     └── Zoom Indicator
         |
-        +-- TScroller
-            |
-            +-- TScrollBar (horizontal)
-            +-- TScrollBar (vertical)
+        └── TScroller
+            │
+            ├── TScrollBar (horizontal)
+            └── TScrollBar (vertical)
 
 It is useful to distinguish between the visual elements provided by the window 
 itself and the additional views inserted into the window.
 
-The frame, title and icon are part of the window representation and are managed 
-by L<TWindow|TUI::Views::Window>. Scrollbars, scroller's and 
-application-specific controls, on the other hand, are typically implemented as 
+The frame, title and icon are part of the window representation and are
+managed by L<TWindow|TUI::Views::Window>. Scrollbars, scroller's and
+application-specific controls, on the other hand, are typically implemented as
 separate views inserted into the window's view hierarchy.
 
 As a result, a window often appears to be a single object while internally 
 consisting of several cooperating views.
 
 This distinction becomes important when constructing application interfaces. 
-Features such as scrolling, list handling or custom data presentation are 
-usually implemented through additional views inserted into a window rather than 
-by extending the window itself.
+Features such as scrolling, list handling or custom data presentation are
+usually implemented through additional views inserted into a window rather
+than by extending the window itself.
 
 =head2 A Typical Window
 
-A newly created L<TWindow|TUI::Views::Window> is usually only an empty 
-workspace. It has a frame, a title and the mechanisms required to participate 
-in the desktop environment, but it does not yet provide application-specific 
+A newly created L<TWindow|TUI::Views::Window> is usually only an empty
+workspace. It has a frame, a title and the mechanisms required to participate
+in the desktop environment, but it does not yet provide application-specific
 behavior.
 
-The following example creates such a plain window and inserts it into the 
+The following example creates such a plain window and inserts it into the
 desktop:
 
     sub newWindow {
@@ -113,8 +113,8 @@ desktop:
         return;
     }
 
-This code creates a visible window, but the resulting object is still largely a 
-frame around an empty interior. It can be moved, selected and managed by the 
+This code creates a visible window, but the resulting object is still largely
+a frame around an empty interior. It can be moved, selected and managed by the
 desktop, but it does not yet display any useful content.
 
 =head2 Building a custom Window
@@ -123,8 +123,8 @@ In practical applications, a window normally becomes useful only after one or
 more additional views have been inserted into it.
 
     TWindow
-        |
-        +-- application-specific TView
+        │
+        └── application-specific TView
 
 This is the point where the distinction between a window and the views 
 contained within it becomes important. The window provides the workspace. The 
@@ -133,12 +133,12 @@ inserted view provides the behavior.
 A simplified event viewer window might be organized as follows:
 
     TEventViewer
-        |
-        +-- TWindow
-              |
-              +-- TScrollBar
-              |
-              +-- TTerminal
+        │
+        └── TWindow
+              │
+              ├── TScrollBar
+              │
+              └── TTerminal
 
 Here L<TEventViewer|TUI::Gadgets::EventViewer> is a specialized window. It 
 derives from L<TWindow|TUI::Views::Window>, creates a vertical scrollbar and 
@@ -177,22 +177,22 @@ The important detail is not the event viewer itself, but the way the window is
 assembled.
 
     TWindow
-        |
-        +-- standardScrollBar(...)
-        |
-        +-- TTerminal
-              |
-              +-- uses vertical scrollbar
+        │
+        ├── standardScrollBar(...)
+        │
+        └── TTerminal
+              │
+              └── uses vertical scrollbar
 
 The L<TWindow|TUI::Views::Window> does not print the events directly. Instead, 
 it creates and owns a view that is responsible for displaying them. The window 
 acts as the container and coordinator, while the embedded view brings the 
 workspace to life.
 
-The same approach can be seen throughout L<TUI::Vision>. Application windows are 
-often implemented as specialized subclasses of L<TWindow|TUI::Views::Window>, 
-while their contents are provided by additional views created and inserted 
-during initialization.
+The same approach can be seen throughout L<TUI::Vision>. Application windows
+are often implemented as specialized subclasses of
+L<TWindow|TUI::Views::Window>, while their contents are provided by additional
+views created and inserted during initialization.
 
 This allows application-specific behavior, data presentation and user 
 interaction to be separated into smaller, reusable components that can
@@ -238,18 +238,19 @@ this example the visible interface consists almost entirely of button views
 inserted into the dialog.
 
     TDialog
-        |
-        +-- TButton "OK"
-        |
-        +-- TButton "Cancel"
+        │
+        ├── TButton "OK"
+        │
+        └── TButton "Cancel"
 
 
 =head2 A Typical Dialog
 
-Dialogs are commonly used whenever an application needs to collect information, 
-present a set of options or request confirmation before performing an action.
+Dialogs are commonly used whenever an application needs to collect
+information, present a set of options or request confirmation before
+performing an action.
 
-Unlike many windows, which often contain one or two specialized views, dialogs 
+Unlike many windows, which often contain one or two specialized views, dialogs
 are usually assembled from a larger collection of smaller controls that work 
 together to perform a specific task.
 
@@ -275,31 +276,31 @@ While the dialog appears as a single object on the desktop, the visible
 interface is produced by several cooperating views.
 
     TDialog
-        |
-        +-- TCheckBoxes
-        |
-        +-- TRadioButtons
-        |
-        +-- TLabel
-        |
-        +-- TInputLine
-        |
-        +-- TButton "OK"
-        |
-        +-- TButton "Cancel"
+        │
+        ├── TCheckBoxes
+        │
+        ├── TRadioButtons
+        │
+        ├── TLabel
+        │
+        ├── TInputLine
+        │
+        ├── TButton "OK"
+        │
+        └── TButton "Cancel"
 
-Each control remains an independent view with its own responsibilities. The 
-check boxes manage a collection of Boolean options, the radio buttons provide a 
-mutually exclusive selection, the input line allows text entry and the buttons 
-determine how the dialog is closed.
+Each control remains an independent view with its own responsibilities. The
+check boxes manage a collection of Boolean options, the radio buttons provide
+a mutually exclusive selection, the input line allows text entry and the
+buttons determine how the dialog is closed.
 
-The dialog itself acts as the container that brings these views together into a 
-coherent user interface. It provides the frame, coordinates focus handling and 
-serves as the parent view for all controls inserted into it.
+The dialog itself acts as the container that brings these views together into
+a coherent user interface. It provides the frame, coordinates focus handling
+and serves as the parent view for all controls inserted into it.
 
-This style of composition is typical throughout L<TUI::Vision>. Additional 
-controls such as list boxes, history views, static text, scroll bars and custom 
-application views can be added using the same mechanism. Regardless of 
+This style of composition is typical throughout L<TUI::Vision>. Additional
+controls such as list boxes, history views, static text, scroll bars and
+custom application views can be added using the same mechanism. Regardless of
 complexity, the overall structure remains the same: the dialog provides the 
 environment while the contained views provide the functionality.
 
@@ -321,15 +322,15 @@ represent a single interaction.
 The example discussed in this chapter uses the following data object:
 
     TParameterData
-        |
-        +-- print
-        +-- font
-        +-- note
+        │
+        ├── print
+        ├── font
+        └── note
 
-The values stored in this object correspond directly to the controls contained 
-in the dialog. In L<TUI::Vision> this data exchange is commonly performed using 
-an array reference whose elements correspond to the controls displayed by the 
-dialog.
+The values stored in this object correspond directly to the controls contained
+in the dialog. In L<TUI::Vision> this data exchange is commonly performed
+using an array reference whose elements correspond to the controls displayed
+by the dialog.
 
 L<Class::Struct> is a convenient way to define a structured array-based data 
 object for dialog exchange. Its use is optional; any array reference that 
@@ -353,20 +354,20 @@ The dialog itself is assembled by creating individual controls and inserting
 them into the dialog.
 
     TDialog
-        |
-        +-- TCheckBoxes
-        |
-        +-- TRadioButtons
-        |
-        +-- TInputLine
-        |
-        +-- TButton "OK"
-        |
-        +-- TButton "Cancel"
+        │
+        ├── TCheckBoxes
+        │
+        ├── TRadioButtons
+        │
+        ├── TInputLine
+        │
+        ├── TButton "OK"
+        │
+        └── TButton "Cancel"
 
-Each control is created independently and added to the dialog using C<insert>. 
-While the controls appear as a single user interface on the screen, they remain 
-individual views within the dialog's hierarchy.
+Each control is created independently and added to the dialog using
+C<insert>. While the controls appear as a single user interface on the screen,
+they remain individual views within the dialog's hierarchy.
 
 The order in which controls are created is significant. When data is
 transferred using C<setData> and C<getData>, the dialog expects the data 
@@ -377,9 +378,9 @@ application data.
 
     $dlg->setData( $self->{parameterData} );
 
-This call transfers the values stored in the data object into the individual 
-controls. Check boxes, radio buttons and input lines update their visible state 
-to reflect the supplied data.
+This call transfers the values stored in the data object into the individual
+controls. Check boxes, radio buttons and input lines update their visible
+state to reflect the supplied data.
 
 The dialog is then executed:
 
@@ -400,22 +401,22 @@ The complete life cycle can therefore be viewed as:
 
      Application Data
             |
-            v
+            ▼
          setData()
-            |
-            v
+            │
+            ▼
           Dialog
-            |
-            v
+            │
+            ▼
      User Interaction
-            |
-            v
+            │
+            ▼
          getData()
-            |
-            v
+            │
+            ▼
      Application Data
 
-This model is one of the defining characteristics of Turbo Vision dialogs. 
+This model is one of the defining characteristics of I<Turbo Vision> dialogs. 
 Rather than accessing controls individually after a dialog has been closed, 
 applications exchange a complete data object with the dialog. The dialog 
 becomes responsible for presenting and editing the data, while the application 
@@ -511,55 +512,55 @@ Although the dialog appears relatively simple on screen, it combines a
 surprisingly large number of views and demonstrates many of the fundamental 
 concepts used throughout L<TUI::Vision>.
 
-The same techniques are used for larger dialogs containing list boxes, history 
-controls, file selectors, custom views and application- specific components. 
-Regardless of complexity, the overall pattern remains unchanged: the dialog 
-acts as a container while individual views provide the functionality visible to 
-the user.
+The same techniques are used for larger dialogs containing list boxes, history
+controls, file selectors, custom views and application-specific components.
+Regardless of complexity, the overall pattern remains unchanged: the dialog
+acts as a container while individual views provide the functionality visible
+to the user.
 
 =head2 Building User Interfaces from Views
 
 A recurring theme throughout this chapter is that user interfaces in
 L<TUI::Vision> are assembled from views.
 
-Windows, dialogs, scrollbars, buttons, input lines, check boxes and many other 
-controls all share a common foundation in the view hierarchy. Although they 
-appear very different on screen, they are combined using the same mechanisms 
+Windows, dialogs, scrollbars, buttons, input lines, check boxes and many other
+controls all share a common foundation in the view hierarchy. Although they
+appear very different on screen, they are combined using the same mechanisms
 and participate in the same object model.
 
 The examples shown in this chapter illustrate two common patterns.
 
     TWindow
-        |
-        +-- TTerminal
-        |
-        +-- TScrollBar
+        │
+        ├── TTerminal
+        │
+        └── TScrollBar
 
 and
 
     TDialog
-        |
-        +-- TCheckBoxes
-        |
-        +-- TRadioButtons
-        |
-        +-- TInputLine
-        |
-        +-- TButton
-        |
-        +-- TButton
+        │
+        ├── TCheckBoxes
+        │
+        ├── TRadioButtons
+        │
+        ├── TInputLine
+        │
+        ├── TButton
+        │
+        └── TButton
 
-The first example demonstrates how a window can provide a workspace for a 
-specialized view. The second demonstrates how a dialog can be assembled from 
+The first example demonstrates how a window can provide a workspace for a
+specialized view. The second demonstrates how a dialog can be assembled from
 many smaller controls that cooperate to perform a specific task.
 
-From the perspective of the framework, these are variations of the same idea. 
-Larger user interface elements are rarely implemented as monolithic objects. 
-Instead, they are constructed by combining many smaller views, each responsible 
-for a specific aspect of the overall behavior.
+From the perspective of the framework, these are variations of the same idea.
+Larger user interface elements are rarely implemented as monolithic objects.
+Instead, they are constructed by combining many smaller views, each
+responsible for a specific aspect of the overall behavior.
 
-This approach encourages reuse and helps keep individual components focused on 
-a single responsibility. A view that displays text can be used in many 
+This approach encourages reuse and helps keep individual components focused
+on a single responsibility. A view that displays text can be used in many
 different windows. A button behaves identically whether it appears in a small 
 confirmation dialog or a complex configuration screen.
 
@@ -567,28 +568,28 @@ As applications grow, the hierarchy may become larger, but the design
 principles remain unchanged:
 
     TApplication
-        |
-        +-- TDeskTop
-                |
-                +-- TWindow
-                |       |
-                |       +-- application-specific views
-                |
-                +-- TDialog
-                        |
-                        +-- controls
+        │
+        └── TDeskTop
+                │
+                ├── TWindow
+                │       │
+                │       └── application-specific views
+                │
+                └── TDialog
+                        │
+                        └── controls
 
 
 Understanding this style of composition is fundamental to working with
-L<TUI::Vision>. Most framework classes ultimately serve as specialized views or 
-containers for views, and complex interfaces emerge from their cooperation 
+L<TUI::Vision>. Most framework classes ultimately serve as specialized views or
+containers for views, and complex interfaces emerge from their cooperation
 rather than from a single large object.
 
 =head2 Conclusion
 
-Windows and dialogs represent the primary workspaces of a TUI::Vision
-application. Although they differ in purpose, both serve as containers in which 
-views cooperate to provide the functionality visible to the user.
+Windows and dialogs represent the primary workspaces of a L<TUI::Vision>
+application. Although they differ in purpose, both serve as containers in
+which views cooperate to provide the functionality visible to the user.
 
 Throughout this chapter, windows and dialogs were shown not as standalone 
 objects, but as compositions of smaller views. Scrollbars, input lines, 
@@ -606,6 +607,7 @@ during normal operation, menu bars and status lines remain present throughout
 the lifetime of the application and form the persistent framework surrounding 
 the desktop.
 
-L<next|TUI::Manual::07> chapter.
+The L<next chapter|TUI::Manual::07> examines two view classes that occupy a 
+special place within every application.
 
 =cut

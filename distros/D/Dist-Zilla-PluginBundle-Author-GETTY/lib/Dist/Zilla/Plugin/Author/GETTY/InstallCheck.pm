@@ -3,7 +3,7 @@ package Dist::Zilla::Plugin::Author::GETTY::InstallCheck;
 use Moose;
 with 'Dist::Zilla::Role::BeforeRelease';
 
-our $VERSION = '0.328';
+our $VERSION = '0.329';
 
 
 has command => (
@@ -63,7 +63,7 @@ Dist::Zilla::Plugin::Author::GETTY::InstallCheck - Test-install the release tarb
 
 =head1 VERSION
 
-version 0.328
+version 0.329
 
 =head1 DESCRIPTION
 

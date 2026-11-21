@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -17,6 +17,7 @@ our @EXPORT = qw(
 );
 
 use Class::Struct;
+use Storable;
 use TUI::toolkit;
 use TUI::toolkit::Types qw(
   Maybe
@@ -26,6 +27,7 @@ use TUI::toolkit::Types qw(
 
 use TUI::Const qw( EOS );
 use TUI::Objects::NSCollection;
+use TUI::Objects::Rect;
 use TUI::Views::ListViewer;
 
 struct TListBoxRec => [
@@ -158,6 +160,40 @@ sub setData {    # void (\@rec)
   $self->drawView();
   return;
 } #/ sub setData
+
+sub write :method {    # void ($os)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $os ) = $sig->( @_ );
+  $self->SUPER::write( $os );
+  $os->put( $self->{items} );
+  return;
+}
+
+sub read :method {    # $self ($is)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $is ) = $sig->( @_ );
+  $self->SUPER::read( $is );
+  $self->{items} = $is->get();
+  return $self;
+}
+
+sub build {    # $obj ()
+  my ( $class ) = @_;
+  assert ( @_ == 1 );
+  assert ( is_Str $class );
+  assert ( Storable::is_retrieving );
+  return $class->new(
+    bounds     => TRect->new(),
+    numCols    => 0,
+    vScrollBar => undef
+  );
+}
 
 1
 

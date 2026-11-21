@@ -11,6 +11,7 @@ use SkilletorTest qw( error_of make_tar write_json );
 use Path::Tiny qw( path tempdir );
 use Skilletor::Catalog;
 use Skilletor::Lock qw( read_lock );
+use Skilletor::Apply qw( apply );
 use Skilletor::Tar qw( parse_tar );
 
 subtest 'vars of a source must be an object' => sub {
@@ -35,6 +36,45 @@ subtest 'via of a lock entry must be an array of strings' => sub {
     $put->($bad);
     like( error_of( sub { read_lock($file) } ), qr/skills\/x: "via" must be an array of strings/, "via $bad" );
   }
+};
+
+subtest 'files of a lock entry must be an object mapping paths to strings' => sub {
+  my $dir  = tempdir;
+  my $file = "$dir/skilletor.lock.json";
+  my $put = sub {
+    my ( $files, $via ) = @_;
+    my $text = '{"skills/x":{"source":"s","version":"v"'.( defined $files ? ',"files":'.$files : '' ).
+      ( defined $via ? ',"via":'.$via : '' ).'}}';
+    path($file)->spew_raw($text);
+  };
+  for my $bad ( [ 'missing', undef ], [ 'null', 'null' ], [ 'array', '[]' ], [ 'string', '"sha256:x"' ],
+    [ 'number', '1' ], [ 'boolean', 'true' ] ) {
+    $put->( $bad->[1] );
+    like( error_of( sub { read_lock($file) } ), qr/skills\/x: "files" must be an object/, $bad->[0] );
+  }
+  for my $bad ( qw( null [] {} 1 true ) ) {
+    $put->( '{"skills/x/SKILL.md":'.$bad.'}' );
+    like( error_of( sub { read_lock($file) } ), qr/skills\/x: "files" values must be strings/, "hash $bad" );
+  }
+  $put->( '{"skills/x/SKILL.md":"legacy:any-string"}' );
+  is( read_lock($file)->{'skills/x'}{files}{'skills/x/SKILL.md'}, 'legacy:any-string', 'an arbitrary string hash is retained' );
+  $put->( 'null', '"bundle:bad@shared"' );
+  like( error_of( sub { read_lock($file) } ), qr/skills\/x: "via" must be an array of strings/, 'via remains the first field error' );
+
+  my $rel = 'skills/x/SKILL.md';
+  path( $dir, 'skills', 'x' )->mkpath;
+  path( $dir, $rel )->spew_raw('old');
+  my $broken = '{"skills/x":{"source":"s","version":"v","files":{"'.$rel.'":1}}}';
+  path($file)->spew_raw($broken);
+  like(
+    error_of( sub {
+      apply( [ { key => 'skills/x', type => 'skill', name => 'x', source => 's', version => 'v', output => [ [ $rel, 'new' ] ] } ], target_dir => "$dir" );
+    } ),
+    qr/skills\/x: "files" values must be strings/,
+    'apply refuses a corrupt hash',
+  );
+  is( path( $dir, $rel )->slurp_raw, 'old', 'the foreign file stays untouched' );
+  is( path($file)->slurp_raw, $broken, 'the corrupt lock stays untouched' );
 };
 
 subtest 'a tarball cut short is a corrupt archive' => sub {

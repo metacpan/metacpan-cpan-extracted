@@ -1,3 +1,39 @@
+0.329     2026-11-20 22:26:55Z
+
+  - The binary release workflow unpacks the dist tarball below
+    $RUNNER_TEMP instead of "src" in the workspace, so a dist that has its
+    own "src" directory at the root runs the probe and the release too.
+
+  - The commit after a release also commits a bumped Perl executable under
+    script/, not only under bin/, so a dist with "[ExecDir] dir = script"
+    no longer leaves its program one version behind as an uncommitted
+    change.
+
+  - The binary release workflow keeps its plan and publish scratch files
+    (dl/, tarball/, assets/, release.json, latest.json) below $RUNNER_TEMP
+    as well, so a probe run no longer creates dl/ in the dist's checkout.
+
+  - The binary release workflow writes a provenance manifest,
+    provenance.json: the source commit (for a release the commit its tag
+    ends at), the workflow's and the scripts' commit, the run, the tarball
+    and binary hashes, and per build leg and smoke run the runner image,
+    machine, container image, packing perl and PAR::Packer. A new
+    provenance job cross-checks what every job recorded before a release
+    is touched. Every run keeps the manifest as the artifact
+    <dist>-<version>.provenance; a release also attaches it (not listed in
+    SHA256SUMS).
+
+  - The binary release workflow's "bundle_ref" input defaults to the
+    workflow's own commit (job.workflow_sha), pinned once per run, so the
+    scripts match the workflow that calls them; an explicit bundle_ref
+    still wins. Callers need no new permissions.
+
+  - The binary release workflow's pre-upload check refuses a release that
+    already holds SHA256SUMS, install.sh, install.ps1 or provenance.json,
+    not only one of the binaries, so a re-run stops before uploading
+    anything instead of failing halfway on a duplicate name. Nothing is
+    overwritten, so a published SHA256SUMS stays the one users pinned.
+
 0.328     2026-11-18 03:01:44Z
 
   - The release test-installs the tarball with "cpanm --test-only" before

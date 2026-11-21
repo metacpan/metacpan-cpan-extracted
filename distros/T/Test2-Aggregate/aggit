@@ -1,0 +1,205 @@
+#!/usr/bin/env perl
+
+=head1 NAME
+
+aggit - Test2::Aggregate iterative aggregator
+
+=head1 DESCRIPTION
+
+Pass a list of Perl test files/directories and they will run aggregated via yath
+(or prove if specified). On the first failure, the suite will re-run with the failed
+test removed. This will be repeated until there are no failed tests.
+
+It is useful for generating a list of tests that can be run aggregated together.
+It may take a very long time, depending on the number of tests in your suite, so
+look into the L<Test2::Aggregate> docs for more efficient strategies.
+Note that it is often the case a passing test might cause several others after it
+to fail, which is why aggregation failures should be investigated if you want to
+aggregate a large percentage of your test suite (and also a reason why using the
+C<reverse/shuffle/sort> options may give you very different results). aggit is just
+a coarse tool that may help as a starting point.
+
+Ordering options are applied once, then retained across retries and in the final
+runner. Requires L<Test2::Plugin::BailOnFail>. Harness startup errors and failures
+after all test files complete abort instead of removing tests. Under C<prove>,
+there is no event timeout. Under C<yath>, the timeout applies to the generated
+runner; timeout comments in aggregated files are not processed by the harness.
+
+=head1 SYNOPSIS
+
+ aggit [options] <file/dir1 ...>
+
+ Options:
+ --out <s>,          -o <s>  : Specify the test file to be created (tmp file by default).
+ --lists,            -l      : Use files specified as lists.
+ --prove,            -p      : Force prove (default is yath/Test2 if installed).
+ --verbose,          -v      : Verbose (passed to yath/prove)
+ --absolute,         -a      : Use absolute paths in generated files. Disabled with -r.
+ --exclude_regex <s> -er <s> : Regex for test paths to exclude.
+ --exclude_list <s>  -el <s> : File with test paths to exclude (one per line).
+ --event_timeout <i> -et <i> : Event timeout for yath (to determine hung tests). Default 10.
+ --root <s>          -r <s>  : Define a custom root dir (default is current dir).
+ --include <s>,      -I <s>  : Library path to include (repeatable).
+ --test_bundle <s>,  -t      : Test bundle (def: Test2::V0 or Test::More if -p). Comma-separated list.
+ --reverse                   : Reverse the test order.
+ --shuffle                   : Shuffle the test order.
+ --sort                      : Run the tests alphabetically.
+ --help              -h      : Show basic help and exit.
+
+=cut
+
+use strict;
+use warnings;
+
+use Carp;
+use Getopt::Long;
+use Path::Tiny;
+use Pod::Usage;
+use Test2::Aggregate;
+use Test2::Aggregate::Helper;
+
+my %opt = (event_timeout => 10);
+GetOptions(
+    \%opt,
+    'absolute|a',
+    'exclude_regex|er=s',
+    'exclude_list|el=s',
+    'help|h',
+    'include|I=s@',
+    'lists|l',
+    'event_timeout|et=i',
+    'out|o=s',
+    'prove|p',
+    'reverse',
+    'root|r=s',
+    'shuffle',
+    'sort',
+    'test_bundle|t=s',
+    'verbose|v',
+) or pod2usage(2);
+
+pod2usage({-verbose => 1, -output => \*STDOUT, -noperldoc => 1})
+    if $opt{help} || !@ARGV;
+
+Test2::Aggregate::Helper::setup_options(\%opt);
+eval { require Test2::Plugin::BailOnFail; 1 }
+    or croak "aggit requires Test2::Plugin::BailOnFail: $@";
+
+my $file = $opt{out} ? path($opt{out}.'.t') : Path::Tiny->tempfile(
+    TEMPLATE => "aggXXXXXX",
+    SUFFIX   => '.t',
+    UNLINK   => 0
+);
+
+my $list = $opt{out} ? path($opt{out}.'.lst') : Path::Tiny->tempfile(
+    TEMPLATE => "aggXXXXXX",
+    SUFFIX   => '.lst',
+    UNLINK   => 0
+);
+
+my $stats;
+$opt{file} = $file;
+my $code = Test2::Aggregate::Helper::generate_code({%opt, dry_run => 1, absolute => 1}, @ARGV);
+
+$code =~ s/(Test2::Aggregate::run_tests)/\$stats = $1/;
+
+{
+    # Discovery is a dry run; capture its TAP so it is not mistaken for a test run.
+    local $0 = "" . $file->absolute;
+    # The harness gets -I paths, but discovery runs here, so apply them too.
+    my @include = ref $opt{include} ? @{$opt{include}} : grep {defined} $opt{include};
+    local @INC = ((map { "" . path($_)->absolute } grep {length} @include), @INC);
+    # Load the bundle first, as Test::Builder must load before Test2 initializes.
+    for my $module (split /,/, $opt{test_bundle}) {
+        eval "require $module; 1" or croak "Cannot load test bundle $module: $@";
+    }
+    my $error;
+    Test2::API::intercept(sub { eval $code; $error = $@ });
+    croak $error if $error;
+}
+croak "No tests found" unless $stats && %$stats;
+
+my @test_list = map {
+    my $path = path($_)->absolute;
+    "" . ($opt{absolute} ? $path : $path->relative($file->parent->absolute));
+} grep {
+    !Test2::Aggregate::Helper::is_excluded(\%opt, path($_)->absolute)
+} sort { $stats->{$a}->{test_no} <=> $stats->{$b}->{test_no} } keys %$stats;
+croak "No tests left after applying --exclude_list" unless @test_list;
+
+# Discovery has already filtered and ordered the tests. Keep that exact order.
+delete @opt{qw(reverse shuffle sort include_pattern exclude_pattern)};
+$opt{root} = "" . $file->parent->absolute;
+$opt{relative_root} = 1;
+
+my $work = Path::Tiny->tempdir;
+my $dir = $work->child('passes');
+$dir->mkpath;
+my $progress = $work->child('active-test');
+my $cnt = 0;
+while (++$cnt) {
+    print "** iter $cnt: ".scalar(@test_list)." test files to attempt\n";
+    $list->spew_utf8(join("\n",@test_list)."\n");
+
+    my $code = Test2::Aggregate::Helper::generate_code({
+            %opt,
+            lists        => 1,
+            stats_output => $dir,
+            pass_output  => 1,
+            bail_on_fail => 1,
+            _progress_file => $progress,
+        },
+        $opt{absolute} ? $list->absolute : $list->basename
+    );
+    $file->spew_utf8($code);
+
+    my @cmd = Test2::Aggregate::Helper::create_command({%opt}, $file);
+    $progress->remove if $progress->exists;
+    my $status = system @cmd;
+    croak "Cannot execute test harness: $!" if $status == -1;
+    croak "Test harness terminated by signal " . ($status & 127) if $status & 127;
+    my @out = read_pass_output($dir);
+    chomp(@out);
+    for my $i (0 .. $#out) {
+        croak "Unexpected passing-test output from test harness"
+            if $i > $#test_list || $out[$i] ne $test_list[$i];
+    }
+    print "** ".scalar(@out)." test files passed\n";
+    finish($file, $list, \%opt, \@out)
+        if !$status && scalar @out == scalar @test_list;
+    my $active = $progress->exists ? $progress->slurp_utf8 : '';
+    chomp $active;
+    croak "Test harness failed without an identifiable active test (exit " . ($status >> 8) . ")"
+        unless $status && length($active) && @out < @test_list
+            && $active eq $test_list[scalar @out];
+    print "** Removing $active at ".scalar(@out)."\n";
+    splice(@test_list, scalar @out, 1);
+    finish($file, $list, \%opt, []) unless scalar @test_list;
+}
+
+sub read_pass_output {
+    my ($dir) = @_;
+    my @out;
+    foreach my $file (path($dir)->children) {
+        push @out, grep {length} split /\r?\n/, $file->slurp_utf8;
+        $file->remove;
+    }
+    return @out;
+}
+
+sub finish {
+    my ($file, $list, $opt, $out) = @_;
+    $list->spew_utf8(join("\n",@$out)."\n");
+    my $code = Test2::Aggregate::Helper::generate_code({
+            %$opt,
+            lists => 1,
+        },
+        $opt->{absolute} ? $list->absolute : $list->basename
+    );
+    $file->spew_utf8($code);
+
+    print "Passing tests: ".scalar(@$out);
+    print "\nTest file: $file\n";
+    print "List file: $list\n";
+    exit;
+}

@@ -4,7 +4,7 @@ package App::mdee;
 # POD documentation is appended from script/mdee at release time.
 # See minil.toml for details.
 
-our $VERSION = "1.22";
+our $VERSION = "1.23";
 
 1;
 =encoding utf-8
@@ -64,7 +64,7 @@ mdee - em·dee, Markdown Easy on the Eyes
 
 =head1 VERSION
 
-Version 1.22
+Version 1.23
 
 =cut
 =head1 DESCRIPTION
@@ -373,13 +373,23 @@ Enable or disable table formatting.  When enabled, Markdown tables
 are formatted using L<ansicolumn(1)|App::ansicolumn> for aligned column display.
 Column alignment specified in the separator line (C<:---> for left,
 C<:---:> for center, C<---:> for right) is respected.
+A C<< <br> >> (or C<< <br/> >>, C<< <br /> >>) in a cell breaks the
+cell into lines after it; one in a code span, or escaped as
+C<< \<br> >>, does not.  The default theme C<nomark> hides the
+C<< <br> >>, and C<--no-theme> shows it.
 Default is enabled.
 
-When folding is enabled, a table wider than the fold width is fit into
-that width: columns that fit keep their width, and the cells of
-over-wide columns are wrapped.  A table that already fits is not
-changed.  Use C<--config table_width=0> to disable wrapping, or
-C<--config table_width=N> to use a different width.  Per-column
+When folding is enabled, a table wider than the table width is fit
+into that width.  The table width is the fold width; with nup, when
+the fold width is not given, it is the fold width plus the run-in
+width but one (81 for a pane of 85), because the lines of a table are
+sent to nup to be kept intact, not folded (see C<--intact> of
+L<ansicolumn(1)|App::ansicolumn>); C<--cat-v> does not do it, and
+the table width is the fold width there.  Columns that fit keep
+their width, and the cells of over-wide columns are wrapped.  A
+table that already fits is not changed.  Use C<--config
+table_width=0> to disable wrapping, or C<--config table_width=N> to
+use a different width.  Per-column
 widths can be given with C<--config table_cell=SPEC>, where SPEC
 is a colon-separated list passed to ansicolumn's C<--cell> option
 (for example C<0:10> fixes the second column at 10 columns, and
@@ -473,8 +483,9 @@ Set the fold width for text wrapping directly.  Default is the
 pane width (output width divided by the number of columns) minus
 3 for borders and padding and the run-in width (see C<--runin>),
 which gives 78 when pane-width is 85.
-Only effective when C<--fold> is enabled.  The same width is used
-to fit tables (see C<--table>).
+Only effective when C<--fold> is enabled.  Tables are fit into the
+same width when it is given; otherwise, with nup, into this width
+plus the run-in width but one (see C<--table>).
 
 =item B<--runin>=I<N>, B<--runout>=I<N>, B<--runlen>=I<N>
 
@@ -677,6 +688,7 @@ Available labels:
     image             Images ![alt](url)
     image_link        Image links [![alt](img)](url)
     link_mark         Link/image brackets (overrides emphasis_mark)
+    br_mark           <br> breaking a table cell (overrides emphasis_mark)
     blockquote        Blockquote marker (>)
     horizontal_rule   Horizontal rules (---, ***, ___)
     comment           HTML comments (<!-- ... -->)
@@ -869,7 +881,8 @@ Append closing hashes to h3-h6 headers.
 =item C<nomark> (default)
 
 Hide emphasis markers (C<**>, C<*>, C<__>, C<_>, C<~~>),
-inline code backticks, and link brackets (C<[>, C<]>).
+inline code backticks, link brackets (C<[>, C<]>), and the
+C<< <br> >> that breaks a table cell into lines.
 Content text keeps its formatting (bold, italic,
 strikethrough, code, clickable links) but the surrounding
 markers are not displayed.  Table marks (C<markcell>,

@@ -1,5 +1,5 @@
 package Net::OpenSSH::More::Linux;
-$Net::OpenSSH::More::Linux::VERSION = '1.06';
+$Net::OpenSSH::More::Linux::VERSION = '1.07';
 #ABSTRACT: Useful subcommands for linux machines
 
 use strict;
@@ -84,7 +84,7 @@ Net::OpenSSH::More::Linux - Useful subcommands for linux machines
 
 =head1 VERSION
 
-version 1.06
+version 1.07
 
 =head1 DESCRIPTION
 

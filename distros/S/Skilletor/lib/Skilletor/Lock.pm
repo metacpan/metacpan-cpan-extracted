@@ -12,7 +12,7 @@ use JSON::MaybeXS ();
 use Skilletor::FSUtil qw( decode_utf8_lossy encode_text node_fs_error write_text );
 use Skilletor::JSON qw( js_parse js_ordered js_sort_keys js_stringify js_type );
 
-our $VERSION = '0.001';
+our $VERSION = '0.008000';
 
 our @EXPORT_OK = qw( read_lock serialize_lock write_lock parse_lock_key key_to_type_name );
 
@@ -41,13 +41,22 @@ sub read_lock {
   my $ok = eval {
     $value = js_parse($text);
     die { message => 'expected an object' } unless js_type($value) eq 'object';
+    # Entries are records, but their fields stay lenient for historical and future lock formats.
     # k145: `via` is matched against bundle labels exactly; anything but an array of strings is refused.
+    # `files` is the ownership boundary, though: every reader and serializer needs its complete,
+    # string-valued map. Refuse corruption rather than reinterpreting or dropping ownership.
     for my $key ( keys %$value ) {
       my $entry = $value->{$key};
-      next unless js_type($entry) eq 'object' && exists $entry->{via};
-      my $via = $entry->{via};
-      die { message => $key.': "via" must be an array of strings' }
-        unless js_type($via) eq 'array' && !grep { js_type($_) ne 'string' } @$via;
+      die { message => $key.': expected an object' } unless js_type($entry) eq 'object';
+      if ( exists $entry->{via} ) {
+        my $via = $entry->{via};
+        die { message => $key.': "via" must be an array of strings' }
+          unless js_type($via) eq 'array' && !grep { js_type($_) ne 'string' } @$via;
+      }
+      die { message => $key.': "files" must be an object' }
+        unless exists $entry->{files} && js_type( $entry->{files} ) eq 'object';
+      die { message => $key.': "files" values must be strings' }
+        if grep { js_type($_) ne 'string' } values %{ $entry->{files} };
     }
     1;
   };
@@ -131,7 +140,7 @@ Skilletor::Lock - A scope's lock file (skilletor.lock.json) – reading, writing
 
 =head1 VERSION
 
-version 0.001
+version 0.008000
 
 =head1 SYNOPSIS
 
@@ -185,19 +194,25 @@ Writes L</serialize_lock> atomically; an empty lock deletes the file.
 
 =head1 SUPPORT
 
+=head2 Issues
+
+Please report bugs and feature requests at
+L<https://github.com/Getty/skilletor/issues>.
+
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <getty@cpan.org>
+Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
+This software is Copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

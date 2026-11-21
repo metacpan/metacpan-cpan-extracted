@@ -4,6 +4,7 @@ use v5.36;
 
 use strict;
 use warnings;
+use autodie;
 
 use FindBin qw($RealBin);
 use lib "$RealBin/../lib";	# prefer local lib/ over any installed version
@@ -14,7 +15,8 @@ use Term::ANSIColor qw(colored);
 use Path::Tiny;
 use YAML::XS qw(LoadFile);
 
-use App::GHGen::Generator qw(generate_workflow list_workflow_types);
+use App::GHGen;
+use App::GHGen::Generator qw(generate_workflow list_workflow_types parse_os_list parse_version_list);
 use App::GHGen::Analyzer qw(analyze_workflow find_workflows);
 use App::GHGen::Detector qw(detect_project_type get_project_indicators);
 use App::GHGen::Interactive qw(customize_workflow);
@@ -22,7 +24,8 @@ use App::GHGen::PerlCustomizer qw(generate_custom_perl_workflow);
 use App::GHGen::Fixer qw(fix_workflow can_auto_fix);
 use App::GHGen::CostEstimator qw(estimate_current_usage estimate_savings);
 
-our $VERSION = '0.05';
+# One source of truth: App::GHGen carries the release version
+our $VERSION = $App::GHGen::VERSION;
 
 my %opts = (
 	help	=> 0,
@@ -43,7 +46,18 @@ GetOptions(
 	'fix|f'	   => \$opts{fix},
 	'estimate|e'  => \$opts{estimate},
 	'timeout=i'     => \$opts{timeout},
+	'os=s'          => \$opts{os},
+	'versions=s'    => \$opts{versions},
 ) or pod2usage(2);
+
+# Turn --os and --versions into validated lists.  The parsers croak on bad
+# input, so report that as a one-line error rather than a stack trace.
+my ($os_list, $version_list);
+eval {
+	$os_list      = parse_os_list($opts{os}) if defined $opts{os};
+	$version_list = parse_version_list($opts{versions}) if defined $opts{versions};
+	1;
+} or fail($@);
 
 pod2usage(1) if $opts{help};
 
@@ -60,6 +74,13 @@ if ($command eq 'generate') {
 	cmd_analyze();
 } else {
 	pod2usage(-message => "Unknown command: $command", -exitval => 1);
+}
+
+# Print a croaked message as a coloured one-line error and exit non-zero.
+sub fail($error) {
+	# Drop Carp's " at FILE line N." suffix; it means nothing to a CLI user
+	$error =~ s/\s+at \S+ line \d+\.?\s*\z//;
+	die colored(['red'], 'Error: '), "$error\n";
 }
 
 sub cmd_generate() {
@@ -100,8 +121,8 @@ sub cmd_generate() {
 		$yaml = generate_custom_perl_workflow({
 			min_perl_version => $perl_versions[0],
 			max_perl_version => $perl_versions[-1],
-			perl_versions => \@perl_versions,
-			os => $config->{os} // ['ubuntu-latest', 'macos-latest', 'windows-latest'],
+			perl_versions => $version_list // \@perl_versions,
+			os => $os_list // $config->{os} // ['ubuntu-latest', 'macos-latest', 'windows-latest'],
 			enable_linter => $config->{enable_linter} // 1,
 			enable_linter_unused => $config->{enable_linter_unused} // 1,
 			enable_critic => $config->{enable_critic} // 1,
@@ -109,9 +130,13 @@ sub cmd_generate() {
 			timeout => $opts{timeout},
 		});
 	} elsif ($type eq 'perl') {
-		$yaml = generate_custom_perl_workflow({ timeout => $opts{timeout} });
+		$yaml = generate_custom_perl_workflow({
+			timeout => $opts{timeout},
+			($os_list ? (os => $os_list) : ()),
+			($version_list ? (perl_versions => $version_list) : ()),
+		});
 	} else {
-		$yaml = generate_workflow($type);
+		$yaml = generate_workflow($type, { versions => $version_list });
 	}
 
 	unless ($yaml) {
@@ -434,6 +459,9 @@ ghgen - GitHub Actions workflow generator and analyzer
   ghgen generate --auto
   ghgen generate --type=perl [--output=FILE]
   ghgen generate --type=perl --timeout=45
+  ghgen generate --type=perl --os=linux,macos
+  ghgen generate --type=perl --versions=5.40,5.42
+  ghgen generate --type=node --versions=20,22
   ghgen generate --type=perl --customize
   ghgen generate --interactive
   ghgen generate --list
@@ -470,6 +498,13 @@ Options:
    --interactive, -i   Interactive mode to select type
    --list, -l          List available workflow types
    --timeout MINUTES   Set job timeout-minutes for Perl workflows (default: 30)
+   --os LIST           Comma-separated operating systems for Perl workflows:
+                       linux, macos, windows (default: linux,macos,windows)
+   --versions LIST     Comma-separated language versions to test against.
+                       Defaults: perl 5.36,5.38,5.40,5.42; node 18.x,20.x,22.x;
+                       python 3.9,3.10,3.11,3.12; ruby 3.1,3.2,3.3;
+                       java 11,17,21; php 8.1,8.2,8.3; go 1.22; rust stable.
+                       Ignored for cpp, docker and static.
 
 For Perl projects, C<--customize> presents the following options:
 
@@ -479,9 +514,9 @@ For Perl projects, C<--customize> presents the following options:
 
 =item * Which operating systems to target (Ubuntu, macOS, Windows)
 
-=item * B<Syntax linting> — C<perl -c> on every matrix cell, no extra CPAN deps (default: enabled)
+=item * B<Syntax linting> - C<perl -c> on every matrix cell, no extra CPAN deps (default: enabled)
 
-=item * B<Unused-variable check> — C<warnings::unused>, latest Perl + Ubuntu only (default: enabled)
+=item * B<Unused-variable check> - C<warnings::unused>, latest Perl + Ubuntu only (default: enabled)
 
 =item * B<Perl::Critic> code quality analysis, latest Perl + Ubuntu only (default: enabled)
 

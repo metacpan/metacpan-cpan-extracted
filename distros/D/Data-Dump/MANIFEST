@@ -16,6 +16,7 @@ t/hash.t
 t/quote-unicode.t
 t/quote.t
 t/ref.t
+t/regexp-eval.t
 t/regexp.t
 t/scalar-obj.t
 t/scalar.t

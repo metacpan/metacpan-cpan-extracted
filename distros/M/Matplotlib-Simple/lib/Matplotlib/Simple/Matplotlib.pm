@@ -12,7 +12,7 @@ package Matplotlib::Simple::Matplotlib;
 # The helpers keep checking their own keywords, against the same lists Matplotlib::Simple
 # checks them with, which are shared below rather than copied.
 require 5.010;
-our $VERSION = 0.3344;
+our $VERSION = 0.3345;
 use Scalar::Util 'looks_like_number';
 use List::Util qw(max sum min);
 use File::Spec;
@@ -36,7 +36,7 @@ BEGIN {
 # a list Matplotlib::Simple changes is the list checked here.
 BEGIN {
 	no strict 'refs';
-	*{$_} = \&{"Matplotlib::Simple::$_"} foreach qw(bad_keyword_error bin_counts bool_option cb_limits
+	*{$_} = \&{"Matplotlib::Simple::$_"} foreach qw(bad_keyword_error bar_series bin_counts bool_option cb_limits
 	 check_key_order check_numbers check_plot_type check_scatter_lengths creator_note
 	 check_scatter_values check_twinx_args check_wide_runs decoded_data
 	 decoded_text finite_values is_finite is_nan logscale_axes nonfinite_name
@@ -400,15 +400,7 @@ sub barplot_helper { # this is a helper function to other matplotlib subroutines
 		$plot_type = 'grouped';
 	} elsif ( defined $ref_counts{'HASH'} ) {
 		$plot_type = 'grouped';    # now make the hash of hash into a ARRAY structure
-		my %key2;
-		foreach my $key1 ( keys %{ $plot->{data} } ) {
-			foreach my $key2 ( keys %{ $plot->{data}{$key1} } ) {
-				$key2{$key2}++;
-			}
-		}
-		# "|| $a cmp $b": two inner keys differing only in case ("a", "A") tied,
-		# and hash order then chose which series came first, from run to run.
-		my @key2 = sort { lc $a cmp lc $b || $a cmp $b } keys %key2;
+		my @key2 = bar_series({ plot => $plot, sub => $current_sub });
 		my %new_structure;
 		foreach my $k1 ( keys %{ $plot->{data} } ) {
 			@{ $new_structure{$k1} } = @{ $plot->{data}{$k1} }{@key2};
@@ -427,6 +419,7 @@ sub barplot_helper { # this is a helper function to other matplotlib subroutines
 		}
 		# A new array rather than "@{ $plot->{label} } = ...", which wrote the
 		# series names into an array the caller may have passed as "label".
+		# The same names as any "label" given, which bar_series has checked.
 		$plot->{label} = [@key2];
 		$plot->{data} = \%new_structure;
 	} else {
@@ -3344,26 +3337,34 @@ sub render {
 		# finite number above 0. Without it savefig is called as it always
 		# was, at matplotlib's own "savefig.dpi".
 		my $dpi = defined $context->{dpi} ? ', dpi = ' . py_num( $context->{dpi} ) : '';
+		# $tooltips_drawn is 1 exactly when output_file is an SVG (or SVGZ),
+		# which is drawn into memory, finished there, and written to the file
+		# once, below. It was saved, read back, and written again, once to cut
+		# the DOCTYPE and once more for tooltips, so that a viewer watching the
+		# file saw it change two or three times, and empty between: Eye of
+		# GNOME 45.3, which reloads a PNG matplotlib has written over, stopped
+		# reloading such an SVG at all. "format" because a buffer has no
+		# extension to read it from.
+		my $target = $tooltips_drawn ? "svg_buffer, format = 'svg'," : 'output_file,';
+		print {$fh} <<'PYTHON' if $tooltips_drawn;
+import gzip, io, re
+svg_buffer = io.BytesIO()
+PYTHON
 		if ( savefig_takes_metadata( $args->{output_file} ) ) {
-			say $fh "plt.savefig(output_file, bbox_inches = 'tight'$dpi, metadata={'Creator': $creator"
+			say $fh "plt.savefig($target bbox_inches = 'tight'$dpi, metadata={'Creator': $creator"
 			 . " + ', Python ' + platform.python_version() + ', matplotlib ' + matplotlib.__version__"
 			 . " + ', by ' + creator_user + ' on ' + creator_host"
 			 . ( $tooltips_drawn ? ", 'Date': None, 'Format': None, 'Type': None" : '' ) . '})';
 		} else {
-			say $fh "plt.savefig(output_file, bbox_inches = 'tight'$dpi) # no metadata: this format keeps none";
+			say $fh "plt.savefig($target bbox_inches = 'tight'$dpi) # no metadata: this format keeps none";
 		}
-		# $tooltips_drawn is 1 exactly when output_file is an SVG. matplotlib
-		# writes <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" ...> from a fixed
-		# string, svgProlog in backend_svg.py, that no option turns off, so it is
-		# cut from the file once written. SVG 2 has no DOCTYPE, and no browser
-		# reads it. It holds no ">" of its own: there is no internal subset.
+		# matplotlib writes <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" ...>
+		# from a fixed string, svgProlog in backend_svg.py, that no option turns
+		# off, so it is cut from what was drawn. SVG 2 has no DOCTYPE, and no
+		# browser reads it. It holds no ">" of its own: there is no internal
+		# subset.
 		print {$fh} <<'PYTHON' if $tooltips_drawn;
-import gzip, re
-svg_open = gzip.open if output_file.lower().endswith('.svgz') else open
-with svg_open(output_file, 'rb') as svg:
-	svg_bytes = svg.read()
-with svg_open(output_file, 'wb') as svg:
-	svg.write(re.sub(rb'<!DOCTYPE[^>]*>\s*', b'', svg_bytes, count = 1))
+svg_bytes = re.sub(rb'<!DOCTYPE[^>]*>\s*', b'', svg_buffer.getvalue(), count = 1)
 PYTHON
 	}
 	if ( ( scalar @tooltip_text > 0 ) && ( not $tooltips_drawn ) ) {
@@ -3471,9 +3472,7 @@ for prefix, uri in (('', svg_ns), ('xlink', 'http://www.w3.org/1999/xlink'),
 	('rdf', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'),
 	('cc', 'http://creativecommons.org/ns#'), ('dc', 'http://purl.org/dc/elements/1.1/')):
 	ET.register_namespace(prefix, uri)
-# svg_open was set where the DOCTYPE was cut, after savefig
-with svg_open(output_file, 'rb') as svg:
-	svg_tree = ET.parse(svg)
+svg_tree = ET.parse(io.BytesIO(svg_bytes))
 for link in list(svg_tree.iter('{%s}a' % svg_ns)):
 	href = link.get(xlink_href, '')
 	if not href.startswith(tooltip_url):
@@ -3487,10 +3486,16 @@ for link in list(svg_tree.iter('{%s}a' % svg_ns)):
 # last, so that every point is in the document when it runs, and the box it
 # draws is on top of everything else
 ET.SubElement(svg_tree.getroot(), '{%s}script' % svg_ns, {'type': 'text/javascript'}).text = tooltip_script
-with svg_open(output_file, 'wb') as svg:
-	svg_tree.write(svg, encoding = 'utf-8', xml_declaration = True)
+svg_buffer = io.BytesIO()
+svg_tree.write(svg_buffer, encoding = 'utf-8', xml_declaration = True)
+svg_bytes = svg_buffer.getvalue()
 PYTHON
 	}
+	# The one write of an SVG, finished above (see $target).
+	print {$fh} <<'PYTHON' if ( defined $args->{output_file} ) && $tooltips_drawn;
+with (gzip.open if output_file.lower().endswith('.svgz') else open)(output_file, 'wb') as svg:
+	svg.write(svg_bytes)
+PYTHON
 	say $fh 'plt.show()' if $args->{show}; # after savefig, so the file is written even if the window is never closed
 	say $fh 'plt.close()' if $args->{execute} == 0;
 	if ( $args->{execute} ) {

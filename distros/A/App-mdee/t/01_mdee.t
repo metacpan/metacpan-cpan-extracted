@@ -802,7 +802,7 @@ subtest q(output width option) => sub {
     my $two = `COLUMNS=300 $mdee -ddn -w 180 $test_md 2>&1`;
     like($two, qr/debug: nup .*--pane=2 .*- -w 180/, q(-w gives nup the pane count and ansicolumn -w));
     like($two, qr/fold_width=83\b/, q(fold width is derived from -w and the pane count));
-    like($two, qr/table_width=83\b/, q(table width follows the fold width));
+    like($two, qr/table_width=86\b/, q(table width is the fold width and the run-in width but one));
 
     my $one = `COLUMNS=300 $mdee -ddn -w 100 $test_md 2>&1`;
     like($one, qr/debug: nup .*--pane=1 - --pages -w 100/, q(single column passes -w after --pages));
@@ -825,6 +825,24 @@ subtest q(output width option) => sub {
     my $plain = `COLUMNS=300 $mdee -ddn $test_md 2>&1`;
     unlike($plain, qr/debug: nup .*-w /, q(without -w nup gets no width));
     like($plain, qr/fold_width=93\b/, q(without -w the fold width comes from the terminal));
+};
+
+subtest q(tables kept intact) => sub {
+    my $nup = `COLUMNS=300 $mdee -ddn -w 180 $test_md 2>&1`;
+    like($nup, qr/intact=table\b/, q(with nup the md module joins the rows of tables));
+    like($nup, qr/debug: nup .* - -w 180 --intact/, q(with nup ansicolumn gets --intact));
+    my $plain = `COLUMNS=300 $mdee -ddn $test_md 2>&1`;
+    like($plain, qr/debug: nup .* - --intact/, q(--intact is given after "-" when there is no other option));
+
+    for my $opt (q(-s cat), q(--cat-v), q(--no-fold), q(--no-table)) {
+        my $out = `COLUMNS=300 $mdee -ddn -w 180 $opt $test_md 2>&1`;
+        unlike($out, qr/intact=table/, qq($opt: tables are not joined));
+        unlike($out, qr/--intact/, qq($opt: no --intact));
+    }
+    my $catv = `COLUMNS=300 $mdee -ddn -w 180 --cat-v $test_md 2>&1`;
+    like($catv, qr/table_width=83\b/, q(without --intact the table width is the fold width));
+    my $fw = `COLUMNS=300 $mdee -ddn -w 180 --fold-width=60 $test_md 2>&1`;
+    like($fw, qr/table_width=60\b/, q(a fold width given is the table width, with --intact too));
 };
 
 # Test: --lateral (-L) gives nup --lateral

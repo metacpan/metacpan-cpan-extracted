@@ -1,5 +1,5 @@
 package Bitcoin::Secp256k1;
-$Bitcoin::Secp256k1::VERSION = '0.011';
+$Bitcoin::Secp256k1::VERSION = '0.012';
 use v5.10;
 use strict;
 use warnings;
@@ -280,7 +280,7 @@ sub verify_digest_recoverable
 	$self->_recover_pubkey_recoverable($digest);
 	my $recovered_pubkey = $self->_pubkey;
 
-	return $recovered_pubkey eq $public_key;
+	return $recovered_pubkey eq $self->_pubkey($public_key, !!1);
 }
 
 sub negate_public_key
@@ -372,14 +372,12 @@ sub combine_public_keys
 	(@public_keys > 0)
 		or _croak_usage(qw($public_key [@more_public_keys]));
 
-	$self->_clear;
+	$self->_pubkey(undef);
 	foreach my $pub (@public_keys) {
-
 		(defined $pub)
 			or _croak_usage(qw($public_key [@more_public_keys]));
 
-		$self->_pubkey($pub);
-		$self->_push_pubkey;
+		$self->_push_pubkey($pub);
 	}
 
 	$self->_pubkey_combine;
@@ -456,8 +454,8 @@ properly. It accepts no arguments.
 	$valid = $secp256k1->verify_private_key($private_key)
 
 Checks whether bytestring C<$private_key> is a valid private key. Private key
-is valid if its length is exactly C<32> and it is below curve order (when
-interpreted as a big-endian integer).
+is valid if its length is exactly C<32> and it is below curve order and above 0
+(when interpreted as a big-endian integer).
 
 Some methods in this module may die if their private key is not valid, but
 chances of picking an invalid 32-byte private key at random are extremely slim.
@@ -491,8 +489,7 @@ Normally, Bitcoin nodes will filter out transactions with malleable signatures.
 Since this is only a standardness rule, this module will let unnormalized
 signatures thorough.
 
-This method lets you both detect whether the signature was malleable and fix it
-to avoid a warning if needed.
+This method lets you both detect whether the signature was malleable and fix it.
 
 =head3 compress_public_key
 
@@ -516,7 +513,7 @@ Signs C<$message>, which may be a bytestring of any length, with
 C<$private_key>, which must be a bytestring of length C<32>. Returns
 DER-encoded C<$signature> as a bytestring.
 
-C<$message> is first hashed with double SHA256 (known an HASH256 in Bitcoin)
+C<$message> is first hashed with double SHA256 (known as HASH256 in Bitcoin)
 before passing it to signing algorithm (which expects length C<32> bytestrings).
 
 This method always produces normalized, deterministic signatures suitable to
@@ -546,7 +543,7 @@ Signs C<$message>, which may be a bytestring of any length, with
 C<$private_key>, which must be a bytestring of length C<32>. Returns
 a hash reference containing the recoverable signature.
 
-C<$message> is first hashed with double SHA256 (known an HASH256 in Bitcoin)
+C<$message> is first hashed with double SHA256 (known as HASH256 in Bitcoin)
 before passing it to signing algorithm (which expects length C<32> bytestrings).
 
 The returned hash reference contains:
@@ -618,7 +615,7 @@ Verifies C<$signature> (DER-encoded, bytestring) of C<$message> (bytestring of
 any length) against C<$public_key> (compressed or uncompressed, bytestring).
 Returns true if verification is successful.
 
-C<$message> is first hashed with double SHA256 (known an HASH256 in Bitcoin)
+C<$message> is first hashed with double SHA256 (known as HASH256 in Bitcoin)
 before passing it to verification algorithm (which expects length C<32> bytestrings).
 
 Unlike underlying libsecp256k1 function, this method accepts malleable
@@ -684,7 +681,7 @@ Returns a xonly form of C<$public_key>. This form is used in Taproot.
 
 =head3 negate_private_key
 
-	$negated_private_key = $secp256k1->negated_private_key($private_key)
+	$negated_private_key = $secp256k1->negate_private_key($private_key)
 
 Negates a private key and returns it.
 
@@ -744,7 +741,7 @@ The module consists of two layers:
 High-level API, which consists of public, stable methods. These methods should
 deliver most of the possible use cases for the library, but some paths may not
 be covered. All of these methods simply accept and return values without
-storing anything inside the object.
+storing anything inside the object themselves.
 
 =item
 
@@ -773,6 +770,8 @@ This module currently covers most usage paths of the base libsecp256k1, the
 Schnorr module, and the recovery module. It currently does not aim to cover
 every usage path, most notably signing variable length messages with Schnorr
 (without digesting first).
+
+This module is currently not thread-safe.
 
 =head1 CAVEATS
 

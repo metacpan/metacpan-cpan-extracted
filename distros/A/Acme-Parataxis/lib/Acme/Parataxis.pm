@@ -2,7 +2,7 @@ use v5.40;
 no warnings 'recursion';    # fibers run on separate heap stacks; Perl's C-stack-depth heuristic misfires there
 use experimental qw[class try];
 
-package Acme::Parataxis v0.1.5 {
+package Acme::Parataxis v0.1.6 {
     use Affix qw[affix :types];
     use Config;
     use File::Spec;

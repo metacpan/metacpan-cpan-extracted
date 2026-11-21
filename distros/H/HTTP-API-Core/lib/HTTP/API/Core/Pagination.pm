@@ -19,7 +19,8 @@ sub new {
     die "mode must be a scalar\n" if ref($mode) ne '';
     $mode = 'next_url' if !defined($mode) || $mode eq '';
     die "unsupported pagination mode: $mode\n"
-        if $mode ne 'next_url' && $mode ne 'page' && $mode ne 'cursor';
+        if $mode ne 'next_url' && $mode ne 'page'
+        && $mode ne 'cursor' && $mode ne 'offset';
 
     my $items = delete($args{items});
     $items = 'items' if !defined $items;
@@ -38,12 +39,15 @@ sub new {
         items           => $items,
         next            => exists($args{next}) ? delete($args{next}) : ($mode eq 'cursor' ? 'next_cursor' : 'next'),
         has_more        => delete($args{has_more}),
+        total           => delete($args{total}),
         response_aware_extractors => $response_aware_extractors ? 1 : 0,
         allow_cross_origin => $allow_cross_origin ? 1 : 0,
         page_param      => exists($args{page_param}) ? delete($args{page_param}) : 'page',
         page_size_param => exists($args{page_size_param}) ? delete($args{page_size_param}) : 'per_page',
         page_size       => delete($args{page_size}),
         current_page    => exists($args{start_page}) ? delete($args{start_page}) : 1,
+        offset_param    => exists($args{offset_param}) ? delete($args{offset_param}) : 'offset',
+        current_offset  => exists($args{start_offset}) ? delete($args{start_offset}) : 0,
         cursor_param    => exists($args{cursor_param}) ? delete($args{cursor_param}) : 'cursor',
         cursor          => delete($args{cursor}),
         query           => exists($args{query}) ? delete($args{query}) : {},
@@ -54,12 +58,12 @@ sub new {
         seen            => {},
     }, $class;
 
-    for my $name (qw(items next has_more)) {
+    for my $name (qw(items next has_more total)) {
         next if !defined $self->{$name};
         die "pagination $name extractor must be a code reference or scalar path\n"
             if ref($self->{$name}) ne '' && ref($self->{$name}) ne 'CODE';
     }
-    for my $name (qw(page_param page_size_param cursor_param)) {
+    for my $name (qw(page_param page_size_param cursor_param offset_param)) {
         die "pagination $name must be a non-empty scalar\n"
             if !defined($self->{$name}) || ref($self->{$name}) ne '' || $self->{$name} eq '';
     }
@@ -69,9 +73,13 @@ sub new {
     die "query must be a hash reference\n" if ref($self->{query}) ne 'HASH';
     die "request must be a hash reference\n" if ref($self->{request}) ne 'HASH';
     die "page_size must be a positive integer\n"
-        if defined($self->{page_size}) && (ref($self->{page_size}) ne '' || $self->{page_size} !~ /\A\d+\z/ || $self->{page_size} < 1);
+        if defined($self->{page_size}) && (ref($self->{page_size}) ne '' || $self->{page_size} !~ /\A[0-9]+\z/ || $self->{page_size} < 1);
     die "start_page must be a positive integer\n"
-        if ref($self->{current_page}) ne '' || $self->{current_page} !~ /\A\d+\z/ || $self->{current_page} < 1;
+        if ref($self->{current_page}) ne '' || $self->{current_page} !~ /\A[0-9]+\z/ || $self->{current_page} < 1;
+    die "start_offset must be a non-negative integer\n"
+        if !defined($self->{current_offset})
+        || ref($self->{current_offset}) ne ''
+        || $self->{current_offset} !~ /\A[0-9]+\z/;
     die "unknown pagination option: $_\n" for sort keys %args;
 
     return $self;
@@ -147,6 +155,35 @@ sub _fetch_page {
             $update{cursor} = $next;
         }
     }
+    elsif ($self->{mode} eq 'offset') {
+        # Advance by the actual number of items returned. Services may impose
+        # a smaller page size than requested, so an explicit total is the most
+        # reliable completion signal for offset-based APIs.
+        my $next_offset = $self->{current_offset} + @$items;
+        my $finished = !@$items;
+
+        if (defined $self->{total}) {
+            my $total = _extract($data, $self->{total}, $response, $self->{response_aware_extractors});
+            die "pagination total extractor must return a non-negative integer\n"
+                if !defined($total) || ref($total) ne ''
+                || $total !~ /\A[0-9]+\z/;
+            $finished = 1 if $next_offset >= $total;
+        }
+        elsif (defined $self->{has_more}) {
+            $finished = 1
+                if !_extract($data, $self->{has_more}, $response, $self->{response_aware_extractors});
+        }
+        elsif (defined $self->{page_size}) {
+            $finished = 1 if @$items < $self->{page_size};
+        }
+
+        if ($finished) {
+            $update{finished} = 1;
+        }
+        else {
+            $update{current_offset} = $next_offset;
+        }
+    }
     else {
         my $has_more;
         if (defined $self->{has_more}) {
@@ -179,6 +216,10 @@ sub _request_url {
     my %query = %{ $self->{query} };
     if ($self->{mode} eq 'page') {
         $query{ $self->{page_param} } = $self->{current_page};
+        $query{ $self->{page_size_param} } = $self->{page_size} if defined $self->{page_size};
+    }
+    elsif ($self->{mode} eq 'offset') {
+        $query{ $self->{offset_param} } = $self->{current_offset};
         $query{ $self->{page_size_param} } = $self->{page_size} if defined $self->{page_size};
     }
     elsif ($self->{mode} eq 'cursor' && defined($self->{cursor}) && $self->{cursor} ne '') {
@@ -221,7 +262,7 @@ sub _extract {
         if (ref($value) eq 'HASH') {
             $value = $value->{$part};
         }
-        elsif (ref($value) eq 'ARRAY' && $part =~ /\A\d+\z/) {
+        elsif (ref($value) eq 'ARRAY' && $part =~ /\A[0-9]+\z/) {
             $value = $value->[$part];
         }
         else {

@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -16,6 +16,7 @@ our @EXPORT = qw(
 );
 
 use Carp ();
+use Storable;
 use TUI::toolkit;
 use TUI::toolkit::Types qw(
   Maybe
@@ -38,6 +39,7 @@ use TUI::ColorSel::Const qw(
   :csXXXX
 );
 use TUI::ColorSel::ColorDisplay;
+use TUI::ColorSel::ColorGroup;
 use TUI::ColorSel::ColorGroupList;
 use TUI::ColorSel::ColorItemList;
 use TUI::ColorSel::ColorSelector;
@@ -345,6 +347,56 @@ sub getIndexes {    # void (\@colIdx)
     $colIdx->[colorIndex][$index] = $self->{groups}->getGroupIndex( $index );
   }
   return;
+}
+
+sub write :method {    # void ($os)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $os ) = $sig->( @_ );
+  $self->SUPER::write( $os );
+  $os->put(
+    $self->{display},
+    $self->{groups},
+    $self->{forLabel},
+    $self->{forSel},
+    $self->{bakLabel},
+    $self->{bakSel},
+    $self->{monoLabel},
+    $self->{monoSel},
+  );
+  return;
+}
+
+sub read :method {    # $self ($is)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $is ) = $sig->( @_ );
+  $self->SUPER::read( $is );
+  $self->{display}   = $is->get();
+  $self->{groups}    = $is->get();
+  $self->{forLabel}  = $is->get();
+  $self->{forSel}    = $is->get();
+  $self->{bakLabel}  = $is->get();
+  $self->{bakSel}    = $is->get();
+  $self->{monoLabel} = $is->get();
+  $self->{monoSel}   = $is->get();
+  $self->{pal}       = undef;
+  return $self;
+}
+
+sub build {    # $obj ()
+  my ( $class ) = @_;
+  assert ( @_ == 1 );
+  assert ( is_Str $class );
+  assert ( Storable::is_retrieving );
+  return $class->new(
+    pal    => undef,
+    groups => TColorGroup->new( name => '' ),
+  );
 }
 
 1

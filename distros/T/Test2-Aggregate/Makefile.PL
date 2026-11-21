@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
     },
+    EXE_FILES     => ["agg", "aggit"],
     TEST_REQUIRES => {
         'Test::Output' => '0',
         'Test2::V0'    => '0'
@@ -46,7 +47,7 @@ my %WriteMakefileArgs = (
         resources => {
             repository => {
                 type => 'git',
-                url => 'git://github.com/SpareRoom/Test2-Aggregate.git',
+                url => 'https://github.com/SpareRoom/Test2-Aggregate.git',
                 web => 'https://github.com/SpareRoom/Test2-Aggregate',
             }
         }
@@ -74,3 +75,15 @@ delete $WriteMakefileArgs{LICENSE}
     unless eval { ExtUtils::MakeMaker->VERSION('6.31'); 1 };
 
 WriteMakefile(%WriteMakefileArgs);
+
+sub MY::postamble {
+    return <<'MAKE';
+
+.PHONY: readme
+readme :
+	$(FULLPERLRUN) author/update-readme.pl
+
+create_distdir distdir : readme
+
+MAKE
+}

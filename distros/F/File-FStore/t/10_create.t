@@ -5,7 +5,7 @@ use warnings;
 use v5.10;
 use lib 'lib', '../lib'; # able to run prove in project dir and .t locally
 
-use Test::More;
+use Test::More tests => 3;
 use File::Temp;
 use File::Spec;
 
@@ -24,7 +24,5 @@ $store->close;
 $store = eval { File::FStore->new(path => $path) };
 isa_ok($store, 'File::FStore');
 $store->close;
-
-done_testing();
 
 exit 0;

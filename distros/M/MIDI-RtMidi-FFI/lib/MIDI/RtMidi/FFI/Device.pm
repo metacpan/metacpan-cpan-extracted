@@ -9,7 +9,7 @@ package MIDI::RtMidi::FFI::Device;
 use MIDI::RtMidi::FFI ':all';
 use Carp qw/ carp croak /;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 
 sub new {
@@ -63,7 +63,7 @@ MIDI::RtMidi::FFI::Device - OO interface for MIDI::RtMidi::FFI
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 SYNOPSIS
 

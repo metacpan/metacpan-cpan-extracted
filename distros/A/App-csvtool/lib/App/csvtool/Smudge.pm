@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2024 -- leonerd@leonerd.org.uk
 
-package App::csvtool::Smudge 0.04;
+package App::csvtool::Smudge 0.05;
 
 use v5.26;
 use warnings;
@@ -14,6 +14,8 @@ use experimental 'signatures';
 C<App::csvtool::Smudge> - implements the F<csvtool> F<smudge> command
 
 =head1 COMMANDS
+
+=for highlighter
 
 =cut
 

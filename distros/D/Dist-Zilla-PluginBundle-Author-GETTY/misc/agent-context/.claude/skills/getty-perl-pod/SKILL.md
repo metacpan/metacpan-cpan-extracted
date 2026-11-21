@@ -1,6 +1,6 @@
 ---
 name: getty-perl-pod
-description: Use when writing or editing POD in a distribution whose dist.ini uses [@Author::GETTY] — the =attr/=method/=opt shortcut commands, the # ABSTRACT line, and which sections Pod::Weaver generates so you must not write them.
+description: "Use when writing or editing POD in a distribution whose dist.ini uses [@Author::GETTY] — =attr/=method/=opt commands, the # ABSTRACT line, sections Pod::Weaver generates."
 user-invocable: false
 ---
 

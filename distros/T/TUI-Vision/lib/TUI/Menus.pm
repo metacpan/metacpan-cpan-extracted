@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -18,6 +18,7 @@ use TUI::Menus::SubMenu;
 use TUI::Menus::MenuView;
 use TUI::Menus::MenuBar;
 use TUI::Menus::MenuBox;
+use TUI::Menus::MenuPopup;
 use TUI::Menus::StatusItem;
 use TUI::Menus::StatusDef;
 use TUI::Menus::StatusLine;
@@ -31,6 +32,7 @@ sub import {
   TUI::Menus::MenuView->import::into( $target );
   TUI::Menus::MenuBar->import::into( $target );
   TUI::Menus::MenuBox->import::into( $target );
+  TUI::Menus::MenuPopup->import::into( $target );
   TUI::Menus::StatusItem->import::into( $target );
   TUI::Menus::StatusDef->import::into( $target );
   TUI::Menus::StatusLine->import::into( $target );
@@ -45,6 +47,7 @@ sub unimport {
   TUI::Menus::MenuView->unimport::out_of( $caller );
   TUI::Menus::MenuBar->unimport::out_of( $caller );
   TUI::Menus::MenuBox->unimport::out_of( $caller );
+  TUI::Menus::MenuPopup->unimport::out_of( $caller );
   TUI::Menus::StatusItem->unimport::out_of( $caller );
   TUI::Menus::StatusDef->unimport::out_of( $caller );
   TUI::Menus::StatusLine->unimport::out_of( $caller );
@@ -119,8 +122,8 @@ Visual menu components.
 L<TStatusDef|TUI::Menus::StatusDef>, L<TStatusLine|TUI::Menus::StatusLine> -
 Status line and hotkey definitions.
 
-=item * MenuPopup (planned)  
-Popup menu support, not yet included in the Perl port.
+=item * L<TMenuPopup|TUI::Menus::MenuPopup> -
+Standalone pop-up menus with Ctrl mnemonic and hot-key handling.
 
 =back
 

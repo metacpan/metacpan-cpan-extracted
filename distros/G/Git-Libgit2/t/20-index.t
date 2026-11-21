@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use Test2::V0;
 use Path::Tiny;
 use Git::Libgit2 qw( init_lib shutdown_lib check_rc oid_to_hex GIT_ENOTFOUND );

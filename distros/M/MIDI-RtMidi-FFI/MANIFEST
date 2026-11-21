@@ -37,6 +37,7 @@ t/08-rpn.t
 t/09-future.t
 t/10-errors.t
 t/11-connected_to.t
+t/12-panic.t
 t/author-critic.t
 t/author-pod-syntax.t
 t/author-synopsis.t

@@ -4,7 +4,7 @@
       "Gisle Aas <gisle@activestate.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -52,6 +52,6 @@
          "url" : "http://github.com/garu/data-dump"
       }
    },
-   "version" : "1.25",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "1.26",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

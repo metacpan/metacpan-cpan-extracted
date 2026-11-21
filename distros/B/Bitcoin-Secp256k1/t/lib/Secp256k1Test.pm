@@ -28,6 +28,12 @@ my $sample_sig_schnorr = pack 'H*',
 my $sample_bad_sig_schnorr = pack 'H*',
 	'f965c1178c3e63a7bad2625bf2674af97b4bae11d373b781902920398c4bdd34e326341213117f9c3df6cbad9cb09e7fc599bd400ed2399d8583ccbb4832914a';
 
+my @to_combine = (
+	pack('H*', '0311ab47c9252066f0ca5946d70c3aaac1486d65969b90cd57207476963c9f9af3'),
+	pack('H*', '0260213f6d967636c54d8845c23098e0f63d906b7903d23692efa155a155eda169'),
+);
+my $combined = pack 'H*', '0255c3386d6833d5e1ad6d863afc1cf5d8ffdc0ebc78e4241e845a6c2cbd78157b';
+
 sub test_data
 {
 	return (
@@ -42,6 +48,8 @@ sub test_data
 		rand => $sample_rand_schnorr,
 		sig_schnorr => $sample_sig_schnorr,
 		bad_sig_schnorr => $sample_bad_sig_schnorr,
+		to_combine => \@to_combine,
+		combined => $combined,
 	);
 }
 

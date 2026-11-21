@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -71,6 +71,7 @@ my (
   $focusView,
   $selectView,
   $findNext,
+  $doPut,
 );
 
 my $lock_value = sub {
@@ -204,7 +205,7 @@ sub awaken {    # void ()
     pos    => [],
   );
   my ( $self ) = $sig->( @_ );
-  $self->forEach( $doAwaken );
+  $self->forEach( $doAwaken, undef );
   return;
 }
 
@@ -244,15 +245,23 @@ sub insertView {    # void ($p, $Target|undef)
   else {
     if ( !$self->{last} ) {
       $p->next( $p );
+      $self->{last} = $p;
+      &$weaken( $p->{next} );
     }
     else {
-      $p->next( $self->{last}{next} );
-      $self->{last}->next( $p );
-    }
-    $self->{last} = $p;
+      my $last  = $self->{last};
+      my $first = $last->{next};
+      my $prev  = $last->prev();
 
-    # Set new weak reference
-    &$weaken( $p->prev()->{next} );
+      # Move the weak link to the new end of the ring.
+      $prev->next( $last );
+
+      $p->next( $first );
+      $last->next( $p );
+      &$weaken( $last->{next} );
+
+      $self->{last} = $p;
+    }
   } #/ else [ if ( $Target ) ]
   q/*
     require Devel::Cycle; 
@@ -441,11 +450,11 @@ sub insert {    # void ($p|undef)
   return;
 }
 
-sub insertBefore {    # void ($p, $Target|undef)
+sub insertBefore {    # void ($p|undef, $Target|undef)
   no warnings qw( uninitialized numeric );
   state $sig = signature(
     method => Object,
-    pos    => [Object, Maybe[Object]],
+    pos    => [Maybe[Object], Maybe[Object]],
   );
   my ( $self, $p, $Target ) = $sig->( @_ );
   if ( $p && !$p->{owner} && ( !$Target || $Target->{owner} == $self ) ) {
@@ -1013,6 +1022,70 @@ $findNext = sub {
   } #/ if ( $p )
   return $result;
 };
+
+$doPut = sub {    # void ($p, $osp)
+  my ( $p, $osp ) = @_;
+  assert ( @_ == 2 );
+  assert ( is_Object $p );
+  assert ( is_Object $osp );
+  $osp->put( $p );
+  return;
+};
+
+sub write :method {    # void ($os)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $os ) = $sig->( @_ );
+  $self->SUPER::write( $os );
+  my $ownerSave = $self->{owner};
+  $self->owner( $self );
+  my $count = $self->indexOf( $self->{last} );
+  $os->put( $count );
+  $self->forEach( $doPut, $os );
+  my $index;
+  if ( !defined $self->{current} ) {
+    $index = 0;
+  }
+  else {
+    $index = $self->indexOf( $self->{current} );
+  }
+  $os->put( $index );
+  $self->owner( $ownerSave );
+  return;
+}
+
+sub read :method {    # $self ($is)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $is ) = $sig->( @_ );
+  $self->SUPER::read( $is );
+  $self->{clip} = $self->getExtent();
+  my $ownerSave = $self->{owner};
+  $self->owner( $self );
+  $self->{last} = undef;
+  $self->{phase} = phFocused;
+  $self->current( undef );
+  $self->{buffer} = undef;
+  $self->{lockFlag} = 0;
+  $self->{endState} = 0;
+  my $count = $is->get();
+  for ( my $i = 0; $i < $count; $i++ ) {
+    my $tv = $is->get();
+    $self->insertView( $tv, undef )
+      if defined $tv;
+  }
+  $self->owner( $ownerSave );
+  my $index = $is->get();
+  my $current = $self->at( $index );
+  $self->setCurrent( $current, normalSelect );
+  $self->awaken()
+    unless defined $ownerGroup;
+  return $self;
+}
 
 1
 

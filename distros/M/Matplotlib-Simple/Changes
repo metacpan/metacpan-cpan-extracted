@@ -1,5 +1,15 @@
 Revision history for Matplotlib-Simple
 
+0.3345 2026-11-20 CST (Claude Opus 5.5 helped)
+
+ [Fixed]
+
+ - An SVG is written to output_file once, in every engine, as a PNG always was, so a viewer that reloads a figure when its file changes reloads it again: Eye of GNOME 45.3 had stopped. Each engine wrote the SVG and then rewrote it -- matplotlib to cut the DOCTYPE and again for tooltips, gnuplot and ggplot2 to add the creator note -- so a viewer saw the file change two or three times, and empty in between. The SVG holds what it did.
+
+ - `label` puts the series of a `bar` or `barh` whose `data` is a hash of hashes in the order it names them, in every engine: `label => [ 'staffed', 'authorized' ]` stacks "staffed" at the bottom and lists it first in the legend. It was dropped without a word, since the inner keys were always sorted and written over `label`, so no option could change which series lay at the bottom of a stack. `label` must name every inner key exactly once; a name that is not an inner key, one named twice, or an inner key left out is refused by name. Without `label` the series are sorted, as before. A hash of arrays is unchanged: there `label` is still the legend's text, by position.
+
+ - The ggplot2 engine's native style stacks the first series of a `bar` or `barh` at the bottom, as matplotlib and gnuplot do. It put the first on top, as `geom_col` does by default, so the same figure stacked the other way up under `engine => 'ggplot2'`, and the other way up from that engine's own bars on a log axis, which already stood the first series at the bottom.
+
 0.3344 2026-11-17 CST (Claude Opus 5.5 helped)
 
  [Performance]

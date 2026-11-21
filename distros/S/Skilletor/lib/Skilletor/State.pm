@@ -4,20 +4,36 @@ package Skilletor::State;
 use Moo;
 use Errno ();
 use Fcntl ();
+use File::Basename ();
 use POSIX ();
 use Path::Tiny qw( path );
 use Sys::Hostname ();
 use Time::HiRes ();
 use Skilletor::Error::LockTimeout;
-use Skilletor::FSUtil qw( read_text write_text path_join );
+use Skilletor::Process ();
+use Skilletor::FSUtil qw( encode_text is_absolute path_join read_text real_or_resolved write_text );
 use Skilletor::JSON qw( js_parse js_stringify js_ordered js_sort_keys js_type );
 use namespace::clean;
 
-our $VERSION = '0.001';
+our $VERSION = '0.008000';
 
 has root => (
   is       => 'ro',
   required => 1,
+);
+
+# One run's view of the files (k250): a check, which only reads, or the holder of the sync lock,
+# the one writer of the records a sync keeps, parses each file once.
+has read_once => (
+  is => 'ro',
+);
+
+# What a read_once state parsed, by file name. A write drops the file, so the next read parses
+# what was written; with_lock empties it as it takes the lock and as it gives it up.
+has _view => (
+  is       => 'ro',
+  init_arg => undef,
+  default  => sub { {} },
 );
 
 sub BUILD {
@@ -37,15 +53,21 @@ sub default_root {
 
 sub _file { path_join( $_[0]->root, $_[1] ) }
 
-# A state file as an object; anything unreadable or no object reads as an empty one.
+# A state file as an object; anything unreadable or no object reads as an empty one. A read_once
+# state hands out the object it parsed first: what a caller changes of it, it writes.
 sub _read_json {
   my ( $self, $name ) = @_;
+  my $view = $self->_view;
+  return $view->{$name} if exists $view->{$name};
   my $value = eval { js_parse( read_text( $self->_file($name) ) ) };
-  return ( defined $value && js_type($value) eq 'object' ) ? $value : js_ordered();
+  $value = js_ordered() unless defined $value && js_type($value) eq 'object';
+  $view->{$name} = $value if $self->read_once;
+  return $value;
 }
 
 sub _write_json {
   my ( $self, $name, $value ) = @_;
+  delete $self->_view->{$name};
   write_text( $self->_file($name), js_stringify( $value, 2 )."\n" );
 }
 
@@ -78,28 +100,50 @@ sub is_trusted {
 
 #### Last check (the in-session check's clock) #########################
 
+# Absolute project keys are canonical only on Windows, where an 8.3 alias and the long path
+# Git reports must share hook state. POSIX keeps persisted raw and symlink-spelled keys.
+sub _project_state_key {
+  my ( $key ) = @_;
+  return $^O eq 'MSWin32' && is_absolute($key) ? real_or_resolved($key) : $key;
+}
+
 sub _now_ms_number { 0 + int( Time::HiRes::time() * 1000 ) }
 
 sub is_due {
   my ( $self, $scope_key, $interval_seconds ) = @_;
+  $scope_key = _project_state_key($scope_key);
   my $last = $self->_read_json('last-check.json')->{$scope_key};
   return 1 unless js_type($last) eq 'number';
   return _now_ms_number() - $last >= $interval_seconds * 1000 ? 1 : 0;
 }
 
+# Mark a check now, dropping the marks of projects that are gone (k255): a key that is no absolute
+# path, or whose directory – the project dir itself, .claude or not – no longer exists. The file is
+# written anyway; is_due only reads it, and clear_checked follows a mark.
 sub mark_checked {
   my ( $self, $scope_key ) = @_;
+  $scope_key = _project_state_key($scope_key);
   my $checks = $self->_read_json('last-check.json');
+  _drop_gone_scopes( $checks, $scope_key, sub { $_[0] } );
   $checks->{$scope_key} = _now_ms_number();
   $self->_write_json( 'last-check.json', $checks );
 }
 
 sub clear_checked {
   my ( $self, $scope_key ) = @_;
+  $scope_key = _project_state_key($scope_key);
   my $checks = $self->_read_json('last-check.json');
   return unless exists $checks->{$scope_key};
   delete $checks->{$scope_key};
   $self->_write_json( 'last-check.json', $checks );
+}
+
+# A sync that timed out on the sync lock synced nothing: drop the key's mark, so the next prompt is
+# due and its background sync retries (k89). Best effort: never throws.
+sub due_again {
+  my ( $self, $key ) = @_;
+  eval { $self->clear_checked($key); 1 };
+  return;
 }
 
 #### Unreached drift (spec §14.3, k70) #################################
@@ -113,12 +157,15 @@ sub unreached {
   return [ grep { js_type($_) eq 'string' } @$ids ];
 }
 
+# Replace a scope's unreached drift, dropping the records of scopes that are gone (k255, as
+# put_sources_read); written only when the file changes.
 sub put_unreached {
   my ( $self, $scope_key, $ids ) = @_;
   my $all = $self->_read_json('unreached.json');
   my %seen;
   my $next = [ js_sort_keys( grep { !$seen{$_}++ } @$ids ) ];
-  return if js_stringify( $all->{$scope_key} // [] ) eq js_stringify($next);
+  my $dropped = _drop_gone_scopes( $all, $scope_key );
+  return if !$dropped && js_stringify( $all->{$scope_key} // [] ) eq js_stringify($next);
   if   (@$next) { $all->{$scope_key} = $next }
   else          { delete $all->{$scope_key} }
   $self->_write_json( 'unreached.json', $all );
@@ -153,12 +200,31 @@ sub sources_read {
   return $out;
 }
 
+# Drop the keys of scopes that are gone (k254) from a state file keyed by lock path, but $keep's: a
+# key that is no absolute path – it names a checkout only from a cwd long changed – or whose lock's
+# directory, the scope's .claude, no longer exists. The directory, not the lock: a sync that
+# installed nothing leaves no lock, and its record still holds. A file keyed by another path names
+# its directory with $dir_of (last-check.json: the project dir itself, k255). True when one was
+# dropped. File::Basename's dirname, as Node's, takes either separator on Windows; a key with a NUL
+# exists nowhere, silently, as for existsSync.
+sub _drop_gone_scopes {
+  my ( $all, $keep, $dir_of ) = @_;
+  $dir_of //= \&File::Basename::dirname;
+  no warnings 'syscalls';
+  my @gone = grep { $_ ne $keep && !( is_absolute($_) && -e encode_text( $dir_of->($_) ) ) } keys %$all;
+  delete $all->{$_} for @gone;
+  return @gone ? 1 : 0;
+}
+
+# Replace a scope's record of sources read, dropping the records of scopes that are gone (k254);
+# written only when the file changes.
 sub put_sources_read {
   my ( $self, $scope_key, $record ) = @_;
   my $all  = $self->_read_json('sources-read.json');
   my $next = js_ordered();
   $next->{$_} = _source_read( $record->{$_} ) for js_sort_keys( keys %$record );
-  return if js_stringify( $all->{$scope_key} // {} ) eq js_stringify($next);
+  my $dropped = _drop_gone_scopes( $all, $scope_key );
+  return if !$dropped && js_stringify( $all->{$scope_key} // {} ) eq js_stringify($next);
   if   (%$next) { $all->{$scope_key} = $next }
   else          { delete $all->{$scope_key} }
   $self->_write_json( 'sources-read.json', $all );
@@ -172,19 +238,78 @@ sub render_inputs {
   return js_type($hash) eq 'string' ? $hash : undef;
 }
 
-# Replace a scope's render-inputs hash, or drop it (undef); written only when it changes.
+# Replace a scope's render-inputs hash, or drop it (undef), dropping the records of scopes that are
+# gone (k255, as put_sources_read); written only when the file changes.
 sub put_render_inputs {
   my ( $self, $scope_key, $hash ) = @_;
   my $all = $self->_read_json('render-inputs.json');
+  my $dropped = _drop_gone_scopes( $all, $scope_key );
   if ( defined $hash ) {
-    return if exists $all->{$scope_key} && js_type( $all->{$scope_key} ) eq 'string' && $all->{$scope_key} eq $hash;
+    return if !$dropped && exists $all->{$scope_key} && js_type( $all->{$scope_key} ) eq 'string' && $all->{$scope_key} eq $hash;
     $all->{$scope_key} = $hash;
   }
   else {
-    return unless exists $all->{$scope_key};
+    return if !$dropped && !exists $all->{$scope_key};
     delete $all->{$scope_key};
   }
   $self->_write_json( 'render-inputs.json', $all );
+}
+
+#### Pending report (spec §8) #########################################
+
+# A background sync's hook output for a project, for one of its next prompts to show.
+sub put_pending_report {
+  my ( $self, $project_key, $report ) = @_;
+  $project_key = _project_state_key($project_key);
+  my $pending = $self->_read_json('pending-report.json');
+  $pending->{$project_key} = $report;
+  $self->_write_json( 'pending-report.json', $pending );
+}
+
+# A project's pending report, taken out (undef: none); the file is written only when it held one.
+sub take_pending_report {
+  my ( $self, $project_key ) = @_;
+  $project_key = _project_state_key($project_key);
+  my $pending = $self->_read_json('pending-report.json');
+  return undef unless exists $pending->{$project_key};
+  my $report = delete $pending->{$project_key};
+  $self->_write_json( 'pending-report.json', $pending );
+  return $report;
+}
+
+#### Session cwd (spec §8, k149) #######################################
+
+# Sessions `session-cwd.json` keeps (a Hermes gateway runs for days).
+use constant SESSION_CWDS => 256;
+
+# A field of a session's entry; undef for an entry that is no object.
+sub _entry_field {
+  my ( $entry, $field ) = @_;
+  return js_type($entry) eq 'object' ? $entry->{$field} : undef;
+}
+
+# Where a session's hook last looked: the cwd of its last SessionStart or prompt. A malformed
+# entry counts as none.
+sub session_cwd {
+  my ( $self, $session_id ) = @_;
+  my $cwd = _entry_field( $self->_read_json('session-cwd.json')->{$session_id}, 'cwd' );
+  return js_type($cwd) eq 'string' ? $cwd : undef;
+}
+
+# Record a session's cwd; written only when it changes, keeping the SESSION_CWDS sessions recorded
+# last (by `at`, newest first; equal ones in the file's order) – one that lost its entry is looked
+# at once more.
+sub put_session_cwd {
+  my ( $self, $session_id, $cwd ) = @_;
+  my $have = $self->session_cwd($session_id);
+  return if defined $have && $have eq $cwd;
+  my $all = $self->_read_json('session-cwd.json');
+  my @others = grep { $_ ne $session_id } keys %$all;
+  my @at = map { my $t = _entry_field( $all->{$_}, 'at' ); js_type($t) eq 'number' ? $t : 0 } @others;
+  my @newest = map { $others[$_] } sort { $at[$b] <=> $at[$a] || $a <=> $b } 0 .. $#others;
+  delete $all->{$_} for @newest[ SESSION_CWDS - 1 .. $#newest ];
+  $all->{$session_id} = js_ordered( cwd => $cwd, at => _now_ms_number() );
+  $self->_write_json( 'session-cwd.json', $all );
 }
 
 #### Hermes home (spec §16.2) ##########################################
@@ -200,6 +325,7 @@ sub put_hermes_home {
   my ( $self, $home ) = @_;
   my $have = $self->hermes_home;
   return if ( !defined $have && !defined $home ) || ( defined $have && defined $home && $have eq $home );
+  delete $self->_view->{'hermes-home.json'};    # written or removed: read again
   if ( defined $home ) { $self->_write_json( 'hermes-home.json', js_ordered( home => $home ) ) }
   else                 { unlink Skilletor::FSUtil::encode_text( $self->_file('hermes-home.json') ) }
 }
@@ -213,11 +339,22 @@ use constant LEFTOVER => LOCK_NAME.'.';
 
 sub _now_ms { int( Time::HiRes::time() * 1000 ) }
 
+# The stops a process can catch (k251): a harness cancelling a hook – Claude Code sends SIGTERM to
+# the hook's process group, SIGKILL 1.5 s later –, Ctrl+C, a closed terminal. By name: _stopped
+# looks a number up only when one comes, since a POSIX macro the platform lacks dies wherever it
+# is evaluated – Windows' POSIX has no SIGHUP, and loading this module there must not die (k261).
+use constant STOPS => qw( TERM INT HUP );
+
+# The release of each sync lock this process takes or holds, by token, with the pid that took it: a
+# child forked under the lock – the heartbeat, a spawn before its exec – holds none.
+my %held;
+
 # Run $code holding `sync.lock/`, the one mutex over the locks, the target dirs and the source
 # cache – shared with the reference, which takes the same directory the same way: mkdir, then
 # `owner.json` created exclusively; a holder refreshes the record's mtime; a record not
 # refreshed for the stale age – or for two refreshes when its pid on this host is gone – is a
-# dead run's, an owner-less dir older than the grace time one that died before writing it.
+# dead run's, an owner-less dir older than the grace time one that died before writing it. A stop
+# the process can catch releases the lock before it ends the process (k251).
 sub with_lock {
   my ( $self, $code, %opts ) = @_;
   my $timeout_ms = $opts{timeout_ms} // 5_000;
@@ -226,10 +363,22 @@ sub with_lock {
   $refresh_ms = 1 if $refresh_ms < 1;
   my $grace_ms = $opts{grace_ms} // 2_000;
   my $poll_ms  = $opts{poll_ms}  // 25;
+  my $win32    = $opts{win32}    // $^O eq 'MSWin32';
   my $lock_dir = $self->_file(LOCK_NAME);
   my $owner    = path_join( $lock_dir, 'owner.json' );
   my $token    = join '', map { sprintf '%02x', int rand 256 } 1 .. 8;
   my $deadline = _now_ms() + $timeout_ms;
+
+  # While this process takes or holds the lock, a stop that would end it – no handler of the
+  # program's own, not ignored; not on Windows, where a process is ended without a signal it can
+  # catch – gives every lock it holds up first (the reference's releaseOnStop). In place before
+  # the owner record is written, so a stop that comes once it is finds the handler; until then,
+  # the release gives nothing up – the token check. A lock taken inside another finds the outer
+  # one's handlers and adds none. A stop can never release a lock it was only waiting for, nor a
+  # SIGKILL any: the next run breaks a lock a dead owner left (_dead_owner).
+  local $held{$token} = [ $$, sub { $self->_release( $lock_dir, $owner, $token ) } ];
+  my @stops = $^O eq 'MSWin32' ? () : grep { ( $SIG{$_} // '' ) =~ /\A(?:DEFAULT)?\z/ } STOPS;
+  local @SIG{@stops} = map { my $name = $_; sub { _stopped($name) } } @stops;
 
   for ( ;; ) {
     last if $self->_acquire( $lock_dir, $owner, $token, $refresh_ms );
@@ -240,10 +389,12 @@ sub with_lock {
     Time::HiRes::sleep( $poll_ms / 1000 );
   }
 
-  my $heartbeat = $self->_heartbeat( $owner, $refresh_ms );
+  %{ $self->_view } = ();    # what was read before the lock is not what holds under it
+  my $heartbeat = $self->_heartbeat( $owner, $refresh_ms, $win32 );
   my $want = wantarray;
   my @result;
   my $ok = eval {
+    local $Skilletor::Process::ON_WAIT = $heartbeat if ref $heartbeat eq 'CODE';
     $self->_sweep_leftovers($stale_ms);
     if    ($want)         { @result = $code->() }
     elsif ( defined $want ) { $result[0] = $code->() }
@@ -253,8 +404,24 @@ sub with_lock {
   my $err = $@;
   $self->_stop_heartbeat($heartbeat);
   $self->_release( $lock_dir, $owner, $token );
+  %{ $self->_view } = ();    # nor what was read under it once another run may write
   die $err unless $ok;
   return $want ? @result : $result[0];
+}
+
+# A stop while this process takes or holds a lock: every lock it holds given up, then the end the
+# signal would have brought – by the signal itself, its default action back and Perl's block of it
+# while its handler runs lifted; by its conventional status should that not end the process, which
+# must not run on without its lock.
+sub _stopped {
+  my ($name) = @_;
+  $_->[0] == $$ and $_->[1]->() for values %held;
+  %held = ();
+  my $number = POSIX->can( 'SIG'.$name )->();
+  $SIG{$name} = 'DEFAULT';
+  kill $name, $$;
+  POSIX::sigprocmask( POSIX::SIG_UNBLOCK(), POSIX::SigSet->new($number) );
+  POSIX::_exit( 128 + $number );
 }
 
 sub _acquire {
@@ -349,32 +516,54 @@ sub _sweep_leftovers {
   }
 }
 
+# Stamp a path's times with now. Time::HiRes has no utime on Windows (it dies there): the core's,
+# which takes now from the system when given no times.
 sub _touch {
-  my ( $path ) = @_;
+  my ( $path, $hires ) = @_;
+  return utime undef, undef, $path unless $hires // Time::HiRes::d_hires_utime();
   my $now = Time::HiRes::time();
   Time::HiRes::utime( $now, $now, $path );
 }
 
 # The refreshes: Perl runs a resolve synchronously, so a child process stamps the owner record
-# while the holder works, and stops when told or when the holder is gone. None on Windows.
+# while the holder works, and stops when told or when the holder is gone. Windows has no fork to
+# spare – Perl emulates one, as threads, with a clone of the interpreter whose end runs every
+# object's DESTROY once more – so there the holder stamps the record itself, at most once a
+# refresh, each time it waits on a program: a code ref for Skilletor::Process's ON_WAIT, which
+# the caller installs while its code runs (a resolve's git runs; not an HTTP download).
 sub _heartbeat {
-  my ( $self, $owner, $refresh_ms ) = @_;
-  return undef if $^O eq 'MSWin32';
+  my ( $self, $owner, $refresh_ms, $win32 ) = @_;
+  return _wait_tick( $owner, $refresh_ms ) if $win32;
   my $parent = $$;
   my $pid = fork;
   return undef unless defined $pid;
   return $pid if $pid;
   local $SIG{TERM} = sub { POSIX::_exit(0) };
-  while ( getppid() == $parent && -e $owner ) {
+  for ( ;; ) {
     Time::HiRes::sleep( $refresh_ms / 1000 );
+    last unless getppid() == $parent && -e $owner;    # no refresh once the holder is gone (k251)
     _touch($owner);
   }
   POSIX::_exit(0);
 }
 
+sub _wait_tick {
+  my ( $owner, $refresh_ms ) = @_;
+  my $outer = $Skilletor::Process::ON_WAIT;    # a lock held inside another's: refresh that one too
+  my $last  = Time::HiRes::time();
+  return sub {
+    my $now = Time::HiRes::time();
+    if ( ( $now - $last ) * 1000 >= $refresh_ms ) {
+      $last = $now;
+      _touch($owner);
+    }
+    $outer->() if $outer;
+  };
+}
+
 sub _stop_heartbeat {
   my ( $self, $pid ) = @_;
-  return unless $pid;
+  return if !$pid || ref $pid;    # none, or the Windows tick (gone with the code's scope)
   kill 'TERM', $pid;
   waitpid $pid, 0;
 }
@@ -393,7 +582,7 @@ Skilletor::State - Instance state under ~/.claude/skilletor – trust, the sync 
 
 =head1 VERSION
 
-version 0.001
+version 0.008000
 
 =head1 SYNOPSIS
 
@@ -425,16 +614,31 @@ writes and reads them.
 
 =item * C<last-check.json>: when the in-session check last ran per key.
 
-=item * C<hermes-home.json>: the Hermes home the user scope was synced under;
-the port, which never targets Hermes, only ever drops it as the reference does.
+=item * C<pending-report.json>: per project, the hook output a background sync
+left for one of its next prompts to show.
+
+=item * C<session-cwd.json>: per session id, the cwd its hook last looked at
+and when (C<{ cwd, at }>), for the 256 sessions recorded last.
+
+=item * C<hermes-home.json>: the Hermes home the user scope was synced under
+(C<{ home }>), while Hermes is a target and the home is not Hermes' default.
 
 =back
-
-Pending reports belong to the reference's hooks and are not ported.
 
 =head2 root
 
 The state directory; created when the object is.
+
+=head2 read_once
+
+True: the object parses each file once and hands out that object from then on
+(k250) – one run's view, for a C<check>, which only reads, and for the holder
+of the sync lock, the one writer of the records a sync keeps. A write, or the
+removal of F<hermes-home.json>, drops the file from the view, so the next read
+parses what was written; L</with_lock> empties the view as it takes the lock
+and as it gives it up. Off by default: a hook's records (F<last-check.json>,
+F<pending-report.json>, F<session-cwd.json>) are written outside the lock, and
+each read sees what another run wrote.
 
 =head2 for_home
 
@@ -462,6 +666,9 @@ Replaces an earlier entry of the name.
 
   $state->put_unreached( $lock_path, \@ids );   # sorted, deduplicated; none drops the key
 
+It drops the records of scopes that are gone, as L</put_sources_read> does
+(k255).
+
 =head2 sources_read
 
   my $read = $state->sources_read($lock_path);
@@ -471,6 +678,10 @@ Replaces an earlier entry of the name.
 
   $state->put_sources_read( $lock_path, \%read );   # names sorted; none drops the key
 
+It drops the records of scopes that are gone, too: a key that is no absolute
+path, or whose lock's directory no longer exists (k254). The scope written
+stays, and so does one whose directory holds no lock.
+
 =head2 render_inputs
 
   my $hash = $state->render_inputs($lock_path);   # 'sha256:…' or undef
@@ -478,6 +689,9 @@ Replaces an earlier entry of the name.
 =head2 put_render_inputs
 
   $state->put_render_inputs( $lock_path, $hash );   # undef drops it
+
+It drops the records of scopes that are gone, as L</put_sources_read> does
+(k255).
 
 =head2 is_due
 
@@ -487,13 +701,57 @@ True when no check was marked for the key, or the interval has passed.
 
 =head2 mark_checked
 
+  $state->mark_checked($key);   # the project dir; is_due is false for the interval
+
+It drops the marks of projects that are gone, too: a key that is no absolute
+path, or whose directory itself no longer exists (k255) – a project without
+F<.claude> keeps its mark. The key marked stays. L</is_due> and
+L</clear_checked> drop nothing.
+
 =head2 clear_checked
+
+  $state->clear_checked($key);   # the next is_due is true; nothing written for a key not marked
+
+=head2 due_again
+
+  $state->due_again($key);
+
+L</clear_checked>, best effort: a sync that timed out on the sync lock synced
+nothing, so the next prompt is due and retries. Never throws.
+
+=head2 put_pending_report
+
+  $state->put_pending_report( $project_dir, { systemMessage => '…' } );
+
+=head2 take_pending_report
+
+  my $output = $state->take_pending_report($project_dir);   # undef: none
+
+Returns the project's pending report and removes it from the file.
+
+=head2 session_cwd
+
+  my $cwd = $state->session_cwd($session_id);   # undef: none recorded
+
+=head2 put_session_cwd
+
+  $state->put_session_cwd( $session_id, $cwd );
+
+Records the session's cwd with the time in ms; writes nothing when it is the
+recorded one. Keeps the 256 sessions recorded last: the others are dropped,
+oldest first.
 
 =head2 hermes_home
 
 =head2 put_hermes_home
 
-  $state->put_hermes_home(undef);   # drop the record
+  my $home = $state->hermes_home;                    # undef: none recorded
+  $state->put_hermes_home('/home/me/hermes-b');      # record it
+  $state->put_hermes_home(undef);                    # drop the record
+
+The Hermes home the user scope's C<hermes:> entries were synced under (spec
+§16.2). A record that is no non-empty string is none. The file is written, or
+removed, only when the record changes.
 
 =head2 with_lock
 
@@ -506,11 +764,27 @@ for another holder up to C<timeout_ms> (default 5000), breaking a lock a dead
 run left (no refresh for C<stale_ms>, default 300000; an owner-less directory
 after C<grace_ms>, default 2000), then throws
 L<Skilletor::Error::LockTimeout>. While the code runs, a forked child refreshes
-the owner record every C<refresh_ms> (default 10000; none on Windows). The
-lock is released however the code ends; its result (in the caller's context)
-is returned and its exception rethrown.
+the owner record every C<refresh_ms> (default 10000). On Windows, which has no
+fork to spare, the holder refreshes it itself, at most every C<refresh_ms>,
+each time it waits on a program through L<Skilletor::Process> – a resolve's git
+runs, not an HTTP download; C<< win32 => 1 >> takes this way on any system,
+for a test. The lock is released however the code ends; its result (in the
+caller's context) is returned and its exception rethrown. A L</read_once>
+object reads every file afresh under the lock, and once more after it.
+
+A stop the process can catch while it takes or holds the lock – C<SIGTERM>,
+C<SIGINT>, C<SIGHUP>, each where it would end the process: no handler of the
+program's own, not ignored – releases every lock the process holds, then ends
+it by that signal (k251). Not on Windows, where a process is ended without a
+signal it can catch. A C<SIGKILL> leaves the lock: the next run breaks it once
+its record, of this host and a pid that is gone, missed two refreshes.
 
 =head1 SUPPORT
+
+=head2 Issues
+
+Please report bugs and feature requests at
+L<https://github.com/Getty/skilletor/issues>.
 
 =head1 CONTRIBUTING
 
@@ -518,13 +792,14 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <getty@cpan.org>
+Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
+This software is Copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

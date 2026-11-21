@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use Test2::V0;
 
 # Import everything the facade exports — the new constant groups must be

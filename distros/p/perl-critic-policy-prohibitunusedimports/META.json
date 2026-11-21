@@ -4,7 +4,7 @@
       "George S. Baugh <george@troglodyne.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013",
+   "generated_by" : "Dist::Zilla version 6.040, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "mit"
    ],
@@ -73,7 +73,7 @@
    "provides" : {
       "Perl::Critic::Policy::ProhibitUnusedImports" : {
          "file" : "lib/Perl/Critic/Policy/ProhibitUnusedImports.pm",
-         "version" : "1.001"
+         "version" : "1.002"
       }
    },
    "release_status" : "stable",
@@ -88,9 +88,12 @@
          "web" : "https://github.com/teodesian/perl-critic-policy-prohibitunusedimports"
       }
    },
-   "version" : "1.001",
+   "version" : "1.002",
+   "x_contributors" : [
+      "troglodyne-robot <trogbot@troglodyne.net>"
+   ],
    "x_generated_by_perl" : "v5.44.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.43",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.82",
    "x_spdx_expression" : "MIT"
 }
 

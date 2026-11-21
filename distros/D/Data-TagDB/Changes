@@ -1,3 +1,12 @@
+v0.16  2026-11-21Z
+    - Improved documentation
+    - Added many tests
+    - Save and restore tags in attribute cache to break cyclic references
+    - Added $migration->create_memory_database()
+    - Added $db->master_cache()
+    - Cache cloudlets
+    - Added $tag->has_role()
+
 v0.15  2026-10-22Z
     - Improved documentation
     - Updated Data::TagDB::Interface::Plugin

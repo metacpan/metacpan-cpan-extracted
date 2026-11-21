@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -15,6 +15,7 @@ our @EXPORT = qw(
   new_TColorDisplay
 );
 
+use Storable;
 use TUI::toolkit;
 use TUI::toolkit::Types qw(
   :is
@@ -23,6 +24,7 @@ use TUI::toolkit::Types qw(
 
 use TUI::Drivers::Const qw( evBroadcast );
 use TUI::Drivers::ColorAttr;
+use TUI::Objects::Rect;
 use TUI::ColorSel::Const qw( :cmXXXX );
 use TUI::Views::DrawBuffer;
 use TUI::Views::View;
@@ -154,6 +156,41 @@ sub setColor {    # void (\$aColor)
   message( $self->{owner}, evBroadcast, cmColorSet, 0 + $$aColor );
   $self->drawView();
   return;
+}
+
+sub write :method {    # void ($os)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $os ) = $sig->( @_ );
+  $self->SUPER::write( $os );
+  $os->put( $self->{text} );
+  return;
+}
+
+sub read :method {    # $self ($is)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $is ) = $sig->( @_ );
+  $self->SUPER::read( $is );
+  $self->{text}  = $is->get();
+  my $color = 0;
+  $self->{color} = \$color;
+  return $self;
+}
+
+sub build {    # $obj ()
+  my ( $class ) = @_;
+  assert ( @_ == 1 );
+  assert ( is_Str $class );
+  assert ( Storable::is_retrieving );
+  return $class->new(
+    bounds => TRect->new(),
+    text   => '',
+  );
 }
 
 1

@@ -13,19 +13,14 @@ Configuration classes used by L<Config::Model>
 
 =head1 Elements
 
-=head2 name_match
+=head2 pattern
 
-B<Deprecated> I< Optional. Type uniline.  > 
-
-=over 4
-
-=item upstream_default value :
-
-.*
-
-=back
-
-
+A regular expression that is tested against
+candidate parameters. When the parameter matches the regular expression,
+a new parameter is created in the model using the properties defined along C<pattern>.
+Note that the regexp must match the whole name
+of the potential parameter. I.e. the specified regexp is eval'ed
+with a leading C<^> and a trailing C<$>. I< Optional. Type uniline.  > 
 
 =head2 accept_after
 

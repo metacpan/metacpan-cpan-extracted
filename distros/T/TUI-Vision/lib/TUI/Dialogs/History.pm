@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -17,6 +17,7 @@ our @EXPORT = qw(
 );
 
 use Encode qw( encode );
+use Storable;
 use TUI::toolkit;
 use TUI::toolkit::Types qw(
   is_Object
@@ -210,6 +211,41 @@ sub shutDown {    # void ()
   $self->{link} = undef;
   $self->SUPER::shutDown();
   return;
+}
+
+sub write :method {    # void ($os)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $os ) = $sig->( @_ );
+  $self->SUPER::write( $os );
+  $os->put( $self->{link}, $self->{historyId} );
+  return;
+}
+
+sub read :method {    # $self ($is)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $is ) = $sig->( @_ );
+  $self->SUPER::read( $is );
+  $self->{link}      = $is->get();
+  $self->{historyId} = $is->get();
+  return $self;
+}
+
+sub build {    # $obj ()
+  my ( $class ) = @_;
+  assert ( @_ == 1 );
+  assert ( is_Str $class );
+  assert ( Storable::is_retrieving );
+  return $class->new(
+    bounds    => TRect->new(),
+    link      => TInputLine->build(),
+    historyId => 0,
+  );
 }
 
 1

@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -190,10 +190,16 @@ sub driveValid {    # $bool ($drive)
   my ( $drive ) = $sig->( @_ );
   $drive = uc( $drive );
   assert ( $drive =~ /^[A-Z]$/ );
+
+  # Unless it's Windows, we will emulate there's only one disk:
+  # the one returned by getdisk(), which is C by default.
+  return $drive eq chr( ord( 'A' ) + getdisk() )
+    if $^O ne 'MSWin32';
+
   my $mask = 1 << ( ord( $drive ) - ord( 'A' ) );
-  if ( $^O eq 'MSWin32' && eval { require Win32API::File; !$@ } ) {
-    return ( Win32API::File::GetLogicalDrives() & $mask ) != 0;
-  }
+  return ( Win32API::File::GetLogicalDrives() & $mask ) != 0
+    if eval { require Win32API::File; !$@ };
+
   my $path = "$drive:/";
   return -d $path;
 }
@@ -441,6 +447,7 @@ directory selection dialogs.
   my $bool = driveValid($drive);
 
 Returns true if the specified drive identifier is valid.
+On Unix systems, this is the emulated current drive.
 
 =head2 fexpand
 

@@ -1,5 +1,12 @@
 Revision history for App-csvtool
 
+0.05    2026-11-20
+        [CHANGES]
+         * Added `sum` command
+         * Added expression language tools `filter` and `extend`
+         * Use core's `Time::Piece` rather than pulling in both
+           `POSIX::strptime` and `Time::timegm` from CPAN
+
 0.04    2024-12-03
         [CHANGES]
          * Ensure the `--tab` option actually works

@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -15,6 +15,7 @@ our @EXPORT = qw(
   new_TStatusLine
 );
 
+use Storable;
 use TUI::toolkit;
 use TUI::toolkit::Types qw(
   Maybe
@@ -25,6 +26,7 @@ use TUI::toolkit::Types qw(
 use TUI::Menus::Const qw( cpStatusLine );
 use TUI::Drivers::Const qw( :evXXXX );
 use TUI::Drivers::Util qw( cstrlen );
+use TUI::Objects::Rect;
 use TUI::Views::DrawBuffer;
 use TUI::Views::Const qw(
   cmCommandSetChanged
@@ -34,6 +36,8 @@ use TUI::Views::Const qw(
 );
 use TUI::Views::Palette;
 use TUI::Views::View;
+use TUI::Menus::StatusDef;
+use TUI::Menus::StatusItem;
 
 sub TStatusLine() { __PACKAGE__ }
 sub name() { 'TStatusLine' }
@@ -53,6 +57,10 @@ my (
   $drawSelect,
   $findItems,
   $itemMouseIsIn,
+  $writeItems,
+  $writeDefs,
+  $readItems,
+  $readDefs,
 );
 
 sub BUILDARGS {    # \%args (%args)
@@ -310,6 +318,127 @@ $itemMouseIsIn = sub {    # $statusItem|undef ($mouse)
   }
   return undef;
 }; #/ sub itemMouseIsIn
+
+$writeItems = sub {    # void ($os, $items|undef)
+  my ( $self, $os, $items ) = @_;
+  assert ( @_ == 3 );
+  assert ( is_Object $self );
+  assert ( is_Object $os );
+  assert ( !defined $items or is_Object $items );
+
+  my $count = 0;
+  for ( my $item = $items ; $item ; $item = $item->{next} ) {
+    $count++;
+  }
+  $os->put( $count );
+  for ( my $item = $items ; $item ; $item = $item->{next} ) {
+    $os->put( $item->{text}, $item->{keyCode}, $item->{command} );
+  }
+  return;
+};
+
+$writeDefs = sub {    # void ($os, $defs|undef)
+  my ( $self, $os, $defs ) = @_;
+  assert ( @_ == 3 );
+  assert ( is_Object $self );
+  assert ( is_Object $os );
+  assert ( !defined $defs or is_Object $defs );
+
+  my $count = 0;
+  for ( my $def = $defs ; $def ; $def = $def->{next} ) {
+    $count++;
+  }
+  $os->put( $count );
+  for ( my $def = $defs ; $def ; $def = $def->{next} ) {
+    $os->put( $def->{min}, $def->{max} );
+    $self->$writeItems( $os, $def->{items} );
+  }
+  return;
+};
+
+$readItems = sub {    # $items|undef ($is)
+  my ( $self, $is ) = @_;
+  assert ( @_ == 2 );
+  assert ( is_Object $self );
+  assert ( is_Object $is );
+
+  my $count = $is->get();
+  my ( $first, $last );
+  while ( $count-- > 0 ) {
+    my $item = TStatusItem->new(
+      text    => $is->get() // '',
+      keyCode => $is->get(),
+      command => $is->get(),
+    );
+    if ( $last ) {
+      $last->{next} = $item;
+    }
+    else {
+      $first = $item;
+    }
+    $last = $item;
+  }
+  return $first;
+};
+
+$readDefs = sub {    # $defs|undef ($is)
+  my ( $self, $is ) = @_;
+  assert ( @_ == 2 );
+  assert ( is_Object $self );
+  assert ( is_Object $is );
+
+  my $count = $is->get();
+  my ( $first, $last );
+  while ( $count-- > 0 ) {
+    my $def = TStatusDef->new(
+      min   => $is->get(),
+      max   => $is->get(),
+      items => $self->$readItems( $is ),
+    );
+    if ( $last ) {
+      $last->{next} = $def;
+    }
+    else {
+      $first = $def;
+    }
+    $last = $def;
+  }
+  return $first;
+};
+
+sub write :method {    # void ($os)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $os ) = $sig->( @_ );
+  $self->SUPER::write( $os );
+  $self->$writeDefs( $os, $self->{defs} );
+  return;
+}
+
+sub read :method {    # $self ($is)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $is ) = $sig->( @_ );
+  $self->SUPER::read( $is );
+  $self->{defs} = $self->$readDefs( $is );
+  $self->$findItems();
+  return $self;
+}
+
+sub build {    # $obj ()
+  my ( $class ) = @_;
+  assert ( @_ == 1 );
+  assert ( is_Str $class );
+  assert ( Storable::is_retrieving );
+  return $class->new(
+    bounds => TRect->new(),
+    defs   => TStatusDef->new( min => 0, max => 0 ),
+  );
+}
 
 1
 

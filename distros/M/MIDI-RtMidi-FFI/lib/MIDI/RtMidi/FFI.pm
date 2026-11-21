@@ -11,7 +11,7 @@ use IO::Handle;
 use IO::Socket qw/ AF_UNIX SOCK_STREAM PF_UNSPEC /;
 use Carp;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 # ABSTRACT: Bindings for librtmidi - Realtime MIDI library
 
@@ -292,7 +292,7 @@ MIDI::RtMidi::FFI - Bindings for librtmidi - Realtime MIDI library
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 SYNOPSIS
 

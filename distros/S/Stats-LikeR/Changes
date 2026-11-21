@@ -1,5 +1,266 @@
 Revision history for Stats-LikeR
 
+0.3427 2026-11-20 CST (Claude Opus 5.5 helped)
+
+ [Tests]
+
+ - t/write_table.oracle.R.python.t failed 120 of its 323 subtests, every
+   ".csv/.tsv is the file the readers read" check, on both of 0.3426's
+   MSWin32 reports (Strawberry Perl 5.24.4 and 5.42.3), the only failures
+   among its 65 reports. The test was at fault, not the module:
+   write_table() ends each row CR LF where perl is a CRLF shop, as it has
+   since 0.3418, but the test compared the file with the bytes frozen on
+   Linux, whose rows end LF. It now expects CR LF at the two row ends
+   there and nowhere else, since an LF inside a quoted field is written
+   as it is. A build with the row end forced to CR LF fails the same 120
+   subtests with the old test and passes with the new one.
+
+0.3426 2026-11-19 CST (Claude Opus 5.5 helped)
+
+ [Behavior change: read_table() of an .xlsx]
+
+ - read_table() now returns the text of an .xlsx as perl characters, not
+   as the raw UTF-8 bytes of its XML. This changes the result for every
+   non-ASCII .xlsx: sheet names (the keys of the hash a workbook is read
+   into), column names, row names and every string cell, shared or inline.
+   A workbook write_table() wrote from the keys "café" and "αβ" used to
+   read back with keys of 5 and 4 bytes, so $book->{"\x{3b1}\x{3b2}"}
+   found nothing and a cell "α" was 2 bytes; it now round-trips. ASCII
+   text is unchanged, and so is every delimited file. Code that decoded
+   these strings itself must stop, or it decodes twice.
+ - For an .xlsx, sheet, row_names, keep_cols, drop_cols, colClasses
+   names, filter keys and na_strings tokens are compared as characters. A
+   byte string that is valid UTF-8 is decoded first, so a name typed
+   without `use utf8` still matches.
+ - Text that is not valid UTF-8, which Excel and LibreOffice never write,
+   is not an error: that string is returned as its bytes, without the
+   UTF-8 flag, as every string was before.
+ - A warning that names such a column or row (a keep_cols or drop_cols
+   name that is no column, a repeated column or row name) gives the name
+   in UTF-8 bytes, which is what perl prints for a string of characters;
+   warn() of the characters themselves would warn "Wide character", which
+   the module's fatal warnings make an error.
+
+ [Behavior change: blank rows of an .xlsx]
+
+ - read_table() now reads a row with no value that lies between an
+   .xlsx's header and its last row with a value as a row of undef, as
+   pandas' read_excel() reads it (GH 39808), where it dropped it. That
+   holds for a row written empty, <row r="3"/> or <row r="3"></row> as
+   write_table() writes a row of empty cells, for one holding only
+   formatted empty cells, and for one missing from the XML, as Excel
+   leaves an empty row out: a row's r= now says how many blank rows lie
+   before it. A table write_table() wrote with a row of undef in it lost
+   that row on the way back. Rows past the last value are still not
+   read, as pandas does not read them (Excel records formatted rows
+   below a table), and the header is still the first row with a value.
+ - With output_type => 'hoh' a blank row is still left out: it has no
+   row name, and an undefined one is refused, which would have made any
+   sheet with a spacer row unreadable as a hash of hashes.
+
+ [Behavior change: write_table() writes delimited text as UTF-8]
+
+ - A field perl holds as bytes that are not valid UTF-8 is now read as
+   Latin-1 and written as UTF-8, as the .xlsx and LaTeX writers already
+   wrote it. "caf\xe9" and "café" are the same string to perl, but the
+   first was written as the single byte E9, which Python's csv, pandas and
+   R all read as "caf\x{FFFD}", and the second as C3 A9. Both are now
+   written C3 A9. Text with the UTF-8 flag on, and bytes that are valid
+   UTF-8, such as the fields read_table() returns from a UTF-8 file, are
+   written as before, so reading a UTF-8 file and writing it back still
+   gives the same bytes; a Latin-1 file read and written back comes out
+   as UTF-8. Writing a 200000 x 20 table is about 2% slower.
+ - A lone surrogate, which only broken data holds, is still written
+   rather than refused: as perl's three bytes for it in a delimited file,
+   and as _xD800_ in an .xlsx, which LibreOffice shows as an empty cell.
+   README.md now says so, where it said LibreOffice decodes every escape.
+
+ [write_table() to an .xlsx]
+
+ - A string was written as a number cell, and so shown as another text,
+   when it had a trailing 0 after the point (6.10, 1.0, 0.50), a point
+   with no digit after it (1.) or none before it (.5), an exponent (1e5,
+   2.5e-3) or a minus sign on zero (-0): Excel and LibreOffice showed 6.1,
+   1, 0.5 and 100000, so section 6.10 of a document read as section 6.1.
+   Such a string is now text, and the POD's "a number cell only when Excel
+   would show it as it stands" holds. A value perl holds as a number is
+   written as before. t/write_table.xlsx.number.python.t checks the sheet
+   XML against what openpyxl 3.1.5 and LibreOffice 24.2.7.2 show.
+
+ [Formulas]
+
+ - Every function that reads a formula through lm_formula_terms() now
+   expands a parenthesised group of terms as R's terms.formula() does:
+   (a + b)*c, a*(b + c), (a + b):c, (a + b + c)^2, (a + b)/c, a %in% b,
+   nested groups and - (a:b). These died with "cannot evaluate term"
+   (until 0.3419, with "0 degrees of freedom"), so car's own vif()
+   example, (income + education)*type, had to be written out.
+ - Terms are ordered by degree and then by appearance, and an interaction
+   is named in R's variable order, so y ~ x*z*w - x*z now labels its
+   interactions x:w, z:w and x:z:w as R does, where it gave w:x, w:z and
+   w:x:z.
+ - A bare a/b is R's nesting, a + a:b; a ratio of two columns is I(a/b).
+   Through 0.3425 a/b was read as the ratio. A column name containing %
+   now croaks.
+ - A power that is not a whole number from 2 to 64, an unbalanced
+   parenthesis, an operator with no operand, a %op% other than %in% and
+   an intercept marker inside a group are errors rather than guesses.
+   Two departures from R remain, both in README: a lone term crossed with
+   itself (wt*wt) keeps the product, and intercept markers are read only
+   at the top level.
+ - A factor is now coded by contrasts when its margin lies inside any
+   earlier term, as R's TermCode() does, and not only when it equals one.
+   y ~ A:U + A:V - 1 gave A:V dummy coding, the mistake the comment at R's
+   tests/reg-tests-2.R line 707 says R 1.5.1 made.
+ - t/formula_groups.R.t checks groups against R 4.6.1's term labels and
+   coefficients through lm, glm, aov, anova, zerotrunc, hurdle, svyglm,
+   ivreg, lmer, coxph and vif.
+
+ [vif()]
+
+ - vif() takes type => 'predictor', ported from car 3.1-5 vif.lm(): one
+   GVIF per predictor together with the terms it interacts with, and the
+   "Interacts With" and "Other Predictors" columns. It refuses what car
+   refuses, a model with no intercept and a design with a single column,
+   and an aliased column as type => 'terms' does. The interaction warning
+   of the default type now suggests it, as car's does. t/vif.R.t tests
+   car's example as car writes it.
+
+ [binom_test()]
+
+ - The two-sided p-value no longer visits every index up to n. R sums
+   dbinom(i) over the far side of the mode wherever it is no larger than
+   dbinom(x) * (1 + 1e-7), a loop of up to n steps, so binom_test(3,
+   1e18) never returned (R itself tries to allocate 37 GB). The pmf is
+   unimodal, so those indices are one run at the far end of the side, and
+   its length is now found by binary search, in about log2(n) density
+   evaluations, as SciPy's binomtest does; binom_test(3, 1e18) takes 0.03
+   s. The counts are the ones R's loop gives: p-values and intervals are
+   bit-identical to 0.3425 on 2047 cases.
+ - The limit on n, and on successes + failures, was LONG_MAX because of
+   that loop, which is 2147483647 on Windows even on a 64-bit perl. It is
+   now IV_MAX, the same on every platform with the same IV, and statistic
+   and parameter are returned exactly up to it. On a double build the
+   two-sided p-value at n = 1e18 is good to about 1e-7 relative, as a
+   double cannot name every count above 2**53.
+ - The 2.1e7 cases of t/binom_test.R.scipy.t no longer need
+   EXTENDED_TESTING, and the file gains n = 1e9, 1e12 and 1e18 cases from
+   mpmath (SciPy is 1.4e-10 off at n = 1e12 and does not return at 1e18).
+
+ [fisher_test()]
+
+ - The cells, margins, total and everything derived from them are
+   int64_t, not long. Where a C long is 32 bits (Windows, 64-bit
+   included) a 2x2 table whose total, or a margin, passed 2147483647
+   croaked or overflowed; it is now answered as on Linux. Each cell is
+   still limited to 2147483647, as in R.
+ - A 2x2 table with a cell within a few units of the end of a large
+   support was off by up to 3e-10: the density formed log1p(-x/n), as R's
+   dbinom_raw does, which keeps only about 7 digits of (n - x)/n there.
+   Past the midpoint it now takes log((n - x)/n), n - x being exact.
+   [[2147483647,2147483647],[2,3]] gives 0.8125 and 0.5000000002182787
+   for 'less' and 'greater' to 1e-15; nothing pinned against R moved.
+ - An r x c table (not 2x2) with a total above 10,000,000 now croaks. The
+   network's log weights are sums of lgamma terms up to N log N, and a
+   double's rounding of them overtakes FEXACT's 3.45e-7 tolerance as N
+   grows: the p-value was off by 2.9e-8 at N = 1e7, by 6e-2 for one table
+   at 6e7, and [[2147483647,5,0],[2147483647,3,0]] answered 0.29 for 0.73
+   without a word. R 4.6.1 refuses such tables too (FEXACT errors 40 and
+   501).
+ - PR#4688 (4x3, N = 16442) is still refused, as R refuses it: R 4.6.1
+   gives FEXACT error 501 at every workspace from 2e5 to 2e9, with hybrid
+   true or false, so no workspace option is offered.
+
+ [Long-double and __float128 perls]
+
+ - The incomplete gamma and beta behind pchisq(), qchisq(), pt(), qt(),
+   pf(), qf(), pbinom() and every p-value built on them were R's
+   double-precision ports on every build, so on a perl with a long double
+   or __float128 NV they agreed with the truth to about 1e-14 however
+   wide the NV. On an x87 long double or a __float128 perl with the
+   matching libm they now compute at the NV's width, log => 1 included; a
+   double perl is unchanged, to the last bit, and so is a long-double perl
+   without the long-double libm or with ppc64's double-double.
+ - What was double-limited and is replaced there: log1pmx() and
+   lgamma1p() (more terms), stirlerr() and bd0(), the normal tail inside
+   Temme's expansion (approx_pnorm() and c_pnorm() stop at z = -38 and are
+   double algorithms), the series sums, the lower continued fraction (R's
+   recurrence subtracts and loses two or three digits), the Numerical
+   Recipes beta fraction's tolerance, and the double literals M_LN2,
+   M_LN_2PI, M_1_SQRT_2PI, the pi in erfcx() and the 2/sqrt(pi) of
+   basym(). Temme's eight terms are used only where they reach the NV's
+   epsilon; the series and fractions take the rest, with Neumaier
+   summation. TOMS 708's bfrac() and basym() now serve every case with
+   both shapes above 1, and bpser() and bgrat() the small shapes from 15
+   up.
+ - Measured against mpmath at 110 digits on 909 (a, x) pairs, 4553 (a, b,
+   x) triples and 480 quantiles, counting epsilons per (1 + |log tail|)
+   because a tail exp(-f) is good to f epsilons by construction, the worst
+   error on a long double / a __float128 is: gamma 8 / 39 (was 5e15 /
+   3e30), beta 64 / 86 (was 1.2e5 / 6.6e19), quantiles 31 / 31 (were 1.7e3
+   / 1e18).
+ - Still short of the epsilon on a __float128: 25 to 39 for a < 1 with x
+   between 1 and 3 (400 terms of rounding), 86 for a shape of 3/2 against
+   1e4 and up (bgrat()). A typical pt() or qchisq() call is about 1.6
+   times slower on a __float128 and 1.3 times on a long double. bup(),
+   apser() and fpser() are not ported; a maximum shape of at most 15 with
+   x0 b0 > 1.5 stays on the Numerical Recipes fraction. pnorm() and
+   qnorm() are as before.
+ - t/incomplete.gamma.beta.mpmath.t pins 615 cases at the width the build
+   computes to, with expected values frozen from mpmath (generator
+   t/incomplete.gamma.beta.mpmath.py). It fails 236 and 577 of its tests
+   on the 0.3425 code on a long double and a __float128 perl.
+
+ [Tests]
+
+ - t/power_t_test.R.scipy.t is split four ways, so that no one file is
+   the long pole of a parallel test run: the rows that solve for n, for
+   delta, and for sd or sig_level move to t/power_t_test.solve_n.R.scipy.t,
+   t/power_t_test.solve_delta.R.scipy.t and
+   t/power_t_test.solve_sd_sig_level.R.scipy.t. Each solve evaluates the
+   noncentral t CDF about 20 times at a fixed 30000-step quadrature,
+   about 4 s on a __float128 perl, where the one file took 470 s and the
+   whole suite 586 s under HARNESS_OPTIONS=j4. With the split and the
+   cuts below, the suite takes 255 s there.
+ - 462 assertions that repeated a computation another one already makes
+   are gone. Every one-sided row was mirrored as alternative => 'greater'
+   and 'less', but power_t_test() takes one.sided's branch for 'greater'
+   and only negates delta, exactly, for 'less', so each mirror repeated
+   its row to the bit; one row per solved parameter is kept, for the sign
+   handling. Twenty one-sided rows with strict => 1 matched their
+   non-strict partners, expected values included, since strict only adds
+   the far tail of a two-sided test; one per type is kept. The
+   power_t_test() block of t/01.t checked values the table already
+   checks, the solved n at a tolerance 1e5 looser, and repeated its leak
+   checks.
+ - t/power_t_test.R.scipy.t now calls power_t_test() with n, and with
+   delta, left out rather than passed as undef, and checks both for
+   leaks. The XS tests for an absent argument separately; only t/01.t
+   called it without n, and nothing called it without delta.
+ - test.all.perls.pl --deps runs cpanm --installdeps . rather than
+   scraping module names from Makefile.PL, which checked each with
+   -MModule and so ignored minimum versions: a fresh 5.10 perl, with core
+   Scalar::Util 1.21, passed it against PREREQ_PM's 1.22.
+ - t/read_write_table.roundtrip.t writes 63 awkward strings, each held
+   four ways (as written, with and without the UTF-8 flag, and after
+   numeric use), and 15 numbers, to csv, tsv, .xlsx, .gz, .bz2 and four
+   other separators, in every frame shape, and reads them back; column
+   names, row names, undef_val and blank rows too. A round trip is what
+   no R or pandas test can check, since their strings are never bytes
+   and never also numbers. It found the dropped .xlsx blank row above.
+ - t/write_table.oracle.R.python.t freezes what openpyxl 3.1.5,
+   LibreOffice 24.2.7.2, Python's csv, pandas 3.0.4 and R 4.6.2 read from
+   write_table()'s output for 60 cases, and requires write_table() to
+   write the same bytes again, so a mistake the writer and read_table()
+   share, as 0.3425's "6.10" number cells were, fails it. Every reading
+   that differs from what was written is explained in the file. The
+   generator is t/write_table.oracle.R.python.py.
+ - t/read_table.xlsx.blank_rows.pandas.t takes the blank-row cases of
+   pandas' Excel tests (GH 39808, 39181, 39547, 40442), rebuilding the
+   workbooks pandas' wheel does not ship in each way a blank row is
+   written; t/read_table.xlsx.blank_rows.pandas.py checks that pandas
+   reads them so.
+
 0.3425 2026-11-18 CST (Claude Opus 5.5 helped)
 
  [Data frames]

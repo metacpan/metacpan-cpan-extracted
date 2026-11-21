@@ -24,7 +24,7 @@ can_ok 'HTTP::API::Core::Response', qw(
 
 can_ok 'HTTP::API::Core::Error', qw(
     new category message method url status retryable retry_after response
-    body text json headers header elapsed request_id rate_limit as_string
+    body text json headers header elapsed request_id rate_limit as_string log_summary
 );
 
 can_ok 'HTTP::API::Core::RateLimit', qw(

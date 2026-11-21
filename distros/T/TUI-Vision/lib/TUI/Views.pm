@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -20,6 +20,7 @@ use TUI::Views::Group;
 use TUI::Views::Frame;
 use TUI::Views::ListViewer;
 use TUI::Views::ScrollBar;
+use TUI::Views::Scroller;
 use TUI::Views::WindowInit;
 use TUI::Views::Window;
 use TUI::Views::Util;
@@ -35,6 +36,7 @@ sub import {
   TUI::Views::Frame->import::into( $target );
   TUI::Views::ListViewer->import::into( $target );
   TUI::Views::ScrollBar->import::into( $target );
+  TUI::Views::Scroller->import::into( $target );
   TUI::Views::WindowInit->import::into( $target );
   TUI::Views::Window->import::into( $target );
   TUI::Views::Util->import::into( $target, qw( message ) );
@@ -51,6 +53,7 @@ sub unimport {
   TUI::Views::Frame->unimport::out_of( $caller );
   TUI::Views::ListViewer->unimport::out_of( $caller );
   TUI::Views::ScrollBar->unimport::out_of( $caller );
+  TUI::Views::Scroller->unimport::out_of( $caller );
   TUI::Views::WindowInit->unimport::out_of( $caller );
   TUI::Views::Window->unimport::out_of( $caller );
   TUI::Views::Util->unimport::out_of( $caller );
@@ -123,6 +126,9 @@ Scrollable list view.
 
 =item * L<TScrollBar|TUI::Views::ScrollBar> -
 Vertical and horizontal scroll bars.
+
+=item * L<TScroller|TUI::Views::Scroller> -
+Base class for scrollable views.
 
 =item * L<TWindowInit|TUI::Views::WindowInit> / L<TWindow|TUI::Views::Window> -
 Window initialization and window objects.

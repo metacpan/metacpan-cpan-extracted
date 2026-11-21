@@ -3,7 +3,7 @@ package PDF::API2::Resource::UniFont;
 use strict;
 use warnings;
 
-our $VERSION = '2.048'; # VERSION
+our $VERSION = '2.049'; # VERSION
 
 use Carp;
 use Encode qw(:all);

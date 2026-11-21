@@ -13,18 +13,217 @@ TUI::Manual::09 - Streams and Persistence in TUI::Vision
 
 =head1 STREAMS AND PERSISTENCE
 
+I<Turbo Vision> uses streams to separate the persistent representation of an
+object from its in-memory representation. L<TUI::Vision> follows the same 
+model: persistent framework objects describe their state through C<write> and
+C<read>, while L<TStream|TUI::Objects::Stream> provides the sequential
+transport used by these methods.
+
+This distinction is important for object structures such as views, groups and
+windows. Persistence does not simply copy their Perl data structures. The
+framework's C<write> and C<read> methods decide which state is saved, and
+during restoration they rebuild the relationships required by the
+L<TUI::Vision> object model.
+
 =head2 Why Streams Exist
+
+A persistent object often contains more than independent scalar values.
+Objects can contain other objects, refer to objects owned elsewhere in the
+view hierarchy, and share references with other parts of the object graph.
+
+Serializing the Perl representation directly would make the persistence
+format depend on implementation details of the object. It would also bypass
+the reconstruction performed by the object's C<read> method.
+
+L<TStream|TUI::Objects::Stream> therefore provides a small sequential
+interface. An object writes
+its persistent state in a defined order. The following excerpt from
+L<TView|TUI::Views::View> stores the geometry, state and option fields of a
+view:
+
+    sub write :method {    # void ($os)
+        ...
+        my $saveState =
+            $self->{state} & ~( sfActive | sfSelected | sfFocused | sfExposed );
+
+        $os->put(
+            $self->{origin},   $self->{size},     $self->{cursor},
+            $self->{growMode}, $self->{dragMode}, $self->{helpCtx},
+            $saveState,        $self->{options},  $self->{eventMask},
+        );
+
+        return;
+    }
+
+The transient flags are cleared before the state is stored. They describe the
+running session, not the persistent layout of the view.
+
+The corresponding C<read> method consumes the values in the same order:
+
+    sub read :method {    # $self ($is)
+        ...
+        $self->{origin}    = $is->get();
+        $self->{size}      = $is->get();
+        $self->{cursor}    = $is->get();
+        $self->{growMode}  = $is->get();
+        $self->{dragMode}  = $is->get();
+        $self->{helpCtx}   = $is->get();
+        $self->{state}     = $is->get();
+        $self->{options}   = $is->get();
+        $self->{eventMask} = $is->get();
+        $self->owner( undef );
+        ...
+    }
+
+The read order must match the write order exactly. The signature handling and
+the assertions are omitted from both excerpts.
+
+The object's C<write> and C<read> implementations therefore define the
+persistent state of the framework classes, not their internal Perl
+representation.
 
 =head2 Streamable Objects
 
-=head2 Stream Registration
+Objects that participate in object streaming perform the
+L<TStreamable|TUI::Objects::Streamable> role.
+
+A L<TStreamable|TUI::Objects::Streamable> class provides two operations:
+
+=over
+
+=item * C<write>
+
+Writes the persistent state of the object to a
+L<TStream|TUI::Objects::Stream>.
+
+=item * C<read>
+
+Restores the persistent state of the object from a stream.
+
+=back
+
+L<TStream|TUI::Objects::Stream> recognizes objects performing this role when
+they are passed to
+C<put>. Ordinary values retain normal value semantics, while streamable
+objects participate in object identity tracking.
+
+The Perl implementation does not call C<write> and C<read> from C<put> and
+C<get> directly. A streamable object is serialized with L<Storable>.
+
+Framework classes such as L<TView|TUI::Views::View> and
+L<TCollection|TUI::Objects::Collection> connect their C<write> and C<read>
+methods to this mechanism through the C<STORABLE_freeze> and
+C<STORABLE_attach> hooks. The freeze hook writes the object into a nested
+stream; the attach hook builds an empty object and calls C<read> on it.
+
+A class that performs the role without these hooks is serialized as its plain
+Perl structure. The role does not enforce the C<write>/C<read> contract, so
+classes that rely on it must provide the hooks.
+
+This corresponds to the distinction made by the original I<Turbo Vision> object
+streaming system between ordinary streamed values and streamable objects.
+
+=head2 Object Identity
+
+Persistence must distinguish between an object's contents and its identity.
+
+Consider an object referenced twice, as the frame of a window is (see
+L</Object Graphs>). Writing the frame twice must not cause two independent
+frame objects to appear after restoration.
+
+When L<TStream|TUI::Objects::Stream> encounters a
+L<TStreamable|TUI::Objects::Streamable> object for the first time, it
+records the object's identity together with its persistent representation.
+If the same object is encountered again, the stream records a reference to
+the previously written object instead of another independent representation.
+
+On reading, the first occurrence reconstructs the object and associates it
+with the recorded identity. Later references resolve to that reconstructed
+object.
+
+The identifiers and registration structures used to implement this behavior
+are internal to the stream implementation. Applications should rely only on
+the resulting identity semantics.
+
+In I<Turbo Vision>, the record of written objects belongs to each stream. The
+Perl implementation keeps the registries of written and restored objects
+process-wide, so identity is shared by all streams in the process. A stream
+that contains only a reference to an object is therefore resolved only if that
+object was already restored in the same process. Restore the stream that
+contains the full object before reading a stream that refers to it.
+
+The lifetime of these entries follows the objects they describe. An entry in
+the registry of written objects is removed when the object is destroyed. The
+registry of restored objects keeps the identifier, but its value is a weak
+reference, so it no longer keeps the object alive. No public API clears either
+registry; an application cannot remove individual entries.
 
 =head2 Object Graphs
 
-=head2 Resource Files
+Object registration allows the restored L<TUI::Vision> object graph to preserve
+shared references.
+
+For example, a L<TWindow|TUI::Views::Window> stores its frame in the C<frame>
+field, and the constructor inserts the same frame into the window's subview
+ring. L<TWindow|TUI::Views::Window> is a L<TGroup|TUI::Views::Group>, so
+C<TWindow::write> calls C<SUPER::write> to write the subviews, and it also
+stores C<$self-E<gt>{frame}> itself. Both references point to one frame
+object, and restoration must not produce two.
+
+After persistence and restoration, the required relationship is therefore
+the following. The diagram shows runtime references after restoration, not
+inheritance or Z-order:
+
+    restored window->{frame} ──┐
+                               │
+                               ├──▶ restored frame
+                               │
+    restored subview ──────────┘
+
+The restored window and its subview must refer to one frame, not to two
+independently reconstructed frames.
+
+This is especially important for L<TUI::Vision> structures. Relationships among
+groups, views and windows are reconstructed according to their C<read>
+implementations. The stream preserves object identity while those methods
+rebuild the framework-specific structure.
+
+Consequently, persistence should be understood as reconstruction of the
+L<TUI::Vision> object graph, not as a direct copy of the complete in-memory
+Perl reference graph.
 
 =head2 Conclusion
 
-L<next|TUI::Manual::10> chapter.
+TUI::Vision separates persistence into three responsibilities:
+
+=over
+
+=item *
+
+Persistent objects define their state through C<write> and C<read>. For the
+framework classes, the Storable hooks call these methods during serialization
+and restoration.
+
+=item *
+
+L<TStreamable|TUI::Objects::Streamable> identifies objects that
+participate in object streaming.
+
+=item *
+
+L<TStream|TUI::Objects::Stream> transports values and preserves the
+identity of shared streamable objects while the L<TUI::Vision> object graph is
+reconstructed. In the Perl implementation, this identity registry is shared by
+all streams in the process.
+
+=back
+
+This keeps the persistent state of framework objects in C<write> and C<read>,
+independent of their internal Perl representation, while the relationships
+required by the L<TUI::Vision> object model are preserved. Resource files
+are not ported; see L<Porting|TUI::Manual::Reference::Porting>.
+
+The L<next chapter|TUI::Manual::10> covers advanced topics,
+including the differences from I<Turbo Vision> C++ and Pascal.
 
 =cut

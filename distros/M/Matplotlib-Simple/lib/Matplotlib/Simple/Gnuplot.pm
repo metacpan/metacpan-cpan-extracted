@@ -24,16 +24,18 @@ package Matplotlib::Simple::Gnuplot;
 # 4.8 inch figure (rcParams figure.figsize) and 100 dots per inch for a PNG
 # (rcParams figure.dpi).
 require 5.010;
-our $VERSION = 0.3344;
+our $VERSION = 0.3345;
 use Scalar::Util 'looks_like_number';
 use List::Util qw(max min sum);
 use POSIX ();
 use Encode ();
+use File::Spec ();
+use File::Temp ();
 use Sys::Hostname ();
 BEGIN { require Matplotlib::Simple }
 BEGIN {
 	no strict 'refs';
-	*{$_} = \&{"Matplotlib::Simple::$_"} foreach qw(as_double axis_limits axis_scale bin_counts bool_option
+	*{$_} = \&{"Matplotlib::Simple::$_"} foreach qw(as_double axis_limits axis_scale bar_series bin_counts bool_option
 	 cb_limits check_key_order check_numbers check_scatter_lengths check_scatter_values
 	 check_wide_runs color_hex colormap_colors creator_note decoded_text double_literal finite_values
 	 is_finite is_nan linspace logscale_axes logspace plain_text program_from_env run_script script_handle
@@ -456,9 +458,7 @@ sub draw_bar {
 	my ( @series, $colors );
 	if ( defined $ref_counts{HASH} ) {
 		# The inner keys are the series, as in barplot_helper.
-		my %inner;
-		$inner{$_}++ foreach map { keys %{$_} } values %{$data};
-		@series = sort { lc $a cmp lc $b || $a cmp $b } keys %inner;
+		@series = bar_series({ plot => $plot, sub => $current_sub });
 		$data = { map { my $k = $_; $k => [ @{ $data->{$k} }{@series} ] } keys %{$data} };
 		if ( ref $plot->{color} eq 'HASH' ) {
 			my @uncolored = grep { not defined $plot->{color}{$_} } @series;
@@ -1719,23 +1719,28 @@ sub creator_user {
 	return ( ( defined $user ) && ( $user ne '' ) ) ? decoded_text($user) : 'unknown user';
 }
 sub creator_svg {
-	# Give an SVG gnuplot has drawn the note matplotlib gives its own, in
-	# <dc:title>. gnuplot has no way to write metadata, nor to read the user or
-	# the host, so this is done here once it has run, and not by a script
-	# written with "execute => 0" and run later. gnuplot's own <title>Gnuplot</title>,
-	# which a browser shows as the figure's name, and its <desc>, whose version
-	# this note now carries, are taken out: the note is all the metadata an
-	# SVG from matplotlib has.
-	my ( $file, $note, $version ) = @_;
+	# Give an SVG gnuplot has drawn into $drawn the note matplotlib gives its
+	# own, in <dc:title>, and write it to $file. gnuplot has no way to write
+	# metadata, nor to read the user or the host, so this is done here once it
+	# has run, and not by a script written with "execute => 0" and run later.
+	# gnuplot's own <title>Gnuplot</title>, which a browser shows as the
+	# figure's name, and its <desc>, whose version this note now carries, are
+	# taken out: the note is all the metadata an SVG from matplotlib has.
+	#
+	# $drawn is a temporary file (see render), so that $file is written once.
+	# gnuplot wrote $file and this wrote it again, so that a viewer watching
+	# the file saw it written twice: Eye of GNOME 45.3 stopped reloading it.
+	# $drawn may be $file itself.
+	my ( $drawn, $file, $note, $version ) = @_;
 	my $host = eval { Sys::Hostname::hostname() };    # dies when it cannot find the name
 	$host = ( ( defined $host ) && ( $host ne '' ) ) ? decoded_text($host) : 'unknown host';
 	$note = decoded_text($note) . ", gnuplot $version, by " . creator_user() . " on $host";
 	$note =~ s/&/&amp;/g;    # first, or the escapes below would be escaped again
 	$note =~ s/</&lt;/g;
 	$note =~ s/>/&gt;/g;
-	open my $in, '<:raw', $file or die "$current_sub: can't read \"$file\", which gnuplot was to write: $!";
+	open my $in, '<:raw', $drawn or die "$current_sub: can't read \"$drawn\", which gnuplot was to write: $!";
 	my $svg = do { local $/; <$in> };
-	close $in or die "$current_sub: can't close \"$file\": $!";
+	close $in or die "$current_sub: can't close \"$drawn\": $!";
 	$svg =~ s{<title>Gnuplot</title>\n}{};
 	$svg =~ s{<desc>Produced by GNUPLOT[^<]*</desc>\n}{};
 	my ( $before, $after ) = svg_creator_metadata();
@@ -1800,10 +1805,36 @@ sub render {
 	say {$out} 'print sprintf("Matplotlib::Simple gnuplot %.1f.%s", GPVAL_VERSION, GPVAL_PATCHLEVEL)';
 	push @{ $svg_notes{ $out->filename } }, [ $file, creator_note($current_sub) ] if $ext eq 'svg';
 	if ( $args->{execute} ) {
-		my $stderr = run_script( [ program_from_env('MATPLOTLIB_SIMPLE_GNUPLOT') // 'gnuplot', $out->filename ] );
-		my ($version) = $stderr =~ m/^Matplotlib::Simple gnuplot (\S+)$/m;
+		# gnuplot runs a copy of the script in which each SVG is drawn into a
+		# temporary file, which creator_svg then writes to output_file once,
+		# with its note (see creator_svg). The script itself, whose path is
+		# returned and which may be run again by hand, still names output_file.
+		# The copy has the script's lines, so gnuplot's messages give the
+		# right line numbers. An SVG named by more than one figure of a shared
+		# "fh" holds the last, as gnuplot would have left it.
+		$out->flush or die "$current_sub: can't flush \"" . $out->filename . "\": $!";
+		open my $in, '<:raw', $out->filename or die "$current_sub: can't read \"" . $out->filename . "\": $!";
+		my $copy = do { local $/; <$in> };
+		close $in or die "$current_sub: can't close \"" . $out->filename . "\": $!";
+		my ( %drawn, @svgs );
 		foreach my $svg ( @{ delete $svg_notes{ $out->filename } // [] } ) {
-			creator_svg( @{$svg}, $version // 'of unknown version' );
+			my ( $svg_file, $svg_note ) = @{$svg};
+			if ( not exists $drawn{$svg_file} ) {
+				$drawn{$svg_file} = File::Temp->new( DIR => File::Spec->tmpdir, TEMPLATE => 'matplotlib-simple-XXXXXX', SUFFIX => '.svg', UNLINK => 1 );
+				close $drawn{$svg_file} or die "$current_sub: can't close \"" . $drawn{$svg_file}->filename . "\": $!";
+				my ( $from, $to ) = map { Encode::encode( 'UTF-8', 'set output ' . gp_str($_) ) } ( $svg_file, $drawn{$svg_file}->filename );
+				$copy =~ s/^\Q$from\E(?=\r?\n)/$to/mg;
+			}
+			@svgs = ( ( grep { $_->[0] ne $svg_file } @svgs ), [ $svg_file, $svg_note ] );
+		}
+		my $run = File::Temp->new( DIR => File::Spec->tmpdir, TEMPLATE => 'matplotlib-simple-XXXXXX', SUFFIX => '.gp', UNLINK => 1 );
+		binmode $run, ':raw' or die "Can't binmode(\$run, ':raw'): $!";
+		print {$run} $copy or die "$current_sub: can't write \"" . $run->filename . "\": $!";
+		close $run or die "$current_sub: can't close \"" . $run->filename . "\": $!";
+		my $stderr = run_script( [ program_from_env('MATPLOTLIB_SIMPLE_GNUPLOT') // 'gnuplot', $run->filename ] );
+		my ($version) = $stderr =~ m/^Matplotlib::Simple gnuplot (\S+)$/m;
+		foreach my $svg (@svgs) {
+			creator_svg( $drawn{ $svg->[0] }->filename, @{$svg}, $version // 'of unknown version' );
 		}
 	}
 	say 'will write ' . "\e[36;103m$file\e[0m";

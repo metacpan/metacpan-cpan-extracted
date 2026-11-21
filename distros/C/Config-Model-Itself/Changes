@@ -1,3 +1,13 @@
+2.033 2026-11-20
+
+  Model changes:
+    * Itself model: accept pattern property for accepted elements
+
+  Backend changed to write elements in models files:
+    * elements are written in a list of hash ref
+    * elements with same properties are factorized with an "alias"
+      property (e.g. { name => 'foo', alias => 'bar' }
+
 2.032 2026-10-17
 
   Bug fix:

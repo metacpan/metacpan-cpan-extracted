@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use Test2::V0;
 use Path::Tiny;
 use Git::Libgit2 qw(

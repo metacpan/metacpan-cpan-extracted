@@ -1,0 +1,390 @@
+#!/usr/bin/env perl
+
+# Summarise DMARC aggregate reports: one row per source IP.
+#
+# What matters in a report is whether a message was ours.  Our own failures are
+# bugs to fix; anybody else's "fail" is a forgery attempt, which is the traffic
+# a quarantine or reject policy is there to catch.  For that reason every row
+# says whether the source address is one of ours, and the NOTE column separates
+# the two ways DKIM can fail: no signature at all (somebody else claiming our
+# domain) from a signature that does not verify (our own key or body).
+
+use strict;
+use warnings;
+
+use Getopt::Long qw(GetOptions);
+use IO::Uncompress::Gunzip qw($GunzipError);
+use Pod::Usage qw(pod2usage);
+use POSIX qw(strftime);
+use Socket qw(inet_aton AF_INET);
+use XML::PP;
+
+# Our sending addresses: the estate's VPS, which is the only host in the SPF
+# record.  Add more here or with --ours.
+my @OUR_IPS = qw(67.205.23.146);
+
+# Reporters send both plain and gzipped XML, so both are candidates.
+my @DEFAULT_GLOBS = ("$ENV{'HOME'}/Downloads/*.xml", "$ENV{'HOME'}/Downloads/*.xml.gz");
+
+my @ours = @OUR_IPS;
+my $whois = 1;
+
+GetOptions(
+	'ours=s' => sub { push @ours, grep { length } split(/,/, $_[1]) },
+	'no-whois' => \$whois,
+	'help|h' => sub { pod2usage(-verbose => 1, -exitval => 0) },
+) or pod2usage(-verbose => 0, -exitval => 2);
+
+my @files = expand(@ARGV ? @ARGV : @DEFAULT_GLOBS);
+if(!@files) {
+	print STDERR 'No report files found',
+		(@ARGV ? '' : ' (looked for ' . join(' ', @DEFAULT_GLOBS) . ')'), "\n";
+	exit(2);
+}
+
+my %OWNERS;
+my %TOTAL = ('files' => 0, 'messages' => 0, 'ours' => 0, 'failing' => 0);
+
+foreach my $file (@files) {
+	summarise($file);
+}
+
+if(@files > 1) {
+	printf("\nTOTAL: %d files, %d messages, %d from our IPs, %d failing DMARC\n",
+		@TOTAL{qw(files messages ours failing)});
+}
+
+exit(0);
+
+sub summarise {
+	my $file = shift;
+
+	my $xml = eval { _read_report($file) };
+	if(!defined($xml)) {
+		my $error = $@;
+		$error =~ s/\s+\z//;
+		warn "Skipping $file: $error\n";
+		return;
+	}
+
+	# Anything that is not XML is turned away before it reaches the parser,
+	# which would otherwise complain about a CSV or a tarball parked in the
+	# same directory.
+	if($xml !~ /\A\s*</) {
+		warn "Skipping $file: not a DMARC aggregate report\n";
+		return;
+	}
+
+	# XML::PP is pure Perl, so it installs where the C parsers do not; a
+	# parse that does not leave a root element is not a report.
+	my $root = eval { XML::PP->new()->parse($xml) };
+	if(!$root || ref($root) ne 'HASH' || !defined($root->{'name'})) {
+		warn "Skipping $file: not a DMARC aggregate report\n";
+		return;
+	}
+
+	my $metadata = _child($root, 'report_metadata');
+	my $policy = _child($root, 'policy_published');
+	my $domain = _field($policy, 'domain') // '-';
+	my $dates = _child($metadata, 'date_range');
+
+	printf("\n%s\n", $file);
+	printf("\t%s <%s>  domain %s  p=%s sp=%s pct=%s adkim=%s aspf=%s\n",
+		_field($metadata, 'org_name') // '?',
+		_field($metadata, 'email') // '?',
+		$domain,
+		_field($policy, 'p') // '-',
+		_field($policy, 'sp') // '-',
+		_field($policy, 'pct') // '-',
+		_field($policy, 'adkim') // '-',
+		_field($policy, 'aspf') // '-');
+	printf("\treport %s  %s -> %s\n\n",
+		_field($metadata, 'report_id') // '?',
+		_window(_field($dates, 'begin')),
+		_window(_field($dates, 'end')));
+
+	printf("\t%-15s %3s  %-6s %-9s %-11s %-4s %-31s %s\n",
+		'IP', 'N', 'DKIM', 'SPF', 'DISPOSITION', 'OURS', 'OWNER', 'NOTE');
+
+	my ($messages, $mine, $failing) = (0, 0, 0);
+
+	foreach my $record (_children($root, 'record')) {
+		my $row = _child($record, 'row');
+		my $evaluated = _child($row, 'policy_evaluated');
+		my $ip = _field($row, 'source_ip') // '?';
+		my $count = _field($row, 'count') // 1;
+		my $dkim = _field($evaluated, 'dkim') // '-';
+		my $spf = _field($evaluated, 'spf') // '-';
+		my $disposition = _field($evaluated, 'disposition') // '-';
+
+		my $is_ours = grep { $_ eq $ip } @ours;
+
+		$messages += $count;
+		$mine += $count if($is_ours);
+		$failing += $count if($dkim ne 'pass' && $spf ne 'pass');
+
+		printf("\t%-15s %3d  %-6s %-9s %-11s %-4s %-31.31s %s\n",
+			$ip, $count, $dkim, $spf, $disposition,
+			$is_ours ? 'yes' : 'no', owner($ip), note($record, $domain));
+	}
+
+	printf("\n\t%d message%s, %d from our IPs, %d failing DMARC\n",
+		$messages, ($messages == 1 ? '' : 's'), $mine, $failing);
+
+	$TOTAL{'files'}++;
+	$TOTAL{'messages'} += $messages;
+	$TOTAL{'ours'} += $mine;
+	$TOTAL{'failing'} += $failing;
+}
+
+# The signature evidence behind the verdicts.  A dkim=fail with no signature
+# listed means the message was not signed at all; a signature that is listed
+# and did not verify is ours to investigate.
+sub note {
+	my ($record, $domain) = @_;
+
+	my @notes;
+	my @signatures;
+
+	foreach my $results (_children($record, 'auth_results')) {
+		push @signatures, _children($results, 'dkim');
+	}
+
+	if(@signatures) {
+		foreach my $signature (@signatures) {
+			push @notes, sprintf('signed d=%s s=%s %s',
+				_field($signature, 'domain') // '?',
+				_field($signature, 'selector') // '?',
+				_field($signature, 'result') // '?');
+		}
+	} else {
+		push @notes, 'unsigned';
+	}
+
+	my $header_from = _field(_child($record, 'identifiers'), 'header_from');
+	push @notes, "header_from=$header_from" if(defined($header_from) && $header_from ne $domain);
+
+	my $row = _child($record, 'row');
+	my $evaluated = _child($row, 'policy_evaluated');
+	foreach my $reason (_children($evaluated, 'reason')) {
+		my $type = _field($reason, 'type') // $reason->{'attributes'}{'type'};
+		push @notes, "reason=$type" if(defined($type) && length($type));
+	}
+
+	return join('; ', @notes) || '-';
+}
+
+# Registries disagree about the field: ARIN has OrgName, RIPE org-name or
+# descr, and the whois command itself has to be given a bare address.
+sub owner {
+	my $ip = shift;
+
+	return $OWNERS{$ip} if(exists($OWNERS{$ip}));
+
+	unless($ip =~ /\A[0-9a-fA-F:.]+\z/) {
+		return $OWNERS{$ip} = '?';
+	}
+
+	my %seen;
+	if($whois) {
+		foreach my $line (split(/\n/, qx{timeout 10 whois $ip 2>/dev/null})) {
+			$line =~ s/\A\s+//;
+			next unless($line =~ /\A([A-Za-z][A-Za-z -]*?)\s*:\s*(\S.*?)\s*\z/);
+			my ($key, $value) = (lc($1), $2);
+			$value =~ s/\s*#.*\z//;
+			$seen{$key} = $value unless(exists($seen{$key}));
+		}
+	}
+
+	foreach my $key (qw(orgname org-name owner organization descr netname)) {
+		return $OWNERS{$ip} = $seen{$key} if($seen{$key});
+	}
+
+	my $name = $ip =~ /\A\d+\./ ? gethostbyaddr(inet_aton($ip), AF_INET) : undef;
+
+	return $OWNERS{$ip} = $name || 'unknown';
+}
+
+# Reports are named after their domain and window, so a pattern is at least as
+# likely as a list of paths; directories of reports are the third case.
+sub expand {
+	my @found;
+
+	foreach my $pattern (@_) {
+		if(-d $pattern) {
+			push @found, glob("$pattern/*.xml"), glob("$pattern/*.xml.gz");
+		} elsif($pattern =~ /[*?\[]/) {
+			push @found, glob($pattern);
+		} else {
+			push @found, $pattern;
+		}
+	}
+
+	my @reports = sort grep { -f $_ } @found;
+
+	return @reports;
+}
+
+# Reporters send either plain XML or a gzip stream, usually named .xml.gz.
+# Compression is detected from the leading bytes rather than the name, because
+# the name is not evidence of anything; gunzip keeps the offset arithmetic in
+# one place instead of streaming a pipe into a parser that wants a seekable
+# handle.
+sub _read_report {
+	my $file = shift;
+
+	open(my $handle, '<', $file) or die "cannot open: $!\n";
+	binmode($handle);
+	my $magic = '';
+	read($handle, $magic, 2);
+	close($handle);
+
+	if(defined($magic) && $magic eq "\x1f\x8b") {
+		my $xml = '';
+		IO::Uncompress::Gunzip::gunzip($file => \$xml)
+			or die "cannot decompress: $GunzipError\n";
+		return $xml;
+	}
+
+	open(my $plain, '<', $file) or die "cannot open: $!\n";
+	binmode($plain);
+	local $/;
+	my $xml = <$plain>;
+	close($plain);
+
+	return $xml;
+}
+
+# The element children of a node, by local name: a report from one reporter
+# prefixes its elements and one from another does not, and XML::PP keeps the
+# prefix apart from the name either way.
+sub _children {
+	my ($node, $name) = @_;
+
+	return () unless($node && ref($node) eq 'HASH');
+
+	return grep { defined($_->{'name'}) && $_->{'name'} eq $name } @{$node->{'children'} || []};
+}
+
+sub _child {
+	my ($node, $name) = @_;
+
+	my ($child) = _children($node, $name);
+
+	return $child;
+}
+
+# All the text under a node, as textContent would give it; text nodes are the
+# children that have no element name.
+sub _text {
+	my $node = shift;
+
+	return '' unless($node && ref($node) eq 'HASH');
+
+	return join('', map { defined($_->{'name'}) ? _text($_) : ($_->{'text'} // '') } @{$node->{'children'} || []});
+}
+
+sub _field {
+	my ($node, $name) = @_;
+
+	my $child = _child($node, $name);
+	return unless($child);
+
+	my $text = _text($child);
+	$text =~ s/\A\s+//;
+	$text =~ s/\s+\z//;
+
+	return $text;
+}
+
+sub _window {
+	my $epoch = shift;
+
+	return '?' unless(defined($epoch) && $epoch =~ /\A\d+\z/);
+
+	return strftime('%Y-%m-%d %H:%MZ', gmtime($epoch));
+}
+
+__END__
+
+=head1 NAME
+
+dmarc-summary - summarise DMARC aggregate reports, one row per source IP
+
+=head1 SYNOPSIS
+
+	dmarc-summary [options] [file|pattern|directory ...]
+
+	# every report that has landed in ~/Downloads
+	dmarc-summary
+
+	# one file, with an extra address counted as ours
+	dmarc-summary --ours=192.0.2.10 '~/Downloads/*.xml'
+
+=head1 DESCRIPTION
+
+Reads DMARC aggregate reports (C<feedback> XML, as sent by Outlook.com,
+Google and others, gzipped or not) and prints, for each report, the published
+policy and one
+line per source IP: how many messages came from it, the DKIM and SPF verdicts,
+the disposition applied, whether the address is one of ours, who owns it, and
+the signature evidence behind the verdicts.
+
+A C<dkim=fail> row with C<unsigned> in the last column is a message that
+carried no signature at all - somebody else sending mail as our domain.  A row
+that names a signature and still fails is our own problem to investigate.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--ours>=I<address>[,I<address>...]
+
+Add source addresses that count as ours.  Defaults to the estate's VPS,
+67.205.23.146; repeatable.
+
+=item B<--no-whois>
+
+Do not look up the owner of each source address.  Faster, and useful when the
+whois servers are unreachable or the output is not wanted.
+
+=item B<-h>, B<--help>
+
+Show this documentation.
+
+=back
+
+=head1 FILES
+
+Without arguments, every F<*.xml> and F<*.xml.gz> in F<~/Downloads> is read,
+since that is where DMARC reports in this mailbox land.  Arguments may be
+paths, shell patterns or directories of reports; anything that is not a
+parseable report is skipped with a warning.
+
+Gzip is detected from the file's leading bytes, not from its name, so a report
+saved without the F<.gz> suffix is still read.
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item B<HOME>
+
+Where the search without arguments starts: every F<*.xml> and F<*.xml.gz> in
+F<~/Downloads> is read, and F<~> is B<HOME>.
+
+=back
+
+=head1 EXIT STATUS
+
+0 when the reports that could be read were summarised, including when some
+files were skipped for not being reports.
+
+2 when the options were not usable, or when there were no report files to read
+at all.
+
+=head1 AUTHOR
+
+Nigel Horne
+
+=cut

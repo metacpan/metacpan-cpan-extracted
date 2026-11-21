@@ -34,9 +34,9 @@ The `content` option is omitted entirely when the request has no body. It is pre
 
 A transport must return a hash reference with:
 
-- `status` — required three-digit HTTP status in the `100`-`599` range
+- `status` — required three-digit HTTP status in the `100`-`599` range, using ASCII digits (`0`–`9`)
 - `reason` — optional scalar reason phrase
-- `headers` — optional hash reference of response headers
+- `headers` — optional hash reference of response headers; each value may be a scalar, `undef`, or an array reference containing scalar values or `undef` for repeated headers (as returned by `HTTP::Tiny`)
 - `content` — optional scalar raw response body
 
 Example:
@@ -50,15 +50,21 @@ return {
 };
 ```
 
-`HTTP::API::Core` converts this transport response into `HTTP::API::Core::Response`. Missing `headers` are treated as an empty header set, missing `content` becomes an empty string, and a missing `reason` remains undefined.
+`HTTP::API::Core` converts this transport response into `HTTP::API::Core::Response`. Missing `headers` are treated as an empty header set, missing `content` becomes an empty string, and a missing `reason` remains undefined. Repeated response header values are retained as arrays in `$response->headers` (which returns defensive copies). `$response->header($name)` remains scalar-valued: when repeated values differ, it returns `undef` rather than choosing an arbitrary value. The same conservative rule applies to retry and rate-limit metadata.
 
 ## Failures
 
 A transport may throw an exception for connection, TLS, timeout, DNS, or other transport failures. Ordinary exceptions are normalized into `HTTP::API::Core::Error` with `category => 'transport'` and participate in the configured retry policy.
 
+The built-in `HTTP::Tiny` transport represents such failures using a
+pseudo-response (`599 Internal Exception`). The core maps this specific
+built-in sentinel to the same structured `transport` category. Custom
+transports remain free to return an actual HTTP status `599`, which is
+handled as an HTTP error unless the transport throws an exception.
+
 If a transport throws an existing `HTTP::API::Core::Error`, that structured error is preserved rather than wrapped again.
 
-Returning a non-hash value, a hash without `status`, a hash with an invalid status value, a response whose defined `headers` value is not a hash reference, or a response whose defined `reason`/`content` value is a reference is normalized into a retryable structured `transport` error.
+Returning a non-hash value, a hash without `status`, a hash with an invalid status value, a response whose defined `headers` value is not a hash reference, a response with unsupported nested reference header values, or a response whose defined `reason`/`content` value is a reference is normalized into a retryable structured `transport` error.
 
 Transport adapters should not implement API-level retry, pagination, rate-limit policy, JSON decoding, or authentication unless required by the underlying HTTP library. Those responsibilities belong above the transport boundary.
 

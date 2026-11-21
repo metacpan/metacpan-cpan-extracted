@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use Test2::V0;
 use Path::Tiny;
 use Git::Libgit2 qw( init_lib shutdown_lib check_rc oid_to_hex );
@@ -47,11 +48,18 @@ my $stashfile = "$tmp/stashfile.txt";
 Path::Tiny->new($stashfile)->spew("modified content\n");
 
 # --- git_stash_save (flags=0: include workdir changes) ---
-my $stash;
-my $rc = Git::Libgit2::FFI::git_stash_save( \$stash, $repo, $sig, 'WIP: stashed changes', 0 );
+my $stash_buf = "\0" x 20;
+my ($stash_ptr) = scalar_to_buffer($stash_buf);
+my $rc = Git::Libgit2::FFI::git_stash_save( $stash_ptr, $repo, $sig, 'WIP: stashed changes', 0 );
 ok( $rc == 0, "git_stash_save returned 0 (rc=$rc)" );
-ok( $stash, 'git_stash_save returned a non-NULL stash handle' )
-  or diag("stash handle is NULL — may have nothing to stash");
+
+# The out-param is a caller-allocated 20-byte git_oid: it must carry the id of
+# the stash commit, i.e. what refs/stash points at.
+my $ref_buf = "\0" x 20;
+my ($ref_ptr) = scalar_to_buffer($ref_buf);
+check_rc Git::Libgit2::FFI::git_reference_name_to_id( $ref_ptr, $repo, 'refs/stash' );
+is( oid_to_hex($stash_ptr), oid_to_hex($ref_ptr), 'git_stash_save wrote the id refs/stash points at' );
+isnt( oid_to_hex($stash_ptr), '0' x 40, 'stash oid is not the null oid' );
 
 Git::Libgit2::FFI::git_signature_free($sig);
 Git::Libgit2::FFI::git_repository_free($repo);

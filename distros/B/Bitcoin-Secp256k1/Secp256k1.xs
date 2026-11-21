@@ -1,6 +1,7 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+#include "ppport.h"
 
 #define SECP256K1_STATIC
 #include <secp256k1.h>
@@ -13,17 +14,71 @@
 #define RECOVERABLE_SIGNATURE_SIZE 64
 
 typedef struct {
+	void **items;
+	unsigned int item_count;
+	unsigned int capacity;
+} secp256k1_perl_multifield;
+
+secp256k1_perl_multifield* secp256k1_perl_multifield_create()
+{
+	secp256k1_perl_multifield *result = malloc (sizeof *result);
+	if (!result) {
+		return NULL;
+	}
+
+	result->capacity = 1;
+	result->item_count = 0;
+	result->items = malloc(sizeof *result->items * result->capacity);
+	if (!result->items) {
+		free(result);
+		return NULL;
+	}
+
+	return result;
+}
+
+void secp256k1_perl_multifield_clear(secp256k1_perl_multifield *multifield)
+{
+	int i;
+	for (i = 0; i < multifield->item_count; ++i) {
+		free(multifield->items[i]);
+	}
+
+	multifield->item_count = 0;
+}
+
+/* IMPORTANT: clear must be called first explicitly (to avoid memory leak) */
+void secp256k1_perl_multifield_destroy(secp256k1_perl_multifield *multifield)
+{
+	free(multifield->items);
+	free(multifield);
+}
+
+int secp256k1_perl_multifield_push(secp256k1_perl_multifield *multifield, void *value)
+{
+	if (multifield->item_count == multifield->capacity) {
+		multifield->capacity *= 2;
+		multifield->items = realloc(multifield->items, sizeof *multifield->items * multifield->capacity);
+		if (!multifield->items) {
+			return 0;
+		}
+	}
+
+	multifield->items[multifield->item_count] = value;
+	multifield->item_count += 1;
+	return 1;
+}
+
+typedef struct {
 	secp256k1_context *ctx;
-	secp256k1_pubkey *pubkey;
+	secp256k1_perl_multifield *pubkeys;
 	secp256k1_xonly_pubkey *xonly_pubkey;
-	secp256k1_pubkey **pubkeys;
-	unsigned int pubkeys_count;
 	secp256k1_ecdsa_signature *signature;
 	unsigned char *schnorr_signature;
 	secp256k1_ecdsa_recoverable_signature *recoverable_signature;
 } secp256k1_perl;
 
-void secp256k1_perl_replace_pubkey(secp256k1_perl *perl_ctx, secp256k1_pubkey *new_pubkey);
+int secp256k1_perl_replace_pubkey(secp256k1_perl *perl_ctx, secp256k1_pubkey *new_pubkey);
 void secp256k1_perl_replace_xonly_pubkey(secp256k1_perl *perl_ctx, secp256k1_xonly_pubkey *new_pubkey);
 void secp256k1_perl_replace_signature(secp256k1_perl *perl_ctx, secp256k1_ecdsa_signature *new_signature);
 void secp256k1_perl_replace_schnorr_signature(secp256k1_perl *perl_ctx, unsigned char *new_signature);
@@ -31,53 +86,60 @@ void secp256k1_perl_replace_recoverable_signature(secp256k1_perl *perl_ctx, secp
 
 secp256k1_perl* secp256k1_perl_create()
 {
-	secp256k1_context *secp_ctx = secp256k1_context_create(SECP256K1_CONTEXT_NONE);
 	secp256k1_perl *perl_ctx = malloc(sizeof *perl_ctx);
-	perl_ctx->ctx = secp_ctx;
-	perl_ctx->pubkey = NULL;
+	if (!perl_ctx) {
+		return NULL;
+	}
+
+	perl_ctx->pubkeys = secp256k1_perl_multifield_create();
+	if (!perl_ctx->pubkeys) {
+		free(perl_ctx);
+		return NULL;
+	}
+
+	perl_ctx->ctx = secp256k1_context_create(SECP256K1_CONTEXT_NONE);
+	if (!perl_ctx->ctx) {
+		free(perl_ctx->pubkeys);
+		free(perl_ctx);
+		return NULL;
+	}
+
 	perl_ctx->xonly_pubkey = NULL;
 	perl_ctx->signature = NULL;
 	perl_ctx->schnorr_signature = NULL;
 	perl_ctx->recoverable_signature = NULL;
-	perl_ctx->pubkeys = NULL;
-	perl_ctx->pubkeys_count = 0;
+
 	return perl_ctx;
 }
 
 void secp256k1_perl_clear(secp256k1_perl *perl_ctx)
 {
-	secp256k1_perl_replace_pubkey(perl_ctx, NULL);
 	secp256k1_perl_replace_xonly_pubkey(perl_ctx, NULL);
 	secp256k1_perl_replace_signature(perl_ctx, NULL);
 	secp256k1_perl_replace_schnorr_signature(perl_ctx, NULL);
 	secp256k1_perl_replace_recoverable_signature(perl_ctx, NULL);
 
-	if (perl_ctx->pubkeys_count > 0) {
-		int i;
-		for (i = 0; i < perl_ctx->pubkeys_count; ++i) {
-			free(perl_ctx->pubkeys[i]);
-		}
-
-		free(perl_ctx->pubkeys);
-		perl_ctx->pubkeys_count = 0;
-		perl_ctx->pubkeys = NULL;
-	}
+	secp256k1_perl_multifield_clear(perl_ctx->pubkeys);
 }
 
 void secp256k1_perl_destroy(secp256k1_perl *perl_ctx)
 {
 	secp256k1_perl_clear(perl_ctx);
+	secp256k1_perl_multifield_destroy(perl_ctx->pubkeys);
 	secp256k1_context_destroy(perl_ctx->ctx);
 	free(perl_ctx);
 }
 
-void secp256k1_perl_replace_pubkey(secp256k1_perl *perl_ctx, secp256k1_pubkey *new_pubkey)
+int secp256k1_perl_replace_pubkey(secp256k1_perl *perl_ctx, secp256k1_pubkey *new_pubkey)
 {
-	if (perl_ctx->pubkey != NULL) {
-		free(perl_ctx->pubkey);
+	secp256k1_perl_multifield_clear(perl_ctx->pubkeys);
+	if (new_pubkey != NULL) {
+		if (!secp256k1_perl_multifield_push(perl_ctx->pubkeys, new_pubkey)) {
+			return 0;
+		}
 	}
 
-	perl_ctx->pubkey = new_pubkey;
+	return 1;
 }
 
 void secp256k1_perl_replace_xonly_pubkey(secp256k1_perl *perl_ctx, secp256k1_xonly_pubkey *new_pubkey)
@@ -114,6 +176,15 @@ void secp256k1_perl_replace_recoverable_signature(secp256k1_perl *perl_ctx, secp
 	}
 
 	perl_ctx->recoverable_signature = new_signature;
+}
+
+secp256k1_pubkey* secp256k1_perl_first_pubkey(secp256k1_perl *perl_ctx)
+{
+	if (perl_ctx->pubkeys->item_count == 0) {
+		croak("missing public key");
+	}
+
+	return perl_ctx->pubkeys->items[0];
 }
 
 /* HELPERS */
@@ -154,6 +225,10 @@ secp256k1_pubkey* pubkey_from_sv(secp256k1_perl *ctx, SV *data)
 	unsigned char *key = bytestr_from_sv(data, &key_size);
 
 	secp256k1_pubkey *result_pubkey = malloc(sizeof *result_pubkey);
+	if (!result_pubkey) {
+		croak("failed to allocate pubkey memory");
+	}
+
 	int result = secp256k1_ec_pubkey_parse(
 		ctx->ctx,
 		result_pubkey,
@@ -178,6 +253,10 @@ secp256k1_xonly_pubkey* xonly_pubkey_from_sv(secp256k1_perl *ctx, SV *data)
 	unsigned char *key = size_bytestr_from_sv(data, CURVE_SIZE, "xonly pubkey");
 
 	secp256k1_xonly_pubkey *result_pubkey = malloc(sizeof *result_pubkey);
+	if (!result_pubkey) {
+		croak("failed to allocate pubkey memory");
+	}
+
 	int result = secp256k1_xonly_pubkey_parse(
 		ctx->ctx,
 		result_pubkey,
@@ -200,10 +279,10 @@ void copy_bytestr(unsigned char *to, unsigned char *from, size_t size)
 	}
 }
 
-void clean_secret(unsigned char *secret)
+void clean_secret(unsigned char *secret, size_t size)
 {
 	int i;
-	for (i = 0; i < CURVE_SIZE; ++i) {
+	for (i = 0; i < size; ++i) {
 		secret[i] = 0;
 	}
 }
@@ -212,12 +291,20 @@ void clean_secret(unsigned char *secret)
 
 MODULE = Bitcoin::Secp256k1				PACKAGE = Bitcoin::Secp256k1
 
-PROTOTYPES: DISABLED
+PROTOTYPES: DISABLE
 
 SV*
 new(classname)
 		SV *classname
 	CODE:
+		const char *classname_str;
+		if (sv_isobject(classname)) {
+			classname_str = sv_reftype(SvRV(classname), 1);
+		}
+		else {
+			classname_str = SvPVbyte_nolen(classname);
+		}
+
 		/* Calling perl function to randomize context */
 		dSP;
 		PUSHMARK(SP);
@@ -240,24 +327,28 @@ new(classname)
 		tmp = POPs;
 		PUTBACK;
 
+		unsigned char *randomize = SvOK(tmp)
+			? size_bytestr_from_sv(tmp, CURVE_SIZE, "random data")
+			: NULL
+			;
+
 		/* Randomness dump */
 		/* for (int i = 0; i < len; ++i) { warn("%d: %d", i, randomize[i]); } */
 
 		secp256k1_perl* ctx = secp256k1_perl_create();
+		if (!ctx) {
+			croak("Failed to create secp256k1 perl context");
+		}
 
-		if (SvOK(tmp)) {
-			unsigned char *randomize = size_bytestr_from_sv(tmp, CURVE_SIZE, "random data");
-
-			if (!secp256k1_context_randomize(ctx->ctx, randomize)) {
-				secp256k1_perl_destroy(ctx);
-				croak("Failed to randomize secp256k1 context");
-			}
+		if (randomize != NULL && !secp256k1_context_randomize(ctx->ctx, randomize)) {
+			secp256k1_perl_destroy(ctx);
+			croak("Failed to randomize secp256k1 context");
 		}
 
 		/* Blessing the object */
 		SV *secp_sv = newSViv(0);
-		RETVAL = sv_setref_iv(secp_sv, SvPVbyte_nolen(classname), (uintptr_t) ctx);
-		SvREADONLY_on(secp_sv);
+		RETVAL = sv_setref_iv(secp_sv, classname_str, (uintptr_t) ctx);
+		SvREADONLY_on(SvRV(secp_sv));
 	OUTPUT:
 		RETVAL
 
@@ -279,10 +370,14 @@ _pubkey(self, ...)
 		if (items > 1 && SvOK(ST(1))) {
 			SV *pubkey_data = ST(1);
 			secp256k1_pubkey *new_pubkey = pubkey_from_sv(ctx, pubkey_data);
-			secp256k1_perl_replace_pubkey(ctx, new_pubkey);
+			if (!secp256k1_perl_replace_pubkey(ctx, new_pubkey)) {
+				croak("could not replace a public key");
+			}
 		}
 		else if (items > 1) {
-			secp256k1_perl_replace_pubkey(ctx, NULL);
+			if (!secp256k1_perl_replace_pubkey(ctx, NULL)) {
+				croak("could not replace a public key");
+			}
 		}
 
 		unsigned int compression = SECP256K1_EC_COMPRESSED;
@@ -291,14 +386,14 @@ _pubkey(self, ...)
 			compression = SECP256K1_EC_UNCOMPRESSED;
 		}
 
-		if (ctx->pubkey != NULL) {
+		if (ctx->pubkeys->item_count > 0) {
 			unsigned char key_output[65];
 			size_t key_size = 65;
 			secp256k1_ec_pubkey_serialize(
 				ctx->ctx,
 				key_output,
 				&key_size,
-				ctx->pubkey,
+				secp256k1_perl_first_pubkey(ctx),
 				compression
 			);
 
@@ -357,6 +452,10 @@ _signature(self, ...)
 			unsigned char *signature = bytestr_from_sv(new_signature, &signature_size);
 
 			secp256k1_ecdsa_signature *result_signature = malloc(sizeof *result_signature);
+			if (!result_signature) {
+				croak("failed to allocate signature memory");
+			}
+
 			int result = secp256k1_ecdsa_signature_parse_der(
 				ctx->ctx,
 				result_signature,
@@ -408,8 +507,11 @@ _signature_schnorr(self, ...)
 			unsigned char *signature = size_bytestr_from_sv(new_signature, SCHNORR_SIGNATURE_SIZE, "Schnorr signature");
 
 			unsigned char *result_signature = malloc(sizeof *result_signature * SCHNORR_SIGNATURE_SIZE);
-			memcpy(result_signature, signature, sizeof *result_signature * SCHNORR_SIGNATURE_SIZE);
+			if (!result_signature) {
+				croak("failed to allocate signature memory");
+			}
 
+			memcpy(result_signature, signature, sizeof *result_signature * SCHNORR_SIGNATURE_SIZE);
 			secp256k1_perl_replace_schnorr_signature(ctx, result_signature);
 		}
 		else if (items > 1) {
@@ -434,10 +536,6 @@ _signature_recoverable(self, ...)
 		if (items > 1 && SvOK(ST(1))) {
 			SV *new_signature = ST(1);
 
-			if (!SvOK(new_signature)) {
-				croak("recoverable signature must be defined");
-			}
-
 			/* Expect hash ref with signature and recovery_id */
 			if (!SvROK(new_signature) || SvTYPE(SvRV(new_signature)) != SVt_PVHV) {
 				croak("recoverable signature must be a hash reference with 'signature' and 'recovery_id' keys");
@@ -453,13 +551,28 @@ _signature_recoverable(self, ...)
 			}
 
 			unsigned char *sig_data = size_bytestr_from_sv(*sig_sv, RECOVERABLE_SIGNATURE_SIZE, "signature data");
-			int recovery_id = SvIV(*recovery_id_sv);
+
+			int recovery_id = -1;
+
+			/* validate the recovery_id to be an integer */
+			if (SvOK(*recovery_id_sv)) {
+				STRLEN recovery_id_len;
+				const char *recovery_id_str = SvPV(*recovery_id_sv, recovery_id_len);
+				int recovery_id_flags = grok_number(recovery_id_str, recovery_id_len, NULL);
+				if (recovery_id_flags && !(recovery_id_flags & IS_NUMBER_NOT_INT)) {
+					recovery_id = SvIV(*recovery_id_sv);
+				}
+			}
 
 			if (recovery_id < 0 || recovery_id > 3) {
 				croak("recovery_id must be 0, 1, 2, or 3");
 			}
 
 			secp256k1_ecdsa_recoverable_signature *parsed_signature = malloc(sizeof *parsed_signature);
+			if (!parsed_signature) {
+				croak("failed to allocate signature memory");
+			}
+
 			int result = secp256k1_ecdsa_recoverable_signature_parse_compact(
 				ctx->ctx,
 				parsed_signature,
@@ -505,20 +618,20 @@ _signature_recoverable(self, ...)
 		RETVAL
 
 void
-_push_pubkey(self)
+_push_pubkey(self, ...)
 		SV *self
 	CODE:
 		secp256k1_perl *ctx = ctx_from_sv(self);
 
-		if (ctx->pubkeys_count > 0) {
-			ctx->pubkeys = realloc(ctx->pubkeys, sizeof *ctx->pubkeys * (ctx->pubkeys_count + 1));
+		if (items > 1 && SvOK(ST(1))) {
+			SV *pubkey_data = ST(1);
+			if (!secp256k1_perl_multifield_push(ctx->pubkeys, pubkey_from_sv(ctx, pubkey_data))) {
+				croak("failed to push public key");
+			}
 		}
 		else {
-			ctx->pubkeys = malloc(sizeof *ctx->pubkeys);
+			croak("missing public key to push");
 		}
-
-		ctx->pubkeys[ctx->pubkeys_count++] = ctx->pubkey;
-		ctx->pubkey = NULL;
 
 # Creates a public key from a private key
 void
@@ -530,6 +643,10 @@ _create_pubkey(self, privkey)
 		unsigned char *seckey_str = size_bytestr_from_sv(privkey, CURVE_SIZE, "private key");
 
 		secp256k1_pubkey *result_pubkey = malloc(sizeof *result_pubkey);
+		if (!result_pubkey) {
+			croak("failed to allocate pubkey memory");
+		}
+
 		int result = secp256k1_ec_pubkey_create(
 			ctx->ctx,
 			result_pubkey,
@@ -541,7 +658,9 @@ _create_pubkey(self, privkey)
 			croak("creating pubkey failed (invalid private key?)");
 		}
 
-		secp256k1_perl_replace_pubkey(ctx, result_pubkey);
+		if (!secp256k1_perl_replace_pubkey(ctx, result_pubkey)) {
+			croak("could not replace a public key");
+		}
 
 # Convert pubkey to xonly pubkey
 void
@@ -549,16 +668,18 @@ _convert_pubkey_xonly(self)
 		SV *self
 	CODE:
 		secp256k1_perl *ctx = ctx_from_sv(self);
-		if (ctx->pubkey == NULL) {
-			croak("converting pubkey to xonly requires a pubkey");
+
+		secp256k1_pubkey *first_key = secp256k1_perl_first_pubkey(ctx);
+		secp256k1_xonly_pubkey *xonly_pubkey = malloc(sizeof *xonly_pubkey);
+		if (!xonly_pubkey) {
+			croak("failed to allocate pubkey memory");
 		}
 
-		secp256k1_xonly_pubkey *xonly_pubkey = malloc(sizeof *xonly_pubkey);
 		int result = secp256k1_xonly_pubkey_from_pubkey(
 			ctx->ctx,
 			xonly_pubkey,
 			NULL,
-			ctx->pubkey
+			first_key
 		);
 
 		if (!result) {
@@ -579,6 +700,10 @@ _normalize(self)
 		}
 
 		secp256k1_ecdsa_signature *result_signature = malloc(sizeof *result_signature);
+		if (!result_signature) {
+			croak("failed to allocate signature memory");
+		}
+
 		int result = secp256k1_ecdsa_signature_normalize(
 			ctx->ctx,
 			result_signature,
@@ -597,8 +722,8 @@ _verify(self, message)
 		SV *message
 	CODE:
 		secp256k1_perl *ctx = ctx_from_sv(self);
-		if (ctx->pubkey == NULL || ctx->signature == NULL) {
-			croak("verification requires both pubkey and signature");
+		if (ctx->signature == NULL) {
+			croak("verification requires a signature");
 		}
 
 		unsigned char *message_str = size_bytestr_from_sv(message, CURVE_SIZE, "digest");
@@ -607,7 +732,7 @@ _verify(self, message)
 			ctx->ctx,
 			ctx->signature,
 			message_str,
-			ctx->pubkey
+			secp256k1_perl_first_pubkey(ctx)
 		);
 
 		RETVAL = result ? &PL_sv_yes : &PL_sv_no;
@@ -652,6 +777,10 @@ _sign(self, privkey, message)
 		unsigned char *seckey_str = size_bytestr_from_sv(privkey, CURVE_SIZE, "private key");
 
 		secp256k1_ecdsa_signature *result_signature = malloc(sizeof *result_signature);
+		if (!result_signature) {
+			croak("failed to allocate signature memory");
+		}
+
 		int result = secp256k1_ecdsa_sign(
 			ctx->ctx,
 			result_signature,
@@ -677,20 +806,6 @@ _sign_schnorr(self, privkey, message)
 	CODE:
 		secp256k1_perl *ctx = ctx_from_sv(self);
 
-		unsigned char *message_str = size_bytestr_from_sv(message, CURVE_SIZE, "digest");
-		unsigned char *seckey_str = size_bytestr_from_sv(privkey, CURVE_SIZE, "private key");
-
-		secp256k1_keypair keypair;
-		int result = secp256k1_keypair_create(
-			ctx->ctx,
-			&keypair,
-			seckey_str
-		);
-
-		if (!result) {
-			croak("creating a keypair failed");
-		}
-
 		/* Calling perl function to get auxiliary randomness */
 		dSP;
 		PUSHMARK(SP);
@@ -713,17 +828,40 @@ _sign_schnorr(self, privkey, message)
 		tmp = POPs;
 		PUTBACK;
 
-		/* Randomness dump */
-		/* for (int i = 0; i < len; ++i) { warn("%d: %d", i, randomize[i]); } */
+		unsigned char *randomize = SvOK(tmp)
+			? size_bytestr_from_sv(tmp, CURVE_SIZE, "auxiliary randomness")
+			: NULL
+			;
+
+		unsigned char *message_str = size_bytestr_from_sv(message, CURVE_SIZE, "digest");
+		unsigned char *seckey_str = size_bytestr_from_sv(privkey, CURVE_SIZE, "private key");
+
+		secp256k1_keypair keypair;
+		int result = secp256k1_keypair_create(
+			ctx->ctx,
+			&keypair,
+			seckey_str
+		);
+
+		if (!result) {
+			croak("creating a keypair failed");
+		}
 
 		unsigned char *result_signature = malloc(sizeof *result_signature * SCHNORR_SIGNATURE_SIZE);
+		if (!result_signature) {
+			croak("failed to allocate signature memory");
+		}
+
 		result = secp256k1_schnorrsig_sign32(
 			ctx->ctx,
 			result_signature,
 			message_str,
 			&keypair,
-			SvOK(tmp) ? size_bytestr_from_sv(tmp, CURVE_SIZE, "auxiliary randomness") : NULL
+			randomize
 		);
+
+		/* keypair is guaranteed by docs to contain 96 bytes */
+		clean_secret(keypair.data, 96);
 
 		if (!result) {
 			free(result_signature);
@@ -745,6 +883,10 @@ _sign_recoverable(self, privkey, message)
 		unsigned char *seckey_str = size_bytestr_from_sv(privkey, CURVE_SIZE, "private key");
 
 		secp256k1_ecdsa_recoverable_signature *signature = malloc(sizeof *signature);
+		if (!signature) {
+			croak("failed to allocate signature memory");
+		}
+
 		int result = secp256k1_ecdsa_sign_recoverable(
 			ctx->ctx,
 			signature,
@@ -776,6 +918,9 @@ _recover_pubkey_recoverable(self, message_hash)
 		unsigned char *message_str = size_bytestr_from_sv(message_hash, CURVE_SIZE, "message hash");
 
 		secp256k1_pubkey *result_pubkey = malloc(sizeof *result_pubkey);
+		if (!result_pubkey) {
+			croak("failed to allocate pubkey memory");
+		}
 
 		int result = secp256k1_ecdsa_recover(
 			ctx->ctx,
@@ -789,7 +934,9 @@ _recover_pubkey_recoverable(self, message_hash)
 			croak("failed to recover public key from signature");
 		}
 
-		secp256k1_perl_replace_pubkey(ctx, result_pubkey);
+		if (!secp256k1_perl_replace_pubkey(ctx, result_pubkey)) {
+			croak("could not replace a public key");
+		}
 
 # Checks whether a private key is valid
 SV*
@@ -828,12 +975,12 @@ _privkey_negate(self, privkey)
 		);
 
 		if (!result) {
-			clean_secret(new_seckey);
+			clean_secret(new_seckey, CURVE_SIZE);
 			croak("resulting negated privkey is not valid");
 		}
 
 		RETVAL = newSVpv((char*) new_seckey, CURVE_SIZE);
-		clean_secret(new_seckey);
+		clean_secret(new_seckey, CURVE_SIZE);
 	OUTPUT:
 		RETVAL
 
@@ -846,7 +993,7 @@ _pubkey_negate(self)
 
 		int result = secp256k1_ec_pubkey_negate(
 			ctx->ctx,
-			ctx->pubkey
+			secp256k1_perl_first_pubkey(ctx)
 		);
 
 		/* NOTE: result is always 1 */
@@ -875,12 +1022,12 @@ _privkey_add(self, privkey, tweak)
 		);
 
 		if (!result) {
-			clean_secret(new_seckey);
+			clean_secret(new_seckey, CURVE_SIZE);
 			croak("resulting added privkey is not valid");
 		}
 
 		RETVAL = newSVpv((char*) new_seckey, CURVE_SIZE);
-		clean_secret(new_seckey);
+		clean_secret(new_seckey, CURVE_SIZE);
 	OUTPUT:
 		RETVAL
 
@@ -895,7 +1042,7 @@ _pubkey_add(self, tweak)
 
 		int result = secp256k1_ec_pubkey_tweak_add(
 			ctx->ctx,
-			ctx->pubkey,
+			secp256k1_perl_first_pubkey(ctx),
 			tweak_str
 		);
 
@@ -924,12 +1071,12 @@ _privkey_mul(self, privkey, tweak)
 		);
 
 		if (!result) {
-			clean_secret(new_seckey);
+			clean_secret(new_seckey, CURVE_SIZE);
 			croak("multiplication arguments are not valid");
 		}
 
 		RETVAL = newSVpv((char*) new_seckey, CURVE_SIZE);
-		clean_secret(new_seckey);
+		clean_secret(new_seckey, CURVE_SIZE);
 	OUTPUT:
 		RETVAL
 
@@ -944,7 +1091,7 @@ _pubkey_mul(self, tweak)
 
 		int result = secp256k1_ec_pubkey_tweak_mul(
 			ctx->ctx,
-			ctx->pubkey,
+			secp256k1_perl_first_pubkey(ctx),
 			tweak_str
 		);
 
@@ -959,12 +1106,20 @@ _pubkey_combine(self)
 	CODE:
 		secp256k1_perl *ctx = ctx_from_sv(self);
 
+		if (ctx->pubkeys->item_count == 0) {
+			croak("there are no public keys to combine");
+		}
+
 		secp256k1_pubkey *result_pubkey = malloc(sizeof *result_pubkey);
+		if (!result_pubkey) {
+			croak("failed to allocate pubkey memory");
+		}
+
 		int result = secp256k1_ec_pubkey_combine(
 			ctx->ctx,
 			result_pubkey,
-			(const secp256k1_pubkey * const *) ctx->pubkeys,
-			ctx->pubkeys_count
+			(const secp256k1_pubkey * const *) ctx->pubkeys->items,
+			ctx->pubkeys->item_count
 		);
 
 		if (!result) {
@@ -972,7 +1127,9 @@ _pubkey_combine(self)
 			croak("resulting sum of pubkeys is not valid");
 		}
 
-		secp256k1_perl_replace_pubkey(ctx, result_pubkey);
+		if (!secp256k1_perl_replace_pubkey(ctx, result_pubkey)) {
+			croak("could not replace a public key");
+		}
 
 
 # Destructor

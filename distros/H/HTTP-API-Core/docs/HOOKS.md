@@ -26,7 +26,7 @@ The context includes:
 - `content`
 - `attempt`
 
-Before the transport call, the core also records `started_at` in the same context. The callback may modify `method`, `url`, `headers`, or `content`; those changes are used for that attempt. Mutated request fields are revalidated before transport execution. In particular, `url` must remain a non-empty absolute HTTP(S) URL.
+Before the transport call, the core also records `started_at` in the same context. The callback may modify `method`, `url`, `headers`, or `content`; those changes are used for that attempt. Mutated request fields are revalidated before transport execution. In particular, `url` must remain a non-empty absolute HTTP(S) URL. After hook validation, the method is normalized to uppercase so transport, response/error metadata, and retry policy see the same method. Each retry starts from the original request's method, URL, and headers, then runs `before_request` again, allowing per-attempt credentials and URLs without leaking previous mutations.
 
 Example:
 

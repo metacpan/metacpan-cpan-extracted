@@ -65,12 +65,7 @@ Specify the backend used to read and write configuration data. See L<Config::Mod
 
 =head2 accept
 
-Specifies names of the elements this configuration class accepts as valid. The key of the hash is a regular expression that are be tested against
-           candidate parameters. When the parameter matches the regular expression,
-           a new parameter is created in the model using the description provided
-           in the value of this hash key. Note that the regexp must match the whole name
-           of the potential parameter. I.e. the specified regexp is eval'ed
-           with a leading C<^> and a trailing C<$>. I< Optional. Type hash of node of class L<Itself::ConfigAccept|Config::Model::models::Itself::ConfigAccept> .  > 
+Specifies names of the elements this configuration class accepts as valid. I< Optional. Type hash of node of class L<Itself::ConfigAccept|Config::Model::models::Itself::ConfigAccept> .  > 
 
 =head1 SEE ALSO
 

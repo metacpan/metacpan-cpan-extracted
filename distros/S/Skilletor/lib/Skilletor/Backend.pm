@@ -7,12 +7,12 @@ use warnings;
 use Cwd ();
 use Skilletor::Error;
 use Skilletor::FSUtil qw( decode_utf8_lossy path_resolve );
-use Skilletor::JSON ();
+use Skilletor::JSON qw( js_ordered );
 use Skilletor::Source::Git;
 use Skilletor::Source::Local;
 use Skilletor::Source::Url;
 
-our $VERSION = '0.001';
+our $VERSION = '0.008000';
 
 sub local_class { 'Skilletor::Source::Local' }
 sub git_class   { 'Skilletor::Source::Git' }
@@ -83,7 +83,7 @@ sub identity {
 # A trust request for a source, naming the backend that would be used.
 sub trust_request {
   my ( $self, $name, $backend ) = @_;
-  return { name => $name, kind => $backend->{kind}, url => $backend->{address} };
+  return js_ordered( name => $name, kind => $backend->{kind}, url => $backend->{address} );
 }
 
 1;
@@ -100,7 +100,7 @@ Skilletor::Backend - Choose a source's backend (author mode) and build it – on
 
 =head1 VERSION
 
-version 0.001
+version 0.008000
 
 =head1 SYNOPSIS
 
@@ -146,7 +146,7 @@ The backend identity a run resolves once (C<JSON.stringify([kind, address, ref ?
 
 =head2 trust_request
 
-  Skilletor::Backend->trust_request( $name, $backend );   # { name, kind, url }
+  Skilletor::Backend->trust_request( $name, $backend );   # { name, kind, url }, in that key order
 
 =head2 local_dir
 
@@ -168,19 +168,25 @@ The class built for a C<url> backend (L<Skilletor::Source::Url>).
 
 =head1 SUPPORT
 
+=head2 Issues
+
+Please report bugs and feature requests at
+L<https://github.com/Getty/skilletor/issues>.
+
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <getty@cpan.org>
+Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
+This software is Copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

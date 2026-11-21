@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -193,4 +193,3 @@ This software is licensed under the MIT license (see the LICENSE file, which is
 part of the distribution).
 
 =cut
-

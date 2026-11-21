@@ -16,7 +16,7 @@ sub new {
     die "response status must be a valid HTTP status\n"
         if !defined($args{status})
         || ref($args{status}) ne ''
-        || $args{status} !~ /\A\d{3}\z/
+        || $args{status} !~ /\A[0-9]{3}\z/
         || $args{status} < 100
         || $args{status} > 599;
 
@@ -24,8 +24,12 @@ sub new {
     die "response headers must be a hash reference\n" if ref($headers) ne 'HASH';
     die "response header names must be scalars\n"
         if grep { ref($_) ne '' } keys %$headers;
-    die "response header values must be scalars or undef\n"
-        if grep { defined($_) && ref($_) ne '' } values %$headers;
+    for my $value (values %$headers) {
+        next if !defined($value) || ref($value) eq '';
+        die "response header values must be scalars, arrays of scalars, or undef\n"
+            if ref($value) ne 'ARRAY'
+            || grep { defined($_) && ref($_) ne '' } @$value;
+    }
 
     for my $name (qw(reason content method url elapsed)) {
         die "response $name must be a scalar or undef\n"
@@ -39,13 +43,11 @@ sub new {
         my $key = lc $name;
         my $value = $headers->{$name};
         if (exists $normalized_headers{$key}) {
-            my $previous = $normalized_headers{$key};
             $conflicts{$key} = 1
-                if (!defined($previous) && defined($value))
-                || (defined($previous) && !defined($value))
-                || (defined($previous) && defined($value) && $previous ne $value);
+                if !_same_header_values($normalized_headers{$key}, $value);
         }
-        $normalized_headers{$key} = $value;
+        $normalized_headers{$key} = ref($value) eq 'ARRAY'
+            ? [ @$value ] : $value;
     }
     $normalized_headers{$_} = undef for keys %conflicts;
 
@@ -60,9 +62,51 @@ sub new {
     }, $class;
 }
 
+# Compare values without stringifying array references (or choosing a
+# case-insensitive duplicate arbitrarily).
+sub _same_header_values {
+    my ($left, $right) = @_;
+    return 0 if ref($left) ne ref($right);
+
+    if (ref($left) eq 'ARRAY') {
+        return 0 if @$left != @$right;
+        for my $i (0 .. $#$left) {
+            return 0 if defined($left->[$i]) != defined($right->[$i]);
+            return 0 if defined($left->[$i]) && $left->[$i] ne $right->[$i];
+        }
+        return 1;
+    }
+
+    return 1 if !defined($left) && !defined($right);
+    return defined($left) && defined($right) && $left eq $right;
+}
+
+# Scalar accessors are intentionally conservative: identical repeated values
+# are unambiguous, while conflicting values do not control API policy.
+sub _scalar_header_value {
+    my ($value) = @_;
+    return $value if ref($value) ne 'ARRAY';
+    return undef if !@$value;
+
+    my $first = $value->[0];
+    for my $item (@$value) {
+        return undef if defined($first) != defined($item);
+        return undef if defined($first) && $first ne $item;
+    }
+    return $first;
+}
+
 sub status      { $_[0]->{status} }
 sub reason      { $_[0]->{reason} }
-sub headers     { +{ %{ $_[0]->{headers} } } }
+sub headers {
+    my ($self) = @_;
+    my %headers = %{ $self->{headers} };
+    for my $name (keys %headers) {
+        $headers{$name} = [ @{ $headers{$name} } ]
+            if ref($headers{$name}) eq 'ARRAY';
+    }
+    return \%headers;
+}
 sub content     { $_[0]->{content} }
 sub text        { $_[0]->{content} }
 sub has_content { length($_[0]->{content}) ? 1 : 0 }
@@ -103,7 +147,7 @@ sub header {
     my ($self, $name) = @_;
     die "response header name must be a defined scalar\n"
         if !defined($name) || ref($name) ne '';
-    return $self->{headers}{lc $name};
+    return _scalar_header_value($self->{headers}{lc $name});
 }
 sub rate_limit  { HTTP::API::Core::RateLimit->from_headers($_[0]->{headers}) }
 
@@ -170,8 +214,11 @@ ending in C<+json>, such as C<application/problem+json>.
 
 =head2 status, reason, headers, header, method, url
 
-Provide response status and request metadata. C<headers> returns a copy.
-Case-insensitively duplicated header names with identical values are preserved;
+Provide response status and request metadata. C<headers> returns a defensive
+copy, including copies of array references for repeated headers such as
+C<Set-Cookie>. C<header($name)> returns a scalar for a single value or
+identical repeated values; conflicting repeated values return C<undef>.
+Case-insensitively duplicated header names with matching values are preserved;
 conflicting values become C<undef> rather than being chosen arbitrarily.
 
 =head2 elapsed

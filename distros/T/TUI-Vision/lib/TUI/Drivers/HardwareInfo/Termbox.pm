@@ -9,7 +9,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -17,8 +17,10 @@ our $AUTHORITY = 'cpan:BRICKPOOL';
 # Import modules
 # -------------------------------------------------------------------------
 
-use constant PERL_ONLY => ( exists $ENV{PERL_ONLY} && $ENV{PERL_ONLY} )
-  || not eval { require Termbox; Termbox->VERSION(2); 1 };
+use constant PERL_ONLY => $^O eq 'MSWin32'
+                       || exists $ENV{PERL_ONLY} && $ENV{PERL_ONLY}
+                       || exists $ENV{ESCDELAY} && $ENV{ESCDELAY}
+                       || !eval { require Termbox; Termbox->VERSION( 2 ); 1 };
 
 use PerlX::Assert::PP;
 use English qw( -no_match_vars );
@@ -66,51 +68,84 @@ use constant TB_NONE => 0;
 # Do not delay too much on ESC key presses, as the Alt modifier works well
 # in most modern terminals. Still, this delay helps Termbox::PP distinguish
 # special key sequences.
-use constant ESCDELAY => exists $ENV{ESCDELAY} ? 0+ $ENV{ESCDELAY} : 100;
+use constant ESCDELAY => exists $ENV{ESCDELAY} && $ENV{ESCDELAY} > 0
+  ? $ENV{ESCDELAY} 
+  : 100;
 
-# The Termbox FFI version doesn't define all keys and attributes, 
-# so we define it here for use in the translation tables.
-use if !PERL_ONLY, constant => {
-  TB_KEY_CTRL_A     => 0x01,
-  TB_KEY_CTRL_B     => 0x02,
-  TB_KEY_CTRL_C     => 0x03,
-  TB_KEY_CTRL_D     => 0x04,
-  TB_KEY_CTRL_E     => 0x05,
-  TB_KEY_CTRL_F     => 0x06,
-  TB_KEY_CTRL_G     => 0x07,
-  TB_KEY_BACKSPACE  => 0x08,
-  TB_KEY_CTRL_H     => 0x08,
-  TB_KEY_TAB        => 0x09,
-  TB_KEY_CTRL_I     => 0x09,
-  TB_KEY_CTRL_J     => 0x0a,
-  TB_KEY_CTRL_K     => 0x0b,
-  TB_KEY_CTRL_L     => 0x0c,
-  TB_KEY_ENTER      => 0x0d,
-  TB_KEY_CTRL_M     => 0x0d,
-  TB_KEY_CTRL_N     => 0x0e,
-  TB_KEY_CTRL_O     => 0x0f,
-  TB_KEY_CTRL_P     => 0x10,
-  TB_KEY_CTRL_Q     => 0x11,
-  TB_KEY_CTRL_R     => 0x12,
-  TB_KEY_CTRL_S     => 0x13,
-  TB_KEY_CTRL_T     => 0x14,
-  TB_KEY_CTRL_U     => 0x15,
-  TB_KEY_CTRL_V     => 0x16,
-  TB_KEY_CTRL_W     => 0x17,
-  TB_KEY_CTRL_X     => 0x18,
-  TB_KEY_CTRL_Y     => 0x19,
-  TB_KEY_CTRL_Z     => 0x1a,
-  TB_KEY_ESC        => 0x1b,
-  TB_KEY_SPACE      => 0x20,
-  TB_KEY_BACKSPACE2 => 0x7f,
-  # That's strange, the following attributes do not rely on truecolor
-  TB_HI_BLACK       => 0x2000,
-  TB_BRIGHT         => 0x4000,
-};
-
+# Provide missing key constants and compatibility aliases when they are not
+# supplied by the selected Termbox implementation.
 BEGIN {
-  *TB_OUTPUT_TRUECOLOR = sub (){ 5 }
-    unless defined &TB_OUTPUT_TRUECOLOR;
+  no warnings 'once';
+  my %compat = (
+    TB_KEY_CTRL_A     => 0x01,
+    TB_KEY_CTRL_B     => 0x02,
+    TB_KEY_CTRL_C     => 0x03,
+    TB_KEY_CTRL_D     => 0x04,
+    TB_KEY_CTRL_E     => 0x05,
+    TB_KEY_CTRL_F     => 0x06,
+    TB_KEY_CTRL_G     => 0x07,
+    TB_KEY_BACKSPACE  => 0x08,
+    TB_KEY_CTRL_H     => 0x08,
+    TB_KEY_TAB        => 0x09,
+    TB_KEY_CTRL_I     => 0x09,
+    TB_KEY_CTRL_J     => 0x0a,
+    TB_KEY_CTRL_K     => 0x0b,
+    TB_KEY_CTRL_L     => 0x0c,
+    TB_KEY_ENTER      => 0x0d,
+    TB_KEY_CTRL_M     => 0x0d,
+    TB_KEY_CTRL_N     => 0x0e,
+    TB_KEY_CTRL_O     => 0x0f,
+    TB_KEY_CTRL_P     => 0x10,
+    TB_KEY_CTRL_Q     => 0x11,
+    TB_KEY_CTRL_R     => 0x12,
+    TB_KEY_CTRL_S     => 0x13,
+    TB_KEY_CTRL_T     => 0x14,
+    TB_KEY_CTRL_U     => 0x15,
+    TB_KEY_CTRL_V     => 0x16,
+    TB_KEY_CTRL_W     => 0x17,
+    TB_KEY_CTRL_X     => 0x18,
+    TB_KEY_CTRL_Y     => 0x19,
+    TB_KEY_CTRL_Z     => 0x1a,
+    TB_KEY_ESC        => 0x1b,
+    TB_KEY_SPACE      => 0x20,
+    TB_KEY_BACKSPACE2 => 0x7f,
+  );
+  no strict 'refs';
+  while ( my ( $name, $value ) = each %compat ) {
+    next if defined &{$name};
+    # The constant could be called even if it is not yet visible as a symbol
+    next if __PACKAGE__->can( $name );
+    *{$name} = sub () { $value };
+  }
+}
+
+# Provide missing high-intensity black constant when they are not supplied by 
+# the selected Termbox implementation.
+BEGIN {
+  no warnings 'once';
+  if ( !defined &TB_HI_BLACK ) {
+    *TB_HI_BLACK = sub () { TB_256_BLACK };
+  }
+}
+
+# Provide missing TrueColor-related API constants when they are not supplied by 
+# the selected Termbox implementation.
+BEGIN {
+  no warnings 'once';
+  my %compat = (
+    TB_OUTPUT_TRUECOLOR    => 5,
+    TB_TRUECOLOR_BOLD      => 0x01000000,
+    TB_TRUECOLOR_UNDERLINE => 0x02000000,
+    TB_TRUECOLOR_REVERSE   => 0x04000000,
+    TB_TRUECOLOR_BLINK     => 0x10000000,
+    TB_TRUECOLOR_BLACK     => 0x20000000,
+  );
+  no strict 'refs';
+  while ( my ( $name, $value ) = each %compat ) {
+    next if defined &{$name};
+    next if __PACKAGE__->can( $name );
+    *{$name} = sub () { $value };
+  }
 }
 
 # -------------------------------------------------------------------------
@@ -226,6 +261,11 @@ my (
 
 # Attribute conversion
 my $TB_ATTR;
+my $attrBold      = TB_BOLD;
+my $attrUnderline = TB_UNDERLINE;
+my $attrReverse   = TB_REVERSE;
+my $attrBlink     = TB_BLINK;
+my $attrBlack     = TB_HI_BLACK;
 my (
   $convertColor,
   $convertNoColor,
@@ -498,7 +538,7 @@ sub setScreenMode {       # void ($class, $mode)
   $mode &= ~smUpdate;
   $mode &= ~smColorHigh 
     if ( $mode & smColorHigh ) 
-    && $class->getColorCount() < 256*256*256;
+    && ( !tb_has_truecolor() || $class->getColorCount() < 256*256*256 );
   $mode &= ~smColor256 
     if ( $mode & smColor256 ) 
     && $class->getColorCount() < 256;
@@ -506,7 +546,8 @@ sub setScreenMode {       # void ($class, $mode)
   # Set the appropriate output mode based on the requested screen mode.
   if ( $mode & smColorHigh ) {
     tb_set_output_mode( TB_OUTPUT_TRUECOLOR )
-      if $outputMode != TB_OUTPUT_TRUECOLOR
+      if tb_has_truecolor() 
+      && $outputMode != TB_OUTPUT_TRUECOLOR
   }
   elsif ( $mode & smColor256 ) {
     tb_set_output_mode( TB_OUTPUT_256 )
@@ -527,6 +568,23 @@ sub setScreenMode {       # void ($class, $mode)
   # Save the current output state
   $screenMode = $mode;
   $outputMode = tb_set_output_mode( TB_OUTPUT_CURRENT );
+
+  # Update attribute constants according to the active output mode.
+  # Termbox may uses different attribute ranges in TrueColor mode.
+  if ( tb_has_truecolor() && $outputMode == TB_OUTPUT_TRUECOLOR ) {
+    $attrBold      = TB_TRUECOLOR_BOLD;
+    $attrUnderline = TB_TRUECOLOR_UNDERLINE;
+    $attrReverse   = TB_TRUECOLOR_REVERSE;
+    $attrBlink     = TB_TRUECOLOR_BLINK;
+    $attrBlack     = TB_TRUECOLOR_BLACK;
+  }
+  else {
+    $attrBold      = TB_BOLD;
+    $attrUnderline = TB_UNDERLINE;
+    $attrReverse   = TB_REVERSE;
+    $attrBlink     = TB_BLINK;
+    $attrBlack     = TB_HI_BLACK;
+  }
 
   return;
 }
@@ -803,6 +861,7 @@ sub getColorCount {    # $count ($class)
   assert ( @_ == 1 );
   assert ( $_[0] and !ref $_[0] );
 
+  # Cache the color count to avoid recalculating it multiple times
   state $COLORS;
   return $COLORS if defined $COLORS;
 
@@ -931,7 +990,7 @@ my %TV_TO_TB = (
   kbBack()      => [ TB_MOD_CTRL,  TB_KEY_BACKSPACE2,  0 ],
   kbCtrlBack()  => [ TB_MOD_CTRL,  TB_KEY_BACKSPACE,   0 ],
 
-  kbShiftTab()  => [ TB_MOD_SHIFT, TB_KEY_BACK_TAB,    0 ],
+  kbShiftTab()  => [ TB_NONE,      TB_KEY_BACK_TAB,    0 ],
   kbTab()       => [ TB_NONE,      TB_KEY_TAB,         0 ],
 
   kbCtrlEnter() => [ TB_MOD_CTRL,  TB_KEY_CTRL_J,      0 ],
@@ -1154,6 +1213,19 @@ $convertKeyCode = sub {    # $keyCode ($event)
     return kbPgDn  if $key == TB_KEY_PGDN;
   }
 
+  # Shift selects text in the editor through controlKeyState. Shifted
+  # navigation keys keep the unmodified key code, as in Turbo Vision.
+  if ( $mod & TB_MOD_SHIFT ) {
+    return kbUp    if $key == TB_KEY_ARROW_UP;
+    return kbDown  if $key == TB_KEY_ARROW_DOWN;
+    return kbLeft  if $key == TB_KEY_ARROW_LEFT;
+    return kbRight if $key == TB_KEY_ARROW_RIGHT;
+    return kbHome  if $key == TB_KEY_HOME;
+    return kbEnd   if $key == TB_KEY_END;
+    return kbPgUp  if $key == TB_KEY_PGUP;
+    return kbPgDn  if $key == TB_KEY_PGDN;
+  }
+
   return kbNoKey();
 };
 
@@ -1202,14 +1274,14 @@ $convertNoColor = sub {    # $tb_color ($color, $isFg)
     my $bios = $color->asBIOS();
     if ( $isFg ) {
       if ( $bios & 0x8 ) {
-        $c |= TB_BOLD;
+        $c |= $attrBold;
       }
       elsif ( $bios == 0x1 ) {
-        $c |= TB_UNDERLINE;
+        $c |= $attrUnderline;
       }
     }
     elsif ( ( $bios & 0x7 ) == 0x7 ) {
-      $c |= TB_REVERSE;
+      $c |= $attrReverse;
     }
   }
   return $c;
@@ -1223,9 +1295,9 @@ $convertIndexed8 = sub {    # $tb_color ($color, $isFg)
   my $idx = $color->$convertIndexed16( $isFg );
   my $c = ( $idx & 0x7 ) + 1;
   if ( $idx & 0x8 ) {
-    $c |= $isFg ? TB_BOLD : TB_BLINK;
+    $c |= $isFg ? $attrBold : $attrBlink;
   }
-  $c = TB_BLACK   if $idx & TB_HI_BLACK;
+  $c = TB_BLACK   if $idx & $attrBlack;
   $c = TB_DEFAULT if $idx == TB_DEFAULT;
   return $c;
 };
@@ -1237,17 +1309,17 @@ $convertIndexed16 = sub {    # $tb_color ($color, $isFg)
   assert ( !ref $isFg );
   if ( $color->isBIOS() ) {
     my $idx = BIOStoXTerm16( $color->asBIOS() );
-    return $idx == TB_DEFAULT ? TB_HI_BLACK : $idx;
+    return $idx == TB_DEFAULT ? $attrBlack : $idx;
   }
   elsif ( $color->isXTerm() ) {
     my $idx = $color->asXTerm();
     $idx = XTerm256toXTerm16( $idx )
       if $idx >= 16;
-    return $idx == TB_DEFAULT ? TB_HI_BLACK : $idx;
+    return $idx == TB_DEFAULT ? $attrBlack : $idx;
   }
   elsif ( $color->isRGB() ) {
     my $idx = RGBtoXTerm16( $color->asRGB() );
-    return $idx == TB_DEFAULT ? TB_HI_BLACK : $idx;
+    return $idx == TB_DEFAULT ? $attrBlack : $idx;
   }
   return TB_DEFAULT;
 };
@@ -1259,11 +1331,11 @@ $convertIndexed256 = sub {    # $tb_color ($color, $isFg)
   assert ( !ref $isFg );
   if ( $color->isXTerm() ) {
     my $idx = $color->asXTerm();
-    return $idx == TB_DEFAULT ? TB_HI_BLACK : $idx;
+    return $idx == TB_DEFAULT ? $attrBlack : $idx;
   }
   elsif ( $color->isRGB() ) {
     my $idx = RGBtoXTerm256( $color->asRGB() );
-    return $idx == TB_DEFAULT ? TB_HI_BLACK : $idx;
+    return $idx == TB_DEFAULT ? $attrBlack : $idx;
   }
   return $color->$convertIndexed16( $isFg );
 };
@@ -1300,11 +1372,11 @@ $convertDirect = sub {    # $tb_color ($color, $isFg)
   assert ( !ref $isFg );
   if ( $color->isRGB() ) {
     my $idx = $color->asRGB();
-    return $idx == TB_DEFAULT ? TB_HI_BLACK : $idx;
+    return $idx == TB_DEFAULT ? $attrBlack : $idx;
   }
   my $idx = $color->$convertIndexed256( $isFg );
   my $c = $XTERM256[ $idx & 0xff ];
-  $c = TB_HI_BLACK if $idx & TB_HI_BLACK;
+  $c = $attrBlack if $idx & $attrBlack;
   return $c;
 };
 
@@ -1327,8 +1399,12 @@ I<Turbo Vision> driver layer.
 The module maps keyboard, mouse, screen, caret, timer, and terminal services
 to the facilities provided by L<Termbox>.
 
-Depending on availability, either the native L<Termbox> FFI implementation or 
-the pure Perl fallback implementation is used transparently.
+On non-Windows systems, the backend normally uses the optional native 
+L<Termbox> FFI implementation. It falls back to L<Termbox::PP> when the native 
+implementation is unavailable. The pure Perl implementation can also be 
+selected explicitly through the environment, as described in L</ENVIRONMENT>.
+
+On Windows, L<Termbox::PP> is the only supported backend.
 
 This module is not instantiated. All interaction is performed through
 class-level method calls.
@@ -1353,7 +1429,8 @@ initialization.
 
 =head2 $pendingEvent
 
-Indicates whether a Termbox input event has been buffered(I<PositiveOrZeroInt>).
+Indicates whether a Termbox input event has been buffered
+(I<PositiveOrZeroInt>).
 
 =head2 $lastButtons
 
@@ -1368,16 +1445,139 @@ documented in L<THardwareInfo|TUI::Drivers::HardwareInfo>.
 In this backend, those methods are mapped to Termbox facilities for terminal
 input handling, screen output, cursor management, timing, and mouse support.
 
-The implementation provides translation between I<Turbo Vision> key codes,
+The implementation provides translation between L<TUI::Vision> key codes,
 character codes, mouse events, and the corresponding Termbox event model.
 
-When the pure Perl L<Termbox::PP> backend is used, additional compatibility
-handling is available for standalone C<Esc> key detection and WinVT-specific
-input processing. These facilities are currently not available when using the
-native FFI-based L<Termbox> implementation.
+When L<Termbox::PP> is used, an additional input hook distinguishes a
+standalone C<Esc> key press from the beginning of an escape sequence. This hook 
+requires access to the pure Perl implementation's input state and is not
+installed when the native FFI-based L<Termbox> implementation is used.
+
+The native L<Termbox> FFI implementation is available only on non-Windows
+systems.
 
 The exact implementation details here are backend-specific and may differ from
 other platform implementations.
+
+=head1 ENVIRONMENT
+
+The environment variables in this section affect backend selection, input
+handling, terminal capability detection, or the initial screen mode.
+
+Variables that affect backend selection or Termbox library features must be
+set before this module is loaded.
+
+=head2 C<PERL_ONLY>
+
+On non-Windows systems, a true value selects L<Termbox::PP> instead of the 
+native L<Termbox> FFI implementation.
+
+Without this setting, the native implementation is preferred when L<Termbox> 
+version 2 or later can be loaded. L<Termbox::PP> is used as the fallback when 
+the native implementation is unavailable.
+
+On Windows, L<Termbox::PP> is always required because the native L<Termbox>
+FFI implementation does not support Windows. Setting C<PERL_ONLY> explicitly
+is therefore unnecessary on Windows.
+
+The value is interpreted according to normal Perl truth semantics. In
+particular, an empty string and C<0> are false.
+
+=head2 C<ESCDELAY>
+
+Specifies the time, in milliseconds, used by L<Termbox::PP> to distinguish a
+standalone C<Esc> key press from the beginning of an escape sequence.
+
+A true value also selects L<Termbox::PP>, because the additional input hook
+requires access to input state that is not available through the native
+L<Termbox> FFI implementation.
+
+A positive value is used as the delay. If the value is not greater than zero,
+the delay defaults to 100 milliseconds.
+
+Backend selection uses Perl truth semantics independently of the numeric delay
+check. Consequently, a true but non-positive value still selects
+L<Termbox::PP> while the delay falls back to 100 milliseconds.
+
+=head2 C<NO_COLOR>
+
+When this variable exists and has a true Perl value, the initial screen mode
+is C<smMono> instead of C<smCO80>.
+
+This setting controls the initial L<TUI::Vision> screen mode. It does not 
+change the terminal color count reported by C<getColorCount>.
+
+=head2 C<COLORTERM>
+
+On non-Windows systems, a value of C<truecolor> or C<24bit>, matched
+case-insensitively, indicates a TrueColor terminal.
+
+The setting is honored only when the loaded Termbox implementation reports
+TrueColor support. Otherwise, color detection continues with the terminal
+capability database and the C<TERM> fallback rules.
+
+=head2 C<TERM>
+
+On non-Windows systems, the terminal capability database is consulted before
+C<TERM> is used as a fallback for color detection.
+
+A value containing C<256color>, matched case-insensitively, selects at least
+256 colors. A value containing C<xterm> selects at least 16 colors. Other
+values, including an undefined value, fall back to 8 colors.
+
+The exact value C<linux> also selects Linux VGA console cursor control.
+Other non-empty values use DEC cursor-style control sequences.
+
+On Windows, C<TERM> is set to C<xterm-256color> before L<Termbox::PP> is
+initialized when it is not already defined. The native L<Termbox> FFI
+implementation is not used on Windows.
+
+=head2 C<TB_LIB_OPTS>
+
+This variable is interpreted by L<Termbox::PP>, not directly by this module.
+
+When enabled, L<Termbox::PP> automatically enables all compile-time library
+features supported by the current Perl interpreter. In particular,
+C<TB_OPT_ATTR_W> is set to the native integer size of the interpreter.
+
+On typical 64-bit Perl builds this enables TrueColor support together with
+additional style attributes. On 32-bit Perl builds it enables TrueColor
+support.
+
+=head2 C<TB_OPT_ATTR_W>
+
+This variable is interpreted by L<Termbox::PP>, not directly by this module.
+
+It controls the bit width used for color and attribute storage.
+
+=over
+
+=item * C<16>
+
+Indexed color modes only.
+
+=item * C<32>
+
+Enables TrueColor output.
+
+=item * C<64>
+
+Enables TrueColor output together with additional style attributes.
+
+=back
+
+The selected value influences the capabilities reported by
+C<tb_has_truecolor()> and therefore affects the maximum color depth detected by 
+this backend.
+
+=head2 C<TB_OPT_TRUECOLOR>
+
+Deprecated compatibility option interpreted by L<Termbox::PP>.
+
+When enabled, it sets C<TB_OPT_ATTR_W> to C<32> unless that variable has
+already been configured explicitly.
+
+New applications should prefer C<TB_OPT_ATTR_W> or C<TB_LIB_OPTS>.
 
 =head1 SEE ALSO
 

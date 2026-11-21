@@ -8,6 +8,7 @@ build_requires:
   FindBin: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  POSIX: '0'
   Test2::Plugin::NoWarnings: '0'
   Test2::Tools::Explain: '0'
   Test2::Tools::Subtest: '0'
@@ -18,7 +19,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013'
+generated_by: 'Dist::Zilla version 6.040, CPAN::Meta::Converter version 2.150013'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,10 +28,10 @@ name: Net-OpenSSH-More
 provides:
   Net::OpenSSH::More:
     file: lib/Net/OpenSSH/More.pm
-    version: '1.06'
+    version: '1.07'
   Net::OpenSSH::More::Linux:
     file: lib/Net/OpenSSH/More/Linux.pm
-    version: '1.06'
+    version: '1.07'
 requires:
   Data::Dumper: '0'
   Data::UUID: '0'
@@ -59,7 +60,7 @@ resources:
   bugtracker: https://github.com/troglodyne-internet-widgets/perl-Net-Openssh-More/issues
   homepage: https://github.com/troglodyne-internet-widgets/perl-Net-Openssh-More
   repository: https://github.com/troglodyne-internet-widgets/perl-Net-Openssh-More.git
-version: '1.06'
+version: '1.07'
 x_contributors:
   - 'Andy Baugh <andy@troglodyne.net>'
   - 'Troglodyne LLC Crash test Dummy <trogbot@troglodyne.net>'

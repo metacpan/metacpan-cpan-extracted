@@ -1,5 +1,11 @@
 Revision history for MIDI-RtMidi-Util
 
+0.0601 2026-11-20 10:12:42
+    - Whoops. Fix-up the eg/eg/start-stop.pl program.
+
+0.0600 2026-11-20 10:09:18
+    - Remove the `stop_all_notes()` function now that `->panic` is fixed.
+
 0.0504 2026-10-11 12:52:50
     - Add the eg/program_changer.pl program.
 

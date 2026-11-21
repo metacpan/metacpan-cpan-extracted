@@ -1,5 +1,10 @@
 Revision history for the TurboVision Perl extension.
 
+0.30	2026-11-20
+	small changes: updated tvision.git and adapted code for it.
+	TEditor: lost 3 methods - insertMultilineText, insertEOL, detectEol, fortunately temporarily
+	verified on prooted-termux (debuan)
+
 0.29	2025-09-28
         TOutline TOutlineViewer TNode
 

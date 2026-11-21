@@ -65,42 +65,42 @@ BEGIN
 
 use Test::More;
 
-use File::Path  qw( make_path remove_tree   );
-use Symbol      qw( qualify_to_ref          );
+use File::Basename        qw( basename dirname  );
+use File::Path            qw( make_path         );
+use File::Spec::Functions qw( catdir rel2abs    );
+use File::Temp            qw( tempdir           );
+use Symbol                qw( qualify_to_ref    );
 
-my @dirz
-= qw
-(
-    ./foo
-    ./foo/etc
-    ./bar
-    ./bar/etc
-);
+########################################################################
+# fixtures: two directories, each with ./etc, created for this run
+# in the test's own directory (searched first from $Bin).  tempdir
+# gives each a unique name, so leftovers from earlier runs or tests
+# running in parallel cannot collide with them; CLEANUP removes them.
+
+my $test_d  = dirname rel2abs $0;
+
+my ( $foo_d, $bar_d )
+= map
+{
+    tempdir "${_}_XXXXXX", DIR => $test_d, CLEANUP => 1
+}
+qw( foo bar );
+
+my ( $foo, $bar ) = map { basename $_ } $foo_d, $bar_d;
+
+my @dirz    = map { catdir $_, 'etc' } $foo_d, $bar_d;
+
 my $madness = 'FindBin::libs';
 my @pass1
-= qw
-(
-    base=foo
-    subdir=etc
-    subonly
-    export=etc
-    append
+= (
+    "base=$foo"
+  , qw( subdir=etc subonly export=etc append )
 );
 my @pass2
-= qw
-(
-    base=bar
-    subdir=etc
-    subonly
-    export=etc
-    append
+= (
+    "base=$bar"
+  , qw( subdir=etc subonly export=etc append )
 );
-
-END
-{
-    remove_tree $_ or diag "failed remove_tree: $_"
-    for qw( ./foo ./bar );
-}
 
 SKIP:
 {

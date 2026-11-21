@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -15,6 +15,8 @@ our @EXPORT = qw(
   new_TFileWindow
 );
 
+use File::Spec ();
+use Storable;
 use Carp ();
 use TUI::toolkit;
 use TUI::toolkit::Types qw(
@@ -83,6 +85,14 @@ sub from {    # $fileWindow ($fileName)
   );
   my ( $class, $fileName ) = $sig->( @_ );
   return $class->new( fileName => $fileName );
+}
+
+sub build {    # $obj ()
+  my ( $class ) = @_;
+  assert ( @_ == 1 );
+  assert ( is_Str $class );
+  assert ( Storable::is_retrieving );
+  return $class->new( fileName => File::Spec->devnull );
 }
 
 1

@@ -11,6 +11,7 @@ use strict;
 use warnings;
 
 use Test::Most;
+use Test::Needs;
 
 use Cwd qw(abs_path);
 use File::Basename qw(dirname);
@@ -337,10 +338,16 @@ subtest 'the crontab line names a perl that can load XML::PP' => sub {
 
 	# PERL left out of the environment, so the wrapper has to find one itself:
 	# the path it used to assume is somebody else's.
+	# The wrapper looks on PATH, under perlbrew and at three fixed places; the
+	# perl running these tests is not necessarily in any of them (a smoker
+	# starts it by its full path), so its directory is put first on PATH, as
+	# it would be for whoever set up the cron job.
 	my $home = fresh_home('probed-perl');
+	my $found = perl_with_xmlpp();
 	my ($status, $out, $err, $mail) = run_wrapper(['--crontab'],
 		HOME => $home, PERL => undef, DMARC_EXPECTED => '192.0.2.10',
-		MAIL_TO => 'alerts@example.org');
+		MAIL_TO => 'alerts@example.org',
+		PATH => dirname($found) . ":$ENV{'PATH'}");
 
 	is($status, 0, 'it exited 0');
 	is($err, '', 'nothing on stderr');
@@ -356,8 +363,8 @@ subtest 'the crontab line names a perl that can load XML::PP' => sub {
 };
 
 subtest 'the alert is signed by mail-dkim when it is there' => sub {
-	plan skip_all => 'openssl and Mail::DKIM are needed to sign an alert'
-		unless($OPENSSL && eval { require Mail::DKIM::Signer; 1 });
+	plan skip_all => 'openssl is needed to make a key' unless($OPENSSL);
+	test_needs 'Mail::DKIM::Signer';
 
 	my $home = fresh_home('signed-alert');
 	my $dir = reports_dir('signed-alert');
@@ -393,6 +400,45 @@ subtest 'the alert is signed by mail-dkim when it is there' => sub {
 	like($sent, qr/^To: /m, 'to the address the alert goes to');
 	like($sent, qr/^Subject: /m, 'with the subject line');
 	like($sent, qr/203\.0\.113\.7/, 'and it still carries the finding');
+};
+
+subtest 'the shipped signer runs under the perl the wrapper uses, not the first one on PATH' => sub {
+	plan skip_all => 'openssl is needed to make a key' unless($OPENSSL);
+	test_needs 'Mail::DKIM::Signer';
+
+	my $home = fresh_home('signer-perl');
+	my $dir = reports_dir('signer-perl');
+	write_file(File::Spec->catfile($dir, 'bad.xml'),
+		report_xml(name => 'bad.xml', domain => 'example.org', ip => '203.0.113.7', count => 3));
+
+	my $keys = File::Spec->catdir($home, 'keys');
+	mkdir($keys) or die "Cannot mkdir $keys: $!";
+	system(qq{"$OPENSSL" genrsa -out "$keys/selector1.private" 2048 2>} . File::Spec->devnull()) == 0
+		or BAIL_OUT('openssl could not make a key');
+
+	my $capture = File::Spec->catfile($home, 'sent.txt');
+	my $sendmail = File::Spec->catfile($home, 'sendmail');
+	write_file($sendmail, "#!/bin/sh\ncat > \"$capture\"\n");
+	chmod(0755, $sendmail) or die "Cannot make $sendmail executable: $!";
+
+	# A perl first on PATH that has none of the modules, like the system perl
+	# on a machine whose modules are in another perl.  The signer starts with
+	# "#!/usr/bin/env perl", so left to itself it would run under this one.
+	my $decoys = File::Spec->catdir($home, 'decoy-bin');
+	mkdir($decoys) or die "Cannot mkdir $decoys: $!";
+	my $decoy = File::Spec->catfile($decoys, 'perl');
+	write_file($decoy, "#!/bin/sh\necho \"decoy perl was used\" >&2\nexit 127\n");
+	chmod(0755, $decoy) or die "Cannot make $decoy executable: $!";
+
+	my ($status, $out, $err) = run_wrapper(HOME => $home, DMARC_DIR => $dir,
+		MAIL_COMMAND => '', DKIM_DOMAINS => 'example.org', DKIM_KEYDIR => $keys,
+		MAIL_FROM => 'alerts@example.org', SENDMAIL => $sendmail,
+		PATH => "$decoys:$ENV{'PATH'}");
+
+	is($status, 1, 'the finding still sets the exit status');
+	unlike($err, qr/decoy perl/, 'the perl first on PATH was not used for the signer') or diag($err);
+	is($err, '', 'nothing on stderr') or diag($err);
+	like(slurp($capture), qr/\ADKIM-Signature: /, 'the alert was signed by the perl the wrapper was given');
 };
 
 subtest 'without a signer the alert still goes, by the plain route' => sub {
@@ -466,9 +512,9 @@ subtest 'the installed wrapper works from a prefix, with no PERL5LIB' => sub {
 
 	# The alert is the interesting half: the wrapper hands it to the signer
 	# beside itself, which loads the module from PREFIX/lib/perl5 or not at all.
-	SKIP: {
-		skip 'openssl and Mail::DKIM are needed to sign an alert', 3
-			unless($OPENSSL && eval { require Mail::DKIM::Signer; 1 });
+	subtest 'the installed copy signs an alert' => sub {
+		plan skip_all => 'openssl is needed to make a key' unless($OPENSSL);
+		test_needs 'Mail::DKIM::Signer';
 
 		my $keys = File::Spec->catdir($home, 'keys');
 		mkdir($keys) or die "Cannot mkdir $keys: $!";
@@ -492,7 +538,7 @@ subtest 'the installed wrapper works from a prefix, with no PERL5LIB' => sub {
 		is($stderr, '', 'and says nothing on stderr') or diag($stderr);
 		like(slurp($capture), qr/\ADKIM-Signature: /,
 			'the alert was signed, so the signer found the module under lib/perl5');
-	}
+	};
 };
 
 done_testing();

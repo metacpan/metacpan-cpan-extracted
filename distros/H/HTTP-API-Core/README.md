@@ -34,7 +34,7 @@ Use `HTTP::API::Core` when you are building a REST API client, JSON API client, 
 * structured errors
 * safe retries and `Retry-After`
 * rate-limit handling
-* next-URL, page-number, and cursor pagination
+* next-URL, page-number, cursor, and offset pagination
 * authentication hooks
 * request IDs and timing
 * idempotency keys
@@ -127,6 +127,7 @@ Tested examples show how the same core maps onto APIs with different conventions
 * `HTTP::API::Core::Example::GitHub` — page-number pagination over a top-level JSON array, plus GitHub rate-limit metadata
 * `HTTP::API::Core::Example::Slack` — cursor pagination using `response_metadata.next_cursor`
 * `HTTP::API::Core::Example::Cloudflare` — page-number pagination using `result_info.total_pages`
+* `HTTP::API::Core::Example::Jira` — offset pagination and HTTP Basic authentication for Jira Server / Data Center search
 
 See [docs/REAL_API_EXAMPLES.md](docs/REAL_API_EXAMPLES.md).
 
@@ -189,7 +190,7 @@ See [docs/AUTHENTICATION.md](docs/AUTHENTICATION.md).
 
 ### Pagination
 
-Next-URL, page-number, and cursor pagination share one iterator interface:
+Next-URL, page-number, cursor, and offset pagination share one iterator interface:
 
 ```perl
 my $pager = $api->paginate(
@@ -232,7 +233,7 @@ Failures use `HTTP::API::Core::Error` with machine-readable categories:
 * `http`
 * `hook`
 
-Application code can inspect fields such as `category`, `status`, `retryable`, and `request_id` instead of parsing human-readable messages.
+Application code can inspect fields such as `category`, `status`, `retryable`, and `request_id` instead of parsing human-readable messages. For routine logs, `$error->log_summary` avoids emitting raw URLs, diagnostics, headers, or bodies that may contain credentials.
 
 See [docs/ERRORS.md](docs/ERRORS.md).
 

@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -343,7 +343,7 @@ L<TEventViewer|TUI::Gadgets::EventViewer>
 
 =over
 
-=item * Borland International (original Turbo Vision design)
+=item * magiblot <magiblot@hotmail.com> (original color attribute design)
 
 =item * J. Schneider <brickpool@cpan.org> (Perl implementation and maintenance)
 
@@ -351,9 +351,7 @@ L<TEventViewer|TUI::Gadgets::EventViewer>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 1990-1994, 1997 by Borland International
-
-Copyright (c) 2026 the L</AUTHORS> as listed above.
+Copyright (c) 2019-2026 the L</AUTHORS> listed above.
 
 This software is licensed under the MIT license (see the LICENSE file, which is
 part of the distribution).

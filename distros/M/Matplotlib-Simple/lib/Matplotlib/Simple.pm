@@ -11,7 +11,7 @@ package Matplotlib::Simple;
 # alone, so the keywords are matplotlib's names throughout, and an engine that
 # has no counterpart for one refuses it by name rather than leaving it out (check_engine).
 require 5.010;
-our $VERSION = 0.3344;
+our $VERSION = 0.3345;
 use Scalar::Util 'looks_like_number';
 use List::Util qw(max sum min);
 use POSIX ();
@@ -810,6 +810,50 @@ sub check_key_order {
 		die "the above keys are named in \"$args->{option}\" but are not keys of \"data\" in $args->{sub}";
 	}
 	return @{$keys};
+}
+sub bar_series {
+	# The series of a bar or barh whose "data" is a hash of hashes -- its inner
+	# keys -- in the order drawn: from the bottom of a stack up, left to right
+	# side by side, and down the legend.
+	#
+	# "label" names them in that order, and must name each exactly once; with
+	# no "label" they are sorted, ignoring case. Every engine sorted them and
+	# then wrote over "label" with the sorted names, so a "label" given with a
+	# hash of hashes was dropped without a word, and no option could put
+	# "staffed" under "authorized" in a stack.
+	#
+	# args: plot => the plot, whose "data" is a hash of hashes
+	#       sub  => the caller's name, for the messages
+	my ($args) = @_;
+	my ( $plot, $sub ) = @{$args}{ 'plot', 'sub' };
+	my %inner;
+	foreach my $k1 ( keys %{ $plot->{data} } ) {
+		$inner{$_}++ foreach keys %{ $plot->{data}{$k1} };
+	}
+	# "|| $a cmp $b": two inner keys differing only in case ("a", "A") tied,
+	# and hash order then chose which series came first, from run to run.
+	my @sorted = sort { lc $a cmp lc $b || $a cmp $b } keys %inner;
+	my $label  = $plot->{label};
+	return @sorted unless defined $label;
+	if ( ( ref $label ne 'ARRAY' ) || ( grep { ( not defined ) || ( ref ) } @{$label} ) ) {
+		my $got = ( ref $label ne 'ARRAY' ) ? ( ref $label ? ( ref $label ) . ' reference' : "\"$label\"" ) : 'an array holding something other than a name';
+		die "\"label\" of a hash of hashes in $sub is an array of the inner keys of \"data\", in the order to draw the series, not $got";
+	}
+	my %n_named;
+	my @twice = grep { $n_named{$_}++ == 1 } @{$label};
+	die "\"label\" names " . join( ', ', map { "\"$_\"" } @twice ) . " more than once in $sub" if scalar @twice > 0;
+	my @unknown = grep { not exists $inner{$_} } @{$label};
+	if ( scalar @unknown > 0 ) {
+		die "\"label\" names " . join( ', ', map { "\"$_\"" } @unknown ) . " in $sub, but no hash in \"data\" has "
+		 . ( scalar @unknown == 1 ? 'that key' : 'those keys' ) . '; with a hash of hashes, "label" gives the order of its inner keys: '
+		 . join( ', ', map { "\"$_\"" } @sorted );
+	}
+	# Left out of "label", a series would be left out of the figure.
+	my @unnamed = grep { not exists $n_named{$_} } @sorted;
+	if ( scalar @unnamed > 0 ) {
+		die "\"label\" leaves out the series " . join( ', ', map { "\"$_\"" } @unnamed ) . " in $sub; with a hash of hashes it gives the order of every inner key of \"data\"";
+	}
+	return @{$label};
 }
 sub logscale_axes {
 	# The axes a "logscale" option asks for, refusing anything that is not an
@@ -3562,7 +3606,20 @@ are named by the inner keys rather than by position, so no C<label> is needed:
  );
 
 Both grouped forms accept C<< stacked =E<gt> 1 >> to pile the series on top of one
-another instead of placing them side by side.
+another instead of placing them side by side.  The first series is drawn at
+the bottom of each stack (at the left, for C<barh>), and the rest go on top of
+it in order; side by side, the first is at the left.
+
+A hash of hashes takes its series in sorted order, and C<label> puts them in
+another: it names every inner key once, in the order to draw them, and that is
+also their order in the legend.
+
+ bar(
+     output_file => '/tmp/staffing.svg',
+     data        => { KDC => { authorized => 56, staffed => 12 } },
+     label       => [ 'staffed', 'authorized' ],    # staffed at the bottom
+     stacked     => 1,
+ );
 
 =head3 Error bars
 
@@ -3593,7 +3650,7 @@ two-element array giving asymmetric C<[ lower, upper ]> errors:
 <tr><td>color</td><td>:mpltype:<code>color</code> or list of :mpltype:<code>color</code>, optional; The colors of the bar faces. This is an alias for *facecolor*. If both are given, *facecolor* takes precedence # if entering multiple colors, quoting isn't needed; as of version 0.23, colors can be given as a hash, whose keys are the bars of a simple hash or the *inner* keys (the series) of a hash of hashes.  A hash of arrays has no series names to key a color hash by, and says so rather than ignoring it</td><td><code>color => ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'fuchsia'],</code> or a single color for all bars <code>color => 'red'</code>, or as of version 0.23 <code>color => {A => 'red', B => 'green'}</code></td></tr>
 <tr><td>edgecolor</td><td>:mpltype:<code>color</code> or list of :mpltype:<code>color</code>, optional; The colors of the bar edges.  For a simple hash, may also be a hash of one color per key, as <code>color</code> may; a grouped plot refuses a hash, since each of its bars is one key of one series</td><td><code>edgecolor     => 'black'</code></td></tr>
 <tr><td>key_order</td><td>define the keys in an order (an array reference)</td><td><code>key_order          => ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],</code></td></tr>
-<tr><td>label</td><td>an array of legend labels for grouped bar plots, indexed like the data arrays; only meaningful for the hash-of-arrays form, since the hash-of-hashes form takes its labels from the inner keys</td><td><code>label => ['North', 'South'],</code></td></tr>
+<tr><td>label</td><td>for a hash of arrays, an array of legend labels, indexed like the data arrays.  For a hash of hashes, an array of its inner keys, every one exactly once, in the order to draw the series: from the bottom of a stack up, left to right, and down the legend; a name that is not an inner key, or an inner key left out, is refused</td><td><code>label => ['North', 'South'],</code></td></tr>
 <tr><td>linewidth</td><td>float or array of one per bar, optional; Width of the bar edge(s). If 0, don't draw edges. Only does anything with defined <code>edgecolor</code></td><td><code>linewidth => 2,</code></td></tr>
 <tr><td>log</td><td>bool, default: False; If *True*, set the y-axis to be log scale.  Give <code>'True'</code> or <code>'False'</code> (or 1 or 0); anything else is refused, and <code>'False'</code> turns the log scale off</td><td><code>log = 'True',</code></td></tr>
 <tr><td>logscale</td><td>a synonym for <code>log</code> taking a Perl true/false value rather than Python's <code>'True'</code>/<code>'False'</code>.  Unlike the <code>logscale</code> of <code>boxplot</code>, <code>hist</code>, <code>hist2d</code>, <code>plot</code>, <code>scatter</code> and <code>violin</code>, this one is a scalar and not an array of axis names</td><td><code>logscale => 1,</code></td></tr>

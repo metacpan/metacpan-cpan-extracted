@@ -1498,6 +1498,8 @@ C<Termbox::tb_debug_handler()> callback.
 B<Note:> If C<PERL_NDEBUG> or C<NDEBUG> is set, debugging support is disabled
 regardless of the value of C<TB_DEBUG_LEVEL>.
 
+Default: 0 (disabled).
+
 =head2 TB_OPT_TRUECOLOR
 
 B<DEPRECATED>
@@ -2011,17 +2013,29 @@ Italic text.
 
 Blinking text.
 
+=item C<TB_BRIGHT>
+
+High-intensity color modifier.
+
+=item C<TB_DIM>
+
+Dim color modifier.
+
 =back
 
 =head3 Extended color support
 
 =over 4
 
+=item C<TB_HI_BLACK>
+
+Black value for 256-color and truecolor mode.
+
 =item C<TB_256_BLACK>
 
-Base value for 256-color mode.
+B<DEPRECATED>: Please use C<TB_HI_BLACK> instead.
 
-=back
+Black constant for 256-color mode. 
 
 =head3 Truecolor attributes
 
@@ -2029,29 +2043,68 @@ These constants are only available when truecolor support is enabled.
 
 =over 4
 
+B<DEPRECATED>
+
 =item C<TB_TRUECOLOR_BOLD>
 
 Bold text in truecolor mode.
 
+B<DEPRECATED>: Please use C<TB_BOLD> instead.
+
 =item C<TB_TRUECOLOR_UNDERLINE>
+
+B<DEPRECATED>: Please use C<TB_UNDERLINE> instead.
 
 Underlined text in truecolor mode.
 
 =item C<TB_TRUECOLOR_REVERSE>
 
+B<DEPRECATED>: Please use C<TB_REVERSE> instead.
+
 Reverse-video text in truecolor mode.
 
 =item C<TB_TRUECOLOR_ITALIC>
+
+B<DEPRECATED>: Please use C<TB_ITALIC> instead.
 
 Italic text in truecolor mode.
 
 =item C<TB_TRUECOLOR_BLINK>
 
-Blinking text in truecolor mode.
+B<DEPRECATED>: Please use C<TB_BLINK> instead.
+
+Blinking text in truecolor mode. 
 
 =item C<TB_TRUECOLOR_BLACK>
 
-Base value for truecolor black.
+B<DEPRECATED>: Please use C<TB_HI_BLACK> instead.
+
+Black value for truecolor mode.
+
+=back
+
+=head3 Extended attributes
+
+These constants are only available on 64bit envorments (Perl compiled in 64bit 
+and C<TB_OPT_ATTR_W == 64>).
+
+=over 4
+
+=item C<TB_STRIKEOUT>
+
+Strikeout text.
+
+=item C<TB_UNDERLINE_2>
+
+Double-underlined text.
+
+=item C<TB_OVERLINE>
+
+Overlined text.
+
+=item C<TB_INVISIBLE>
+
+Invisible text.
 
 =back
 
@@ -2161,7 +2214,8 @@ Grayscale output mode.
 
 Truecolor output mode.
 
-This constant is only available when truecolor support is enabled.
+This constant is only available when truecolor support is enabled (when 
+C<<TB_OPT_ATTR_W >= 32>>).
 
 =back
 

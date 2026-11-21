@@ -3,13 +3,13 @@ package Net::DNS::Parameters;
 ################################################
 ##
 ##	Domain Name System (DNS) Parameters
-##	(last updated 2026-08-24)
+##	(last updated 2026-11-09)
 ##
 ################################################
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: Parameters.pm 2059 2026-08-28 10:04:18Z willem $)[2];
+our $VERSION = (qw$Id: Parameters.pm 2066 2026-11-17 11:13:39Z willem $)[2];
 
 use integer;
 use Carp;
@@ -50,10 +50,6 @@ our %classbyname = ( '*' => 255, @classbyname );
 
 # Registry: Resource Record (RR) TYPEs
 my @typebyname = (
-	DELEG	   => 65432,					# draft-ietf-deleg-02
-	DELEG	   => 61440,					# draft-ietf-deleg-03
-	DELEGPARAM => 65433,					# draft-ietf-deleg-07
-	DELEGI	   => 65433,					# draft-ietf-deleg-03
 	A	   => 1,					# RFC1035
 	NS	   => 2,					# RFC1035
 	MD	   => 3,					# RFC1035
@@ -107,6 +103,7 @@ my @typebyname = (
 	NSEC3PARAM => 51,					# RFC5155
 	TLSA	   => 52,					# RFC6698
 	SMIMEA	   => 53,					# RFC8162
+	DELEGPARAM => 54,					# draft-ietf-deleg-12
 	HIP	   => 55,					# RFC8005
 	NINFO	   => 56,					#
 	RKEY	   => 57,					#
@@ -153,6 +150,7 @@ my @typebyname = (
 	IPN	   => 264,					# draft-johnson-dns-ipn-cla-07
 	TA	   => 32768,					# http://www.watson.org/~weiler/INI1999-19.pdf
 	DLV	   => 32769,					# RFC8749 RFC4431
+	DELEG	   => 61440,					# draft-ietf-deleg-12
 	);
 our %typebyval = reverse( TYPE0 => 0, @typebyname );
 push @typebyname, map { /^\d/ ? $_ : lc($_) } @typebyname;

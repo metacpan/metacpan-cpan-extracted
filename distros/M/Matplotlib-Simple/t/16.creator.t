@@ -168,11 +168,16 @@ SKIP: {
 	# The head of an SVG from gnuplot 6.0's svg terminal.
 	print {$o} qq{<?xml version="1.0" encoding="utf-8"  standalone="no"?>\n<svg \n viewBox="0 0 640 480"\n xmlns="http://www.w3.org/2000/svg"\n>\n\n<title>Gnuplot</title>\n<desc>Produced by GNUPLOT 6.0 patchlevel 0 </desc>\n\n<g id="gnuplot_canvas">\n\t<title>gnuplot_plot_1</title>\n</g>\n</svg>\n};
 	close $o or die "can't close $file: $!";
+	# Read from what gnuplot drew and written once to the output file (0.3345),
+	# which is a file of its own here, so that the drawing is seen to be left as it was.
+	my $drawn = slurp($file);
+	my $written = out_file();
 	{
 		local $ENV{LOGNAME} = "r\xcf\x81&<o>";    # an environment holds bytes: this is UTF-8 for "r\x{3c1}&<o>"
-		Matplotlib::Simple::Gnuplot::creator_svg( $file, "/R&D/\x{3c1}.pl called using \"plt\"", '6.0.0' );
+		Matplotlib::Simple::Gnuplot::creator_svg( $file, $written, "/R&D/\x{3c1}.pl called using \"plt\"", '6.0.0' );
 	}
-	my $svg = slurp($file);
+	is( slurp($file), $drawn, 'what gnuplot drew is read and not written' );
+	my $svg = slurp($written);
 	my $host = eval { Sys::Hostname::hostname() } // 'unknown host';
 	is( creator($svg), "/R&amp;D/\x{3c1}.pl called using \"plt\", gnuplot 6.0.0, by r\x{3c1}&amp;&lt;o&gt; on $host", 'the note, as UTF-8 and escaped for XML, ends with the gnuplot version, the user and the host' );
 	like( $svg, qr{<svg [^>]*>\n <metadata>\n  <rdf:RDF }, 'in <metadata>, right after the <svg> tag, as matplotlib puts it' );

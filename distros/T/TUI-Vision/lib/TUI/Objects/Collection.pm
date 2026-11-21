@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -15,14 +15,107 @@ our @EXPORT = qw(
   new_TCollection
 );
 
-use TUI::Objects::NSCollection;
+use Devel::StrictMode;
+use if STRICT => 'Hash::Util';
+use Scalar::Util qw( reftype );
+use Storable qw( freeze thaw );
 use TUI::toolkit;
+use TUI::toolkit::Types qw(
+  :is
+  :types
+);
+
+use TUI::Objects::NSCollection;
+use TUI::Objects::Stream;
+use TUI::Objects::Streamable;
 
 sub TCollection() { __PACKAGE__ }
 sub name() { 'TCollection' };
 sub new_TCollection { __PACKAGE__->from(@_) }
 
 extends TNSCollection;
+with: *DOES = TStreamable->can('DOES');
+
+sub STORABLE_freeze {    # @list ($cloning)
+  my ( $self, $cloning ) = @_;
+  assert ( is_Object $self );
+  assert ( is_Bool $cloning );
+  assert ( not $cloning );
+
+  my $stream = TStream->new();
+  $self->write( $stream );
+  return freeze $stream;
+} 
+
+sub STORABLE_attach {   # $obj ($cloning, $serialized)
+  my ( $class, $cloning, $serialized ) = @_;
+  assert ( is_Str $class );
+  assert ( is_Bool $cloning );
+  assert ( is_Str $serialized );
+  assert ( not $cloning );
+
+  my $self = $class->build();
+  my $stream = thaw $serialized;
+  return $self->read( $stream );
+}
+
+sub writeItem {    # void ($item, $os)
+  ...
+}
+
+sub readItem {    # $item|undef ($is)
+  ...
+}
+
+sub write :method {    # void ($os)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $os ) = $sig->( @_ );
+  assert ( Storable::is_storing );
+
+  $os->put(
+    $self->{count},
+    $self->{limit},
+    $self->{delta},
+  );
+  for ( my $idx = 0 ; $idx < $self->{count} ; $idx++ ) {
+    $self->writeItem( $self->SUPER::at( $idx ), $os );
+  }
+
+  return;
+}
+
+sub read :method {    # $self ($is)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $is ) = $sig->( @_ );
+  assert ( Storable::is_retrieving );
+
+  $self->{count} = $is->get();
+  my $savedLimit = $is->get();
+  $self->{delta} = $is->get();
+  $self->setLimit( $savedLimit );
+  for ( my $idx = 0 ; $idx < $self->{count} ; $idx++ ) {
+    $self->SUPER::atPut( $idx, $self->readItem( $is ) );
+  }
+
+  return $self;
+}
+
+sub build {    # $obj ()
+  my ( $class ) = @_;
+  assert ( @_ == 1 );
+  assert ( is_Str $class );
+  assert ( Storable::is_retrieving );
+  return $class->new(
+    limit => 0,
+    delta => 0,
+  );
+}
 
 1
 

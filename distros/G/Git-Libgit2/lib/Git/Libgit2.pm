@@ -1,7 +1,7 @@
 # ABSTRACT: Low-level FFI bindings to libgit2
 
 package Git::Libgit2;
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 use strict;
 use warnings;
 use Carp ();
@@ -364,7 +364,7 @@ Git::Libgit2 - Low-level FFI bindings to libgit2
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -491,7 +491,7 @@ L<Alien::Libgit2>, L<Git::Native>, L<FFI::Platypus>, L<libgit2|https://libgit2.o
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-git-libgit2/issues>.
 
 =head1 CONTRIBUTING

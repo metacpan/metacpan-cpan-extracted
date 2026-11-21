@@ -81,47 +81,47 @@
    "provides" : {
       "Dist::Zilla::Plugin::Author::GETTY::Binary" : {
          "file" : "lib/Dist/Zilla/Plugin/Author/GETTY/Binary.pm",
-         "version" : "0.328"
+         "version" : "0.329"
       },
       "Dist::Zilla::Plugin::Author::GETTY::GitHubRelease" : {
          "file" : "lib/Dist/Zilla/Plugin/Author/GETTY/GitHubRelease.pm",
-         "version" : "0.328"
+         "version" : "0.329"
       },
       "Dist::Zilla::Plugin::Author::GETTY::GiteaMeta" : {
          "file" : "lib/Dist/Zilla/Plugin/Author/GETTY/GiteaMeta.pm",
-         "version" : "0.328"
+         "version" : "0.329"
       },
       "Dist::Zilla::Plugin::Author::GETTY::InstallCheck" : {
          "file" : "lib/Dist/Zilla/Plugin/Author/GETTY/InstallCheck.pm",
-         "version" : "0.328"
+         "version" : "0.329"
       },
       "Dist::Zilla::PluginBundle::Author::GETTY" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/GETTY.pm",
-         "version" : "0.328"
+         "version" : "0.329"
       },
       "Dist::Zilla::PluginBundle::Author::GETTY::Binary" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/GETTY/Binary.pm",
-         "version" : "0.328"
+         "version" : "0.329"
       },
       "Dist::Zilla::PluginBundle::Author::GETTY::Docker" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/GETTY/Docker.pm",
-         "version" : "0.328"
+         "version" : "0.329"
       },
       "Pod::Elemental::Transformer::Author::GETTY" : {
          "file" : "lib/Pod/Elemental/Transformer/Author/GETTY.pm",
-         "version" : "0.328"
+         "version" : "0.329"
       },
       "Pod::Weaver::PluginBundle::Author::GETTY" : {
          "file" : "lib/Pod/Weaver/PluginBundle/Author/GETTY.pm",
-         "version" : "0.328"
+         "version" : "0.329"
       },
       "Pod::Weaver::Section::Author::GETTY::Legal" : {
          "file" : "lib/Pod/Weaver/Section/Author/GETTY/Legal.pm",
-         "version" : "0.328"
+         "version" : "0.329"
       },
       "Pod::Weaver::Section::Author::GETTY::Support" : {
          "file" : "lib/Pod/Weaver/Section/Author/GETTY/Support.pm",
-         "version" : "0.328"
+         "version" : "0.329"
       }
    },
    "release_status" : "stable",
@@ -136,7 +136,7 @@
          "web" : "https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty"
       }
    },
-   "version" : "0.328",
+   "version" : "0.329",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040001"
@@ -240,7 +240,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Author::GETTY::InstallCheck",
             "name" : "@Author::GETTY/Author::GETTY::InstallCheck",
-            "version" : "0.328"
+            "version" : "0.329"
          },
          {
             "class" : "Dist::Zilla::Plugin::ConfirmRelease",
@@ -517,7 +517,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.328",
+                  "tag" : "0.329",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },
@@ -569,7 +569,8 @@
                   ],
                   "allow_dirty_match" : [
                      "(?^:^bin/)",
-                     "(?^:^lib/.*\\.pm$)"
+                     "(?^:^lib/.*\\.pm$)",
+                     "(?^:^script/)"
                   ],
                   "changelog" : "Changes"
                },
@@ -604,7 +605,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Author::GETTY::GitHubRelease",
             "name" : "@Author::GETTY/Author::GETTY::GitHubRelease",
-            "version" : "0.328"
+            "version" : "0.329"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",

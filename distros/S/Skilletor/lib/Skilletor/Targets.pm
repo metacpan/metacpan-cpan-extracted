@@ -7,14 +7,16 @@ use warnings;
 use Exporter qw( import );
 use Skilletor::Entry qw( HARNESSES );
 use Skilletor::Error::Target;
-use Skilletor::FSUtil qw( path_join );
+use Skilletor::FSUtil qw( decode_utf8_lossy encode_text path_join read_text );
+use Skilletor::Gitignore qw( SKILL_GITIGNORE );
+use Skilletor::JSON qw( js_parse js_type );
 use Skilletor::JSString qw( js_trim );
 use Skilletor::Lock qw( parse_lock_key );
 
-our $VERSION = '0.001';
+our $VERSION = '0.008000';
 
 our @EXPORT_OK = qw(
-  DETECTED default_markers detect_harnesses select_targets default_hermes_home
+  DETECTED default_markers detect_harnesses detect_project_harnesses select_targets default_hermes_home
   lock_key supports root_of root_of_key served_via receivers is_block_type is_local_type all_roots target_gaps
   place_output lacks_local_prefix
 );
@@ -39,6 +41,179 @@ sub detect_harnesses {
   return [ grep { my $h = $_; grep { -e $_ } @{ $markers->{$h} // [] } } DETECTED ];
 }
 
+sub _path_is_evidence {
+  my ( $path ) = @_;
+  return lstat( encode_text($path) ) ? 1 : 0;
+}
+
+sub _path_is_link {
+  my ( $path ) = @_;
+  return lstat( encode_text($path) ) && -l _ ? 1 : 0;
+}
+
+# Does a root contain a user-owned entry? A symlink is evidence but is never traversed.
+sub _root_has_evidence {
+  my ( $root, $classify ) = @_;
+  return 0 unless lstat( encode_text($root) );
+  return 1 if -l _ || !-d _;
+  my $visit;
+  $visit = sub {
+    my ( $dir, $prefix ) = @_;
+    opendir( my $dh, encode_text($dir) ) or return 0;
+    my @names = map { decode_utf8_lossy($_) } grep { $_ ne '.' && $_ ne '..' } readdir $dh;
+    closedir $dh;
+    for my $name (@names) {
+      my $rel = length $prefix ? $prefix.'/'.$name : $name;
+      my $abs = path_join( $dir, $name );
+      next unless lstat( encode_text($abs) );
+      my $link = -l _ ? 1 : 0;
+      my $directory = -d _ ? 1 : 0;
+      my $verdict = $classify->( $rel, $abs, $directory );
+      next if $verdict eq 'skip';
+      return 1 if $verdict eq 'evidence' || $link || !$directory;
+      return 1 if $visit->( $abs, $rel );
+    }
+    return 0;
+  };
+  return $visit->( $root, '' );
+}
+
+sub _owned_skills {
+  my ( $lock, $harness ) = @_;
+  my %owned;
+  for my $key ( keys %$lock ) {
+    my $parsed = parse_lock_key($key);
+    $owned{ $parsed->{target} } = 1
+      if defined $parsed->{harness} && $parsed->{harness} eq $harness && $parsed->{type} eq 'skill';
+  }
+  return \%owned;
+}
+
+sub _owned_files {
+  my ( $lock, $harness, @types ) = @_;
+  my %type = map { $_ => 1 } @types;
+  my %owned;
+  for my $key ( keys %$lock ) {
+    my $parsed = parse_lock_key($key);
+    next unless defined $parsed->{harness} && $parsed->{harness} eq $harness && $type{ $parsed->{type} };
+    my $entry = $lock->{$key};
+    next unless js_type($entry) eq 'object' && js_type( $entry->{files} ) eq 'object';
+    $owned{$_} = 1 for keys %{ $entry->{files} };
+  }
+  return \%owned;
+}
+
+sub _in_owned_skill {
+  my ( $rel, $owned ) = @_;
+  for my $target ( keys %$owned ) { return 1 if $rel eq $target || index( $rel, $target.'/' ) == 0 }
+  return 0;
+}
+
+sub _generated_skill_dir {
+  my ( $rel, $abs, $directory ) = @_;
+  return 0 unless $directory && $rel =~ m{\Askills/[^/]+\z};
+  my $text = eval { read_text( path_join( $abs, '.gitignore' ) ) };
+  return defined $text && $text eq SKILL_GITIGNORE ? 1 : 0;
+}
+
+# Empty settings and settings containing only skilletor-generated plugin/marketplace declarations
+# are not evidence. Malformed settings or any other key is Claude evidence.
+sub _claude_settings_are_evidence {
+  my ( $path, $text ) = @_;
+  my $settings = eval { js_parse( $text // read_text($path) ) };
+  return 1 unless $settings && js_type($settings) eq 'object';
+  return 1 if grep { $_ ne 'enabledPlugins' && $_ ne 'extraKnownMarketplaces' } keys %$settings;
+  my $enabled = $settings->{enabledPlugins};
+  my $markets = $settings->{extraKnownMarketplaces};
+  return 1 if exists $settings->{enabledPlugins} && js_type($enabled) ne 'object';
+  return 1 if exists $settings->{extraKnownMarketplaces} && js_type($markets) ne 'object';
+  my @enabled = keys %{ $enabled // {} };
+  my @markets = keys %{ $markets // {} };
+  return @markets ? 1 : 0 unless @enabled;
+  return 1 unless @enabled == 1;
+  my $key = $enabled[0];
+  my $at = rindex( $key, '@' );
+  return 1 if $at <= 0 || $at == length($key) - 1 || substr( $key, 0, $at ) ne 'skilletor';
+  return 1 unless js_type( $enabled->{$key} ) eq 'boolean' && $enabled->{$key};
+  my $market = substr( $key, $at + 1 );
+  return ( grep { $_ ne $market } @markets ) ? 1 : 0;
+}
+
+# A direct skill entry is evidence only when linked or when it contains SKILL.md. A leftover
+# directory containing unrelated foreign files must not re-enable its harness.
+sub _skill_evidence_verdict {
+  my ( $rel, $abs, $directory ) = @_;
+  return undef unless $rel =~ m{\Askills/[^/]+\z};
+  return _path_is_link($abs) ? 'evidence' : 'skip' unless $directory;
+  return _path_is_evidence( path_join( $abs, 'SKILL.md' ) ) ? 'evidence' : 'skip';
+}
+
+# Project-local harness evidence (k229), excluding current lock ownership and fixed generated
+# artifacts so a sync cannot opt another harness in on its next run.
+# $settings_text substitutes a proposed .claude/settings.json in memory, even if absent on disk.
+sub detect_project_harnesses {
+  my ( $project_dir, $lock, $settings_text ) = @_;
+  my %evidence;
+  my $claude_owned = _owned_skills( $lock, 'claude' );
+  my $claude_files = _owned_files( $lock, 'claude', qw( skill agent rule ) );
+  my $projected_settings = defined $settings_text
+    ? !$claude_files->{'settings.json'} && _claude_settings_are_evidence( path_join( $project_dir, '.claude', 'settings.json' ), $settings_text )
+    : undef;
+  my $claude = _path_is_evidence( path_join( $project_dir, 'CLAUDE.md' ) ) || $projected_settings || _root_has_evidence(
+    path_join( $project_dir, '.claude' ),
+    sub {
+      my ( $rel, $abs, $directory ) = @_;
+      return 'skip' if grep { $rel eq $_ } qw( skilletor.json skilletor.local.json skilletor.lock.json .gitignore skilletor );
+      return 'skip' if $claude_files->{$rel};
+      return ( $projected_settings // _claude_settings_are_evidence($abs) ) ? 'evidence' : 'skip' if $rel eq 'settings.json';
+      return 'skip' if _in_owned_skill( $rel, $claude_owned ) || _generated_skill_dir( $rel, $abs, $directory );
+      my $skill = _skill_evidence_verdict( $rel, $abs, $directory );
+      return $skill if defined $skill;
+      my @parts = split m{/}, $rel;
+      return 'skip' if ( $parts[0] eq 'agents' || $parts[0] eq 'rules' ) && $parts[-1] =~ /\A\.local\./;
+      return 'inspect';
+    },
+  );
+  $evidence{claude} = 1 if $claude;
+
+  my $codex_owned = _owned_skills( $lock, 'codex' );
+  my $codex_files = _owned_files( $lock, 'codex', qw( agent rule ) );
+  my $agents = _root_has_evidence(
+    path_join( $project_dir, '.agents' ),
+    sub {
+      my ( $rel, $abs, $directory ) = @_;
+      my ($top) = split m{/}, $rel;
+      return 'skip' if $rel eq '.gitignore' || $top ne 'skills';
+      return 'skip' if _in_owned_skill( $rel, $codex_owned ) || _generated_skill_dir( $rel, $abs, $directory );
+      return _skill_evidence_verdict( $rel, $abs, $directory ) // 'inspect';
+    },
+  );
+  my $codex = _root_has_evidence(
+    path_join( $project_dir, '.codex' ),
+    sub {
+      my ( $rel ) = @_;
+      return 'skip' if $rel eq '.gitignore' || $rel eq 'skilletor-rules.md' || $codex_files->{$rel};
+      my @parts = split m{/}, $rel;
+      return 'skip' if $parts[0] eq 'agents' && $parts[-1] =~ /\A\.local\./;
+      return 'inspect';
+    },
+  );
+  $evidence{codex} = 1 if $agents || $codex || _path_is_evidence( path_join( $project_dir, 'AGENTS.override.md' ) );
+
+  my $hermes_owned = _owned_skills( $lock, 'hermes' );
+  my $hermes = _root_has_evidence(
+    path_join( $project_dir, '.hermes' ),
+    sub {
+      my ( $rel, $abs, $directory ) = @_;
+      return 'skip' if $rel eq '.gitignore';
+      return 'skip' if _in_owned_skill( $rel, $hermes_owned ) || _generated_skill_dir( $rel, $abs, $directory );
+      return _skill_evidence_verdict( $rel, $abs, $directory ) // 'inspect';
+    },
+  );
+  $evidence{hermes} = 1 if $hermes;
+  return [ grep { $evidence{$_} } HARNESSES ];
+}
+
 # Hermes' default home: ~/.hermes; on native Windows %LOCALAPPDATA%\hermes.
 sub default_hermes_home {
   my ( $home, $platform, $env ) = @_;
@@ -51,8 +226,9 @@ sub default_hermes_home {
   return $joined;
 }
 
-# The merge rule (spec §14.1): machine = user targets // detected (empty is an error); the user
-# scope gets the machine set; the project scope the machine set narrowed to the project's.
+# Machine = user targets // detected (empty is an error); user scope gets that set. Explicit
+# project targets win; otherwise evidence decides, with one-target bootstrap and an explicit
+# unresolved signal for an ambiguous multi-target project.
 sub select_targets {
   my ( $configured, $detected, $markers ) = @_;
   my $machine = $configured->{user} // $detected;
@@ -65,6 +241,7 @@ sub select_targets {
   }
   my @warnings;
   my $project = [@$machine];
+  my $unresolved;
   if ( my $want = $configured->{project} ) {
     my %in = map { $_ => 1 } @$want;
     $project = [ grep { $in{$_} } @$machine ];
@@ -73,12 +250,33 @@ sub select_targets {
         .'('.join( ', ', @$machine ).'); nothing is installed for the project';
     }
   }
-  return { user => [@$machine], project => $project, warnings => \@warnings };
+  elsif ( exists $configured->{project_evidence} ) {
+    my $evidence = $configured->{project_evidence};
+    if (@$evidence) {
+      my %in = map { $_ => 1 } @$evidence;
+      $project = [ grep { $in{$_} } @$machine ];
+      unless (@$project) {
+        push @warnings, 'project harness evidence ('.join( ', ', @$evidence ).') is not in use on this machine '
+          .'('.join( ', ', @$machine ).'); nothing is installed for the project';
+      }
+    }
+    elsif ( @$machine == 1 ) {
+      $project = [@$machine];
+    }
+    else {
+      $project = [@$machine];
+      $unresolved = 1;
+      push @warnings, 'project targets are ambiguous: no project-local harness evidence for machine targets ('
+        .join( ', ', @$machine ).'); set "targets" in the project\'s .claude/skilletor.json or '
+        .'.claude/skilletor.local.json; project scope is left unchanged';
+    }
+  }
+  return { user => [@$machine], project => $project, warnings => \@warnings, ( $unresolved ? ( project_unresolved => 1 ) : () ) };
 }
 
 #### The layout table (spec §14.2, §16.2) ##############################
 #
-# Where each harness reads each item type. The Perl port writes for Claude Code alone, but the
+# Where each harness reads each item type. The Perl port writes for Claude Code and Codex, but the
 # table is whole: the managed blocks list every harness's roots (spec §6.4), and lock keys of
 # every harness are parsed, kept or reported as the reference does.
 
@@ -253,7 +451,7 @@ Skilletor::Targets - Which agent harnesses a sync installs for (detection and th
 
 =head1 VERSION
 
-version 0.001
+version 0.008000
 
 =head1 SYNOPSIS
 
@@ -261,7 +459,11 @@ version 0.001
 
   my $markers = default_markers( $home, $ENV{CODEX_HOME} );
   my $sel = select_targets(
-    { user => $config->user->{targets}, project => $config->project && $config->project->{targets} },
+    {
+      user => $config->user->{targets},
+      project => $config->project && $config->project->{targets},
+      project_evidence => detect_project_harnesses( $project_dir, $lock ),
+    },
     detect_harnesses($markers),
     $markers,
   );
@@ -276,13 +478,16 @@ C<~/.claude> alone.
 It also holds the reference's layout table (C<LAYOUTS>, spec §14.2, §16.2):
 where each harness reads each item type in each scope, how a lock key names its
 harness, which types install as C<.local.> files. The Perl port writes for
-Claude Code alone; the table is whole because the managed blocks list every
-harness's roots and lock keys of every harness are parsed, kept and reported as
-the reference does.
+all three harnesses, Claude Code, Codex and Hermes. The project's
+C<.worktreeinclude> block lists every harness's roots; the C<.gitignore>
+blocks never go into a Hermes root (C<all_roots> skips it: an installed
+skill carries its own C<.gitignore>). Lock keys of every harness are parsed,
+kept and reported as the reference does.
 
-A root context (C<$rc>) is C<< { base, scope, codex_home?, hermes_home? } >>:
-the scope's base (the home or the project root), C<$CODEX_HOME> and the Hermes
-home, either empty for its default.
+A root context (C<$rc>) is C<< { base, scope, claude_dir?, codex_home?,
+hermes_home? } >>: the scope's base (the home or the project root), Claude
+Code's config dir (user scope), C<$CODEX_HOME> and the Hermes home, each empty
+for its default.
 
 =head2 default_markers
 
@@ -295,11 +500,21 @@ harness is in use.
 
 The detected harnesses, in the order C<claude>, C<codex>.
 
+=head2 detect_project_harnesses
+
+  detect_project_harnesses( $project_dir, $lock );
+
+The harness evidence owned by the project, excluding paths the current lock or
+skilletor's generated naming and marker conventions identify as its own output.
+Symlink roots count but are not traversed.
+
 =head2 select_targets
 
-  select_targets( { user => $u, project => $p }, $detected, $markers );
+  select_targets( { user => $u, project => $p, project_evidence => $e }, $detected, $markers );
 
-C<< { user => [...], project => [...], warnings => [...] } >>; throws
+C<< { user => [...], project => [...], warnings => [...], project_unresolved? => 1 } >>;
+explicit project targets win over evidence, one machine target bootstraps without
+evidence, and an ambiguous multi-target project is marked unresolved. Throws
 L<Skilletor::Error::Target> when no harness applies.
 
 =head2 default_hermes_home
@@ -363,19 +578,25 @@ The harnesses detection looks for: C<claude>, C<codex>.
 
 =head1 SUPPORT
 
+=head2 Issues
+
+Please report bugs and feature requests at
+L<https://github.com/Getty/skilletor/issues>.
+
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <getty@cpan.org>
+Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
+This software is Copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

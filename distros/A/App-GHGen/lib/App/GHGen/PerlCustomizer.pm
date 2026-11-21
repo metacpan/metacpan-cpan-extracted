@@ -3,6 +3,7 @@ package App::GHGen::PerlCustomizer;
 use v5.36;
 use strict;
 use warnings;
+use autodie;
 
 use Path::Tiny;
 use Readonly;
@@ -13,7 +14,7 @@ our @EXPORT_OK = qw(
 	generate_custom_perl_workflow
 );
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 Readonly my $DEFAULT_TIMEOUT_MINUTES => 60;
 
@@ -182,6 +183,18 @@ Default: C<['ubuntu-latest', 'macos-latest', 'windows-latest']>.
 
 Value written to C<timeout-minutes> on every matrix job.
 
+=item C<install_db_file> (boolean, default C<1>)
+
+When true, Linux jobs run C<apt install libdb-dev libperl-dev> before the
+CPAN install, because many CPAN modules need C<DB_File>.  Set it to C<0> for
+projects that do not, to save the apt round trip.
+
+=item C<cpanm_verbose> (boolean, default C<1>)
+
+When true, C<cpanm> runs with C<--verbose>.  The extra output stops GitHub
+Actions cancelling a job for "no activity" while many prerequisites build.
+Set it to C<0> for a quieter log on small dependency sets.
+
 =item C<enable_linter> (boolean, default C<1>)
 
 When true, inserts a B<"Lint and syntax check"> step after all dependency
@@ -243,15 +256,15 @@ B<Generated step order:>
 
 =item 5. Install project dependencies
 
-=item 6. B<Lint and syntax check> — all matrix cells (when C<enable_linter> is true); the unused-variable check via C<PERL5OPT=-Mwarnings::unused> is embedded at the end of this step when C<enable_linter_unused> is true
+=item 6. B<Lint and syntax check> - all matrix cells (when C<enable_linter> is true); the unused-variable check via C<PERL5OPT=-Mwarnings::unused> is embedded at the end of this step when C<enable_linter_unused> is true
 
 =item 7. Run tests
 
-=item 8. Run Perl::Critic — latest Perl + Ubuntu only (when C<enable_critic> is true)
+=item 8. Run Perl::Critic - latest Perl + Ubuntu only (when C<enable_critic> is true)
 
-=item 9. B<Check imports with perlimports> — latest Perl + Ubuntu only (when C<enable_perlimports> is true)
+=item 9. B<Check imports with perlimports> - latest Perl + Ubuntu only (when C<enable_perlimports> is true)
 
-=item 10. Test coverage — latest Perl + Ubuntu only (when C<enable_coverage> is true)
+=item 10. Test coverage - latest Perl + Ubuntu only (when C<enable_coverage> is true)
 
 =item 11. Show cpanm build log on failure
 
@@ -271,6 +284,8 @@ B<Generated step order:>
                 max_perl_version     => { type => 'scalar',  default  => '5.42' },
                 os                   => { type => 'arrayref', optional => 1 },
                 timeout              => { type => 'scalar',  default  => $DEFAULT_TIMEOUT_MINUTES },
+                install_db_file      => { type => 'scalar',  default  => 1 },
+                cpanm_verbose        => { type => 'scalar',  default  => 1 },
                 enable_linter        => { type => 'scalar',  default  => 1 },
                 enable_linter_unused => { type => 'scalar',  default  => 1 },
                 enable_critic        => { type => 'scalar',  default  => 1 },
@@ -291,6 +306,8 @@ B<Generated step order:>
     versions ≔ opts.perl_versions ?? range(min, max)
     latest   ≔ versions[|versions|−1]
 
+    yaml contains "Install DB_File" step             ↔  opts.install_db_file = 1
+    yaml contains "cpanm ... --verbose"              ↔  opts.cpanm_verbose = 1
     yaml contains "Lint and syntax check" step       ↔  opts.enable_linter = 1
     yaml contains "PERL5OPT=-Mwarnings::unused"      ↔  opts.enable_linter_unused = 1
     yaml contains "Run Perl::Critic"                 ↔  opts.enable_critic = 1
@@ -306,6 +323,8 @@ sub generate_custom_perl_workflow($opts = {}) {
 	my $min_version = $opts->{min_perl_version} // '5.36';
 	my $max_version = $opts->{max_perl_version} // '5.42';
 	my $timeout = $opts->{timeout} // $DEFAULT_TIMEOUT_MINUTES;
+	my $install_db_file = $opts->{install_db_file} // 1;
+	my $cpanm_verbose = $opts->{cpanm_verbose} // 1;
 	my @os = @{$opts->{os} // ['ubuntu-latest', 'macos-latest', 'windows-latest']};
 	my $enable_linter = $opts->{enable_linter} // 1;
 	my $enable_linter_unused = $opts->{enable_linter_unused} // 1;
@@ -378,7 +397,7 @@ sub generate_custom_perl_workflow($opts = {}) {
 
 	$yaml .= "      - name: Setup Perl\n";
 	$yaml .= "        id: setup-perl\n";
-	$yaml .= "        uses: shogo82148/actions-setup-perl\@v1.44.2\n";
+	$yaml .= "        uses: shogo82148/actions-setup-perl\@v1.44.5\n";
 	$yaml .= "        with:\n";
 	$yaml .= "          perl-version: \${{ matrix.perl }}\n\n";
 
@@ -426,21 +445,25 @@ VERSION_STEP
 	$yaml .= "        if: runner.os == 'Windows'\n";
 	$yaml .= "        run: cpanm --notest App::cpanminus local::lib\n\n";
 
-	# TODO: should be configurable
-	$yaml .= "      - name: Install DB_File, needed for a lot of CPAN modules\n";
-	$yaml .= "        if: runner.os == 'Linux'\n";
-	$yaml .= "        run: |\n";
-	$yaml .= "           sudo apt update\n";
-	$yaml .= "           sudo apt install libdb-dev libperl-dev\n";
+	# Many CPAN modules need DB_File, but projects that do not can opt out
+	if ($install_db_file) {
+		$yaml .= "      - name: Install DB_File, needed for a lot of CPAN modules\n";
+		$yaml .= "        if: runner.os == 'Linux'\n";
+		$yaml .= "        run: |\n";
+		$yaml .= "           sudo apt update\n";
+		$yaml .= "           sudo apt install libdb-dev libperl-dev\n";
+	}
 
 	$yaml .= "      - name: Install dependencies\n";
 	$yaml .= "        if: runner.os != 'Windows'\n";
 	$yaml .= "        shell: bash\n";
 	$yaml .= "        run: |\n";
-	$yaml .= "          eval \$(perl -I ~/perl5/lib/perl5 -Mlocal::lib)\n";
-	# Add the --verbose to stop the no activity timeout in GitHub actions whene there are a lot of prequisites
-	# TODO: should be configurable
-	$yaml .= "          cpanm --notest --installdeps --verbose .\n\n";
+	$yaml .= "          eval \"\$(perl -I ~/perl5/lib/perl5 -Mlocal::lib)\"\n";
+	# --verbose stops GitHub Actions cancelling the job for "no activity"
+	# when there are a lot of prerequisites; the command is shared by the
+	# Unix and Windows install steps
+	my $cpanm_install = 'cpanm --notest --installdeps' . ($cpanm_verbose ? ' --verbose' : '') . ' .';
+	$yaml .= "          $cpanm_install\n\n";
 
 	$yaml .= "      - name: Install dependencies (Windows)\n";
 	$yaml .= "        if: runner.os == 'Windows'\n";
@@ -449,7 +472,7 @@ VERSION_STEP
 	$yaml .= "          \@echo off\n";
 	$yaml .= "          set \"PATH=%USERPROFILE%\\perl5\\bin;%PATH%\"\n";
 	$yaml .= "          set \"PERL5LIB=%USERPROFILE%\\perl5\\lib\\perl5\"\n";
-	$yaml .= "          cpanm --notest --installdeps --verbose .\n\n";
+	$yaml .= "          $cpanm_install\n\n";
 
 	# The shogo82148 Perl distributions bundle pre-compiled XS modules (e.g.
 	# YAML::XS) in the Perl zip.  cpanm sees them as "already installed" and
@@ -507,7 +530,7 @@ UNUSED_CODE
 	$yaml .= "        if: runner.os != 'Windows'\n";
 	$yaml .= "        shell: bash\n";
 	$yaml .= "        run: |\n";
-	$yaml .= "          eval \$(perl -I ~/perl5/lib/perl5 -Mlocal::lib)\n";
+	$yaml .= "          eval \"\$(perl -I ~/perl5/lib/perl5 -Mlocal::lib)\"\n";
 	$yaml .= "          prove -lr t/\n\n";
 
 	$yaml .= "      - name: Run tests (Windows)\n";
@@ -525,7 +548,7 @@ UNUSED_CODE
 		$yaml .= "        if: matrix.perl == '$latest' && matrix.os == 'ubuntu-latest'\n";
 		$yaml .= "        continue-on-error: true\n";
 		$yaml .= "        run: |\n";
-		$yaml .= "          eval \$(perl -I ~/perl5/lib/perl5 -Mlocal::lib)\n";
+		$yaml .= "          eval \"\$(perl -I ~/perl5/lib/perl5 -Mlocal::lib)\"\n";
 		$yaml .= "          cpanm --notest Perl::Critic\n";
 		$yaml .= "          perlcritic --severity 3 lib/ || true\n";
 		$yaml .= "        shell: bash\n\n";
@@ -537,9 +560,9 @@ UNUSED_CODE
 		$yaml .= "        if: matrix.perl == '$latest' && matrix.os == 'ubuntu-latest'\n";
 		$yaml .= "        continue-on-error: true\n";
 		$yaml .= "        run: |\n";
-		$yaml .= "          eval \$(perl -I ~/perl5/lib/perl5 -Mlocal::lib)\n";
+		$yaml .= "          eval \"\$(perl -I ~/perl5/lib/perl5 -Mlocal::lib)\"\n";
 		$yaml .= "          cpanm --notest App::perlimports\n";
-		$yaml .= "          find lib -name '*.pm' | xargs perlimports --lint\n";
+		$yaml .= "          find lib -name '*.pm' -print0 | xargs -0 perlimports --lint\n";
 		$yaml .= "        shell: bash\n\n";
 	}
 
@@ -548,7 +571,7 @@ UNUSED_CODE
 		$yaml .= "      - name: Test coverage\n";
 		$yaml .= "        if: matrix.perl == '$latest' && matrix.os == 'ubuntu-latest'\n";
 		$yaml .= "        run: |\n";
-		$yaml .= "          eval \$(perl -I ~/perl5/lib/perl5 -Mlocal::lib)\n";
+		$yaml .= "          eval \"\$(perl -I ~/perl5/lib/perl5 -Mlocal::lib)\"\n";
 		$yaml .= "          cpanm --notest Devel::Cover\n";
 		$yaml .= "          cover -delete\n";
 		$yaml .= "          HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lr t/\n";
@@ -607,8 +630,8 @@ The shogo82148 C<perl-5.40.4-thr-win32-x64.zip> distribution ships a
 C<perl.exe> and a C<libperl540.a> from two different builds.  Any XS module
 compiled against that C<libperl540.a> receives handshake key
 C<0x12c00080>, but C<perl.exe> needs C<0x12d00080>.  Even
-C<Win32::Process> — a core Windows XS module bundled in the zip and loaded
-transitively by C<IPC::System::Simple> — fails to load with this mismatch,
+C<Win32::Process> - a core Windows XS module bundled in the zip and loaded
+transitively by C<IPC::System::Simple> - fails to load with this mismatch,
 so no XS-using test can pass on this combination.
 
 Recompiling XS modules (e.g. via C<cpanm --reinstall YAML::XS>) does not

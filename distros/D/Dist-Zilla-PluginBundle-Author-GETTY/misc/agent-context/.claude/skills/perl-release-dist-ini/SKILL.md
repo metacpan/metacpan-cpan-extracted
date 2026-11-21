@@ -1,6 +1,6 @@
 ---
 name: perl-release-dist-ini
-description: "Load when reading, editing or debugging any dist.ini — plugins, bundles such as Author::GETTY, version config, prereqs."
+description: "Use when reading, editing or debugging any dist.ini — plugins, bundles such as Author::GETTY, version config, prereqs."
 user-invocable: false
 allowed-tools: Read, Grep
 model: sonnet

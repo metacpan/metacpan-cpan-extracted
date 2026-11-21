@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -419,28 +419,26 @@ TUI::StdDlg::FindFirstRec::Win32 - Win32 implementation of FindFirstRec
 
 =head1 DESCRIPTION
 
-This module provides the Windows-specific implementation of the C<FindFirstRec> 
-directory search interface.
+This module provides the Windows-specific implementation of the 
+L<FindFirstRec|TUI::StdDlg::FindFirstRec> directory search interface.
 
 The implementation maps the generic search operations to the Win32
 C<FindFirstFile> and C<FindNextFile> APIs and updates the associated C<find_t>
 record accordingly.
 
-=head1 CONSTRUCTOR
+=head1 IMPLEMENTATION
 
-=head2 allocate
+This module contains the Windows-specific implementation behind
+L<FindFirstRec|TUI::StdDlg::FindFirstRec>. Public API semantics and usage are 
+documented in usage are documented in the
+L<FindFirstRec|TUI::StdDlg::FindFirstRec> module.
 
-Win32-specific initialization of a directory search.
+In this implementation, the module translates the generic directory search 
+operations into the corresponding Win32 API calls and manages the search 
+context accordingly.
 
-=head1 METHODS
-
-=head2 get
-
-Retrieves the search context associated with a C<find_t> record.
-
-=head2 next
-
-Advances the search using the Win32 filesystem APIs.
+The exact implementation details here are platform-specific and may differ from
+other platforms.
 
 =head1 AUTHORS
 

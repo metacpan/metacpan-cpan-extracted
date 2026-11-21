@@ -9,10 +9,14 @@
 #                         DLLs it links, win-dlls.pl), lib-gate.pl, require-gate.pl
 #                         -> out/, artifact
 #   build-leg.sh verify   per binary: the dist's verify
+#   build-leg.sh provenance  the leg's provenance part (provenance.pl merges it)
+#                         -> provenance/build-<platform>.txt
 # Run from the job's workspace. Environment: PLATFORM, VERSION (the version slot
 # of the asset names), PREPARE_KEY, LEG_IMAGE (part of perl_key),
 # MACOSX_DEPLOYMENT_TARGET (macOS), DZIL_BINARY_PERL_BIN (Windows: Strawberry's
-# perl bin directory).
+# perl bin directory); for provenance RUNNER_LABEL (the leg's runner),
+# LEG_CONTAINER (its container, empty on the runner itself), BUNDLE_COMMIT and the
+# runner's ImageOS, ImageVersion, RUNNER_OS, RUNNER_ARCH, GITHUB_RUN_ATTEMPT.
 # ~/dzil-binary holds what the workflow caches: perl/ (the packing perl; Windows
 # packs with Strawberry), local/ (the deps local lib), prepare/ (prepare's cache dir).
 # A hook from x_binaries runs from the dist root as  sh -c '<cmd> "$@"' sh <arg>.
@@ -267,7 +271,38 @@ verify() {
   done
 }
 
+# One KEY=VALUE line per fact (facts.sh's part format): the leg, the machine,
+# the packing perl and PAR::Packer it packed with, the hash of every binary.
+# binmode: Strawberry perl would print CRLF.
+provenance() {
+  local name asset sum part
+  leg_env lib
+  names
+  for name in "${NAMES[@]}"; do
+    [ -f "$OUT/$name-$VERSION-$PLATFORM$exe" ] || die "no binary $OUT/$name-$VERSION-$PLATFORM$exe"
+  done
+  mkdir -p "$TOP/provenance"
+  part=$TOP/provenance/build-$PLATFORM.txt
+  {
+    printf '%s\n' kind=build "platform=$PLATFORM" "runner=${RUNNER_LABEL:?RUNNER_LABEL is not set}" \
+      "container=${LEG_CONTAINER:-}" "runner_image_os=${ImageOS:-}" "runner_image_version=${ImageVersion:-}" \
+      "runner_os=${RUNNER_OS:-}" "runner_arch=${RUNNER_ARCH:-}" \
+      "run_attempt=${GITHUB_RUN_ATTEMPT:?GITHUB_RUN_ATTEMPT is not set}" \
+      "bundle_commit=${BUNDLE_COMMIT:?BUNDLE_COMMIT is not set}"
+    sh "$HERE/facts.sh" machine build_
+    perl -MConfig -MPAR::Packer -e 'binmode STDOUT;
+      print "perl_version=$Config{version}\nperl_archname=$Config{archname}\npar_packer_version=$PAR::Packer::VERSION\n"'
+    printf 'macosx_deployment_target=%s\n' "${MACOSX_DEPLOYMENT_TARGET:-}"
+    for name in "${NAMES[@]}"; do
+      asset=$name-$VERSION-$PLATFORM$exe
+      sum=$(sha256 <"$OUT/$asset")
+      printf 'binary=%s %s\n' "$asset" "$sum"
+    done
+  } >"$part"
+  cat "$part"
+}
+
 case $phase in
-  init|keys|prepare|deps|pack|verify) "$phase" ;;
-  *) die "usage: build-leg.sh init|keys|prepare|deps|pack|verify" ;;
+  init|keys|prepare|deps|pack|verify|provenance) "$phase" ;;
+  *) die "usage: build-leg.sh init|keys|prepare|deps|pack|verify|provenance" ;;
 esac

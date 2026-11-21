@@ -147,7 +147,7 @@ subtest 'templates are flagged, and refused as includes' => sub {
   my $err;
   eval { $sk->resolve_skill('tmpl'); 1 } or $err = $@;
   isa_ok( $err, 'Skilletor::Error::Unsupported' );
-  like( $err->message, qr/\Askill tmpl\@u is a Nunjucks template \(skills\/tmpl\/extra\.md\.njk\); the Perl port/, 'the message' );
+  like( $err->message, qr/\Askill tmpl\@u is a Nunjucks template \(skills\/tmpl\/extra\.md\.njk\); a lookup serves source files and no unrendered template \(a sync renders it\)\z/, 'the message' );
   my $agent = $sk->resolve_item( agent => 'helper' );
   is( $agent->{file}, "$proj_src/agents/helper.md.njk", 'a templated main file is still located' );
   like( error_of( sub { $sk->resolve_agent('helper') } ), qr/agent helper\@p is a Nunjucks template/, 'and refused' );

@@ -27,7 +27,7 @@ depend on the `Content-Type` header. Empty or whitespace-only bodies return
 The response object also exposes `status`, `reason`, `headers`, `header($name)`,
 `method`, `url`, `elapsed`, `request_id`, and `rate_limit`.
 
-`headers` returns a copy rather than the internal hash.
+`headers` returns a defensive copy of the internal hash, including copies of array references used for repeated response headers (for example, `Set-Cookie`). `header($name)` returns an unambiguous scalar value or `undef` when repeated values conflict. Retry and rate-limit metadata likewise ignore ambiguous repeated values.
 
 ## Design principle
 

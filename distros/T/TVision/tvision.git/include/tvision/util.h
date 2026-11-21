@@ -18,12 +18,12 @@
 
 #include <stdarg.h>
 
-inline constexpr int min( int a, int b )
+constexpr int min( int a, int b )
 {
     return a < b ? a : b;
 }
 
-inline constexpr int max( int a, int b )
+constexpr int max( int a, int b )
 {
     return a > b ? a : b;
 }
@@ -31,13 +31,13 @@ inline constexpr int max( int a, int b )
 #if !defined( __MINMAX_DEFINED ) // Also defined in Borland C++'s stdlib.h.
 #define __MINMAX_DEFINED
 template <class T>
-inline constexpr const T& min( const T& a, const T& b )
+constexpr const T& min( const T& a, const T& b )
 {
     return a < b ? a : b;
 }
 
 template <class T>
-inline constexpr const T& max( const T& a, const T& b )
+constexpr const T& max( const T& a, const T& b )
 {
     return a > b ? a : b;
 }
@@ -46,12 +46,18 @@ inline constexpr const T& max( const T& a, const T& b )
 void fexpand( char *rpath ) noexcept;
 void fexpand( char *rpath, const char *relativeTo ) noexcept;
 
-char hotKey( const char *s ) noexcept;
-ushort ctrlToArrow( ushort ) noexcept;
+class TStringView;
+char hotKey( TStringView s ) noexcept;
+ushort ctrlToArrow( ushort keyCode ) noexcept;
 char getAltChar( ushort keyCode ) noexcept;
 ushort getAltCode( char ch ) noexcept;
-char getCtrlChar(ushort) noexcept;
-ushort getCtrlCode(uchar) noexcept;
+char getCtrlChar( ushort keyCode ) noexcept;
+ushort getCtrlCode( uchar ch ) noexcept;
+
+struct _FAR KeyDownEvent;
+TStringView hotKeyStr( TStringView s ) noexcept;
+TStringView getAltCharStr( const KeyDownEvent & ) noexcept;
+TStringView getCtrlCharStr( const KeyDownEvent & ) noexcept;
 
 ushort historyCount( uchar id ) noexcept;
 const char *historyStr( uchar id, int index ) noexcept;
@@ -72,8 +78,8 @@ ushort popupMenu(TPoint where, TMenuItem &aMenu, TGroup * = 0);
 Boolean lowMemory() noexcept;
 
 char *newStr( TStringView ) noexcept;
-char *fmtStr( const char _FAR *format, ... ) noexcept;
-char *vFmtStr( const char _FAR *format, va_list args ) noexcept;
+char *formatStr( const char _FAR *format, ... ) noexcept;
+char *vFormatStr( const char _FAR *format, va_list args ) noexcept;
 
 Boolean driveValid( char drive ) noexcept;
 Boolean isDir( const char *str ) noexcept;
@@ -85,6 +91,8 @@ Boolean isWild( const char *f ) noexcept;
 
 size_t strnzcpy( char *dst, TStringView src, size_t dstSize ) noexcept;
 size_t strnzcat( char *dst, TStringView src, size_t dstSize ) noexcept;
+
+#include <tvision/compat/borland/iosfwd.h>
 
 void printKeyCode(ostream _FAR &, ushort keyCode);
 void printControlKeyState(ostream _FAR &, ushort controlKeyState);

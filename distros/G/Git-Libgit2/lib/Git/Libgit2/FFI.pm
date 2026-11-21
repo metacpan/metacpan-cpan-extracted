@@ -1,7 +1,7 @@
 # ABSTRACT: Internal FFI::Platypus instance for Git::Libgit2
 
 package Git::Libgit2::FFI;
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 use strict;
 use warnings;
 use FFI::Platypus 2.00;
@@ -422,8 +422,8 @@ sub _attach_all {
   _attach git_annotated_commit_id       => [ 'git_annotated_commit' ]                                              => 'opaque';
   _attach git_annotated_commit_free     => [ 'git_annotated_commit' ]                                               => 'void';
   _attach git_merge_base                => [ 'opaque', 'git_repository', 'opaque', 'opaque' ]                     => 'int';
-  _attach git_merge_base_many          => [ 'opaque', 'git_repository', 'uint', 'opaque' ]                     => 'int';
-  _attach git_merge_analysis           => [ 'uint*', 'uint*', 'git_repository', 'opaque', 'uint' ]                  => 'int';
+  _attach git_merge_base_many          => [ 'opaque', 'git_repository', 'size_t', 'opaque' ]                   => 'int';
+  _attach git_merge_analysis           => [ 'uint*', 'uint*', 'git_repository', 'opaque', 'size_t' ]                => 'int';
   _attach git_merge_options_init       => [ 'opaque', 'uint' ]                                                      => 'int';
 
   # ========================
@@ -437,7 +437,7 @@ sub _attach_all {
   # Stash
   # ========================
 
-  _attach git_stash_save   => [ 'opaque*', 'git_repository', 'git_signature', 'string', 'uint' ]        => 'int';
+  _attach git_stash_save   => [ 'opaque', 'git_repository', 'git_signature', 'string', 'uint' ]        => 'int';
   _attach git_stash_apply  => [ 'git_repository', 'size_t', 'opaque' ]                                   => 'int';
   _attach git_stash_drop  => [ 'git_repository', 'size_t' ]                                             => 'int';
 
@@ -492,7 +492,7 @@ sub _attach_all {
   # ODB
   # ========================
 
-  _attach git_odb_new    => [ 'opaque*', 'git_repository' ]                                          => 'int';
+  _attach git_odb_new    => [ 'opaque*' ]                                                            => 'int';
   _attach git_odb_exists => [ 'git_odb', 'opaque' ]                                                  => 'int';
   _attach git_odb_free   => [ 'git_odb' ]                                                            => 'void';
 }
@@ -511,7 +511,7 @@ Git::Libgit2::FFI - Internal FFI::Platypus instance for Git::Libgit2
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -1926,9 +1926,14 @@ Return true if C<$commit> is a descendant of C<$ancestor>.
 
 =head2 git_stash_save
 
-    Git::Libgit2::FFI::git_stash_save(\my $stash, $repo, $sig, $msg, $flags);
+    my $buf = "\0" x 20;
+    my ($oid_ptr) = scalar_to_buffer($buf);
+    Git::Libgit2::FFI::git_stash_save($oid_ptr, $repo, $sig, $msg, $flags);
+    my $stash_id = oid_to_hex($oid_ptr);
 
-Save the current working directory state as a stash. Free with C<git_object_free>.
+Save the current working directory state as a stash. The first argument is a
+caller-allocated 20-byte C<git_oid> buffer that receives the id of the stash
+commit (what C<refs/stash> points at). Nothing is returned that needs freeing.
 
 =head2 git_stash_apply
 
@@ -2140,9 +2145,12 @@ Initialize revert options struct.
 
 =head2 git_odb_new
 
-    Git::Libgit2::FFI::git_odb_new(\my $odb, $repo);
+    Git::Libgit2::FFI::git_odb_new(\my $odb);
 
-Create a new ODB wrapper. Free with C<git_odb_free>.
+Create a new, empty object database with B<no backends> — it takes no
+repository and knows no objects until you add backends yourself.
+C<git_odb_exists> on it answers false for everything. To get the ODB of an
+open repository use C<git_repository_odb>. Free with C<git_odb_free>.
 
 =head2 git_odb_exists
 
@@ -2160,7 +2168,7 @@ Free the ODB handle.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-git-libgit2/issues>.
 
 =head1 CONTRIBUTING

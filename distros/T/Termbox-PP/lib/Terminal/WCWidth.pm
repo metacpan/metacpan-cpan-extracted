@@ -26,7 +26,7 @@ use warnings;
 # version '...'
 use version;
 our $version = version->declare('v0.1.5');
-our $VERSION = version->declare('v0.6.1');
+our $VERSION = version->declare('v0.6.3');
 
 # authority '...'
 our $authority = 'github:raku-community-modules';
@@ -65,11 +65,17 @@ our %EXPORT_TAGS = (
 );
 
 # ------------------------------------------------------------------------
+# Variables --------------------------------------------------------------
+# ------------------------------------------------------------------------
+
+our $CACHE;
+
+# ------------------------------------------------------------------------
 # Functions --------------------------------------------------------------
 # ------------------------------------------------------------------------
 
 # Auxiliary function for binary search in interval table
-sub _bisearch {    # $result ($ucs, \@table)
+my $bisearch = sub {    # $result ($ucs, \@table)
   my ($ucs, $table) = @_;
   my $lower = 0;
   my $upper = scalar(@$table) - 1;
@@ -85,9 +91,7 @@ sub _bisearch {    # $result ($ucs, \@table)
     }
   }
   return 0;
-}
-
-my %cache = ();
+};
 
 sub wcwidth {    # $result ($ucs)
   my ($ucs) = @_;
@@ -99,9 +103,10 @@ sub wcwidth {    # $result ($ucs)
     if ($ucs < 0 || $ucs > 0x10ffff) 
     || ($ucs >= 0xD800 && $ucs <= 0xDFFF);
 
-  return $cache{$ucs} if exists $cache{$ucs};
+  return $CACHE->{$ucs}
+    if defined $CACHE && exists $CACHE->{$ucs};
 
-  return ($cache{$ucs} = 0)
+  return (defined $CACHE ? ($CACHE->{$ucs} = 0) : 0)
     if $ucs == 0
     || $ucs == 0x034f
     || $ucs == 0x2028
@@ -110,13 +115,16 @@ sub wcwidth {    # $result ($ucs)
     || (0x202a <= $ucs && $ucs <= 0x202e)
     || (0x2060 <= $ucs && $ucs <= 0x2063);
 
-  return ($cache{$ucs} = -1) 
+  return (defined $CACHE ? ($CACHE->{$ucs} = -1) : -1) 
     if $ucs < 32 || (0x07f <= $ucs && $ucs < 0x0a0);
 
-  return ($cache{$ucs} = 0) if _bisearch($ucs, ZERO_WIDTH);
-  return ($cache{$ucs} = 2) if _bisearch($ucs, WIDE_EASTASIAN);
+  return (defined $CACHE ? ($CACHE->{$ucs} = 0) : 0)
+    if $bisearch->($ucs, ZERO_WIDTH);
 
-  return ($cache{$ucs} = 1);
+  return (defined $CACHE ? ($CACHE->{$ucs} = 2) : 2) 
+    if $bisearch->($ucs, WIDE_EASTASIAN);
+
+  return (defined $CACHE ? ($CACHE->{$ucs} = 1) : 1);
 }
 
 sub wcswidth {    # $result ($str)
@@ -164,6 +172,24 @@ for Terminals, or make pretend to be an emulator.
   print_right_aligned("this is right-aligned");
   print_right_aligned("another right-aligned string");
 
+=head1 VARIABLES
+
+=head2 C<$CACHE>
+
+By default, C<wcwidth> is stateless and performs a binary search on every
+lookup to avoid unbounded memory growth (e.g., when iterating over the entire
+Unicode range).
+
+To enable caching for repeated lookups, assign a hash reference to
+C<$Terminal::WCWidth::CACHE>:
+
+  local $Terminal::WCWidth::CACHE = {};
+  my $width = wcswidth($long_text);
+
+Using C<local> restores the previous cache value when the enclosing scope
+exits, allowing the temporary cache to be reclaimed automatically. You may also
+bind a tied hash (such as L<Tie::Cache::LRU>) to enforce a fixed memory limit.
+
 =head1 SUBROUTINES
 
 =head2 C<wcwidth>
@@ -194,9 +220,37 @@ Takes a I<string> and outputs its total width:
 
 Returns -1 if any control characters are found.
 
+Note that the string must be a decoded character string (with Perl's internal
+UTF-8 flag enabled, e.g., via C<use utf8> or L<Encode::decode|Encode/decode>).
+Passing raw UTF-8 octets will produce incorrect results.
+
 Unlike the original version, this module does not support getting the width of
 only the first C<n> characters of a string, as you can use the C<substr>
 method.
+
+=head1 DIAGNOSTICS
+
+=over
+
+=item C<Argument "%s" isn't numeric in numeric lt (E<lt>)>
+
+(W numeric) You probably passed a character string (like C<wcwidth("a")>)
+instead of an integer codepoint (C<wcwidth(ord("a"))>). Use C<wcswidth> for
+strings or convert single characters with C<ord> first.
+
+=item C<Use of uninitialized value in subroutine entry>
+
+(W uninitialized) C<wcswidth> was called with C<undef> instead of a decoded
+character string. Pass a defined Unicode string with Perl's internal UTF-8 flag
+enabled.
+
+=item C<Not a HASH reference>
+
+(F) C<$Terminal::WCWidth::CACHE> contains a defined value that cannot be
+used as a hash reference. Set it to C<undef> to disable caching, or assign
+a hash reference to enable caching.
+
+=back
 
 =head1 COPYRIGHT AND LICENCE
 
@@ -209,7 +263,7 @@ method.
 
  Copyright (c) 2014 Jeff Quast
                2015-2017 +merlan #flirora
-               2020,2024 Raku Commuity
+               2020,2024 Raku Community
                2024-2026 J. Schneider
 
  Permission is hereby granted, free of charge, to any person obtaining a
@@ -236,7 +290,7 @@ method.
 
 =item * Raku Community
 
-=item * J. Schneider L<https://github.com/brickpool/>
+=item * J. Schneider
 
 =back
 

@@ -50,6 +50,28 @@ sub json        { defined($_[0]->{response}) ? $_[0]->{response}->json : undef }
 sub rate_limit  { defined($_[0]->{response}) ? $_[0]->{response}->rate_limit : undef }
 sub as_string   { defined($_[0]->{message}) ? $_[0]->{message} : 'HTTP API core error' }
 
+# Use only fixed labels and allowlisted scalar metadata. Diagnostic strings,
+# URLs, request IDs, headers and bodies may contain credentials or user data.
+sub log_summary {
+    my ($self) = @_;
+
+    my $category = defined($self->{category})
+        && $self->{category} =~ /\A(?:encode|decode|transport|http|hook)\z/
+        ? $self->{category} : 'unknown';
+    my $method = defined($self->{method})
+        && $self->{method} =~ /\A(?:GET|HEAD|POST|PUT|PATCH|DELETE|OPTIONS|TRACE|CONNECT)\z/
+        ? $self->{method} : 'OTHER';
+
+    my @parts = ('HTTP API error', "category=$category", "method=$method");
+    my $status = $self->{status};
+    push @parts, "status=$status" if defined($status)
+        && $status =~ /\A[0-9]{3}\z/
+        && $status >= 100 && $status <= 599;
+    push @parts, 'retryable=' . ($self->{retryable} ? 1 : 0);
+
+    return join(' ', @parts);
+}
+
 1;
 
 __END__
@@ -112,5 +134,22 @@ Returns normalized rate-limit metadata when an associated response exists.
 
 Returns the human-readable diagnostic message. Exact message wording is not
 part of the machine-readable compatibility contract.
+
+=head2 log_summary
+
+Returns a deliberately limited single-line error summary suitable for routine
+operational logs. It uses only allowlisted category and HTTP method values, an
+HTTP status in the 100-599 range when present, and a boolean retryable flag.
+It never interpolates the URL, raw message, request ID, headers or response
+body, any of which may contain secrets. Unknown categories and methods are
+shown as C<unknown> and C<OTHER>.
+
+Example:
+
+  warn $error->log_summary, "\n";
+
+Use C<message>, C<url> and response-body accessors only in a suitably protected
+diagnostic context. This method does not sanitize other values that application
+code may add to the same log line.
 
 =cut

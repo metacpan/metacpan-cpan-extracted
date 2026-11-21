@@ -141,6 +141,19 @@ subtest '_dos_findfirst and _dos_findnext' => sub {
   }
 };
 
+SKIP: {
+  skip 'The emulated C: drive is used on Unix-like systems', 1
+    if $^O eq 'MSWin32';
+
+  subtest 'findfirst maps the emulated C: drive to the Unix root' => sub {
+    my $finfo = find_t->new();
+    my $path = 'C:' . File::Spec->catfile( $dir, 'test.txt' );
+
+    is( _dos_findfirst( $path, 0, $finfo ), 0, 'DOS path is found' );
+    is( $finfo->name, 'test.txt', 'matching file is returned' );
+  };
+}
+
 #-----------------
 note 'No matches';
 #-----------------

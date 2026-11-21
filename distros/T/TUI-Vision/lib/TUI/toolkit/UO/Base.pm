@@ -9,6 +9,7 @@ our $VERSION   = '0.02';
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
 use Hash::Util ();
+use Scalar::Util ();
 use UNIVERSAL::Object;
 
 BEGIN { require Devel::GlobalDestruction unless $] >= 5.014 }
@@ -19,9 +20,12 @@ BEGIN { @ISA = ( 'UNIVERSAL::Object' ) }
 
 sub DESTROY {
   my $self  = shift;
-  my $class = ref $self || $self;
+  my $class = ref $self || return;
 
-  Hash::Util::unlock_keys( %$self );
+  my $repr = Scalar::Util::reftype $self;
+  if ( $repr eq 'HASH' ) {
+    Hash::Util::unlock_keys( %$self );
+  }
 
   my $in_global_destruction = defined ${^GLOBAL_PHASE}
     ? ${^GLOBAL_PHASE} eq 'DESTRUCT'
@@ -65,6 +69,8 @@ global destruction.
 =item * L<Devel::GlobalDestruction> when using perl < v5.14.
 
 =item * L<MRO::Compat> when using perl < v5.10 
+
+=item * L<Scalar::Util>
 
 =item * L<Hash::Util>
 

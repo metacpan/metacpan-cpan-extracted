@@ -1,5 +1,10 @@
 Revision history for perl module MIDI::RtMidi::FFI
 
+0.14 2026-11-20
+
+  - Fixes for MIDI panic methods. Thanks to Gene Boggs (GENE) for reporting and testing!
+  - Disable destuctors for now, they don't work as expected.
+
 0.13 2026-08-15
 
   - New device methods: connected_to(), connected_to_name() - provide info on the target device connected to in an open_port* call.
@@ -23,7 +28,7 @@ Revision history for perl module MIDI::RtMidi::FFI
   - MIDI::Stream should handle concatenated and running messages more reliably than MIDI::Event, due to the hackish way the latter was integrated (this issue was not a shortcoming of MIDI::Event, just my code).
   - get_compiled_api() now always returns an arrayref of available APIs (RtMidiApi enum).
   - Default buffer size for input devices is now 4096 bytes.
-  - Thanks to Gene Boggs (OLOGY) for testing help on MacOS!
+  - Thanks to Gene Boggs (GENE) for testing help on MacOS!
 
 0.08 2025-01-20
 

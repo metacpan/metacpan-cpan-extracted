@@ -15,7 +15,7 @@ use Skilletor::FSUtil qw( read_text inner_segments path_join write_text );
 use Skilletor::JSON qw( js_parse js_stringify js_ordered js_type );
 use namespace::clean;
 
-our $VERSION = '0.001';
+our $VERSION = '0.008000';
 
 my @ALLOWED_KEYS = qw( sources install vars gitignore claudeSettings checkInterval targets );
 my %ALLOWED_KEY  = map { $_ => 1 } @ALLOWED_KEYS;
@@ -652,6 +652,14 @@ sub source_entry {
   return $sources->{$name};
 }
 
+# Does the file declare source $name – the reference's sourceEntry(...) !== undefined, which
+# tells an entry written as null from none at all (source_entry is undef for both)?
+sub has_source_entry {
+  my ( $self, $file, $name ) = @_;
+  my $sources = $self->_load_raw($file)->{sources};
+  return ( js_type($sources) eq 'object' && exists $sources->{$name} ) ? 1 : 0;
+}
+
 sub add_source {
   my ( $self, $file, $name, $def ) = @_;
   my $cfg = $self->_load_raw($file);
@@ -822,7 +830,7 @@ Skilletor::Config - Load, merge and validate the user, project and local skillet
 
 =head1 VERSION
 
-version 0.001
+version 0.008000
 
 =head1 SYNOPSIS
 
@@ -984,6 +992,14 @@ it; returns the fields present. C<$needs_backend> defaults to true.
 
   Skilletor::Config->source_entry( $file, $name );
 
+=head2 has_source_entry
+
+  Skilletor::Config->has_source_entry( $file, $name );
+
+True when the file's C<sources> has the key C<$name>, whatever its value – an
+entry written as C<null> too, for which L</source_entry> is C<undef> as for
+none.
+
 =head2 add_source
 
   Skilletor::Config->add_source( $file, $name, $def );
@@ -1034,19 +1050,25 @@ Appends to C<install.bundles> unless that bundle of that source is listed.
 
 =head1 SUPPORT
 
+=head2 Issues
+
+Please report bugs and feature requests at
+L<https://github.com/Getty/skilletor/issues>.
+
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <getty@cpan.org>
+Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
+This software is Copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

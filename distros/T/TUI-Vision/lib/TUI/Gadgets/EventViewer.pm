@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -19,6 +19,7 @@ require bytes;
 use Carp ();
 use Encode qw( decode );
 use Symbol ();
+use Storable;
 use TUI::toolkit;
 use TUI::toolkit::Types qw(
   :is
@@ -39,6 +40,7 @@ use TUI::Gadgets::PrintConstants qw(
   printMouseWheelState
   printMouseEventFlags
 );
+use TUI::Objects::Rect;
 use TUI::TextView::Terminal;
 use TUI::Views::Const qw(
   sbHandleKeyboard
@@ -99,7 +101,8 @@ sub BUILD {    # void (\%args)
   assert ( is_Object $self );
   assert ( is_HashRef $args );
   $self->{eventMask} |= evBroadcast;
-  $self->$init( $args->{bufSize} );
+  $self->$init( $args->{bufSize} )
+    unless Storable::is_retrieving;
   return;
 }
 
@@ -275,7 +278,8 @@ $printEvent = sub {    # void ($out, $ev)
     # used by the backend. For Win32 this is typically the legacy code page.
     # The pseudo-fields 'text' and 'textLength' always show the UTF-8 byte
     # sequence corresponding to the character.
-    my @text = $charCode && !( $ev->{keyDown}{controlKeyState} & ( kbCtrlShift | kbAltShift ) )
+    my @text = $charCode 
+    && !( $ev->{keyDown}{controlKeyState} & ( kbCtrlShift | kbAltShift ) )
       ? unpack( 'C*', bytes::substr( decode( 'cp437' => chr $charCode ), 0 ) )
       : ();
     my $textLength = @text;
@@ -295,6 +299,53 @@ $printEvent = sub {    # void ($out, $ev)
   select $current;
   return;
 }; #/ sub $printEvent
+
+
+sub write :method {    # void ($os)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $os ) = $sig->( @_ );
+  # TTerminal does not override the TStreamable methods, so do not
+  # store it in the stream.
+  my $title     = $self->{title};
+  my $scrollBar = $self->{scrollBar};
+  my $interior  = $self->{interior};
+
+  $self->{title} = undef;
+  $self->remove( $scrollBar );
+  $self->remove( $interior );
+  $self->SUPER::write( $os );
+  $self->{title} = $title;
+  $self->insert( $scrollBar );
+  $self->insert( $interior );
+
+  $os->put( $self->{bufSize} );
+  return;
+}
+
+sub read :method {    # $self ($is)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $is ) = $sig->( @_ );
+  $self->SUPER::read( $is );
+  $self->$init( $is->get() );
+  return $self;
+}
+
+sub build {    # $obj ()
+  my ( $class ) = @_;
+  assert ( @_ == 1 );
+  assert ( is_Str $class );
+  assert ( Storable::is_retrieving );
+  return $class->new(
+    bounds  => TRect->new(),
+    bufSize => 0,
+  );
+}
 
 1
 

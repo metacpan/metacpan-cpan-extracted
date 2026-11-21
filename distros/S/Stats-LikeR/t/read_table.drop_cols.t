@@ -383,19 +383,20 @@ check_all('unanchored pattern', $npi, \@npi_hdr, \@npi_rows, [ drop_cols => qr/L
 # .xlsx, .gz and a VCF's own columns
 {
 	my $x = File::Spec->catfile($dir, 'names.xlsx');
-	my $groes = "Gr\xc3\xb6\xc3\x9fe";	# the bytes a sheet's name comes back as
+	my $groes = "Gr\xc3\xb6\xc3\x9fe";	# written as these bytes, and matched by them: a caller without `use utf8`
+	my $groes_c = "Gr\x{f6}\x{df}e";	# what a name comes back as since 0.3426: characters
 	write_table([
 		[ 'NPI', 'Provider License Number_1', 'name', $groes, 'n' ],
 		[ 101, 'A1', 'bob', 180, 5 ],
 		[ 102, undef, 'amy', 175, undef ],
 	], $x, quiet => 1);
-	is(read_table($x, output_type => 'aoa')->[0][3], $groes, '.xlsx: the UTF-8 name is read back as its bytes');
+	is(read_table($x, output_type => 'aoa')->[0][3], $groes_c, '.xlsx: the UTF-8 name is read back as characters');
 	check_all('.xlsx, by name', $x, [qw(NPI name n)], [ [101, 'bob', 5], [102, 'amy', undef] ],
 		[ drop_cols => [ 'Provider License Number_1', $groes ] ]);
 	check_all('.xlsx, by a name of characters', $x, [ 'NPI', 'Provider License Number_1', 'name', 'n' ],
 		[ [101, 'A1', 'bob', 5], [102, undef, 'amy', undef] ],
 		[ drop_cols => "Gr\x{f6}\x{df}e" ]);
-	check_all('.xlsx, an absent name', $x, [ 'NPI', 'Provider License Number_1', 'name', $groes ],
+	check_all('.xlsx, an absent name', $x, [ 'NPI', 'Provider License Number_1', 'name', $groes_c ],
 		[ [101, 'A1', 'bob', 180], [102, undef, 'amy', 175] ],
 		[ drop_cols => [ 'n', 'N' ] ], qr/not all columns named in 'drop_cols' exist in .*: 'N'\n\z/);
 	my $gz = File::Spec->catfile($dir, 'names.csv.gz');

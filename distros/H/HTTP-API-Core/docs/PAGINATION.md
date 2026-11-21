@@ -22,11 +22,12 @@ In list context, `all()` returns the items as a list. In scalar context, it retu
 
 ## Supported modes
 
-Three modes are supported:
+Four modes are supported:
 
 - `next_url`
 - `page`
 - `cursor`
+- `offset`
 
 The default mode is `next_url`.
 
@@ -71,6 +72,42 @@ These can be changed with `start_page`, `page_param`, and `page_size_param`.
 
 When `has_more` is supplied, its extracted value controls whether another page is requested. Otherwise, if `page_size` is set, a page containing fewer than `page_size` items ends pagination. Without either setting, an empty item list ends pagination.
 
+### `offset`
+
+Offset mode adds a zero-based offset parameter to each request and advances it by the **actual number of returned items** (not the requested page size). It works for APIs that limit the page size below the requested size, provided that the API reports the total number of items.
+
+For example, with Jira REST API v2:
+
+```perl
+my $pager = $api->paginate(
+    '/jira/rest/api/2/search',
+    mode            => 'offset',
+    items           => 'issues',
+    total           => 'total',
+    offset_param    => 'startAt',
+    page_size_param => 'maxResults',
+    page_size       => 1000,
+    query => {
+        jql    => 'filter=415607',
+        fields => 'summary,description,components',
+    },
+);
+
+while (my $issue = $pager->next) {
+    # Process one issue
+}
+```
+
+Defaults:
+
+- initial offset: `0`
+- offset parameter: `offset`
+- page-size parameter: `per_page`
+
+Override these with `start_offset`, `offset_param`, and `page_size_param`. When `total` is provided, it is an extractor (a dotted path or code reference) returning a non-negative integer. Pagination ends when the number of items consumed (including the starting offset) reaches the total. An empty page always ends pagination to prevent a non-advancing loop.
+
+Without `total`, a provided `has_more` extractor controls completion. Otherwise, an item count shorter than `page_size` ends pagination; with neither configured, an empty page ends pagination. For APIs that silently cap the page size, supply `total` or `has_more` to avoid stopping early. If both `total` and `has_more` are supplied, `total` takes precedence.
+
 ### `cursor`
 
 Cursor mode sends a cursor value as a query parameter after the first response supplies one.
@@ -95,7 +132,7 @@ Undefined or empty cursors end pagination.
 
 ## Item and continuation extractors
 
-`items`, `next`, and `has_more` may use dotted paths into decoded JSON structures.
+`items`, `next`, `has_more`, and `total` may use dotted paths into decoded JSON structures.
 
 ```perl
 items => 'data.items'
@@ -111,7 +148,7 @@ items => sub {
 }
 ```
 
-The items extractor must return an array reference. Any other value is an error.
+The items extractor must return an array reference. Any other value is an error. Numeric array indices in dotted paths use ASCII digits only; Unicode digit characters are not silently coerced to array offsets.
 
 The default items extractor is `items`.
 
@@ -155,6 +192,9 @@ The constructor rejects:
 - non-hash `request`
 - non-positive `page_size`
 - non-positive `start_page`
+- non-ASCII digits in `page_size` or `start_page`
+- invalid or negative `start_offset`
+- invalid `total` extractor type
 - unknown options
 
 These validation rules are part of the compatibility contract.
@@ -163,7 +203,7 @@ These validation rules are part of the compatibility contract.
 
 Across the 1.x series, the project intends to preserve:
 
-- the three supported modes and their default names
+- the four supported modes and their default names
 - `next()` and `all()` consumption behavior
 - dotted-path and code-reference extractors
 - query and request option handling

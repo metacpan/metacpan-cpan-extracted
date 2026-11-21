@@ -8,7 +8,7 @@ I started this as a personal project at the very end of 2018. By May 2020 I cons
 
 The original goals of this project were:
 
-* Making Turbo Vision work on Linux by altering the legacy codebase as little as possible.
+* Making Turbo Vision work on Unix/Linux by altering the legacy codebase as little as possible.
 * Keeping it functional on DOS/Windows.
 * Being as compatible as possible at the source code level with old Turbo Vision applications. This led me to implement some of the Borland C++ RTL functions, as explained below.
 
@@ -24,7 +24,7 @@ The original location of this project is https://github.com/magiblot/tvision.
 * [How do I use Turbo Vision?](#how-to)
 * [Releases and downloads](#downloads)
 * Build environment
-    * [Linux](#build-linux)
+    * [Unix/Linux](#build-linux)
     * [Windows (MSVC)](#build-msvc)
     * [Windows (MinGW)](#build-mingw)
     * [Windows/DOS (Borland C++)](#build-borland)
@@ -49,7 +49,7 @@ Turbo Vision does not excel at any of those, but it certainly overcomes many of 
 
 2. Reuse what has already been done. Turbo Vision provides many widget classes (also known as *views*), including resizable, overlapping windows, pull-down menus, dialog boxes, buttons, scroll bars, input boxes, check boxes and radio buttons. You may use and extend these; but even if you prefer creating your own, Turbo Vision already handles event dispatching, display of fullwidth Unicode characters, etc.: you do not need to waste time rewriting any of that.
 
-3. Can you imagine writing a text-based interface that works both on Linux and Windows (and thus is cross-platform) out-of-the-box, with no `#ifdef`s? Turbo Vision makes this possible. First: Turbo Vision keeps on using `char` arrays instead of relying on the implementation-defined and platform-dependent `wchar_t` or `TCHAR`. Second: thanks to UTF-8 support in `setlocale` in [recent versions of Microsoft's RTL](https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/setlocale-wsetlocale#utf-8-support), code like the following will work as intended:
+3. Can you imagine writing a text-based interface that works both on Unix/Linux and Windows (and thus is cross-platform) out-of-the-box, with no `#ifdef`s? Turbo Vision makes this possible. First: Turbo Vision keeps on using `char` arrays instead of relying on the implementation-defined and platform-dependent `wchar_t` or `TCHAR`. Second: thanks to UTF-8 support in `setlocale` in [recent versions of Microsoft's RTL](https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/setlocale-wsetlocale#utf-8-support), code like the following will work as intended:
     ```c++
     std::ifstream f("コンピュータ.txt"); // On Windows, the RTL converts this to the system encoding on-the-fly.
     ```
@@ -72,16 +72,17 @@ This project has no stable releases for the time being. If you are a developer, 
 If you just want to test the demo applications:
 
 * Unix systems: you'll have to build Turbo Vision yourself. You may follow the [build instructions](#build-linux) below.
-* Windows: you can find up-to-date binaries in the [Actions](https://github.com/magiblot/tvision/actions?query=branch:master+event:push) section. Click on the first successful workflow (with a green tick) in the list. At the bottom of the workflow page, as long as you have logged in to GitHub, you'll find an *Artifacts* section with the following files:
-    * `examples-dos32.zip`: 32-bit executables built with Borland C++. No Unicode support.
+* Windows/DOS: you can find up-to-date binaries in the [Actions](https://github.com/magiblot/tvision/actions?query=branch:master+event:push) section. Click on the first successful workflow (with a green tick) in the list. At the bottom of the workflow page, as long as you have logged in to GitHub, you'll find an *Artifacts* section with the following files:
     * `examples-x86.zip`: 32-bit executables built with MSVC. Windows Vista or later required.
     * `examples-x64.zip`: 64-bit executables built with MSVC. x64 Windows Vista or later required.
+    * `examples-dos.zip`: 16-bit DOS executables built with Borland C++. No Unicode support.
+    * `examples-dpmi32.zip`: 32-bit Windows/DOS executables built with Borland C++. No Unicode support.
 
 ## Build environment
 
 <div id="build-linux"></div>
 
-### Linux
+### Unix/Linux
 
 Turbo Vision can be built as an static library with CMake and GCC/Clang.
 
@@ -111,9 +112,9 @@ The build requirements are:
 
 * A compiler supporting C++14.
 * `libncursesw` (note the 'w').
-* `libgpm` for mouse support on the Linux console (optional).
+* `libgpm` for mouse support on the Linux console (optional, Linux only).
 
-If your distribution provides separate *devel* packages (e.g. `libncurses-dev`, `libgpm-dev` in Debian-based distros), install these too.
+If your package manager provides separate development packages (e.g. `libncurses-dev`, `libgpm-dev` in Debian-based Linux distributions), install these too.
 
 <div id="build-linux-runtime"></div>
 
@@ -168,13 +169,13 @@ If you use [Turbo Vision as a CMake submodule](#build-cmake), these flags will b
 
 **Note:** Turbo Vision uses `setlocale` to set the [RTL functions in UTF-8 mode](https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/setlocale-wsetlocale#utf-8-support). This won't work if you use an old version of the RTL.
 
-With the RTL statically linked in, and if UTF-8 is supported in `setlocale`, Turbo Vision applications are portable and work by default on **Windows Vista and later**.
+With the RTL statically linked in, and if UTF-8 is supported in `setlocale`, Turbo Vision applications are portable and work by default on Windows Vista and later. You may also have them work on Windows XP if you use the right MSVC version and settings.
 
 <div id="build-mingw"></div>
 
 ### Windows (MinGW)
 
-Once your MinGW environment is properly set up, build is done in a similar way to Linux:
+Once your MinGW environment is properly set up, build is done in a similar way to Unix/Linux:
 ```sh
 cmake . -B ./build -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release &&
 cmake --build ./build
@@ -182,6 +183,8 @@ cmake --build ./build
 In the example above, `libtvision.a` and all examples are in `./build` if `TV_BUILD_EXAMPLES` option is `ON` (the default).
 
 If you wish to link an application against Turbo Vision, simply add `-L./build/lib -ltvision` to your linker and `-I./include` to your compiler
+
+Turbo Vision applications can run on Windows XP or newer, if your compiler supports it.
 
 <div id="build-borland"></div>
 
@@ -294,9 +297,7 @@ There are a few environment variables that affect the behaviour of all Turbo Vis
 
 * `TVISION_MAX_FPS`: maximum refresh rate, default `60`. This can help keep smoothness in terminal emulators with unefficient handling of box-drawing characters. Special values for this option are `0`, to disable refresh rate limiting, and `-1`, to actually draw to the terminal in every call to `THardwareInfo::screenWrite` (useful when debugging).
 
-* `TVISION_CODEPAGE`: the character set used internally by Turbo Vision to translate *extended ASCII* into Unicode. Valid values at the moment are `437` and `850`, with `437` being the default, although adding more takes very little effort.
-
-### Unix
+### Unix/Linux
 
 * Ncurses-based terminal support.
 * Extensive mouse and keyboard support:
@@ -306,7 +307,7 @@ There are a few environment variables that affect the behaviour of all Turbo Vis
     * Support for Conpty's [`win32-input-mode`](https://github.com/microsoft/terminal/blob/37b0cfd32ba0aa54e0fe50bb158154d906472a89/doc/specs/%234999%20-%20Improved%20keyboard%20handling%20in%20Conpty.md) (available in WSL).
     * Support for [far2l](https://github.com/elfmz/far2l)'s terminal extensions.
     * Support for key modifiers (via `TIOCLINUX`) and mouse (via GPM) in the Linux console.
-* Custom signal handler that restores the terminal state before the program crashes.
+* Custom signal handler that restores the terminal state before the program gets terminated or suspended by these signals: `SIGINT`, `SIGQUIT`, `SIGILL`, `SIGABRT`, `SIGBUS`, `SIGFPE`, `SIGSEGV`, `SIGPIPE`, `SIGTERM`, `SIGTSTP`.
 * When `stderr` is a tty, messages written to it are redirected to a buffer to prevent them from messing up the display and are eventually printed to the console when exiting or suspending the application.
     * The buffer used for this purpose has a limited size, so writes to `stderr` will fail once the buffer is full. If you wish to preserve all of `stderr`, just redirect it into a file from the command line with `2>`.
 
@@ -314,7 +315,7 @@ The following environment variables are also taken into account:
 
 * `TERM`: Ncurses uses it to determine terminal capabilities. It is set automatically by the terminal emulator.
 * `COLORTERM`: when set to `truecolor` or `24bit`, Turbo Vision will assume the terminal emulator supports 24-bit color. It is set automatically by terminal emulators that support it.
-* `TVISION_ESCDELAY`: the number of milliseconds to wait after receiving an ESC key press, default `10`. If another key is pressed during this delay, it will be interpreted as an Alt+Key combination. Using a larger value is useful when the terminal doesn't support the Alt key.
+* `ESCDELAY`: the number of milliseconds to wait after receiving an ESC key press, default `10`. If another key is pressed during this delay, it will be interpreted as an Alt+Key combination. Using a larger value is useful when the terminal doesn't support the Alt key.
 * `TVISION_USE_STDIO`: when not empty, terminal I/O is performed through `stdin`/`stdout`, so that it can be redirected from the shell. By default, Turbo Vision performs terminal I/O through `/dev/tty`, allowing the user to redirect `stdin`, `stdout` and `stderr` for their needs, without affecting the application's stability.
 
     For example, the following will leave `out.txt` empty:
@@ -336,7 +337,7 @@ The following environment variables are also taken into account:
 
 The following are not available when compiling with Borland C++:
 
-* The console's codepage is set to UTF-8 on startup and restored on exit.
+* The console's code page is set to UTF-8 on startup and restored on exit.
 * Microsoft's C runtime functions are set automatically to UTF-8 mode, so you as a developer don't need to use the `wchar_t` variants.
 * If the console crashes, a new one is allocated automatically.
 
@@ -375,14 +376,15 @@ The following are new features not available in Borland's release of Turbo Visio
 * Triple-click support: new mouse event flag `meTripleClick`.
 * `TRect` methods `move`, `grow`, `intersect` and `Union` now return `TRect&` instead of being `void` so that they can be chained.
 * `TOutlineViewer` now allows the root node to have siblings.
-* New function `ushort popupMenu(TPoint where, TMenuItem &aMenu, TGroup *receiver=0)` which spawns a `TMenuPopup` on the desktop. See `source/tvision/popupmnu.cpp`.
+* New method `THelpTopic::longestLineWidth` to measure the width of the longest line in a help topic, taking line wrapping into account.
+* New function `ushort popupMenu(TPoint where, TMenuItem &aMenu, TGroup *receiver = 0)` which spawns a `TMenuPopup` on the desktop. See `source/tvision/popupmnu.cpp`.
 * New virtual method `TMenuItem& TEditor::initContextMenu(TPoint p)` that determines the entries of the right-click context menu in `TEditor`.
 * `fexpand` can now take a second parameter `relativeTo`.
 * New class `TStringView`, inspired by `std::string_view`.
-    * Many functions which originally had null-terminated string parameters now receive `TStringView` instead. `TStringView` is compatible with `std::string_view`, `std::string` and `const char *` (even `nullptr`).
-* New class `TSpan<T>`, inspired by `std::span`.
+    * Many functions which originally had null-terminated string parameters now receive `TStringView` instead. `TStringView` is intercompatible with `std::string_view`, `std::string` and `TSpan<const char>`, and can also be constructed from `const char *` (even `nullptr`, in which case it results in an empty view).
+* New class `TSpan<T>`, inspired by `std::span` and intercompatible with it.
 * New classes `TDrawSurface` and `TSurfaceView`, see `<tvision/surface.h>`.
-* The system integration subsystems (`THardwareInfo`, `TScreen`, `TEventQueue`...) are now initialized when constructing a `TApplication` for the first time, rather than before `main`. They are still destroyed on exit from `main`.
+* Turbo Vision's subsystems (`THardwareInfo`, `TScreen`, `TEventQueue`...) are now initialized when constructing a `TApplication` for the first time, rather than before `main`. They are still destroyed on exit from `main`.
 * New method `TVMemMgr::reallocateDiscardable()` which can be used along `allocateDiscardable` and `freeDiscardable`.
 * New method `TView::textEvent()` which allows receiving text in an efficient manner, see [Clipboard interaction](#clipboard).
 * New class `TClipboard`, see [Clipboard interaction](#clipboard).
@@ -403,6 +405,12 @@ The following are new features not available in Borland's release of Turbo Visio
     void printMouseButtonState(ostream &, ushort buttonState);
     void printMouseWheelState(ostream &, ushort wheelState);
     void printMouseEventFlags(ostream &, ushort eventFlags);
+    ```
+* New string-based variants of the `hotKey`, `getAltChar` and `getCtrlChar` functions from `tvision/util.h`, which can be used to implement multibyte shortcuts:
+    ```c++
+    TStringView hotKeyStr(TStringView);
+    TStringView getAltCharStr(const KeyDownEvent &);
+    TStringView getCtrlCharStr(const KeyDownEvent &);
     ```
 * New class `TKey` which can be used to define new key combinations (e.g. `Shift+Alt+Up`) by specifying a key code and a mask of key modifiers:
     ```c++
@@ -445,6 +453,10 @@ If your application is based on this project and you'd like it to appear in the 
 * [Turbo](https://github.com/magiblot/turbo) by [magiblot](https://github.com/magiblot), a proof-of-concept text editor.
 * [tvterm](https://github.com/magiblot/tvterm) by [magiblot](https://github.com/magiblot), a proof-of-concept terminal emulator.
 * [TMBASIC](https://github.com/electroly/tmbasic) by [Brian Luft](https://github.com/electroly), a programming language for creating console applications.
+* [battleships](https://github.com/Ddimk/battleships) by [Ddimk](https://github.com/Ddimk), an implementation of the the world-famous game *Battleship*.
+* [Turbo Vision dialog designer](https://github.com/IngvarRiga/TurboVision-dialog-designer) by [Ivan Rog](https://github.com/IngvarRiga), a proof-of-concept dialog editor.
+* [turboIDE](https://github.com/aestubbs/turboIDE) by [Alistair Stubbs](https://github.com/aestubbs), a fork of [Turbo](https://github.com/magiblot/turbo) that adds many additional features to it.
+* [mr (*Multi-Edit Revisited*)](https://github.com/ebeneezer/mr) by [Michael Raus](https://github.com/ebeneezer), an attempt at recreating American Cybernetics' *Multi-Edit* application.
 
 <div id="unicode"></div>
 
@@ -454,7 +466,7 @@ The Turbo Vision API has been extended to allow receiving Unicode input and disp
 
 * It is compatible with already present data types (`char *`), so it does not require intrusive modifications to existing code.
 * It is the same encoding used for terminal I/O, so redundant conversions are avoided.
-* Conformance to the [UTF-8 Everywhere Manifesto](http://utf8everywhere.org/), which exposes many other advantages.
+* Several other advantages enumerated in the [UTF-8 Everywhere Manifesto](http://utf8everywhere.org/).
 
 Note that when built with Borland C++, Turbo Vision does not support Unicode. However, this does not affect the way Turbo Vision applications are written, since the API extensions are designed to allow for encoding-agnostic code.
 
@@ -468,32 +480,29 @@ switch (ev.keyDown.keyCode) {
     // Key shortcuts are usually checked first.
     // ...
     default: {
-        // The character is encoded in the current codepage
-        // (CP437 by default).
         char c = ev.keyDown.charScan.charCode;
         // ...
     }
 }
 ```
 
-Some of the existing Turbo Vision classes that deal with text input still depend on this methodology, which has not changed. Single-byte characters, when representable in the current codepage, continue to be available in `ev.keyDown.charScan.charCode`.
+However, the `charScan.charCode` field can only hold a single-byte character and therefore it does not support Unicode. For backward compatibility, the `charScan.charCode` field in key press events still contains code page characters (CP437, unless overriden by the developer).
 
-Unicode support consists in two new fields in `ev.keyDown` (which is a `struct KeyDownEvent`):
+For Unicode support, two new fields have been introduced in `ev.keyDown` (which is a `struct KeyDownEvent`):
 
 * `char text[4]`, which may contain whatever was read from the terminal: usually a UTF-8 sequence, but possibly any kind of raw data.
 * `uchar textLength`, which is the number of bytes of data available in `text`, from 0 to 4.
 
-Note that the `text` string is not null-terminated.
-You can get a `TStringView` out of a `KeyDownEvent` with the `getText()` method.
+Note that the `text` string is not null-terminated. In order not to tamper with the `text` and `textLength` fields directly, you may instead use the `getText()` method which returns a string view.
 
-So a Unicode character can be retrieved from `TEvent` in the following way:
+So, a Unicode character can be retrieved from `TEvent` in the following way:
 
 ```c++
 switch (ev.keyDown.keyCode) {
     // ...
     default: {
-        std::string_view sv = ev.keyDown.getText();
-        processText(sv);
+        std::string_view ch = ev.keyDown.getText();
+        std::cerr << "Character received: " << ch << std::endl;
     }
 }
 ```
@@ -554,15 +563,15 @@ A new `TScreenCell` type is defined in `<tvision/scrncell.h>` which is capable o
 
 ### Text display rules
 
-A character provided as argument to any of the Turbo Vision API functions that deal with displaying text is interpreted as follows:
+Turbo Vision API functions that handle text display behave as follows:
 
-* Non-printable characters in the range `0x00` to `0xFF` are interpreted as characters in the active codepage. For instance, `0x7F` is displayed as `⌂` and `0xF0` as `≡` if using CP437. As an exception, `0x00` is always displayed as a regular space. These characters are all one column wide.
-* Character sequences which are not valid UTF-8 are interpreted as sequences of characters in the current codepage, as in the case above.
-* Valid UTF-8 sequences with a display width other than one are taken care of in a special way, see below.
+* ASCII control characters are handled as code page characters. For example, `'\x09'` is displayed as `○` instead of a tabulator, and `0x7F` as `⌂`. Null characters are displayed as spaces.
+* Other valid UTF-8 character sequences are displayed as-is. Double-width and combining characters are handled specially; see below.
+* Characters that do not form a valid UTF-8 sequence are also handled as code page characters. For example, a stray `'\xF0'` is displayed as `≡`, even if it is surrounded by valid UTF-8 sequences. So, the string `"╔[\xFE]╗"` is displayed as `╔[■]╗`.
 
-For example, the string `"╔[\xFE]╗"` may be displayed as `╔[■]╗`. This means that box-drawing characters can be mixed with UTF-8 in general, which is useful for backward compatibility. If you rely on this behaviour, though, you may get unexpected results: for instance, `"\xC4\xBF"` is a valid UTF-8 sequence and is displayed as `Ŀ` instead of `─┐`.
+This means that extended ASCII characters can be mixed with UTF-8, which is useful for backward-compatibility. If you rely on this behaviour, though, you may get unexpected results: for instance, `"\xC4\xBF"` is a valid UTF-8 sequence and is displayed as `Ŀ` instead of `─┐`.
 
-One of the issues of Unicode support is the existence of [double-width](https://convertcase.net/vaporwave-wide-text-generator/) characters and [combining](https://en.wikipedia.org/wiki/Combining_Diacritical_Marks) characters. This conflicts with Turbo Vision's original assumption that the screen is a grid of cells occupied by a single character each. Nevertheless, these cases are handled in the following way:
+Another aspect of Unicode support is the existence of [double-width](https://convertcase.net/vaporwave-wide-text-generator/) characters and [combining](https://en.wikipedia.org/wiki/Combining_Diacritical_Marks) characters. This conflicts with Turbo Vision's original assumption that the screen is a grid of cells occupied by a single character each. Nevertheless, these cases are handled in the following way:
 
 * Double-width characters can be drawn anywhere on the screen and nothing bad happens if they overlap partially with other characters.
 * Zero-width characters overlay the previous character. For example, the sequence `में` consists of the single-width character `म` and the combining characters `े` and `ं`. In this case, three Unicode codepoints are fit into the same cell.
@@ -575,34 +584,30 @@ Here is an example of such characters in the [Turbo](https://github.com/magiblot
 
 ### Unicode-aware API functions
 
-The usual way of writing to the screen is by using `TDrawBuffer`. A few methods have been added and others have changed their meaning:
+The usual way of writing to the screen is by using `TDrawBuffer`. Some of its methods have been updated to support the new features:
 
 ```c++
 void TDrawBuffer::moveChar(ushort indent, char c, TColorAttr attr, ushort count);
 void TDrawBuffer::putChar(ushort indent, char c);
 ```
-`c` is always interpreted as a character in the active codepage.
+`c` is handled as a code page character.
 
 ```c++
-ushort TDrawBuffer::moveStr(ushort indent, TStringView str, TColorAttr attr);
-ushort TDrawBuffer::moveCStr(ushort indent, TStringView str, TAttrPair attrs);
+ushort TDrawBuffer::moveStr( ushort indent, TStringView str, TColorAttr attr,
+                             ushort maxStrWidth = USHRT_MAX, ushort strIndent = 0 ); // New
+ushort TDrawBuffer::moveCStr( ushort indent, TStringView str, TColorAttr attr, 
+                              ushort maxStrWidth = USHRT_MAX, ushort strIndent = 0 ); // New
 ```
-`str` is interpreted according to the rules exposed previously.
+`str` is handled according to the rules exposed previously, and there are two new parameters:
+* `maxStrWidth` specifies the maximum amount of text that should be copied from `str`, measured in columns (not in bytes).
+* `strIndent` specifies the initial position in `str` where to copy from, measured in columns (not in bytes). This is useful for horizontal scrolling. If `strIndent` points to the middle of a double-width character, a space will be copied instead of the right half of the double-width character, since it is not possible to do such a thing.
 
-```c++
-ushort TDrawBuffer::moveStr(ushort indent, TStringView str, TColorAttr attr, ushort maxWidth, ushort strOffset = 0); // New
-ushort TDrawBuffer::moveCStr(ushort indent, TStringView str, TColorAttr attr, ushort maxWidth, ushort strOffset = 0); // New
-```
-`str` is interpreted according to the rules exposed previously, but:
-* `maxWidth` specifies the maximum amount of text that should be copied from `str`, measured in text width (not in bytes).
-* `strOffset` specifies the initial position in `str` where to copy from, measured in text width (not in bytes). This is useful for horizontal scrolling. If `strOffset` points to the middle of a double-width character, a space will be copied instead of the right half of the double-width character, since it is not possible to do such a thing.
-
-The return values are the number of cells in the buffer that were actually filled with text (which is the same as the width of the copied text).
+The return value is the width (in columns) of the copied text.
 
 ```c++
 void TDrawBuffer::moveBuf(ushort indent, const void *source, TColorAttr attr, ushort count);
 ```
-The name of this function is misleading. Even in its original implementation, `source` is treated as a string. So it is equivalent to `moveStr(indent, TStringView((const char*) source, count), attr)`.
+This function is actually the same as `moveStr`. However, it exists because it used to be the only `TDrawBuffer` function that could be used with non-null-terminated strings before the introduction of `TStringView`.
 
 There are other useful Unicode-aware functions:
 
@@ -618,7 +623,7 @@ Returns the displayed length of `s`.
 
 On Borland C++, these methods assume a single-byte encoding and all characters being one column wide. This makes it possible to write encoding-agnostic `draw()` and `handleEvent()` methods that work on both platforms without a single `#ifdef`.
 
-The functions above are implemented using the functions from the `TText` namespace, another API extension. You will have to use them directly if you want to fill `TScreenCell` objects with text manually. To give an example, below are some of the `TText` functions. You can find all of them with complete descriptions in `<tvision/ttext.h>`.
+The functions above are implemented using the functions from the `TText` namespace, another API extension. You will have to use them directly if you want to fill `TScreenCell` objects with text manually or to use a custom code page translation table. To give an example, below are some of the `TText` functions. You can find all of them with complete descriptions in `<tvision/ttext.h>`.
 
 ```c++
 size_t TText::next(TStringView text);
@@ -685,7 +690,7 @@ writeBuf( 0, i, size.x, 1, b );
 ```
 All it does is move part of a string in `fileLines` into `b`, which is a `TDrawBuffer`. `delta` is a `TPoint` representing the scroll offset in the text view, and `i` is the index of the visible line being processed. `c` is the text color. A few issues are present:
 
-* `TDrawBuffer::moveStr(ushort, const char *, TColorAttr)` takes a null-terminated string. In order to pass a substring of the current line, a copy is made into the array `s`, at the risk of a [buffer overrun](https://github.com/magiblot/tvision/commit/8aa2bf4af4474b85e86e340b08d7c56081b68986). The case where the line does not fit into `s` is not handled, so at most `maxLineLenght` characters will be copied. What's more, a multibyte character near position `maxLineLength` could be copied incompletely and be displayed as garbage.
+* `TDrawBuffer::moveStr` takes a null-terminated string. In order to pass a substring of the current line, a copy is made into the array `s`, at the risk of a [buffer overrun](https://github.com/magiblot/tvision/commit/8aa2bf4af4474b85e86e340b08d7c56081b68986). The case where the line does not fit into `s` is not handled, so at most `maxLineLenght` characters will be copied. What's more, a multibyte character near position `maxLineLength` could be copied incompletely and be displayed as garbage.
 * `delta.x` is the first visible column. With multibyte-encoded text, it is no longer true that such column begins at position `delta.x` in the string.
 
 Below is a corrected version of the code above that handles Unicode properly:
@@ -698,7 +703,7 @@ if (delta.y + i < fileLines->getCount()) {
 }
 writeBuf( 0, i, size.x, 1, b );
 ```
-The overload of `moveStr` used here is `TDrawBuffer::moveStr(ushort indent, TStringView str, TColorAttr attr, ushort width, ushort begin)`. This function not only provides Unicode support, but also helps us write cleaner code and overcome some of the limitations previously present:
+The overload of `moveStr` used here is `TDrawBuffer::moveStr(ushort indent, TStringView str, TColorAttr attr, ushort maxStrWidth, ushort strIndent = 0)`. This function not only provides Unicode support, but also helps us write cleaner code and overcome some of the limitations previously present:
 
 * The intermediary copy is avoided, so the displayed text is not limited to `maxLineLength` bytes.
 * `moveStr` takes care of printing the string starting at column `delta.x`. We do not even need to worry about how many bytes correspond to `delta.x` columns.
@@ -723,16 +728,17 @@ The following views can display Unicode text properly. Some of them also do hori
 - [x] `TFileViewer` (from the `tvdemo` application) ([`068bbf7a`](https://github.com/magiblot/tvision/commit/068bbf7a0a13482bda91f9f3411ec614f9a1e6ff)).
 - [x] `TFilePane` (from the `tvdir` application) ([`9bcd897c`](https://github.com/magiblot/tvision/commit/9bcd897cb7cf010ef34d0281d42e9ea58345ce53)).
 
-The following views can, in addition, process Unicode text or user input:
+The following views can, in addition, process Unicode user input:
 
 - [x] `TInputLine` ([`81066ee5`](https://github.com/magiblot/tvision/commit/81066ee5c05496612dfcd9cf75df5702cbfb9679), [`cb489d42`](https://github.com/magiblot/tvision/commit/cb489d42d522f7515c870942bcaa8f0f3dea3f35)).
 - [x] `TEditor` ([`702114dc`](https://github.com/magiblot/tvision/commit/702114dc03a13ebce2b52504eb122c97f9892de9)). Instances are in UTF-8 mode by default. You may switch back to single-byte mode by pressing `Ctrl+P`. This only changes how the document is displayed and the encoding of user input; it does not alter the document. This class is used in the `tvedit` application; you may test it there.
+- [x] Shortcuts in `TMenuView` ([`64e60064`](https://github.com/magiblot/tvision/commit/64e6006498cf1309d94cdbdb171142d5e9668b9a)).
 
 Views not in this list may not have needed any corrections or I simply forgot to fix them. Please submit an issue if you notice anything not working as expected.
 
 Use cases where Unicode is not supported (not an exhaustive list):
 
-- [ ] Highlighted key shortcuts, in general (e.g. `TMenuBox`, `TStatusLine`, `TButton`...).
+- [ ] Highlighted key shortcuts, in general (e.g. `TStatusLine`, `TButton`...).
 
 <div id="clipboard"></div>
 
@@ -750,7 +756,7 @@ To deal with this, a new class `TClipboard` has been added which allows accessin
 
 On Windows (including WSL) and macOS, clipboard integration is supported out-of-the-box.
 
-On Unix systems other than macOS, it is necessary to install some external dependencies. See [runtime requirements](#build-linux-runtime).
+On Unix/Linux systems (except macOS) it is necessary to install some external dependencies. See [runtime requirements](#build-linux-runtime).
 
 For applications running remotely (e.g. through SSH), clipboard integration is supported in the following situations:
 
@@ -880,86 +886,80 @@ Below is a more detailed explanation aimed at developers.
 
 In the first place we will explain the data types the programmer needs to know in order to take advantage of the extended color support. To get access to them, you may have to define the macro `Uses_TColorAttr` before including `<tvision/tv.h>`.
 
-All the types described in this section are *trivial*. This means that they can be `memset`'d and `memcpy`'d. But variables of these types are *uninitialized* when declared without initializer, just like primitive types. So make sure you don't manipulate them before initializing them.
-
 ### Color format types
 
 Several types are defined which represent different color formats.
-The reason why these types exist is to allow distinguishing color formats using the type system. Some of them also have public fields which make it easier to manipulate individual bits.
+The reason why these types exist is to allow distinguishing color formats using the type system.
 
-* `TColorBIOS` represents a BIOS color. It allows accessing the `r`, `g`, `b` and `bright` bits individually, and can be casted implicitly into/from `uint8_t`.
+* `TColorBIOS` represents a BIOS color. It allows accessing the individual color components via getter/setter methods, and can be casted implicitly into/from `uint8_t`.
 
     The memory layout is:
 
-    * Bit 0: Blue (field `b`).
-    * Bit 1: Green (field `g`).
-    * Bit 2: Red (field `r`).
-    * Bit 3: Bright (field `bright`).
-    * Bits 4-7: unused.
+    * Bit 0: Blue.
+    * Bit 1: Green.
+    * Bit 2: Red.
+    * Bit 3: Intensity.
+    * Bits 4-7: Unused.
 
     Examples of `TColorBIOS` usage:
     ```c++
-    TColorBIOS bios = 0x4;  // 0x4: red.
-    bios.bright = 1;        // 0xC: light red.
-    bios.b = bios.r;        // 0xD: light magenta.
-    bios = bios ^ 3;        // 0xE: yellow.
-    uint8_t c = bios;       // Implicit conversion to integer types.
+    TColorBIOS bios = 0x4;          // 0x4: red.
+    bios.setIntensity(true);        // 0xC: light red.
+    bios.setBlue(bios.getRed());    // 0xD: light magenta.
+    bios = bios ^ 3;                // 0xE: yellow.
+    uint8_t c = bios;               // Implicit conversion to integer types.
     ```
 
     In terminal emulators, BIOS colors are mapped to the basic 16 ANSI colors.
 
-* `TColorRGB` represents a color in 24-bit RGB. It allows accessing the `r`, `g` and `b` bit fields individually, and can be casted implicitly into/from `uint32_t`.
+* `TColorRGB` represents a color in 24-bit RGB. It allows accessing the individual color components via getter/setter methods, and can be casted implicitly into/from `uint32_t`.
 
     The memory layout is:
 
-    * Bits 0-7: Blue (field `b`).
-    * Bits 8-15: Green (field `g`).
-    * Bits 16-23: Red (field `r`).
-    * Bits 24-31: unused.
+    * Bits 0-7: Blue.
+    * Bits 8-15: Green.
+    * Bits 16-23: Red.
+    * Bits 24-31: Unused.
 
     Examples of `TColorRGB` usage:
     ```c++
-    TColorRGB rgb = 0x9370DB;   // 0xRRGGBB.
-    rgb = {0x93, 0x70, 0xDB};   // {R, G, B}.
-    rgb = rgb ^ 0xFFFFFF;       // Negated.
-    rgb.g = rgb.r & 0x88;       // Access to individual components.
-    uint32_t c = rgb;           // Implicit conversion to integer types.
+    TColorRGB rgb = 0x9370DB;           // 0xRRGGBB.
+    rgb = {0x93, 0x70, 0xDB};           // {R, G, B}.
+    rgb = rgb ^ 0xFFFFFF;               // Negated.
+    rgb.setGreen(rgb.getRed() & 0x88);  // Access to individual components.
+    uint32_t c = rgb;                   // Implicit conversion to integer types.
     ```
 
 * `TColorXTerm` represents an index into the `xterm-256color` color palette. It can be casted into and from `uint8_t`.
 
-### `TColorDesired`
+* `TColorDefault` represents the terminal default color. This is the color used by terminal emulators when no display attributes are enabled (usually white for foreground and black for background). It is implicitly convertible to `TColor`.
 
-`TColorDesired` represents a color which the programmer intends to show on screen, encoded in any of the supported color types.
+### `TColor`
 
-A `TColorDesired` can be initialized in the following ways:
+`TColor` works like a union type of the different supported color types.
+
+A `TColor` can be initialized in the following ways:
 
 * As a BIOS color: with a `char` literal or a `TColorBIOS` object:
 
     ```c++
-    TColorDesired bios1 = '\xF';
-    TColorDesired bios2 = TColorBIOS(0xF);
+    TColor bios1 = '\xF';
+    TColor bios2 = TColorBIOS(0xF);
     ```
 * As a RGB color: with an `int` literal or a `TColorRGB` object:
 
     ```c++
-    TColorDesired rgb1 = 0xFF7700; // 0xRRGGBB.
-    TColorDesired rgb2 = TColorRGB(0xFF, 0x77, 0x00); // {R, G, B}.
-    TColorDesired rgb3 = TColorRGB(0xFF7700); // 0xRRGGBB.
+    TColor rgb1 = 0xFF7700; // 0xRRGGBB.
+    TColor rgb2 = TColorRGB(0xFF, 0x77, 0x00); // {R, G, B}.
+    TColor rgb3 = TColorRGB(0xFF7700); // 0xRRGGBB.
     ```
 * As an XTerm palette index: with a `TColorXTerm` object.
-* As the *terminal default* color: through zero-initialization:
+* As the *terminal default* color: with a `TColorDefault` object, or through value-initialization:
 
     ```c++
-    TColorDesired def1 {};
-    // Or with 'memset':
-    TColorDesired def2;
-    memset(&def2, 0, sizeof(def2));
+    TColor def1 = TColorDefault();
+    TColor def2 {};
     ```
-
-`TColorDesired` has methods to query the contained color, but you will usually not need to use them. See the struct definition in `<tvision/colors.h>` for more information.
-
-Trivia: the name is inspired by [Scintilla](https://www.scintilla.org/index.html)'s `ColourDesired`.
 
 ### `TColorAttr`
 
@@ -967,8 +967,8 @@ Trivia: the name is inspired by [Scintilla](https://www.scintilla.org/index.html
 
 A `TColorAttr` is composed of:
 
-* A foreground color, of type `TColorDesired`.
-* A background color, of type `TColorDesired`.
+* A foreground color, of type `TColor`.
+* A background color, of type `TColor`.
 * A style bitmask containing a combination of the following flags:
 
     * `slBold`.
@@ -978,9 +978,9 @@ A `TColorAttr` is composed of:
     * `slReverse`.
     * `slStrike`.
 
-    These flags are based on the basic display attributes selectable through [ANSI escape codes](https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters). The results may vary between terminal emulators. `slReverse` is probably the least reliable of them: prefer using the `TColorAttr reverseAttribute(TColorAttr attr)` free function over setting this flag.
+    These flags are based on the basic display attributes selectable through [ANSI escape codes](https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters). The results may vary between terminal emulators. `slReverse` is probably the least reliable of them: prefer using the `reversed()` method over setting this flag.
 
-The most straight-forward way to create a `TColorAttr` is by means of the `TColorAttr(TColorDesired fg, TColorDesired bg, ushort style=0)` and `TColorAttr(int bios)` constructors:
+The most straight-forward way to create a `TColorAttr` is by means of the `TColorAttr(TColor fg, TColor bg, ushort style = 0)` and `TColorAttr(int bios)` constructors:
 
 ```c++
 // Foreground: RGB 0x892312
@@ -996,7 +996,7 @@ TColorAttr a2 = {'\x7', 0x7F00BB, slBold | slItalic};
 // Foreground: Terminal default.
 // Background: BIOS 0xF.
 // Style: Normal.
-TColorAttr a3 = {{}, TColorBIOS(0xF)};
+TColorAttr a3 = {TColorDefault(), TColorBIOS(0xF)};
 
 // Foreground: Terminal default.
 // Background: Terminal default.
@@ -1009,16 +1009,7 @@ TColorAttr a4 = {};
 TColorAttr a5 = 0x70;
 ```
 
-The fields of a `TColorAttr` can be accessed with the following free functions:
-
-```c++
-TColorDesired getFore(const TColorAttr &attr);
-TColorDesired getBack(const TColorAttr &attr);
-ushort getStyle(const TColorAttr &attr);
-void setFore(TColorAttr &attr, TColorDesired fg);
-void setBack(TColorAttr &attr, TColorDesired bg);
-void setStyle(TColorAttr &attr, ushort style);
-```
+Important: `TColorAttr` is a *trivial* type. This means that it can be `memset`'d and `memcpy`'d. But variables of this type are *uninitialized* when declared without an initializer, just like primitive types. So make sure you don't manipulate them before initializing them.
 
 ### `TAttrPair`
 
@@ -1049,8 +1040,8 @@ assert(hi == attrs[1]);
 Views are commonly drawn by means of a `TDrawBuffer`. Most `TDrawBuffer` member functions take color attributes by parameter. For example:
 
 ```c++
-ushort TDrawBuffer::moveStr(ushort indent, TStringView str, TColorAttr attr);
-ushort TDrawBuffer::moveCStr(ushort indent, TStringView str, TAttrPair attrs);
+ushort TDrawBuffer::moveStr(ushort indent, TStringView str, TColorAttr attr, ushort maxStrWidth, ushort strIndent);
+ushort TDrawBuffer::moveCStr(ushort indent, TStringView str, TAttrPair attrs, ushort maxStrWidth, ushort strIndent);
 void TDrawBuffer::putAttribute(ushort indent, TColorAttr attr);
 ```
 
@@ -1098,7 +1089,7 @@ So, in general, there are three ways to use extended colors in views:
 
 ```c++
 // The 'TMyScrollBar' class inherits from 'TScrollBar' and overrides 'TView::mapColor'.
-TColorAttr TMyScrollBar::mapColor(uchar index) noexcept
+TColorAttr TMyScrollBar::mapColor(uchar index)
 {
     // In this example the values are hardcoded,
     // but they could be stored elsewhere if desired.
@@ -1127,20 +1118,7 @@ TColorAttr TMyScrollBar::mapColor(uchar index) noexcept
 
 3. By modifying the palettes. There are two ways to do this:
 
-    1. By modifying the application palette after it has been built. Note that the palette elements are `TColorAttr`. For example:
-
-    ```c++
-    void updateAppPalette()
-    {
-        TPalette &pal = TProgram::application->getPalete();
-        pal[1] = {0x762892, 0x828712};              // TBackground.
-        pal[2] = {0x874832, 0x249838, slBold};      // TMenuView normal text.
-        pal[3] = {{}, {}, slItalic | slUnderline};  // TMenuView disabled text.
-        /* ... */
-    }
-    ```
-
-    2. By using extended color attributes in the application palette definition:
+    1. By redefining the entire application palette using extended color attributes:
 
     ```c++
     static const TColorAttr cpMyApp[] =
@@ -1156,6 +1134,19 @@ TColorAttr TMyScrollBar::mapColor(uchar index) noexcept
     {
         static TPalette palette(cpMyApp);
         return palette;
+    }
+    ```
+
+    2. By modifying the application palette after it has been built. For example:
+
+    ```c++
+    void updateAppPalette()
+    {
+        TPalette &pal = TProgram::application->getPalete();
+        pal[1] = {0x762892, 0x828712};              // TBackground.
+        pal[2] = {0x874832, 0x249838, slBold};      // TMenuView normal text.
+        pal[3] = {{}, {}, slItalic | slUnderline};  // TMenuView disabled text.
+        /* ... */
     }
     ```
 
@@ -1176,8 +1167,8 @@ The types defined previously represent concepts that are also important when dev
 | Concept | Layout in Borland C++ | Layout in modern platforms |
 |:-:|:-:|:-:|
 | Color Attribute | `uchar`. A BIOS color attribute. | `struct TColorAttr`. |
-| Color | A 4-bit number. | `struct TColorDesired`. |
-| Attribute Pair | `ushort`. An attribute in each byte. | `struct TAttrPair`. |
+| Color | A 4-bit number. | `class TColor`. |
+| Attribute Pair | `ushort`. An attribute in each byte. | `class TAttrPair`. |
 
 One of this project's key principles is that the API should be used in the same way both in Borland C++ and modern platforms, that is to say, without the need for `#ifdef`s. Another principle is that legacy code should compile out-of-the-box, and adapting it to the new features should increase complexity as little as possible.
 
@@ -1188,7 +1179,7 @@ Backward-compatibility is accomplished in the following way:
 
     A `TColorAttr` initialized with `uchar` represents a BIOS color attribute. When converting back to `uchar`, the following happens:
 
-    * If `fg` and `bg` are BIOS colors, and `style` is cleared, the resulting `uchar` represents the same BIOS color attribute contained in the `TColorAttr` (as in the code above).
+    * If both the foreground and background are BIOS colors, and no style flags have been set, the resulting `uchar` represents the same BIOS color attribute contained in the `TColorAttr` (as in the code above).
     * Otherwise, the conversion results in a color attribute that stands out, i.e. white on magenta, meaning that the programmer should consider replacing `uchar`/`ushort` with `TColorAttr`/`TAttrPair` if they intend to support the extended color attributes.
 
     The same goes for `TAttrPair` and `ushort`, considering that it is composed of two `TColorAttr`.
@@ -1232,4 +1223,4 @@ The code above still works just like it did originally. It's only non-BIOS color
 +    TAttrPair cFrame, cTitle;
 ```
 
-Nothing prevents you from using different variables for palette indices and color attributes, which is what should actually be done. The point of backward-compatibility is the ability to support new features without changing the program's logic, that is to say, minimizing the risk of increasing code complexity or introducing bugs.
+Since this example was using the same variables for storing both palette indices and color attributes, replacing `ushort` with `TAttrPair` may result in counter-intuitive code: it would be best to use different sets of variables. Nevertheless, the point of backward-compatibility is to be able to support new features without changing the program's logic, which minimizes the risk of increasing code complexity or introducing bugs.

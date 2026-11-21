@@ -371,9 +371,11 @@ dies_with(
 	like( $py, qr/ax0\.bar\(\[[^\]]*\], \[0,4\]/, 'bar: the missing value is drawn as 0' );
 
 	# The label array the caller gave a hash-of-hashes plot was overwritten.
-	my @label = ( 'one', 'two' );
+	# Its inner keys, out of sorted order: since 0.3345 "label" orders them,
+	# and refuses a name that is not one of them.
+	my @label = ( 'y', 'x' );
 	capture { plt( output_file => out_file(), execute => 0, plot_type => 'bar', data => { A => { x => 1, y => 2 } }, label => \@label ) };
-	is_deeply( \@label, [ 'one', 'two' ], 'bar: the caller\'s label array is not overwritten' );
+	is_deeply( \@label, [ 'y', 'x' ], 'bar: the caller\'s label array is not overwritten' );
 }
 {
 	# hexbin passed vmin/vmax beside a LogNorm, which matplotlib refuses.

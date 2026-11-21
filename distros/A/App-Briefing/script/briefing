@@ -1,0 +1,268 @@
+#!/usr/bin/env perl
+# ABSTRACT: Preload declared skills and diagnose briefing-aware agents
+# PODNAME: briefing
+
+use strict;
+use warnings;
+
+use App::Briefing::CLI;
+
+our $VERSION = '0.006000';
+
+exit App::Briefing::CLI->run(\@ARGV);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+briefing - Preload declared skills and diagnose briefing-aware agents
+
+=head1 VERSION
+
+version 0.006000
+
+=head1 SYNOPSIS
+
+    briefing doctor                                   # this project, both harnesses
+    briefing doctor --cwd ~/dev/shop --harness codex
+    briefing doctor --tsv                             # the Claude Code team, for tools
+    briefing hook subagent-start < payload.json       # what the plugin's hooks run
+    briefing --version
+
+=head1 DESCRIPTION
+
+C<briefing> runs the hooks of the briefing plugin for Claude Code and Codex,
+and checks the skills a project's agents declare before anything spawns. The
+plugin's hooks call it as C<briefing hook EVENT> with the harness's JSON
+payload on standard input; you call C<briefing doctor>. What briefing does,
+how agents declare skills and where names resolve is described in
+L<App::Briefing>.
+
+Inside Claude Code the plugin puts its own launcher on the C<PATH> of the Bash
+tool as C<briefing>. That launcher takes the same commands. It runs a prebuilt
+binary of this program when the plugin version pins one and it is cached.
+Otherwise C<hook marketplace-notice> runs the plugin's Python notice script or
+does nothing; every other C<hook> runs the plugin's Python hook; a plain
+C<doctor> runs that Python hook's doctor and, without Python, this program from
+the plugin's source; every other command, C<doctor --tsv> included, runs this
+program from the plugin's source. That source runs only when the machine's
+C<perl> has its modules.
+
+C<briefing> reads agent files, skills and settings and never changes them. The
+one exception is the state file of the marketplace note (see L</notice>).
+
+=head2 Exit status
+
+C<0> for C<hook>, whatever the payload and also for an unknown event word, for
+C<notice>, for C<--help> and C<--version>, and for a C<doctor> run in which no spawn would fail (warnings
+included). C<1> when C<doctor> finds a declaration that would fail, or when
+C<doctor --tsv> prints a C<missing> line. C<2> for an unknown command or
+arguments, a bad C<doctor> option, or a C<doctor --tsv> path that is not a
+directory; these print C<briefing: unknown command or arguments> or
+C<briefing doctor: MESSAGE> on standard error, followed by the usage except
+for the directory error.
+
+=head1 COMMANDS
+
+=head2 hook
+
+    briefing hook [subagent-start|pre-tool-use|session-start]
+
+Reads one hook payload as JSON from standard input and writes the hook's
+answer as JSON to standard output; the payload's C<cwd> is the project. The
+event word picks the handler: C<subagent-start>, C<pre-tool-use> or
+C<session-start>, with letter case, C<-> and C<_> ignored, so C<SubagentStart>
+works too. Without it the payload's C<hook_event_name> decides. An unknown word
+prints C<briefing: unknown hook event: WORD> on standard error and exits 0;
+more than one word is a usage error. Empty or invalid input gives no output.
+
+=over 4
+
+=item *
+
+C<subagent-start>
+
+For an agent that declares skills, its briefing as C<additionalContext> and
+the audit line as C<systemMessage>, such as
+C<< briefing: reviewer E<0x2190> code-style, review-checklist (13 kB) >>. When
+the skills exceed 64 kB, or a Codex agent still uses a C<[briefing]> table, a
+note follows in C<systemMessage> and on standard error.
+When a declared skill is missing, C<additionalContext> instead tells the agent
+not to attempt the task and to report the failure, and
+C<briefing: agent 'NAME' references unknown skill(s): ...> goes to
+C<systemMessage> and standard error. An agent that is not found or declares
+nothing gets no output.
+
+=item *
+
+C<pre-tool-use>
+
+The Claude Code guard, for a call of the C<Agent> tool: when the agent declares
+a skill that is missing, a C<deny> decision with that same reason, which also
+goes to standard error. Otherwise no output; the call is never changed.
+
+=item *
+
+C<session-start>
+
+At C<startup>, at C<resume> or without a C<source>: a C<systemMessage> that
+names every declaration of that harness that would fail, eight at most and
+then how many more. Otherwise, and for a healthy project, no output.
+
+=back
+
+=head2 hook marketplace-notice
+
+    briefing hook marketplace-notice
+
+The plugin's SessionStart entry for the marketplace note; exactly the same as
+L</notice>.
+
+=head2 doctor
+
+    briefing doctor [--cwd DIR] [--harness claude|codex|both]
+
+Checks every agent of the project that declares skills and prints a report:
+per harness, one line per agent with C<ok>, C<WARN> (more than 64 kB of skill
+text) or C<FAIL> (an unknown skill, or a Codex C<[briefing]> table), its
+skills with their size, and the reason under it:
+
+    briefing doctor — /home/you/dev/shop
+
+    Claude Code
+      FAIL  backend  (.claude/agents/backend.md)
+            code-style, kubernetes-rest  (9 kB)
+            → unknown skill(s): kubernetes-rest
+      ok    reviewer  (.claude/agents/reviewer.md)
+            code-style, review-checklist  (13 kB)
+
+A project without declarations prints C<no agents declare skills>.
+
+=head2 doctor --tsv
+
+    briefing doctor --tsv [--cwd DIR]
+
+Prints the findings about the project's Claude Code team as tab-separated
+lines, one per finding: what (C<agent>, C<skill>, C<settings> or C<hook>),
+status (C<ok>, C<missing> or C<warn>), name and text. The checks are listed in
+L<App::Briefing::Team>. C<--harness codex> is an error here; a C<DIR> that is
+not a directory prints
+
+    briefing doctor: 'DIR' is not a directory.
+    briefing doctor: pass the repository that holds the team.
+
+=head2 notice
+
+    briefing notice
+
+Prints the one-time note for installs from a marketplace other than Getty's,
+as a C<systemMessage>, when C<CLAUDE_PLUGIN_ROOT> lies in such a marketplace
+cache and F<~/.claude/.briefing-marketplace-notice> does not exist yet; it then
+creates that file, so the note appears once. Otherwise it prints nothing. It
+reads no input and exits 0, also when anything fails.
+
+=head2 help
+
+    briefing --help
+    briefing help
+    briefing
+
+Prints the usage on standard output.
+
+=head2 --version
+
+    briefing --version
+
+Prints C<briefing VERSION>.
+
+=head1 OPTIONS
+
+The options belong to C<doctor>. Each value can also be given as
+C<--option=VALUE>.
+
+=head2 --cwd DIR
+
+The project to check. Default: the current directory. On Windows, change into
+a directory whose path has characters outside the ANSI code page instead of
+naming it here: command-line arguments reach the program in the ANSI code
+page.
+
+=head2 --harness claude|codex|both
+
+Which harness's agents to check. Default C<both>. C<--tsv> takes C<claude> or
+C<both> only.
+
+=head2 --tsv
+
+Print the team findings as tab-separated lines instead of the report.
+
+=head2 --help
+
+Print the usage and exit 0.
+
+=head1 ENVIRONMENT
+
+=head2 HOME
+
+The user's home directory: F<~/.claude> (user skills and agents, settings,
+installed plugins), F<~/.agents/skills>, the default C<CODEX_HOME> and the
+note's state file.
+
+=head2 USERPROFILE, HOMEDRIVE, HOMEPATH
+
+On Windows the home directory when C<HOME> is not set: C<USERPROFILE>, else
+C<HOMEDRIVE> plus C<HOMEPATH>.
+
+=head2 CODEX_HOME
+
+The Codex configuration directory. Default F<~/.codex>.
+
+=head2 PWD
+
+The project directory of a hook payload without C<cwd>.
+
+=head2 CLAUDE_PLUGIN_ROOT
+
+Set by the harness for the plugin's hooks; the marketplace note reads from it
+which marketplace the plugin was installed from.
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<App::Briefing> - what briefing does, and the library behind this command
+
+=item * L<App::Briefing::Team> - the checks of C<doctor --tsv>
+
+=item * L<https://github.com/Getty/briefing> - the plugin: installation, platforms and status
+
+=back
+
+=head1 SUPPORT
+
+=head2 Issues
+
+Please report bugs and feature requests at
+L<https://github.com/Getty/briefing/issues>.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
+
+=head1 AUTHOR
+
+Torsten Raudssus <torsten@raudssus.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

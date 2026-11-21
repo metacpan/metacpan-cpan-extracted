@@ -31,8 +31,16 @@ t/path.t
 t/pod-cm.t
 t/pod-coverage.t
 t/pod-synopsis.t
+t/locales.t
+t/options.t
+t/customizer_options.t
+t/version.t
+t/deps.t
+t/meta.t
 t/pull_6.t
+t/os_option.t
 t/timeout.t
+t/versions_option.t
 t/unit.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

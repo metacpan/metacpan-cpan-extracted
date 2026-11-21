@@ -3,7 +3,7 @@ package Net::DNS::Packet;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Packet.pm 2003 2025-01-21 12:06:06Z willem $)[2];
+our $VERSION = (qw$Id: Packet.pm 2067 2026-11-20 12:25:28Z willem $)[2];
 
 
 =head1 NAME
@@ -640,8 +640,8 @@ sub sign_tsig {
 Verify TSIG signature of a reply to the corresponding query.
 
 
-	$opaque  = $packet1->verify( $query ) || die $packet1->verifyerr;
-	$opaque  = $packet2->verify( $opaque );
+	$opaque	 = $packet1->verify( $query ) || die $packet1->verifyerr;
+	$opaque	 = $packet2->verify( $opaque );
 	$verifed = $packet3->verify( $opaque ) || die $packet3->verifyerr;
 
 Verify TSIG signature of a multi-packet reply to the corresponding query.
@@ -839,17 +839,37 @@ sub dump {				## print internal data structure
 }
 
 
-my ( $cache1, $cache2, $limit );
+{
+	use constant HASH => defined eval { require Digest::SHA };
+	use constant HRES => defined eval { use Time::HiRes qw(time) };
+	my $hash = HASH ? Digest::SHA->new(256) : undef;
+	my $mark = time();
+	my $seed = int rand(0xffff);
 
-sub _quid {				## generate (short-term) unique query ID
-	my $self = shift;
-	my $id	 = $self->{id};
-	$cache1->{$id}++ if $id;				# cache non-zero ID
-	return $id	 if defined $id;
-	( $cache2, $cache1, $limit ) = ( $cache1, {0 => 1}, 50 ) unless $limit--;
-	$id = int rand(0xffff);					# two layer ID cache
-	$id = int rand(0xffff) while $cache1->{$id}++ + exists( $cache2->{$id} );
-	return $self->{id} = $id;
+	my $prng = sub {		## PRNG using truncated hash
+		croak 'missing prerequisite: "Digest::SHA"' unless HASH;
+		my $time = time();
+		( my $delta_t, $mark ) = ( $time - $mark, $time );
+		$hash->add($seed);
+		$hash->add($time);
+		$hash->add($delta_t);
+		( my $random, $seed ) = unpack 'na*', $hash->digest;
+		return $random;
+	};
+
+
+	my ( $cache1, $cache2, $limit );
+
+	sub _quid {			## generate (short-term) "unique" query TxID
+		my $self = shift;
+		my $id	 = $self->{id};
+		$cache1->{$id}++ if $id;			# cache non-zero TxID
+		return $id	 if defined $id;
+		$id = &$prng();					# two layer TxID cache
+		( $limit, $cache2, $cache1 ) = ( 50, $cache1, {0 => 1} ) unless $limit--;
+		$id = &$prng() while $cache1->{$id}++ + exists( $cache2->{$id} );
+		return $self->{id} = $id;
+	}
 }
 
 
@@ -865,7 +885,7 @@ Portions Copyright (c)2002-2004 Chris Reinhardt.
 
 Portions Copyright (c)2002-2009 Olaf Kolkman
 
-Portions Copyright (c)2007-2019 Dick Franks
+Portions Copyright (c)2007-2026 Dick Franks
 
 All rights reserved.
 

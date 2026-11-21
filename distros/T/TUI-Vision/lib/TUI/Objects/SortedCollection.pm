@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -15,8 +15,17 @@ our @EXPORT = qw(
   new_TSortedCollection
 );
 
-use TUI::Objects::NSSortedCollection;
+use Storable;
 use TUI::toolkit;
+use TUI::toolkit::Types qw(
+  is_Str
+  Object
+);
+
+use TUI::Objects::Stream;
+use TUI::Objects::Streamable;
+use TUI::Objects::Collection;
+use TUI::Objects::NSSortedCollection;
 
 sub TSortedCollection() { __PACKAGE__ }
 sub name() { 'TSortedCollection' };
@@ -24,8 +33,53 @@ sub new_TSortedCollection { __PACKAGE__->from(@_) }
 
 extends TNSSortedCollection;
 
-sub compare {    # $cmp ($key1, $key2)
-  return 0;
+sub STORABLE_freeze {    # @list ($cloning)
+  goto &TUI::Objects::Collection::STORABLE_freeze;
+} 
+
+sub STORABLE_attach {    # $obj ($cloning, $serialized)
+  goto &TUI::Objects::Collection::STORABLE_attach;
+}
+
+sub writeItem {    # void ($item, $os)
+  goto &TUI::Objects::Collection::writeItem;
+}
+
+sub readItem {    # $item|undef ($is)
+  goto &TUI::Objects::Collection::readItem;
+}
+
+sub write :method {    # void ($os)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $os ) = $sig->( @_ );
+  $self->TUI::Objects::Collection::write( $os );
+  $os->put( $self->{duplicates} ? 1 : 0 );
+  return;
+}
+
+sub read :method {    # $self ($is)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $is ) = $sig->( @_ );
+  $self->TUI::Objects::Collection::read( $is );
+  $self->{duplicates} = $is->get() ? true : false;
+  return $self;
+}
+
+sub build {    # $obj ()
+  my ( $class ) = @_;
+  assert ( @_ == 1 );
+  assert ( is_Str $class );
+  assert ( Storable::is_retrieving );
+  return $class->new(
+    limit => 0,
+    delta => 0,
+  );
 }
 
 1

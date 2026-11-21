@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -16,6 +16,7 @@ our @EXPORT = qw(
   new_TFileList
 );
 
+use Storable;
 use TUI::toolkit;
 use TUI::toolkit::Types qw(
   Maybe
@@ -34,6 +35,7 @@ use TUI::MsgBox::Const qw(
 );
 use TUI::MsgBox::MsgBoxText qw( messageBox );
 use TUI::Objects::Const qw( maxCollectionSize );
+use TUI::Objects::Rect;
 use TUI::StdDlg::Const qw(
   cmFileDoubleClicked
   cmFileFocused
@@ -270,6 +272,17 @@ sub getKey {    # $key ($s)
   }
   $sR->name( uc $s );
   return $sR;
+}
+
+sub build {    # $obj ()
+  my ( $class ) = @_;
+  assert ( @_ == 1 );
+  assert ( is_Str $class );
+  assert ( Storable::is_retrieving );
+  return $class->new(
+    bounds     => TRect->new(),
+    vScrollBar => undef
+  );
 }
 
 1

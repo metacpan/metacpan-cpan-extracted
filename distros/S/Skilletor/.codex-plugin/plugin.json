@@ -1,0 +1,15 @@
+{
+  "name": "skilletor",
+  "version": "0.8.0",
+  "description": "Remote skills, agents and rules for Codex, Claude Code and Hermes Agent — declared once in skilletor.json, synced on every session, templated per project. For Codex: skills in .agents/skills, agents as agent-role TOML, rules injected at session start by the hook.",
+  "author": {
+    "name": "Torsten Raudssus",
+    "url": "https://github.com/Getty"
+  },
+  "homepage": "https://github.com/Getty/skilletor",
+  "repository": "https://github.com/Getty/skilletor",
+  "license": "Artistic-2.0",
+  "keywords": ["skills", "agents", "rules", "sync", "templates", "codex", "claude-code", "plugin", "nunjucks"],
+  "skills": "./skills/",
+  "hooks": "./hooks/codex-hooks.json"
+}

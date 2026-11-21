@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 1.6.1 are described by their release commits.
 
+## 1.17.1 - 2026-11-21
+
+### Fixes
+
+- Re-pin the spec to 2026.11.20 as republished: 64-bit AS numbers, and the AS's country and RPKI status required ([`d874f19`](https://github.com/internetdata/sdk-perl/commit/d874f19e4a5f3a9f22ff946b001261effa872f2c))
+
 ## 1.17.0 - 2026-11-20
 
 ### Features

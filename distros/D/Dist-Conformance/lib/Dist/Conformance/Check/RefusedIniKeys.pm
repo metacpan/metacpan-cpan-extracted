@@ -1,4 +1,4 @@
-package Dist::Conformance::Check::RefusedIniKeys 0.006;
+package Dist::Conformance::Check::RefusedIniKeys 0.007;
 
 # ABSTRACT: An INI file, such as dist.ini, sets no key that the flavor refuses, and the update removes each one
 
@@ -93,7 +93,7 @@ Dist::Conformance::Check::RefusedIniKeys - An INI file, such as dist.ini, sets n
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 DESCRIPTION
 

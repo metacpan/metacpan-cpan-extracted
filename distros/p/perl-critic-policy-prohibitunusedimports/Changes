@@ -1,5 +1,12 @@
 Revision history for perl-critic-policy-prohibitunusedimports
 
+1.002 2026-11-20 TEODESIAN
+    - Add Test::NoWarnings, Test2::Plugin::NoWarnings and Mojo::Base to the
+      built-in exempt list.  Each works through its import: the first two
+      check the warnings of the whole test, and Mojo::Base takes flags that
+      turn on features rather than name symbols.  Every distribution that
+      used them had to list them in allow.
+
 1.001 2026-09-03 TEODESIAN
     - Ad 're' to the default exempt list
 

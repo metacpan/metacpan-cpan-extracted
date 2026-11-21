@@ -1,0 +1,15 @@
+{
+  "enabledPlugins": {
+    "briefing@getty": true,
+    "ruler@getty": true,
+    "skilletor@getty": true
+  },
+  "extraKnownMarketplaces": {
+    "getty": {
+      "source": {
+        "source": "github",
+        "repo": "Getty/marketplace"
+      }
+    }
+  }
+}

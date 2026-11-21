@@ -481,7 +481,7 @@ subtest 'CostEstimator::estimate_current_usage - free-tier and billing math' => 
 				build => {
 					strategy => {
 						matrix => { os => ['ubuntu-latest','macos-latest','windows-latest'],
-						            perl => ['5.36','5.38','5.40'] },
+									perl => ['5.36','5.38','5.40'] },
 					},
 					steps => [
 						{ uses => 'actions/setup-node@v4' },

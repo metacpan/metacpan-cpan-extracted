@@ -27,7 +27,7 @@ use constant {
     FEATURE_HYBRID               => '5a1895b8-61f1-4ce1-a44f-1a239b7d9de7',
 };
 
-our $VERSION = v0.15;
+our $VERSION = v0.16;
 
 my %table_defs = (
     SQLite => {
@@ -145,6 +145,25 @@ sub create {
     $self->upgrade;
 
     $dbh->commit;
+
+    return $db;
+}
+
+
+sub create_memory_database {
+    my ($pkg, %opts) = @_;
+    my Data::TagDB $db = $pkg->create('dbi:SQLite:dbname=:memory:');
+    my $include = delete $opts{include};
+
+    croak 'Stray options passed' if scalar keys %opts;
+
+    if (defined $include) {
+        my $migration = $db->migration;
+        $include = [$include] unless ref($include) eq 'ARRAY';
+        $db->in_transaction(rw => sub {
+                $migration->include(@{$include});
+            });
+    }
 
     return $db;
 }
@@ -581,7 +600,7 @@ Data::TagDB::Migration - Work with Tag databases
 
 =head1 VERSION
 
-version v0.15
+version v0.16
 
 =head1 SYNOPSIS
 
@@ -610,6 +629,27 @@ Also ensures all required base objects are present.
 
 Creates a database and returns an handle to it.
 This function takes the same arguments as L<Data::TagDB/new>.
+
+=head2 create_memory_database
+
+    my Data::TagDB $db = Data::TagDB::Migration->create_memory_database(%opts);
+
+(since v0.16)
+
+Creates a in-memory database and returns an handle to it.
+
+This is specifically useful for testing.
+
+The following, all optional, options are supported:
+
+=over
+
+=item C<include>
+
+A single value or an arrayref of values that are passed to L</include>.
+This can be used to easily populate the database.
+
+=back
 
 =head2 db
 

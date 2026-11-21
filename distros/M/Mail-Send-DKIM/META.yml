@@ -3,12 +3,21 @@ abstract: 'Sign mail with DKIM, and summarise DMARC reports'
 author:
   - 'Nigel Horne <njh@nigehorne.com>'
 build_requires:
+  Config: '0'
+  Cwd: '0'
   ExtUtils::MakeMaker: '0'
+  File::Copy: '0'
+  File::Find: '0'
+  File::Path: '0'
   File::Temp: '0'
   Net::DNS: '0'
   Pod::Github: '0'
   Test::DescribeMe: '0'
+  Test::Memory::Cycle: '0'
+  Test::Mockingbird: '0.14'
   Test::Most: '0'
+  Test::Needs: '0.002010'
+  Test::Returns: '0.05'
   Time::HiRes: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
@@ -24,20 +33,37 @@ no_index:
     - t
     - inc
 requires:
+  Carp: '0'
+  Errno: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  FindBin: '0'
+  Getopt::Long: '0'
   IO::Compress::Gzip: '0'
   IO::Compress::Zip: '0'
   IO::Uncompress::Gunzip: '0'
   IO::Uncompress::Unzip: '0'
+  IPC::System::Simple: '0'
+  Mail::Address: '0'
   Mail::DKIM: '0'
+  Mail::DKIM::Signer: '0'
   Object::Configure: '0'
+  POSIX: '0'
   Params::Get: '0'
+  Params::Validate::Strict: '0.43'
+  Pod::Usage: '0'
   Readonly: '0'
+  Scalar::Util: '0'
+  Sub::Private: '0.09'
+  Sub::Protected: '0.03'
+  Sys::Hostname: '0'
   Sys::Syslog: '0'
   XML::PP: '0'
-  perl: '5.016'
+  autodie: '0'
+  perl: '5.026'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Mail-Send-DKIM
   homepage: https://metacpan.org/pod/Mail::Send::DKIM
   repository: git://github.com/nigelhorne/Mail-Send-DKIM.git
-version: 0.002.0
+version: 0.004.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -4,7 +4,7 @@
       "George S. Baugh <george@troglodyne.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013",
+   "generated_by" : "Dist::Zilla version 6.040, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "mit"
    ],
@@ -76,6 +76,7 @@
             "FindBin" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
+            "POSIX" : "0",
             "Test2::Plugin::NoWarnings" : "0",
             "Test2::Tools::Explain" : "0",
             "Test2::Tools::Subtest" : "0",
@@ -89,11 +90,11 @@
    "provides" : {
       "Net::OpenSSH::More" : {
          "file" : "lib/Net/OpenSSH/More.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       },
       "Net::OpenSSH::More::Linux" : {
          "file" : "lib/Net/OpenSSH/More/Linux.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       }
    },
    "release_status" : "stable",
@@ -108,13 +109,13 @@
          "web" : "https://github.com/troglodyne-internet-widgets/perl-Net-Openssh-More"
       }
    },
-   "version" : "1.06",
+   "version" : "1.07",
    "x_contributors" : [
       "Andy Baugh <andy@troglodyne.net>",
       "Troglodyne LLC Crash test Dummy <trogbot@troglodyne.net>"
    ],
    "x_generated_by_perl" : "v5.44.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.43",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.82",
    "x_spdx_expression" : "MIT"
 }
 

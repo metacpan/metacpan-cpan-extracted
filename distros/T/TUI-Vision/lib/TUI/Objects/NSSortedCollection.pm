@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -111,7 +111,7 @@ sub keyOf {    # $key ($item|undef)
 sub compare {    # $cmp ($key1, $key2)
   state $sig = signature(
     method => Object,
-    pos    => [Any, Any],
+    pos    => [Item, Item],
   );
   $sig->( @_ );
   return 0;

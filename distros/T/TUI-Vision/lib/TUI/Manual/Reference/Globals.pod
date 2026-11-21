@@ -107,6 +107,21 @@ the user interface.
  $validSignedChars   Validator pattern for signed numeric input
  $validUnsignedChars Validator pattern for unsigned numeric input
 
+=head2 Editors
+
+These variables hold the shared state of the editor search, replace and
+clipboard functions. They are package variables of
+L<TUI::Editors::Editor|TUI::Editors::Editor> and are shared by all editor
+instances.
+
+ $clipboard          Editor holding the clipboard contents
+ $clipboardTitle     Title of the clipboard window
+ $editorDialog       Dialog callback, a dummy until TEditorDialog is ported
+ $editorFlags        Search and replace option flags
+ $findStr            Last search text
+ $replaceStr         Last replacement text
+ $untitled           Title of an editor window without a file name
+
 =head2 Platform Backends
 
 These variables are maintained by platform-specific backend
@@ -159,6 +174,8 @@ inventory.
   $chdirText           TChDirDialog           Change directory action label
   $clearOnSuspend      TScreen                Clear screen on suspend flag
   $clearText           TFileDialog            Clear action label
+  $clipboard           TEditor                Clipboard holding the contents
+  $clipboardTitle      TEditWindow            Title of the clipboard window
   $closeIcon           TFrame                 Close window icon
   $commandSetChanged   TView                  Command set modified flag
   $colors              TColorDialog           Color selection label
@@ -177,9 +194,12 @@ inventory.
   $doubleDelay         TEventQueue            Double-click delay
   $downMouse           TEventQueue            Mouse-down state
   $downTicks           TEventQueue            Ticks since mouse press
+  $dragFrame           TIndicator             Drag frame drawing character
   $dragIcon            TFrame                 Drag window icon
   $drives              TDirListBox            Drives label text
   $drivesText          TChDirDialog           Drives label
+  $editorDialog        TEditor                Dialog callback
+  $editorFlags         TEditor                Search and replace option flags
 
   $emptyText           TListViewer            Empty list placeholder text
   $errorAttr           TView                  Error display attribute
@@ -191,6 +211,7 @@ inventory.
   $exitText            TProgram               Exit command label text
 
   $filesText           TFileDialog            Files section label
+  $findStr             TEditor                Last search text
   $firstDir            TDirListBox            First directory tree element
   $forText             TColorDialog           Foreground color label
   $frameChars          TFrame                 Frame drawing characters
@@ -214,6 +235,7 @@ inventory.
   $informationText     MsgBoxText             Information dialog title
   $initFrame           TFrame                 Frame initialization table
   $insertState         HardwareInfo::*        Insert/overwrite input mode
+  $invalidContext      THelpFile              Uninitialized help context text
   $invalidDriveText    TFileDialog            Invalid drive message
   $invalidFileText     TFileDialog            Invalid file message
   $invalidText         TChDirDialog           Invalid directory message
@@ -239,6 +261,7 @@ inventory.
 
   $noMouse             THWMouse               Mouse hardware unavailable flag
   $normal              TMonoSelector          Normal text attribute
+  $normalFrame         TIndicator             Normal frame drawing character
 
   $okText              MsgBoxText             OK button label
   $okText              TChDirDialog           OK button label
@@ -256,6 +279,7 @@ inventory.
   $pmText              TFileInfoPane          PM time indicator
 
   $repeatDelay         TEventQueue            Auto-repeat delay
+  $replaceStr          TEditor                Last replacement text
   $revertText          TChDirDialog           Revert action label
   $rightArrow          TInputLine             Right overflow indicator
 
@@ -277,6 +301,7 @@ inventory.
   $tooManyFiles        TFileList              Too many files message
 
   $underline           TMonoSelector          Underlined text attribute
+  $untitled            TEditWindow            Editor title without a file name
   $unZoomIcon          TFrame                 Unzoom window icon
 
   $vChars              TScrollBar             Vertical scrollbar characters

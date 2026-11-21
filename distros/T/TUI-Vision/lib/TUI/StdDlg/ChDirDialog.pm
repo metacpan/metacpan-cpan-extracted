@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -16,6 +16,7 @@ our @EXPORT = qw(
 );
 
 use Carp ();
+use Storable;
 use TUI::toolkit;
 use TUI::toolkit::Types qw(
   Maybe
@@ -287,18 +288,18 @@ sub valid {    # $bool ($command)
   my ( $self, $command ) = $sig->( @_ );
 
   return true 
-    if $command == cmOK;
+    if $command != cmOK;
 
   my $path = $self->{dirInput}{data};
 
   # BUG FIX - EFW - Tue 05/16/95
   # Ignore "Drives" line if switching drives.
   $path = ''
-    if $path ne $drivesText;
+    if $path eq $drivesText;
 
   # If it was "Drives" or the input line was blank, issue a
   # cmChangeDir event to select the current drive/directory.
-  if ( $path ne '' ) {
+  if ( $path eq '' ) {
     my $event = TEvent->new();
     $event->{what} = evCommand;
     $event->{message}{command} = cmChangeDir;
@@ -356,6 +357,48 @@ $setUpDialog = sub {    # void ()
 
   return;
 }; #/ $setUpDialog = sub
+
+sub write :method {    # void ($os)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $os ) = $sig->( @_ );
+  $self->SUPER::write( $os );
+  $os->put(
+    $self->{dirList},
+    $self->{dirInput},
+    $self->{okButton},
+    $self->{chDirButton},
+  );
+  return;
+}
+
+sub read :method {    # $self ($is)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $is ) = $sig->( @_ );
+  $self->SUPER::read( $is );
+  $self->{dirList}     = $is->get();
+  $self->{dirInput}    = $is->get();
+  $self->{okButton}    = $is->get();
+  $self->{chDirButton} = $is->get();
+  $self->$setUpDialog();
+  return $self;
+}
+
+sub build {    # $obj ()
+  my ( $class ) = @_;
+  assert ( @_ == 1 );
+  assert ( is_Str $class );
+  assert ( Storable::is_retrieving );
+  return $class->new(
+    options => cdNoLoadDir,
+    histId  => 0,
+  );
+}
 
 1
 

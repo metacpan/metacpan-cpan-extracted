@@ -14,7 +14,9 @@ our @EXPORT_OK = qw(
 	customize_workflow
 );
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
+
+=encoding utf-8
 
 =head1 NAME
 
@@ -26,8 +28,6 @@ App::GHGen::Interactive - Interactive workflow customization
 
     my $config = customize_workflow('perl');
     # Returns hash of user choices
-
-=encoding utf-8
 
 =head1 FUNCTIONS
 
@@ -175,18 +175,18 @@ Reads one line from STDIN; prints to STDOUT.
 =cut
 
 sub prompt_choice($question, $choices, $default = 0) {
-    say $question;
-    for my $i (0 .. $#$choices) {
-        my $marker = $i == $default ? colored(['green'], '→') : ' ';
-        say "  $marker " . ($i + 1) . ". $choices->[$i]";
-    }
+	say $question;
+	for my $i (0 .. $#$choices) {
+		my $marker = $i == $default ? colored(['green'], '→') : ' ';
+		say "  $marker " . ($i + 1) . ". $choices->[$i]";
+	}
 
-    print "\nEnter number [" . ($default + 1) . "]: ";
-    chomp(my $answer = <STDIN>);
+	print "\nEnter number [" . ($default + 1) . "]: ";
+	chomp(my $answer = <STDIN>);
 
-    return $default if $answer eq '';
-    return $answer - 1 if $answer =~ /^\d+$/ && $answer >= 1 && $answer <= @$choices;
-    return $default;
+	return $default if $answer eq '';
+	return $answer - 1 if $answer =~ /^\d+$/ && $answer >= 1 && $answer <= @$choices;
+	return $default;
 }
 
 =head2 prompt_multiselect($question, $options, $defaults)
@@ -273,33 +273,33 @@ Reads one line from STDIN; prints to STDOUT.
 =cut
 
 sub prompt_multiselect($question, $options, $defaults = []) {
-    say $question;
-    say colored(['cyan'], "(Enter numbers separated by commas, or 'all')");
+	say $question;
+	say colored(['cyan'], "(Enter numbers separated by commas, or 'all')");
 
-    my %is_default = map { $_ => 1 } @$defaults;
+	my %is_default = map { $_ => 1 } @$defaults;
 
-    for my $i (0 .. $#$options) {
-        my $marker = $is_default{$options->[$i]} ? colored(['green'], '✓') : ' ';
-        say "  $marker " . ($i + 1) . ". $options->[$i]";
-    }
+	for my $i (0 .. $#$options) {
+		my $marker = $is_default{$options->[$i]} ? colored(['green'], '✓') : ' ';
+		say "  $marker " . ($i + 1) . ". $options->[$i]";
+	}
 
-    print "\nEnter choices [" . join(',', map { $_+1 } 0..$#$defaults) . "]: ";
-    chomp(my $answer = <STDIN>);
+	print "\nEnter choices [" . join(',', map { $_+1 } 0..$#$defaults) . "]: ";
+	chomp(my $answer = <STDIN>);
 
-    return $defaults if $answer eq '';
+	return $defaults if $answer eq '';
 
-    if ($answer =~ /^all$/i) {
-        return $options;
-    }
+	if ($answer =~ /^all$/i) {
+		return $options;
+	}
 
-    my @selected;
-    for my $num (split /[,\s]+/, $answer) {
-        if ($num =~ /^\d+$/ && $num >= 1 && $num <= @$options) {
-            push @selected, $options->[$num - 1];
-        }
-    }
+	my @selected;
+	for my $num (split /[,\s]+/, $answer) {
+		if ($num =~ /^\d+$/ && $num >= 1 && $num <= @$options) {
+			push @selected, $options->[$num - 1];
+		}
+	}
 
-    return @selected ? \@selected : $defaults;
+	return @selected ? \@selected : $defaults;
 }
 
 =head2 prompt_text($question, $default)
@@ -360,11 +360,11 @@ Reads one line from STDIN; prints to STDOUT.
 =cut
 
 sub prompt_text($question, $default = '') {
-    my $prompt = $default ? "[$default]" : '';
-    print "$question $prompt: ";
-    chomp(my $answer = <STDIN>);
+	my $prompt = $default ? "[$default]" : '';
+	print "$question $prompt: ";
+	chomp(my $answer = <STDIN>);
 
-    return $answer eq '' ? $default : $answer;
+	return $answer eq '' ? $default : $answer;
 }
 
 =head2 customize_workflow($type)
@@ -424,299 +424,299 @@ Reads multiple lines from STDIN; prints to STDOUT.
 =cut
 
 sub customize_workflow($type) {
-    say '';
-    say colored(['bold cyan'], "=== Workflow Customization: " . uc($type) . " ===");
-    say '';
+	say '';
+	say colored(['bold cyan'], "=== Workflow Customization: " . uc($type) . " ===");
+	say '';
 
-    my %dispatch = (
-        perl   => \&_customize_perl,
-        node   => \&_customize_node,
-        python => \&_customize_python,
-        rust   => \&_customize_rust,
-        go     => \&_customize_go,
-        ruby   => \&_customize_ruby,
-        docker => \&_customize_docker,
-        static => \&_customize_static,
-    );
+	my %dispatch = (
+		perl   => \&_customize_perl,
+		node   => \&_customize_node,
+		python => \&_customize_python,
+		rust   => \&_customize_rust,
+		go     => \&_customize_go,
+		ruby   => \&_customize_ruby,
+		docker => \&_customize_docker,
+		static => \&_customize_static,
+	);
 
-    if (exists $dispatch{$type}) {
-        return $dispatch{$type}->();
-    }
+	if (exists $dispatch{$type}) {
+		return $dispatch{$type}->();
+	}
 
-    return {};
+	return {};
 }
 
 sub _customize_perl() {
-    my %config;
+	my %config;
 
-    # Perl versions
-    say colored(['bold'], "Perl Versions to Test:");
-    my @all_versions = qw(5.40 5.38 5.36 5.34 5.32 5.30 5.28 5.26 5.24 5.22);
-    my @default_versions = qw(5.40 5.38 5.36);
+	# Perl versions
+	say colored(['bold'], "Perl Versions to Test:");
+	my @all_versions = qw(5.40 5.38 5.36 5.34 5.32 5.30 5.28 5.26 5.24 5.22);
+	my @default_versions = qw(5.40 5.38 5.36);
 
-    $config{perl_versions} = prompt_multiselect(
-        "Which Perl versions?",
-        \@all_versions,
-        \@default_versions
-    );
-    say '';
+	$config{perl_versions} = prompt_multiselect(
+		"Which Perl versions?",
+		\@all_versions,
+		\@default_versions
+	);
+	say '';
 
-    # Operating systems
-    say colored(['bold'], "Operating Systems:");
-    my @all_os = ('ubuntu-latest', 'macos-latest', 'windows-latest');
-    my @default_os = @all_os;
+	# Operating systems
+	say colored(['bold'], "Operating Systems:");
+	my @all_os = ('ubuntu-latest', 'macos-latest', 'windows-latest');
+	my @default_os = @all_os;
 
-    $config{os} = prompt_multiselect(
-        "Which operating systems?",
-        \@all_os,
-        \@default_os
-    );
-    say '';
+	$config{os} = prompt_multiselect(
+		"Which operating systems?",
+		\@all_os,
+		\@default_os
+	);
+	say '';
 
-    # Code quality
-    say colored(['bold'], "Code Quality Tools:");
-    $config{enable_linter} = prompt_yes_no(
-        "Enable syntax linting (perl -c on all matrix cells)?",
-        'y'
-    );
-    say '';
+	# Code quality
+	say colored(['bold'], "Code Quality Tools:");
+	$config{enable_linter} = prompt_yes_no(
+		"Enable syntax linting (perl -c on all matrix cells)?",
+		'y'
+	);
+	say '';
 
-    $config{enable_linter_unused} = prompt_yes_no(
-        "Enable unused-variable check (warnings::unused, latest+ubuntu only)?",
-        'n'
-    );
-    say '';
+	$config{enable_linter_unused} = prompt_yes_no(
+		"Enable unused-variable check (warnings::unused, latest+ubuntu only)?",
+		'n'
+	);
+	say '';
 
-    $config{enable_critic} = prompt_yes_no(
-        "Enable Perl::Critic?",
-        'y'
-    );
-    say '';
+	$config{enable_critic} = prompt_yes_no(
+		"Enable Perl::Critic?",
+		'y'
+	);
+	say '';
 
-    # Coverage
-    $config{enable_coverage} = prompt_yes_no(
-        "Enable test coverage (Devel::Cover)?",
-        'y'
-    );
-    say '';
+	# Coverage
+	$config{enable_coverage} = prompt_yes_no(
+		"Enable test coverage (Devel::Cover)?",
+		'y'
+	);
+	say '';
 
-    # Branches
-    say colored(['bold'], "Branch Configuration:");
-    my $branches = prompt_text(
-        "Branches to run on (comma-separated)",
-        'main,master'
-    );
-    $config{branches} = [split /,\s*/, $branches];
-    say '';
+	# Branches
+	say colored(['bold'], "Branch Configuration:");
+	my $branches = prompt_text(
+		"Branches to run on (comma-separated)",
+		'main,master'
+	);
+	$config{branches} = [split /,\s*/, $branches];
+	say '';
 
-    return \%config;
+	return \%config;
 }
 
 sub _customize_node() {
-    my %config;
+	my %config;
 
-    # Node versions
-    say colored(['bold'], "Node.js Versions to Test:");
-    my @all_versions = qw(18.x 20.x 22.x 23.x);
-    my @default_versions = qw(20.x 22.x);
+	# Node versions
+	say colored(['bold'], "Node.js Versions to Test:");
+	my @all_versions = qw(18.x 20.x 22.x 23.x);
+	my @default_versions = qw(20.x 22.x);
 
-    $config{node_versions} = prompt_multiselect(
-        "Which Node.js versions?",
-        \@all_versions,
-        \@default_versions
-    );
-    say '';
+	$config{node_versions} = prompt_multiselect(
+		"Which Node.js versions?",
+		\@all_versions,
+		\@default_versions
+	);
+	say '';
 
-    # Package manager
-    say colored(['bold'], "Package Manager:");
-    my $pm_choice = prompt_choice(
-        "Which package manager?",
-        ['npm', 'yarn', 'pnpm'],
-        0
-    );
-    $config{package_manager} = ['npm', 'yarn', 'pnpm']->[$pm_choice];
-    say '';
+	# Package manager
+	say colored(['bold'], "Package Manager:");
+	my $pm_choice = prompt_choice(
+		"Which package manager?",
+		['npm', 'yarn', 'pnpm'],
+		0
+	);
+	$config{package_manager} = ['npm', 'yarn', 'pnpm']->[$pm_choice];
+	say '';
 
-    # Linting
-    $config{enable_lint} = prompt_yes_no(
-        "Enable linting?",
-        'y'
-    );
-    say '';
+	# Linting
+	$config{enable_lint} = prompt_yes_no(
+		"Enable linting?",
+		'y'
+	);
+	say '';
 
-    # Build step
-    $config{enable_build} = prompt_yes_no(
-        "Enable build step?",
-        'y'
-    );
-    say '';
+	# Build step
+	$config{enable_build} = prompt_yes_no(
+		"Enable build step?",
+		'y'
+	);
+	say '';
 
-    # Branches
-    my $branches = prompt_text(
-        "Branches to run on (comma-separated)",
-        'main,develop'
-    );
-    $config{branches} = [split /,\s*/, $branches];
-    say '';
+	# Branches
+	my $branches = prompt_text(
+		"Branches to run on (comma-separated)",
+		'main,develop'
+	);
+	$config{branches} = [split /,\s*/, $branches];
+	say '';
 
-    return \%config;
+	return \%config;
 }
 
 sub _customize_python() {
-    my %config;
+	my %config;
 
-    # Python versions
-    say colored(['bold'], "Python Versions to Test:");
-    my @all_versions = qw(3.9 3.10 3.11 3.12 3.13);
-    my @default_versions = qw(3.11 3.12);
+	# Python versions
+	say colored(['bold'], "Python Versions to Test:");
+	my @all_versions = qw(3.9 3.10 3.11 3.12 3.13);
+	my @default_versions = qw(3.11 3.12);
 
-    $config{python_versions} = prompt_multiselect(
-        "Which Python versions?",
-        \@all_versions,
-        \@default_versions
-    );
-    say '';
+	$config{python_versions} = prompt_multiselect(
+		"Which Python versions?",
+		\@all_versions,
+		\@default_versions
+	);
+	say '';
 
-    # Linting
-    say colored(['bold'], "Code Quality:");
-    $config{enable_flake8} = prompt_yes_no(
-        "Enable flake8 linting?",
-        'y'
-    );
-    say '';
+	# Linting
+	say colored(['bold'], "Code Quality:");
+	$config{enable_flake8} = prompt_yes_no(
+		"Enable flake8 linting?",
+		'y'
+	);
+	say '';
 
-    $config{enable_black} = prompt_yes_no(
-        "Enable black formatter check?",
-        'n'
-    );
-    say '';
+	$config{enable_black} = prompt_yes_no(
+		"Enable black formatter check?",
+		'n'
+	);
+	say '';
 
-    # Coverage
-    $config{enable_coverage} = prompt_yes_no(
-        "Enable test coverage?",
-        'y'
-    );
-    say '';
+	# Coverage
+	$config{enable_coverage} = prompt_yes_no(
+		"Enable test coverage?",
+		'y'
+	);
+	say '';
 
-    # Branches
-    my $branches = prompt_text(
-        "Branches to run on (comma-separated)",
-        'main,develop'
-    );
-    $config{branches} = [split /,\s*/, $branches];
-    say '';
+	# Branches
+	my $branches = prompt_text(
+		"Branches to run on (comma-separated)",
+		'main,develop'
+	);
+	$config{branches} = [split /,\s*/, $branches];
+	say '';
 
-    return \%config;
+	return \%config;
 }
 
 sub _customize_rust() {
-    my %config;
+	my %config;
 
-    say colored(['bold'], "Rust Workflow Options:");
+	say colored(['bold'], "Rust Workflow Options:");
 
-    $config{enable_fmt} = prompt_yes_no(
-        "Enable formatting check (cargo fmt)?",
-        'y'
-    );
-    say '';
+	$config{enable_fmt} = prompt_yes_no(
+		"Enable formatting check (cargo fmt)?",
+		'y'
+	);
+	say '';
 
-    $config{enable_clippy} = prompt_yes_no(
-        "Enable clippy linting?",
-        'y'
-    );
-    say '';
+	$config{enable_clippy} = prompt_yes_no(
+		"Enable clippy linting?",
+		'y'
+	);
+	say '';
 
-    $config{enable_release} = prompt_yes_no(
-        "Build release binary?",
-        'y'
-    );
-    say '';
+	$config{enable_release} = prompt_yes_no(
+		"Build release binary?",
+		'y'
+	);
+	say '';
 
-    my $branches = prompt_text(
-        "Branches to run on (comma-separated)",
-        'main'
-    );
-    $config{branches} = [split /,\s*/, $branches];
-    say '';
+	my $branches = prompt_text(
+		"Branches to run on (comma-separated)",
+		'main'
+	);
+	$config{branches} = [split /,\s*/, $branches];
+	say '';
 
-    return \%config;
+	return \%config;
 }
 
 sub _customize_go() {
-    my %config;
+	my %config;
 
-    say colored(['bold'], "Go Workflow Options:");
+	say colored(['bold'], "Go Workflow Options:");
 
-    my $go_version = prompt_text(
-        "Go version",
-        '1.22'
-    );
-    $config{go_version} = $go_version;
-    say '';
+	my $go_version = prompt_text(
+		"Go version",
+		'1.22'
+	);
+	$config{go_version} = $go_version;
+	say '';
 
-    $config{enable_vet} = prompt_yes_no(
-        "Enable go vet?",
-        'y'
-    );
-    say '';
+	$config{enable_vet} = prompt_yes_no(
+		"Enable go vet?",
+		'y'
+	);
+	say '';
 
-    $config{enable_race} = prompt_yes_no(
-        "Enable race detector?",
-        'y'
-    );
-    say '';
+	$config{enable_race} = prompt_yes_no(
+		"Enable race detector?",
+		'y'
+	);
+	say '';
 
-    $config{enable_coverage} = prompt_yes_no(
-        "Enable test coverage?",
-        'y'
-    );
-    say '';
+	$config{enable_coverage} = prompt_yes_no(
+		"Enable test coverage?",
+		'y'
+	);
+	say '';
 
-    my $branches = prompt_text(
-        "Branches to run on (comma-separated)",
-        'main'
-    );
-    $config{branches} = [split /,\s*/, $branches];
-    say '';
+	my $branches = prompt_text(
+		"Branches to run on (comma-separated)",
+		'main'
+	);
+	$config{branches} = [split /,\s*/, $branches];
+	say '';
 
-    return \%config;
+	return \%config;
 }
 
 sub _customize_ruby() {
-    my %config;
+	my %config;
 
-    say colored(['bold'], "Ruby Versions to Test:");
-    my @all_versions = qw(3.1 3.2 3.3);
-    my @default_versions = qw(3.2 3.3);
+	say colored(['bold'], "Ruby Versions to Test:");
+	my @all_versions = qw(3.1 3.2 3.3);
+	my @default_versions = qw(3.2 3.3);
 
-    $config{ruby_versions} = prompt_multiselect(
-        "Which Ruby versions?",
-        \@all_versions,
-        \@default_versions
-    );
-    say '';
+	$config{ruby_versions} = prompt_multiselect(
+		"Which Ruby versions?",
+		\@all_versions,
+		\@default_versions
+	);
+	say '';
 
-    my $branches = prompt_text(
-        "Branches to run on (comma-separated)",
-        'main'
-    );
-    $config{branches} = [split /,\s*/, $branches];
-    say '';
+	my $branches = prompt_text(
+		"Branches to run on (comma-separated)",
+		'main'
+	);
+	$config{branches} = [split /,\s*/, $branches];
+	say '';
 
-    return \%config;
+	return \%config;
 }
 
 sub _customize_docker() {
-    my %config;
+	my %config;
 
-    say colored(['bold'], "Docker Workflow Options:");
+	say colored(['bold'], "Docker Workflow Options:");
 
-    my $image_name = prompt_text(
-        "Docker image name (user/image)",
-        'your-username/your-image'
-    );
-    $config{image_name} = $image_name;
-    say '';
+	my $image_name = prompt_text(
+		"Docker image name (user/image)",
+		'your-username/your-image'
+	);
+	$config{image_name} = $image_name;
+	say '';
 
 	$config{push_on_pr} = prompt_yes_no(
 		'Push images on pull requests?',

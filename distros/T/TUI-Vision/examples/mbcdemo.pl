@@ -1,6 +1,6 @@
 #---------------------------------------------------------#
 #                                                         #
-#    Turbo Vision MultiCheckBoxes Demo Source File        #
+#    Turbo Vision MultiCheckBoxes Demo                    #
 #                                                         #
 #---------------------------------------------------------#
 #
@@ -153,4 +153,151 @@ sub main {
   return 0;
 }
 
-exit main();
+exit main( @ARGV+1, [ $0, @ARGV ] );
+
+#---------------------------------------------------------#
+
+use Getopt::Long qw(GetOptions);
+use Pod::Usage qw(pod2usage);
+
+# Command line options handling for help and manual pages
+BEGIN {
+  my ( $help, $man );
+  GetOptions(
+    'help|?' => \$help,
+    'man'    => \$man,
+  ) or pod2usage( -verbose => 0, -exitval => 2 );
+  pod2usage( -verbose => 0, -exitval => 0 ) if $help;
+  pod2usage( -verbose => 2, -exitval => 0 ) if $man;
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+mbcdemo.pl - TMultiCheckBoxes control demonstration
+
+=head1 SYNOPSIS
+
+  mbcdemo.pl [options]
+
+  Options:
+    -?, --help    Show brief usage information
+        --man     Show the complete manual
+
+=head1 DESCRIPTION
+
+This demo application demonstrates the
+L<TMultiCheckBoxes|TUI::Dialogs::MultiCheckBoxes> control provided by
+L<TUI::Vision>.
+
+The example creates a dialog containing three items named C<Low>, C<Med>, 
+and C<High>.  Each item can be cycled through three states, displayed as C<->, 
+C<+>, and C<*>.
+
+Select C<MultiCheck Demo...> from the Demo menu or press C<Alt-M> to open the 
+demonstration dialog.
+
+=head1 MULTICHECKBOXES CONTROL
+
+L<TMultiCheckBoxes|TUI::Dialogs::MultiCheckBoxes> extends the usual checkbox 
+concept, allowing each item to have more than two states.
+
+This example configures the control with three states:
+
+  states   => "-+*"
+  selRange => 3
+
+Each item therefore cycles through C<->, C<+>, and C<*> instead of being 
+limited to an unchecked and checked state.
+
+The example stores each selected state in a two-bit field:
+
+  flags => 0x0203
+
+The low byte defines the mask used for an individual item, while the high byte 
+defines the number of bits by which successive item values are shifted.
+
+With three items, their states are therefore combined into a single bitfield 
+value.
+
+=head1 RESULT
+
+Press C<OK> to close the dialog and display the resulting bitfield in a message 
+box.
+
+The value represents the combined states of the C<Low>, C<Med>, and C<High> 
+items.
+
+Press C<Cancel> to close the dialog without displaying the value.
+
+=head1 KEYBOARD SHORTCUTS
+
+=over 4
+
+=item C<Alt-M>
+
+Open the MultiCheckBoxes demonstration dialog.
+
+=item C<F10>
+
+Activate the menu bar.
+
+=item C<Alt-X>
+
+Exit the application.
+
+=back
+
+=head1 DEMONSTRATED FEATURES
+
+This example demonstrates:
+
+=over 4
+
+=item *
+
+Creating and inserting a L<TMultiCheckBoxes|TUI::Dialogs::MultiCheckBoxes> 
+control.
+
+=item *
+
+Configuring more than two states per item.
+
+=item *
+
+Defining the characters used to represent the available states.
+
+=item *
+
+Packing the states of several items into a single bitfield.
+
+=item *
+
+Building the item list used by a cluster control.
+
+=item *
+
+Retrieving the resulting value after executing a modal dialog.
+
+=back
+
+=head1 SEE ALSO
+
+L<TUI::App>,
+L<TUI::Dialogs>,
+L<TUI::Menus>,
+L<TUI::MsgBox>
+
+=head1 COPYRIGHT AND LICENSE
+
+  Turbo Vision - Version 2.0 (Perl Edition)
+
+  Copyright (c) 2026 J. Schneider
+
+This software is licensed under the MIT license.  See the LICENSE file
+included with the L<TUI::Vision> distribution.
+
+=cut

@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -17,7 +17,11 @@ our @EXPORT = qw(
 
 use Devel::StrictMode;
 use List::Util qw( min max );
-use Scalar::Util qw( weaken );
+use Scalar::Util qw(
+  weaken
+  reftype
+);
+use Storable qw( freeze thaw );
 use TUI::toolkit;
 use TUI::toolkit::Types qw(
   Maybe
@@ -29,6 +33,8 @@ use TUI::Const qw( INT_MAX );
 use TUI::Objects::Object;
 use TUI::Objects::Point;
 use TUI::Objects::Rect;
+use TUI::Objects::Stream;
+use TUI::Objects::Streamable;
 use TUI::Drivers::Const qw(
   :evXXXX
   :kbXXXX
@@ -62,6 +68,7 @@ sub name() { 'TView' }
 sub new_TView { __PACKAGE__->from(@_) }
 
 extends TObject;
+with: *DOES = TStreamable->can('DOES');
 
 # declare global variables
 our $shadowSize        = TPoint->new( x => 2, y => 1 );
@@ -1022,7 +1029,7 @@ sub getState {    # $bool ($aState)
   return ( $self->{state} & $aState ) == $aState;
 }
 
-sub select {    # void ()
+sub select :method {    # void ()
   state $sig = signature(
     method => Object,
     pos    => [],
@@ -1284,7 +1291,7 @@ sub writeBuf {    # void ($x, $y, $w, $h, $b)
   my ( $self, $x, $y, $w, $h, $b ) = $sig->( @_ );
   while ( $h-- > 0 ) {
     $self->$writeView( $x, $y++, $w, $b );
-    alias: $b = sub { \@_ }->( @$b[ $w .. $#$b ] );
+    alias: $b = sub { \@_ }->( @$b[ $w .. $#$b ] ) if $h;
   }
   return;
 }
@@ -1324,7 +1331,7 @@ sub writeStr {    # void ($x, $y, $str, $color)
     pos    => [Int, Int, Str, PositiveOrZeroInt],
   );
   my ( $self, $x, $y, $str, $color ) = $sig->( @_ );
-  if ( $str ) {
+  if ( defined $str ) {
     my $length = length( $str );
     if ( $length > 0 ) {
       my $attr = $self->mapColor( $color )->$coerceAttr();
@@ -1449,6 +1456,82 @@ $writeView = sub {    # void ($x, $y, $count, $b)
   TUI::Views::View::Write::L0( $self, $x, $y, $count, $b );
   return;
 };
+
+sub STORABLE_freeze {    # @list ($cloning)
+  my ( $self, $cloning ) = @_;
+  assert ( is_Object $self );
+  assert ( is_Bool $cloning );
+  assert ( not $cloning );
+
+  my $stream = TStream->new();
+  $self->write( $stream );
+  return freeze $stream;
+} 
+
+sub STORABLE_attach {    # $obj ($cloning, $serialized)
+  my ( $class, $cloning, $serialized ) = @_;
+  assert ( is_Str $class );
+  assert ( is_Bool $cloning );
+  assert ( is_Str $serialized );
+  assert ( not $cloning );
+
+  my $self = $class->build();
+  my $stream = thaw $serialized;
+  return $self->read( $stream );
+}
+
+sub build {    # $obj ()
+  my ( $class ) = @_;
+  assert ( @_ == 1 );
+  assert ( is_Str $class );
+  assert ( Storable::is_retrieving );
+  return $class->new(
+    bounds => TRect->new(),
+  );
+}
+
+sub write :method {    # void ($os)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $os ) = $sig->( @_ );
+  assert ( Storable::is_storing );
+
+  my $saveState =
+    $self->{state} & ~( sfActive | sfSelected | sfFocused | sfExposed );
+
+  $os->put(
+    $self->{origin},   $self->{size},     $self->{cursor},
+    $self->{growMode}, $self->{dragMode}, $self->{helpCtx},
+    $saveState,        $self->{options},  $self->{eventMask},
+  );
+
+  return;
+}
+
+sub read :method {    # $self ($is)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $is ) = $sig->( @_ );
+  assert ( Storable::is_retrieving );
+
+  $self->{origin}    = $is->get();
+  $self->{size}      = $is->get();
+  $self->{cursor}    = $is->get();
+  $self->{growMode}  = $is->get();
+  $self->{dragMode}  = $is->get();
+  $self->{helpCtx}   = $is->get();
+  $self->{state}     = $is->get();
+  $self->{options}   = $is->get();
+  $self->{eventMask} = $is->get();
+  $self->owner( undef );
+  $self->next( undef );
+
+  return $self;
+}
 
 1
 

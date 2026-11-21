@@ -2,7 +2,7 @@ package Net::DNS::RR::RRSIG;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: RRSIG.pm 2059 2026-08-28 10:04:18Z willem $)[2];
+our $VERSION = (qw$Id: RRSIG.pm 2066 2026-11-17 11:13:39Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -34,9 +34,9 @@ my @deprecated;
 if (DNSSEC) {
 	my @module = qw(Private DSA RSA ECDSA EdDSA MLDSA Digest);
 	foreach my $class ( map {"Net::DNS::SEC::$_"} @module ) {
-		my @index = eval join '', qw(r e q u i r e), " $class; ${class}::_index()";	## no critic
+		my @index = eval join '', qw(r e q u i r e), " $class; $class->_index()";	## no critic
 		push @algorithms, map { ( $_ => $class ) } @index;
-		push @deprecated, eval "${class}::_deprecate()";			   	## no critic
+		push @deprecated, eval { $class->_deprecate() };
 	}
 	croak 'Net::DNS::SEC version not supported' unless scalar(@algorithms);
 }

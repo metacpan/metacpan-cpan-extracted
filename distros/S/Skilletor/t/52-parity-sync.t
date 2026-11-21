@@ -2,8 +2,9 @@
 # Sync parity on one machine: the reference and Skilletor::Engine sync the same home and project
 # from the same pristine state, and must leave the same bytes – installed files, lock, .gitignore
 # blocks, .worktreeinclude, settings.json and the state records `check` reads (render-inputs.json
-# with its hash, sources-read.json, unreached.json) – and the same reports; each one's `check`
-# must accept what the other synced. Needs node and the TypeScript tree beside perl/.
+# with its hash, sources-read.json, unreached.json), rendered templates with the default host and
+# user – and the same reports, down to the bytes `--json` prints (k171); each one's `check` must
+# accept what the other synced. Needs node and the TypeScript tree (src/) beside lib/.
 use strict;
 use warnings;
 use Test::More;
@@ -15,13 +16,14 @@ use IPC::Open2 qw( open2 );
 use Path::Tiny qw( path tempdir );
 use Skilletor::Engine;
 use Skilletor::FSUtil qw( decode_utf8_lossy encode_text );
-use Skilletor::JSON qw( js_parse js_sort_keys js_stringify js_type );
+use Skilletor::JSON qw( js_ordered js_parse js_sort_keys js_stringify js_type );
+use Skilletor::Report qw( report_json );
 
 my $runner = path( $FindBin::Bin, '..', 'maint', 'ts-run.mjs' );
-my $src_ts = path( $FindBin::Bin, '..', '..', 'src', 'engine.ts' );
-plan skip_all => 'needs the skilletor checkout (../src) and maint/ts-run.mjs' unless $runner->exists && $src_ts->exists;
+my $src_ts = path( $FindBin::Bin, '..', 'src', 'engine.ts' );
+plan skip_all => 'needs the skilletor checkout (src/) and maint/ts-run.mjs' unless $runner->exists && $src_ts->exists;
 plan skip_all => 'needs node' unless grep { -x path( $_, 'node' ) } split /:/, $ENV{PATH} // '';
-plan skip_all => 'needs the reference\'s node_modules' unless path( $FindBin::Bin, '..', '..', 'node_modules', 'nunjucks' )->exists;
+plan skip_all => 'needs the reference\'s node_modules' unless path( $FindBin::Bin, '..', 'node_modules', 'nunjucks' )->exists;
 
 sub ts {
   my ( $req ) = @_;
@@ -51,9 +53,18 @@ sub canonical {
   return $v;
 }
 
-sub same_json {
+# The reference's report of a sync, check or status as `--json` prints it: { text, report }.
+sub ts_report {
+  my ( $op, $req ) = @_;
+  my $text = ts( { op => $op, %$req, json => JSON::MaybeXS::true() } );
+  return { text => $text, report => js_parse($text) };
+}
+
+# The same report: the same data, then the same bytes – key order, every array in its order.
+sub same_report {
   my ( $perl, $ts, $name ) = @_;
-  is( js_stringify( canonical( js_parse( js_stringify($perl) ) ), 2 ), js_stringify( canonical($ts), 2 ), $name );
+  is( js_stringify( canonical( js_parse( js_stringify($perl) ) ), 2 ), js_stringify( canonical( $ts->{report} ), 2 ), "$name: the same data" );
+  is( report_json($perl), $ts->{text}, "$name: the same --json bytes" );
 }
 
 sub files {
@@ -109,14 +120,29 @@ $remote->{commit}->( {
   'agents/rev.md'         => "---\nname: rev\ndescription: reviews\nbriefing:\n  skills: [lint, nowhere]\n---\nReview.\n",
   'rules/style.md'        => "Short sentences.\n",
   'bundles/team.yaml'     => "description: The team set\nskills: [lint]\nrules: [style]\nvars: {from: bundle}\n",
+  # Templates (spec §5): the user's vars as the template sees them, a main file gated off in the
+  # user scope (renders-empty).
+  'skills/greet/SKILL.md.njk' => "---\ndescription: greets\n---\n{{ vars | dump }} {{ project is defined }} {{ scope }}/{{ harness }}\n",
+  'rules/gated.md.njk'        => "{% if project is defined %}Only in a project.{% endif %}\n",
 } );
-my $crew = files( "$root/crew", 'skills/tool/SKILL.md' => skill('tool'), 'skilletor.json' => '{"vars": {"from": "source", "n": 10}}' );
+# A template with the whole context, an include from the source root, and one that fails.
+my $crew = files(
+  "$root/crew",
+  'skills/tool/SKILL.md'       => skill('tool'),
+  'skilletor.json'             => '{"vars": {"from": "source", "n": 10}}',
+  'skills/hello/SKILL.md.njk'  => "---\ndescription: hello for {{ project.name }}\n---\n"
+    ."{{ item.type }} {{ item.name }} from {{ item.source }}, {{ scope }}/{{ harness }} into {{ target.dir }}\n"
+    ."{{ project.dir }} {{ project.git_remote }}\n{{ user.name }} {{ user.home }} on {{ host.name }} ({{ host.os }})\n"
+    ."{{ vars | dump }}\n{% for k, v in vars %}{{ k }}={{ v | dump }};{% endfor %}\n{% include \"snippets/sig.md\" %}\n",
+  'snippets/sig.md'            => "\x{2013} {{ vars.from }}, n={{ vars.n + 1 }}",
+  'skills/broken/SKILL.md.njk' => "---\ndescription: broken\n---\n{{ vars.nope }}\n",
+);
 
 path( $home, '.claude' )->mkpath;
 path( $home, '.claude.json' )->spew_raw("{}\n");
 write_json( "$home/.claude/skilletor.json", {
   sources => { shared => { git => $remote->{url} }, crew => { local => $crew } },
-  install => { skills => [ 'lint@shared', 'taken@shared' ], agents => ['rev@shared'], rules => ['nomatch-*@shared'] },
+  install => { skills => [ 'lint@shared', 'taken@shared', 'greet@shared' ], agents => ['rev@shared'], rules => [ 'nomatch-*@shared', 'gated@shared' ] },
   vars    => { level => 1, nested => { b => [ 1, 'x', JSON::MaybeXS::true() ], a => undef }, 10 => 'ten', 9 => 'nine' },
 } );
 # A hand-written skill where an item goes: a lasting conflict, recorded as unreached.
@@ -130,10 +156,25 @@ git_ok( $proj, 'init', '-q', '-b', 'main' );
 git_ok( $proj, 'remote', 'add', 'origin', 'https://example.invalid/team/app.git' );    # a render input
 write_json( "$proj/.claude/skilletor.json", {
   sources => { team => { git => 'https://example.invalid/team/skills.git' } },    # project-only, untrusted
-  install => { skills => [ 'tool@crew', 'deploy@team' ], bundles => ['team@shared'] },
+  install => { skills => [ 'tool@crew', 'deploy@team', 'hello@crew', 'broken@crew' ], bundles => ['team@shared'] },
   vars    => { team => 'core' },
 } );
 write_json( "$proj/.claude/skilletor.local.json", { vars => { who => 'me' } } );
+
+# What earlier syncs recorded of scopes that are gone – a removed checkout, a key a relative
+# --project-dir made – beside a live scope's (k254; unreached.json and render-inputs.json, k255):
+# both engines drop the same, the live one stays.
+my $other = "$root/other/.claude/skilletor.lock.json";
+path($other)->parent->mkpath;
+path($other)->spew_raw("{}\n");
+my %earlier = (
+  'sources-read.json'  => js_ordered( s => js_ordered( version => 'git:1', kind => 'git', address => 'https://example.invalid/s.git' ) ),
+  'unreached.json'     => ['missing:skills/x@s'],
+  'render-inputs.json' => 'sha256:1',
+);
+write_json( "$home/.claude/skilletor/$_",
+  js_ordered( "$root/gone/.claude/skilletor.lock.json" => $earlier{$_}, '.claude/skilletor.lock.json' => $earlier{$_}, $other => $earlier{$_} ) )
+  for sort keys %earlier;
 
 # The pristine machine, to start each engine's sync from; the project's .git stays as it is.
 my %pristine = ( home => tree($home), project => tree( $proj, '.git' ) );
@@ -159,7 +200,8 @@ my $engine = Skilletor::Engine->new(
   git_tracked      => sub { [] },
 );
 
-my $ts_sync = ts( { op => 'sync', %$req } );
+my $ts_sync_json = ts_report( sync => $req );
+my $ts_sync = $ts_sync_json->{report};
 my %after_ts = (
   home    => tree( $home, '.claude/skilletor' ),
   project => tree( $proj, '.git' ),
@@ -167,19 +209,31 @@ my %after_ts = (
 );
 ok( scalar( keys %{ $after_ts{state} } ) >= 3, 'the reference recorded its state' )
   or diag join ', ', sort keys %{ $after_ts{state} };
+for my $file ( sort keys %earlier ) {
+  my $recorded = js_parse( decode_utf8_lossy( $after_ts{state}{$file} ) );
+  is_deeply( [ keys %$recorded ], [ $other, "$home/.claude/skilletor.lock.json", "$proj/.claude/skilletor.lock.json" ],
+    "$file: the reference dropped the records of scopes that are gone, kept the live one" );
+  is( js_stringify( $recorded->{$other} ), js_stringify( $earlier{$file} ), "$file: the live one as it was" );
+}
+# The templates did render there, so the same bytes here are the same rendering.
+like( decode_utf8_lossy( $after_ts{project}{'.claude/skills/hello/SKILL.md'} // '' ),
+  qr/^skill hello from crew, project\/claude into \Q$proj\E\/\.claude\n.*^\x{2013} source, n=11$/ms, 'the reference rendered the templates' );
+is_deeply( [ map { $_->{key} } map { @{ $_->{skipped} } } @{ $ts_sync->{scopes} } ], ['rules/gated'], 'skipped one that renders empty' );
+is( scalar( grep { /\Atemplate error in skill broken: / } map { @{ $_->{warnings} } } @{ $ts_sync->{scopes} } ), 1,
+  'and warned of the one that fails' );
 
 subtest 'the port checks and reports what the reference synced' => sub {
   my $perl_check = $engine->check;
   only_local_moved( $perl_check, 'the port' );
-  same_json( $perl_check, ts( { op => 'check', %$req } ), 'the same check report' );
-  same_json( $engine->status, ts( { op => 'status', %$req } ), 'the same status report' );
+  same_report( $perl_check, ts_report( check => $req ), 'the same check report' );
+  same_report( $engine->status, ts_report( status => $req ), 'the same status report' );
 };
 
 restore();
 my $perl_sync = $engine->sync;
 
 subtest 'the port syncs as the reference did, byte for byte' => sub {
-  same_json( $perl_sync, $ts_sync, 'the same sync report' );
+  same_report( $perl_sync, $ts_sync_json, 'the same sync report' );
   my %after_perl = (
     home    => tree( $home, '.claude/skilletor' ),
     project => tree( $proj, '.git' ),
@@ -194,10 +248,10 @@ subtest 'the port syncs as the reference did, byte for byte' => sub {
 };
 
 subtest 'the reference checks what the port synced' => sub {
-  my $ts_check = ts( { op => 'check', %$req } );
-  only_local_moved( $ts_check, 'the reference' );
-  same_json( $engine->check, $ts_check, 'the same check report' );
-  same_json( $engine->sync, ts( { op => 'sync', %$req } ), 'a second sync of each: the same report' );
+  my $ts_check = ts_report( check => $req );
+  only_local_moved( $ts_check->{report}, 'the reference' );
+  same_report( $engine->check, $ts_check, 'the same check report' );
+  same_report( $engine->sync, ts_report( sync => $req ), 'a second sync of each: the same report' );
 };
 
 done_testing;

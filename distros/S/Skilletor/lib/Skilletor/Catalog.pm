@@ -13,7 +13,7 @@ use Skilletor::FSUtil qw( decode_utf8_lossy encode_text inner_segments node_fs_e
 use Skilletor::JSON qw( js_parse js_sort_keys js_stringify js_type );
 use Skilletor::JSString qw( js_trim js_ws_re );
 
-our $VERSION = '0.001';
+our $VERSION = '0.008000';
 
 # The `.gitignore` skilletor writes into every skill it installs (spec §6.4): a skill directory
 # holding exactly this is one of its installed copies.
@@ -489,7 +489,7 @@ Skilletor::Catalog - Scan a source tree into its installable items, bundles and 
 
 =head1 VERSION
 
-version 0.001
+version 0.008000
 
 =head1 SYNOPSIS
 
@@ -542,19 +542,25 @@ C<.local.>, the name prefix of installed agents and rules.
 
 =head1 SUPPORT
 
+=head2 Issues
+
+Please report bugs and feature requests at
+L<https://github.com/Getty/skilletor/issues>.
+
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <getty@cpan.org>
+Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
+This software is Copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

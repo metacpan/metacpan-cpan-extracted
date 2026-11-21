@@ -12,7 +12,7 @@ use Skilletor::Error::Frontmatter;
 use Skilletor::JSON qw( js_ordered );
 use Skilletor::JSString qw( js_trim js_ws_re );
 
-our $VERSION = '0.001';
+our $VERSION = '0.008000';
 
 our @EXPORT_OK = qw( split_frontmatter parse_yaml_document is_yaml_float );
 
@@ -287,6 +287,21 @@ sub _unescape_double {
       my $cp = hex $hex;
       # Above U+10FFFF the reference refuses the escape like any other bad one.
       _fail( $line, 'bad \\'.$e.' escape' ) if $cp > 0x10FFFF;
+      # JavaScript strings are UTF-16: adjoining escapes that make a high and low half are one
+      # scalar when Node later encodes the string. Keep that character joined in Perl too.
+      my $next = $i + $hex_len + 1;
+      my $next_e = $next < $n ? substr( $s, $next + 1, 1 ) : '';
+      my $next_len = $next_e eq 'u' ? 4 : $next_e eq 'U' ? 8 : 0;
+      my $next_hex = $next_len ? substr( $s, $next + 2, $next_len ) : '';
+      if ( $cp >= 0xD800 && $cp <= 0xDBFF && substr( $s, $next, 1 ) eq '\\'
+        && $next_hex =~ /\A[0-9a-fA-F]{$next_len}\z/ ) {
+        my $low = hex $next_hex;
+        if ( $low >= 0xDC00 && $low <= 0xDFFF ) {
+          $out .= chr( 0x10000 + ( ( $cp - 0xD800 ) << 10 ) + ( $low - 0xDC00 ) );
+          $i = $next + 1 + $next_len;
+          next;
+        }
+      }
       no warnings qw( surrogate nonchar non_unicode );
       $out .= chr $cp;
       $i += $hex_len;
@@ -414,7 +429,8 @@ sub _inline {
   return _typed_plain( _strip_comment($s) );
 }
 
-package Skilletor::Frontmatter::Float;
+package    # hide from PAUSE
+  Skilletor::Frontmatter::Float;
 
 # A YAML float: JavaScript cannot tell 1 from 1.0, TOML can (Codex agents).
 sub new   { my ( $class, $value ) = @_; return bless { value => $value }, $class }
@@ -436,7 +452,7 @@ Skilletor::Frontmatter - The reference's YAML subset – agent frontmatter and b
 
 =head1 VERSION
 
-version 0.001
+version 0.008000
 
 =head1 SYNOPSIS
 
@@ -484,19 +500,25 @@ A YAML float; C<< ->value >> is the number.
 
 =head1 SUPPORT
 
+=head2 Issues
+
+Please report bugs and feature requests at
+L<https://github.com/Getty/skilletor/issues>.
+
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <getty@cpan.org>
+Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
+This software is Copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

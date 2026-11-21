@@ -4,7 +4,6 @@
 #include <internal/dispbuff.h>
 #include <internal/platform.h>
 #include <internal/codepage.h>
-#include <internal/getenv.h>
 #include <chrono>
 
 #ifdef _MSC_VER
@@ -14,7 +13,7 @@
 namespace tvision
 {
 
-DisplayBuffer::DisplayBuffer() noexcept :
+DisplayBuffer::DisplayBuffer(int aMaxFps) noexcept :
     // This could be checked at runtime, but for now this is as much as I know.
 #ifdef _WIN32
     wideOverlapping(false)
@@ -22,18 +21,15 @@ DisplayBuffer::DisplayBuffer() noexcept :
     wideOverlapping(true)
 #endif
 {
-    // Check if FPS shall be limited.
-    int fps = getEnv<int>("TVISION_MAX_FPS", defaultFPS);
-    limitFPS = (fps > 0);
-    if (limitFPS)
-        flushDelay = std::chrono::microseconds((int) 1e6/fps);
+    maxFps = aMaxFps < 0 ? defaultFps : aMaxFps;
+    if (maxFps > 0)
+        flushDelay = std::chrono::microseconds((int) 1e6/maxFps);
 }
 
-TScreenCell *DisplayBuffer::reloadScreenInfo(DisplayStrategy &display) noexcept
+TScreenCell *DisplayBuffer::reloadScreenInfo(DisplayAdapter &display) noexcept
 {
-    display.reloadScreenInfo();
-    size = display.getScreenSize();
-    caretSize = display.getCaretSize();
+    size = display.reloadScreenInfo();
+    caretSize = -1;
     resizeBuffer();
     return buffer.data();
 }
@@ -50,14 +46,14 @@ void DisplayBuffer::resizeBuffer() noexcept
     rowDamage.resize(size.y, {INT_MAX, INT_MIN});
 }
 
-void DisplayBuffer::clearScreen(DisplayStrategy &display) noexcept
+void DisplayBuffer::clearScreen(DisplayAdapter &display) noexcept
 {
     display.clearScreen();
-    display.lowlevelFlush();
+    display.flush();
     resizeBuffer();
 }
 
-void DisplayBuffer::redrawScreen(DisplayStrategy &display) noexcept
+void DisplayBuffer::redrawScreen(DisplayAdapter &display) noexcept
 {
     screenTouched = true;
     lastFlush = {};
@@ -115,7 +111,7 @@ void DisplayBuffer::setDirty(int x, int y, int len) noexcept
 bool DisplayBuffer::timeToFlush() noexcept
 {
     // Avoid flushing faster than the maximum FPS.
-    if (limitFPS)
+    if (maxFps > 0)
     {
         auto now = Clock::now();
         auto flushTime = lastFlush + flushDelay;
@@ -159,7 +155,7 @@ void DisplayBuffer::setCursorVisibility(bool visible) noexcept
     cursorVisible = visible;
 }
 
-static TColorAttr negateAttribute(TColorAttr attr) noexcept
+static uchar negateAttribute(TColorAttr attr) noexcept
 {
     return attr.toBIOS() ^ 0x77;
 }
@@ -172,11 +168,11 @@ void DisplayBuffer::drawCursor() noexcept
         if (inBounds(x, y))
         {
             auto *cell = &buffer[y*size.x + x];
-            if ( cell->_ch.isWideCharTrail() &&
-                    x > 0 && (cell - 1)->isWide() )
+            if ( cell->character.isWideCharTrail() &&
+                 x > 0 && (cell - 1)->character.isWide() )
                 --cell, --x;
-            attrUnderCursor = cell->attr;
-            cell->attr = negateAttribute(cell->attr);
+            attrUnderCursor = cell->attribute;
+            cell->attribute = negateAttribute(cell->attribute);
             setDirty(x, y, 1);
         }
     }
@@ -190,10 +186,10 @@ void DisplayBuffer::undrawCursor() noexcept
         if (inBounds(x, y))
         {
             auto *cell = &buffer[y*size.x + x];
-            if ( cell->_ch.isWideCharTrail() &&
-                    x > 0 && (cell - 1)->isWide() )
+            if ( cell->character.isWideCharTrail() &&
+                 x > 0 && (cell - 1)->character.isWide() )
                 --cell, --x;
-            cell->attr = attrUnderCursor;
+            cell->attribute = attrUnderCursor;
             setDirty(x, y, 1);
         }
     }
@@ -206,38 +202,24 @@ bool DisplayBuffer::needsFlush() const noexcept
 
 namespace
 {
-void flushScreenAlgorithm(DisplayBuffer &, DisplayStrategy &) noexcept;
+void flushScreenAlgorithm(DisplayBuffer &, DisplayAdapter &) noexcept;
 }
 
-void DisplayBuffer::flushScreen(DisplayStrategy &display) noexcept
+void DisplayBuffer::flushScreen(DisplayAdapter &display) noexcept
 {
     if (needsFlush() && timeToFlush())
     {
         drawCursor();
         flushScreenAlgorithm(*this, display);
         if (caretPosition.x != -1)
-            display.lowlevelMoveCursor(caretPosition.x, caretPosition.y);
+            display.setCaretPosition(caretPosition);
         undrawCursor();
         if (caretSize != newCaretSize)
-            display.lowlevelCursorSize(newCaretSize);
-        display.lowlevelFlush();
+            display.setCaretSize(newCaretSize);
+        display.flush();
         screenTouched = false;
         caretOrCursorChanged = false;
         caretSize = newCaretSize;
-    }
-}
-
-inline void DisplayBuffer::validateCell(TScreenCell &cell) const noexcept
-{
-    auto &ch = cell._ch;
-    if (ch[1] == '\0') // size 1
-    {
-        uchar c = ch[0];
-        if (c == '\0')
-            ch[0] = ' ';
-        else if (c < ' ' || 0x7F <= c)
-            // Translate from codepage as fallback.
-            ch.moveMultiByteChar(CpTranslator::toPackedUtf8(c));
     }
 }
 
@@ -250,9 +232,8 @@ namespace
 struct FlushScreenAlgorithm
 {
     DisplayBuffer &disp;
-    DisplayStrategy &display;
+    DisplayAdapter &display;
     TPoint size;
-    TPoint last;
     int x, y, rowOffs;
     TScreenCell *cell;
     DisplayBuffer::Range damage;
@@ -266,20 +247,21 @@ struct FlushScreenAlgorithm
     void processCell() noexcept;
     void writeCell() noexcept;
     void writeSpace() noexcept;
-    void writeCell(const TCellChar &Char, const TColorAttr &Attr, bool wide) noexcept;
+    void writeCell(const TScreenCharacter &Char, const TColorAttr &Attr, bool wide) noexcept;
     void commitDirty() noexcept;
+    void ensureCharacterIsPrintable(TScreenCell &cell) const noexcept;
     void handleWideCharSpill() noexcept;
     void handleTrail() noexcept;
 };
 
 inline bool isTrail(const TScreenCell &cell) noexcept
 {
-    return __builtin_expect(cell._ch.isWideCharTrail(), 0);
+    return __builtin_expect(cell.character.isWideCharTrail(), 0);
 }
 
 inline bool isWide(const TScreenCell &cell) noexcept
 {
-    return __builtin_expect(cell.isWide(), 0);
+    return __builtin_expect(cell.character.isWide(), 0);
 }
 
 inline const TScreenCell& FlushScreenAlgorithm::cellAt(int x) const noexcept
@@ -290,7 +272,7 @@ inline const TScreenCell& FlushScreenAlgorithm::cellAt(int x) const noexcept
 inline void FlushScreenAlgorithm::getCell() noexcept
 {
     cell = &disp.buffer[rowOffs + x];
-    disp.validateCell(*cell);
+    ensureCharacterIsPrintable(*cell);
 }
 
 inline bool FlushScreenAlgorithm::cellDirty() const noexcept
@@ -308,7 +290,7 @@ inline bool FlushScreenAlgorithm::wideCanOverlap() const noexcept
     return disp.wideOverlapping;
 }
 
-inline void flushScreenAlgorithm(DisplayBuffer &disp, DisplayStrategy &display) noexcept
+inline void flushScreenAlgorithm(DisplayBuffer &disp, DisplayAdapter &display) noexcept
 {
     FlushScreenAlgorithm {disp, display}.run();
 }
@@ -316,7 +298,6 @@ inline void flushScreenAlgorithm(DisplayBuffer &disp, DisplayStrategy &display) 
 inline void FlushScreenAlgorithm::run() noexcept
 {
     size = disp.size;
-    last = {INT_MIN, INT_MIN};
     rowOffs = 0;
     for (y = 0; y < size.y; ++y, rowOffs += size.x)
     {
@@ -367,35 +348,41 @@ inline void FlushScreenAlgorithm::processCell() noexcept
 
 inline void FlushScreenAlgorithm::writeCell() noexcept
 {
-    writeCell(cell->_ch, cell->attr, cell->isWide());
+    writeCell(cell->character, cell->attribute, cell->character.isWide());
 }
 
 inline void FlushScreenAlgorithm::writeSpace() noexcept
 {
-    TCellChar ch;
-    ch.moveChar(' ');
-    writeCell(ch, cell->attr, 0);
+    TScreenCharacter ch;
+    ch.initWithChar(' ');
+    writeCell(ch, cell->attribute, 0);
 }
 
-inline void FlushScreenAlgorithm::writeCell( const TCellChar &Char,
-                                             const TColorAttr &Attr,
+inline void FlushScreenAlgorithm::writeCell( const TScreenCharacter &ch,
+                                             const TColorAttr &attr,
                                              bool wide ) noexcept
 {
-    // 'last' is the last written cell occupied by text.
-    // That is to say, the hardware cursor is located at {last.x + 1, last.y}.
-    if (y != last.y)
-        display.lowlevelMoveCursor(x, y);
-    else if (x != last.x + 1)
-        display.lowlevelMoveCursorX(x, y);
+    display.writeCell({x, y}, ch.getText(), attr, wide);
+}
 
-    display.lowlevelWriteChars(Char.getText(), Attr);
-    last = {x + wide, y};
+void FlushScreenAlgorithm::ensureCharacterIsPrintable(TScreenCell &cell) const noexcept
+{
+    if (cell.character.isWideCharTrail())
+        return;
+
+    TStringView text = cell.character.getText();
+    uchar c = text[0];
+    if (c == '\0')
+        cell.character.initWithChar(' ');
+    else if (text.size() == 1 && (c < ' ' || 0x7F <= c))
+        // Translate from codepage as fallback.
+        cell.character.initWithMultiByteChar(CpTranslator::toPackedUtf8(c));
 }
 
 void FlushScreenAlgorithm::handleWideCharSpill() noexcept
 {
-    uchar width = cell->isWide();
-    const auto Attr = cell->attr;
+    uchar width = cell->character.isWide();
+    const auto Attr = cell->attribute;
     if (x + width < size.x)
         writeCell();
     else {
@@ -439,7 +426,7 @@ void FlushScreenAlgorithm::handleWideCharSpill() noexcept
     if (x + 1 < size.x) {
         ++x;
         getCell();
-        if (Attr != cell->attr) {
+        if (Attr != cell->attribute) {
             commitDirty();
             processCell();
         } else
@@ -449,14 +436,12 @@ void FlushScreenAlgorithm::handleWideCharSpill() noexcept
 
 void FlushScreenAlgorithm::handleTrail() noexcept
 {
-    // Having TCellChar::wideCharTrail in a cell implies wide characters
-    // can spill, as the value is otherwise discarded in ensurePrintable().
-    const auto Attr = cell->attr;
+    const auto Attr = cell->attribute;
     if (x > 0) {
         --x;
         getCell();
         // Check the character behind the placeholder.
-        if (cell->isWide()) {
+        if (cell->character.isWide()) {
             handleWideCharSpill();
             return;
         }
@@ -474,7 +459,7 @@ void FlushScreenAlgorithm::handleTrail() noexcept
             return;
     } while (isTrail(*cell));
     // We now got a normal character.
-    if (x > damage.end && Attr != cell->attr) {
+    if (x > damage.end && Attr != cell->attribute) {
         // Redraw a character that would otherwise not be printed,
         // to prevent attribute spill.
         processCell();

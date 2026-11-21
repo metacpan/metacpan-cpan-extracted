@@ -24,20 +24,20 @@ use parent qw(File::FStore::Base Data::Identifier::Interface::Known);
 
 use constant {
     WRITE_BITS                  => S_IWUSR|S_IWGRP|S_IWOTH,
-    RE_ISE                      => qr<^(?:[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}|[1-3](?:\.(?:0|[1-9][0-9]*))+|[a-zA-Z][a-zA-Z0-9\+\.\-]+:.*)$>,
+    RE_ISE                      => qr<^(?:[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}|[1-3](?:\.(?:0|[1-9][0-9]*))+|[a-zA-Z][a-zA-Z0-9\+\.\-]+:.*)\z>,
 
     MEDIA_SUBTYPE_GENERATOR     => Data::Identifier->new(uuid => 'a649d48d-35b0-4454-81af-c5fd2eb40373')->register,
     MEDIA_SUBTYPE_NAMESPACE     => Data::Identifier->new(uuid => '50d7c533-2d9b-4208-b560-bcbbf75ce3f9')->register,
 };
 
-our $VERSION = v0.07;
+our $VERSION = v0.08;
 
 my @_xattr_hashes = qw(sha-1-160 sha-2-256 sha-3-512);
 
 my %_valid_properties = (
-    size            => qr<^(?:0|[1-9][0-9]*)$>,
+    size            => qr<^(?:0|[1-9][0-9]*)\z>,
     inode           => qr<>, # any
-    mediasubtype    => qr<^(?:application|audio|example|font|haptics|image|message|model|multipart|text|video)/[0-9a-zA-Z][0-9a-zA-Z\!\#\$\&\-\^_\.\+]{0,126}$>,
+    mediasubtype    => qr<^(?:application|audio|example|font|haptics|image|message|model|multipart|text|video)/[0-9a-zA-Z][0-9a-zA-Z\!\#\$\&\-\^_\.\+]{0,126}\z>,
     contentise      => RE_ISE,
     inodeise        => RE_ISE,
 );
@@ -47,7 +47,9 @@ my %_exts = (
     'image/png'                 => 'png',
     'image/gif'                 => 'gif',
     'image/vnd.microsoft.icon'  => 'ico',
+    'image/webp'                => 'webp',
     'audio/flac'                => 'flac',
+    'video/mp4'                 => 'mp4',
     'application/pdf'           => 'pdf',
     'application/zip'           => 'zip',
     'text/plain'                => 'txt',
@@ -729,7 +731,7 @@ File::FStore::File - Module for interacting with file stores
 
 =head1 VERSION
 
-version v0.07
+version v0.08
 
 =head1 SYNOPSIS
 

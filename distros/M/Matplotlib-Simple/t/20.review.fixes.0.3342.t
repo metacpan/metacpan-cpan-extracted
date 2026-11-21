@@ -161,7 +161,8 @@ my %bars = ( A => 1, B => 2 );
 	# extension, which matplotlib saves as a PNG
 	foreach my $ext ( '.png', '.PNG', '.pdf', '.svg', '.svgz', '.eps', '.ps', '' ) {
 		my ($py) = gen( plot_type => 'bar', data => \%bars, output_file => out_file($ext) );
-		like( $py, qr/^plt\.savefig\(output_file, bbox_inches = 'tight', metadata=\{'Creator': /m, '"' . $ext . '": savefig still carries the Creator note' );
+		# An SVG is drawn into svg_buffer and written to output_file once, as of 0.3345.
+		like( $py, qr/^plt\.savefig\((?:output_file|svg_buffer, format = 'svg'), bbox_inches = 'tight', metadata=\{'Creator': /m, '"' . $ext . '": savefig still carries the Creator note' );
 	}
 	# kept: in a figure of subplots too, which is written by the same lines
 	my ($grid) = gen( plots => [ { plot_type => 'bar', data => \%bars }, { plot_type => 'pie', data => \%bars } ], ncols => 2, output_file => out_file('.tif') );

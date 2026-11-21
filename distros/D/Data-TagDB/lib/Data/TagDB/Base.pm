@@ -11,8 +11,9 @@ use strict;
 use warnings;
 
 use Carp;
+use List::Util qw(any);
 
-our $VERSION = v0.15;
+our $VERSION = v0.16;
 
 my %_plugin_attr_pkg_map = (
     'Data::TagDB'           => 'db_attributes',
@@ -39,6 +40,17 @@ sub get {
 sub execute {
     my ($self, @args) = @_;
     return $self->_run_plugin('execute', @args);
+}
+
+
+sub clear_cache {
+    my ($self, @opts) = @_;
+
+    croak 'Stray options passed' if scalar @opts;
+
+    delete $self->{attribute_cache};
+
+    return $self;
 }
 
 # ---- Private helpers ----
@@ -75,8 +87,29 @@ sub _run_plugin {
             }
             $value = \%extra;
 
-            unless ($op eq 'execute') {
-                $self->{attribute_cache}{$key} = $value unless $extra{no_cache};
+            unless ($op eq 'execute' || $extra{no_cache}) {
+                # We cache the value.
+                my $cache_value = $value;
+
+                unless ($extra{no_value}) {
+                    # To ensure we build no cyclic references first we check our rawtype.
+                    my %found = map {ref($_) => undef} @{$v};
+
+                    if (exists $found{'Data::TagDB::Tag'}) {
+                        # We can handle Data::TagDB::Tag but only if it's the only one
+                        if (scalar(keys %found) == 1) {
+                            $cache_value->{rawtype} = 'Data::TagDB::Tag';
+                            $cache_value = {%{$cache_value}, _data => [map {$_->dbid} @{$v}], _restore_tags => 1}; # build our own object
+                        } else {
+                            # Sadly we need to refuse to cache
+                            $cache_value = undef;
+                        }
+                    } elsif (any {/^Data::TagDB::/} keys %found) {
+                        $cache_value = undef;
+                    }
+                }
+
+                $self->{attribute_cache}{$key} = $cache_value if $cache_value;
             }
         }
     }
@@ -92,6 +125,10 @@ sub _run_plugin {
         if (scalar(@{$data}) != 1) {
             croak 'Not a single-value';
         }
+    }
+
+    if ($value->{_restore_tags}) {
+        $data = [map {$db->tag_by_dbid($_)} @{$data}];
     }
 
     if (defined($as) && $as ne 'raw' && !(defined($value->{rawtype}) && $as eq $value->{rawtype})) {
@@ -131,7 +168,7 @@ Data::TagDB::Base - Work with Tag databases
 
 =head1 VERSION
 
-version v0.15
+version v0.16
 
 =head1 SYNOPSIS
 
@@ -204,6 +241,16 @@ They are not idempotent (calling twice with exactly the same parameters is not t
 The result is not cached by default.
 
 =back
+
+=head2 clear_cache
+
+    $base->clear_cache;
+
+(experimental since v0.16)
+
+Clears the cache of this object.
+This may be needed after adding more data to it.
+It however may degrade performance.
 
 =head1 AUTHOR
 

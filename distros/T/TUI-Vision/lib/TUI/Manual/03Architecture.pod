@@ -13,18 +13,329 @@ TUI::Manual::03 - Architecture of TUI::Vision
 
 =head1 ARCHITECTURE
 
+L<TUI::Vision> is not simply a collection of independent user interface
+components. The framework consists of cooperating objects whose
+relationships form an essential part of its architecture.
+
+When examining this architecture, two different kinds of relationships
+must be distinguished.
+
+The first relationship is established by inheritance between classes.
+A L<TWindow|TUI::Views::Window>, for example, is derived from
+L<TGroup|TUI::Views::Group> and is therefore also a
+L<TView|TUI::Views::View>. A L<TDialog|TUI::Dialogs::Dialog>, in turn, is
+a specialization of L<TWindow|TUI::Views::Window>. This relationship
+describes which properties and capabilities a class inherits from its
+ancestors.
+
+Alongside this class relationship exists another, independent
+relationship between the concrete objects of a running application.
+A window may, for example, contain a frame, scrollbars and a scroller.
+These objects are not related because their classes inherit from one
+another, but because they cooperate within the same group.
+
+The classic I<Turbo Vision> model therefore distinguishes between the
+class hierarchy and the relationships between concrete view objects.
+
+Both perspectives are necessary to understand the architecture of a
+L<TUI::Vision> application.
+
 =head2 Core Concepts
+
+Almost everything that becomes visible within a L<TUI::Vision>
+application is a L<TView|TUI::Views::View> or an instance of a class
+derived from it.
+
+L<TView|TUI::Views::View> therefore provides the common foundation for
+otherwise very different objects such as buttons, scrollbars, input
+lines, menus, windows and dialogs.
+
+A simplified class hierarchy looks like this:
+
+  .                      TView
+  .                        ▲
+  .          ┌─────────────┼─────────────┐
+  .          │             │             │
+  .       TGroup       TScroller      TButton
+  .          ▲
+  .          │
+  .       TWindow
+  .          ▲
+  .          │
+  .       TDialog
+
+The arrows point towards the respective ancestor.
+
+This diagram answers a specific question:
+
+    From which class does an object inherit?
+
+It does not yet describe which concrete objects are connected to one
+another at runtime.
+
+L<TGroup|TUI::Views::Group> plays a central role in this second kind of
+relationship.
+
+A L<TGroup|TUI::Views::Group> is itself a L<TView|TUI::Views::View>, but
+it can additionally contain and manage other views. The contained views
+are referred to as subviews.
+
+This allows more complex elements to be composed from simpler views.
+At the same time, such a composite element continues to appear as a
+single view to its own owner.
+
+A L<TWindow|TUI::Views::Window> is a typical example. To the outside,
+the window forms a single unit, while internally it may consist of
+several cooperating views.
+
+The same principle is repeated at different levels of the framework
+and ultimately creates a tree of connected view objects.
 
 =head2 The Application Object
 
+The central object of a L<TUI::Vision> application is
+L<TApplication|TUI::App::Application>. It is the root of the view tree.
+It initializes the permanent framework of the user interface and
+eventually starts event processing.
+
+The visible base structure of an application, already introduced in the
+previous chapter, consists of three permanent views. The constructor of
+L<TProgram|TUI::App::Program>, the class from which
+L<TApplication|TUI::App::Application> derives, creates them through the
+initialization hooks C<initDeskTop>, C<initMenuBar> and C<initStatusLine>.
+The following diagram shows runtime ownership, not inheritance:
+
+  .                      application
+  .                           │
+  .            ┌──────────────┼──────────────┐
+  .            │              │              │
+  .         menuBar        deskTop       statusLine
+
+The menu bar, the desktop and the status line are subviews of the
+application, and each one is responsible for its own part of the screen.
+The application does not render the screen itself; it distributes that
+responsibility among its subviews.
+
+When a window is opened, it does not become another child of
+L<TApplication|TUI::App::Application> alongside the menu bar or status
+line. Instead, the window is inserted into the desktop:
+
+  .                      application
+  .                           │
+  .            ┌──────────────┼──────────────┐
+  .            │              │              │
+  .         menuBar        deskTop       statusLine
+  .                           │
+  .                        window
+
+The desktop thereby becomes the owner of the window.
+
+Further windows extend this structure without changing the application
+model. The application object is therefore the root of a structure that
+changes throughout the lifetime of the program.
+
+The method C<puzzle> in F<examples/tvdemo.pl> shows the same relationship
+in code. The window is created, checked and inserted into the desktop,
+which then owns it. The window never becomes a direct subview of the
+application:
+
+    sub puzzle {
+        my ( $self ) = @_;
+        my $win = $self->validView( new_TPuzzleWindow() );
+        if ( $win ) {
+            $win->helpCtx( hcPuzzle );
+            $deskTop->insert( $win );
+        }
+        return;
+    }
+
 =head2 The View Hierarchy
+
+The concrete structure formed by connected views can be understood as
+the view tree.
+
+A window demonstrates particularly well how this tree develops.
+
+L<TWindow|TUI::Views::Window> is a group. A concrete window may therefore
+contain additional view objects such as a L<TFrame|TUI::Views::Frame>, a
+L<TScroller|TUI::Views::Scroller>, and horizontal and vertical
+L<TScrollBar|TUI::Views::ScrollBar> objects.
+
+A section of a possible view tree may therefore look like this:
+
+  .                      application
+  .                           │
+  .            ┌──────────────┼──────────────┐
+  .            │              │              │
+  .         menuBar        deskTop       statusLine
+  .                           │
+  .                        window
+  .                           │
+  .                ┌──────────┼───────────┐
+  .                │          │           │
+  .             frame     scrollBar    scroller
+  .                                       │
+  .                                  more views
+
+When a second window is opened, no separate view tree is created.
+Instead, C<deskTop> gains another branch:
+
+  .                      application
+  .                           │
+  .            ┌──────────────┼──────────────┐
+  .            │              │              │
+  .         menuBar        deskTop       statusLine
+  .                           │
+  .                  ┌────────┴────────┐
+  .                  │                 │
+  .               window            window
+  .                  │                 │
+  .             ┌────┼────┐       ┌────┼────┐
+  .             │    │    │       │    │    │
+  .         frame scrollBar ..  frame scrollBar ..
+
+Every view that has been inserted into the tree remains connected,
+directly or indirectly, to the application object.
+
+This view tree must not be confused with the class hierarchy.
+
+A button contained in a dialog may, for example, occupy the following
+position in the view tree:
+
+  .                      dialog
+  .                        │
+  .                      button
+
+This does not imply that L<TButton|TUI::Dialogs::Button> is derived from
+L<TDialog|TUI::Dialogs::Dialog>.
+
+Their class relationships instead look, in simplified form, like this:
+
+  .             TView                    TView
+  .               ▲                        ▲
+  .               │                        │
+  .            TGroup                  TButton
+  .               ▲
+  .               │
+  .            TWindow
+  .               ▲
+  .               │
+  .            TDialog
+
+L<TDialog|TUI::Dialogs::Dialog> and L<TButton|TUI::Dialogs::Button> are
+both members of the view family through their respective class ancestry.
+Only the concrete application connects an instance of
+L<TButton|TUI::Dialogs::Button> as a subview of an instance of
+L<TDialog|TUI::Dialogs::Dialog>.
+
+The distinction between class hierarchy and view tree is fundamental
+to understanding I<Turbo Vision>.
 
 =head2 Ownership and Lifetime
 
+Inserting a view into a group establishes more than a visual
+relationship.
+
+The group assumes responsibility for managing its subviews. Within the
+view tree this relationship is expressed through the owner. The diagram
+below shows the owner of a group and its subviews at runtime:
+
+  .                      owner
+  .                        │
+  .                        ▼
+  .                      group
+  .                        │
+  .           ┌────────────┼────────────┐
+  .           │            │            │
+  .         view         view         group
+  .                                     │
+  .                                ┌────┴────┐
+  .                                │         │
+  .                              view      view
+
+This ownership structure represents the runtime relationship between
+the concrete views of a I<Turbo Vision> application.
+
+It describes which object is responsible for which subviews. Since a
+group may itself belong to another owner, these relationships produce
+the view tree shown earlier.
+
+In the original I<Turbo Vision> sources, the lifetime of the subviews is tied
+to their group: when a group is shut down, C<TGroup::shutDown()> destroys
+the subviews it manages.
+
+L<TUI::Vision> keeps the ownership relation but leaves the release of memory
+to Perl. A group holds its subviews, while the owner link of each view is
+a weak reference. The owner therefore does not keep its group alive, and
+a view is released once nothing else refers to it.
+
+It is therefore important to distinguish logical ownership from the mere
+existence of a Perl reference. Not every reference to an object implies
+responsibility for that object's lifetime. The distinction matters most in
+complex view hierarchies, where the circular subview chain is partly
+weakened for the same reason. The details of weak references and reference
+cycles are discussed in L<the chapter on advanced topics|TUI::Manual::10>.
+For the architectural model, the important point is that the view tree
+also expresses the principal ownership relationships within the user
+interface.
+
 =head2 Event Driven Design
+
+The view tree also describes the paths along which events travel.
+
+L<TUI::Vision> is event driven. Keyboard and mouse input is not polled
+independently by every view. The framework captures the input, represents
+it as events and passes them through the view structure.
+
+Assume that the active window contains a scroller. The following diagram
+shows the branch that a focused event follows:
+
+  .                      application
+  .                           │
+  .                        deskTop
+  .                           │
+  .                         window
+  .                           │
+  .                        scroller
+
+If the scroller is the focused object, this branch of the view tree
+describes the path a focused event takes to its destination. A mouse event
+does not necessarily follow the same path: the framework uses the position
+and arrangement of the subviews to find the view responsible for the
+selected screen position. Broadcast events use the tree differently again
+and may be forwarded to several views.
+
+The view tree is therefore more than a description of the visible user
+interface. It also provides the infrastructure for view management,
+ownership, overlapping views, selection and focus, and event distribution.
+The exact routing of the individual event types is discussed in the chapter
+on the event model.
+
+Likewise, focus, selection, view ordering and drawing are examined in
+greater detail in the following chapter on L<TView|TUI::Views::View> and
+L<TGroup|TUI::Views::Group>.
 
 =head2 Conclusion
 
-L<next|TUI::Manual::04> chapter.
+The architecture of L<TUI::Vision> is based on two different but closely
+related structures.
+
+The class hierarchy describes ancestry and therefore the properties
+and behavior inherited by framework classes.
+
+The view tree, on the other hand, describes the relationships between
+the concrete objects of a running application.
+
+The class hierarchy shows which class an object inherits from, while the
+view tree shows which concrete instances own one another at runtime.
+
+Only together do these two perspectives explain how the individual
+framework classes become a running L<TUI::Vision> application.
+
+The following chapter examines L<TView|TUI::Views::View> and
+L<TGroup|TUI::Views::Group> in greater detail. It introduces the mechanisms
+through which views manage their screen area, render themselves and combine
+into more complex structures. It is covered in the
+L<next chapter|TUI::Manual::04>.
 
 =cut

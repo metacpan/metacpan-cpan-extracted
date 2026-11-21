@@ -285,6 +285,22 @@ int THelpTopic::getNumCrossRefs() noexcept
     return numRefs;
 }
 
+int THelpTopic::longestLineWidth() noexcept
+{
+    int maxWidth = 0;
+    int lineCount = numLines();
+
+    for (int i = 1; i <= lineCount; ++i)
+        {
+        TStringView line = getLine(i);
+        int lineWidth = strwidth(line);
+        if (lineWidth > maxWidth)
+            maxWidth = lineWidth;
+        }
+
+    return maxWidth;
+}
+
 int THelpTopic::numLines() noexcept
 {
     int offset, lines;
@@ -396,50 +412,52 @@ Boolean isBlank( char ch ) noexcept
         return False;
 }
 
-static int scan( char *p, int offset, int size, char c) noexcept
+static TStringView getLineAtOffset( char *text, int textSize, int offset ) noexcept
 {
-    char *temp1, *temp2;
-
-    temp1 = p + offset;
-    temp2 = (char *) memchr(temp1, c, strlen(temp1));
-    if (temp2 == 0)
-        return size;
+    char *lineStart = &text[offset];
+    char *lineEnd = (char *) memchr(lineStart, '\n', textSize - offset);
+    if (lineEnd == 0)
+        lineEnd = &text[textSize];
     else
-        {
-        if ((int)(temp2 - temp1) <= size )
-            return (int) (temp2 - temp1) + 1;
-        else
-            return size;
-        }
+        ++lineEnd; // Point past '\n'.
+    return TStringView(lineStart, lineEnd - lineStart);
 }
 
-TStringView THelpTopic::wrapText( char *text, int size, int& offset, Boolean wrap ) noexcept
+static TStringView discardTrailingWhitespaces( TStringView str ) noexcept
 {
-    int i = scan(text, offset, size, '\n');
-    if( i + offset > size )
-        i = size - offset;
+    size_t newSize = str.size();
+    while( newSize > 0 )
+        {
+        if( !isBlank(str[newSize - 1]) )
+            break;
+        --newSize;
+        }
+    return str.substr(0, newSize);
+}
+
+TStringView THelpTopic::wrapText( char *text, int textSize, int& offset, Boolean wrap ) noexcept
+{
+    TStringView line = getLineAtOffset(text, textSize, offset);
     if( wrap )
         {
-        size_t l, w;
-        TText::scroll(TStringView(&text[offset], i), width, False, l, w);
-        if( int(l) < i )
+        size_t wrappedSize = TText::scroll(line, width, False);
+        if( 0 < wrappedSize && wrappedSize < line.size() )
             {
-            int j = l + offset;
-            int k = j;
-            while( (k > offset) && !(isBlank(text[k])) )
-                --k;
-            if( k == offset )
-                k = j;
-            if( k < size && isBlank(text[k]) )
-                ++k;
-            i = k - offset;
+            size_t newSize = wrappedSize;
+            // Omit the last word if it was cut off by wrapping.
+            while( newSize > 0 && !isBlank(line[newSize]) )
+                --newSize;
+            // Unless it fills the whole line.
+            if( newSize == 0 )
+                newSize = wrappedSize;
+            // If a space follows, keep it so 'offset' points past it.
+            if( (int) newSize < textSize && isBlank(line[newSize]) )
+                ++newSize;
+            line = line.substr(0, newSize);
             }
         }
-    TStringView str(&text[offset], i);
-    if (str.size() && str.back() == '\n')
-        str = str.substr(0, str.size() - 1);
-    offset += i;
-    return str;
+    offset += line.size();
+    return discardTrailingWhitespaces(line);
 }
 
 // THelpIndex
@@ -525,13 +543,11 @@ void THelpIndex::add( int i, int32_t val )
         p = new int32_t[newSize];
         if (p != 0)
             {
-            memmove(p, index, size * sizeof(int32_t));
+            if (index != 0)
+                memcpy(p, index, size * sizeof(int32_t));
             memset(p+size, 0xFF, (newSize - size) * sizeof(int32_t));
             }
-        if (size > 0)
-            {
-            delete [] index;
-            }
+        delete[] index;
         index = p;
         size = newSize;
         }
@@ -550,22 +566,21 @@ THelpFile::THelpFile( iopstream &s )
     s.seekg(0, ios::end);
     size = s.tellg();
     s.seekg(0);
-    if ((size_t) size > sizeof(magic))
+    if (size > (int) sizeof(magic))
         s >> magic;
-    if (magic != magicHeader)
-        {
-        indexPos = 12;
-        s.seekg(indexPos);
-        index =  new THelpIndex;
-        modified = True;
-        }
-    else
+    if (magic == magicHeader && size >= 12)
         {
         s.seekg(8);
         s >> indexPos;
         s.seekg(indexPos);
         s >> index;
         modified = False;
+        }
+    else
+        {
+        indexPos = 12;
+        index = new THelpIndex;
+        modified = True;
         }
     stream = &s;
 }
@@ -576,14 +591,13 @@ THelpFile::~THelpFile(void)
 
     if (modified == True)
         {
+        ensureStreamSize(*stream, indexPos);
         stream->seekp(indexPos);
         *stream << index;
-        stream->seekp(0);
         magic = magicHeader;
-        streampos sp=stream->tellp();
         stream->seekp(0, ios::end);
         size = stream->tellp() - (streamoff) 8;
-        stream->seekp(sp);
+        stream->seekp(0);
         *stream << magic;
         *stream << size;
         *stream << indexPos;
@@ -612,8 +626,8 @@ THelpTopic *THelpFile::invalidTopic()
     THelpTopic *topic;
     TParagraph *para;
 
-    topic =  new THelpTopic;
-    para =  new TParagraph;
+    topic = new THelpTopic;
+    para = new TParagraph;
     para->text = newStr(invalidContext);
     para->size = strlen(invalidContext);
     para->wrap = False;
@@ -630,10 +644,27 @@ void THelpFile::recordPositionInIndex( int i )
 
 void THelpFile::putTopic( THelpTopic *topic )
 {
+    ensureStreamSize(*stream, indexPos);
     stream->seekp(indexPos);
     *stream << topic;
     indexPos = stream->tellp();
     modified = True;
+}
+
+void THelpFile::ensureStreamSize( iopstream &stream, int desiredSize )
+// When the stream is backed by a regular file, 'seekp' can be used to extend
+// the file size. However, this behaviour is not guaranteed by the Standard and
+// it certainly won't work with devices such as a std::stringbuf. Therefore,
+// it's safer to extend the stream by manually writing null bytes.
+{
+    stream.seekg(0, ios::end);
+    streampos currentSize = stream.tellg();
+    if (currentSize < desiredSize)
+        {
+        stream.seekp(0, ios::end);
+        for (int i = currentSize; i < desiredSize; ++i)
+            stream.writeByte('\0');
+        }
 }
 
 void notAssigned( opstream& , int )

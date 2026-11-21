@@ -7,7 +7,7 @@ package
     MIDI::RtMidi::FFI::AbstractDevice;
 class MIDI::RtMidi::FFI::AbstractDevice;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 # ABSTRACT: Base class for MIDI::RtMidi::FFI input and output devices
 
@@ -199,7 +199,7 @@ MIDI::RtMidi::FFI::AbstractDevice - Base class for MIDI::RtMidi::FFI input and o
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 DESCRIPTION
 

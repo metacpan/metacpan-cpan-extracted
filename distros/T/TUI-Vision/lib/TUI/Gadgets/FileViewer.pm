@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -16,8 +16,10 @@ our @EXPORT = qw(
 );
 
 use Carp ();
+use File::Spec ();
 use IO::File;
 use List::Util qw( max );
+use Storable;
 use TUI::toolkit;
 use TUI::toolkit::Types qw(
   Maybe
@@ -31,6 +33,7 @@ use TUI::Gadgets::LineCollection;
 use TUI::Memory qw( lowMemory );
 use TUI::MsgBox::Const qw( :mfXXXX );
 use TUI::MsgBox::MsgBoxText qw( messageBox );
+use TUI::Objects::Rect;
 use TUI::Views::Const qw(
   gfGrowHiX
   gfGrowHiY
@@ -48,7 +51,7 @@ extends TScroller;
 # public attributes
 has fileName  => ( is => 'rw', default => sub { die 'required' } );
 has fileLines => ( is => 'rw' );
-has isValid   => ( is => 'rw', default => !!0 );
+has isValid   => ( is => 'rw', default => false );
 
 sub BUILDARGS {    # \%args (%args)
   state $sig = signature(
@@ -195,6 +198,43 @@ sub valid {    # $bool ($command)
   );
   my ( $self, undef ) = $sig->( @_ );
   return $self->{isValid}
+}
+
+sub write :method {    # void ($os)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $os ) = $sig->( @_ );
+  $self->SUPER::write( $os );
+  $os->put( $self->{fileName} );
+  return;
+}
+
+sub read :method {    # $self ($is)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $is ) = $sig->( @_ );
+  $self->SUPER::read( $is );
+  my $fileName = $is->get();
+  $self->{fileName} = '';
+  $self->readFile( $fileName );
+  return $self;
+}
+
+sub build {    # $obj ()
+  my ( $class ) = @_;
+  assert ( @_ == 1 );
+  assert ( is_Str $class );
+  assert ( Storable::is_retrieving );
+  return $class->new(
+    bounds     => TRect->new(),
+    hScrollBar => undef,
+    vScrollBar => undef,
+    fileName   => File::Spec->devnull,
+  );
 }
 
 1

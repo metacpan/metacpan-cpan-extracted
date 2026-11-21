@@ -5,7 +5,7 @@
 #define Uses_TEvent
 #include <tvision/tv.h>
 
-#include <ncurses.h>
+#include <internal/ncurdisp.h>
 #include <internal/ncursinp.h>
 #include <internal/getenv.h>
 #include <internal/utf8.h>
@@ -271,7 +271,7 @@ void NcursesInputGetter::unget(int k) noexcept
 
 NcursesInput::NcursesInput( ConsoleCtl &aCon, NcursesDisplay &,
                             InputState &aState, bool mouse ) noexcept :
-    InputStrategy(aCon.in()),
+    InputAdapter(aCon.in()),
     con(aCon),
     state(aState),
     mouseEnabled(mouse)
@@ -291,7 +291,7 @@ NcursesInput::NcursesInput( ConsoleCtl &aCon, NcursesDisplay &,
     /* Do not delay too much on ESC key presses, as the Alt modifier works well
      * in most modern terminals. Still, this delay helps ncurses distinguish
      * special key sequences, I believe. */
-    set_escdelay(getEnv<int>("TVISION_ESCDELAY", 10));
+    set_escdelay(getEnv<int>("ESCDELAY", 10));
 
     TermIO::keyModsOn(con);
     if (mouseEnabled)
@@ -304,13 +304,6 @@ NcursesInput::~NcursesInput()
         TermIO::mouseOff(con);
     TermIO::keyModsOff(con);
     TermIO::consumeUnprocessedInput(con, in, state);
-}
-
-int NcursesInput::getButtonCount() noexcept
-{
-    // The exact button count is not really important. Turbo Vision
-    // only checks whether it is non-zero.
-    return mouseEnabled ? 2 : 0;
 }
 
 int NcursesInput::getChNb() noexcept

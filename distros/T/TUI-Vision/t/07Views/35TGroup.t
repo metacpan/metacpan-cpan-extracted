@@ -65,6 +65,21 @@ subtest sprintf( 'Test insert %x', $view[2] ) => sub {
   is( refcount( $view[2] ), 2, sprintf 'Object %x refcount is 2', $view[2] );
 };
 
+subtest 'Appending insertView keeps one weak next link' => sub {
+  my $appendGroup = TGroup->new( bounds => $bounds );
+  my @appended = map { TView->new( bounds => $bounds ) } 0 .. 2;
+
+  $appendGroup->insertView( $_, undef ) for @appended;
+
+  is( $appendGroup->{last}, $appended[2], 'last is final appended view' );
+  is( $appended[0]->next, $appended[1], 'first view points to second' );
+  is( $appended[1]->next, $appended[2], 'second view points to last' );
+  is( $appended[2]->next, $appended[0], 'last view closes the cycle' );
+  ok( !isweak( $appended[0]{next} ), 'first next link is strong' );
+  ok( isweak( $appended[1]{next} ), 'only predecessor of last is weak' );
+  ok( !isweak( $appended[2]{next} ), 'last next link is strong' );
+};
+
 subtest 'Test current field' => sub {
   lives_ok { $group->current( $view[2] ) }
     sprintf 'current Object %x', $view[2];

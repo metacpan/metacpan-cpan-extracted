@@ -16,17 +16,19 @@
 #define Uses_TGroup
 #define Uses_TScreen
 #define Uses_THardwareInfo
-#define Uses_TEvent
+#define Uses_TText
 #include <tvision/tv.h>
 
-#ifdef __FLAT__
+#if !defined( __FLAT__ )
+#error The 16-bit version of this file is in TVWRITE.ASM
+#else
 
 #include <string.h>
 #include <stdlib.h>
 #include <malloc.h>
 
 extern TPoint shadowSize;
-extern uchar shadowAttr;
+extern TColorAttr shadowAttr;
 
 struct TVWrite {
 
@@ -42,8 +44,8 @@ struct TVWrite {
     void L40( TView * ) noexcept;
     void L50( TGroup * ) noexcept;
 #ifdef __BORLANDC__
-    void copyShort( ushort *, const ushort * );
-    void copyShort2CharInfo( ushort *, const ushort * );
+    void copyShort( TScreenCell *, const TScreenCell * );
+    void copyShort2CharInfo( CHAR_INFO *, const TScreenCell * );
 #else
     void copyCell( TScreenCell *, const TScreenCell * ) noexcept;
     void copyShort2Cell( TScreenCell *, const ushort * ) noexcept;
@@ -61,22 +63,23 @@ struct TVWrite {
 #ifdef __BORLANDC__
         // Because we can't know if the cell has already been shadowed,
         // we compare against the shadow attributes. This may yield some false positives.
-        TColorAttr shadowAttrInv = reverseAttribute(shadowAttr);
+        TColorAttr shadowAttrInv = (shadowAttr << 4) | (shadowAttr >> 4);
         if (attr == shadowAttr || attr == shadowAttrInv)
             return attr;
         else
             return attr & 0xF0 ? shadowAttr : shadowAttrInv;
 #else
-        // Here TColorAttr is a struct, so we can have a dedicated field
+        // Here TColorAttr is a struct, so we use a dedicated style flag
         // to determine whether the shadow has been applied.
-        auto style = ::getStyle(attr);
-        if (!(style & slNoShadow))
+        auto style = attr.getStyle();
+        if (!(style & slWindowShadow))
         {
-            if (::getBack(attr).toBIOS(false) != 0)
+            if (attr.getBackground().toBIOS(false) == 0)
+                // Reverse the shadow attribute on black areas.
+                attr = shadowAttr.reversed();
+            else
                 attr = shadowAttr;
-            else // Reverse the shadow attribute on black areas.
-                attr = reverseAttribute(shadowAttr);
-            ::setStyle(attr, style | slNoShadow);
+            attr.setStyle(style | slWindowShadow);
         }
         return attr;
 #endif
@@ -209,37 +212,28 @@ void TVWrite::L40( TView *dest ) noexcept
 {
     TGroup *owner = dest->owner;
     if (owner->buffer)
-    {
-        if (owner->buffer != TScreen::screenBuffer)
-            L50(owner);
-        else
-        {
-#ifdef __BORLANDC__
-            TMouse::hide();
-#endif
-            L50(owner);
-#ifdef __BORLANDC__
-            TMouse::show();
-#endif
-        }
-    }
+        L50(owner);
     if (owner->lockFlag == 0)
         L10(owner);
 }
 
 void TVWrite::L50( TGroup *owner ) noexcept
 {
-    TScreenCell *dst = &owner->buffer[Y*owner->size.x + X];
 #ifdef __BORLANDC__
-    const ushort *src = &((const ushort *) Buffer)[X - wOffset];
+    const TScreenCell *src = &((const TScreenCell *) Buffer)[X - wOffset];
     if (owner->buffer != TScreen::screenBuffer)
+    {
+        TScreenCell *dst = &owner->buffer[Y*owner->size.x + X];
         copyShort(dst, src);
+    }
     else
     {
+        CHAR_INFO *dst = &((CHAR_INFO *) owner->buffer)[Y*owner->size.x + X];
         copyShort2CharInfo(dst, src);
         THardwareInfo::screenWrite(X, Y, dst, Count - X);
     }
 #else
+    TScreenCell *dst = &owner->buffer[Y*owner->size.x + X];
     if (bufIsShort)
     {
         auto *src = &((const ushort *) Buffer)[X - wOffset];
@@ -260,40 +254,37 @@ void TVWrite::L50( TGroup *owner ) noexcept
 // attributes for every cell. On Windows, all TGroup buffers follow this schema
 // except the topmost one, which interfaces with the Win32 Console API.
 
-void TVWrite::copyShort( ushort *dst, const ushort *src )
+void TVWrite::copyShort( TScreenCell *dst, const TScreenCell *src )
 {
     int i;
     if (edx == 0)
         memcpy(dst, src, 2*(Count - X));
     else
     {
-#define loByte(w)    (((uchar *)&w)[0])
-#define hiByte(w)    (((uchar *)&w)[1])
         for (i = 0; i < Count - X; ++i)
         {
-            loByte(dst[i]) = loByte(src[i]);
-            hiByte(dst[i]) = applyShadow(hiByte(src[i]));
+            dst[i].character = src[i].character;
+            dst[i].attribute = applyShadow(src[i].attribute);
         }
-#undef loByte
-#undef hiByte
     }
 }
 
-void TVWrite::copyShort2CharInfo( ushort *dst, const ushort *src )
+void TVWrite::copyShort2CharInfo( CHAR_INFO *dst, const TScreenCell *src )
 {
     int i;
     if (edx == 0)
         // Expand character/attribute pair
-        for (i = 0; i < 2*(Count - X); ++i)
+        for (i = 0; i < Count - X; ++i)
         {
-            dst[i] = ((const uchar *) src)[i];
+            dst[i].Char.AsciiChar = src[i].character;
+            dst[i].Attributes = src[i].attribute;
         }
     else
         // Mix in shadow attribute
-        for (i = 0; i < 2*(Count - X); i += 2)
+        for (i = 0; i < Count - X; ++i)
         {
-            dst[i] = ((const uchar *) src)[i];
-            dst[i + 1] = applyShadow(((const uchar *) src)[i + 1]);
+            dst[i].Char.AsciiChar = src[i].character;
+            dst[i].Attributes = applyShadow(src[i].attribute);
         }
 }
 
@@ -307,7 +298,7 @@ void TVWrite::copyCell(TScreenCell *dst, const TScreenCell *src) noexcept
         for (i = 0; i < Count - X; ++i)
         {
             auto c = src[i];
-            ::setAttr(c, applyShadow(::getAttr(c)));
+            c.attribute = applyShadow(c.attribute);
             dst[i] = c;
         }
 }
@@ -326,7 +317,7 @@ void TVWrite::copyShort2Cell( TScreenCell *dst, const ushort *src ) noexcept
         for (i = 0; i < Count - X; ++i)
         {
             TScreenCell c {src[i]};
-            ::setAttr(c, applyShadow(::getAttr(c)));
+            c.attribute = applyShadow(c.attribute);
             dst[i] = c;
         }
 }
@@ -353,15 +344,13 @@ void TView::writeBuf( short x, short y, short w, short h, const void _FAR* b ) n
 
 void TView::writeChar( short x, short y, char c, uchar color, short count ) noexcept
 {
+    if (count > size.x)
+        count = size.x;
     if (count > 0)
     {
-        TScreenCell cell;
-        ::setCell(cell, c, mapColor(color));
-        TScreenCell *buf = (TScreenCell *) alloca(count*sizeof(TScreenCell));
-        for (short i = 0; i < count; ++i)
-        {
-            buf[i] = cell;
-        }
+        TScreenCell *buf = (TScreenCell *) alloca(count * sizeof(TScreenCell));
+        TSpan<TScreenCell> cells(buf, count);
+        TText::drawChar(cells, c, mapColor(color));
         writeView(x, y, count, buf);
     }
 }
@@ -386,20 +375,17 @@ void TView::writeLine( short x, short y, short w, short h, const TScreenCell *b 
 
 void TView::writeStr( short x, short y, const char *str, uchar color ) noexcept
 {
-    if (str != 0)
+    TStringView text(str);
+    int count = strwidth(text);
+    if (count > size.x)
+        count = size.x;
+    if (count > 0)
     {
-        size_t length = strlen(str);
-        if (length > 0)
-        {
-            TColorAttr attr = mapColor(color);
-            TScreenCell *buf = (TScreenCell*) alloca(length*sizeof(TScreenCell));
-            for (size_t i = 0; i < length; ++i)
-            {
-                ::setCell(buf[i], str[i], attr);
-            }
-            writeView(x, y, length, buf);
-        }
+        TScreenCell *buf = (TScreenCell *) alloca(count * sizeof(TScreenCell));
+        TSpan<TScreenCell> cells(buf, count);
+        TText::drawStr(cells, text, mapColor(color));
+        writeView(x, y, count, buf);
     }
 }
 
-#endif
+#endif // __FLAT__

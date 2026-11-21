@@ -3,6 +3,7 @@ bin/csvtool
 Build.PL
 Changes
 lib/App/csvtool.pm
+lib/App/csvtool/Expr.pm
 lib/App/csvtool/Smudge.pm
 lib/App/csvtool/Summarizing.pm
 lib/App/csvtool/Timetools.pm
@@ -24,5 +25,9 @@ t/20strptime.t
 t/20tsort.t
 t/30smudge.t
 t/40count.t
+t/40sum.t
+t/50expr.t
+t/50extend.t
+t/50filter.t
 t/99pod.t
 t/lib/TestAppcsvtool.pm

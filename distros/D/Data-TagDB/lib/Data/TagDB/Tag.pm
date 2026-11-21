@@ -12,8 +12,9 @@ use warnings;
 
 use Carp;
 use URI;
+use List::Util qw(any all);
 
-our $VERSION = v0.15;
+our $VERSION = v0.16;
 
 use parent qw(Data::Identifier::Interface::Simple Data::TagDB::Base);
 
@@ -333,32 +334,60 @@ sub description {
 
 sub cloudlet {
     my ($self, $which) = @_;
-    my $wk = $self->db->wk;
-    my %opts = (
-        tag => $self,
-        indirect => [
-            $wk->specialises,
-        ],
-    );
+    my $cloudlets = $self->{cloudlets} //= {};
 
-    if ($which eq 'roles') {
-        $opts{direct} = [
-            $wk->has_type,
-            $wk->also_has_role,
-        ];
-    } elsif ($which eq 'flags') {
-        $opts{direct} = [
-            $wk->flagged_as,
-        ];
-    } elsif ($which eq 'specialises') {
-        $opts{direct} = [
-            $wk->specialises,
-        ];
+    if (defined $cloudlets->{$which}) {
+        return $cloudlets->{$which};
     } else {
-        croak 'Unknown cloudlet';
+        my $wk = $self->db->wk;
+        my %opts = (
+            tag => $self,
+            indirect => [
+                $wk->specialises,
+            ],
+        );
+
+        if ($which eq 'roles') {
+            $opts{direct} = [
+                $wk->has_type,
+                $wk->also_has_role,
+            ];
+        } elsif ($which eq 'flags') {
+            $opts{direct} = [
+                $wk->flagged_as,
+            ];
+        } elsif ($which eq 'specialises') {
+            $opts{direct} = [
+                $wk->specialises,
+            ];
+        } else {
+            croak 'Unknown cloudlet';
+        }
+
+        return $cloudlets->{$which} = $self->db->_load_cloudlet(%opts);
+    }
+}
+
+
+sub has_role {
+    my ($self, $op, $list, @opts) = @_;
+    my $cl = $self->cloudlet('roles');
+    my $db = $self->db;
+
+    croak 'Stray options passed' if scalar @opts;
+
+    $list = [$list] unless ref($list) eq 'ARRAY';
+    foreach my $ent (@{$list}) {
+        $ent = $ent->as(__PACKAGE__, db => $db) unless $ent->isa(__PACKAGE__);
     }
 
-    return $self->db->_load_cloudlet(%opts);
+    if ($op eq 'any') {
+        return any {$cl->is_entry($_)} @{$list};
+    } elsif ($op eq 'all') {
+        return all {$cl->is_entry($_)} @{$list};
+    } else {
+        ...;
+    }
 }
 
 # ---- Private helpers ----
@@ -489,6 +518,16 @@ sub attribute {
     return $self->{attribute}{$attribute};
 }
 
+
+sub clear_cache {
+    my ($self, @opts) = @_;
+    $self->SUPER::clear_cache(@opts);
+
+    delete $self->{$_} foreach qw(displayname displaycolour icontext description cloudlets);
+
+    return $self;
+}
+
 1;
 
 __END__
@@ -503,7 +542,7 @@ Data::TagDB::Tag - Work with Tag databases
 
 =head1 VERSION
 
-version v0.15
+version v0.16
 
 =head1 SYNOPSIS
 
@@ -612,11 +651,29 @@ The following universal options are ignored (without warning or error): L</no_de
 
     my Data::TagDB::Cloudlet $cl = $tag->cloudlet($which);
 
-B<Experimental:>
+(experimental since v0.07)
+
 Gets the given cloudlet.
 
 B<Note:>
 This method is experimental. It may change prototype, and behaviour or may be removed in future versions without warning.
+The returned value is subject to caching (since v0.16).
+
+=head2 has_role
+
+    my $bool = $tag->has_role(any => \@list);
+    my $bool = $tag->has_role(all => \@list);
+
+(experimental since v0.16)
+
+Checks if the tag has any/all of the listed roles.
+
+The list of roles can be given as a arrayref.
+If not an arrayref the value is used like an arrayref with a single value.
+Each role must be an instance of this package, L<Data::Identifier>, or L<Data::Identifier::Interface::Simple>.
+
+B<Note:>
+This method is subject to the same limitations and experimental status as L</cloudlet>.
 
 =head1 AUTHOR
 

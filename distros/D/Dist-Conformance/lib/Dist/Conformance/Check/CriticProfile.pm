@@ -1,6 +1,6 @@
-package Dist::Conformance::Check::CriticProfile 0.006;
+package Dist::Conformance::Check::CriticProfile 0.007;
 
-# ABSTRACT: The perlcritic profile enables or turns off every policy of its template, and no retired one
+# ABSTRACT: The perlcritic profile is its template, with the overrides of the repository
 
 use 5.040;
 use warnings FATAL => 'all';
@@ -12,29 +12,26 @@ use Config::Tiny();
 use Dist::Conformance::Schema();
 
 
+our $VALUE = { anyOf => [ { type => 'string', nullable => 1 }, { type => 'number' } ] };
+
 sub config_schema ($) {
     return {
         required   => [qw{file template}],
         properties => {
-            file     => $Dist::Conformance::Schema::PATH,
-            template => $Dist::Conformance::Schema::PATH,
-            replace  => { type => 'boolean', default   => 0 },
-            retired  => { type => 'array',   items     => $Dist::Conformance::Check::MODULE, uniqueItems => 1, default => [] },
-            header   => { type => 'string',  minLength => 1 },
-            outdated => { type => 'array',   items     => { type => 'string', minLength => 1 } },
+            file      => $Dist::Conformance::Schema::PATH,
+            template  => $Dist::Conformance::Schema::PATH,
+            overrides => {
+                type                 => 'object',
+                additionalProperties => { anyOf => [ { type => 'string', enum => ['off'] }, { type => 'object', additionalProperties => $VALUE } ] },
+                default              => {},
+            },
+            settings => { type => 'object', additionalProperties => $VALUE, default => {} },
+            replace  => { type => 'boolean' },
+            retired  => { type => 'array', items => { type => 'string' } },
+            header   => { type => 'string' },
+            outdated => { type => 'array', items => { type => 'string' } },
         },
     };
-}
-
-
-sub policies ( $text, $where ) {
-    my $profile = Config::Tiny->read_string($text) // die( "$where does not parse as a perlcritic profile: " . Config::Tiny->errstr . "\n" );
-    my %policies;
-    for my $section ( grep { $_ ne q{_} } keys %$profile ) {
-        my ( $off, $name ) = policy_of($section);
-        $policies{$name} = $off ? 'disabled' : 'enabled';
-    }
-    return \%policies;
 }
 
 
@@ -44,51 +41,14 @@ sub policy_of ($section) {
 }
 
 
-sub missing_policies ( $self, $text ) {
-    my ( $file, $template ) = @{ $self->config }{qw{file template}};
-    my $want    = policies( ( $self->template($template) )[0], $template );
-    my $have    = policies( $text,                             $file );
-    my @missing = sort grep { $want->{$_} eq 'enabled' && !exists $have->{$_} } keys %$want;
-    return @missing;
-}
-
-
-sub retired ($self) {
-    my @retired = map { ( policy_of($_) )[1] } @{ $self->config->{retired} };
-    return if !@retired;
-    my $template = $self->config->{template};
-    my $want     = policies( ( $self->template($template) )[0], $template );
-    my @both     = grep { ( $want->{$_} // q{} ) eq 'enabled' } @retired;
-    die( "$template enables " . join( ', ', @both ) . ", which retired names too: a policy is either in the template or retired\n" ) if @both;
-    return @retired;
-}
-
-
-sub enabled_retired ( $self, $text, @retired ) {
-    my $have    = policies( $text, $self->config->{file} );
-    my @enabled = sort grep { ( $have->{$_} // q{} ) eq 'enabled' } @retired;
-    return @enabled;
-}
-
-
-sub lacks (@missing) {
-    return 'lacks the ' . ( @missing == 1 ? 'policy ' : 'policies ' ) . join ', ', @missing;
-}
-
-
-sub verdict ( $self, $text ) {
-    my $template = $self->config->{template};
-    my @retired  = $self->retired;
-    my ( $missing, $enabled ) = eval { ( [ $self->missing_policies($text) ], [ $self->enabled_retired( $text, @retired ) ] ) };
-    if ($@) {
-        my $detail = Dist::Conformance::Schema::first_line($@);
-        return ( 'fail', $detail, "$detail: fix it by hand, or set replace: true to overwrite it" );
+sub profile_of ( $text, $where ) {
+    my $tiny = Config::Tiny->read_string($text) // die( "$where does not parse as a perlcritic profile: " . Config::Tiny->errstr . "\n" );
+    my %profile = ( settings => $tiny->{_} // {}, policies => {} );
+    for my $section ( grep { $_ ne q{_} } keys %$tiny ) {
+        my ( $off, $name ) = policy_of($section);
+        $profile{policies}{$name} = { off => $off, parameters => $off ? {} : $tiny->{$section} };
     }
-    return ( 'pass', "has every policy of $template" ) if !@$missing && !@$enabled;
-    my @details;
-    push @details, lacks(@$missing) . " of $template"                                                                                                     if @$missing;
-    push @details, 'enables the retired ' . ( @$enabled == 1 ? 'policy ' : 'policies ' ) . join( ', ', @$enabled ) . ', which conformance update removes' if @$enabled;
-    return ( 'fail', join( '; ', @details ), undef, $missing, $enabled );
+    return \%profile;
 }
 
 
@@ -98,83 +58,184 @@ sub header_of ($line) {
 }
 
 
-sub ignored ($line) {
-    return $line =~ m/\A\s*(?:[\#;]|$)/;
+sub parameter_of ($line) {
+    return if $line =~ m/\A\s*(?:[\#;]|$)/;
+    my ( $key, $value ) = $line =~ m/\A\s*([^=]+?)\s*=\s*(.*?)\s*$/;
+    return if !defined $key;
+    return ( $key, $value );
 }
 
 
-sub sections ($text) {
-    my ( %sections, $name );
-    for my $line ( split /^/, $text ) {
-        if ( defined( my $section = header_of($line) ) ) {
-            my ( $off, $policy ) = policy_of($section);
-            $name = $off ? undef : $policy;
-            $sections{$name} = q{} if defined $name;
-            next;
+sub rewrite ( $lines, $overlay ) {
+    my ( @out, %seen, $after );
+    for my $line (@$lines) {
+        my ($key) = parameter_of($line);
+        my $kept = $line;
+        if ( defined $key && exists $overlay->{$key} ) {
+            $seen{$key} = 1;
+            next if !defined $overlay->{$key};
+            $kept = "$key = $overlay->{$key}\n";
         }
-        next if !defined $name || ignored($line);
-        $sections{$name} .= $line =~ s/\n?\z/\n/r;
+        push @out, $kept;
+        $after = scalar @out if defined $key;
     }
-    return { map { $_ => "[$_]\n$sections{$_}" } keys %sections };
+    my @new = map {"$_ = $overlay->{$_}\n"} grep { !$seen{$_} && defined $overlay->{$_} } sort keys %$overlay;
+    splice @out, $after // 0, 0, @new;
+    return @out;
 }
 
 
-sub without_sections ( $text, @names ) {
-    my %gone  = map { $_ => 1 } @names;
-    my @lines = split /^/, $text;
-    my %remove;
-    for my $start ( grep { defined header_of( $lines[$_] ) } 0 .. $#lines ) {
-        my ( $off, $policy ) = policy_of( header_of( $lines[$start] ) );
-        next if $off || !$gone{$policy};
-        my $end = $start + 1;
-        $end++ while $end <= $#lines   && !defined header_of( $lines[$end] );
-        $end-- while $end > $start + 1 && ignored( $lines[ $end - 1 ] );
-        my $above = $start;
-        $above-- while $above > 0 && $lines[ $above - 1 ] =~ m/\A\s*[\#;]/;
-        $above = $start if $above == 0;
-        $remove{$_} = 1 for $above .. $end - 1;
+sub overrides ($self) {
+    my %overrides;
+    for my $given ( sort keys %{ $self->config->{overrides} } ) {
+        my ( $off, $name ) = policy_of($given);
+        die "overrides names $given, which is not the name of a policy\n" if $off || !Dist::Conformance::Schema::matches( $Dist::Conformance::Check::MODULE, $name );
+        die "overrides names the policy $name twice\n"                     if exists $overrides{$name};
+        $overrides{$name} = $self->config->{overrides}{$given};
     }
-    return join q{}, @lines[ grep { !$remove{$_} } 0 .. $#lines ];
+    return \%overrides;
+}
+
+
+sub expected ($self) {
+    my $template = $self->config->{template};
+    my ( $text, @unfilled ) = $self->template($template);
+    die( "$template needs the variables " . join( ', ', @unfilled ) . " in .conformance.yml: nothing sets them\n" ) if @unfilled;
+    my $standard = profile_of( $text, $template )->{policies};
+    my $given = $self->overrides;
+    my %overrides;
+    for my $as ( sort keys %$given ) {
+        my $name = full_name( $as, $standard );
+        die "overrides names the policy $name twice\n" if exists $overrides{$name};
+        $overrides{$name} = $given->{$as};
+    }
+    my $overrides = \%overrides;
+
+    $text .= "\n" if $text =~ m/[^\n]\z/;
+    my @lines   = split /^/, $text;
+    my @headers = grep { defined header_of( $lines[$_] ) } 0 .. $#lines;
+    my @bodies  = ( [ 0, $headers[0] // scalar @lines ] );
+    push @bodies, map { [ $headers[$_] + 1, $headers[ $_ + 1 ] // scalar @lines ] } 0 .. $#headers;
+
+    my @out = rewrite( [ @lines[ $bodies[0][0] .. $bodies[0][1] - 1 ] ], $self->config->{settings} );
+    my %named;
+    for my $i ( 0 .. $#headers ) {
+        my $name = ( policy_of( header_of( $lines[ $headers[$i] ] ) ) )[1];
+        my @body = @lines[ $bodies[ $i + 1 ][0] .. $bodies[ $i + 1 ][1] - 1 ];
+        my $want = $overrides->{$name};
+        $named{$name} = 1;
+        if ( !defined $want ) {
+            push @out, $lines[ $headers[$i] ], @body;
+        }
+        elsif ( $want eq 'off' ) {
+            my %gone;
+            for my $line (@body) {
+                my ($key) = parameter_of($line);
+                $gone{$key} = undef if defined $key;
+            }
+            push @out, "[-$name]\n", rewrite( \@body, \%gone );
+        }
+        else {
+            push @out, "[$name]\n", rewrite( \@body, $want );
+        }
+    }
+
+    my @own = grep { !$named{$_} } sort keys %$overrides;
+    push @out, "\n# The overrides of .conformance.yml\n" if @own;
+    for my $name (@own) {
+        my $want = $overrides->{$name};
+        push @out, ref $want ? ( "[$name]\n", rewrite( [], $want ) ) : "[-$name]\n";
+    }
+    return join q{}, @out;
+}
+
+
+sub differences ( $have, $want ) {
+    my ( $hp, $wp ) = ( $have->{policies}, $want->{policies} );
+    my $same = sub ( $x, $y ) {
+        return join( "\n", map {"$_=$x->{$_}"} sort keys %$x ) eq join( "\n", map {"$_=$y->{$_}"} sort keys %$y );
+    };
+    my @kinds = (
+        [ 'lacks the policy',                     grep { !$hp->{$_} } sort keys %$wp ],
+        [ 'names the policy',                     grep { !$wp->{$_} } sort keys %$hp ],
+        [ 'enables the policy',                   grep { $hp->{$_} && $wp->{$_}{off} && !$hp->{$_}{off} } sort keys %$wp ],
+        [ 'turns off the policy',                 grep { $hp->{$_} && !$wp->{$_}{off} && $hp->{$_}{off} } sort keys %$wp ],
+        [ 'sets other parameters for the policy', grep { $hp->{$_} && !$wp->{$_}{off} && !$hp->{$_}{off} && !$same->( $hp->{$_}{parameters}, $wp->{$_}{parameters} ) } sort keys %$wp ],
+    );
+    my @differences;
+    for my $kind (@kinds) {
+        my ( $phrase, @names ) = @$kind;
+        next if !@names;
+        my $text = ( @names > 1 ? $phrase =~ s/policy\z/policies/r : $phrase ) . ' ' . join ', ', @names;
+        $text .= ', which neither the template nor the overrides name' if $phrase eq 'names the policy';
+        push @differences, $text;
+    }
+    push @differences, 'sets other global settings' if !$same->( $have->{settings}, $want->{settings} );
+    return @differences;
 }
 
 
 sub check ( $self, $snapshot ) {
-    my $file = $self->config->{file};
+    my ( $file, $template ) = @{ $self->config }{qw{file template}};
     my $text = $snapshot->content($file) // return ( 'fail', "$file is missing" );
-    my ( $status, $detail ) = $self->verdict($text);
-    return ( $status, $detail );
+    my $want = $self->expected;
+    return ( 'pass', "is $template with the overrides" ) if $text eq $want;
+    my $have = eval { profile_of( $text, $file ) } // return ( 'fail', Dist::Conformance::Schema::first_line($@) . ', and conformance update replaces it' );
+    my @differences = differences( $have, profile_of( $want, $template ) );
+    return ( 'info', "differs from $template with the overrides only in comments and layout, which conformance update rewrites" ) if !@differences;
+    return ( 'fail', join( '; ', @differences ) . ', which conformance update corrects' );
 }
 
 
 sub update ( $self, $update ) {
-    my ( $file, $template ) = @{ $self->config }{qw{file template}};
-    my $text = $update->snapshot->content($file);
-    if ( defined $text ) {
-        my ( $status, undef, $by_hand, $missing, $enabled ) = $self->verdict($text);
-        return if $status eq 'pass';
-        if ( !$self->config->{replace} ) {
-            return $update->by_hand($by_hand) if defined $by_hand;
-            my $edited = without_sections( $text, @$enabled );
-            $edited = $self->append_policies( $update, $edited, @$missing ) // $edited if @$missing;
-            $update->write( $file, $edited ) if $edited ne $text;
-            return;
-        }
-    }
-    $self->write_template( $update, $file, $template );
+    my $want = eval { $self->expected };
+    return $update->by_hand( Dist::Conformance::Schema::first_line($@) . ': ' . $self->name . ' cannot write ' . $self->config->{file} ) if !defined $want;
+    $update->write( $self->config->{file}, $want );
     return;
 }
 
 
-sub append_policies ( $self, $update, $text, @missing ) {
-    my ( $file,     $template ) = @{ $self->config }{qw{file template}};
-    my ( $policies, @unfilled ) = $self->template($template);
-    if (@unfilled) {
-        $update->by_hand( 'Add the policies ' . join( ', ', @missing ) . " of $template to $file by hand, or set the variables " . join( ', ', @unfilled ) . ' in .conformance.yml: nothing sets them' );
-        return;
+sub adopt ( $self, $snapshot ) {
+    my ( $file, $template ) = @{ $self->config }{qw{file template}};
+    my $text = $snapshot->content($file) // return;
+    my ( $filled, @unfilled ) = $self->template($template);
+    die( "$template needs the variables " . join( ', ', @unfilled ) . " in .conformance.yml: nothing sets them\n" ) if @unfilled;
+    my $have = profile_of( $text,   $file );
+    my $want = profile_of( $filled, $template );
+
+    my %overrides;
+    for my $given ( sort keys %{ $have->{policies} } ) {
+        my $mine     = $have->{policies}{$given};
+        my $name     = full_name( $given, $want->{policies} );
+        my $standard = $want->{policies}{$name};
+        if ( $mine->{off} ) {
+            $overrides{$name} = 'off' if !$standard || !$standard->{off};
+            next;
+        }
+        if ( !$standard || $standard->{off} ) {
+            $overrides{$name} = { %{ $mine->{parameters} } };
+            next;
+        }
+        my $changed = overlay( $standard->{parameters}, $mine->{parameters} );
+        $overrides{$name} = $changed if %$changed;
     }
-    my $sections = sections($policies);
-    $text .= "\n" if $text =~ m/[^\n]\z/;
-    return $text . join q{}, @{$sections}{@missing};
+    my $settings = overlay( $want->{settings}, $have->{settings} );
+    my %adopted  = ( %overrides ? ( overrides => \%overrides ) : (), %$settings ? ( settings => $settings ) : () );
+    return %adopted ? \%adopted : undef;
+}
+
+
+sub full_name ( $name, $policies ) {
+    return $name if exists $policies->{$name};
+    my @longer = grep { substr( $_, -length("::$name") ) eq "::$name" } keys %$policies;
+    return @longer == 1 ? $longer[0] : $name;
+}
+
+
+sub overlay ( $from, $to ) {
+    my %overlay = map { $_ => $to->{$_} } grep { !exists $from->{$_} || $from->{$_} ne $to->{$_} } keys %$to;
+    $overlay{$_} = undef for grep { !exists $to->{$_} } keys %$from;
+    return \%overlay;
 }
 
 __END__
@@ -185,103 +246,82 @@ __END__
 
 =head1 NAME
 
-Dist::Conformance::Check::CriticProfile - The perlcritic profile enables or turns off every policy of its template, and no retired one
+Dist::Conformance::Check::CriticProfile - The perlcritic profile is its template, with the overrides of the repository
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 DESCRIPTION
 
-A profile is compared with its template by the policies that each names.  Both
-are read as Perl::Critic reads a profile, with L<Config::Tiny>: each section
-C<[Name]> enables the policy C<Name>, a section C<[-Name]> turns it off, and the
-keys before the first section are global settings.  A name with the prefix
-C<Perl::Critic::Policy::> is the same policy as the name without it.
+The profile is not edited by hand.  It is the template, with the variables
+filled in, and with the overrides of the repository applied.  So the standards
+decide every policy and every parameter, and a repository says where it
+departs from them in F<.conformance.yml>, where a reviewer sees it.  The
+comments of the profile are those of the template.  A note about an override
+goes in F<.conformance.yml>, beside it.
 
-The check passes when the file names each policy that the template enables,
-either as C<[Name]>, which enables it, or as C<[-Name]>, which turns it off on
-purpose.  It fails when the file is missing, when it does not parse, and when
-it does not name a policy that the template enables.  The detail names each
-such policy.  So when the template gains a policy, every profile that does not
-have it yet fails, by the name of that policy.
-
-It also fails when the file enables a policy that C<retired> names, and the
-detail names each such policy and says that C<conformance update> removes it.
-Dropping a policy from the template is not enough to take it away, because a
-profile may enable policies of its own, and the check cannot tell one of them
-from a policy that the standards used to have.  So the standards say which
-policies they take back, by name.  A section C<[-Name]>, which turns a retired
-policy off, is not an error, and stays.
-
-What else the file says is the distribution's own business, and does not
-change the result:
+Each entry of C<overrides> names a policy, with or without the prefix
+C<Perl::Critic::Policy::>, and says one of these.  A name that is the last
+parts of a name in the template, such as C<ProhibitLeadingZeros> for
+C<Plicease::ProhibitLeadingZeros>, is that policy, as Perl::Critic reads it.
 
 =over
 
-=item the parameters of a policy
+=item C<off>
 
-A policy that the template configures, and the file configures differently or
-not at all, is there.  An exemption or a threshold of its own is a choice of
-the distribution, not a policy that it lacks.
+The profile turns the policy off with C<[-Name]>, whether the template enables
+it or does not name it.  A profile that sets C<severity> low runs every
+installed policy that it does not turn off.
 
-=item a policy that the template does not enable
+=item a mapping of parameters
 
-A policy of the distribution's own, or one that the template has dropped or
-turns off, can stay, unless C<retired> names it.
-
-=item the global settings and the comments
-
-The first line among them, so a header says nothing about whether a profile
-is current.
+The profile enables the policy, with the parameters of the template and these
+over them.  A parameter whose value is C<~> is removed.  An empty mapping
+enables the policy with the parameters of the template, so it adds a policy
+that the template does not name, or turns on one that the template turns off.
 
 =back
 
-The update writes the template when the file is missing.  A profile that is
-there usually has changes of its own, such as exemptions, so it is replaced
-only when C<replace> is true.  Otherwise the update appends to the end of the
-file each policy that it lacks, as the template writes its section: the
-C<[Name]> line and the parameters below it, without the comments.  Every line
-that the file had stays as it was.  A profile that does not parse is left for a
-person, and so is one whose template still has a placeholder that nothing
-fills.
+C<settings> does the same for the global settings, the keys before the first
+section, such as C<severity>: each key replaces the setting of the template,
+and C<~> removes it.
 
-Without C<replace>, the update also removes the section of each retired policy
-that the file enables: the C<[Name]> line, the parameters below it, and the
-comment lines directly above the C<[Name]> line, up to a line that is blank or
-is not a comment.  A comment block at the very top of the file is its header,
-and stays.  The comment lines and blank lines at the end of the section stay
-as well, because they are usually about the section after it.  Every other
-line stays as it was.
+The overrides change the text of the template in place.  A parameter that an
+override changes stays on its line, a new parameter goes after the last
+parameter of its section, and a policy that the template does not name goes at
+the end of the file.
 
-A template that enables a policy that C<retired> names contradicts itself, so
-the check dies, and so does the update, and each says which policy.
+The check passes when the profile is that text.  It fails when the file is
+missing, and when it differs in what Perl::Critic reads: a policy that it
+lacks, a policy that neither the template nor the overrides name, a policy
+that it turns on or off otherwise, a parameter, or a global setting.  The
+detail names each.  A profile that differs only in comments or layout is
+C<info>.  A profile that does not parse fails.
+
+So when the standards add a policy, drop one, turn one off or change a
+parameter, every profile that does not follow fails, and the update brings it
+along.  A policy that the template drops leaves every profile, unless an
+override names it.
+
+The update writes the text whenever the file differs from it, also in the
+comments.  It replaces whatever the file had, so run C<conformance adopt>
+before the first update of a profile that has changes of its own.  See
+L</adopt>.  A template with a placeholder that nothing fills is not written:
+the update says which variables it needs.
 
 =head1 METHODS
 
-=head2 missing_policies
+=head2 overrides
 
-C<($text)>.  The sorted names of the policies that the template enables and
-the profile C<$text> does not name.  Dies when either does not parse.
+The entries of C<overrides>, by the short name of each policy.  Dies on a name
+that is not that of a policy, and on two entries for one policy.
 
-=head2 retired
+=head2 expected
 
-The short names of the policies that C<retired> names, in its order.  Dies
-when the template enables one of them, or does not parse.
-
-=head2 enabled_retired
-
-C<($text, @retired)>.  The sorted names of the policies of C<@retired> that
-the profile C<$text> enables.  Dies when it does not parse.
-
-=head2 verdict
-
-C<($text)>.  The status and the detail of the profile C<$text>, as C<check>
-returns them.  For a profile that does not parse, then what a person must do
-to fix it by hand; for one that lacks policies or enables retired ones, then
-C<undef> and two array references: the names of the policies that it lacks,
-and of the retired policies that it enables.  Dies when the template enables a
-retired policy, as L</retired> does.
+The text that the profile must be: the template, its placeholders filled in,
+with the overrides and the settings applied, as L</DESCRIPTION> says.  Dies
+when a placeholder has no variable, and when the template does not parse.
 
 =head2 check
 
@@ -290,34 +330,35 @@ profile in C<$snapshot>.
 
 =head2 update
 
-Writes the template when the profile is missing, or when it is not current and
-C<replace> is true.  Otherwise removes the sections of the retired policies
-that the profile enables, and appends the sections of the template that it
-lacks, as L</DESCRIPTION> says.
+Writes L</expected> to the profile when the file differs from it.
 
-=head2 append_policies
+=head2 adopt
 
-C<($update, $text, @missing)>.  The profile C<$text> with the section of the
-template of each policy of C<@missing> appended.  When the template still has
-a placeholder, returns C<undef> and records through C<$update> what is needed.
+C<($snapshot)>.  The C<overrides> and C<settings> that make L</expected> read
+as the profile in C<$snapshot> reads now, as a hash reference with the keys
+that hold something.  Nothing when the profile is missing, or needs neither.
+A policy that the template names and the profile lacks is not adopted: the
+profile lacked it because the template gained it later.  A policy that the
+profile names by the last parts of a name that the template gives in full,
+such as C<ProhibitLeadingZeros> for C<Plicease::ProhibitLeadingZeros>, is the
+policy of the template, as Perl::Critic reads it, and is adopted by the full
+name.  Dies when either does
+not parse, and when a placeholder has no variable.
 
 =head1 FUNCTIONS
-
-=head2 policies
-
-C<($text, $where)>.  The policies of the profile C<$text>, as a hash reference
-from the short name of each to C<enabled> or C<disabled>.  Dies, naming
-C<$where>, when Perl::Critic could not parse the text either.
 
 =head2 policy_of
 
 C<($section)>.  Whether the header C<$section> of a profile turns its policy
 off, and the short name of the policy.
 
-=head2 lacks
+=head2 profile_of
 
-C<(@missing)>.  The detail for a profile that lacks the policies C<@missing>,
-without the template.
+C<($text, $where)>.  What Perl::Critic reads from the profile C<$text>, as a
+hash reference: C<settings>, the global settings, and C<policies>, from the
+short name of each policy that a section names to a hash reference with C<off>,
+whether it turns the policy off, and C<parameters>.  Dies, naming C<$where>,
+when it does not parse.
 
 =head2 header_of
 
@@ -325,26 +366,36 @@ C<($line)>.  The section that the line C<$line> of a profile starts, as
 L<Config::Tiny> reads it, with its inline C< ; > comment: C<undef> when it
 starts none.
 
-=head2 ignored
+=head2 parameter_of
 
-C<($line)>.  Whether L<Config::Tiny> ignores the line C<$line> of a profile,
-as a comment or a blank line.
+C<($line)>.  The key and the value that the line C<$line> of a profile sets, as
+L<Config::Tiny> reads them, or nothing for a line that sets none.
 
-=head2 sections
+=head2 rewrite
 
-C<($text)>.  The text of each section of the profile C<$text> that enables a
-policy, as a hash reference from the short name of the policy: the line of the
-section and the lines of its parameters, each with its newline, without the
-comments and the blank lines.  The lines are found as L<Config::Tiny> finds
-them, so the names are the names of L</policies>.
+C<(\@lines, \%overlay)>.  The lines C<@lines> of a section, without its
+header, with the parameters of C<%overlay> over theirs: a key that it sets to
+a value has that value on its line, a key that it sets to C<undef> loses its
+line, and a key that the lines lack gets a line after their last parameter, or
+first when they have none.  The other lines stay as they were.
 
-=head2 without_sections
+=head2 differences
 
-C<($text, @names)>.  The profile C<$text> without each section that enables a
-policy of C<@names>, as L</DESCRIPTION> says: the line of the section, its
-parameters, and the comment lines directly above it unless they start the
-file, but not the comment lines and blank lines that end it.  A section that
-turns a policy off stays.
+C<($have, $want)>.  How the profile C<$have> differs from C<$want>, both as
+L</profile_of> returns them, as phrases for a person.  Empty when Perl::Critic
+reads both the same.
+
+=head2 full_name
+
+C<($name, \%policies)>.  The name in C<%policies> that ends with C<::$name>,
+when C<$name> is not a key there and exactly one name ends so.  C<$name>
+otherwise.
+
+=head2 overlay
+
+C<(\%from, \%to)>.  The overlay that turns the parameters C<%from> into C<%to>:
+each key of C<%to> whose value differs, and C<undef> for each key that only
+C<%from> has.
 
 =head1 IN A FLAVOR
 
@@ -352,9 +403,20 @@ turns a policy off stays.
       CriticProfile:
         file: .perlcriticrc
         template: templates/perlcriticrc
-        replace: false
-        retired:
-          - Subroutines::ProhibitUnderscorePrivateSubs
+
+=head1 IN .conformance.yml
+
+    checks:
+      CriticProfile:
+        overrides:
+          logicLAB::RequireSheBang:
+            formats: '#!/usr/bin/env perl'
+          Subroutines::ProhibitExcessComplexity:
+            max_mccabe: 30
+          ValuesAndExpressions::ProhibitMagicNumbers: off
+          Some::Policy::OfItsOwn: {}
+        settings:
+          severity: 3
 
 =head1 CONFIGURATION
 
@@ -366,26 +428,28 @@ Required.  The path of the profile.
 
 =item template
 
-Required.  The template of the current profile.
+Required.  The template of the profile.
+
+=item overrides
+
+What the repository sets otherwise than the template, by policy, as
+L</DESCRIPTION> says.  Default none.
+
+=item settings
+
+The global settings that the repository sets otherwise.  Default none.
 
 =item replace
 
-Whether an update overwrites a profile that is not current.  Default false.
-
 =item retired
-
-The policies that the standards have taken back, by name, with or without the
-prefix C<Perl::Critic::Policy::>.  A profile must not enable one, and the
-update removes it.  Default none.  Name a policy here when the template drops
-it, and keep it here for as long as a profile made from an older template can
-still enable it.
 
 =item header
 
 =item outdated
 
-Deprecated, and ignored.  Each named a first line to compare, which the check
-no longer does.  They are accepted so that a flavor that names them still
+Deprecated, and ignored.  The profile is always the template with the
+overrides, so it is always replaced, and a policy that the template drops goes
+without a list.  They are accepted so that a flavor that names them still
 loads.
 
 =back

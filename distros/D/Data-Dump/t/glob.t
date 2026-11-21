@@ -23,13 +23,13 @@ do {
 }
 EOT
 
-use IO::Socket::INET;
-my $s = IO::Socket::INET->new(
-    Listen => 1,
-    Timeout => 5,
-    LocalAddr => '127.0.0.1',
-);
+my $s = gensym();
+bless $s, 'Data::Dump::Test';
+${*$s}{ddt_domain}  = 2;
+${*$s}{ddt_proto}   = 6;
+${*$s}{ddt_type}    = 1;
+${*$s}{ddt_timeout} = 5;
 $s = dump($s);
 print "$s\n";
-ok($s =~ /my \$a = bless\(Symbol::gensym\(\), "IO::Socket::INET"\);/);
-ok($s =~ /^\s+io_socket_timeout\s+=> 5,/m);
+ok($s =~ /my \$a = bless\(Symbol::gensym\(\), "Data::Dump::Test"\);/);
+ok($s =~ /\s+ddt_timeout\s+=> 5/m);

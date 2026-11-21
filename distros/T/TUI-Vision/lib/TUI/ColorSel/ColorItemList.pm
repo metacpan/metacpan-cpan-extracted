@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -15,6 +15,7 @@ our @EXPORT = qw(
   new_TColorItemList
 );
 
+use Storable;
 use Carp ();
 use TUI::toolkit;
 use TUI::toolkit::Types qw(
@@ -30,6 +31,7 @@ use TUI::ColorSel::Const qw(
   cmSaveColorIndex
 );
 use TUI::ColorSel::ColorGroup;
+use TUI::Objects::Rect;
 use TUI::Views::ListViewer;
 use TUI::Views::Util qw( message );
 
@@ -148,6 +150,18 @@ sub handleEvent {    # void ($event)
     }
   }
   return;
+}
+
+sub build {    # $obj ()
+  my ( $class ) = @_;
+  assert ( @_ == 1 );
+  assert ( is_Str $class );
+  assert ( Storable::is_retrieving );
+  return $class->new(
+    bounds    => TRect->new(),
+    scrollBar => undef,
+    items     => undef,
+  );
 }
 
 1

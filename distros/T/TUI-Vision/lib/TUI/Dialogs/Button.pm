@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -15,6 +15,7 @@ our @EXPORT = qw(
   new_TButton
 );
 
+use Storable;
 use TUI::toolkit;
 use TUI::toolkit::Types qw(
   :is
@@ -33,6 +34,7 @@ use TUI::Drivers::Util qw(
   cstrlen
   getAltCode
 );
+use TUI::Objects::Rect;
 use TUI::Views::Const qw(
   cmDefault
   cmCommandSetChanged
@@ -194,7 +196,7 @@ sub drawState {    # void ($down)
       $i = 1;
     } #/ else [ if ( $down ) ]
 
-    if ( $y == $T && $self->{title} ) {
+    if ( $y == $T && defined $self->{title} ) {
       $self->$drawTitle( $b, $s, $i, $cButton, $down );
     }
 
@@ -441,6 +443,55 @@ $getActiveRect = sub {    # $rect ()
   assert ( is_Object $_[0] );
   ...;
 };
+
+sub write :method {    # void ($os)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $os ) = $sig->( @_ );
+  $self->SUPER::write( $os );
+  $os->put(
+    $self->{title},
+    $self->{command},
+    $self->{flags},
+    $self->{amDefault} ? 1 : 0,
+  );
+  return;
+}
+
+sub read :method {    # $self ($is)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $is ) = $sig->( @_ );
+  $self->SUPER::read( $is );
+  $self->{title}     = $is->get();
+  $self->{command}   = $is->get();
+  $self->{flags}     = $is->get();
+  $self->{amDefault} = $is->get() ? true : false;
+  if ( TView->commandEnabled( $self->{command} ) ) {
+    $self->{state} &= ~sfDisabled;
+  }
+  else {
+    $self->{state} |= sfDisabled;
+  }
+  return $self;
+}
+
+sub build {    # $obj ()
+  my ( $class ) = @_;
+  assert ( @_ == 1 );
+  assert ( is_Str $class );
+  assert ( Storable::is_retrieving );
+  return $class->new(
+    bounds  => TRect->new(),
+    title   => '',
+    command => 0,
+    flags   => 0,
+  );
+}
 
 1
 

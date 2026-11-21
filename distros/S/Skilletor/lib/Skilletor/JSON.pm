@@ -12,7 +12,7 @@ use Scalar::Util qw( blessed reftype );
 use Skilletor::Error::JSON;
 use Skilletor::JSON::OrderedHash;
 
-our $VERSION = '0.001';
+our $VERSION = '0.008000';
 
 our @EXPORT_OK = qw( js_parse js_stringify js_ordered js_sort_keys js_number js_type );
 
@@ -183,6 +183,8 @@ sub js_number {
 
 # A recursive-descent JSON.parse with V8's error messages. Objects come back as hashes tied
 # to Skilletor::JSON::OrderedHash, so they keep the property order JavaScript gives them.
+# Every match runs on $p->{s} itself, never on a copy: a copy of a UTF-8 text has no offset
+# cache, so each pos() on it scans from the start and a big file parses in quadratic time (k196).
 
 sub js_parse {
   my ( $text ) = @_;
@@ -273,7 +275,6 @@ sub _literal {
 sub _number {
   my ( $p ) = @_;
   my $start = $p->{i};
-  my $s     = $p->{s};
   if ( _peek($p) eq '-' ) {
     $p->{i}++;
     my $c = _peek($p);
@@ -286,27 +287,27 @@ sub _number {
     _fail_at( $p, 'Unexpected number' ) if defined $c && $c =~ /[0-9]/;
   }
   else {
-    pos($s) = $p->{i};
-    $s =~ /\G[0-9]+/gc;
-    $p->{i} = pos($s);
+    pos( $p->{s} ) = $p->{i};
+    $p->{s} =~ /\G[0-9]+/gc;
+    $p->{i} = pos( $p->{s} );
   }
   my $simple = 1;
   if ( ( _peek($p) // '' ) eq '.' ) {
     $simple = 0;
     $p->{i}++;
-    pos($s) = $p->{i};
-    _fail_at( $p, 'Unterminated fractional number' ) unless $s =~ /\G[0-9]+/gc;
-    $p->{i} = pos($s);
+    pos( $p->{s} ) = $p->{i};
+    _fail_at( $p, 'Unterminated fractional number' ) unless $p->{s} =~ /\G[0-9]+/gc;
+    $p->{i} = pos( $p->{s} );
   }
   if ( ( _peek($p) // '' ) =~ /\A[eE]\z/ ) {
     $simple = 0;
     $p->{i}++;
     $p->{i}++ if ( _peek($p) // '' ) =~ /\A[-+]\z/;
-    pos($s) = $p->{i};
-    _fail_at( $p, 'Exponent part is missing a number' ) unless $s =~ /\G[0-9]+/gc;
-    $p->{i} = pos($s);
+    pos( $p->{s} ) = $p->{i};
+    _fail_at( $p, 'Exponent part is missing a number' ) unless $p->{s} =~ /\G[0-9]+/gc;
+    $p->{i} = pos( $p->{s} );
   }
-  my $text = substr( $s, $start, $p->{i} - $start );
+  my $text = substr( $p->{s}, $start, $p->{i} - $start );
   my $n = 0 + $text;
   # A JavaScript number is a double: an integer beyond 2**53 loses its low digits there.
   $n = unpack 'd', pack 'd', $n unless $simple && $p->{i} - $int_start <= 15;
@@ -318,13 +319,12 @@ my %UNESCAPE = ( '"' => '"', '\\' => '\\', '/' => '/', b => "\b", f => "\f", n =
 sub _string {
   my ( $p ) = @_;
   $p->{i}++;    # the opening quote
-  my $s   = $p->{s};
   my $out = '';
   while (1) {
-    pos($s) = $p->{i};
-    if ( $s =~ /\G([^"\\\x{0}-\x{1F}]+)/gc ) {
+    pos( $p->{s} ) = $p->{i};
+    if ( $p->{s} =~ /\G([^"\\\x{0}-\x{1F}]+)/gc ) {
       $out .= $1;
-      $p->{i} = pos($s);
+      $p->{i} = pos( $p->{s} );
     }
     my $c = _peek($p);
     _fail_at( $p, 'Unterminated string' ) unless defined $c;
@@ -345,7 +345,7 @@ sub _string {
     _fail_at( $p, 'Bad escaped character' ) unless $e eq 'u';
     $p->{i}++;
     my $code = _hex4($p);
-    if ( $code >= 0xD800 && $code <= 0xDBFF && substr( $s, $p->{i}, 2 ) eq '\\u' ) {
+    if ( $code >= 0xD800 && $code <= 0xDBFF && substr( $p->{s}, $p->{i}, 2 ) eq '\\u' ) {
       my $save = $p->{i};
       $p->{i} += 2;
       my $low = _hex4($p);
@@ -440,7 +440,7 @@ Skilletor::JSON - JSON read and written exactly as the reference implementation 
 
 =head1 VERSION
 
-version 0.001
+version 0.008000
 
 =head1 SYNOPSIS
 
@@ -521,19 +521,25 @@ is C<undefined> in JavaScript: test it with C<exists>.
 
 =head1 SUPPORT
 
+=head2 Issues
+
+Please report bugs and feature requests at
+L<https://github.com/Getty/skilletor/issues>.
+
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <getty@cpan.org>
+Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
+This software is Copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

@@ -132,7 +132,7 @@ Boolean validFileName( const char *fileName ) noexcept
 
 void getCurDir( char *dir, char drive ) noexcept
 {
-    dir[0] = (char) ((0 <= drive && drive <= 'Z' - 'A' ? drive : getdisk()) + 'A');
+    dir[0] = char((uchar(drive) <= 'Z' - 'A' ? drive : getdisk()) + 'A');
     dir[1] = ':';
     dir[2] = '\\';
     dir[3] = '\0';
@@ -164,8 +164,8 @@ void *TDirCollection::readItem( ipstream& is )
     char *txt = is.readString();
     char *dir = is.readString();
     TDirEntry *entry = new TDirEntry( txt, dir );
-    delete txt;
-    delete dir;
+    delete[] txt;
+    delete[] dir;
     return entry;
 }
 

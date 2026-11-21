@@ -18,7 +18,7 @@ use namespace::clean;
 
 with 'Skilletor::Role::Source';
 
-our $VERSION = '0.001';
+our $VERSION = '0.008000';
 
 # The first line of a version file: the format of its tree. 2: an entry's owner executable bit
 # is kept.
@@ -291,7 +291,7 @@ Skilletor::Source::Url - A url source: an https .tar.gz, conditional GET, staged
 
 =head1 VERSION
 
-version 0.001
+version 0.008000
 
 =head1 SYNOPSIS
 
@@ -376,19 +376,25 @@ C<format 2>, the first line of a current version file.
 
 =head1 SUPPORT
 
+=head2 Issues
+
+Please report bugs and feature requests at
+L<https://github.com/Getty/skilletor/issues>.
+
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <getty@cpan.org>
+Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
+This software is Copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

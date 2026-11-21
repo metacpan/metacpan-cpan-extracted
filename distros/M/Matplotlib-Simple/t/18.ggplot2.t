@@ -205,10 +205,19 @@ like( refusal( plot_type => 'plot', data => { A => [ \@x, \@y ] }, set_xlim => '
 # 5. A Windows path, with an apostrophe and a percent sign, survives.
 # ----------------------------------------------------------------------------
 {
-	my $path = q{C:\new\x's dir\100% out.svg};
+	my $path = q{C:\new\x's dir\100% out.png};
 	my ( undef, undef, $file ) = capture { plt( engine => 'ggplot2', execute => 0, plot_type => 'bar', data => { A => 1 }, output_file => $path ) };
 	push @scripts, $file;
-	like( slurp($file), qr/grDevices::svg\("C:\\\\new\\\\x's dir\\\\100%% out\.svg"/, 'the backslashes are escaped and the % doubled, which every R device reads as a format' );
+	like( slurp($file), qr/grDevices::png\("C:\\\\new\\\\x's dir\\\\100%% out\.png"/, 'the backslashes are escaped and the % doubled, which every R device reads as a format' );
+	# An SVG is drawn into a temporary file, and written to the path by
+	# writeBin, which reads no format, once its note is in (0.3345).
+	( my $svg = $path ) =~ s/png\z/svg/;
+	( undef, undef, $file ) = capture { plt( engine => 'ggplot2', execute => 0, plot_type => 'bar', data => { A => 1 }, output_file => $svg ) };
+	push @scripts, $file;
+	my $r = slurp($file);
+	like( $r, qr/^\tsvg_drawn <- tempfile\(fileext = "\.svg"\)\n\tgrDevices::svg\(gsub\("%", "%%", svg_drawn, fixed = TRUE\), /m, 'an SVG is drawn into a temporary file, whose % are doubled' );
+	like( $r, qr/writeBin\(.*, "C:\\\\new\\\\x's dir\\\\100% out\.svg"\)\n\t\tunlink\(svg_drawn\)/, 'and written once to the path, which arrives whole' );
+	unlike( $r, qr/100%% out\.svg/, 'with its % as it was given' );
 }
 
 # ----------------------------------------------------------------------------
@@ -279,8 +288,11 @@ like( refusal( plot_type => 'plot', data => { A => [ \@x, \@y ] }, set_xlim => '
 # were checked against np.histogram and np.histogram2d. All twelve were taken
 # again when the module went back to the name Matplotlib::Simple, which the
 # script gives in its message about ggplot2's version; with "Cn::Plot" put
-# back in its place, each script still gave its old digest. To see the digests
-# the engine writes now, run
+# back in its place, each script still gave its old digest. All twelve were
+# taken again in 0.3345, when an SVG came to be drawn into a temporary file and
+# written once: with the old "grDevices::svg("x.svg", ...)" line rewritten as
+# the new two, each old script gave the new digest. To see the digests the
+# engine writes now, run
 #
 #	MATPLOTLIB_SIMPLE_PRINT_PINS=1 prove -Ilib t/18.ggplot2.t
 use Digest::SHA 'sha256_hex';
@@ -296,18 +308,18 @@ my %native_only = (
 );
 my @pin_v = map { sin($_) * 3 + $_ / 10 } 1 .. 40;
 my %pinned = (
-	grouped => [ '5de8eb822ca4c3bcad0eb400c18d5c97b71ead2fd59ead0b592488f4e22323b6', { plot_type => 'bar', data => { '2023' => { A => 3, B => 5 }, '2024' => { A => 4, B => 3 } }, title => 'g' } ],
-	simple  => [ '14296eec1fae7a3e32232d81c1519e3d8e07432186467c74a7d00d42e4f5a89f', { plot_type => 'bar', data => { a => 1, b => 2 }, yerr => { a => 0.1, b => 0.2 } } ],
-	boxplot => [ '2abbdfb316b1b6b8b23f5c68b33a5695e10fee570b3caccdc6f742fd9996dedb', { plot_type => 'boxplot', data => { A => [@pin_v], B => [ map { $_ * 2 } @pin_v ] }, showmeans => 1 } ],
-	violin  => [ 'fff037c0bf0649ed3f1dfdccad013eec552183d207d68a86d176b15b2fe96f4c', { plot_type => 'violin', data => { A => [@pin_v], B => [ map { $_ * 2 } @pin_v ] } } ],
-	hist    => [ '8579b60fdc5f1a25c890a3e95de237f9b3c28f8e4699c874f4be5e42bcd6727f', { plot_type => 'hist', data => { A => [@pin_v], B => [ map { $_ + 1 } @pin_v ] }, bins => 7 } ],
-	hist2d  => [ '7a76da2d500145d6fefae9645d3ca230dfd79df8c0b955ec486f27713ea08f7d', { plot_type => 'hist2d', data => { x => [@pin_v], y => [ reverse @pin_v ] }, xbins => 5, ybins => 4 } ],
-	scatter => [ '8e87b45a515648ff0ce8a790a696c78245e088f11e0388d763d318a57c312770', { plot_type => 'scatter', data => { x => [ 1 .. 5 ], y => [ 2, 4, 1, 3, 5 ], z => [ 5, 4, 3, 2, 1 ] } } ],
-	sets    => [ '16470a65d64fe52ee25a34fe11ab6d0e5d675fcd7a5dfa2d5f4e51213f22f047', { plot_type => 'scatter', data => { P => { x => [ 1, 2 ], y => [ 3, 4 ] }, Q => { x => [ 2, 3 ], y => [ 1, 2 ] } } } ],
-	table   => [ '47f088caeab29766a0003e03d0fc99cfca1eb900a66a60c5ef43e24fdc2fe36e', { plot_type => 'colored_table', data => { H => { H => 1, C => 2 }, C => { C => 3 } }, mirror => 1, show_numbers => 1 } ],
-	pie     => [ '5975722f0b84206347b05f14769cdd688f9a0685229e6383361e03a6411a2b90', { plot_type => 'pie', data => { a => 1, b => 2, c => 3 }, autopct => '%1.1f%%' } ],
-	imshow  => [ 'aa70df9251989fc0d9b43b32e851faf995e62747e66d60c6e7c1ed9ad1f8af28', { plot_type => 'imshow', data => [ [ 1, 2 ], [ 3, 4 ] ], cmap => 'viridis' } ],
-	plot    => [ '4becca4b6667ba46f6ac82c0a6c3019fd73e54250ed40362984d65b17cbc010c', { plot_type => 'plot', data => { s => [ [ 1, 2, 3 ], [ 1, 4, 9 ] ], t => [ 3, 2, 1 ] } } ],
+	grouped => [ 'b407c81c3b0180cc9c15cca17d9406a953142af92d17eb93e0e4c422bd88b3ba', { plot_type => 'bar', data => { '2023' => { A => 3, B => 5 }, '2024' => { A => 4, B => 3 } }, title => 'g' } ],
+	simple  => [ '50a64f08f2f18eed43b3cab2cdb8863d83b5df53835252f38ba6900886e8d040', { plot_type => 'bar', data => { a => 1, b => 2 }, yerr => { a => 0.1, b => 0.2 } } ],
+	boxplot => [ '63c640a84c3c9cac3e86413c2af480aa53ce1a7f124199d9f7400588a751fc17', { plot_type => 'boxplot', data => { A => [@pin_v], B => [ map { $_ * 2 } @pin_v ] }, showmeans => 1 } ],
+	violin  => [ '2434225309711c4f04e3222cc987609c9d14d1e83cc8e683eca85677587cb985', { plot_type => 'violin', data => { A => [@pin_v], B => [ map { $_ * 2 } @pin_v ] } } ],
+	hist    => [ 'ff52673fc6ecf23d890461f46378625966fdf9cd9aa38e1adcdcc5e4cd9a0049', { plot_type => 'hist', data => { A => [@pin_v], B => [ map { $_ + 1 } @pin_v ] }, bins => 7 } ],
+	hist2d  => [ 'ed3d781eb2859ce9ce8eb4eb093839cb636da9732e364d5caf91ed9a7c6e672f', { plot_type => 'hist2d', data => { x => [@pin_v], y => [ reverse @pin_v ] }, xbins => 5, ybins => 4 } ],
+	scatter => [ 'c3b1d24d98adab2b369bc7eed343d537a0f7b146232327678ee1120efdc8616c', { plot_type => 'scatter', data => { x => [ 1 .. 5 ], y => [ 2, 4, 1, 3, 5 ], z => [ 5, 4, 3, 2, 1 ] } } ],
+	sets    => [ 'b3edba3c18b232207f14a42a75cb0e82dc53307c0e1c9fd30e676117200ea304', { plot_type => 'scatter', data => { P => { x => [ 1, 2 ], y => [ 3, 4 ] }, Q => { x => [ 2, 3 ], y => [ 1, 2 ] } } } ],
+	table   => [ '36f8b33e42613532d0ff90ba921bd9ce97a37f8a113386d4a00fbd4b7210464f', { plot_type => 'colored_table', data => { H => { H => 1, C => 2 }, C => { C => 3 } }, mirror => 1, show_numbers => 1 } ],
+	pie     => [ 'fd1a7d024fcf7b7eb0d9d8d61bdff8467f0c7cc5debec4c9b337c2e66c0a12a9', { plot_type => 'pie', data => { a => 1, b => 2, c => 3 }, autopct => '%1.1f%%' } ],
+	imshow  => [ 'a1fe7afb2d25da5f046d9bced2cdd66a9aa25093cceea15eeeb046af0119963c', { plot_type => 'imshow', data => [ [ 1, 2 ], [ 3, 4 ] ], cmap => 'viridis' } ],
+	plot    => [ 'ce4c5b353e1de36b5c4275b5aba5956bf16ab13d24d5b2161a8c39a45a6b5d74', { plot_type => 'plot', data => { s => [ [ 1, 2, 3 ], [ 1, 4, 9 ] ], t => [ 3, 2, 1 ] } } ],
 );
 my %libm_dependent = map { $_ => 1 } qw(boxplot hist hist2d pie violin);    # whose scripts hold a result of sin, cos or **
 sub pinned_script {
@@ -441,7 +453,7 @@ sub pinned_script {
 	like( $r, qr/aes\(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, fill = s\)/, 'bar, log, stacked: the series in the fill scale' );
 	$r = script_of( plot_type => 'bar', data => { A => [ 1, 2 ], B => [ 3, 4 ] }, style => 'native' );
 	like( $r, qr/position = "dodge".*scale_fill_hue\(.*guide = "none"\)/s, 'bar: series with no name are dodged, and told apart by color without a legend' );
-	like( script_of( plot_type => 'bar', data => { A => { x => 1 }, B => { x => 2 } }, stacked => 1, style => 'native' ), qr/position = "stack"/, 'bar: stacked' );
+	like( script_of( plot_type => 'bar', data => { A => { x => 1 }, B => { x => 2 } }, stacked => 1, style => 'native' ), qr/position = ggplot2::position_stack\(reverse = TRUE\)/, 'bar: stacked, the first series at the bottom' );
 	like( script_of( plot_type => 'imshow', data => [ [ 'a', 'b' ] ], stringmap => { a => 'A', b => 'B' }, style => 'native' ), qr/scale_fill_hue\(name = NULL, limits = c\("a", "b"\), breaks = c\("a", "b"\), labels = c\("A", "B"\)/, 'imshow: a stringmap\'s categories in the hue scale' );
 }
 

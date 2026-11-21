@@ -68,6 +68,7 @@ public:
     void getCrossRef( int i, TPoint& loc, uchar& length, int& ref ) noexcept;
     TStringView getLine( int line ) noexcept;
     int getNumCrossRefs() noexcept;
+    int longestLineWidth() noexcept;
     int numLines() noexcept;
     void setCrossRef( int i, TCrossRef& ref ) noexcept;
     void setNumCrossRefs( int i ) noexcept;
@@ -183,6 +184,11 @@ public:
 
     THelpIndex *index;
     int32_t indexPos;
+
+private:
+
+    static void ensureStreamSize( iopstream &, int );
+
 };
 
 extern void notAssigned( opstream& s, int value );

@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -26,6 +26,7 @@ use TUI::Memory;
 use TUI::Validate;
 use TUI::ColorSel;
 use TUI::Editors;
+use TUI::Outline;
 use TUI::Help;
 use TUI::toolkit;
 
@@ -46,6 +47,7 @@ sub import {
   TUI::Validate->import::into( $target );
   TUI::ColorSel->import::into( $target );
   TUI::Editors->import::into( $target );
+  TUI::Outline->import::into( $target );
   TUI::Help->import::into( $target );
   TUI::toolkit->import::into( $target );
 }
@@ -67,6 +69,7 @@ sub unimport {
   TUI::Validate->unimport::out_of( $caller );
   TUI::ColorSel->unimport::out_of( $caller );
   TUI::Editors->unimport::out_of( $caller );
+  TUI::Outline->unimport::out_of( $caller );
   TUI::Help->unimport::out_of( $caller );
   TUI::toolkit->unimport::out_of( $caller );
 }
@@ -85,18 +88,26 @@ TUI::Vision - Perl TUI Framework (Turbo Vision 2.0 Port)
 
   use TUI::Vision;
 
-  # Imports the framework aggregators (Objects, App, Views, Dialogs,
-  # Menus, Drivers, Gadgets, StdDlg, MsgBox, TextView, Memory, ColorSel, 
-  # Editors, Help, Validate)
-  # and the toolkit helpers into your package.
+  # Imports the constants (:all), the framework aggregators (Objects, App,
+  # Views, Dialogs, Menus, Drivers, Gadgets, StdDlg, MsgBox, TextView,
+  # Memory, Validate, ColorSel, Editors, Outline, Help) and the toolkit
+  # helpers into your package.
 
 =head1 DESCRIPTION
 
 C<TUI::Vision> is the top-level umbrella module of the framework.
 
 It aggregates and re-exports the main subsystem modules through
-C<Import::Into>, so applications can import the common surface via a single 
-C<use TUI::Vision;> statement.
+C<Import::Into>, so applications can import the common surface via a single
+C<use TUI::Vision;> statement. C<import> also imports the constants of
+L<TUI::Const> (all tags, C<:all>); C<no TUI::Vision;> removes the imports
+again via C<unimport>.
+
+The re-exported modules are L<TUI::Objects>, L<TUI::App>, L<TUI::Views>,
+L<TUI::Dialogs>, L<TUI::Menus>, L<TUI::Drivers>, L<TUI::Gadgets>,
+L<TUI::StdDlg>, L<TUI::MsgBox>, L<TUI::TextView>, L<TUI::Memory>,
+L<TUI::Validate>, L<TUI::ColorSel>, L<TUI::Editors>, L<TUI::Outline>,
+L<TUI::Help>, and L<TUI::toolkit>.
 
 =head1 AUTHORS
 

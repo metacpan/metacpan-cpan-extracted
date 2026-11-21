@@ -1,0 +1,56 @@
+---
+abstract: 'Build the Changes entry for a release from the Changelog trailers of its commits'
+author:
+  - 'George S. Baugh <george@troglodyne.net>'
+build_requires:
+  File::Spec: '0'
+  File::Temp: '0'
+  File::pushd: '0'
+  FindBin::libs: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test2::Plugin::NoWarnings: '0'
+  Test2::V1: '0'
+  Test::DZil: '0'
+  Test::MockModule: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.040, CPAN::Meta::Converter version 2.150013'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-Git-ChangelogFromTrailers
+no_index:
+  directory:
+    - docs
+    - t
+    - templates
+provides:
+  Dist::Zilla::Plugin::Git::ChangelogFromTrailers:
+    file: lib/Dist/Zilla/Plugin/Git/ChangelogFromTrailers.pm
+    version: '0.001'
+requires:
+  Dist::Zilla::File::InMemory: '0'
+  Dist::Zilla::Plugin::NextRelease: '0'
+  Dist::Zilla::Role::BeforeRelease: '0'
+  Dist::Zilla::Role::FileGatherer: '0'
+  Git::Wrapper: '0'
+  List::Util: '1.45'
+  Moose: '0'
+  namespace::autoclean: '0'
+  perl: '5.020'
+  re: '0'
+  strict: '0'
+  version: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/Troglodyne-Internet-Widgets/Dist-Zilla-Plugin-Git-ChangelogFromTrailers/issues
+  homepage: https://github.com/Troglodyne-Internet-Widgets/Dist-Zilla-Plugin-Git-ChangelogFromTrailers
+  repository: https://github.com/Troglodyne-Internet-Widgets/Dist-Zilla-Plugin-Git-ChangelogFromTrailers.git
+version: '0.001'
+x_generated_by_perl: v5.44.0
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: MIT

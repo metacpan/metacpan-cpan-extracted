@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -16,6 +16,7 @@ our @EXPORT = qw(
   new_TCluster
 );
 
+use Storable;
 use TUI::toolkit;
 use TUI::toolkit::Types qw(
   Maybe
@@ -37,6 +38,7 @@ use TUI::Drivers::Util qw(
   ctrlToArrow
   getAltCode
 );
+use TUI::Objects::Rect;
 use TUI::Objects::StringCollection;
 use TUI::Views::Const qw(
   hcNoContext
@@ -580,6 +582,50 @@ sub buttonState {    # $bool ($item)
   my $mask = ( 1 << $item );
   return !!( $self->{enableMask} & $mask );
 } #/ sub buttonState
+
+sub write :method {    # void ($os)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $os ) = $sig->( @_ );
+  $self->SUPER::write( $os );
+  $os->put(
+    $self->{value},
+    $self->{sel},
+    $self->{enableMask},
+    $self->{strings},
+  );
+  return;
+}
+
+sub read :method {    # $self ($is)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $is ) = $sig->( @_ );
+  $self->SUPER::read( $is );
+  $self->{value}      = $is->get();
+  $self->{sel}        = $is->get();
+  $self->{enableMask} = $is->get();
+  $self->{strings}    = $is->get();
+  $self->setCursor( 2, 0 );
+  $self->showCursor();
+  $self->setButtonState( 0, true );
+  return $self;
+}
+
+sub build {    # $obj ()
+  my ( $class ) = @_;
+  assert ( @_ == 1 );
+  assert ( is_Str $class );
+  assert ( Storable::is_retrieving );
+  return $class->new(
+    bounds => TRect->new(), 
+    strings => undef,
+  );
+}
 
 1
 

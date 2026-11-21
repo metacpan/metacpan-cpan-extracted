@@ -42,50 +42,45 @@ uint scan( const char *block, uint size, const char *str );
 uint iScan( const char *block, uint size, const char *str );
 }
 
-static int getCharType( char ch )
+static int getCharCategory( char ch )
 {
-    if( strchr("\t \0", ch) )
+    if( ch == ' ' || ch == '\t' || ch == '\0' )
         return 0;
-    if( strchr("\n\r", ch) )
+    if( ch == '\n' || ch == '\r' )
         return 1;
-    if( strchr("!\"#$%&'()*+,-./:;<=>?@[\\]^`{|}~", ch) )
+    if( ch != '_' && ispunct((uchar) ch) )
         return 2;
     return 3;
 }
 
 static inline int isWordBoundary( char a, char b )
 {
-    return getCharType(a) != getCharType(b);
+    return getCharCategory(a) != getCharCategory(b);
 }
 
-static inline int isWordChar( int ch )
+static inline int isWhitespaceOrNewline( char ch )
 {
-    return strchr(" !\"#$%&'()*+,-./:;<=>?@[\\]^`{|}~\0", ch) == 0;
+    return getCharCategory(ch) <= 1;
 }
 
-#pragma warn -asc
-
-
-#pragma warn .asc
-
-void TEditor::detectEol()
+static inline int isWordChar( char ch )
 {
-    for (uint p = 0; p < bufLen; ++p)
-        if (bufChar(p) == '\r')
-        {
-            if (p+1 < bufLen && bufChar(p+1) == '\n')
-                eolType = eolCrLf;
-            else
-                eolType = eolCr;
-            return;
-        }
-        else if (bufChar(p) == '\n')
-        {
-            eolType = eolLf;
-            return;
-        }
-    // Default to CRLF.
-    eolType = eolCrLf;
+    return getCharCategory(ch) == 3;
+}
+
+TEditor::LineEndingType TEditor::detectLineEndingType()
+{
+    // Detect the line ending type based on the first line break.
+    for( uint p = 0; p < bufLen; ++p )
+        if( bufChar(p) == '\r' )
+            {
+            if( p + 1 < bufLen && bufChar(p + 1) == '\n' )
+                return eolCrLf;
+            return eolCr;
+            }
+        else if( bufChar(p) == '\n' )
+            return eolLf;
+    return defaultLineEndingType;
 }
 
 Boolean TEditor::hasSelection()
@@ -105,8 +100,8 @@ void TEditor::initBuffer()
 }
 
 TMenuItem& TEditor::initContextMenu( TPoint )
-// The TPoint argument is the future location of the context menu.
-// You can get the text under it with 'getMousePtr'.
+// The TPoint parameter is the right-click position in global coordinates, near
+// which the context menu will be located.
 {
     return
         *new TMenuItem( "Cu~t~", cmCut, kbShiftDel, hcNoContext, "Shift-Del" ) +
@@ -115,21 +110,52 @@ TMenuItem& TEditor::initContextMenu( TPoint )
         *new TMenuItem( "~U~ndo", cmUndo, kbCtrlU, hcNoContext, "Ctrl-U" );
 }
 
-uint TEditor::insertMultilineText( const char *text, uint length )
+TStringView TEditor::getLineEnding()
 {
-    size_t i = 0, j = 0;
-    do  {
-        if( text[i] == '\n' || text[i] == '\r' )
+    switch( lineEndingType )
+        {
+        case eolLf: return "\n";
+        case eolCr: return "\r";
+        default: return "\r\n";
+        }
+}
+
+uint TEditor::lengthWithConvertedLineEndings( const char *p, uint length )
+{
+    uint lineEndingLength = getLineEnding().size();
+    uint newLength = 0;
+    for( uint i = 0; i < length; ++i )
+        if( p[i] == '\n' || p[i] == '\r' )
             {
-            if( !insertText( &text[j], i - j, False ) ) return j;
-            if( !insertEOL( False ) ) return i;
-            if( i + 1 < length && text[i] == '\r' && text[i + 1] == '\n' )
-                ++i;
-            j = i + 1;
+            newLength += lineEndingLength;
+            if( p[i] == '\r' && i + 1 < length && p[i + 1] == '\n' )
+                ++i; // Skip LF after CR.
             }
-        } while( ++i < length );
-    if( !insertText( &text[j], i - j, False ) ) return j;
-    return i;
+        else
+            ++newLength;
+    return newLength;
+}
+
+void TEditor::copyAndConvertLineEndings( char *dest, const char *src, uint srcLen )
+{
+    TStringView lineEnding = getLineEnding();
+    const char *srcEnd = &src[srcLen];
+
+    while( src < srcEnd )
+        {
+        char c = *src;
+        if( c == '\n' || c == '\r' )
+            {
+            *dest++ = lineEnding[0];
+            if( lineEnding.size() > 1 )
+                *dest++ = lineEnding[1];
+            if( c == '\r' && src < srcEnd - 1 && *(src + 1) == '\n' )
+                ++src; // Skip LF after CR.
+            }
+        else
+            *dest++ = c;
+        ++src;
+        }
 }
 
 Boolean TEditor::insertBuffer( const char *p,
@@ -154,7 +180,8 @@ Boolean TEditor::insertBuffer( const char *p,
                 delLen = selLen - insCount;
         }
 
-    ulong newSize = ulong(bufLen + delCount - selLen + delLen) + length;
+    uint insLen = lengthWithConvertedLineEndings( p, length );
+    ulong newSize = ulong(bufLen + delCount - selLen + delLen) + insLen;
 
     if( newSize > bufLen + delCount )
         {
@@ -195,14 +222,12 @@ Boolean TEditor::insertBuffer( const char *p,
         }
 
     if( length > 0 )
-        memmove(
-                &buffer[curPtr],
-                &p[offset],
-                length
-               );
+        copyAndConvertLineEndings( &buffer[curPtr], &p[offset], length );
 
-    uint lines = countLines( &buffer[curPtr], length );
-    curPtr += length;
+    uint lines = countLines( &buffer[curPtr], insLen );
+    curPtr += insLen;
+    bufLen += insLen - selLen;
+    gapLen -= insLen - selLen;
     curPos.y += lines;
     drawLine = curPos.y;
     drawPtr = lineStart(curPtr);
@@ -210,12 +235,10 @@ Boolean TEditor::insertBuffer( const char *p,
     if( selectText == False )
         selStart = curPtr;
     selEnd = curPtr;
-    bufLen += length - selLen;
-    gapLen -= length - selLen;
     if( allowUndo == True )
         {
         delCount += delLen;
-        insCount += length;
+        insCount += insLen;
         }
     limit.y += lines - selLines;
     delta.y = max(0, min(delta.y, limit.y - size.y));
@@ -227,13 +250,6 @@ Boolean TEditor::insertBuffer( const char *p,
     else
         update(ufView);
     return True;
-}
-
-Boolean TEditor::insertEOL( Boolean selectText )
-{
-    static const char * const eolBytes[] = { "\r\n", "\n", "\r" };
-    const char *eol = eolBytes[eolType];
-    return insertText( eol, strlen(eol), selectText );
 }
 
 Boolean TEditor::insertFrom( TEditor *editor )
@@ -293,7 +309,8 @@ void TEditor::newLine()
            ( (buffer[i] == ' ') || (buffer[i] == '\x9'))
          )
          i++;
-    insertEOL(False);
+    // Line break will be automatically converted to the right type.
+    insertText( "\n", 1, False );
     if( autoIndent == True )
         insertText( &buffer[p], i - p, False);
 }
@@ -303,17 +320,23 @@ uint TEditor::nextLine( uint p )
     return nextChar(lineEnd(p));
 }
 
-uint TEditor::nextWord( uint p )
+uint TEditor::nextWordBoundary( uint p )
 {
     if (p < bufLen)
         {
-        char a = bufChar(p);
-        char b;
+        char c = bufChar(p);
         do  {
-            b = a;
             p = nextChar(p);
-            } while( p < bufLen && !isWordBoundary((a = bufChar(p)), b) );
+            } while( p < bufLen && !isWordBoundary(bufChar(p), c) );
         }
+    return p;
+}
+
+uint TEditor::nextWord( uint p )
+{
+    p = nextWordBoundary(p);
+    while( p < bufLen && isWhitespaceOrNewline(bufChar(p)) )
+        p = nextWordBoundary(p);
     return p;
 }
 
@@ -322,20 +345,28 @@ uint TEditor::prevLine( uint p )
   return lineStart(prevChar(p));
 }
 
+uint TEditor::prevWordBoundary( uint p )
+{
+    if (p > 0)
+        {
+        p = prevChar(p);
+        char c = bufChar(p);
+        while( p > 0 )
+            {
+            uint q = prevChar(p);
+            if( isWordBoundary(bufChar(q), c) )
+                break;
+            p = q;
+            }
+        }
+    return p;
+}
+
 uint TEditor::prevWord( uint p )
 {
-    if (p > 0 && (p = prevChar(p), p > 0))
-        {
-        char a = bufChar(p);
-        char b;
-        do  {
-            b = a;
-            p = prevChar(p);
-            a = bufChar(p);
-            } while( p > 0 && !isWordBoundary(a, b) );
-        if( isWordBoundary(a, b) )
-            p = nextChar(p);
-        }
+    p = prevWordBoundary(p);
+    while( p > 0 && isWhitespaceOrNewline(bufChar(p)) )
+        p = prevWordBoundary(p);
     return p;
 }
 
@@ -425,7 +456,7 @@ void TEditor::setBufLen( uint length )
     delCount = 0;
     insCount = 0;
     modified = False;
-    detectEol();
+    lineEndingType = detectLineEndingType();
     update(ufView);
 }
 
@@ -458,8 +489,8 @@ void TEditor::setCurPtr( uint p, uchar selectMode )
         {
         if( (selectMode & smDouble) != 0 )
             {
-            p = prevWord(nextWord(p));
-            anchor = nextWord(prevWord(anchor));
+            p = prevWordBoundary(nextWordBoundary(p));
+            anchor = nextWordBoundary(prevWordBoundary(anchor));
             }
         else if( (selectMode & smTriple) != 0 )
             {
@@ -472,8 +503,8 @@ void TEditor::setCurPtr( uint p, uchar selectMode )
         {
         if( (selectMode & smDouble) != 0 )
             {
-            p = nextWord(p);
-            anchor = prevWord(nextWord(anchor));
+            p = nextWordBoundary(p);
+            anchor = prevWordBoundary(nextWordBoundary(anchor));
             }
         else if( (selectMode & smTriple) != 0 )
             {
@@ -635,7 +666,7 @@ void TEditor::write( opstream& os )
 {
     TView::write( os );
     os << hScrollBar << vScrollBar << indicator
-       << bufSize << (uchar)canUndo << (uchar)eolType
+       << bufSize << (uchar)canUndo << (uchar)lineEndingType
        << (uchar)encoding;
 }
 
@@ -646,7 +677,7 @@ void *TEditor::read( ipstream& is )
        >> bufSize;
     uchar temp;
     is >> temp; canUndo = Boolean(temp);
-    is >> temp; eolType = EolType(temp);
+    is >> temp; lineEndingType = LineEndingType(temp);
     is >> temp; encoding = Encoding(temp);
     selecting = False;
     overwrite = False;

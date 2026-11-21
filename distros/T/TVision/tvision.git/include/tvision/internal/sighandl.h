@@ -21,8 +21,8 @@ class SignalHandler
 
     enum HandledSignals
     {
-        SigInt, SigQuit, SigIll, SigAbrt, SigFpe, SigSegv, SigTerm, SigTstp,
-        HandledSignalCount
+        SigInt, SigQuit, SigIll, SigAbrt, SigBus, SigFpe, SigSegv, SigPipe,
+        SigTerm, SigTstp, HandledSignalCount
     };
 
 public:

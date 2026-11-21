@@ -32,6 +32,7 @@ note 'init_resize_handler';
 subtest 'init_resize_handler' => sub {
   plan tests => 4;
 
+  local $SIG{WINCH} = 'DEFAULT';
   my $rv = Termbox::init_resize_handler();
   is($rv, TB_OK(), 'returns TB_OK');
 
@@ -41,7 +42,7 @@ subtest 'init_resize_handler' => sub {
   );
   is(scalar @{ $Termbox::global->{resize_pipefd} }, 2, 'pipe has two fds');
 
-  is($SIG{WINCH}, \&Termbox::handle_resize, 'SIGWINCH handler installed');
+  ok(ref($SIG{WINCH}) eq 'CODE', 'SIGWINCH handler installed');
 };
 
 # -------------------

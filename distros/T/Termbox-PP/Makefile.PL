@@ -5,15 +5,21 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile1(
   NAME              => 'Termbox::PP',
-  VERSION_FROM      => 'lib/Termbox/PP.pm',
   ABSTRACT          => 'Perl port of the termbox2 terminal library',
-  MIN_PERL_VERSION  => '5.010',
   AUTHOR            => 'J. Schneider',
+  VERSION_FROM      => 'lib/Termbox/PP.pm',
+  MIN_PERL_VERSION  => '5.010',
   LICENSE           => 'mit',
   EXE_FILES         => ['bin/build_wcwidth_tables.pl'],
 
   CONFIGURE_REQUIRES => {
     'ExtUtils::MakeMaker' => 6.64,
+  },
+
+  BUILD_REQUIRES => {
+    'ExtUtils::Install'   => 1.54,
+    'ExtUtils::Command'   => 1.17,
+    'ExtUtils::Manifest'  => 1.58,
   },
 
   PREREQ_PM => {
@@ -41,6 +47,10 @@ WriteMakefile1(
         web => 'https://github.com/brickpool/Termbox/issues',
       },
     },
+    provides => {
+      'Terminal::WCWidth' 
+        => { file => 'lib/Terminal/WCWidth.pm', version => '0.6.3' },
+    },
     prereqs => {
       runtime => {
         requires => {    # v5.10 builtin modules
@@ -59,7 +69,7 @@ WriteMakefile1(
 #          'Unicode::UCD'       => 0,
 #          'utf8'               => 0,
 #          'vars'               => 0,
-#          'version'            => 0,
+          'version'            => 0,
         },
         recommends => {
           'Getopt::Long'                    => 0,
@@ -67,7 +77,7 @@ WriteMakefile1(
           'lib'                             => 0,
           'List::Util'                      => 0,
           'Pod::Usage'                      => 0,
-          'threads'                         => 0,
+#          'threads'                         => 0,
           'Time::HiRes'                     => 0,
           'Unicode::EastAsianWidth'         => 0,
           'Unicode::EastAsianWidth::Detect' => 0,
@@ -91,7 +101,7 @@ WriteMakefile1(
 );
 
 # Cribbed from eumm-upgrade by Alexandr Ciornii
-sub WriteMakefile1 { # void (%params)
+sub WriteMakefile1 {    # void (%params)
   my %params = @_;
   my $eumm_version = $ExtUtils::MakeMaker::VERSION;
   $eumm_version = eval $eumm_version;
@@ -112,7 +122,7 @@ sub WriteMakefile1 { # void (%params)
     delete $params{TEST_REQUIRES};
   }
   if ($params{BUILD_REQUIRES} and $eumm_version < 6.5503) {
-    #EUMM 6.5502 has problems with BUILD_REQUIRES
+    # EUMM 6.5502 has problems with BUILD_REQUIRES
     $params{PREREQ_PM} = {
       %{$params{PREREQ_PM} || {}} , 
       %{$params{BUILD_REQUIRES}}

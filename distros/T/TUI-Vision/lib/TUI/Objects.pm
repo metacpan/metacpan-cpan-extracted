@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -20,6 +20,7 @@ use TUI::Objects::NSSortedCollection;
 use TUI::Objects::Collection;
 use TUI::Objects::SortedCollection;
 use TUI::Objects::StringCollection;
+use TUI::Objects::Stream;
 
 sub import {
   my $target = caller;
@@ -32,6 +33,7 @@ sub import {
   TUI::Objects::Collection->import::into( $target );
   TUI::Objects::SortedCollection->import::into( $target );
   TUI::Objects::StringCollection->import::into( $target );
+  TUI::Objects::Stream->import::into( $target );
 }
 
 sub unimport {
@@ -45,6 +47,7 @@ sub unimport {
   TUI::Objects::Collection->unimport::out_of( $caller );
   TUI::Objects::SortedCollection->unimport::out_of( $caller );
   TUI::Objects::StringCollection->unimport::out_of( $caller );
+  TUI::Objects::Stream->unimport::out_of( $caller );
 }
 
 1
@@ -75,7 +78,7 @@ TUI::Objects - Base object classes for the TUI::Vision framework
 
 =head1 DESCRIPTION
 
-C<TUI::Objects> provides the foundational object layer for the TUI::Vision
+C<TUI::Objects> provides the foundational object layer for the L<TUI::Vision>
 framework. It corresponds to the classic I<Turbo Vision> 
 L<TObject|TUI::Objects::Object> system and serves as the central hub for all 
 structural classes, including:
@@ -94,6 +97,9 @@ Typed and sorted collections, mirroring the original I<Turbo Vision> design.
 
 =item * Constants and shared definitions -
 Symbolic L<constants|TUI::Objects::Const> used throughout the framework.
+
+=item * L<TStream|TUI::Objects::Stream> stream class -
+Stream abstraction for I/O operations within the framework.
 
 =back
 

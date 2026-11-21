@@ -7,8 +7,12 @@ on:
       - '*'
   pull_request:
 jobs:
-  # Alien::Libgit2 handed a system libgit2 by pkg-config. On bookworm that is
-  # 1.5.1, which is the floor this distribution supports.
+  # Alien::Libgit2 handed a system libgit2 by pkg-config. The floor is 1.9.3
+  # (Alien::Libgit2 0.002), which no Debian release reaches -- bookworm ships
+  # 1.5.1, trixie 1.9.0 -- so apt's libgit2-dev cannot serve this path: the
+  # probe would fail. Install libgit2 1.9.3 into /usr/local instead, with the
+  # CMake flags Alien::Libgit2's alienfile uses, and let ALIEN_INSTALL_TYPE=system
+  # below fail the job rather than test another path in silence.
   debian:
     runs-on: ubuntu-latest
     strategy:
@@ -32,16 +36,41 @@ jobs:
         run: |
           apt-get update
           apt-get install -y --no-install-recommends \
-            libgit2-dev pkg-config git
+            cmake build-essential libssl-dev libssh2-1-dev zlib1g-dev \
+            pkg-config git curl ca-certificates
+      - name: Install libgit2 1.9.3 into /usr/local
+        run: |
+          set -eux
+          curl -fsSL -o /tmp/libgit2-1.9.3.tar.gz \
+            https://github.com/libgit2/libgit2/archive/refs/tags/v1.9.3.tar.gz
+          tar xzf /tmp/libgit2-1.9.3.tar.gz -C /tmp
+          cmake -S /tmp/libgit2-1.9.3 -B /tmp/libgit2-build \
+            -DCMAKE_INSTALL_PREFIX=/usr/local \
+            -DCMAKE_INSTALL_LIBDIR=lib \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_SHARED_LIBS=ON \
+            -DBUILD_TESTS=OFF \
+            -DBUILD_CLAR=OFF \
+            -DBUILD_EXAMPLES=OFF \
+            -DUSE_SSH=ON \
+            -DUSE_HTTPS=OpenSSL \
+            -DREGEX_BACKEND=builtin
+          cmake --build /tmp/libgit2-build -j"$(nproc)"
+          cmake --install /tmp/libgit2-build
+          ldconfig
+      - name: Verify pkg-config sees 1.9.3
+        run: |
+          set -eux
+          test "$(pkg-config --modversion libgit2)" = 1.9.3
       - name: Install Dist::Zilla
         env:
-          PERL_CPANM_OPT: --mirror http://cpan.metacpan.org --mirror-only
+          PERL_CPANM_OPT: --mirror https://cpan.metacpan.org --mirror-only
         run: cpanm -nq Dist::Zilla
       - name: Install Alien::Libgit2
         env:
-          PERL_CPANM_OPT: --mirror http://cpan.metacpan.org --mirror-only
+          PERL_CPANM_OPT: --mirror https://cpan.metacpan.org --mirror-only
           # Fail loudly rather than quietly building the bundled copy if
-          # pkg-config cannot see the libgit2 installed above.
+          # pkg-config cannot see the libgit2 1.9.3 installed above.
           ALIEN_INSTALL_TYPE: system
         run: cpanm -nq Alien::Libgit2
       - name: Report the libgit2 under test
@@ -49,7 +78,7 @@ jobs:
           perl -MAlien::Libgit2 -e 'printf "install_type=%s version=%s\n",
             Alien::Libgit2->install_type, Alien::Libgit2->version // q(?)'
       - name: dzil test
-        uses: Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@main
+        uses: Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@v1
 
   # The Alien::Libgit2 share build — its bundled libgit2 1.9.3, which is what a
   # user without a system libgit2 ends up linking against. Pinned by
@@ -74,11 +103,11 @@ jobs:
             pkg-config git libssl-dev libssh2-1-dev zlib1g-dev
       - name: Install Dist::Zilla
         env:
-          PERL_CPANM_OPT: --mirror http://cpan.metacpan.org --mirror-only
+          PERL_CPANM_OPT: --mirror https://cpan.metacpan.org --mirror-only
         run: cpanm -nq Dist::Zilla
       - name: Install Alien::Libgit2 (share build)
         env:
-          PERL_CPANM_OPT: --mirror http://cpan.metacpan.org --mirror-only
+          PERL_CPANM_OPT: --mirror https://cpan.metacpan.org --mirror-only
           ALIEN_INSTALL_TYPE: share
         run: cpanm -nq Alien::Libgit2
       - name: Report the libgit2 under test
@@ -86,4 +115,4 @@ jobs:
           perl -MAlien::Libgit2 -e 'printf "install_type=%s version=%s\n",
             Alien::Libgit2->install_type, Alien::Libgit2->version // q(?)'
       - name: dzil test
-        uses: Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@main
+        uses: Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@v1

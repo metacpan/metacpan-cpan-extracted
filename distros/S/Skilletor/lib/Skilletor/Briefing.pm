@@ -11,7 +11,7 @@ use Skilletor::FSUtil qw( encode_text path_join read_text );
 use Skilletor::Frontmatter qw( split_frontmatter );
 use Skilletor::JSON qw( js_sort_keys js_type );
 
-our $VERSION = '0.001';
+our $VERSION = '0.008000';
 
 our @EXPORT_OK = qw( declared_skills skill_roots missing_skills briefing_warning );
 
@@ -112,7 +112,7 @@ Skilletor::Briefing - Are an installed agent's briefing skills there? (spec §6.
 
 =head1 VERSION
 
-version 0.001
+version 0.008000
 
 =head1 SYNOPSIS
 
@@ -130,7 +130,9 @@ installed without them fails when it is spawned. This reads the installed
 agent file – never renders it – and names the bare skill names no root the
 harness's briefing lookup searches holds: for Claude Code the project's
 C<.claude/skills> (a project agent), C<~/.claude/skills> and Claude Code's
-plugin cache. C<plugin:skill> names are not checked. Read-only; a file it
+plugin cache; for Codex the project's C<.agents/skills> and C<.codex/skills>
+(a project agent), C<$CODEX_HOME/skills> and C<~/.agents/skills>.
+C<plugin:skill> names are not checked. Read-only; a file it
 cannot parse yields nothing.
 
 =head2 declared_skills
@@ -151,19 +153,25 @@ The report line for one agent and target.
 
 =head1 SUPPORT
 
+=head2 Issues
+
+Please report bugs and feature requests at
+L<https://github.com/Getty/skilletor/issues>.
+
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <getty@cpan.org>
+Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
+This software is Copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

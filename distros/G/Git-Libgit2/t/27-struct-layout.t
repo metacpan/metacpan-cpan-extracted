@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use Test2::V0;
 use FFI::Platypus::Buffer qw( scalar_to_buffer );
 

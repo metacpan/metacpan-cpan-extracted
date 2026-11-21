@@ -1,0 +1,18 @@
+Changes
+cpanfile
+lib/Log/Dispatch/Email/DKIM.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README.md
+t/00-load.t
+t/dkim/202611.private
+t/flush.t
+t/function.t
+t/internals.t
+t/locales.t
+t/pod.t
+t/dkim.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

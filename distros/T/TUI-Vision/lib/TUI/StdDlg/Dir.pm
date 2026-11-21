@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -266,11 +266,13 @@ sub setdisk {    # $int ($drive)
   my ( $drive ) = $sig->( @_ );
 
   if ( $^O eq 'MSWin32' ) {
-    require Win32;
     require Win32API::File;
-    return -1 unless $drive >= 1 && $drive <= 26;
-    my $letter = chr( ord( 'A' ) + $drive - 1 );
-    Win32::SetCwd( "${letter}:\\" ) or return -1;
+    return -1 unless $drive >= 0 && $drive <= 25;
+    my $letter = chr( ord( 'A' ) + $drive );
+    # Like _chdrive(): switch to the drive's saved directory, keeping it.
+    my $dir = Cwd::getdcwd( "${letter}:" );
+    return -1 unless defined $dir && length $dir;
+    chdir( $dir ) or return -1;
     my $mask = Win32API::File::GetLogicalDrives();
     my $count = 0;
     $count++ while $mask &= $mask - 1;
@@ -374,7 +376,8 @@ Returns the index of the current drive (A=0, B=1, C=2, ...).
 
   my $rc = setdisk($drive);
 
-Sets the current drive.
+Sets the current drive. The drive index is 0-based (A=0, B=1, C=2, ...), the
+same convention as C<getdisk>.
 
 =head1 IMPLEMENTATION NOTES
 

@@ -12,7 +12,7 @@ use Scalar::Util qw( blessed );
 use Skilletor::FSUtil qw( encode_text node_fs_error path_join read_text same_path );
 use Skilletor::JSON qw( js_ordered js_parse js_sort_keys js_stringify js_type );
 
-our $VERSION = '0.001';
+our $VERSION = '0.008000';
 
 our @EXPORT_OK = qw( plan_claude_settings skilletor_marketplace not_declarable OFFICIAL_MARKETPLACE );
 
@@ -229,7 +229,7 @@ Skilletor::ClaudeSettings - The plugin requirement in a project's committed .cla
 
 =head1 VERSION
 
-version 0.001
+version 0.008000
 
 =head1 SYNOPSIS
 
@@ -277,19 +277,25 @@ C<claude-plugins-official>: known everywhere, never declared.
 
 =head1 SUPPORT
 
+=head2 Issues
+
+Please report bugs and feature requests at
+L<https://github.com/Getty/skilletor/issues>.
+
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <getty@cpan.org>
+Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
+This software is Copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

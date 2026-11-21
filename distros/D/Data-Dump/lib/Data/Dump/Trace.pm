@@ -259,7 +259,7 @@ sub return_list {
 
 sub errno {
     my $t = "";
-    for (keys %!) {
+    for (keys(%!)) {
         if ($!{$_}) {
             $t = $_;
             last;

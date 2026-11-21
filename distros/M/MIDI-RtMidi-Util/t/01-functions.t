@@ -6,7 +6,7 @@ use Test::Exception;
 
 BEGIN {
     use_ok 'MIDI::RtMidi::Util', qw(
-        in_port out_port stop_device input_ports output_ports stop_all_notes program_changer
+        in_port out_port stop_device input_ports output_ports program_changer
     );
 }
 
@@ -28,7 +28,7 @@ package Local::MockDevice {
 
 subtest exports => sub {
     can_ok 'main', qw(
-        in_port out_port stop_device input_ports output_ports stop_all_notes program_changer
+        in_port out_port stop_device input_ports output_ports program_changer
     );
 };
 
@@ -42,9 +42,6 @@ subtest throws => sub {
     throws_ok { stop_device() }
         qr/Too few arguments/,
         'stop_device() dies without a port';
-    throws_ok { stop_all_notes() }
-        qr/Too few arguments/,
-        'stop_all_notes() dies without a port';
     throws_ok { program_changer() }
         qr/Too few arguments/,
         'program_changer() dies without a device';
@@ -88,23 +85,6 @@ subtest stop_device => sub {
         like $warnings[0], qr/\ACan't stop the MIDI device: mock \Q$method\E failed\n\z/,
             "warning describes the $method failure";
     }
-};
-
-subtest stop_all_notes => sub {
-    my $dev = Local::MockDevice->new;
-    stop_all_notes($dev);
-
-    my @calls = $dev->calls;
-    is scalar @calls, 16 * 128, 'a note_off for every channel and note';
-    ok !( grep { $_->[0] ne 'note_off' } @calls ), 'only note_off messages sent';
-    ok !( grep { $_->[3] != 0 } @calls ), 'all velocities are 0';
-
-    my %seen;
-    $seen{ $_->[1] }{ $_->[2] }++ for @calls;
-    is_deeply [ sort { $a <=> $b } keys %seen ], [ 0 .. 15 ],
-        'all 16 channels are covered (not just 0 and 15)';
-    my @short = grep { keys $seen{$_}->%* != 128 } keys %seen;
-    is scalar @short, 0, 'every channel gets all 128 notes';
 };
 
 subtest program_changer => sub {

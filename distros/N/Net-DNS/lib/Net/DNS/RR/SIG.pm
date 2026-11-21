@@ -2,7 +2,7 @@ package Net::DNS::RR::SIG;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: SIG.pm 2057 2026-07-16 10:05:04Z willem $)[2];
+our $VERSION = (qw$Id: SIG.pm 2066 2026-11-17 11:13:39Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -32,10 +32,11 @@ use constant DNSSEC => defined $INC{'Net/DNS/SEC.pm'};	## Discover how we got he
 my @algorithms;
 my @deprecated;
 if (DNSSEC) {
-	foreach my $class ( map {"Net::DNS::SEC::$_"} qw(Private DSA RSA ECDSA EdDSA Digest SM2) ) {
-		my @index = eval join '', qw(r e q u i r e), " $class; ${class}::_index()";	## no critic
+	my @module = qw(Private DSA RSA ECDSA EdDSA MLDSA Digest);
+	foreach my $class ( map {"Net::DNS::SEC::$_"} @module ) {
+		my @index = eval join '', qw(r e q u i r e), " $class; $class->_index()";	## no critic
 		push @algorithms, map { ( $_ => $class ) } @index;
-		push @deprecated, eval "${class}::_deprecate()";			   	## no critic
+		push @deprecated, eval { $class->_deprecate() };
 	}
 	croak 'Net::DNS::SEC version not supported' unless scalar(@algorithms);
 }
@@ -50,13 +51,13 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	my ( $self, $data, $offset, @opaque ) = @_;
 
 	my $limit = $offset + $self->{rdlength};
-	@{$self}{@field} = unpack "\@$offset n C2 N3 n", $$data;
-	( $self->{signame}, $offset ) = Net::DNS::DomainName->decode( $data, $offset + 18, @opaque );
-	$self->{sigbin} = substr $$data, $offset, $limit - $offset;
-
 	croak('misplaced or corrupt SIG') unless $limit == length $$data;
 	my $raw = substr $$data, 0, $self->{offset}++;
 	$self->{rawref} = \$raw;
+
+	@{$self}{@field} = unpack "\@$offset n C2 N3 n", $$data;
+	( $self->{signame}, $offset ) = Net::DNS::DomainName->decode( $data, $offset + 18, @opaque );
+	$self->{sigbin} = substr $$data, $offset, $limit - $offset;
 	return;
 }
 
@@ -352,6 +353,7 @@ sub vrfyerrstr {
 		'ED25519'	     => 15,			# [RFC8080]
 		'ED448'		     => 16,			# [RFC8080]
 		'SM2SM3'	     => 17,			# [RFC9563]
+		'MLDSA44'	     => 18,			# [draft-westerbaan-dnssec-mldsa]
 		'ECC-GOST12'	     => 23,			# [RFC9558]
 
 		'INDIRECT'   => 252,				# [RFC4034]
@@ -678,8 +680,8 @@ that comes with the ISC BIND distribution.
 The optional remaining arguments consist of ( name => value ) pairs
 as follows:
 
-	sigin  => 20251201010101,	# signature inception
-	sigex  => 20251201011101,	# signature expiration
+	sigin  => 20261201010101,	# signature inception
+	sigex  => 20261201011101,	# signature expiration
 	sigval => 10,			# validity window (minutes)
 
 The sigin and sigex values may be specified as Perl time values or as

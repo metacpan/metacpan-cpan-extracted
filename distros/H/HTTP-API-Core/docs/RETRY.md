@@ -37,7 +37,7 @@ A `403` is retryable only when normalized rate-limit metadata reports an exhaust
 
 A retryable error is only retried when the request method is allowed by the active retry policy.
 
-If a `before_request` hook changes the HTTP method, the **method actually sent** must also be allowed by the retry policy. For example, changing an initial `GET` to `POST` does not opt `POST` into retries. To deliberately retry a hook-mutated `POST`, configure `methods` to include both `GET` and `POST`. An `on_error` hook cannot change the retry eligibility of a method that has already been sent.
+If a `before_request` hook changes the HTTP method, the modified method is normalized to uppercase before transport and retry decisions. The **method actually sent** must also be allowed by the retry policy. For example, changing an initial `GET` to `POST` (or `post`) does not opt `POST` into retries. To deliberately retry a hook-mutated `POST`, configure `methods` to include both `GET` and `POST`. An `on_error` hook cannot change the retry eligibility of a method that has already been sent.
 
 ## Delays
 
@@ -47,7 +47,9 @@ The delay before another attempt is chosen in this order:
 2. exhausted rate-limit reset metadata
 3. exponential backoff
 
-HTTP-date values use the IMF-fixdate form (for example, `Wed, 21 Oct 2015 07:28:00 GMT`). The weekday must match the calendar date; a mismatched weekday makes the header invalid. Valid dates in the past produce a zero-second delay. Malformed values are ignored so the existing rate-limit reset or exponential-backoff fallback can be used.
+Numeric `Retry-After` values and the date/time components of IMF-fixdate values must use ASCII digits (`0`–`9`). Other Unicode digit characters are malformed, not zero-second delays, so retry delay selection falls back to rate-limit reset or backoff.
+
+HTTP-date values use the IMF-fixdate form (for example, `Wed, 21 Oct 2015 07:28:00 GMT`). The weekday must match the calendar date, and the converted UTC year must match the literal four-digit year in the header; a mismatch makes the header invalid. This also avoids treating historical years as future dates due to `Time::Local` year interpretation. Valid dates in the past produce a zero-second delay. Malformed values are ignored so the existing rate-limit reset or exponential-backoff fallback can be used.
 
 Exponential backoff starts at `base_delay`, doubles after each failed attempt, and is capped at `max_delay`.
 
@@ -80,6 +82,6 @@ $api->post('/jobs',
 
 ## Validation
 
-`attempts` must be a positive integer. `base_delay` and `max_delay` must be non-negative numbers. `methods` must be an array reference and may not contain empty values. Unknown retry options are rejected.
+`attempts` must be a defined positive integer; an explicit `undef`, zero, or non-integer value is rejected before a request is sent and without Perl uninitialized-value warnings. `base_delay` and `max_delay` must be non-negative numbers. All retry numeric options require ASCII digits (`0`–`9`); Unicode digit characters are rejected before numerical coercion, avoiding surprising zero-delay behavior and warnings. `methods` must be an array reference and may not contain empty values. Unknown retry options are rejected.
 
 The `retry` accessor returns a defensive copy of the normalized policy so callers cannot mutate client state accidentally.

@@ -78,8 +78,8 @@ throughout the framework:
 
 Button Flags constants
 
-The C<bfXXXX> values are passed as a bit mask to C<< TButton->new >> and specify 
-button attributes, as shown in the table:
+The C<bfXXXX> values are passed as a bit mask to C<< TButton->new >> and
+specify button attributes, as shown in the table:
 
   Constant        Value   Usage
   --------------- ------- --------------------------------------------------
@@ -95,6 +95,13 @@ button attributes, as shown in the table:
 B<Note>: It's up to the programmer to ensure that each 
 L<TGroup|TUI::Views::Group> entity (L<TDialog|TUI:.Dialogs::Dialog> is 
 descended from L<TGroup|TUI::Views::Group>) has only one default button.
+
+=head2 :wrapXXXX
+
+Paragraph states available from L<TUI::Help::Const> individually or through
+C<:wrapXXXX>. C<undefined> is C<0> before a wrapping mode has been selected.
+C<wrapping> is C<1> and enables word wrapping;
+C<notWrapping> is C<2> and preserves explicit line breaks.
 
 =head2 cmXXXX
 
@@ -140,12 +147,12 @@ C<100..255>, and C<1000..65535>.
   cmResize            6   cmResize is sent when a window is resized. Also
                           see wfMove and wfGrow. By convention, Ctrl-F5 is
                           often used to zoom a window.
-  cmNext              7   Causes the last window on the desktop to be moved
-                          to in front of all the others. F6 is often used as
-                          a short cut key for this command.
-  cmPrev              8   Moves the first window on the desktop to behind all
-                          the other windows. Shift-F6 is often used as a
-                          short cut key for this command.
+  cmNext              7   Selects the window behind the focused one in
+                          Z-order, which brings it to the front. F6 is often
+                          used as a short cut key for this command.
+  cmPrev              8   Moves the focused window behind all the other
+                          windows. Shift-F6 is often used as a short cut key
+                          for this command.
   cmOk                9   In a dialog, this value is returned if the Okay
                           button was pressed.
   cmCancel            10  In a dialog, this value is returned if the Cancel
@@ -447,6 +454,11 @@ C<kbLeft> and C<kbRight> are the arrow keys.
 C<maxCollectionSize> sets the maximum number of elements that can be put into a
 collection.
 
+=head2 MAXHELPTOPICID
+
+The maximum help-topic ID accepted by the parser. Its value is documented in
+L<TUI::Help::Const>, which exports it individually or through C<:all>.
+
 =head2 maxViewWidth
 
   use constant maxViewWidth => 132;
@@ -671,6 +683,52 @@ B<See>: C<blockCursor>, C<exposed>, C<hide>, C<hideCursor>,
 C<normalCursor>, C<setState>, C<show>, C<showCursor> from 
 L<TView|TUI::Views::View>.
 
+Additionally, C<sfSearchFailed> (value C<0xFFFF>) is not a state flag but the
+return value of the scan functions that means the search text was not found.
+It is not part of the C<:sfXXXX> tag and must be imported by name:
+C<use TUI::Editors::Const qw(sfSearchFailed);>.
+
+=head2 edXXXX
+
+Editor message constants
+
+Identify the message an editor passes to its C<$editorDialog> callback.
+
+  Constant         Value  Usage
+  ---------------- ------ ------------------------------------------------
+  edOutOfMemory    0      Not enough memory for the editor buffer
+  edReadError      1      Error while reading a file
+  edWriteError     2      Error while writing a file
+  edCreateError    3      Error while creating a file
+  edSaveModify     4      The text has been modified and must be saved
+  edSaveUntitled   5      The untitled text must be saved
+  edSaveAs         6      The file must be saved under a new name
+  edFind           7      Prompt for the text to search for
+  edSearchFailed   8      The search text was not found
+  edReplace        9      Prompt for the replacement text
+  edReplacePrompt  10     Ask whether to replace an occurrence
+
+B<See>: C<$editorDialog> from L<TEditor|TUI::Editors::Editor>.
+
+=head2 efXXXX
+
+Editor search and replace option flags
+
+Combine these flags in C<$editorFlags>, which C<find>, C<search> and
+C<replace> use to control the search.
+
+  Constant          Value   Usage
+  ----------------- ------- ------------------------------------------
+  efCaseSensitive   0x0001  Match case when searching
+  efWholeWordsOnly  0x0002  Match whole words only
+  efPromptOnReplace 0x0004  Ask before each replacement
+  efReplaceAll      0x0008  Replace all occurrences
+  efDoReplace       0x0010  Perform the replacement
+  efBackupFiles     0x0100  Create backup files when saving
+
+B<See>: C<$editorFlags>, C<find>, C<replace>, C<search> from
+L<TEditor|TUI::Editors::Editor>.
+
 =head2 slXXXX
 
 Style attribute constants
@@ -710,6 +768,14 @@ modes.
 
 B<See>: C<< TScreen->setVideoMode >>, C<< TScreen->screenMode >>, 
 C<< TProgram->setScreenMode >>
+
+=head3 Editor selection modes
+
+The constants C<smExtend> (C<0x01>) and C<smDouble> (C<0x02>) are the
+editor selection modes. They are not screen modes and are exported with the
+C<:smXXXX> tag.
+
+  use TUI::Editors::Const qw(:smXXXX);
 
 =head2 wfXXXX
 

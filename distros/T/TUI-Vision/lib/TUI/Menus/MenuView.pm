@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -17,6 +17,7 @@ our @EXPORT = qw(
 
 use Devel::StrictMode;
 use Scalar::Util qw( weaken );
+use Storable;
 use TUI::toolkit;
 use TUI::toolkit::Types qw(
   Maybe
@@ -44,6 +45,8 @@ use TUI::Menus::Const qw(
   :menuAction
   cpMenuView
 );
+use TUI::Menus::Menu;
+use TUI::Menus::MenuItem;
 
 sub TMenuView() { __PACKAGE__ }
 sub name() { 'TMenuView' }
@@ -68,6 +71,8 @@ my (
   $updateMenu,
   $do_a_select,
   $findHotKey,
+  $writeMenu,
+  $readMenu,
 );
 
 my $lock_value = sub {
@@ -291,10 +296,12 @@ sub execute {    # $int ()
           DEFAULT: {
             $target = $self;
             my $ch = getAltChar( $e->{keyDown}{keyCode} );
-            $ch = $e->{keyDown}{charScan}{charCode} 
-              unless $ch;
-            $target = $self->$topMenu()
-              if $ch;
+            if ( $ch eq "\0" ) {
+              $ch = chr( $e->{keyDown}{charScan}{charCode} );
+            }
+            else {
+              $target = $self->$topMenu();
+            }
             my $p = $target->findItem( $ch );
             if ( !$p ) {
               $p = $self->$topMenu()->hotKey( $e->{keyDown}{keyCode} );
@@ -749,6 +756,118 @@ $findHotKey = sub {    # $menuItem|undef ($p|undef, $keyCode)
   } #/ while ( $p )
   return undef;
 }; #/ sub $findHotKey
+
+$writeMenu = sub {    # void ($os, $menu)
+  my ( $self, $os, $menu ) = @_;
+  assert ( @_ == 3 );
+  assert ( is_Object $self );
+  assert ( is_Object $os );
+  assert ( is_Object $menu );
+
+  my $tok = 0xff;
+
+  for ( my $item = $menu->{items} ; $item ; $item = $item->{next} ) {
+    $os->put(
+      $tok,
+      $item->{name},
+      $item->{command},
+      $item->{disabled} ? 1 : 0,
+      $item->{keyCode},
+      $item->{helpCtx},
+    );
+    if ( $item->{name} ) {
+      if ( !$item->{command} ) {
+        $self->$writeMenu( $os, $item->{subMenu} );
+      }
+      else {
+        $os->put( $item->{param} );
+      }
+    }
+  }
+
+  $tok = 0;
+  $os->put( $tok );
+  return;
+};
+
+$readMenu = sub {    # $menu ($is)
+  my ( $self, $is ) = @_;
+  assert ( @_ == 2 );
+  assert ( is_Object $self );
+  assert ( is_Object $is );
+
+  my $first;
+  my $last;
+
+  my $tok = $is->get();
+  while ( $tok ) {
+    assert ( $tok == 0xFF );
+    my $name     = $is->get();
+    my $command  = $is->get();
+    my $disabled = $is->get();
+    my $keyCode  = $is->get();
+    my $helpCtx  = $is->get();
+    my $item = TMenuItem->new(
+      name    => defined $name ? $name : '',
+      command => $command,
+      keyCode => $keyCode,
+      helpCtx => $helpCtx,
+    );
+    $item->{disabled} = $disabled ? true : false;
+    if ( $item->{name} ) {
+      if ( !$command ) {
+        $item->{subMenu} = $self->$readMenu( $is );
+      }
+      else {
+        $item->{param} = $is->get();
+      }
+    }
+    if ( $last ) {
+      $last->{next} = $item;
+    }
+    else {
+      $first = $item;
+    }
+    $last = $item;
+    $tok = $is->get();
+  }
+
+  return $first
+    ? TMenu->new( items => $first, default => $first )
+    : TMenu->new();
+};
+
+sub write :method {    # void ($os)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $os ) = $sig->( @_ );
+  $self->SUPER::write( $os );
+  $self->$writeMenu( $os, $self->{menu} );
+  return;
+}
+
+sub read :method {    # $self ($is)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $is ) = $sig->( @_ );
+  $self->SUPER::read( $is );
+  $self->{menu} = $self->$readMenu( $is );
+  $self->parentMenu( undef );
+  $self->current( undef );
+  return $self;
+}
+
+sub build {    # $obj ()
+  my ( $class ) = @_;
+  assert ( @_ == 1 );
+  assert ( is_Str $class );
+  assert ( Storable::is_retrieving );
+  return $class->new( bounds => TRect->new() );
+}
 
 1
 

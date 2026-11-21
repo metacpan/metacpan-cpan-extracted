@@ -2,7 +2,7 @@
 #
 #   Termbox (Perl port)
 #
-#   Implementation based on termbox2 v2.7.0-dev, 8. Feb 2026
+#   Implementation based on termbox2 v2.7.0-dev, 3. Sep 2026
 #
 #   Copyright (C) 2015-2026 Adam Saponara <as@php.net>
 #                 2010-2020 nsf <no.smile.face@gmail.com>
@@ -29,7 +29,7 @@ use warnings;
 # version '...'
 use version;
 our $version = version->declare('v2.7.0_0');
-our $VERSION = version->declare('v0.6.1');
+our $VERSION = version->declare('v0.6.3');
 
 # authority '...'
 our $authority = 'github:adsr';
@@ -60,7 +60,7 @@ use constant _WIN32 => $^O eq 'MSWin32';
 BEGIN { sub TB_VERSION_STR () { state $qv = $version->normal } }
 
 # STRICT is a global flag that enables strict argument checking.
-use constant STRICT => !!grep { exists $ENV{$_} && $ENV{$_} } qw(
+use constant STRICT => !!grep { $ENV{$_} } qw(
   PERL_STRICT
   EXTENDED_TESTING
   AUTHOR_TESTING
@@ -84,7 +84,7 @@ use constant TB_OPT_TRUECOLOR => $ENV{TB_OPT_TRUECOLOR} ? 1 : 0;
 # values consume more memory in exchange for more features. Defaults to 16.
 use constant TB_OPT_ATTR_W => 
   ( TB_LIB_OPTS                              ) ? $Config{ivsize} * 8 :
-  ( exists $ENV{TB_OPT_ATTR_W} 
+  ( $ENV{TB_OPT_ATTR_W}
     && $ENV{TB_OPT_ATTR_W} =~ /^(16|32|64)$/ ) ? $ENV{TB_OPT_ATTR_W} :
   ( TB_OPT_TRUECOLOR                         ) ? 32                  : 
                                                  16                  ;
@@ -96,11 +96,15 @@ use constant TB_OPT_EGC => TB_LIB_OPTS || ($ENV{TB_OPT_EGC} ? 1 : 0);
 # Write buffer size for printf operations. Represents the largest string that 
 # can be sent in one call to tb_print and tb_send functions. Defaults to 4096.
 use constant TB_OPT_PRINTF_BUF => !TB_LIB_OPTS 
-  && exists $ENV{TB_OPT_PRINTF_BUF} ? ($ENV{TB_OPT_PRINTF_BUF} || 4096): 4096;
+  && $ENV{TB_OPT_PRINTF_BUF} && $ENV{TB_OPT_PRINTF_BUF} =~ /\A[1-9]\d*\z/
+    ? $ENV{TB_OPT_PRINTF_BUF}
+    : 4096;
 
 # Read buffer size for tty reads. Defaults to 64.
 use constant TB_OPT_READ_BUF => !TB_LIB_OPTS 
-  && exists $ENV{TB_OPT_READ_BUF} ? ($ENV{TB_OPT_READ_BUF} || 64): 64;
+  && $ENV{TB_OPT_READ_BUF} && $ENV{TB_OPT_READ_BUF} =~ /\A[1-9]\d*\z/
+    ? $ENV{TB_OPT_READ_BUF}
+    : 64;
 
 # If set, use Perl's core Unicode::UCD module instead of the built-in 
 # Unicode-aware versions. Note, Unicode::UCD are version-dependent and must 
@@ -110,19 +114,25 @@ use constant TB_OPT_LIBC_WCHAR => !TB_LIB_OPTS
   && Unicode::UCD->can('prop_invmap') 
   && Unicode::UCD->can('search_invlist') ? 1 : 0;
 
-use constant TB_PATH_MAX => exists $ENV{PATH_MAX} ? 0+$ENV{PATH_MAX} : 4096;
-use constant TB_TERMINFO_DIR => exists $ENV{TB_TERMINFO_DIR} 
-  ? ''.$ENV{TB_TERMINFO_DIR}
+use constant TB_PATH_MAX => $ENV{PATH_MAX} && $ENV{PATH_MAX} =~ /\A[1-9]\d*\z/
+  ? $ENV{PATH_MAX}
+  : 4096;
+
+use constant TB_TERMINFO_DIR => $ENV{TB_TERMINFO_DIR}
+  ? ''. $ENV{TB_TERMINFO_DIR}
   : undef;
 
-use constant TB_RESIZE_FALLBACK_MS => exists $ENV{TB_RESIZE_FALLBACK_MS} 
-  ? ($ENV{TB_RESIZE_FALLBACK_MS} || 1000)
-  : 1000;
+use constant TB_RESIZE_FALLBACK_MS => 
+  $ENV{TB_RESIZE_FALLBACK_MS} && $ENV{TB_RESIZE_FALLBACK_MS} =~ /\A[1-9]\d*\z/
+    ? $ENV{TB_RESIZE_FALLBACK_MS}
+    : 1000;
 
 # Retrieve the debug level from the environment variable TB_DEBUG_LEVEL. 
-use constant _DEBUG => $ENV{TB_DEBUG_LEVEL} && !$ENV{PERL_NDEBUG} && !$ENV{NDEBUG} 
-  ? ($ENV{TB_DEBUG_LEVEL} || 0)
-  : 0;
+use constant _DEBUG => defined($ENV{TB_DEBUG_LEVEL}) 
+  && $ENV{TB_DEBUG_LEVEL} =~ /\A\d\z/
+  && !$ENV{PERL_NDEBUG} && !$ENV{NDEBUG} 
+    ? $ENV{TB_DEBUG_LEVEL}
+    : 0;
 
 # ------------------------------------------------------------------------
 # Exports ----------------------------------------------------------------
@@ -1344,6 +1354,9 @@ sub cellbuf::resize {     # $int ($width, $height)
     }
   }
 
+  # Don't need to call cell::free for the old cells, 
+  # as Perl will handle it automatically.
+
   return TB_OK;
 }
 
@@ -1844,8 +1857,8 @@ if (_WIN32) {
   $global->{wfd} = $hOutput;
 } else {
   $global->{ttyfd} =
-    POSIX::isatty($rfd) ? $rfd :
-    POSIX::isatty($wfd) ? $wfd :
+    POSIX::isatty($rfd)                 ? $rfd :
+    $wfd != $rfd && POSIX::isatty($wfd) ? $wfd :
     -1;
   $global->{rfd} = $rfd;
   $global->{wfd} = $wfd;
@@ -2405,11 +2418,13 @@ sub tb_print_ex {    # $int ($x, $y, $fg, $bg, \$out_w|undef, $str)
     if ($w < 0) {
       return TB_ERR;            # shouldn't happen if iswprint
     }
-    elsif ($w == 0) {           # combining character
+    elsif ($w == 0) {           # combining character? TODO: UAX-29
+if (TB_OPT_EGC) {
       if ($back->in_bounds($x_prev, $y)) {
         $rv = tb_extend_cell($x_prev, $y, chr $uni);
         return $rv if $rv != TB_OK;
       }
+} #endif
     }
     else {
       if ($back->in_bounds($x, $y)) {
@@ -2445,6 +2460,7 @@ sub tb_send {    # $int ($buf, $nbuf)
   my ($buf, $nbuf) = $sig->(@_);
   my $rv;
   my $guard = TRACE_LEAVE(\$rv) if _DEBUG > 1;
+  return $rv = TB_ERR_NOT_INIT unless $global->{initialized};
   return $rv = bytebuf_nputs(\$global->{outbuf}, $buf, $nbuf);
 }
 
@@ -2853,63 +2869,61 @@ sub tb_deinit {    # $int ()
     bytebuf_flush(\$global->{outbuf}, $global->{wfd});
   }
 
-  if ($global->{ttyfd} >= 0) {
-    if ($global->{has_orig_tios}) {
+  if ($global->{has_orig_tios} && $global->{ttyfd} >= 0) {
 if (_WIN32) {
-      # Restore the console input mode
-      my $hInput = $global->{rfd} // INVALID_HANDLE_VALUE;
-      if ($hInput == INVALID_HANDLE_VALUE) {
-        $^E = ERROR_INVALID_HANDLE;
-        $global->{last_errno} = $! = EBADF;
-        return TB_ERR_WIN_NO_STDIO;
+    # Restore the console input mode
+    my $hInput = $global->{rfd} // INVALID_HANDLE_VALUE;
+    if ($hInput == INVALID_HANDLE_VALUE) {
+      $^E = ERROR_INVALID_HANDLE;
+      $global->{last_errno} = $! = EBADF;
+      return TB_ERR_WIN_NO_STDIO;
+    }
+    my $orig_mode_in = $global->{orig_tios}{mode_in};
+    if (defined $orig_mode_in) {
+      $^E = 0;
+      Win32::Console::_SetConsoleMode($hInput, $orig_mode_in);
+      if ($^E) {
+        $global->{last_errno} = $! = ENOTTY;
+        return TB_ERR_WIN_SET_CONMODE;
       }
-      my $orig_mode_in = $global->{orig_tios}{mode_in};
-      if (defined $orig_mode_in) {
-        $^E = 0;
-        Win32::Console::_SetConsoleMode($hInput, $orig_mode_in);
-        if ($^E) {
-          $global->{last_errno} = $! = ENOTTY;
-          return TB_ERR_WIN_SET_CONMODE;
-        }
-      }
+    }
 
-      # Restore the console output mode
-      my $hOutput = $global->{wfd} // INVALID_HANDLE_VALUE;
-      if ($hOutput == INVALID_HANDLE_VALUE) {
-        $^E = ERROR_INVALID_HANDLE;
-        $global->{last_errno} = $! = EBADF;
-        return TB_ERR_WIN_NO_STDIO;
+    # Restore the console output mode
+    my $hOutput = $global->{wfd} // INVALID_HANDLE_VALUE;
+    if ($hOutput == INVALID_HANDLE_VALUE) {
+      $^E = ERROR_INVALID_HANDLE;
+      $global->{last_errno} = $! = EBADF;
+      return TB_ERR_WIN_NO_STDIO;
+    }
+    my $orig_mode_out = $global->{orig_tios}{mode_out};
+    if (defined $orig_mode_out) {
+      $^E = 0;
+      Win32::Console::_SetConsoleMode($hOutput, $orig_mode_out);
+      if ($^E) {
+        $global->{last_errno} = $! = ENOTTY;
+        return TB_ERR_WIN_SET_CONMODE;
       }
-      my $orig_mode_out = $global->{orig_tios}{mode_out};
-      if (defined $orig_mode_out) {
-        $^E = 0;
-        Win32::Console::_SetConsoleMode($hOutput, $orig_mode_out);
-        if ($^E) {
-          $global->{last_errno} = $! = ENOTTY;
-          return TB_ERR_WIN_SET_CONMODE;
-        }
-      }
+    }
 
-      # Restore the console output codepage
-      my $orig_cp_out = $global->{orig_tios}{cp_out};
-      if (defined $orig_cp_out) {
-        if (!Win32::Console::_SetConsoleOutputCP($orig_cp_out)) {
-          $global->{last_errno} = $! = EIO;
-          return TB_ERR_WIN_SET_CONMODE;
-        }
+    # Restore the console output codepage
+    my $orig_cp_out = $global->{orig_tios}{cp_out};
+    if (defined $orig_cp_out) {
+      if (!Win32::Console::_SetConsoleOutputCP($orig_cp_out)) {
+        $global->{last_errno} = $! = EIO;
+        return TB_ERR_WIN_SET_CONMODE;
       }
+    }
 } else {
-      $global->{orig_tios}->setattr($global->{ttyfd}, TCSAFLUSH);
+    $global->{orig_tios}->setattr($global->{ttyfd}, TCSAFLUSH);
 } #endif
-    }
-    if ($global->{ttyfd_open}) {
-      close(TB_OUT);
+  }
+  if ($global->{ttyfd_open}) {
+    close(TB_OUT);
 if (_WIN32) {
-      close(TB_IN);
+    close(TB_IN);
 } #endif
-      $global->{ttyfd_open} = 0;
-      $global->{ttyfd} = -1;
-    }
+    $global->{ttyfd_open} = 0;
+    $global->{ttyfd} = -1;
   }
 
 if (!_WIN32) {
@@ -3440,7 +3454,14 @@ if (_WIN32) {
     $global->{last_errno} = $! = EACCES;
     return TB_ERR_RESIZE_SIGACTION;
   }
-  $SIG{WINCH} = \&handle_resize;
+  $SIG{WINCH} = do {
+    state $signo = do {
+      my %sig_num;
+      @sig_num{ split(' ', $Config{sig_name}) } = split(' ', $Config{sig_num});
+      $sig_num{WINCH} // 28;
+    };
+    sub { handle_resize($signo) };
+  };
   return TB_OK;
 }
 

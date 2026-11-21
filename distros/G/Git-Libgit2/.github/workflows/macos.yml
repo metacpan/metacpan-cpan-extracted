@@ -25,11 +25,11 @@ jobs:
         run: perl -V
       - name: Install Dist::Zilla
         env:
-          PERL_CPANM_OPT: --mirror http://cpan.metacpan.org --mirror-only
+          PERL_CPANM_OPT: --mirror https://cpan.metacpan.org --mirror-only
         run: cpanm -nq Dist::Zilla
       - name: Install Alien::Libgit2
         env:
-          PERL_CPANM_OPT: --mirror http://cpan.metacpan.org --mirror-only
+          PERL_CPANM_OPT: --mirror https://cpan.metacpan.org --mirror-only
           # Fail loudly rather than quietly building the bundled copy if
           # pkg-config cannot see the Homebrew libgit2 installed above.
           ALIEN_INSTALL_TYPE: system
@@ -39,4 +39,4 @@ jobs:
           perl -MAlien::Libgit2 -e 'printf "install_type=%s version=%s\n",
             Alien::Libgit2->install_type, Alien::Libgit2->version // q(?)'
       - name: dzil test
-        uses: Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@main
+        uses: Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@v1

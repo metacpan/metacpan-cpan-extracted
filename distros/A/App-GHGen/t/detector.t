@@ -26,84 +26,84 @@ use_ok('App::GHGen::Detector', qw(detect_project_type get_project_indicators));
 
 	chdir $tmpdir;
 
-    # Test Perl detection
-    {
-        $tmpdir->child('cpanfile')->touch;
-        $tmpdir->child('lib')->mkpath;
+	# Test Perl detection
+	{
+		$tmpdir->child('cpanfile')->touch;
+		$tmpdir->child('lib')->mkpath;
 
-        my $type = detect_project_type();
-        is($type, 'perl', 'Detects Perl project with cpanfile');
+		my $type = detect_project_type();
+		is($type, 'perl', 'Detects Perl project with cpanfile');
 
-        # Clean up
-        $tmpdir->child('cpanfile')->remove;
-        $tmpdir->child('lib')->remove_tree;
-    }
+		# Clean up
+		$tmpdir->child('cpanfile')->remove;
+		$tmpdir->child('lib')->remove_tree;
+	}
 
-    # Test Node detection
-    {
-        $tmpdir->child('package.json')->spew_utf8('{}');
+	# Test Node detection
+	{
+		$tmpdir->child('package.json')->spew_utf8('{}');
 
-        my $type = detect_project_type();
-        is($type, 'node', 'Detects Node.js project with package.json');
+		my $type = detect_project_type();
+		is($type, 'node', 'Detects Node.js project with package.json');
 
-        # Clean up
-        $tmpdir->child('package.json')->remove;
-    }
+		# Clean up
+		$tmpdir->child('package.json')->remove;
+	}
 
-    # Test Python detection
-    {
-        $tmpdir->child('requirements.txt')->touch;
-        $tmpdir->child('setup.py')->touch;
+	# Test Python detection
+	{
+		$tmpdir->child('requirements.txt')->touch;
+		$tmpdir->child('setup.py')->touch;
 
-        my $type = detect_project_type();
-        is($type, 'python', 'Detects Python project with requirements.txt');
+		my $type = detect_project_type();
+		is($type, 'python', 'Detects Python project with requirements.txt');
 
-        # Clean up
-        $tmpdir->child('requirements.txt')->remove;
-        $tmpdir->child('setup.py')->remove;
-    }
+		# Clean up
+		$tmpdir->child('requirements.txt')->remove;
+		$tmpdir->child('setup.py')->remove;
+	}
 
-    # Test Rust detection
-    {
-        $tmpdir->child('Cargo.toml')->touch;
+	# Test Rust detection
+	{
+		$tmpdir->child('Cargo.toml')->touch;
 
-        my $type = detect_project_type();
-        is($type, 'rust', 'Detects Rust project with Cargo.toml');
+		my $type = detect_project_type();
+		is($type, 'rust', 'Detects Rust project with Cargo.toml');
 
-        # Clean up
-        $tmpdir->child('Cargo.toml')->remove;
-    }
+		# Clean up
+		$tmpdir->child('Cargo.toml')->remove;
+	}
 
-    # Test Go detection
-    {
-        $tmpdir->child('go.mod')->touch;
+	# Test Go detection
+	{
+		$tmpdir->child('go.mod')->touch;
 
-        my $type = detect_project_type();
-        is($type, 'go', 'Detects Go project with go.mod');
+		my $type = detect_project_type();
+		is($type, 'go', 'Detects Go project with go.mod');
 
-        # Clean up
-        $tmpdir->child('go.mod')->remove;
-    }
+		# Clean up
+		$tmpdir->child('go.mod')->remove;
+	}
 
-    # Test no detection
-    {
-        my $type = detect_project_type();
-        ok(!defined $type, 'Returns undef when no project detected');
-    }
+	# Test no detection
+	{
+		my $type = detect_project_type();
+		ok(!defined $type, 'Returns undef when no project detected');
+	}
 
-    # Test multiple detections (returns highest score)
-    {
-        $tmpdir->child('package.json')->spew_utf8('{}');
-        $tmpdir->child('Dockerfile')->touch;
+	# Test multiple detections (returns highest score)
+	{
+		$tmpdir->child('package.json')->spew_utf8('{}');
+		$tmpdir->child('Dockerfile')->touch;
 
-        my @detections = detect_project_type();
-        ok(@detections > 1, 'Detects multiple project types');
-        is($detections[0]->{type}, 'node', 'Returns highest scored type first');
+		my @detections = detect_project_type();
+		ok(@detections > 1, 'Detects multiple project types');
+		is($detections[0]->{type}, 'node', 'Returns highest scored type first');
 
-        # Clean up
-        $tmpdir->child('package.json')->remove;
-        $tmpdir->child('Dockerfile')->remove;
-    }
+		# Clean up
+		$tmpdir->child('package.json')->remove;
+		$tmpdir->child('Dockerfile')->remove;
+	}
 
 	chdir $orig;
 }

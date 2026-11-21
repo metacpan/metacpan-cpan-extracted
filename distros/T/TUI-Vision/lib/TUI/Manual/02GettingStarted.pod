@@ -18,7 +18,7 @@ L<TUI::Vision> application.
 
 Unlike the previous chapter, which focused on the history and design
 goals of the framework, the purpose of this chapter is entirely
-practical. By the end, you will have seen how a TUI::Vision
+practical. By the end, you will have seen how a L<TUI::Vision>
 application is installed, created and executed.
 
 =head2 Installation
@@ -80,17 +80,17 @@ From a conceptual point of view, the life cycle can be represented as
 follows:
 
     Application Startup
-            |
-            v
+            │
+            ▼
       TApplication
-            |
-            v
-        run()
-            |
-            v
+            │
+            ▼
+          run()
+            │
+            ▼
        Event Loop
-            |
-            v
+            │
+            ▼
      Application Exit
 
 The event system itself is discussed in detail in a later chapter.
@@ -107,12 +107,12 @@ interface hierarchy.
 A typical application consists of the following permanent objects:
 
     TApplication
-         |
-         +-- TMenuBar
-         |
-         +-- TDeskTop
-         |
-         +-- TStatusLine
+         │
+         ├── TMenuBar
+         │
+         ├── TDeskTop
+         │
+         └── TStatusLine
 
 These objects are created and managed by the application itself and
 remain available throughout the lifetime of the program.
@@ -129,20 +129,20 @@ The desktop forms the central workspace of a L<TUI::Vision> application.
 Conceptually, the screen is divided into three areas:
 
     ┌────────────────────────────────────────────────────┐
-    | Menu Bar                                           |
-    |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
-    |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
-    |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
-    |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
-    |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
-    |░░░░░░░░░░░░░░░░░░░░ TDeskTop ░░░░░░░░░░░░░░░░░░░░░░|
-    |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
-    |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
-    |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
-    |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
-    |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
-    |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
-    | Status Line                                        |
+    │ Menu Bar                                           │
+    │░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░│
+    │░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░│
+    │░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░│
+    │░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░│
+    │░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░│
+    │░░░░░░░░░░░░░░░░░░░░ TDeskTop ░░░░░░░░░░░░░░░░░░░░░░│
+    │░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░│
+    │░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░│
+    │░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░│
+    │░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░│
+    │░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░│
+    │░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░│
+    │ Status Line                                        │
     └────────────────────────────────────────────────────┘ 
 
 The desktop occupies the area between the menu bar and the status
@@ -170,6 +170,7 @@ The next chapter examines the overall architecture of L<TUI::Vision> and
 introduces the view hierarchy upon which the remainder of the
 framework is built.
 
-L<next|TUI::Manual::03> chapter.
+The L<next chapter|TUI::Manual::03> examines the overall architecture of 
+L<TUI::Vision> and introduces the view hierarchy.
 
 =cut

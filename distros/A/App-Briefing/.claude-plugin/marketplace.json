@@ -1,0 +1,15 @@
+{
+  "name": "briefing",
+  "owner": {
+    "name": "Torsten Raudssus",
+    "email": "getty@conflict.industries"
+  },
+  "plugins": [
+    {
+      "name": "briefing",
+      "source": "./",
+      "description": "Pre-loads declared skills into a subagent's context at spawn time, via a SubagentStart hook. Programmatic briefing beats prompt stuffing."
+    }
+  ],
+  "description": "briefing's own one-plugin marketplace. Still maintained. Getty/marketplace carries this plugin alongside the others."
+}

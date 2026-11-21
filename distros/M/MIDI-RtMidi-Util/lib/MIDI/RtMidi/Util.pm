@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Handy Utilities for Real-time MIDI
 
-our $VERSION = '0.0504';
+our $VERSION = '0.0601';
 
 use v5.40;
 # use Data::Dumper::Compact qw(ddc);
@@ -16,7 +16,6 @@ our @EXPORT = qw(
     stop_device
     input_ports
     output_ports
-    stop_all_notes
     program_changer
 );
 
@@ -49,15 +48,6 @@ sub stop_device ($device) {
     catch ($e) {
         chomp $e;
         warn "Can't stop the MIDI device: $e\n";
-    }
-}
-
-
-sub stop_all_notes ($device) {
-    for my $chan (0 .. 15) {
-        for my $n (0 .. 127) {
-            $device->note_off($chan, $n, 0);
-        }
     }
 }
 
@@ -109,7 +99,7 @@ MIDI::RtMidi::Util - Handy Utilities for Real-time MIDI
 
 =head1 VERSION
 
-version 0.0504
+version 0.0601
 
 =head1 SYNOPSIS
 
@@ -126,7 +116,7 @@ version 0.0504
 
   END {
     stop_device($midi_out);
-    stop_all_notes($midi_out);
+    $midi_out->panic; # CC#123 RtMidi method
   }
 
 =head1 DESCRIPTION
@@ -157,12 +147,6 @@ This function takes a unique part of an open MIDI port name as its argument.
 
 Stop an open C<MIDI::RtMidi::FFI::Device> device.
 
-=head2 stop_all_notes
-
-  stop_all_notes($device);
-
-Send a C<note_off()> message to all 16 channels and all 128 notes.
-
 =head2 input_ports
 
   $input_ports = input_ports();
@@ -190,6 +174,8 @@ the previous setting.
 =head1 SEE ALSO
 
 L<MIDI::RtMidi::FFI::Device>
+
+=cut
 
 =head1 AUTHOR
 

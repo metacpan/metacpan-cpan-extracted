@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -18,11 +18,16 @@ our @EXPORT_OK = qw(
 our %EXPORT_TAGS = (
 
   cmXXXX => [qw(
+    cmCharFocused
     cmFndEventView
+    cmCalcButton
+    cmAsciiTableCmdBase
   )],
 
   cpXXXX => [qw(
+    cpCalcPalette
     cpMousePalette
+    cpPuzzlePalette
   )],
 
   hlXXXX => [qw(
@@ -48,7 +53,10 @@ use TUI::StdDlg::Const qw( cmChangeDir );
 
 # Constants for Gadgets events
 use constant {
-  cmFndEventView => 114,
+  cmCharFocused       => 0,
+  cmFndEventView      => 114,
+  cmCalcButton        => 200,
+  cmAsciiTableCmdBase => 910,
 };
 
 # History id for the change directory dialog
@@ -61,9 +69,19 @@ use constant {
   maxLineLength => 256,
 };
 
+# Palette for TCalcDisplay
+use constant {
+  cpCalcPalette => "\x13",
+};
+
 # Palette for TClickTester
 use constant {
   cpMousePalette => "\x07\x08",
+};
+
+# Palette for TPuzzleView
+use constant {
+  cpPuzzlePalette => "\x06\x07",
 };
 
 1
@@ -136,9 +154,7 @@ Constants are exported using the following tag-based export groups:
 
 =head1 SEE ALSO
 
-L<Gadgets|TUI::Gadgets>,
-L<TEventViewer|TUI::Gadgets::EventViewer>,
-L<TEvent|TUI::Drivers::Event>
+L<Gadgets|TUI::Gadgets>
 
 =head1 AUTHORS
 

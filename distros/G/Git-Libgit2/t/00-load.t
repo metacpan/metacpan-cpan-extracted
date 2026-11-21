@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use Test2::V0;
 
 use Git::Libgit2 qw( init_lib shutdown_lib version );

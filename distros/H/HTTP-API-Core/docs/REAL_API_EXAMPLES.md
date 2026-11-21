@@ -153,11 +153,53 @@ This validation likewise did not expose a new generic core requirement.
 
 API reference: <https://docs.gitlab.com/api/rest/>
 
+## Jira Server / Data Center
+
+Jira's search endpoint uses zero-based `startAt` offsets, `maxResults` page
+sizes, a top-level `issues` list, and `total` for the result count. It can
+therefore use generic offset pagination without a Jira-specific core mode.
+
+An optional example wrapper keeps application code short:
+
+```perl
+use lib 'examples';
+use HTTP::API::Core::Example::Jira;
+
+my $jira = HTTP::API::Core::Example::Jira->new(
+    base_url => 'https://jira.example.com/jira',
+    username => $ENV{JIRA_USERNAME},
+    password => $ENV{JIRA_PASSWORD},
+);
+
+my $pager = $jira->issues_pager(
+    jql => 'filter=415607',
+    max_results => 1000,
+    fields => [qw(summary description components)],
+);
+
+while (my $issue = $pager->next) {
+    print "$issue->{key}\n";
+}
+```
+
+Set `base_url` to the Jira installation root. For an installation hosted at the
+domain root, use `https://jira.example.com`; if Jira is hosted under a
+context path such as `/jira`, include it in `base_url`. The example appends
+only `/rest/api/2/search` to this base URL.
+
+The example wraps the existing `basic_auth` helper and generic `offset`
+paginator. It is a recipe under `examples/`, not a separately installable Jira
+SDK or a new dependency. It is tested entirely offline. Keep credentials in
+environment variables or an appropriately protected secret store, never in
+source files. Jira deployments using token authentication can call the core
+directly with the relevant authentication hook. No default Jira host or
+credentials are embedded.
+
 ## Validation notes
 
-Across GitHub, Slack, Cloudflare, Stripe, and GitLab, the recurring shapes are
+Across GitHub, Slack, Cloudflare, Stripe, GitLab, and Jira, the recurring shapes are
 covered by the transport-independent primitives: header authentication, query
-encoding, page/cursor/next-URL pagination, response-aware pagination extractors,
+encoding, page/cursor/next-URL/offset pagination, response-aware pagination extractors,
 generic idempotency headers, normalized rate-limit metadata, request IDs, and
 structured HTTP/transport errors.
 

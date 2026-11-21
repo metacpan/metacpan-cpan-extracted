@@ -1,7 +1,7 @@
 use v5.40;
 no warnings qw[experimental::class recursion];
 use feature 'class';
-class Acme::Parataxis::Sync::Barrier v0.1.5 : isa(Acme::Parataxis::Sync) {
+class Acme::Parataxis::Sync::Barrier v0.1.6 : isa(Acme::Parataxis::Sync) {
     use Acme::Parataxis;
     use Carp qw[croak];
     field $parties : reader : param;    # fibers required per phase

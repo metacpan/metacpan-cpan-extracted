@@ -143,12 +143,13 @@ for my $r (@rows) {
 	ok(close_to($res->{conf_int}[1], $hi, 1e-4), "$n hi") or diag("$res->{conf_int}[1] vs $hi");
 }
 # 2e9 observations: the support is 5e8 points, which the full-support arrays could not hold
-# under a 3 GB limit; now only the window is held.  Needs a 64-bit long (the total is a long).
+# under a 3 GB limit; now only the window is held.  The total is an int64_t, so this no longer
+# depends on the width of C's long (it needed 64 bits there up to 0.3425); the 2e9 here is below
+# 2^31 - 1 anyway, and t/fisher_test.R.scipy.t Case 12 covers totals above it.
 # No reference value: by symmetry the odds ratio is exactly 1, which is what is asserted.
 # Gated: the window is 38 standard deviations wide on a double and 150 on a long double or
 # quadmath, and this table's takes about 2 s on double and 25 s on perl-5.12.5 (long double).
-use Config;
-if ($ENV{EXTENDED_TESTING} && $Config{longsize} >= 8) {
+if ($ENV{EXTENDED_TESTING}) {
 	my $r = fisher_test([[5e8, 5e8], [5e8, 5e8]]);
 	ok($r->{p_value} > 0.999999, 'huge symmetric table: p is 1');
 	ok(abs($r->{estimate}{'odds ratio'} - 1) < 1e-6, 'huge symmetric table: odds ratio 1');

@@ -278,7 +278,7 @@ exit do {
   GetOptions('help|?' => \my $help, 'man' => \my $man) or pod2usage(2);
   pod2usage(1) if $help;
   pod2usage(-exitval => 0, -verbose => 2) if $man;
-  main($#ARGV, $0, @ARGV);
+  main(@ARGV+1, [ $0, @ARGV ]);
 };
 
 __END__

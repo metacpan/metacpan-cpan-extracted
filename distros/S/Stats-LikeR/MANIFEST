@@ -70,6 +70,7 @@ t/bedroc.python.t
 t/bedroc.t
 t/better.coverage.t
 t/binom_test.R.scipy.t
+t/binom_test.large_n.py
 t/binom_test.t
 t/bioChemists.csv
 t/bladder.csv
@@ -150,11 +151,14 @@ t/filter.rowid.t
 t/filter.t
 t/filter_match.t
 t/fisher_test.R.scipy.t
+t/fisher_test.big_total.py
 t/fisher_test.rxc.R
 t/fisher_test.rxc.exact.py
 t/fisher_test.t
 t/fisher_test.window.R.scipy.t
 t/formula.utf8_names.t
+t/formula_groups.R.R
+t/formula_groups.R.t
 t/friedman_mcnemar_prop_cmh.R.R
 t/friedman_mcnemar_prop_cmh.R.t
 t/friedman_test.t
@@ -182,6 +186,8 @@ t/hoh2hoa.t
 t/hosmer_lemeshow.R.R
 t/hosmer_lemeshow.R.t
 t/hot_path.t
+t/incomplete.gamma.beta.mpmath.py
+t/incomplete.gamma.beta.mpmath.t
 t/interpolate.nan.pandas.py
 t/interpolate.nan.pandas.t
 t/interpolate.spline.banded.py
@@ -269,6 +275,9 @@ t/pm.coverage.t
 t/pnorm.t
 t/portability.bugs.t
 t/power_t_test.R.scipy.t
+t/power_t_test.solve_delta.R.scipy.t
+t/power_t_test.solve_n.R.scipy.t
+t/power_t_test.solve_sd_sig_level.R.scipy.t
 t/prcomp.R.R
 t/prcomp.R.t
 t/prcomp.small_scale.R.t
@@ -337,9 +346,13 @@ t/read_table.vcf_explode.bcftools.pl
 t/read_table.vcf_explode.bcftools.t
 t/read_table.ws_sep.pl
 t/read_table.ws_sep.t
+t/read_table.xlsx.blank_rows.pandas.py
+t/read_table.xlsx.blank_rows.pandas.t
 t/read_table.xlsx.parser.t
 t/read_table.xlsx.t
+t/read_table.xlsx.utf8.t
 t/read_table.xlsx.xml.t
+t/read_write_table.roundtrip.t
 t/roc.R.R
 t/roc.R.t
 t/roc.t
@@ -424,6 +437,8 @@ t/wilcox_test.t
 t/write_table.announce.t
 t/write_table.compressed.pandas.t
 t/write_table.longtable.t
+t/write_table.oracle.R.python.py
+t/write_table.oracle.R.python.t
 t/write_table.quoting.t
 t/write_table.t
 t/write_table.tex.comment.t
@@ -433,6 +448,8 @@ t/write_table.tex.stream.t
 t/write_table.tex.t
 t/write_table.xlsx.book.t
 t/write_table.xlsx.escape.t
+t/write_table.xlsx.number.python.py
+t/write_table.xlsx.number.python.t
 t/write_table.xlsx.t
 t/xlsx.entity_scan.t
 t/xlsx_col_idx.t

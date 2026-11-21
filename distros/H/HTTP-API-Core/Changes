@@ -1,5 +1,40 @@
 Revision history for HTTP-API-Core
 
+1.13  2026-11-21
+    - Reject non-ASCII digit characters in client timeout, retry options,
+      pagination page sizes/indexes, and URL ports before numeric coercion;
+      preserve ordinary ASCII numeric configuration without warnings.
+    - Add a bounded Error->log_summary accessor for routine logging without
+      exposing raw URLs, diagnostic messages, request IDs, or response data.
+    - Classify HTTP::Tiny's synthetic 599 Internal Exception responses as
+      transport errors, preserving retry policy while distinguishing them
+      from real server HTTP errors and custom transport responses.
+    - Add a tested Jira Server/Data Center integration recipe demonstrating
+      simple Basic authentication and offset pagination without changing
+      generic core behavior; update the pagination POD and README examples.
+
+1.12  2026-11-21
+    - Add generic offset pagination with configurable start/size parameters
+      and total-based completion, advancing by the actual returned item count
+      to support APIs that cap their page sizes.
+
+1.11  2026-11-21
+    - Accept HTTP::Tiny-style array-valued repeated response headers, preserving
+      all Set-Cookie values and defensive copies without transport workarounds.
+    - Keep header($name), retry, and rate-limit metadata scalar and conservative
+      when repeated header values conflict; reject malformed nested references.
+    - Require ASCII digits in HTTP statuses, Retry-After delays, and rate-limit
+      quota values to avoid Unicode numeric coercion and unintended retries.
+    - Reject Retry-After HTTP-dates whose year changes during Time::Local
+      conversion, avoiding incorrect long waits for historical dates.
+    - Reject undefined retry attempt counts without Perl uninitialized-value warnings.
+    - Normalize before_request-mutated HTTP methods before dispatch and retry checks,
+      preserving per-attempt URLs and credentials.
+    - Recognize percent-encoding-equivalent and bare existing query API-key names
+      without appending duplicate authentication parameters.
+    - Reject conflicting case-insensitive outbound header values before dispatch,
+      including default, per-request, and hook-mutated headers.
+
 1.10  2026-11-15
     - Prevent automatic retries of unsafe HTTP methods introduced by before_request hooks,
       unless the method is explicitly allowed by the retry policy.

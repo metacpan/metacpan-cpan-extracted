@@ -1,3 +1,20 @@
+2026-11-20  Breno G. de Oliveira <garu@cpan.org>
+
+   Release 1.26
+
+   Quote sigils in regexp so eval'ing the dump doesn't interpolate (CVE-2026-133443).
+
+   Recognize modern regexp modifiers.
+
+   Fix test in cygwin (failure reported by PJACKLAM)
+
+   Add parens to keys %! call to avoid warning on perl 5.8 (HAARG)
+
+   Dump core booleans with !!1 and !!0 notation (LEONERD)
+
+   Don't use vars, use our (HAARG)
+
+
 2021-06-26  Breno G. de Oliveira <garu@cpan.org>
 
    Release 1.25

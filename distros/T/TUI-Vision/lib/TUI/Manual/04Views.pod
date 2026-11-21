@@ -13,18 +13,462 @@ TUI::Manual::04 - Views and Groups in TUI::Vision
 
 =head1 VIEWS AND GROUPS
 
+The previous chapter introduced the view tree as the runtime structure
+of a L<TUI::Vision> application. This chapter now examines the mechanisms
+used to organize individual views within that tree.
+
+L<TView|TUI::Views::View> represents the fundamental unit. Every view
+occupies an area within its owner, maintains its own state and provides
+the information required to participate in the view structure.
+
+L<TGroup|TUI::Views::Group> extends this model by managing additional views.
+
+These subviews do not form an unordered collection. They have a
+defined order that affects both their position within the group and
+their Z-order.
+
+Additional relationships determine which view is currently selected
+within a group and, across several nested groups, which view ultimately
+receives the input focus.
+
+These mechanisms provide the foundation for drawing, navigation and,
+later, event distribution.
+
 =head2 The Role of TView
+
+L<TView|TUI::Views::View> contains the fundamental information required by
+an object to participate in the view system.
+
+Conceptually, this includes:
+
+    ┌─────────────────────────┐
+    │          TView          │
+    ├─────────────────────────┤
+    │ origin / size           │
+    │ state                   │
+    │ options                 │
+    │ growMode                │
+    │ owner                   │
+    │ next                    │
+    └─────────────────────────┘
+
+C<origin> and C<size> describe the geometry of the view within its
+owner.
+
+C<state> describes its current state. This includes, for example,
+visibility, selection, focus and whether the view is disabled.
+
+C<options> defines fundamental aspects of its behavior. A view may,
+for example, be selectable or participate in particular phases of
+event processing.
+
+C<growMode> describes how the position and size of the view change
+when the size of its owner changes.
+
+C<owner> connects the view upward to the group that contains it.
+
+C<next>, on the other hand, establishes a lateral connection to
+another subview belonging to the same owner.
+
+These two relationships therefore serve different purposes:
+
+    owner
+      │
+      │       View A ──next──▶ View B
+      ▼
+    TGroup
+
+C<owner> answers the question:
+
+    To which group does this view belong?
+
+C<next> instead answers:
+
+    Which view follows this one within the group?
+
+An individual view does not therefore need to know the complete view
+tree. Its immediate relationships provide enough information for the
+surrounding groups to place it within the overall structure.
 
 =head2 The Role of TGroup
 
+L<TGroup|TUI::Views::Group> is itself a L<TView|TUI::Views::View>, but
+additionally manages an ordered set of subviews.
+
+In the classic I<Turbo Vision> model these subviews are not treated as a
+simple linear list. Their C<next> links form a closed ring.
+
+With three views, the ring can be represented in simplified form as:
+
+    .     View A ──next──▶ View B ──next──▶ View C
+    .        ▲                                     │
+    .        └──────────────────next───────────────┘
+
+Every view therefore refers to the next view belonging to the same
+group. The final view refers back to the first.
+
+A ring has no inherent beginning or end. The group therefore provides
+additional relationships that give this cycle an order that can be
+used by I<Turbo Vision>.
+
+Of particular importance are C<last> and C<current>.
+
+C<last> identifies a fixed reference point within the ring.
+
+Starting from C<last>, the first view can be obtained through its
+C<next> link:
+
+    .                                     last
+    .                                       │
+    .                                       ▼
+    .     View A ──next──▶ View B ──next──▶ View C
+    .        ▲                                     │
+    .        └──────────────────next───────────────┘
+    .        ▲
+    .        │
+    .    last->next
+
+The cyclic structure can therefore be interpreted in a defined order:
+
+    first = last->next
+
+    first -> ... -> last -> first
+
+C<last> is consequently more than a technical pointer to an arbitrary
+subview. Together with C<next>, it establishes the ordering of the
+views within the group.
+
+The reference point is also visible from Perl. For a group C<$group>, the
+accessors C<first> and C<last> return the topmost and the bottommost
+subview:
+
+    my $front = $group->first;    # topmost view in Z-order
+    my $back  = $group->last;     # bottommost view
+
+C<insert> places a new view at the top (front) of the Z-order, directly
+before the previous C<first>. The new view becomes C<first>, while C<last>
+keeps pointing to the bottommost view.
+
+C<current> serves a different purpose.
+
+C<current> identifies the subview currently selected within the group:
+
+    .                    TGroup
+    .                       │
+    .                    current
+    .                       │
+    .                       ▼
+    .     View A ──next──▶ View B ──next──▶ View C
+    .        ▲                                     │
+    .        └──────────────────next───────────────┘
+
+In this example C<View B> is the current view. Its position within the
+ring does not change as a result.
+
+Three distinct concepts should therefore be kept separate:
+
+    next       ordering of subviews
+
+    last       reference point for that ordering
+
+    current    currently selected subview
+
+This structure also has an immediate visual meaning.
+
+The ordering of the subviews represents their Z-order within the
+group.
+
+The views can be imagined as surfaces stacked above one another, where
+views in front obscure those behind them:
+
+    ┌─────────────┐
+    │   View A    │       front (first)
+    └─────────────┘
+    ┌─────────────┐
+    │   View B    │
+    └─────────────┘
+    ┌─────────────┐
+    │   View C    │       back (last)
+    └─────────────┘
+
+The stack belongs to the group. The owner relation is separate: the group
+owns its subviews, and each subview refers back to its group.
+
+This representation is more than a metaphor for drawing.
+
+When views overlap, their position in the Z-order determines which
+view appears in front of another.
+
+The structure of a group therefore combines several responsibilities:
+
+    TGroup
+      │
+      ├── next / last ─────► ordering
+      │                      and Z-order
+      │
+      └── current ─────────► selection
+
+Changing the order does not change the view tree as an ownership
+structure. The views continue to belong to the same group, but may
+occupy different positions within its Z-order.
+
+This distinction is particularly important for windows. Several
+windows may belong to the desktop at the same time, while their order
+determines which window appears in front of the others.
+
 =head2 Geometry and Bounds
+
+Every view occupies a rectangular area within its owner.
+
+The important distinction is between the coordinate system of the
+owner and the local coordinate system of the view.
+
+Assume that a view begins at position C<(10,5)> within its owner:
+
+    Owner coordinate system
+
+       (10,5)
+          │
+          ▼
+          ┌────────────────────────┐
+          │                        │
+          │         TView          │
+          │                        │
+          └────────────────────────┘
+
+From the owner's perspective, the upper-left corner of this view is at
+C<(10,5)>.
+
+The view itself, however, operates within its own local coordinate
+system:
+
+    .     ┌────────────────────────┐
+    .     │ (0,0) ─────▶ x         │
+    .     │   │                    │
+    .     │   ▼ y                  │
+    .     │                        │
+    .     └────────────────────────┘
+
+Drawing code within the view therefore does not need to know its
+absolute position on the screen.
+
+This is particularly important for reusable views. The same
+application-specific view can be placed at different positions within
+a window or dialog without requiring changes to its drawing code.
+
+When the size of the owner changes, the geometry of its subviews may
+also change.
+
+I<Turbo Vision> describes this relationship through C<growMode>.
+
+A horizontally growing view could initially appear as follows:
+
+    ┌──────────────────────────────┐
+    │ Owner                        │
+    │                              │
+    │  ┌────────────────────────┐  │
+    │  │          View          │  │
+    │  └────────────────────────┘  │
+    └──────────────────────────────┘
+
+If the owner becomes wider, C<growMode> can cause the view to expand
+accordingly:
+
+    ┌────────────────────────────────────────┐
+    │ Owner                                  │
+    │                                        │
+    │  ┌──────────────────────────────────┐  │
+    │  │               View               │  │
+    │  └──────────────────────────────────┘  │
+    └────────────────────────────────────────┘
+
+Other growMode configurations may keep a view attached to a particular
+edge or adjust its position in response to changes in the owner's
+dimensions.
+
+Geometry is therefore not merely a static property of a view. It also
+describes how the view responds to changes in its owner's geometry.
 
 =head2 Visibility and Focus
 
+The position of a view within a group does not by itself determine
+whether that view is visible, selected or focused.
+
+I<Turbo Vision> uses state flags such as:
+
+    sfVisible
+    sfSelected
+    sfFocused
+    sfDisabled
+
+These states serve different purposes.
+
+C<sfVisible> determines whether a view participates in the visible
+representation of its group.
+
+A visible view does not necessarily have to be completely visible on
+the screen. Other views belonging to the same group may lie in front
+of it and obscure part or all of its area.
+
+This is where view state and Z-order meet:
+
+    .         front
+    .
+    .         View A       sfVisible
+    .           │
+    .         View B       sfVisible
+    .           │
+    .         View C       sfVisible
+    .
+    .         back
+
+All three views may have C<sfVisible> set even though C<View C> is
+partially or completely obscured by views in front of it.
+
+C<sfSelected>, on the other hand, describes the selection of a view
+within its group.
+
+The selected view is represented by C<current>:
+
+    .                    TGroup
+    .                       │
+    .                    current
+    .                       │
+    .                       ▼
+    .                     View B
+    .                       │
+    .                  sfSelected
+
+If the selected view is itself a group, that view may in turn have its
+own C<current> subview.
+
+Across several nested groups this produces a selection path:
+
+    .                  application
+    .                       │
+    .                    current
+    .                       ▼
+    .                    deskTop
+    .                       │
+    .                    current
+    .                       ▼
+    .                     window
+    .                       │
+    .                    current
+    .                       ▼
+    .                   inputLine
+    .                       │
+    .                   sfFocused
+
+Every group involved in this path identifies the next active view
+through C<current>.
+
+C<sfSelected> and C<sfFocused> therefore do not describe the same
+state.
+
+A window may be selected within the desktop while an input line inside
+that window holds the actual input focus.
+
+C<sfFocused> identifies the view at the active end of the selection
+path.
+
+Several of the mechanisms introduced so far thus fit together:
+
+    next / last
+        │
+        └──▶ ordering within the group
+
+    current
+        │
+        └──▶ selection within the group
+
+    current -> current -> ...
+        │
+        └──▶ selection path
+
+    end of selection path
+        │
+        └──▶ focus
+
+This structure becomes particularly important for event processing in
+the following chapter.
+
 =head2 Event Handling in Views
+
+L<TView|TUI::Views::View> combines presentation and behavior.
+
+A specialized view may draw its contents while also responding to
+events delivered by the framework.
+
+Conceptually, an application-specific view therefore has two major
+aspects:
+
+    .                    TView
+    .                      │
+    .            ┌─────────┴─────────┐
+    .            │                   │
+    .          draw             handleEvent
+    .            │                   │
+    .            ▼                   ▼
+    .      screen output       event reaction
+
+The view does not poll the keyboard or mouse itself.
+
+Input is converted by the framework into L<TEvent|TUI::Drivers::Event>
+objects and is then processed according to the view structure.
+
+The selection path from the previous section is also the route taken by
+focused events. For some event types, this path is significant.
+
+Other events follow different rules. Mouse events, for example, must
+take the position and Z-order of views into account. Broadcasts may
+reach several views. Groups may process events before or after their
+subviews.
+
+Those differences no longer belong to the view model itself.
+
+For this chapter, the important relationship is:
+
+    View structure
+         │
+         ├── next / last
+         ├── Z-order
+         ├── current
+         └── selection path
+                 │
+                 ▼
+           foundation for
+          event processing
+
+The following chapter examines how the different event types are
+distributed and processed.
 
 =head2 Conclusion
 
-L<next|TUI::Manual::05> chapter.
+L<TView|TUI::Views::View> provides the fundamental properties required
+by an object to participate in the view system.
+
+These include its geometry, state, owner and position within the
+subview structure.
+
+L<TGroup|TUI::Views::Group> extends these properties by
+managing an ordered set of subviews.
+
+C<next> and C<last> define the ordered structure of the subviews and
+therefore their Z-order.
+
+C<current> identifies the selected view within a group.
+
+Across several nested groups, the C<current> relationships form the
+selection path, with the focused view at its active end.
+
+Geometry determines which area a view occupies within its owner.
+State and options determine how the view behaves within that
+structure.
+
+This completes the structural side of the view system.
+
+The L<following chapter|TUI::Manual::05> adds its dynamic counterpart: the 
+creation, distribution and processing of events.
 
 =cut

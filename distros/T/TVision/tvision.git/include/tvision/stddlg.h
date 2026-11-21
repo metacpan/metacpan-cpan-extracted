@@ -243,7 +243,7 @@ inline opstream& operator << ( opstream& os, TSortedListBox* cl )
 
 inline TSortedCollection *TSortedListBox::list()
 {
-    return (TSortedCollection *)TListBox::list();
+    return static_cast<TSortedCollection *>(TListBox::list());
 }
 
 #endif  // Uses_TSortedListBox
@@ -315,11 +315,17 @@ inline void TFileList::newList( TFileCollection *f )
 
 inline TFileCollection *TFileList::list()
 {
-    return (TFileCollection *)TSortedListBox::list();
+    return static_cast<TFileCollection *>(TSortedListBox::list());
 }
 
 #endif  // Uses_TFileList
 
+/* ---------------------------------------------------------------------- */
+/*      class TFileInfoPane                                               */
+/*                                                                        */
+/*      Palette layout                                                    */
+/*        1 = Normal                                                      */
+/* ---------------------------------------------------------------------- */
 
 #if defined( Uses_TFileInfoPane ) && !defined( __TFileInfoPane )
 #define __TFileInfoPane
@@ -593,7 +599,6 @@ public:
     ~TDirListBox();
 
     virtual void getText( char *, short, short );
-//    virtual void handleEvent( TEvent& );
     virtual Boolean isSelected( short );
     virtual void selectItem( short item );
     void newDirectory( TStringView );
@@ -642,7 +647,7 @@ inline opstream& operator << ( opstream& os, TDirListBox* cl )
 
 inline TDirCollection *TDirListBox::list()
 {
-    return (TDirCollection *)TListBox::list();
+    return static_cast<TDirCollection *>(TListBox::list());
 }
 
 #endif  // Uses_TDirListBox

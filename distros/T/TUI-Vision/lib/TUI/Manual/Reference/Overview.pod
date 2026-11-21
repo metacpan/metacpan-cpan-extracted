@@ -21,6 +21,12 @@ TUI::Manual::Reference::Overview - Overview of TUI::Vision Classes
   |     |
   |     +- TFileCollection
   |     +- TStringCollection
+  |     +- TRefTable
+  |
+  +- THelpFile
+  +- THelpIndex
+  +- THelpTopic
+  +- TTopicDefinition
   |
   +- TGroup
   |  |
@@ -38,6 +44,7 @@ TUI::Manual::Reference::Overview - Overview of TUI::Vision Classes
   |     |  +- TMouseDialog
   |     |
   |     +- TFileWindow
+  |     +- THelpWindow
   |     +- THistoryWindow
   |
   +- TView
@@ -85,7 +92,11 @@ TUI::Manual::Reference::Overview - Overview of TUI::Vision Classes
     +- TScrollBar
     +- TScroller
     |  |
+    |  +- THelpViewer
     |  +- TFileViewer
+    |  +- TOutlineViewer
+    |  |  +- TOutline
+    |  |
     |  +- TTextDevice
     |     +- TTerminal
     |
@@ -112,6 +123,7 @@ TUI::Manual::Reference::Overview - Overview of TUI::Vision Classes
     +-- Memory/   - Memory manager
     +-- Menus/    - TMenuBar, TMenuBox, TStatusLine, etc.
     +-- Objects/  - TObject, TPoint, TRect, TCollection, TSortedCollection, etc.
+    +-- Outline/  - TNode, TOutlineViewer, TOutline.
     +-- StdDlg/   - TFileDialog, TChDirDialog, TDirListBox, etc.
     +-- TextView/ - TTextDevice, TTerminal, etc.
     +-- toolkit/  - Object toolkit

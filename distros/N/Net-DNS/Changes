@@ -1,4 +1,13 @@
-$Id: Changes 2061 2026-09-01 11:37:52Z willem $                       -*-text-*-
+$Id: Changes 2068 2026-11-20 12:27:22Z willem $                       -*-text-*-
+
+
+**** 1.58 Nov 20, 2026
+
+	Implement DELEGPARAM as clone of DELEG RR.
+
+Fix rt.cpan.org #183247
+	Query ID predictable from a short sequence of observations
+	[CVE-2026-101340]
 
 
 **** 1.57 Sep 1, 2026
@@ -8,9 +17,14 @@ $Id: Changes 2061 2026-09-01 11:37:52Z willem $                       -*-text-*-
 
 Fix rt.cpan.org #181125
 	Unbounded recursion when re-encoding message with misplaced TSIG
+	[CVE-2026-81928]
 
 Fix rt.cpan.org #180773
 	UNIX resolver can fail in taint mode
+
+Fix rt.cpan.org #179945
+	Remote code injection via EDNS EXTENDED ERROR
+	[CVE-2026-64193]
 
 
 **** 1.56 Jul 18, 2026
@@ -21,10 +35,6 @@ Fix rt.cpan.org #180088
 Fix rt.cpan.org #179946
 	Denial of Service via long DNS compression chains
 	[CVE-2026-64194]
-
-Fix rt.cpan.org #179945
-	Remote code injection via EDNS EXTENDED ERROR
-	[CVE-2026-64193]
 
 Fix rt.cpan.org #179692/#176900
 	UNIX.pm: Unreachable code warning using Apache/mod_perl
@@ -106,7 +116,7 @@ Fix rt.cpan.org #157043
 
 **** 1.48 Nov 8, 2024
 
-	SVCB: Add tls-suppored-groups parameter.
+	SVCB: Add tls-supported-groups parameter.
 	Fix failures in 01-resolver.t dry tests.
 
 

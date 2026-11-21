@@ -74,7 +74,9 @@ subtest 'check: an unknown check' => sub {
     $dir->child('unknown.yml')->spew("name: unknown\nchecks: { NoSuchCheck: {} }\n");
     $dir->child('notacheck.yml')->spew("name: notacheck\nchecks: { X: { module: 'Dist::Conformance::Schema' } }\n");
     $dir->child('badmodule.yml')->spew("name: badmodule\nchecks: { X: { module: 'a b' } }\n");
+    $dir->child('unicode.yml')->spew(qq{name: unicode\nchecks: { X: { module: "Foo::B\\u00e4r" } }\n});
     my sub conformance ($flavor) { return Dist::Conformance->new( root => Fixture::checkout( '.conformance.yml' => "flavor: $flavor\nsource: { directory: $std }\n" ) ) }
+    like( dies { conformance('unicode')->check },   qr/but\ Foo::B.r\ is\ not\ the\ name\ of\ a\ module/,     'a name with a non-ASCII letter is not a module name, and does not get as far as loading' );
     like( dies { conformance('unknown')->check },   qr/its\ module\ \S+NoSuchCheck\ does\ not\ load/,         'a check without a module is named' );
     like( dies { conformance('notacheck')->check }, qr/but\ \S+Schema\ is\ not\ a\ Dist::Conformance::Check/, 'a module that is not a check is refused' );
     like( dies { conformance('badmodule')->check }, qr/but\ \S+::a\ b\ is\ not\ the\ name\ of\ a\ module/,    'and so is a name that is not a module' );

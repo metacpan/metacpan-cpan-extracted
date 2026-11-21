@@ -4,7 +4,9 @@ author:
   - 'J. Schneider'
 build_requires:
   Data::Dumper: '0'
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::Command: '1.17'
+  ExtUtils::Install: '1.54'
+  ExtUtils::Manifest: '1.58'
   File::Temp: '0'
   Test::More: '1.302188'
 configure_requires:
@@ -22,6 +24,10 @@ no_index:
     - inc
   package:
     - Termbox
+provides:
+  Terminal::WCWidth:
+    file: lib/Terminal/WCWidth.pm
+    version: v0.6.3
 recommends:
   Encode: '0'
   Getopt::Long: '0'
@@ -31,7 +37,6 @@ recommends:
   Unicode::EastAsianWidth: '0'
   Unicode::EastAsianWidth::Detect: '0'
   lib: '0'
-  threads: '0'
 requires:
   Carp: '0'
   Exporter: '0'
@@ -41,9 +46,10 @@ requires:
   Unicode::Normalize: '0'
   constant: '0'
   perl: '5.010'
+  version: '0'
 resources:
   bugtracker: https://github.com/brickpool/Termbox/issues
   repository: https://github.com/brickpool/Termbox.git
-version: v0.6.1
+version: v0.6.3
 x_homepage: http://brickpool.de
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

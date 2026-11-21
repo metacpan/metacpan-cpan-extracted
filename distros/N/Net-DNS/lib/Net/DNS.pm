@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $VERSION;
-$VERSION = '1.57';
+$VERSION = '1.58';
 $VERSION = eval {$VERSION};
-our $SVNVERSION = (qw$Id: DNS.pm 2061 2026-09-01 11:37:52Z willem $)[2];
+our $SVNVERSION = (qw$Id: DNS.pm 2068 2026-11-20 12:27:22Z willem $)[2];
 
 
 =head1 NAME
@@ -23,7 +23,7 @@ Net::DNS - Perl Interface to the Domain Name System
 
 Net::DNS is a collection of Perl modules that act as a Domain Name System
 (DNS) resolver. It allows the programmer to perform DNS queries that are
-beyond the capabilities of "gethostbyname" and "gethostbyaddr".
+beyond the capabilities of C<gethostbyname()> and C<gethostbyaddr()>.
 
 The programmer should be familiar with the structure of a DNS packet
 and the zone file presentation format described in RFC1035.
@@ -448,8 +448,8 @@ elapsed since the previous update is less than one second.
 
 The 32 bit value returned by the auxiliary C<YYYYMMDDxx()> function
 will be used as the base for the date-coded zone serial number.
-Serial number increments must be limited to 100 per day for the
-date information to remain useful.
+Serial number increments must be limited to 100 per day if the
+date information is to remain useful.
 
 
 

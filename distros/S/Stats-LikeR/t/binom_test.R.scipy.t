@@ -41,14 +41,11 @@ use Test::More;
 use Config;
 use Stats::LikeR 'binom_test';
 
-# The n = 2.1e7 cases scan the whole support once per call, which is a fixed
-# ~2.1e7 iterations of Loader's dbinom -- fast enough on a plain double build
-# (~0.4s each) but one to two orders slower on a long-double or __float128
-# perl, where the inner loop is lgammal/lgammaq.  R does exactly the same O(n)
-# scan, so this is not overhead binom_test() adds; it is just too slow for a
-# CPAN smoker.  Everything else in this file runs in well under a second.
-my $EXTENDED = $ENV{EXTENDED_TESTING} || $ENV{AUTHOR_TESTING} || $ENV{RELEASE_TESTING};
-my $SLOW_WHY = 'slow O(n) case at n = 2.1e7; set EXTENDED_TESTING=1 to run it';
+# Up to 0.3425 the two-sided p-value scanned the whole support, as R's does, so
+# the n = 2.1e7 cases below were gated behind EXTENDED_TESTING (~0.4 s each on a
+# double build, far more on long double or __float128).  Since 0.3426 it is a
+# binary search for the boundary, log2(n) density evaluations, and every case
+# here, n = 1e18 included, runs in well under a second on any NV width.
 
 # Tolerances.
 #
@@ -1355,7 +1352,8 @@ for my $c (@BIG_CORPUS) {
 
 # 4. The n = 2.1e7 cases from SciPy's test_two_sided_pvalues1 -- the exact ones
 # the truncation above was found on, and the only place where R, SciPy and this
-# module all pin the same four numbers.  Gated because each is an O(n) scan.
+# module all pin the same four numbers.  They were an O(n) scan each (hence
+# gated) before 0.3426.
 #
 # [ x, n, p, alternative, p-value ]
 my @SLOW_CORPUS = (
@@ -1365,14 +1363,11 @@ my @SLOW_CORPUS = (
 	[ 10080017, 21000000, 0.48, 'two.sided', 0.99407548173280669 ],
 );
 
-SKIP: {
-	skip $SLOW_WHY, 2 * scalar @SLOW_CORPUS unless $EXTENDED;
-	for my $c (@SLOW_CORPUS) {
-		my ($x, $n, $p, $alt, $exp) = @$c;
-		my $r = binom_test($x, $n, p => $p, alternative => $alt);
-		close_to($r->{'p_value'}, $exp, "C4 x=$x n=$n p=$p $alt p-value (n=2.1e7)");
-		close_to($r->{estimate}, $x / $n, "C4 x=$x n=$n estimate");
-	}
+for my $c (@SLOW_CORPUS) {
+	my ($x, $n, $p, $alt, $exp) = @$c;
+	my $r = binom_test($x, $n, p => $p, alternative => $alt);
+	close_to($r->{'p_value'}, $exp, "C4 x=$x n=$n p=$p $alt p-value (n=2.1e7)");
+	close_to($r->{estimate}, $x / $n, "C4 x=$x n=$n estimate");
 }
 
 # 5. REGRESSION GUARD: Clopper-Pearson bounds far below 1.
@@ -1650,6 +1645,109 @@ for my $x (1, 5, 999999) {
 		ok($p >= 0 && $p < 1e-300,
 			"C9 x=$x n=1e6 two-sided is past 1e-300 on this NV ($p)");
 	}
+}
+
+# 10. Very large n (0.3426).  binom_test(3, 1e18) used to run an O(n) loop and
+# never return (R fails there too, trying to allocate 37 GB), and n was limited
+# to LONG_MAX, which is 2^31 - 1 on Windows.  The two-sided boundary is now
+# found by binary search, and the counts are UVs below IV_MAX.
+#
+# Provenance.  p-values: mpmath at mp.dps = 40 (t/binom_test.large_n.py, beside
+# this file, regenerates them): the defining sums, each tail an incomplete beta
+# integrated by quadrature about its mode (mpmath's own betainc() fails to
+# converge at these shapes), and the two-sided count y found by bisection on
+# the exact pmf from loggamma(), R's rule dbinom(i) <= dbinom(x) * (1 + 1e-7).
+# They agree with SciPy 1.18.0 binomtest() where SciPy returns: at n = 1e9 to
+# 4e-12, and at n = 1e12 to 1.4e-10, where it is SciPy that is off (mpmath and
+# this module agree to 4e-16).  SciPy does not return at all for the n = 1e18
+# cases with x near the mean, and R cannot run any of them.  Confidence
+# intervals: SciPy's binomtest().proportion_ci(method = "exact"), which agrees
+# with this module to 6e-15 here.
+#
+# Tolerances: 1e-9 relative at n <= 1e12 (worst observed 3.5e-12, the upper
+# tail at n = 1e9, a factor of 300).  At n = 1e18 they are 1e-6, which is
+# measured: the worst is the two-sided value at 6e-8, because an NV cannot name
+# an integer above 2^53 exactly, so on a double build the boundary index found
+# by the search is good to the 64-wide grid of doubles there, 3 or 4 steps of
+# the pmf (8e-10 each) -- a long double or __float128 build does better -- and
+# the upper tail is 2.4e-9 off from the incomplete beta at a + b = 1e18.
+#
+# [ x, n, p, alternative, p-value, tolerance ]
+my @LARGE_N = (
+	[ 333363333, 1000000000, 1/3, 'two.sided', 0.044174877433138167, 1e-9 ],
+	[ 333363333, 1000000000, 1/3, 'less', 0.97791431776515038, 1e-9 ],
+	[ 333363333, 1000000000, 1/3, 'greater', 0.022089214822609565, 1e-9 ],
+	[ 500001000000, 1000000000000, 0.5, 'two.sided', 0.045500371878345432, 1e-9 ],
+	[ 500001000000, 1000000000000, 0.5, 'less', 0.97724992204276031, 1e-9 ],
+	[ 500001000000, 1000000000000, 0.5, 'greater', 0.022750185939172716, 1e-9 ],
+	[ 250000300000, 1000000000000, 0.25, 'two.sided', 0.48842231662265776, 1e-9 ],
+	[ 250000300000, 1000000000000, 0.25, 'less', 0.75578923546067455, 1e-9 ],
+	[ 250000300000, 1000000000000, 0.25, 'greater', 0.24421148927327876, 1e-9 ],
+	[ '500000001000000000', '1000000000000000000', 0.5, 'two.sided', 0.04550026659590687, 1e-6 ],
+	[ '500000001000000000', '1000000000000000000', 0.5, 'less', 0.97724986810581176, 1e-6 ],
+	[ '500000001000000000', '1000000000000000000', 0.5, 'greater', 0.022750132002170174, 1e-6 ],
+	[ '499999999000000000', '1000000000000000000', 0.5, 'two.sided', 0.04550026659590687, 1e-6 ],
+	[ '300000001000000000', '1000000000000000000', 0.3, 'two.sided', 0.029096331741252256, 1e-6 ],
+	[ '300000000000000000', '1000000000000000000', 0.3, 'two.sided', 0.9999999904238023, 1e-6 ],
+);
+# [ x, n, alternative, lower, upper ]  (conf_level 0.95, p = 0.5)
+my @LARGE_CI = (
+	[ 3, '1000000000000000000', 'two.sided', 6.186721228956017e-19, 8.767273069742269e-18 ],
+	[ 3, '1000000000000000000', 'less', 0, 7.753656527932714e-18 ],
+	[ 3, '1000000000000000000', 'greater', 8.176914471639536e-19, 1 ],
+	[ 500001000000, 1000000000000, 'two.sided', 0.5000000200175078, 0.5000019799824923 ],
+	[ 500001000000, 1000000000000, 'less', 0, 0.5000018224273135 ],
+	[ 500001000000, 1000000000000, 'greater', 0.5000001775726866, 1 ],
+	[ 333363333, 1000000000, 'two.sided', 0.3333341149070041, 0.33339255205761265 ],
+	[ 333363333, 1000000000, 'less', 0, 0.3333878544378868 ],
+	[ 333363333, 1000000000, 'greater', 0.3333388122743463, 1 ],
+);
+# Counts are strings of digits so that the file compiles on a 32-bit IV perl,
+# where the large ones are only skipped.
+my $E18 = '1000000000000000000';
+SKIP: {
+	skip 'needs a 64-bit IV for counts above 2^31', 1 unless $Config{ivsize} >= 8;
+	for my $c (@LARGE_N) {
+		my ($x, $n, $p, $alt, $exp, $tol) = @$c;
+		my $r = binom_test($x, $n, p => $p, alternative => $alt);
+		close_to($r->{'p_value'}, $exp, "C10 x=$x n=$n p=$p $alt p-value (large n)", $tol);
+		is($r->{statistic}, $x, "C10 x=$x n=$n statistic is exact");
+		is($r->{parameter}, $n, "C10 x=$x n=$n parameter is exact");
+	}
+	for my $c (@LARGE_CI) {
+		my ($x, $n, $alt, $lo, $hi) = @$c;
+		my $ci = binom_test($x, $n, alternative => $alt)->{conf_int};
+		close_to($ci->[0], $lo, "C10 x=$x n=$n $alt lower bound", $TOL_CI_TINY);
+		close_to($ci->[1], $hi, "C10 x=$x n=$n $alt upper bound", $TOL_CI_TINY);
+	}
+	# x = 3 in n = 1e18: dbinom(3) underflows, so R's rule counts every index whose
+	# density does, and the far tail P(X >= n - y + 1) is what is left: a denormal
+	# (3.2e-317 on a double build), past 1e-300 on any NV.
+	my $far = binom_test(3, $E18)->{'p_value'};
+	ok($far >= 0 && $far < 1e-300, "C10 x=3 n=1e18 two-sided is past 1e-300 ($far)");
+	# The [successes, failures] form builds n = s + f above 2^31.
+	my $sf = binom_test([500001000000, 499999000000], p => 0.5);
+	is($sf->{parameter}, 1000000000000, 'C10 [s, f] form: n is the sum');
+	close_to($sf->{'p_value'}, 0.045500371878345432, 'C10 [s, f] form at n = 1e12, two-sided', 1e-9);
+	# p and x at the edges, at n = 1e18: the degenerate branches never search.
+	is(binom_test(0, $E18, p => 0)->{'p_value'}, 1, 'C10 p = 0, x = 0, n = 1e18');
+	is(binom_test($E18, $E18, p => 1)->{'p_value'}, 1, 'C10 p = 1, x = n, n = 1e18');
+	is(binom_test(1, $E18, p => 0)->{'p_value'}, 0, 'C10 p = 0, x = 1, n = 1e18');
+	# x = 0 and x = n: the search runs on one side only.
+	cmp_ok(binom_test(0, $E18)->{'p_value'}, '<', 1e-300, 'C10 x = 0, n = 1e18');
+	cmp_ok(binom_test($E18, $E18)->{'p_value'}, '<', 1e-300, 'C10 x = n, n = 1e18');
+	# x at the mean exactly, and one below it.
+	is(binom_test('500000000000000000', $E18)->{'p_value'}, 1, 'C10 x = mean, n = 1e18');
+	cmp_ok(binom_test('499999999999999999', $E18)->{'p_value'}, '>', 0.999, 'C10 x one below the mean, n = 1e18');
+	# The limit is IV_MAX, whatever the width of C's long.
+	my $e = !eval { binom_test(1, '9223372036854775807'); 1 };
+	ok($e && $@ =~ /too large \(the limit is 9223372036854775806\)/, 'C10 n = IV_MAX is refused with its limit') or diag($@);
+}
+SKIP: {
+	skip 'a 64-bit IV has no 2^31 limit', 2 if $Config{ivsize} >= 8;
+	my $e = !eval { binom_test(1, 3000000000); 1 };
+	ok($e, 'C10 n above IV_MAX croaks on a 32-bit IV');
+	like($@, qr/too large \(the limit is 2147483646\)/, 'C10 the 32-bit limit is named');
 }
 
 done_testing();

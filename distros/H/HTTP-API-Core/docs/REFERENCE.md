@@ -22,7 +22,7 @@ Values are percent-encoded. Values may be scalars, array references containing o
 
 ## Request headers
 
-Client-level and per-request header values must be scalars or `undef`; reference values are rejected. Per-request `headers` must be a hash reference. They are merged over client-level default headers before idempotency handling and lifecycle hooks run. Invalid request header containers are rejected with a descriptive validation error rather than being passed to the transport. When `json` is used, `Content-Type` and `Accept` default to `application/json` only when no case-insensitive equivalent header is already present, so explicit client or request headers take precedence.
+Client-level and per-request header values must be scalars or `undef`; reference values are rejected. Per-request `headers` must be a hash reference. They are merged over client-level default headers before idempotency handling and lifecycle hooks run. Invalid request header containers are rejected with a descriptive validation error rather than being passed to the transport. Within one header set, differently cased names with **conflicting values** (including a defined value versus `undef`) are rejected before dispatch; matching values are allowed. This applies to client defaults, per-request options, and `before_request` hook mutations. Per-request headers still override defaults case-insensitively. When `json` is used, `Content-Type` and `Accept` default to `application/json` only when no case-insensitive equivalent header is already present, so explicit client or request headers take precedence.
 
 
 ## Authentication
@@ -81,7 +81,7 @@ my $api = HTTP::API::Core->new(
 );
 ```
 
-`before_request` receives a mutable context containing `method`, `url`, `headers`, `content`, and the current retry `attempt`. It runs immediately before each transport attempt. Before transport, the final mutable request fields are revalidated: `method` must be a non-empty scalar, `url` a defined scalar, `headers` a hash reference whose defined values are scalars, and `content` a scalar or `undef`. Invalid hook mutations are rejected before the transport is called.
+`before_request` receives a mutable context containing `method`, `url`, `headers`, `content`, and the current retry `attempt`. It runs immediately before each transport attempt. Before transport, the final mutable request fields are revalidated: `method` must be a non-empty scalar, `url` a defined scalar, `headers` a hash reference whose defined values are scalars, and `content` a scalar or `undef`. URL port numbers and the client timeout must use ASCII digits; Unicode numeric characters are rejected without Perl numerical-coercion warnings. Invalid hook mutations are rejected before the transport is called.
 
 `after_response` runs after a successful response. `on_error` runs before retry handling decides whether another attempt should be made.
 
@@ -243,6 +243,9 @@ Application code can inspect structured fields such as:
 * `request_id`
 
 instead of parsing human-readable error messages.
+
+For routine logs, `$error->log_summary` provides a bounded summary without
+URLs, exception messages, request IDs, headers, or response bodies.
 
 See `docs/ERRORS.md`.
 

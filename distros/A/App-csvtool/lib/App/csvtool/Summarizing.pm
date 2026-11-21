@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2024 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2024-2025 -- leonerd@leonerd.org.uk
 
-package App::csvtool::Summarizing 0.04;
+package App::csvtool::Summarizing 0.05;
 
 use v5.26;
 use warnings;
@@ -12,6 +12,10 @@ use experimental 'signatures';
 =head1 NAME
 
 C<App::csvtool::Summarizing> - summarize tabular data in F<csvtool>
+
+=head1 COMMANDS
+
+=for highlighter
 
 =cut
 
@@ -68,6 +72,73 @@ The field index to use as the counting key (defaults to 1).
 
       foreach my $key ( @keys ) {
          $output->( [ $key, $count_for_key{$key} ] );
+      }
+   }
+}
+
+package App::csvtool::sum
+{
+
+=head2 sum
+
+   $ csvtool sum -fFIELD INPUT...
+
+Sums the values in a given column, outputting a total at the end. Optionally,
+rows can be grouped together by one or more group-key fields, maintaining
+separate totals per unique set of values in those fields.
+
+Outputs a new table with a row per set of keys. Each row will contain all of
+the key values, in the order given by the list of key fields, followed by its
+group total. If there are no key fields the output will be a single row
+containing just a single value.
+
+=head3 --field, -f
+
+The field index of the column to sum (defaults to 1).
+
+=head3 --group, -g
+
+Optional comma-separated list of additional fields to use as group keys.
+Defaults to empty, meaning that no key-based grouping will occur.
+
+=cut
+
+   use constant COMMAND_DESC => "Sum the values in the FIELD column";
+
+   use constant COMMAND_OPTS => (
+      { name => "field|f=", description => "Field to sum",
+         default => 1 },
+      { name => "group|g=", description => "Field(s) to use as group keys",
+         default => "" },
+   );
+
+   use constant WANT_READER => 1;
+   use constant WANT_OUTPUT => 1;
+
+   sub run ( $pkg, $opts, $reader, $output )
+   {
+      my $VALFIELD = $opts->{field};
+      my @KEYFIELDS = split m/,/, $opts->{group};
+
+      # 1-indexed
+      $VALFIELD--;
+      $_-- for @KEYFIELDS;
+
+      my @keysets;
+      my %totals;
+
+      while( my $row = $reader->() ) {
+         my $key = join "\0", @{$row}[@KEYFIELDS];
+         my $value = $row->[$VALFIELD];
+         defined $value or next;
+
+         exists $totals{$key} or push @keysets, $key;
+         $totals{$key} += $value;
+      }
+
+      foreach my $key ( @keysets ) {
+         my @keys = length $key ? ( split m/\0/, $key ) : ();
+         $output->( [ @keys, $totals{$key} ] );
       }
    }
 }

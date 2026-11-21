@@ -4,7 +4,8 @@ use v5.40;
 
 use Cwd                   qw( abs_path );
 use File::Basename        qw( basename dirname    );
-use File::Path            qw( make_path remove_tree );
+use File::Path            qw( make_path );
+use File::Temp            qw( tempdir );
 use File::Spec::Functions qw( catdir catfile catpath file_name_is_absolute rel2abs splitdir splitpath );
 use List::Util            qw( first );
 use Symbol                qw( qualify_to_ref );
@@ -73,21 +74,44 @@ sub run
     = $all->[0]{ $group }{ $test_name }
     or die "No config for '$group/$test_name' in '$yaml_f'";
 
-    my @setup      = $config->{ setup } ? @{ $config->{ setup } } : ();
-    my @abs_setup  = map { rel2abs catdir $t_dir, $_ } @setup;
-    my @to_cleanup = grep { ! -e $_ } @abs_setup;
+    my @setup   = $config->{ setup  } ? @{ $config->{ setup  } } : ();
+    my @args    = $config->{ args   } ? @{ $config->{ args   } } : ();
+    my @expect  = @{ $config->{ expect } };
+    my $var     = $config->{ var };
 
-    make_path @abs_setup if @abs_setup;
+    # the setup paths are GROUP/BASE[/SUBDIR].  BASE is created as a
+    # tempdir with a unique name in the group's directory, so leftovers
+    # from earlier runs or tests running in parallel cannot collide
+    # with it; CLEANUP removes it.  the unique name replaces BASE in
+    # the setup and expect paths, base=BASE, and an exported variable
+    # named after BASE.
+
+    if( @setup )
+    {
+        my ( undef, $base ) = split m{/}, $setup[0];
+
+        my $uniq_d  = tempdir "${base}_XXXXXX", DIR => catdir( $t_dir, $group ), CLEANUP => 1;
+        my $uniq    = basename $uniq_d;
+
+        s{ ^ ( \Q$group\E / ) \Q$base\E (?= / | $ ) }{$1$uniq}x
+        for @setup, @expect;
+
+        s{ ^ base= \Q$base\E $ }{base=$uniq}x
+        for @args;
+
+        defined $var && $var eq $base
+        and $var = $uniq;
+
+        make_path map { rel2abs catdir $t_dir, $_ } @setup;
+    }
 
     require FindBin::libs;
 
-    my @args      = $config->{ args } ? @{ $config->{ args } } : ();
     my $is_scalar = grep { $_ eq 'scalar' } @args;
 
     FindBin::libs->import( @args );
 
     my $check  = $config->{ check };
-    my @expect = @{ $config->{ expect } };
 
     if( $check eq 'inc' )
     {
@@ -105,7 +129,6 @@ sub run
     }
     elsif( $check eq 'export' )
     {
-        my $var = $config->{ var };
         my $ref = qualify_to_ref $var;
 
         my @found
@@ -144,8 +167,6 @@ sub run
     }
 
     done_testing;
-
-    remove_tree @to_cleanup if @to_cleanup;
 }
 
 1

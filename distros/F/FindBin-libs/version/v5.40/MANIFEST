@@ -57,6 +57,7 @@ version/v5.40/example/p5run
 version/v5.40/example/single_config_dir
 version/v5.40/lib/FindBin/Bin.pm
 version/v5.40/lib/FindBin/Parents.pm
+version/v5.40/lib/FindBin/Files.pm
 version/v5.40/lib/FindBin/libs.pm
 version/v5.40/t/00-lib-check.t
 version/v5.40/t/01-use-ok.t
@@ -83,6 +84,9 @@ version/v5.40/t/10-Bin-path/16-chdir-builtin.t
 version/v5.40/t/10-Bin-path/17-chdir-cwd.t
 version/v5.40/t/10-Bin-path/18-pwd-removed-cwd.t
 version/v5.40/t/50-examples/01-syntax.t
+version/v5.40/t/50-files/01-use-ok.t
+version/v5.40/t/50-files/02-args.t
+version/v5.40/t/50-files/03-search.t
 version/v5.40/t/11-Bin/01-Bin-sanity.t
 version/v5.40/t/11-Bin/02-Bin-abspath.t
 version/v5.40/t/30-list/20-append-list.t
@@ -93,6 +97,7 @@ version/v5.40/t/30-list/24-ignore.t
 version/v5.40/t/30-list/25-libs-abspath.t
 version/v5.40/t/30-list/26-scalar-export.t
 version/v5.40/t/30-list/27-ignore-default.t
+version/v5.40/t/30-list/28-subdir-symlink.t
 version/v5.40/t/bin/install-bash
 version/v5.40/t/bin/install-syntax
 version/v5.40/t/bin/install-tests

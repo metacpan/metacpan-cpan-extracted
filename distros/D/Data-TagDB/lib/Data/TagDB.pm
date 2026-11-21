@@ -26,7 +26,7 @@ use Data::URIID::Colour;
 
 use parent 'Data::TagDB::Base';
 
-our $VERSION = v0.15;
+our $VERSION = v0.16;
 
 my %_queries = (
     _default => {
@@ -88,7 +88,7 @@ sub disconnect {
     my ($self) = @_;
     $self->assert_connected->disconnect;
     $self->{dbh} = undef;
-    $self->_cache_clear;
+    $self->clear_cache;
 }
 
 
@@ -399,6 +399,18 @@ sub create_cache {
 }
 
 
+sub master_cache {
+    my ($self, $cache) = @_;
+
+    if (defined $cache) {
+        $self->{master_cache} = $cache;
+        weaken($self->{master_cache});
+    }
+
+    return $self->{master_cache};
+}
+
+
 sub migration {
     my ($self) = @_;
     require Data::TagDB::Migration;
@@ -578,10 +590,15 @@ sub _cache_maintain {
     }
 }
 
-sub _cache_clear {
-    my ($self) = @_;
+sub clear_cache {
+    my ($self, @opts) = @_;
+    $self->SUPER::clear_cache(@opts);
+
     $self->_cache_maintain;
     %{$self->{cache_ise}} = ();
+    $_->clear_cache foreach values %{$self->{cache_tag}};
+
+    return $self;
 }
 
 sub _as_tag {
@@ -889,7 +906,7 @@ Data::TagDB - Work with Tag databases
 
 =head1 VERSION
 
-version v0.15
+version v0.16
 
 =head1 SYNOPSIS
 
@@ -1159,6 +1176,23 @@ Creates a relation (if it does not yet exist) and returns it.
 Create a new cache object every time this is called.
 Cache objects can be used to speed up processing.
 See L<Data::TagDB::Cache> for details.
+
+=head2 master_cache
+
+    $db->master_cache($cache);
+    my Data::TagDB::Cache $cache = $db->master_cache;
+
+    # often:
+    my Data::TagDB::Cache $cache = $db->master_cache($db->create_cache);
+
+(since v0.16)
+
+Gets or sets the master cache. The master cache, if set, might be used by plugins and or the application
+as a default cache to use.
+
+By default it is unset.
+The internal reference is intentionally weak.
+This means that an external refernece is required for it to stay valid.
 
 =head2 migration
 

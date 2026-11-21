@@ -1,5 +1,16 @@
 Revision history for Termbox
 
+0.6.3  2026-11-20
+    - Fix argument handling in examples and the WCWidth table builder
+    - Make WCWidth caching optional to avoid unbounded memory growth
+    - Document WCWidth caching and decoded-string requirements
+    - Declare build-time prerequisites in Makefile.PL
+
+0.6.2  2026-10-05
+    - Fix WINCH handler passing signal name instead of signo
+    - Improvements in the validation of TB_* environment variables
+    - Missing constants in POD have been documented
+
 0.6.1  2026-08-18
     - Prevent installing the Termbox package if it has already been loaded
     - Fix Type (undef to remove callback) of tb_set_func() in STRICT mode

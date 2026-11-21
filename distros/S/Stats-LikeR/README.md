@@ -492,7 +492,17 @@ Bare string columns are treated as factors; numeric columns, `I(x^2)` and
 `log2()`, `log10()`, `log1p()` and `abs()` a term may use `+ - * / ^`, numbers
 and nested parentheses with R's precedence, so `log(x+1)`, `I(x*2)` and
 `I(x/z-1)` are each one regressor; a term that cannot be read is a fatal
-"cannot evaluate term" error. A factor is coded by treatment contrasts
+"cannot evaluate term" error. A parenthesis that does not follow a function's
+name groups terms, and the formula algebra is R's (`terms.formula()`):
+`(a + b)*c` is `a + b + c + a:c + b:c`, `a*(b + c)` and `(a + b):c` expand the
+same way, `(a + b + c)^2` is the main effects and every pairwise interaction,
+`(a + b)/c` is `a + b + a:b:c`, `a %in% b` is `a:b`, groups nest, and
+`- (a + b)` removes both terms. Terms are ordered by degree and then by
+appearance, and an interaction is named in the order its variables first
+appear in the formula, as R's `terms()` does. A `/` outside a function is nesting, as in R,
+so a ratio of two columns is `I(a/b)`; through 0.3425 a bare `a/b` was read
+as that ratio. A power must be a whole number of at least 2, as in R, and any other `%op%`, an unbalanced parenthesis or an
+operator with no operand is an error rather than a guess. A factor is coded by treatment contrasts
 or by a full set of indicators exactly as R decides it (its "margin rule"), so
 nested and per-group-slope models come out as in R: `y ~ a + a:b` gives `a:b`
 `levels(a) * (levels(b) - 1)` degrees of freedom, and `y ~ g + g:x` fits a
@@ -1253,9 +1263,16 @@ you have wins and losses instead of wins and a total.
 
 Every count must be a whole number (to within 1e-7, as in R) that is not
 negative. `NaN`, an infinity, `undef` or a string croaks, as R's `binom.test`
-stops on them. So does a count, or a successes + failures sum, of `LONG_MAX`
-or more: 9223372036854775807 on most 64-bit systems, but 2147483647 on Windows
-and on 32-bit perls.
+stops on them. So does a count, or a successes + failures sum, of perl's `IV_MAX`
+or more: 9223372036854775807 on a 64-bit perl, 2147483647 on a perl with 32-bit
+integers. The width of C's `long` does not matter, so Windows has the same limit
+as Linux. The two-sided p-value finds the far boundary of R's tail-counting rule
+by binary search rather than by visiting every index up to `n`, so
+`binom_test(3, 1e18)` returns at once (R tries to allocate 37 GB there), with the
+same answer as R wherever R can run. Above 2**53 a double cannot name every
+count, so on a perl whose NV is a double the boundary, and with it the two-sided
+p-value, is good to about 1e-7 relative at `n` = 1e18; a long double or
+`__float128` perl is better.
 
 ## cfilter
 
@@ -2989,9 +3006,23 @@ relative terms at any df: up to 0.33 `pchisq(1e15, 1e15)` was `0.379` where R
 and the truth are `0.50000000594708`, `pt(1.96, 1e15)` was `0.97448` for
 `0.97500`, and `pf(1, 1e15, 1e15)` was `0.481` for exactly `0.5`. `qchisq` is a
 Newton iteration from AS 91's starting value, so `qchisq(0.5, 1e10)` takes about
-2 microseconds where it took 11 milliseconds. The constants are a double's, as
-R's are, so these agree with R to about `1e-14` relative on a double,
-long-double and `__float128` perl alike.
+2 microseconds where it took 11 milliseconds. On a double perl the constants
+are a double's, as R's are, so these agree with R to about `1e-14` relative.
+
+On a long-double or `__float128` perl they are the NV's from 0.3426 on: the
+incomplete gamma and beta (and so `pchisq`, `pt`, `pf`, `pbinom` and the
+`qchisq`, `qt`, `qf` that invert them, `log => 1` included) are accurate to a
+few tens of the NV's epsilon rather than to `1e-14`. Against mpmath at 110
+digits the worst relative error over a grid of 900 chi-square and 4500 beta
+tails, 60 standard deviations either side of the mean and shapes from 1/1024
+to 1e7 (counting the exponent's own rounding: a tail `exp(-f)` is good to `f`
+epsilons) is 8 epsilons of a long double and 39 of a `__float128` for the gamma
+(it was 5e15 and 3e30) and 64 and 86 for the beta (it was 1e5 and 7e19); the
+quantiles, 31 and 31 (they were 1.7e3 and 1e18). A double perl is not changed
+by a single bit. `t/incomplete.gamma.beta.mpmath.t` holds the expected
+values, frozen, with the script that made them. A long-double perl whose C
+library lacks the long-double math functions, or whose long double is the
+double-double of ppc64, keeps the double's constants and its `1e-14`.
 
 `log => 1` is carried through in both directions, as in R:
 
@@ -3608,8 +3639,18 @@ warning:
 
 An all-zero 2x2 table gives p = 1, an odds ratio of 0 and a confidence interval
 of [0, Inf], as R does. An all-zero larger table croaks, as R's does
-("FEXACT error 3"). Where a C `long` is 32 bits (Windows, 32-bit perls), a
-table whose total passes 2147483647 croaks, where R would still answer it.
+("FEXACT error 3"). The cells, margins and total are 64-bit whatever the width
+of C's `long`, so a 2x2 table whose total passes 2147483647 is answered on
+Windows as on Linux (R cannot answer it: its margins overflow an integer).
+An r x c table (anything but 2x2) whose total passes 10000000 croaks
+(`the limit is 10000000`): the network's log weights are sums of `lgamma` terms
+as large as N log N, and a double's rounding of them overtakes FEXACT's own
+3.45e-7 tolerance as N grows (2.9e-8 relative at N = 1e7, a wrong answer, 0.29
+for 0.73, at 2**31), so it refuses rather than answer silently wrong. R cannot
+answer these either. R's PR#4688 table (4x3, N = 16442) is refused here as R refuses it, and no
+`workspace` makes R answer it: R 4.6.1 gives FEXACT error 501 at every
+workspace from 2e5 to 2e9, with `hybrid` true or false, so `fisher_test` has no
+`workspace` option.
 
 ## friedman_test
 
@@ -4899,7 +4940,7 @@ changes nothing. Only a `-` outside parentheses removes, and a term that is
 itself the name of a column is that column, so a column named `a-b` can still be
 written `y ~ a-b`.
 
-Four details differ from R deliberately:
+Three details differ from R deliberately:
 
 - Levels are sorted with `strcmp`, i.e. by byte value, which is what
   `patsy`/`pandas` does. R sorts with the collation of the running locale, so a
@@ -4907,17 +4948,18 @@ Four details differ from R deliberately:
   the two: on `c("b", "A", "a")` R takes `a` and `lm` takes `A`. Both
   parameterise the same fit — residual sum of squares, rank and fitted values
   agree — but the coefficient names and values differ.
-- A term crossed with itself keeps the product, so `wt:wt` is `wt` squared and
-  `y ~ wt*wt` fits `y ~ wt + I(wt^2)`. R's formula algebra collapses `a:a` to
-  `a`, making the same formula mean `y ~ wt` there.
+- A lone term crossed with itself keeps the product, so `wt:wt` is `wt` squared
+  and `y ~ wt*wt` fits `y ~ wt + I(wt^2)`. R's formula algebra collapses `a:a`
+  to `a`, making the same formula mean `y ~ wt` there. Any other product, such
+  as `(a + b)*(a + b)` or `(a + b)*a`, is R's: the union of the two terms'
+  variables.
 - A categorical column with only one level contributes no column, so
   `y ~ x + g` fits `y ~ x`. R refuses the model outright ("contrasts can be
   applied only to factors with 2 or more levels").
-- An interaction's variables are named in the order they first appear among
-  the terms that remain after removals, where R orders them by the whole
-  formula. So `y ~ x*z*w - x*z`, whose first remaining term is `w`, names its
-  interactions `w:x`, `w:z` and `w:x:z` where R has `x:w`, `z:w` and `x:z:w`.
-  The fit is the same.
+- The intercept markers `- 1`, `+ 0`, `0 +` are read only at the top level of
+  the formula. R reads one inside a group, as in `y ~ (a + 1)*b`, and lets the
+  last one win; here it is an error, because the intercept has been decided
+  before the groups are expanded.
 
 the dot operator also works:
 
@@ -6456,8 +6498,9 @@ A UTF-8 byte-order mark at the start of a text file, which Excel's "CSV UTF-8"
 export writes, is dropped rather than read as part of the first column's name,
 as pandas' `read_csv` drops it.
 
-A file is read as bytes and its fields come back as bytes; nothing is decoded.
-Text you pass in to be compared with a field — a `sep`, a `comment` marker, an
+A delimited file is read as bytes and its fields come back as bytes; nothing is
+decoded. (An `.xlsx` is the exception: its text comes back as characters, see
+*Excel (.xlsx) files* below.) Text you pass in to be compared with a field — a `sep`, a `comment` marker, an
 `na_strings` token, a `filter` key, `row_names` or a `sheet` name — is
 compared as UTF-8 bytes when perl holds it as characters, as it does under
 `use utf8` or for a string you have decoded. So `'na_strings' => '—'` under
@@ -6942,6 +6985,39 @@ work exactly as they do for text files:
 A `sheet` is looked up as a name first and as a number only when no sheet has
 that name. So in a workbook whose sheets are `2024` and `2023`,
 `sheet => 2023` is the sheet named `2023`, and `sheet => 2` is the second.
+
+**Text is characters.** An `.xlsx` is XML in UTF-8, and its text comes back
+decoded: the sheet names (the keys of the hash a workbook is read into), the
+column names and every string cell, shared or inline, are perl character
+strings, so a workbook that `write_table` wrote from the keys `café` and `αβ`
+reads back with keys of 4 and 2 characters and `$book->{"\x{3b1}\x{3b2}"}` finds
+the sheet. Up to 0.3425 they were the raw UTF-8 bytes (5 and 4 of them), and a
+cell `α` was 2 bytes; a caller that decoded them itself must stop, or it will
+decode twice. ASCII text is the same either way. The names and tokens you pass
+in (`sheet`, `row_names`, `keep_cols`, `drop_cols`, a `filter` key, a
+`colClasses` name and an `na_strings` token) are compared with these
+characters: a string perl holds as characters is used as it is, and one it
+holds as bytes is decoded first when the bytes are valid UTF-8 with a non-ASCII
+byte, so a name typed in a script without `use utf8` still matches. Text that is
+not valid UTF-8 (Excel and LibreOffice write none; a damaged or hostile file
+might hold some) is not an error: that string comes back as the bytes it holds,
+with no UTF-8 flag, and the strings beside it are decoded as usual. A delimited
+file is not affected; its fields are still bytes.
+
+**Blank rows are rows.** A row with no value that lies between the header and
+the last row with a value is a row of `undef`, whether it is empty
+(`<row r="3"/>`, or `<row r="3"></row>` as `write_table` writes a row of empty
+cells), holds only cells that have formatting and no value, or is missing from
+the XML altogether, as Excel leaves an empty row out. That is how pandas'
+`read_excel` reads it, and a table `write_table` wrote with a row of `undef` in
+it reads back with that row. Rows past the last row with a value are not read,
+as pandas does not read them either: Excel records rows it has only formatted
+below a table. The header is the first row with a value; pandas instead takes a
+blank first row as the header. With `output_type => 'hoh'` a blank row is left
+out, since it has no row name, where a CSV record of empty fields is refused.
+Rows are taken in the order the XML gives them, and a row's `r=` number only
+says how many blank rows lie before it. Up to 0.3425 every row with no value
+was dropped. Tested in `t/read_table.xlsx.blank_rows.pandas.t`.
 
 **Multiple worksheets.** If the workbook has more than one worksheet and no
 `sheet` is given, `read_table` returns a **hashref keyed by worksheet name**,
@@ -8368,8 +8444,8 @@ the size, its format against pandas' own, and `view.xs.t` the row order of a
 
 Variance inflation factors, the standard multicollinearity diagnostic for a
 regression model; values above ~5–10 flag problematic collinearity. Same as
-`car::vif()` (car 3.1-5) at its default `type = "terms"`, and validated against
-it.
+`car::vif()` (car 3.1-5), at its default `type = "terms"` and at
+`type = "predictor"`, and validated against it.
 
     my $v = vif(\%data, 'sbp ~ age + bmi + chol');      # or [qw(age bmi chol)]
     for my $p (sort { $v->{$b} <=> $v->{$a} } keys %$v) {
@@ -8386,6 +8462,7 @@ factors are all understood:
     vif(\%data, 'sbp ~ age * bmi + chol');      # terms age, bmi, chol, age:bmi
     vif(\%data, 'sbp ~ . - id');
     vif(\%data, [qw(age bmi smoking)]);         # smoking is a factor: a GVIF table
+    vif(\%data, 'sbp ~ (age + bmi)*smoking');   # groups of terms, as in lm()
 
 For each term, with `C` the correlation matrix of the design's columns less the
 intercept and `S` the term's own columns,
@@ -8408,11 +8485,46 @@ result becomes a table:
 | `GVIF^(1/(2*Df))` | `GVIF` to the power `1/(2 Df)`, comparable across terms of different sizes. |
 
 As in `car::vif()`, a model with an interaction warns that "there are
-higher-order terms (interactions) in this model" (car's `type = "predictor"` is
-not implemented), a model with no intercept warns "No intercept: vifs may not be
+higher-order terms (interactions) in this model" and suggests `type =
+'predictor'`, a model with no intercept warns "No intercept: vifs may not be
 sensible.", and a model with fewer than two terms, or with an aliased column,
 is an error. A formula whose response is a name the data do not have is an
 error too.
+
+### type = 'predictor'
+
+`vif($data, $formula, type => 'predictor')` is what `car` suggests for a model
+with interactions, where a term's GVIF says little about a variable that
+appears in several. It gives one GVIF per predictor, the variables of the
+formula, from the columns of every term that predictor is in and of the
+variables it interacts with, holding out the terms of every predictor it does
+not interact with (Fox and Monette, as `car::vif.lm()` does it):
+
+    my $v = vif(\%mtcars, 'mpg ~ wt*hp + disp', type => 'predictor');
+    # $v->{wt}{GVIF} is 7.36, as is $v->{hp}{GVIF}, with Df 3 each;
+    # $v->{disp} has Df 1 and 'Other Predictors' 'wt, hp'
+
+A model whose predictors all have one column each gives a plain
+`predictor => GVIF` hash, and otherwise each predictor maps to a hash:
+
+| Key | Description |
+| --- | --- |
+| `GVIF` | The generalized VIF of the predictor's columns. |
+| `Df` | The number of those columns. |
+| `GVIF^(1/(2*Df))` | `GVIF` to the power `1/(2 Df)`. |
+| `Interacts With` | The variables it appears with in a term, after the first; `--  ` (two spaces) for none. |
+| `Other Predictors` | The predictors held out, in formula order; `--  ` for none. |
+
+`type` may be abbreviated, as R's `match.arg()` allows. Like `car::vif()`,
+this form notes "VIFs computed for predictors" or "GVIFs computed for
+predictors", refuses a model with no intercept (`car` stops there with
+"object 'assign.X' not found") and a design with a single column besides the
+intercept (`cor()` has no matrix to read), and reports a variable the formula
+names but removes, as in `y ~ a + b - b`, with `Df` 0. It also reports
+`Interacts With` as `car` does, which drops the first variable of the first term
+the predictor is in, so a predictor `c` that appears only in `a:c` is listed
+as interacting with `c` rather than with `a`. Where `car` goes on into `NaN` over an aliased
+column, `vif()` stops with the error `type = 'terms'` gives.
 
 ## wilcox_test
 
@@ -8542,6 +8654,15 @@ A hash of arrays has as many rows as the longest of the arrays it writes; an arr
 
 An empty `{}` or `[]` is a table with no rows, and is written as one: the header `col_names` and `row_names` give, if any, and otherwise a single empty record. `write_table([], 'out.csv', 'col_names' => ['A'], 'row_names' => 1)` writes `,A`, as pandas writes `DataFrame({"A": []}).to_csv()`.
 
+Delimited output is UTF-8. A string perl holds as characters is written as the
+UTF-8 of its characters, and one it holds as bytes is written as it stands when
+it is valid UTF-8 — so the fields `read_table` returns from a UTF-8 file are
+written back unchanged — and read as Latin-1 when it is not, so `"caf\xe9"`
+and `"café"`, which are the same string to perl, are both written `café`. This
+is the reading the `.xlsx` and LaTeX writers give text too. Up to 0.3425 a
+string held as bytes was written as those bytes, and `"caf\xe9"` came out as a
+single byte E9, which Python's `csv`, pandas and R read as `caf\x{FFFD}`.
+
 Every cell of delimited output is written whole, including one holding a NUL byte, and a cell of a tied hash or array (such as `Tie::IxHash`) is read through its `FETCH`. A number is formatted the way perl formats it, but in a copy, so writing a table does not add a string buffer to every numeric scalar in it. Nor does finding an AoH's or a HoH's columns leave an iterator on every row hash, as walking them with `keys` would. A row that is a restricted hash (`Hash::Util::lock_keys`) may lack some of the columns; those cells are written empty, where they used to die with *Attempt to access disallowed key*.
 
 A field is quoted when it holds a quote (which is doubled), a line break or the separator, as Python's `csv.writer` quotes, and in two more places where `read_table` would otherwise not see the record at all. With a separator of more than one character, a field is also quoted when its end and the separator written after it would spell the separator early -- `"a:"` before `::`, which would otherwise be written `a:::` and read back cut at the first `::`. A record of a single field that is empty, `undef` or nothing but spaces and tabs is written quoted, `""` or `"  "`, because a blank line is skipped on reading; `csv.writer` writes `['']` and `[None]` the same way. The first field of a record is quoted when it starts with `#`, `read_table`'s default comment character.
@@ -8658,18 +8779,28 @@ A number is written as a number cell, and every other non-empty cell as an
 inline string (`undef`/empty cells are omitted). A value perl holds as a number
 is a number cell, unless it is infinite or `NaN`, which are written as text. A
 string is a number cell only when Excel would show it as it stands: a plain
-decimal (an optional `-`, digits with at most one `.`, an optional exponent),
-with no leading zeros but the one in `0` or `0.5`, at most 15 significant
-digits, and a magnitude Excel holds (up to `9.99999999999999E+307`). So `007`,
-`+5` and a 20-digit accession number stay text, where Excel used to show them
-as `7`, `5` and `1.23457E+19`; pandas likewise writes a `str` as a string. The
-result reads straight back with [`read_table`](#read_table).
+decimal (an optional `-` and digits with at most one `.`, with a digit on each
+side of it and no `0` as the last digit after it), no exponent, with no leading
+zeros but the one in `0` or `0.5`, at most 15 significant digits, a magnitude
+Excel holds (up to `9.99999999999999E+307`), and no minus sign on zero. So
+`007`, `+5` and a 20-digit accession number stay text, where Excel used to show
+them as `7`, `5` and `1.23457E+19`, and so do `6.10`, `1.0`, `1.`, `.5`, `1e5`
+and `-0`, which a number cell shows as `6.1`, `1`, `1`, `0.5`, `100000` and `0`
+(up to 0.3425 they were number cells); `6.12`, `0.5` and `-7` are numbers.
+pandas likewise writes a `str` as a string. A value perl holds as a number is
+not subject to these rules. The result reads straight back with
+[`read_table`](#read_table), a workbook's sheet names and a table's text
+included, non-ASCII ones too.
 
 XML 1.0 cannot hold a NUL, most other control characters, the noncharacters
 U+FFFE and U+FFFF, or a surrogate, and a workbook holding one is refused by its
 readers. In a cell each is written as Excel's own escape, `_xHHHH_` (`\r` is
 `_x000D_`), which Excel and LibreOffice turn back into the character, as
-XlsxWriter does. A literal `_x0041_` in a cell is written `_x005F_x0041_` so
+XlsxWriter does. A lone surrogate is written the same way, `_xD800_`, rather
+than refused, but it is not a character any encoding has, and LibreOffice shows
+an empty cell for it; `read_table` reads it back as written. In a delimited
+file it is written as perl's own UTF-8 for it, three bytes a UTF-8 reader
+replaces. A literal `_x0041_` in a cell is written `_x005F_x0041_` so
 that it is not mistaken for one, and so is every other underscore that would
 open an escape, overlapping ones included, so that a reader decoding left to
 right gets back exactly the text written.

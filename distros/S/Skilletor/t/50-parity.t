@@ -16,12 +16,12 @@ use Skilletor::State;
 
 # The reference implementation and the port, side by side on the same remotes and the same
 # cache root: what one fetched, the other serves; messages and versions are the same. Needs
-# node and the TypeScript tree beside perl/ – a checkout of the skilletor repository.
+# node and the TypeScript tree (src/) beside lib/ – a checkout of the skilletor repository.
 my $runner = path( $FindBin::Bin, '..', 'maint', 'ts-run.mjs' );
-my $src_ts = path( $FindBin::Bin, '..', '..', 'src', 'engine.ts' );
-plan skip_all => 'needs the skilletor checkout (../src) and maint/ts-run.mjs' unless $runner->exists && $src_ts->exists;
+my $src_ts = path( $FindBin::Bin, '..', 'src', 'engine.ts' );
+plan skip_all => 'needs the skilletor checkout (src/) and maint/ts-run.mjs' unless $runner->exists && $src_ts->exists;
 plan skip_all => 'needs node' unless grep { -x path( $_, 'node' ) } split /:/, $ENV{PATH} // '';
-plan skip_all => 'needs the reference\'s node_modules' unless path( $FindBin::Bin, '..', '..', 'node_modules', 'nunjucks' )->exists;
+plan skip_all => 'needs the reference\'s node_modules' unless path( $FindBin::Bin, '..', 'node_modules', 'nunjucks' )->exists;
 
 sub ts {
   my ( $req ) = @_;

@@ -1,5 +1,29 @@
 Revision history for App-GHGen
 
+0.13	Fri Nov 20 04:24:16 PM EST 2026
+	[ Enhancements ]
+	- Updated to actions-setup-perl to 1.44.5
+	- Added --os option to ghgen generate, e.g. --os=linux,macos to omit Windows
+	- Added --versions option to ghgen generate to choose the language versions tested
+	- Added parse_os_list and parse_version_list to App::GHGen::Generator;
+	  generate_workflow now takes an optional { versions => [...] }
+	- Perl workflows: new install_db_file and cpanm_verbose options
+	  (resolves two "should be configurable" TODOs)
+	- Documented the new options in the main POD and README, and added an API
+	  SPECIFICATION section to App::GHGen
+	- New tests: version consistency (t/version.t), dependency declarations
+	  (t/deps.t) and CPAN META validity (t/meta.t, author only)
+	- META now lists the provided modules
+	- POD is ASCII outside the formal specifications; code is tab-indented
+	[ Bug Fixes ]
+	- Readonly is a runtime prerequisite and is now declared as one
+	- ghgen --version reported 0.05; it now reports the App::GHGen version
+	- Removed the unused IPC::System::Simple test requirement
+	- Fix shellcheck:
+	  eval $(perl -I ~/perl5/lib/perl5 -Mlocal::lib)
+	  should read
+	  eval "$(perl -I ~/perl5/lib/perl5 -Mlocal::lib)"
+
 0.12	Sun Oct 25 06:53:36 PM EDT 2026
 	[ Enhancements ]
 	- Updated to actions-setup-perl to 1.44.2

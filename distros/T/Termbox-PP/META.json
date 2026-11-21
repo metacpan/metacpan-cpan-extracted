@@ -25,7 +25,9 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::Command" : "1.17",
+            "ExtUtils::Install" : "1.54",
+            "ExtUtils::Manifest" : "1.58"
          }
       },
       "configure" : {
@@ -42,8 +44,7 @@
             "Time::HiRes" : "0",
             "Unicode::EastAsianWidth" : "0",
             "Unicode::EastAsianWidth::Detect" : "0",
-            "lib" : "0",
-            "threads" : "0"
+            "lib" : "0"
          },
          "requires" : {
             "Carp" : "0",
@@ -53,7 +54,8 @@
             "Scalar::Util" : "0",
             "Unicode::Normalize" : "0",
             "constant" : "0",
-            "perl" : "5.010"
+            "perl" : "5.010",
+            "version" : "0"
          }
       },
       "test" : {
@@ -62,6 +64,12 @@
             "File::Temp" : "0",
             "Test::More" : "1.302188"
          }
+      }
+   },
+   "provides" : {
+      "Terminal::WCWidth" : {
+         "file" : "lib/Terminal/WCWidth.pm",
+         "version" : "v0.6.3"
       }
    },
    "release_status" : "stable",
@@ -75,7 +83,7 @@
          "web" : "https://github.com/brickpool/Termbox"
       }
    },
-   "version" : "v0.6.1",
+   "version" : "v0.6.3",
    "x_homepage" : "http://brickpool.de",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

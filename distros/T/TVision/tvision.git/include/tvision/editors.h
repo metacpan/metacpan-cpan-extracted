@@ -112,6 +112,14 @@ const int
 typedef ushort (*TEditorDialog)( int, ... );
 ushort defEditorDialog( int dialog, ... );
 
+/* ---------------------------------------------------------------------- */
+/*      class TIndicator                                                  */
+/*                                                                        */
+/*      Palette layout                                                    */
+/*        1 = Frame passive                                               */
+/*        2 = Frame active                                                */
+/* ---------------------------------------------------------------------- */
+
 #if defined( Uses_TIndicator ) && !defined( __TIndicator )
 #define __TIndicator
 
@@ -165,6 +173,13 @@ inline opstream& operator << ( opstream& os, TIndicator* cl )
 
 #endif  // Uses_TIndicator
 
+/* ---------------------------------------------------------------------- */
+/*      class TEditor                                                     */
+/*                                                                        */
+/*      Palette layout                                                    */
+/*      1 = Normal text                                                   */
+/*      2 = Selected text                                                 */
+/* ---------------------------------------------------------------------- */
 
 #if defined( Uses_TEditor ) && !defined( __TEditor )
 #define __TEditor
@@ -199,9 +214,7 @@ public:
     virtual void handleEvent( TEvent& );
     virtual void initBuffer();
     virtual TMenuItem& initContextMenu( TPoint );
-    uint insertMultilineText( const char *, uint );
     Boolean insertBuffer( const char *, uint, uint, Boolean, Boolean );
-    Boolean insertEOL( Boolean );
     virtual Boolean insertFrom( TEditor * );
     Boolean insertText( const void *, uint, Boolean );
     void scrollTo( int, int );
@@ -224,7 +237,7 @@ public:
     void doUpdate();
     void doSearchReplace();
     void drawLines( int, int, uint );
-    void formatLine(TScreenCell *, uint, int, TAttrPair );
+    void formatLine( TDrawBuffer &, uint, int, int, TAttrPair );
     void find();
     uint getMousePtr( TPoint );
     Boolean hasSelection();
@@ -251,7 +264,6 @@ public:
     void unlock();
     void update( uchar );
     void checkScrollBar( const TEvent&, TScrollBar *, int& );
-    void detectEol();
 
     TScrollBar *hScrollBar;
     TScrollBar *vScrollBar;
@@ -277,14 +289,6 @@ public:
     Boolean overwrite;
     Boolean autoIndent;
 
-    enum EolType { eolCrLf, eolLf, eolCr } eolType;
-    enum Encoding { encDefault, encSingleByte } encoding;
-
-    void nextChar( TStringView, uint &P, uint &width );
-    Boolean formatCell( TSpan<TScreenCell>, uint&, TStringView, uint& , TColorAttr );
-    TStringView bufChars( uint );
-    TStringView prevBufChars( uint );
-
     static TEditorDialog _NEAR editorDialog;
     static ushort _NEAR editorFlags;
     static char _NEAR findStr[maxFindStrLen];
@@ -294,7 +298,22 @@ public:
     uchar updateFlags;
     int keyState;
 
+    enum LineEndingType { eolCrLf, eolLf, eolCr } lineEndingType;
+    enum Encoding { encDefault, encSingleByte } encoding;
+
+    uint getText( uint p, TSpan<char> dest );
+    Boolean nextCharAndPos( uint &p, int &pos );
+
 private:
+
+    LineEndingType detectLineEndingType();
+    TStringView getLineEnding();
+    uint lengthWithConvertedLineEndings( const char *, uint );
+    void copyAndConvertLineEndings( char *, const char *, uint );
+    uint nextWordBoundary( uint );
+    uint prevWordBoundary( uint );
+
+    static const LineEndingType defaultLineEndingType;
 
     virtual const char *streamableName() const
         { return name; }
@@ -323,6 +342,14 @@ inline opstream& operator << ( opstream& os, TEditor* cl )
     { return os << (TStreamable *)cl; }
 
 #endif  // Uses_TEditor
+
+/* ---------------------------------------------------------------------- */
+/*      class TMemo                                                       */
+/*                                                                        */
+/*      Palette layout                                                    */
+/*      1 = Normal text                                                   */
+/*      2 = Selected text                                                 */
+/* ---------------------------------------------------------------------- */
 
 #if defined( Uses_TMemo ) && !defined( __TMemo )
 #define __TMemo
@@ -377,6 +404,13 @@ inline opstream& operator << ( opstream& os, TMemo* cl )
 
 #endif  // Uses_TMemo
 
+/* ---------------------------------------------------------------------- */
+/*      class TFileEditor                                                 */
+/*                                                                        */
+/*      Palette layout                                                    */
+/*      1 = Normal text                                                   */
+/*      2 = Selected text                                                 */
+/* ---------------------------------------------------------------------- */
 
 #if defined( Uses_TFileEditor ) && !defined( __TFileEditor )
 #define __TFileEditor
@@ -446,6 +480,18 @@ inline opstream& operator << ( opstream& os, TFileEditor* cl )
 
 #endif  // Uses_TFileEditor
 
+/* ---------------------------------------------------------------------- */
+/*      class TEditWindow                                                 */
+/*                                                                        */
+/*      Palette layout                                                    */
+/*        1 = Frame passive                                               */
+/*        2 = Frame active                                                */
+/*        3 = Frame icon                                                  */
+/*        4 = ScrollBar page area                                         */
+/*        5 = ScrollBar controls                                          */
+/*        6 = Editor normal text                                          */
+/*        7 = Editor selected text                                        */
+/* ---------------------------------------------------------------------- */
 
 #if defined( Uses_TEditWindow ) && !defined( __TEditWindow )
 #define __TEditWindow

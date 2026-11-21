@@ -30,4 +30,7 @@ lib/Data/TagDB/Tutorial/WellKnown.pod
 lib/Data/TagDB/WeakBaseObject.pm
 lib/Data/TagDB/WellKnown.pm
 t/01_load.t
+t/02_tempdb.t
+t/10_cache.t
+t/11_master_cache.t
 xt/author/pod-syntax.t

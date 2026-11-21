@@ -1,5 +1,5 @@
 package Net::Stripe::Simple;
-$Net::Stripe::Simple::VERSION = '0.005';
+$Net::Stripe::Simple::VERSION = '0.006';
 # ABSTRACT: simple, non-Moose interface to the Stripe API
 
 use v5.10;
@@ -10,7 +10,7 @@ use Exporter qw(import);
 use LWP::UserAgent;
 use HTTP::Request::Common qw(GET POST DELETE);
 use MIME::Base64 qw(encode_base64);
-use URI::Escape qw(uri_escape);
+use URI::Escape qw(uri_escape uri_escape_utf8);
 use Scalar::Util qw(reftype blessed);
 use JSON ();
 use Devel::StackTrace;
@@ -617,12 +617,12 @@ sub _encode_params {
                 next
                   if ref $sv;  # don't think this PHP convention goes deeper
                 push @components,
-                  $ek . '[' . uri_escape($sk) . ']=' . uri_escape($sv);
+                  $ek . '[' . uri_escape($sk) . ']=' . uri_escape_utf8($sv);
             }
         } elsif ($ref eq 'ARRAY') {
             for my $sv (@$value) {
                 next if ref $sv;    # again, I think we can't go deeper
-                push @components, $ek . '[]=' . uri_escape($sv);
+                push @components, $ek . '[]=' . uri_escape_utf8($sv);
             }
         } else {
             $value =    # JSON boolean stringification magic has been erased
@@ -630,7 +630,7 @@ sub _encode_params {
               ? $value
                   ? 'true'
                   : 'false'
-              : uri_escape($value);
+              : uri_escape_utf8($value);
             push @components, "$ek=$value"
         }
     }
@@ -1303,22 +1303,13 @@ B<Available Actions>
 
 =back
 
-=head2 payment intents
+=head2 payment_intents
 
 See L<https://stripe.com/docs/api/payment_intents>.
 
 B<Available Actions>
 
 =over 4
-
-=item update
-
-    $stripe->disputes(
-        update => {
-            id       => $charge,
-            metadata => { foo => 'bar' }
-        }
-    );
 
 =item create
 
@@ -1335,11 +1326,12 @@ B<Available Actions>
 
     $payment_intent = $stripe->payment_intents( retrieve => $id );
 
-=item list
+=item update
 
     $stripe->payment_intents(
-        list => {
-            customer => $customer
+        update => {
+            id       => $payment_intent,
+            metadata => { foo => 'bar' }
         }
     );
 
@@ -1362,6 +1354,14 @@ B<Available Actions>
 =item cancel
 
     $payment_intent = $stripe->payment_intents( cancel => $payment_intent );
+
+=item list
+
+    $stripe->payment_intents(
+        list => {
+            customer => $customer
+        }
+    );
 
 =back
 
@@ -1554,27 +1554,6 @@ You can import the constants individually or all together with C<:const>.
 =item *
 
 Andy Beverley <andy@andybev.com>
-
-=item *
-
-Grant Street Group <developers@grantstreet.com>
-
-=item *
-
-David F. Houghton <dfhoughton@gmail.com>
-
-=back
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2014 by Grant Street Group.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=head1 AUTHORS
-
-=over 4
 
 =item *
 

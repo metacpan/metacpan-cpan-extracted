@@ -34,13 +34,13 @@ package Matplotlib::Simple::Ggplot2;
 # with grid's own layouts, not patchwork or cowplot, which ggplot2 does not
 # depend on.
 require 5.010;
-our $VERSION = 0.3344;
+our $VERSION = 0.3345;
 use Scalar::Util 'looks_like_number';
 use List::Util qw(max min sum);
 BEGIN { require Matplotlib::Simple }
 BEGIN {
 	no strict 'refs';
-	*{$_} = \&{"Matplotlib::Simple::$_"} foreach qw(as_double axis_limits axis_scale bin_counts bool_option
+	*{$_} = \&{"Matplotlib::Simple::$_"} foreach qw(as_double axis_limits axis_scale bar_series bin_counts bool_option
 	 cb_limits check_key_order check_numbers check_scatter_lengths check_scatter_values
 	 check_wide_runs color_hex colormap_colors creator_note decoded_text double_literal finite_values
 	 is_finite is_nan linspace logscale_axes logspace nonfinite_name plain_text program_from_env
@@ -286,11 +286,7 @@ sub draw_bar {
 		}
 	} elsif ( defined $ref_counts{HASH} ) {
 		$form = 'grouped';
-		my %inner;
-		foreach my $k1 ( keys %{$data} ) {
-			$inner{$_}++ foreach keys %{ $data->{$k1} };
-		}
-		@series_names = sort { lc $a cmp lc $b || $a cmp $b } keys %inner;
+		@series_names = bar_series({ plot => $plot, sub => $sub . $where });
 		foreach my $k1 ( keys %{$data} ) {
 			$values{$k1} = [ @{ $data->{$k1} }{@series_names} ];
 		}
@@ -473,8 +469,13 @@ sub r_factor {
 sub draw_bar_native {
 	# A bar chart as ggplot2 draws one: geom_col on a discrete axis of the
 	# keys, at its own width and fill unless "width" or "color" is given, a
-	# grouped chart dodged and a stacked one stacked, in ggplot2's order, its
-	# series in the hue scale. The checks are draw_bar's, already made.
+	# grouped chart dodged and a stacked one stacked, its series in the hue
+	# scale. The checks are draw_bar's, already made.
+	#
+	# A stack is reversed from ggplot2's own order, which puts the first
+	# series on top: the series are in the caller's order ("label", for a hash
+	# of hashes), and the first is at the bottom, as matplotlib draws it and as
+	# log_bar_layer draws it here.
 	my ($a) = @_;
 	my ( $plot, $s, $keys, $values, $where, $sub ) = @{$a}{qw(plot s keys values where sub)};
 	my $horizontal = $a->{horizontal};
@@ -535,7 +536,7 @@ sub draw_bar_native {
 	}
 	$extra .= ', colour = c(' . join( ', ', @edge ) . ')' if $edges;
 	push @{ $s->{layers} }, 'ggplot2::geom_col(data = ' . r_frame( k => 'factor(' . r_strs(@k) . ', levels = ' . r_strs( @{$keys} ) . ')', s => 'factor(' . r_strs(@series) . ', levels = ' . r_strs(@names) . ')', v => r_nums(@v) )
-	 . ", ggplot2::aes($aes, fill = s), position = " . ( $a->{stacked} ? '"stack"' : '"dodge"' ) . "$extra, na.rm = TRUE)";
+	 . ", ggplot2::aes($aes, fill = s), position = " . ( $a->{stacked} ? 'ggplot2::position_stack(reverse = TRUE)' : '"dodge"' ) . "$extra, na.rm = TRUE)";
 }
 sub log_bar_layer {
 	# Native bars on a log value axis, as rectangles laid out the way geom_col
@@ -1814,23 +1815,29 @@ sub device_of {
 	# The R graphics device for an output file, by its extension, as R code
 	# opening it at the given size. Every one of these devices reads a "%" in
 	# its file name as the start of a page-number format, so each is doubled.
+	#
+	# An SVG is drawn into a temporary file, svg_drawn, which creator_code
+	# writes to $file once, with its note. svg() wrote $file itself, and the
+	# note was then spliced into it, so that a viewer watching the file saw it
+	# written twice: Eye of GNOME 45.3 stopped reloading it.
 	my ( $file, $w, $h, $sub ) = @_;
 	my ($ext) = $file =~ m/\.([^.\/\\]+)\z/;
 	$ext = lc( $ext // '' );
 	( my $name = $file ) =~ s/%/%%/g;
 	my $path = r_str($name);
-	return "grDevices::svg($path, width = $w, height = $h)" if $ext eq 'svg';
+	return qq{svg_drawn <- tempfile(fileext = ".svg")\n\tgrDevices::svg(gsub("%", "%%", svg_drawn, fixed = TRUE), width = $w, height = $h)} if $ext eq 'svg';
 	return "grDevices::png($path, width = " . int( $w * $png_dpi + 0.5 ) . ', height = ' . int( $h * $png_dpi + 0.5 ) . ", res = $png_dpi)" if $ext eq 'png';
 	return "grDevices::cairo_pdf($path, width = $w, height = $h)" if $ext eq 'pdf';    # cairo, as svg() is, so that text outside Latin-1 is drawn
 	die "$sub: the $engine engine writes .svg, .png and .pdf files, so it cannot write \"$file\"";
 }
 sub creator_code {
-	# R that gives the SVG just drawn the note matplotlib gives its own, in
-	# <dc:title>, which no R device writes. The script reads the R and ggplot2
-	# versions, the user and the host as it runs, as the matplotlib engine's
-	# does, so that a script written with "execute => 0" and run later names
-	# whoever ran it. The file is spliced as raw bytes, so no encoding R might
-	# take it to be in can change it.
+	# R that gives the SVG just drawn into svg_drawn (see device_of) the note
+	# matplotlib gives its own, in <dc:title>, which no R device writes, and
+	# writes it to $file. The script reads the R and ggplot2 versions, the user
+	# and the host as it runs, as the matplotlib engine's does, so that a
+	# script written with "execute => 0" and run later names whoever ran it.
+	# The file is spliced as raw bytes, so no encoding R might take it to be in
+	# can change it.
 	my ( $file, $sub ) = @_;
 	my ( $before, $after ) = svg_creator_metadata();
 	my $note = r_str( creator_note($sub) );
@@ -1847,11 +1854,11 @@ sub creator_code {
 		note <- gsub("&", "&amp;", note, fixed = TRUE) # first, or the escapes below would be escaped again
 		note <- gsub("<", "&lt;", note, fixed = TRUE)
 		note <- gsub(">", "&gt;", note, fixed = TRUE)
-		svg <- ${\ r_str($file) }
-		bytes <- readBin(svg, "raw", file.size(svg))
+		bytes <- readBin(svg_drawn, "raw", file.size(svg_drawn))
 		at <- grepRaw(">", bytes, offset = grepRaw("<svg", bytes, fixed = TRUE), fixed = TRUE)
 		block <- charToRaw(enc2utf8(paste0(${\ r_str($before) }, note, ${\ r_str($after) })))
-		writeBin(c(bytes[seq_len(at)], block, bytes[-seq_len(at)]), svg)
+		writeBin(c(bytes[seq_len(at)], block, bytes[-seq_len(at)]), ${\ r_str($file) })
+		unlink(svg_drawn)
 	})
 R
 }

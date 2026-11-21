@@ -62,11 +62,14 @@ for my $case (
 		['y ~ x*z - x:z',     'y ~ x + z',      [qw(Intercept x z)]],
 		['y ~ x*z - z:x',     'y ~ x + z',      [qw(Intercept x z)]],   # a:b and b:a are one term
 		['y ~ x*z*w - x:z:w', 'y ~ x + z + w + x:z + x:w + z:w', [qw(Intercept x z w x:z x:w z:w)]],
-		# R labels these x:w and x:z:w: it orders a term's variables by the
-		# whole formula, removed terms and all, where the design orders them
-		# by the terms that remain, and w is the first of those.  The fit is
-		# the same; README.md lists this among the differences from R.
-		['y ~ x*z*w - x*z',   'y ~ w + x:w + z:w + x:z:w',       [qw(Intercept w w:x w:z w:x:z)]],
+		# R labels these x:w, z:w and x:z:w: it orders a term's variables by the
+		# whole formula, removed terms and all.  Through 0.3425 the design
+		# ordered them by the terms that remain, so w came first and they were
+		# w:x, w:z and w:x:z; lm_formula_terms() now names every variable some
+		# term uses ahead of the terms, in the formula's order.  The plain
+		# formula keeps x, z, w as the first appearances, by naming x and z and
+		# removing them.
+		['y ~ x*z*w - x*z',   'y ~ x + z + w + x:w + z:w + x:z:w - x - z', [qw(Intercept w x:w z:w x:z:w)]],
 		['y ~ -x + z',        'y ~ z',          [qw(Intercept z)]],
 		['y ~ x + z - x - 1', 'y ~ z - 1',      [qw(z)]],
 	) {

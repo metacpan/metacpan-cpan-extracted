@@ -1,5 +1,12 @@
 Revision history for TUI::Vision
 
+2.0.3  2026-11-20
+    - Added text editor, outline, help, popup-menu, and gadget components
+    - Added object streaming and expanded demo applications
+    - Improved platform backends, keyboard handling, and dialog behavior
+    - Expanded the programming manual and POD documentation
+    - Fixed rendering, streaming, and navigation bugs
+
 2.0.2  2026-10-01
     - Add Termbox backend to support Unix platforms
     - Extended validation utilities to the framework

@@ -38,15 +38,25 @@ for my $c (@cases) {
 			"$f: $w->[0]") or diag("got " . ($g // 'undef') . ", want $w->[1]");
 	}
 }
+# A bare group is a group of terms, not arithmetic: in R (x + z)*x is x + z +
+# x:z, (x + z)^2 the same crossing, and (x + z) the two terms x and z, so
+# each fits as the formula it expands to, never as one regressor x + z.  Since
+# 0.3426; through 0.3425 all three were refused here as unreadable.
+# t/formula_groups.R.t checks groups against R's own coefficients.
+for my $c (['(x + z)*x', 'x*z'], ['(x + z)^2', 'x*z'], ['(x + z)', 'x + z']) {
+	my ($f, $expanded) = @$c;
+	my ($g, $e) = map { lm(formula => "y ~ $_", data => \%d) } $f, $expanded;
+	is_deeply($g->{coefficients}, $e->{coefficients}, "y ~ $f fits as y ~ $expanded");
+}
 # unreadable terms croak, naming the term
-# A bare group is refused too: in R (x + z)*x is x + z + x:z, a group of
-# terms, and (x + z)^2 the same crossing, so fitting the sum x + z as one
-# regressor in their place would be a different model.
-for my $f ('(x + z)*x', '(x + z)^2', '(x + z)', 'foo(x)', 'poly(x,2)', 'log(x+)', 'I(x+z', 'log(x,2)') {
+for my $f ('foo(x)', 'poly(x,2)', 'log(x+)', 'log(x,2)') {
 	eval { lm(formula => "y ~ $f", data => \%d) };
 	like($@, qr/cannot evaluate term/, "$f is refused") or diag($@);
 }
 like($@, qr/log\(x,2\)/, 'the message names the term');
+# an unclosed call is a parenthesis the formula does not balance
+eval { lm(formula => 'y ~ I(x+z', data => \%d) };
+like($@, qr/unbalanced parenthesis/, 'I(x+z is refused');
 # a column of all undef is still the usual NaN column, not the new croak
 eval { lm(formula => 'y ~ log(x)', data => { y => [1,2,3,4], x => [undef, undef, undef, undef] }) };
 like($@, qr/0 degrees of freedom/, 'an all-undef column keeps its message');

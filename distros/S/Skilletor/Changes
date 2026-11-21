@@ -1,4 +1,161 @@
-Revision history for Skilletor
+Revision history for skilletor and Skilletor, its Perl distribution
+
+0.008000  2026-11-21 03:31:10Z
+  - One version line in two spellings: the CPAN dist Skilletor 0.008000 is the
+    plugin's 0.8.0 (package.json, the Codex and Hermes manifests). The dist
+    keeps both sub-levels, x.yyyzzz for the plugin's x.y.z, so the next patch
+    is 0.008001 (0.8.1). The Perl CLI reports it. The Claude Code manifest carries no version any more, so
+    every commit on main reaches marketplace users with auto-update.
+  - The Perl distribution Skilletor lives at the root of the repository and is
+    released with dzil; its tag is the bare version. It is now the whole tool,
+    not a library: a `skilletor` command (script/skilletor) that behaves like
+    the TypeScript CLI; shared conformance cases hold both to the same output.
+    Requires Perl 5.40, Text::Nunjucks 0.001 and, on Windows, Win32::Process.
+  - Standalone binaries (no Perl, no Node) for linux-x86_64, linux-arm64,
+    macos-arm64 and windows-x86_64 are built by the house dzil-binary workflow
+    and attached to the GitHub release. Each carries its own OpenSSL, linked
+    statically on Linux and macOS, Strawberry Perl's OpenSSL DLLs packed in on
+    Windows, so https url sources need no system OpenSSL.
+  - The plugin's hooks and bin/skilletor start through bin/skilletor-start,
+    which runs, first match wins: the release binary of the plugin's version,
+    cached under <claudeConfigDir>/skilletor/bin/ and checked against the
+    SHA256SUMS pinned in bin/skilletor-binaries.sha256; else Node.js >= 18;
+    else Perl >= 5.40 from source. Without that pin file nothing is
+    downloaded. It does not exist in this release: the maintainer commits it
+    once the binaries are built, until then the plugin runs Node (or Perl) as
+    before. A SessionStart hook fetches the binary in the background and never
+    waits for it; a failed fetch backs off for 15 minutes. --version and -v
+    never fetch. For now the plugin on Windows keeps starting Node through
+    bin/skilletor.exe; the windows-x86_64 binary is there to run skilletor
+    directly, installed from the release (install.ps1, which the release
+    carries, does it). The bundled skill and the Hermes reference describe
+    this order.
+  - skilletor is licensed under the Artistic License 2.0 from this release,
+    the dist (Perl 5 terms in 0.001) and the plugin (MIT up to 0.7.0) alike.
+  - `install.sh` sets skilletor up from a plain shell (GitHub issue #1):
+    `curl -fsSL https://raw.githubusercontent.com/Getty/skilletor/main/install.sh | sh`
+    installs the plugin when `claude` is on `PATH` (or updates it) and writes
+    a `~/.local/bin/skilletor` that survives plugin updates; without Claude
+    Code, or with `--no-plugin`, it clones the repository and links
+    `bin/skilletor`. Without Node.js it leaves the plugin metadata alone and
+    links the starter after checking that it runs. `--bin-dir` picks the
+    directory. The README has it under "From the command line".
+  - A session that moves into another checkout of a skilletor project (a
+    plain `git worktree add`, say) gets that checkout's project scope synced,
+    so the worktree completes itself: one line names the directory, and the
+    model is told what landed. In Claude Code a Bash `cd` is awaited (a
+    `PostToolUse` hook), so the next tool call finds the items; other moves
+    are seen by `CwdChanged`, which is not awaited. A Codex or Hermes session
+    moves only between turns, and the next prompt waits for the sync. Under
+    Hermes, when skills landed, the line names `hermes skills trust <dir>`;
+    skilletor never reads or writes Hermes trust. After updating, trust the
+    changed hooks again in Codex `/hooks` and run `hermes plugins update
+    skilletor` for the Hermes plugin.
+  - The Perl CLI has every command of the TypeScript one: sync, check and
+    status (--scope, --force, --project-dir, --json), add, install, uninstall
+    (wildcards, bundles, prompts, scope-aware removal), source list and
+    remove, available, trust, and the Claude Code, Codex and Hermes hooks.
+    The engine renders .njk items through Text::Nunjucks and syncs the Codex
+    and Hermes targets as the reference does; Skilletor::Engine gains a
+    hermes_home attribute and a hermes_opt_in_hint method. Under Windows its
+    programs run through Skilletor::Process, the hooks' background sync
+    through Win32::Process. A Skilletor::Error stringifies to its message,
+    as documented, and the CLI starts faster (--version and --help load one
+    module).
+  - A project scope now installs into explicit project targets, or the
+    harnesses that have evidence in that project (their own files, not
+    skilletor's), instead of every machine target. A project with several
+    such harnesses and no explicit targets is left as it is and warned about;
+    a sole machine target stays the fallback. Claude plugin requirements in
+    `.claude/settings.json` are skipped, without check drift, when adding
+    them would change which targets a project infers; items still sync, and
+    explicit project targets allow the update.
+  - SessionStart gives source checking, lock waiting and source resolution a
+    20-second budget before anything is applied; a scope that runs out of it
+    is named, and earlier scopes are not rolled back.
+  - `CLAUDE_CONFIG_DIR` is Claude Code's config dir and now the user scope's
+    `.claude` everywhere: the user config, the lock, the installed items, the
+    state dir, the briefing lookup, the plugin state read for the project's
+    `.claude/settings.json` requirement and the Claude detection markers.
+    Default `<home>/.claude`; an empty value counts as unset.
+  - A sync resolves its sources in parallel but reports what became of each
+    (a failure, a fall back to the cache, a trust request) in the order the
+    sources are declared, so the report and --json no longer vary from run
+    to run.
+  - Malformed input is refused instead of read loosely. A source's
+    `skilletor.json` whose `vars` is not an object fails that source's scan;
+    a lock entry that is not an object, whose `via` is not an array of
+    strings or whose `files` is not a map of strings makes the lock invalid;
+    a url tarball cut short is a corrupt archive (the cache stays), as is one
+    with a corrupt header size, which used to hang a sync.
+  - Hooks fail open more thoroughly: from a working directory that no longer
+    exists, with null or non-object JSON, or a non-string `cwd`, a hook
+    exits 0 with at most one warning line instead of a stack trace. Other
+    commands from a removed directory exit 1 with a message that points to
+    --project-dir.
+  - An included template's syntax error is a warning on that item at once
+    rather than a delayed crash; unaffected items still install. Plain items
+    no longer look up the operating system's user, only a `.njk` file does.
+  - Fixes from the Perl port's comparison: a source serving two foreign
+    entries of one bundle asks for trust once; a `\U` escape above U+10FFFF in
+    a bundle file is that bundle's warning, not an error that aborts the
+    source scan; a SKILL.md, agent or rule with CRLF line ends or a BOM keeps
+    its description in the catalog; frontmatter, Codex agent conversion and
+    hook state keep keys named like Object.prototype members (`__proto__`,
+    `constructor`) as data; `uninstall` no longer throws on a non-string
+    entry in an install list; `available` matches item names without regard
+    to case.
+  - On Windows, an existing project path is spelled canonically, so its 8.3
+    and long names share one scope, pending report and last check. Managed
+    `.gitignore` and `.worktreeinclude` blocks recognize CRLF files and leave
+    every byte outside the markers unchanged. Items of a published layout are
+    listed in UTF-8 byte order on every platform.
+  - The Perl port reads a large state file (a 300 KB sources-read.json) in a
+    quarter second instead of 10 s and more, so `check` and the SessionStart
+    hook no longer stall on it: its JSON parser no longer copies the text for
+    every string and number (k196).
+  - A sync drops from sources-read.json the records of scopes that are gone: a
+    removed worktree or temp checkout, or a key a relative --project-dir left
+    (k254). A scope stays while its .claude directory exists, with or without
+    a lock. On a machine with many removed worktrees this cut the file from
+    300 KB to 55 KB. A relative --project-dir is now taken from the current
+    directory, so the scope is recorded under its absolute path.
+  - A sync also drops from render-inputs.json and unreached.json the records
+    of scopes that are gone, as from sources-read.json (k255). Marking the
+    in-session check drops from last-check.json the marks of project
+    directories that no longer exist, and of keys that are no absolute path;
+    a project without .claude keeps its mark. On a machine with many removed
+    worktrees this cut render-inputs.json from 126 KB to 23 KB and
+    last-check.json from 16 KB to 8 KB.
+  - A SessionStart reads each state record file at most twice instead of up
+    to six times: its check once for both scopes, its sync once under the
+    sync lock (k250). The Perl port spends a quarter second on each parse of
+    a 300 KB sources-read.json, so its SessionStart on such a file takes
+    1.0 s instead of 2.0 s (the binary 1.2 s instead of 2.3 s). The files
+    written stay byte for byte the same.
+  - A run stopped while it holds the sync lock (Claude Code cancelling a hook
+    at its time limit with SIGTERM, Ctrl+C, a closed terminal) now releases
+    the lock and still ends by that signal, in Node, Perl and the binary. A
+    SIGKILLed holder's lock is broken by the next run once its record missed
+    two refreshes, and the Perl heartbeat no longer refreshes a dead
+    holder's record (k251).
+  - A cached binary that fails its pinned checksum is still refused, and the
+    starter's line now says so on every path that falls through to it
+    (--version, -v, any hook, a failed fetch, the SessionStart backoff)
+    instead of "the pinned binary is not cached" (k252).
+  - bin/skilletor-start fetches the release binary only over https://. A
+    SKILLETOR_BINARY_BASE_URL of another scheme (http://, file://) is refused
+    unless SKILLETOR_STARTER_TESTING=1, as briefing's starter does; the
+    starter's line says why, and Node or Perl run instead (k253).
+  - The README and the POD of Skilletor and skilletor open with the product
+    and its use: what it does, installing it in Claude Code, Codex and
+    Hermes Agent, first steps and everyday use with real output, and a Status
+    of what is released, switched on and tested where. The Perl
+    implementation, the CPAN library and the build move to a short Develop
+    part. New ASCII abstracts for Skilletor and skilletor. Module POD fixed
+    where it was false: Engine (Codex skills of both scopes in
+    .agents/skills), Targets (writes for Hermes too; the .gitignore blocks
+    skip Hermes roots), Briefing (the Codex skill roots) (k258).
 
 0.001     2026-10-24 03:08:52Z
   - Follows the reference's k145: CLAUDE_CONFIG_DIR is the user scope's
@@ -79,3 +236,144 @@ Revision history for Skilletor
   - Tests replay oracles recorded from the reference (t/data) and, in a
     checkout with node, drive the reference and the port against the same
     remotes and cache (t/50-parity.t).
+
+0.7.0     2026-10-16 20:00:22Z
+  - The plugin, package and README descriptions name Hermes Agent as the third
+    target.
+  - The Hermes plugin installs with Hermes' own installer:
+    `hermes plugins install Getty/skilletor/hermes/skilletor --enable`, then
+    `hermes plugins update skilletor`. It does not bring the CLI: name a clone's
+    `bin/skilletor` as `SKILLETOR_BIN` in `$HERMES_HOME/.env`, or put
+    `skilletor` on `PATH`; Hermes shows how after the install. The hand-linked
+    install still runs the checkout's CLI. The bundled skill states this setup
+    and that `["hermes"]` alone in `targets` drops Claude and Codex.
+  - `bin/skilletor` follows its own symlinks to find `dist/`, so a link on
+    `PATH` (`ln -s <clone>/bin/skilletor ~/.local/bin/skilletor`), `npm link`
+    and `npm install -g` run the CLI instead of failing with "Cannot find
+    module".
+  - The bundled skill is shorter, with source, Hermes and sync detail in its
+    references.
+  - A project sync makes the plugin a requirement of the project: in the
+    committed `.claude/settings.json` it enables `skilletor@<marketplace>`,
+    the marketplace Claude Code installed skilletor from, and declares in
+    `extraKnownMarketplaces` every marketplace an `enabledPlugins` entry there
+    needs (`briefing@getty` too), so a fresh checkout offers to install them.
+    The report says what it added and asks to commit the file once. It only
+    adds: existing keys and the file's formatting stay, `false` entries are
+    respected, a marketplace with a source on this machine's disk is never
+    written, and a file that does not parse is left alone with a warning. It
+    runs for projects with a committed `skilletor.json` and Claude Code as a
+    target; `"claudeSettings": false` turns it off. A config with
+    `claudeSettings` is a config error for skilletor 0.6.0 and earlier. The
+    README keeps the snippet for the standalone CLI under "Sharing a project:
+    require the plugin". Codex has no equivalent.
+
+0.6.0     2026-10-15 17:39:19Z
+  - Hermes Agent is a third target, `hermes` in `targets`. It is opt-in:
+    never detected, so `"targets"` in `~/.claude/skilletor.json` must name it,
+    together with every other harness in use (`["claude", "hermes"]`). Skills
+    install into the Hermes home (`$HERMES_HOME`, else Hermes' own default:
+    `~/.hermes`, `%LOCALAPPDATA%\hermes` on Windows) and, in a project, into
+    `.hermes/skills`; agents and rules are reported as not installed. The
+    plugin in `hermes/skilletor` runs skilletor's hooks when a Hermes session
+    starts and on each turn, reports changes to the model, says how to opt in
+    while `hermes` is not in `targets`, and fails open. On Windows it starts
+    `bin/skilletor.exe`.
+  - A source entry takes an optional `path`, a directory or a list of them
+    relative to the source root, for repositories that keep skills outside
+    `skills/<name>/`, such as `"path": ["skills", "optional-skills"]` for
+    NousResearch/hermes-agent. Every directory beneath it that holds a
+    `SKILL.md` is one skill, and the source then offers those skills only. A
+    name found in two directories is an error of that skill alone. A config
+    with `path` is a config error for skilletor 0.4.2 and earlier.
+    Skills a sync installed there (carrying skilletor's `.gitignore`) are
+    not offered, so a `path` into a `.claude/skills` offers the repo's own.
+    Names that differ only in case count as one name on every system, as
+    they share a directory on macOS and Windows.
+  - `skilletor add` of a GitHub link into a directory (`.../tree/<ref>/<dir>`)
+    sets `ref` and `path` instead of being refused.
+  - Agent worktrees get the project's installed skills, agents and rules. A
+    project that uses skilletor gets a fixed block in `.worktreeinclude`
+    naming the paths skilletor installs to, its lock and
+    `skilletor.local.json`; Claude Code copies the gitignored files it matches
+    into every worktree it creates (`--worktree`, subagents with `isolation:
+    worktree`, desktop parallel sessions). Commit the file once, when the
+    report asks; your own lines in it stay untouched. A project synced before
+    gets the block in its next session.
+  - Windows: the background sync a prompt starts runs with its window
+    hidden, so no console window can flash up.
+  - A source entry needs no `git`, `url` or `local` of its own when another
+    config file gives that source one: `{ "ref": "v2" }` or `{ "path": [...] }`
+    in `skilletor.local.json` changes only that field of the project's source.
+    A source no file gives a backend is a config error naming the source and
+    each file declaring it. A user config entry without one changes projects
+    only; a user install naming it is a config error.
+  - `skilletor add` of a forge link: a `?query` or `#anchor` is dropped, also
+    from a repository link; `/releases/tag/<tag>` and `/commit/<sha>` pin that
+    ref; `%`-escapes in a link's ref and path are decoded (`%2F` puts a `/`
+    into a ref); `Getty/karr/tree/v1` and `github:Getty/karr/tree/v1` pin the
+    ref like `github.com/...` instead of dropping it. GitLab (`/-/tree/`,
+    `/-/commit/`, `/-/tags/`), Codeberg (`/src/branch|tag|commit/`,
+    `/releases/tag/`, `/commit/`) and Hugging Face (`/tree/`, `/commit/`,
+    `datasets/` and `spaces/` repositories) links are read the same way, and
+    a GitLab project path keeps every segment before `/-/` (nested groups).
+    Any other page (`/issues`, `/pulls`, `/releases`, a segment past the
+    repository such as `Getty/karr/extra`) is an error naming the repository
+    to add, instead of a source that tracked HEAD or failed at fetch.
+  - Names that differ only in case count as one name everywhere, not only
+    under a source's `path`: `skills/Foo` beside `skills/foo` (or
+    `agents/Bar.md` beside `agents/bar.md.njk`) in a source, in `.claude/`
+    and in `plugin.json` skills are the duplicate-name error; `Foo@a` and
+    `foo@b` in one install list are a duplicate target; two sources' wildcards
+    offering `Foo` and `foo` skip both with a warning, and an explicit entry
+    wins over another source's other spelling.
+  - macOS, Windows: an item whose name changes only in case (`Foo@a` to
+    `foo@a`, a source renaming `skills/Foo`), or a file inside an item
+    renamed so, is no longer a conflict with its own old copy nor deleted
+    with the old spelling after the sync wrote it: the file both spellings
+    name is taken over (reported as added and removed, as on Linux).
+    `uninstall foo@a` removes an entry `Foo@a`, and names the wildcard or
+    bundle that installed `Foo`.
+  - `"ref": null` in the user config or `skilletor.local.json` unpins a
+    source: the `ref` a lower config file gave is dropped and `git` tracks
+    the remote's HEAD again.
+  - `skilletor source remove` refuses to remove the entry giving a source its
+    only `git`, `url` or `local` while another config file keeps an entry for
+    it without one, which would leave a config that no longer loads; the error
+    names those files and how to remove them.
+
+0.4.2     2026-10-06 05:28:16Z
+  - Windows: hooks and the CLI start without Git Bash. `bin/skilletor.exe`, a
+    small launcher next to the sh script, runs the bundle with the first
+    `node.exe` on `PATH` and is the `skilletor` command in PowerShell and cmd.
+  - Windows: a project synced there and on Linux gets the same files and the
+    same lock. Sources are checked out with the repository's line endings,
+    whatever `core.autocrlf` says, and paths inside an item, a lock key or a
+    `.gitignore` line use `/`.
+  - The Claude Code hooks are declared in exec form and start `bin/skilletor`
+    without a shell.
+  - A source name outside `^[A-Za-z0-9][A-Za-z0-9._-]*$` is a config error.
+  - Specs: an empty spec, a blank `github:` or forge owner, a shorthand owner,
+    repo or port no forge takes, and an unknown `word:` prefix are errors. A
+    scheme and `github:` match in any case, `.TAR.GZ` is a url, an empty repo
+    segment in `github:` means the default repo, and git's
+    `transport::address` form is a git source kept as written. A GitHub tree
+    link is the repo at that ref; a file or subdirectory link is an error.
+  - `add` refuses a non-https url source before writing anything, and refuses
+    to keep an entry the config loader rejects, before trusting it.
+  - `source remove`: a name the target config lacks is an error that names
+    where else it is declared; an entry the config loader rejects can be
+    removed when nothing else is refused.
+  - Bundles: an entry address the config loader rejects is a bundle error, not
+    a missing source, and a bundle's missing source never replaces one in the
+    target config.
+  - Catalog: `x.md` beside `x.md.njk` is an error of that agent or rule, and
+    `f` beside `f.njk` inside a skill is an error of that skill.
+  - `add`, `install`, `uninstall` and `source remove` exit 2 when their sync
+    hits a config error.
+  - A skill's scripts keep their executable bit. After the upgrade, one sync
+    gives earlier installs and url caches theirs.
+
+0.4.1     2026-09-26 22:58:47Z
+  - First published release. The versions before it, 0.1.0 to 0.4.0, were
+    development builds listed in the marketplace.

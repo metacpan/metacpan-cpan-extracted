@@ -44,9 +44,10 @@ use Stats::LikeR 'read_table';
 #     non-Char, an unclosed CDATA section, a <sheet> with no name, an <rPh>
 #     without its sb= and eb=. This reader leaves the reference in the text,
 #     reads on to the end of the part, and names the sheet "SheetN".
-#   - openpyxl places rows by their r= and pads a gap with an empty row, and
-#     keeps a trailing column that holds only empty cells; this reader drops
-#     both, as it always has (README.md, "Excel (.xlsx) files").
+#   - openpyxl keeps a trailing column that holds only empty cells; this
+#     reader drops it, as it always has (README.md, "Excel (.xlsx) files").
+#     Both place rows by their r= and pad a gap with an empty row, this
+#     reader since 0.3426 (up to 0.3425 it dropped the gap).
 # Where openpyxl's rules are written down:
 #   - openpyxl/cell/text.py, Text.content: a string's text is its <t> and its
 #     <r><t> runs; <rPh> is parsed into Text.rPh and is not part of it
@@ -157,10 +158,10 @@ my $h = '<row r="1"><c r="A1" t="inlineStr"><is><t>h</t></is></c></row>';	# a he
 		'<si><t>k</t></si><si><t>i</t></si>'
 		. "<si><t>\xe6\xbc\xa2\xe5\xad\x97</t><rPh sb=\"0\" eb=\"2\"><t>\xe3\x82\xab\xe3\x83\xb3\xe3\x82\xb8</t></rPh>"
 		. '<phoneticPr fontId="1" type="noConversion"/></si>');
-	is_deeply( read_table($f), [ { k => "\xe6\xbc\xa2\xe5\xad\x97", i => 'ab' } ],
+	is_deeply( read_table($f), [ { k => "\x{6f22}\x{5b57}", i => 'ab' } ],
 		'<rPh> is left out of a shared string and of an inline string' );
 	is_deeply( read_table($f, filter => { 0 => sub { 1 } }),
-		[ { k => "\xe6\xbc\xa2\xe5\xad\x97", i => 'ab' } ], '... and through the callback path' );
+		[ { k => "\x{6f22}\x{5b57}", i => 'ab' } ], '... and through the callback path' );
 
 	# A cell whose only text is phonetic is empty, so it does not widen the
 	# table -- pass 1 and pass 2 have to read it alike, or a row comes out
@@ -281,8 +282,11 @@ my $h = '<row r="1"><c r="A1" t="inlineStr"><is><t>h</t></is></c></row>';	# a he
 		'an unnamed sheet never takes the key of a sheet that has the name' );
 }
 
-# 6. Numeric character references: a Char is decoded to UTF-8 bytes, and
-# anything else is left in the text as it was written.
+# 6. Numeric character references: a Char is decoded, to the character it
+# names, and anything else is left in the text as it was written. The
+# expected values below are the UTF-8 bytes of each Char, decoded by chars().
+sub chars { my ($s) = @_; utf8::decode($s) or die "not UTF-8"; return $s }
+
 {
 	my @ok = (
 		[ '&#x9;', "\t" ], [ '&#xA;', "\n" ], [ '&#xD;', "\r" ], [ '&#x20;', ' ' ],
@@ -300,7 +304,7 @@ my $h = '<row r="1"><c r="A1" t="inlineStr"><is><t>h</t></is></c></row>';	# a he
 		} @_;
 	};
 	is_deeply( read_table(mk($rows_of->(map { $_->[0] } @ok))),
-		[ map { { h => "[$_->[1]]" } } @ok ], 'each reference to an XML Char is decoded' );
+		[ map { { h => '[' . chars($_->[1]) . ']' } } @ok ], 'each reference to an XML Char is decoded' );
 	is_deeply( read_table(mk($rows_of->(@bad))), [ map { { h => "[$_]" } } @bad ],
 		'... and every reference to anything else is left in the text verbatim' );
 	is( Stats::LikeR::_xml_unescape('a&#0;b&#x10FFFF;c&#x110000;'),
@@ -318,8 +322,9 @@ my $h = '<row r="1"><c r="A1" t="inlineStr"><is><t>h</t></is></c></row>';	# a he
 	         . '<row r="7"><c r="A7" t="inlineStr"><is><t><![CDATA[]]>x<![CDATA[y]]></t></is></c></row>',
 		'<si><t>s0</t></si><!-- <si><t>gone</t></si> --><si><t><![CDATA[s&1]]></t></si>');
 	is_deeply( read_table($f, 'output_type' => 'aoa'),
-		[ ['h'], [13], ['a&amp;b<c></t>'], [45], ['s&1'], ['xy'] ],
-		'comments are dropped, a commented-out <row> or <si> included, and CDATA is its literal text' );
+		[ ['h'], [undef], [13], ['a&amp;b<c></t>'], [45], ['s&1'], ['xy'] ],
+		'comments are dropped, a commented-out <row> or <si> included (row 2 is then missing, '
+		. 'a row of undef as openpyxl reads it), and CDATA is its literal text' );
 	# An unclosed CDATA section runs to the end of the part, as an unclosed
 	# element does, and its text is all there is left. Not XML, so this is
 	# this reader's answer alone: expat refuses the part.
@@ -351,37 +356,39 @@ my $h = '<row r="1"><c r="A1" t="inlineStr"><is><t>h</t></is></c></row>';	# a he
 		'a literal CR LF or CR is LF, in text and in CDATA, and &#13; is still a CR' );
 }
 
-# 8. A shared-string cell carries the same bytes and the same flag as before
-# the strings were stored as shared hash keys, and each cell is its own value.
+# 8. A shared-string cell is the same string as before the strings were stored
+# as shared hash keys, and each cell is its own value. Since 0.3426 a string
+# with a non-ASCII character is characters, not the bytes of its UTF-8.
 {
 	my $f = mk('<row r="1"><c r="A1" t="s"><v>0</v></c><c r="B1" t="s"><v>1</v></c></row>'
 	         . '<row r="2"><c r="A2" t="s"><v>2</v></c><c r="B2" t="s"><v>3</v></c></row>'
 	         . '<row r="3"><c r="A3" t="s"><v>2</v></c><c r="B3" t="s"><v>3</v></c></row>',
 		"<si><t>k</t></si><si><t>v</t></si><si><t>caf\xc3\xa9</t></si><si><t>&#xe9;x</t></si>");
 	my $aoa = read_table($f, 'output_type' => 'aoa');
-	is_deeply( $aoa, [ ['k', 'v'], ["caf\xc3\xa9", "\xc3\xa9x"], ["caf\xc3\xa9", "\xc3\xa9x"] ],
-		'shared strings come back as their UTF-8 bytes' );
-	ok( !grep({ utf8::is_utf8($_) } map { @$_ } @$aoa), '... with no UTF-8 flag on any of them' );
+	is_deeply( $aoa, [ ['k', 'v'], ["caf\x{e9}", "\x{e9}x"], ["caf\x{e9}", "\x{e9}x"] ],
+		'shared strings come back as characters' );
+	is( length($aoa->[1][0]), 4, '... a 4-character string, not the 5 bytes of its UTF-8' );
 	$aoa->[1][0] .= '!';
 	substr($aoa->[1][1], 0, 1) = 'Z';
 	is_deeply( [ $aoa->[1][0], $aoa->[1][1], $aoa->[2][0], $aoa->[2][1] ],
-		[ "caf\xc3\xa9!", "Z\xa9x", "caf\xc3\xa9", "\xc3\xa9x" ],
+		[ "caf\x{e9}!", "Zx", "caf\x{e9}", "\x{e9}x" ],
 		'... and changing one cell changes no other cell sharing its string' );
 	my @warned;
 	my $hoh = do {
 		local $SIG{__WARN__} = sub { push @warned, $_[0] };
 		read_table($f, 'output_type' => 'hoh');
 	};
-	is_deeply( $hoh, { "caf\xc3\xa9" => { v => "\xc3\xa9x" } }, '... and keys a hoh by them' );
+	is_deeply( $hoh, { "caf\x{e9}" => { v => "\x{e9}x" } }, '... and keys a hoh by them' );
 	is( scalar @warned, 1, '... warning once that the two rows share a name' );
 	is_deeply( Stats::LikeR::_xlsx_shared_strings($f),
-		[ 'k', 'v', "caf\xc3\xa9", "\xc3\xa9x" ], '_xlsx_shared_strings, as bytes' );
+		[ 'k', 'v', "caf\x{e9}", "\x{e9}x" ], '_xlsx_shared_strings, as characters' );
 }
 
 # 9. Excel's own escape, ST_Xstring's _xHHHH_, in a <t>: a character XML
 # cannot hold, written as _x, four hex digits and _, and a literal "_xHHHH_"
 # written with its underscore escaped as _x005F_. Decoded after references and
-# CDATA, one <t> at a time, left to right, into UTF-8 bytes. The writers'
+# CDATA, one <t> at a time, left to right, into characters (lone surrogates
+# included, which LibreOffice's export cannot show). The writers'
 # side is Excel::Writer::XLSX 1.15, Package/XMLwriter.pm,
 # _escape_control_characters(), and XlsxWriter 1.3.9's sharedstrings.py
 # _write_si(). Every expected value here is what LibreOffice 24.2.7.2 reads the
@@ -391,8 +398,9 @@ my $h = '<row r="1"><c r="A1" t="inlineStr"><is><t>h</t></is></c></row>';	# a he
 # shared string and decodes nothing else, and it leaves an inline string as
 # written.
 {
+	no warnings 'utf8';	# perl 5.10 warns, fatally here, at chr(0xFFFF) and at a surrogate
 	my @cases = (
-		[ 'a_x0000_b',            "a\0b" ],
+		[ 'a_x0000_b',           "a\0b" ],
 		[ '_x000D__x000a_',       "\r\n" ],
 		[ '_x0041_',              'A' ],
 		[ '_x005F_x0041_',        '_x0041_' ],	# a literal "_x0041_", escaped
@@ -402,10 +410,10 @@ my $h = '<row r="1"><c r="A1" t="inlineStr"><is><t>h</t></is></c></row>';	# a he
 		# left-to-right reading -- openpyxl's regex included -- cannot invert
 		[ '_x005F_x005F_x005F_x0041_', '_x005F_x0041_' ],
 		[ '_x005F_x005F_x0041_',  '_x005FA' ],
-		[ '_x00e9_',              "\xc3\xa9" ],
-		[ '_xFFFF__xD800_',       "\xef\xbf\xbf\xed\xa0\x80" ],	# a nonchar and a lone surrogate
-		[ '_xD83D__xDE00_',       "\xf0\x9f\x98\x80" ],	# a pair: U+1F600, as LibreOffice reads it
-		[ '_xDE00__xD83D_',       "\xed\xb8\x80\xed\xa0\xbd" ],	# low then high: two lone ones
+		[ '_x00e9_',              "\x{e9}" ],
+		[ '_xFFFF__xD800_',       chr(0xFFFF) . chr(0xD800) ],	# a nonchar and a lone surrogate
+		[ '_xD83D__xDE00_',       "\x{1F600}" ],	# a pair: U+1F600, as LibreOffice reads it
+		[ '_xDE00__xD83D_',       chr(0xDE00) . chr(0xD83D) ],	# low then high: two lone ones
 		[ '__x0041__',            '_A_' ],
 		[ 'tail_x0041_',          'tailA' ],
 		[ '_x004_ _x00G1_ x0041_ _X0041_ _x0041', '_x004_ _x00G1_ x0041_ _X0041_ _x0041' ],

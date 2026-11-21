@@ -5,7 +5,7 @@ use warnings;
 use v5.10;
 use lib 'lib', '../lib'; # able to run prove in project dir and .t locally
 
-use Test::More;
+use Test::More tests => 13;
 use File::Temp;
 use File::Spec;
 
@@ -27,57 +27,62 @@ my $f = File::Spec->catfile($tempdir->dirname, 'test-file');
     $fh->close;
 }
 
-# Only create
-my $store = eval { File::FStore->create(path => $path) };
-isa_ok($store, 'File::FStore');
-
-my $adder = $store->new_adder;
-isa_ok($adder, 'File::FStore::Adder');
-
-$adder->move_in($f);
-
-ok(!-e $f, 'File was moved');
-
-$adder->insert;
-
-undef($adder);
-
-$store->close;
-
-
-# Open:
-$store = eval { File::FStore->new(path => $path) };
-isa_ok($store, 'File::FStore');
-
-my $file = $store->query(ise => TEST_CONTENTISE);
-
-isa_ok($file, 'File::FStore::File');
-
-is(scalar(eval {$file->get(properties => 'size')}), length(TEST_STRING), 'Size matches');
-
-isa_ok(scalar(eval {$file->as('Data::Identifier')}), 'Data::Identifier');
-
 {
-    my $fh = $file->open;
-    my $data;
+    # Only create
+    my $store = eval { File::FStore->create(path => $path) };
+    isa_ok($store, 'File::FStore');
 
-    ok(defined($fh), 'Can open file');
+    my $adder = $store->new_adder;
+    isa_ok($adder, 'File::FStore::Adder');
 
-    $data = do {
-        local $/ = undef;
-        readline($fh);
-    };
+    $adder->move_in($f);
 
-    $fh->close;
+    ok(!-e $f, 'File was moved');
 
-    is($data, TEST_STRING, 'File is not corrupted');
+    $adder->insert;
+
+    undef($adder);
+
+    $store->fix(qw(upgrade scrub scan));
+
+    $store->close;
 }
 
-ok(defined(eval {$file->update; 1}), 'Update passes');
 
-$store->close;
+{
+    # Open:
+    my $store = eval { File::FStore->new(path => $path) };
+    isa_ok($store, 'File::FStore');
 
-done_testing();
+    my $file = $store->query(ise => TEST_CONTENTISE);
+
+    isa_ok($file, 'File::FStore::File');
+
+    is(scalar(eval {$file->get(properties => 'size')}), length(TEST_STRING), 'Size matches');
+    is(scalar(eval {$file->contentise}), TEST_CONTENTISE, 'Content ISE matching reported content ISE');
+    is(scalar(eval {$file->ise}),        TEST_CONTENTISE, 'Content ISE matching reported ISE');
+
+    isa_ok(scalar(eval {$file->as('Data::Identifier')}), 'Data::Identifier');
+
+    {
+        my $fh = $file->open;
+        my $data;
+
+        ok(defined($fh), 'Can open file');
+
+        $data = do {
+            local $/ = undef;
+            readline($fh);
+        };
+
+        $fh->close;
+
+        is($data, TEST_STRING, 'File is not corrupted');
+    }
+
+    ok(defined(eval {$file->update; 1}), 'Update passes');
+
+    $store->close;
+}
 
 exit 0;
-

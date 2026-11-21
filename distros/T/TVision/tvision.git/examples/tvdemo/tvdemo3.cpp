@@ -51,7 +51,7 @@ void TVDemo::mouse()
         // 'mouseReverse' will be received by the checkbox inserted into
         // 'TMouseDialog'. 'TCheckBoxes' takes a pointer to a 'ushort' in
         // 'getData'/'setData'.
-        ushort mouseReverse = TEventQueue::mouseReverse;
+        ushort mouseReverse = (ushort) TEventQueue::mouseReverse;
         mouseCage->helpCtx = hcOMMouseDBox;
         mouseCage->setData(&mouseReverse);
         if (deskTop->execView(mouseCage) != cmCancel)
@@ -184,10 +184,13 @@ TMenuBar *TVDemo::initMenuBar(TRect r)
 {
     TSubMenu& sub1 =
       *new TSubMenu( "~\360~", 0, hcSystem ) +
-        *new TMenuItem( "~V~ideo mode", cmVideoMode, kbNoKey, hcNoContext, "" ) +
-         newLine() +
         *new TMenuItem( "~A~bout...", cmAboutCmd, kbNoKey, hcSAbout ) +
          newLine() +
+#if defined( __BORLANDC__ )
+        // Changing the screen mode only makes sense on DOS or DPMI.
+        *new TMenuItem( "~V~ideo mode", cmVideoMode, kbNoKey, hcNoContext ) +
+         newLine() +
+#endif
         *new TMenuItem( "~P~uzzle", cmPuzzleCmd, kbNoKey, hcSPuzzle ) +
         *new TMenuItem( "Ca~l~endar", cmCalendarCmd, kbNoKey, hcSCalendar ) +
         *new TMenuItem( "Ascii ~T~able", cmAsciiCmd, kbNoKey, hcSAsciiTable ) +

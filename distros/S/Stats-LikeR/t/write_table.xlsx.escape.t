@@ -236,12 +236,17 @@ sub cell_a {
 
 # ---- which cells are numbers -------------------------------------------
 {
-	# [text, 1 = a <v> number, 0 = an inline string]
+	# [text, 1 = a <v> number, 0 = an inline string]. Since 0.3426 a string
+	# is a number only when its text is the shortest spelling of its value,
+	# so a trailing 0 after the point, a bare point, no digit before the
+	# point, any exponent and a signed zero are text (t/write_table.xlsx.number.t
+	# has the values Excel, LibreOffice and openpyxl show for them).
 	my @strings = (
-		['0', 1], ['-0', 1], ['42', 1], ['-42', 1], ['0.5', 1], ['-0.5', 1], ['0.', 1],
-		['5.', 1], ['.5', 1], ['1e3', 1], ['1E-3', 1], ['2.5e+10', 1],
+		['0', 1], ['-0', 0], ['42', 1], ['-42', 1], ['0.5', 1], ['-0.5', 1], ['0.', 0],
+		['5.', 0], ['.5', 0], ['1e3', 0], ['1E-3', 0], ['2.5e+10', 0],
 		['123456789012345', 1], ['1234567890.12345', 1], ['0.000123456789012345', 1],
-		['9.99999999999999e307', 1], ['1e-307', 1], ['0e999', 1],
+		['9.99999999999999e307', 0], ['1e-307', 0], ['0e999', 0],
+		['0.' . '0' x 306 . '1', 1], ['0.' . '0' x 307 . '1', 0], # 1E-307 is in Excel's range, 1E-308 is not
 		['007', 0], ['00', 0], ['-007', 0], ['00.5', 0], ['+5', 0], ['1234567890123456', 0],
 		['12345678901234567890', 0], ['1.234567890123456', 0], ['1e308', 0], ['1e400', 0],
 		['1e-308', 0], ['1e-400', 0], ['Inf', 0], ['-Inf', 0], ['NaN', 0], ['inf', 0],

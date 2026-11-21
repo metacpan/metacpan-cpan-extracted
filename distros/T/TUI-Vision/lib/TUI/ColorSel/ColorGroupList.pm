@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -15,6 +15,7 @@ our @EXPORT = qw(
   new_TColorGroupList
 );
 
+use Storable;
 use Carp ();
 use TUI::toolkit;
 use TUI::toolkit::Types qw(
@@ -28,6 +29,9 @@ use TUI::ColorSel::Const qw(
   cmNewColorItem
   cmSaveColorIndex
 );
+use TUI::ColorSel::ColorGroup;
+use TUI::ColorSel::ColorItem;
+use TUI::Objects::Rect;
 use TUI::Views::ListViewer;
 use TUI::Views::Util qw( message );
 
@@ -39,6 +43,14 @@ extends TListViewer;
 
 # protected attributes
 has groups => ( is => 'ro', default => sub { die 'required' } );
+
+# predeclare private methods
+my (
+  $writeItems,
+  $writeGroups,
+  $readItems,
+  $readGroups,
+);
 
 sub BUILDARGS {    # \%args (%args)
   state $sig = signature(
@@ -206,6 +218,125 @@ sub getNumGroups {    # $num ()
     $g = $g->{next};
   }
   return $n;
+}
+
+$writeItems = sub {    # void ($os, $items|undef)
+  my ( $self, $os, $items ) = @_;
+  assert ( @_ == 3 );
+  assert ( is_Object $self );
+  assert ( is_Object $os );
+  assert ( !defined $items or is_Object $items );
+
+  my $count = 0;
+  for ( my $item = $items ; $item ; $item = $item->{next} ) {
+    $count++;
+  }
+  $os->put( $count );
+  for ( my $item = $items ; $item ; $item = $item->{next} ) {
+    $os->put( $item->{name}, $item->{index} );
+  }
+  return;
+};
+
+$writeGroups = sub {    # void ($os, $groups|undef)
+  my ( $self, $os, $groups ) = @_;
+  assert ( @_ == 3 );
+  assert ( is_Object $self );
+  assert ( is_Object $os );
+  assert ( !defined $groups or is_Object $groups );
+
+  my $count = 0;
+  for ( my $group = $groups ; $group ; $group = $group->{next} ) {
+    $count++;
+  }
+  $os->put( $count );
+  for ( my $group = $groups ; $group ; $group = $group->{next} ) {
+    $os->put( $group->{name} );
+    $self->$writeItems( $os, $group->{items} );
+  }
+  return;
+};
+
+$readItems = sub {    # $items|undef ($is)
+  my ( $self, $is ) = @_;
+  assert ( @_ == 2 );
+  assert ( is_Object $self );
+  assert ( is_Object $is );
+
+  my $count = $is->get();
+  my ( $first, $last );
+  while ( $count-- > 0 ) {
+    my $item = TColorItem->new(
+      name  => $is->get() // '',
+      index => $is->get(),
+    );
+    if ( $last ) {
+      $last->{next} = $item;
+    }
+    else {
+      $first = $item;
+    }
+    $last = $item;
+  }
+  return $first;
+};
+
+$readGroups = sub {    # $groups|undef ($is)
+  my ( $self, $is ) = @_;
+  assert ( @_ == 2 );
+  assert ( is_Object $self );
+  assert ( is_Object $is );
+
+  my $count = $is->get();
+  my ( $first, $last );
+  while ( $count-- > 0 ) {
+    my $group = TColorGroup->new(
+      name  => $is->get() // '',
+      items => $self->$readItems( $is ),
+    );
+    if ( $last ) {
+      $last->{next} = $group;
+    }
+    else {
+      $first = $group;
+    }
+    $last = $group;
+  }
+  return $first;
+};
+
+sub write :method {    # void ($os)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $os ) = $sig->( @_ );
+  $self->SUPER::write( $os );
+  $self->$writeGroups( $os, $self->{groups} );
+  return;
+}
+
+sub read :method {    # $self ($is)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $is ) = $sig->( @_ );
+  $self->SUPER::read( $is );
+  $self->{groups} = $self->$readGroups( $is );
+  return $self;
+}
+
+sub build {    # $obj ()
+  my ( $class ) = @_;
+  assert ( @_ == 1 );
+  assert ( is_Str $class );
+  assert ( Storable::is_retrieving );
+  return $class->new(
+    bounds   => TRect->new(),
+    scrollBar => undef,
+    groups   => undef,
+  );
 }
 
 1

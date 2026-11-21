@@ -1,3 +1,21 @@
+-   5.5.1 Fri Nov 20 12:19:02 EST 2026
+
+    fixed test: fixtures are unique tempdirs, so leftovers from
+    earlier runs or tests running in parallel cannot collide.
+
+-   5.5.0 Fri Nov 20 10:53:06 EST 2026
+
+    New module FindBin::Files v0.1.0: FindBin::libs for files.
+    Walks up from $FindBin::Bin and exports the paths of a relative
+    file found below each parent directory, e.g. configuration
+    files ('file=.myconfig.yaml', 'dir=etc file=app.conf').
+    Nothing is added to @INC or the environment.
+    - scalar exports the nearest match, a list all of them.
+    - strict (default) skips dangling symlinks; nostrict returns
+      them.
+    - The default export name comes from the file's basename.
+    - Tests in t/50-files.
+
 -   5.4.1 Sun Nov 15 01:32:20 EST 2026
 
    Makefile.PL udpates to include File::Util::SecureDir as a 

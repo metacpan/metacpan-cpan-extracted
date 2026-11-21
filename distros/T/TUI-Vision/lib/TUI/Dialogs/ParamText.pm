@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -17,10 +17,12 @@ our @EXPORT = qw(
 );
 
 use Carp ();
+use Storable;
 use TUI::toolkit;
 use TUI::toolkit::Types qw( :types );
 
 use TUI::Dialogs::StaticText;
+use TUI::Objects::Rect;
 use TUI::toolkit;
 
 sub TParamText()   { __PACKAGE__ }
@@ -89,6 +91,36 @@ sub setText {    # void ($fmt, @args)
   $self->{str} = sprintf( $fmt, @$args );
   $self->drawView();
   return;
+}
+
+sub write :method {    # void ($os)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $os ) = $sig->( @_ );
+  $self->SUPER::write( $os );
+  $os->put( $self->{str} );
+  return;
+}
+
+sub read :method {    # $self ($is)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $is ) = $sig->( @_ );
+  $self->SUPER::read( $is );
+  $self->{str} = $is->get();
+  return $self;
+}
+
+sub build {    # $obj ()
+  my ( $class ) = @_;
+  assert ( @_ == 1 );
+  assert ( is_Str $class );
+  assert ( Storable::is_retrieving );
+  return $class->new( bounds => TRect->new() );
 }
 
 1

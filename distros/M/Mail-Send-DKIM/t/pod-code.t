@@ -29,7 +29,7 @@ my $LIB = File::Spec->catdir($Bin, File::Spec->updir(), 'lib');
 # Every programme the distribution installs, each with the page that describes
 # it.  The shell wrapper keeps its page in a here-document, because POD lines
 # are not shell comments; the rest keep it at the end of the file.
-my @PROGRAMMES = qw(mail-dkim dmarc-report.pl dmarc-weekly.sh dmarc-check-mail.pl);
+my @PROGRAMMES = qw(mail-dkim dmarc-report.pl dmarc-summary dmarc-weekly.sh dmarc-check-mail.pl);
 
 # The page and the programme, from one file: what is between the POD markers
 # is the specification, and everything else is the code it describes.

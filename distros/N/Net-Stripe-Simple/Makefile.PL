@@ -43,10 +43,16 @@ my %WriteMakefileArgs = (
     "autodie" => 0,
     "blib" => "1.01"
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
-  }
+  },
+  META_MERGE => {
+    resources => {
+      repository => 'https://github.com/abeverley/net-stripe-simple/',
+      bugtracker => 'https://rt.cpan.org/Dist/Display.html?Name=Net-Stripe-Simple',
+    },
+  },
 );
 
 

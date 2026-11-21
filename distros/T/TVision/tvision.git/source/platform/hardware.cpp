@@ -8,9 +8,6 @@
 #include <internal/getenv.h>
 #include <iostream.h>
 #include <chrono>
-using std::chrono::duration_cast;
-using std::chrono::milliseconds;
-using std::chrono::steady_clock;
 
 TEvent THardwareInfo::eventQ[];
 size_t THardwareInfo::eventCount = 0;
@@ -21,9 +18,7 @@ static tvision::Platform *platf;
 THardwareInfo::THardwareInfo() noexcept
 {
     using namespace tvision;
-    static int initPlatform =
-        (platf = new Platform(), (void) initPlatform, 0);
-
+    platf = &Platform::getInstance();
     pendingEvent = 0;
     alwaysFlush = getEnv<int>("TVISION_MAX_FPS", 0) < 0;
 }
@@ -49,9 +44,10 @@ void THardwareInfo::screenWrite( ushort x, ushort y, TScreenCell *buf, DWORD len
 }
 TScreenCell *THardwareInfo::allocateScreenBuffer() noexcept { return platf->reloadScreenInfo(); }
 void THardwareInfo::freeScreenBuffer(TScreenCell *) noexcept { platf->freeScreenBuffer(); }
-DWORD THardwareInfo::getButtonCount() noexcept { return platf->getButtonCount(); }
-void THardwareInfo::cursorOn() noexcept { platf->cursorOn(); }
-void THardwareInfo::cursorOff() noexcept { platf->cursorOff(); }
+// Turbo Vision only checks whether this is non-zero.
+DWORD THardwareInfo::getButtonCount() noexcept { return 2; }
+void THardwareInfo::cursorOn() noexcept {}
+void THardwareInfo::cursorOff() noexcept {}
 void THardwareInfo::flushScreen() noexcept { platf->flushScreen(); }
 void THardwareInfo::setUpConsole() noexcept { platf->setUpConsole(); }
 void THardwareInfo::restoreConsole() noexcept { platf->restoreConsole(); }
@@ -120,6 +116,15 @@ void THardwareInfo::waitForEvents( int timeoutMs ) noexcept
 void THardwareInfo::interruptEventWait() noexcept
 {
     platf->interruptEventWait();
+}
+
+uint64_t THardwareInfo::getTickCountMs() noexcept
+{
+    // This effectively gives a system time reference in milliseconds.
+    // steady_clock is best suited for measuring intervals.
+    return std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::steady_clock::now().time_since_epoch()
+    ).count();
 }
 
 BOOL THardwareInfo::setClipboardText( TStringView text ) noexcept

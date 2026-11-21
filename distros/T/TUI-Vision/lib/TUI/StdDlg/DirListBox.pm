@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -18,6 +18,7 @@ our @EXPORT = qw(
 );
 
 use Encode qw( encode );
+use Storable;
 use TUI::toolkit;
 use TUI::toolkit::Types qw(
   Maybe
@@ -26,6 +27,7 @@ use TUI::toolkit::Types qw(
 
 use TUI::Const qw( EOS );
 use TUI::Drivers::Const qw( evBroadcast );
+use TUI::Objects::Rect;
 use TUI::Dialogs::ListBox;
 use TUI::StdDlg::Const qw(
   cmChangeDir
@@ -299,6 +301,17 @@ $showDirs = sub {    # void ($dirs)
   return;
   } #/ alias:
 };
+
+sub build {    # $obj ()
+  my ( $class ) = @_;
+  assert ( @_ == 1 );
+  assert ( is_Str $class );
+  assert ( Storable::is_retrieving );
+  return $class->new(
+    bounds     => TRect->new(),
+    vScrollBar => undef
+  );
+}
 
 1
 

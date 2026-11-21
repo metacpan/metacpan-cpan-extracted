@@ -14,7 +14,8 @@ use Stats::LikeR 'read_table';
 # well-formed workbook never exercises:
 #
 #   * a cell with no r= at all, and an r= that is not the first attribute
-#   * self-closing <c/> and <row/>, blank rows, and gaps mid-row
+#   * self-closing <c/> and <row/>, blank rows (rows of undef since 0.3426),
+#     and gaps mid-row
 #   * every entity form _xml_unescape used to handle, decimal and hex numeric
 #     character references included, and the ones that must NOT be decoded
 #   * sheet names, which _xml_unescape decodes through the same single pass
@@ -125,8 +126,8 @@ sub mk {
 	           [ 'x&#38;lt;y', 'p&amp;q &#x41;&#233; &#999999999999; &bad' ]);
 	my $book = read_table($f);
 	is_deeply( [ sort keys %$book ],
-		[ "p&q A\xc3\xa9 &#999999999999; &bad", 'x&lt;y' ],
-		'sheet names: each reference decoded once, UTF-8 bytes for a number, '
+		[ "p&q A\x{e9} &#999999999999; &bad", 'x&lt;y' ],
+		'sheet names: each reference decoded once, a character for a number, '
 		. 'and an out-of-range or unknown one left as it is' );
 	is_deeply( $book->{'x&lt;y'}, [ { a => 1 } ], 'sheet names: the sheet is read under it' );
 	is_deeply( read_table($f, sheet => 'x&lt;y'), [ { a => 1 } ],
@@ -163,8 +164,12 @@ sub mk {
 	         . '<row r="4"/>'
 	         . '<row r="5"><c r="A5"/><c r="B5"><v>5</v></c><c r="C5"><v>6</v></c></row>',
 	           '<si><t>a</t></si><si><t>b</t></si><si><t>c</t></si>');
+	# rows 3 and 4 have no value: each is a row of undef, as pandas reads them
+	# (t/read_table.xlsx.blank_rows.pandas.t); up to 0.3425 both were dropped
 	is_deeply( read_table($f),
 		[ { a => '1',   b => undef, c => '3' },
+		  { a => undef, b => undef, c => undef },
+		  { a => undef, b => undef, c => undef },
 		  { a => undef, b => '5',   c => '6' } ],
 		'self-closing cell/row, blank rows and a mid-row gap' );
 }
@@ -175,8 +180,8 @@ sub mk {
 	         . '<row r="2"/>'
 	         . '<row r="3"><c r="A3"><v>1</v></c><c r="B3"><v>2</v></c></row>',
 	           '<si><t>a</t></si><si><t>b</t></si>');
-	is_deeply( read_table($f), [ { a => '1', b => '2' } ],
-		'an empty <row/> between data rows is dropped, not merged' );
+	is_deeply( read_table($f), [ { a => undef, b => undef }, { a => '1', b => '2' } ],
+		'an empty <row/> between data rows is a row of undef, not merged with the next' );
 }
 
 # entity decoding, in inline strings and in shared strings
@@ -193,10 +198,9 @@ sub mk {
 	         .            '<c r="B5" t="inlineStr"><is><t>&#x7F;</t></is></c></row>');
 	my $rows = read_table($f);
 	is( $rows->[0]{'h&1'}, " a <b> ", 'lt/gt decoded, xml:space="preserve" kept' );
-	# UTF-8 bytes, because read_table hands the file back as bytes and does not
-	# decode it: e-acute is C3 A9 and U+4E2D is E4 B8 AD.
-	is( $rows->[0]{h2}, "\xc3\xa9\xe4\xb8\xad&",
-		'decimal and hex numeric character references become UTF-8 bytes' );
+	# characters, since 0.3426: U+00E9 and U+4E2D, not their UTF-8 bytes
+	is( $rows->[0]{h2}, "\x{e9}\x{4e2d}&",
+		'decimal and hex numeric character references become characters' );
 	is( $rows->[1]{'h&1'}, '&lt;',
 		'&amp;lt; decodes once, to &lt; and not to <' );
 	is( $rows->[1]{h2}, 'q"\'x', 'quot and apos decoded' );
@@ -565,11 +569,12 @@ sub inline_rows {
 	         . '<row r="2"><c r="A2"><v>1</v></c><c r="B2" s="3"></c><c r="C2"><v>3</v></c></row>');
 	is_deeply( read_table($g), [ { a => 1, b => undef, c => 3 } ],
 		'an empty open cell between values is an undef' );
-	# a row of nothing but empty open cells is a blank row, and dropped
+	# a row of nothing but empty open cells is a blank row: a row of undef, and
+	# no wider than the sheet
 	my $b = mk('<row r="1"><c r="A1" t="inlineStr"><is><t>a</t></is></c></row>'
 	         . '<row r="2"><c r="A2" s="1"></c><c r="B2"><v></v></c></row>'
 	         . '<row r="3"><c r="A3"><v>9</v></c></row>');
-	is_deeply( read_table($b), [ { a => 9 } ], 'a row of empty open cells is dropped' );
+	is_deeply( read_table($b), [ { a => undef }, { a => 9 } ], 'a row of empty open cells is a row of undef' );
 }
 
 # 'sheet' takes a name before a number. A workbook read whole comes back keyed
@@ -594,16 +599,16 @@ sub inline_rows {
 	is_deeply( read_table($f, sheet => 2),   [ { s => 'first' } ],  '... and sheet => 2 the one named 2' );
 	is_deeply( read_table($f), { 2 => [ { s => 'first' } ], 1 => [ { s => 'second' } ] },
 		'the whole book does not swap them' );
-	# A name the caller holds as characters is compared as the UTF-8 bytes the
-	# workbook's name was read as (up to 0.3213 it was never found, and the
-	# message printed it as Latin-1).
+	# A name the caller holds as characters is compared with the characters the
+	# workbook's name is read as (up to 0.3213 it was never found, and the
+	# message printed it as Latin-1; up to 0.3425 it was compared as bytes).
 	$f = mk(\@body, undef, [ "Donn\xc3\xa9es", 'Other' ]);
 	my $chars = "Donn\x{e9}es";
 	utf8::upgrade($chars);
 	is_deeply( read_table($f, sheet => $chars), [ { s => 'first' } ], 'a sheet name given as characters' );
 	is_deeply( read_table($f, sheet => "Donn\xc3\xa9es"), [ { s => 'first' } ], '... and as UTF-8 bytes' );
 	throws_ok { read_table($f, sheet => 'Nope') }
-		qr/^read_table: sheet 'Nope' not found in \Q$f\E \(have: 'Donn\xc3\xa9es', 'Other'\)$/,
+		qr/^read_table: sheet 'Nope' not found in \Q$f\E \(have: 'Donn\x{e9}es', 'Other'\)$/,
 		'an unknown sheet name lists the ones there are';
 }
 

@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Itself 2.032;
+package Config::Model::Itself 2.033;
 
 use Mouse ;
 use Mouse::Util::TypeConstraints;
@@ -18,7 +18,7 @@ use warnings;
 use feature qw/postderef signatures/;
 no warnings qw/experimental::postderef experimental::signatures/;
 
-use Config::Model 2.163;
+use Config::Model 2.169;
 use IO::File ;
 use Log::Log4perl 1.11;
 use Carp ;
@@ -416,7 +416,7 @@ sub factorize_model ($model, $factorize = 'none') {
 
     move_properties_out_of_element($model, $to_factorize);
 
-    factorize_element($model->{element});
+    $model->{element} = factorize_element($model->{element});
 
     # compare elements data and remove duplicated data
     while (my ($prop, $sub) = each $to_factorize->%*) {
@@ -520,19 +520,22 @@ sub factorize_element ($factorized_element) {
     my $previous_data;
     my $previous_name;
 
+    my @new;
     for (my $idx = 0; $idx < $factorized_element->@*; $idx+=2) {
         my $name = $factorized_element->[$idx];
         my $data = $factorized_element->[$idx+1];
-
         if (Compare($data, $previous_data)) {
-            $factorized_element->[$idx+1] = "*$previous_name";
+            push @new , { name => $name, alias => $previous_name };
         }
-        elsif (ref $data) {
+        elsif (ref $data and not $data->{alias}) {
+            push @new , { name => $name, $data->%* };
             $previous_name = $name;
             $previous_data = $data;
         }
         # else $data is already an alias
     }
+
+    return \@new;
 }
 
 sub write_app_files {
@@ -607,7 +610,7 @@ sub write_all ($self, %args) {
     foreach my $file (keys %map_to_write) {
         my $data = $self->check_model_to_write($file, $factorize, \%map_to_write, \%loaded_classes);
         next unless @$data ; # don't write empty model
-        write_model_file ($dir->child($file), $self->{header}{$file}, $data);
+        write_perl_model_file ($dir->child($file), $self->{header}{$file}, $data);
         delete $map_to_write{$file};
     }
 
@@ -663,7 +666,7 @@ sub write_model_plugin ($self, %args) {
 
         my $plugin_file = $class.'.pl';
         $plugin_file =~ s!::!/!g;
-        write_model_file ($plugin_dir->child($plugin_name)->child($plugin_file), [], [ $data ]);
+        write_perl_model_file ($plugin_dir->child($plugin_name)->child($plugin_file), [], [ $data ]);
     }
 
     $self->meta_instance->clear_changes ;
@@ -722,7 +725,7 @@ sub read_plugin_file {
     return;
 }
 
-sub write_model_file {
+sub write_perl_model_file {
     my $wr_file  = shift; # Path::Tiny object
     my $comments = shift ;
     my $data     = shift;
@@ -904,7 +907,7 @@ Config::Model::Itself - Model (or schema) editor for Config::Model
 
 =head1 VERSION
 
-version 2.032
+version 2.033
 
 =head1 SYNOPSIS
 

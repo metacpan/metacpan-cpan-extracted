@@ -27,7 +27,7 @@ subtest "deduplicate level" => sub {
         qw/hidden B standard D/
     };
     Config::Model::Itself::factorize_reverse_packed($input);
-    
+
     eq_or_diff($input, $expect, "test factorize_reverse_packed" );
 };
 
@@ -40,7 +40,7 @@ subtest "deduplicate summary" => sub {
     };
     my $expect = {qw/A summary1 B summary2 C *A D *B/};
     Config::Model::Itself::factorize_with_alias($input);
-    
+
     eq_or_diff($input, $expect, "test factorize_with_alias" );
 };
 
@@ -68,11 +68,15 @@ subtest "factorize description and level" => sub {
     my $expect = {
         name    => 'Itself::CommonElement::WarnIfMatch',
         element => [
-            'msg' => {
-                'type' => 'leaf',
-                'value_type' => 'string'
-            },
-            'fix' => '*msg'
+          {
+            name => 'msg',
+            type => 'leaf',
+            value_type => 'string',
+          },
+          {
+            name => 'fix',
+            alias => 'msg',
+          },
         ],
         description => {
             fix => 'fix description',
@@ -112,15 +116,20 @@ subtest "deduplicate description" => sub {
     my $expect = {
         name    => 'Itself::CommonElement::WarnIfMatch',
         element => [
-            'msg' => {
-                'value_type' => 'string',
-                'type' => 'leaf'
-            },
-            'fix' => '*msg',
-            'other' => {
-                'value_type' => 'uniline',
-                'type' => 'leaf'
-            },
+          {
+            name => 'msg',
+            type => 'leaf',
+            value_type => 'string',
+          },
+          {
+            name => 'fix',
+            alias => 'msg',
+          },
+          {
+            name => 'other',
+            type => 'leaf',
+            value_type => 'uniline',
+          },
         ],
         description => {
             'fix' => 'a description',
@@ -145,17 +154,18 @@ subtest "test on many identical elements" => sub {
     my $expect = {
         name    => 'DontCare',
         element => [
-            aa2 => {
-                type       => 'leaf',
+            {
+                name => 'aa2',
+                type => 'leaf',
                 value_type => 'string',
             },
-            qw/ab2 *aa2 ac2 *aa2 ad2 *aa2 Z *aa2/
+            map { { name => $_, alias => 'aa2'} } grep {$_ ne 'aa2'} @elt_list,
         ]
     };
 
-    Config::Model::Itself::factorize_element($class->{element});
+    my $new = Config::Model::Itself::factorize_element($class->{element});
 
-    eq_or_diff($class, $expect, "test factorized element" );
+    eq_or_diff($new, $expect->{element}, "test factorized element" );
 
     # no need to add 'all', element is always factorized
     Config::Model::Itself::factorize_model($class);

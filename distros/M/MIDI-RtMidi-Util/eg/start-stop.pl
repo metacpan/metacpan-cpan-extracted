@@ -7,7 +7,7 @@ use Data::Dumper::Compact qw(ddc);
 use IO::Async::Loop ();
 use IO::Async::Timer::Periodic ();
 use MIDI::RtMidi::FFI::Device ();
-use MIDI::RtMidi::Util qw(out_port stop_device stop_all_notes);
+use MIDI::RtMidi::Util qw(out_port stop_device);
 
 my $bpm  = shift || 60;
 my $port = shift || 'usb';
@@ -25,7 +25,7 @@ $loop->watch_signal(INT => sub {
     say "\nStop";
     try {
         stop_device($device);
-        stop_all_notes($device);
+        $device->panic;
     }
     catch ($e) {
         warn "Can't halt MIDI out device '$device': $e\n";

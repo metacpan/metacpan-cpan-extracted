@@ -1,6 +1,21 @@
 Revision history for Chem-Structure-Parser
 
 
+0.0401 2026-11-20 CST (Claude Opus 5.5 helped)
+
+ - Fix for Windows, in a test: the module was right.  t/convert.t wrote
+   convert()'s PDB to a text-mode IO::File and compared the file's size on
+   disk with the length of the same text read back through a text-mode
+   handle.  On Windows the :crlf layer writes each newline as two bytes and
+   reads it back as one, so test 461 of 500 saw 7544 bytes where it expected
+   7452.  It now reads the IO::File's output back as it reads the plain
+   handle's and compares the text, which also checks what was written and not
+   only how much.  convert() itself writes a named file :raw, the same bytes
+   on every platform, and a handle it is given through that handle's own
+   layers.  Three Strawberry smokers, perl 5.24.4 and 5.42.3,
+   MSWin32-x64-multi-thread, reported it:
+   https://www.cpantesters.org/cpan/report/6ed62f44-e460-11f1-b731-c71eb110897b
+
 0.040 2026-11-19 CST (ChatGPT, Claude Opus 5.5 helped)
 
  - convert($in, $out, %opt) writes a structure in the other format, mmCIF to

@@ -1,4 +1,4 @@
-package Dist::Conformance::Check 0.006;
+package Dist::Conformance::Check 0.007;
 
 # ABSTRACT: The interface of a check, and what the checks share
 
@@ -8,6 +8,7 @@ use re '/aasx';
 use Mojo::Base -base, -signatures;
 
 use List::Util();
+use Module::Runtime();
 
 use Dist::Conformance::Schema();
 
@@ -17,7 +18,7 @@ has config => sub { {} };
 has 'source';
 has variables => sub { {} };
 
-our $MODULE = { type => 'string', pattern => '\A[A-Za-z_]\w*(?:::\w+)*\z' };
+our $MODULE = { type => 'string', pattern => "\\A$Module::Runtime::module_name_rx\\z" };
 
 
 sub config_schema ($) { return { properties => {} } }
@@ -53,6 +54,9 @@ sub update ( $self, $update ) {
     $update->by_hand( "$detail: " . $self->name . ' has no automatic fix' ) if $status eq 'fail';
     return;
 }
+
+
+sub adopt ( $, $ ) { return }
 
 
 sub template ( $self, $path ) {
@@ -91,7 +95,7 @@ Dist::Conformance::Check - The interface of a check, and what the checks share
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -188,6 +192,15 @@ L<Dist::Conformance::Update>.  Returns nothing that the caller reads.
 The default is for a check that cannot change anything: when L</check> fails,
 it records the detail and that there is no automatic fix.
 
+=head2 adopt
+
+C<($snapshot)>.  The configuration that would make this check accept the
+repository in C<$snapshot> as it is now, as a hash reference of the keys of
+this check for F<.conformance.yml>, or nothing.  C<conformance adopt> prints
+it, so that a person can record the choices of a repository before an update
+replaces them.  The default is nothing: a check whose configuration has no
+room for the choices of a repository has nothing to adopt.
+
 =head2 template
 
 C<($path)>.  Returns the template at C<$path> in the source with the variables
@@ -267,8 +280,7 @@ F<CLAUDE.md> exists and names the skills that it must.
 
 =item L<Dist::Conformance::Check::CriticProfile>
 
-The perlcritic profile enables or turns off every policy that its template
-enables, and enables none that the standards retired.
+The perlcritic profile is its template, with the overrides of the repository.
 
 =item L<Dist::Conformance::Check::ToolConfiguration>
 

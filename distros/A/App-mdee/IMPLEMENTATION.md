@@ -77,28 +77,13 @@ definition, and joins those lines in the original text.  A line that
 starts a footnote definition (`[^name]:`) stays on its own line.  The
 joined lines are folded like list items.
 
-#### Text Folding
-
-Text folding is handled within the [App::Greple::md](https://metacpan.org/pod/App%3A%3AGreple%3A%3Amd) module
-using [Greple::tee](https://metacpan.org/pod/Greple%3A%3Atee) to pipe matched regions through
-[ansifold(1)](https://metacpan.org/pod/App%3A%3Aansifold).  It preserves ANSI escape sequences
-and maintains proper indentation for nested lists.  List items,
-definition lists and the paragraphs joined by `--refill` are
-folded; code blocks, front matter, HTML comments, and tables are
-excluded.
-
-Recognized list markers include `*`, `+`, `-`, `1.`, `1)`, `#.`,
-and `#)`.  The `#` marker is the auto-numbered list of Pandoc's Markdown.
-
-The folding width is controlled by `--fold-width` option (default: the
-pane width minus 3 and the run-in width, 78 for a pane of 85).
-
 #### Table Formatting
 
 Table formatting is handled within the [App::Greple::md](https://metacpan.org/pod/App%3A%3AGreple%3A%3Amd) module
-(after syntax highlighting, before output).  Markdown tables are
-detected by the pattern `^ {0,3}(\|.+\|\n){3,}` and formatted with
-aligned columns using [ansicolumn(1)](https://metacpan.org/pod/App%3A%3Aansicolumn) while
+(after syntax highlighting, before text folding).  Markdown tables
+are detected by the pattern `(^ {0,3}\|.+\|\h*\n){3,}` (spaces after
+the last pipe are allowed and removed) and formatted with aligned
+columns using [ansicolumn(1)](https://metacpan.org/pod/App%3A%3Aansicolumn) while
 preserving ANSI colors.
 
 Column alignment is parsed from the separator line: `:---` (left,
@@ -111,11 +96,71 @@ before further processing.
 When `--rule` is enabled (default), ASCII pipe characters are replaced
 with Unicode box-drawing characters (`│`, `├`, `┤`, `┼`, `─`).
 
+A table wider than the table width (`table_width`, see Text Folding)
+is fit into it by ansicolumn (`-w`): columns that fit keep their
+width, and the long columns are cut to about the same width and their
+cells are wrapped.  A wrapped column often comes out narrower than it
+was cut to, because lines break at word boundaries and the room kept
+for run-in characters is used only when one goes there; ansicolumn
+gives that width back to the other columns, first by fitting the
+table again with a larger budget, then by widening the wrapped
+columns one by one, so that the table is as wide as it may be.
+
+A `<br>` in a cell breaks the cell into lines.  Before coloring, while
+code spans still have their backticks, `mark_line_breaks()` puts a
+LINE SEPARATOR (U+2028) after every `<br>` in the table rows, except
+in a code span, after a backslash, and at the end of a cell.
+ansicolumn takes it as a line break in a cell.  The `<br>` is colored with
+`br_mark`, which the `nomark` theme makes empty to hide it.
+A separator left in rows that are not formatted as a table is taken
+out after the formatting.
+
+With `intact=table` (mdee sets it when nup is used), the lines of a
+formatted table are joined into one line by UNIT SEPARATOR (0x1F),
+the last newline kept, as the `--crmode` of App::Greple::tee does
+with CR.  ansicolumn `--intact`, behind nup, divides the line into
+them again and does not fold one that fits the pane, so a table
+can use the run-in room that the panes keep for text.  The joined
+lines are what `table_regions()` excludes from folding: US comes from
+nowhere else, as `remove_controls()` takes it out of the text.
+
+#### Text Folding
+
+Text folding is handled within the [App::Greple::md](https://metacpan.org/pod/App%3A%3AGreple%3A%3Amd) module
+using [App::Greple::tee](https://metacpan.org/pod/App%3A%3AGreple%3A%3Atee) to pipe matched regions through
+[ansifold(1)](https://metacpan.org/pod/App%3A%3Aansifold).  It preserves ANSI escape sequences
+and maintains proper indentation for nested lists.  List items,
+definition lists, block quotes and the paragraphs joined by
+`--refill` are folded; the continuation lines of a block quote start
+with the quote marker again.  Code blocks, front matter, HTML
+comments, and tables are excluded.
+
+Folding comes last.  The md module refills the paragraphs, colors the
+text and formats the tables in its `--begin` function, before greple
+matches anything; greple then finds the regions to fold in that
+result, and the tables already formatted are excluded from them.
+
+Recognized list markers include `*`, `+`, `-`, `1.`, `1)`, `#.`,
+and `#)`.  The `#` marker is the auto-numbered list of Pandoc's Markdown.
+
+The folding width is controlled by `--fold-width` option (default: the
+pane width minus 3 and the run-in width, 78 for a pane of 85).
+Tables are fit into the same width, except that with nup, when the
+fold width is not given, they are kept intact (`intact=table`, see
+Table Formatting), which the panes do not fold: the table width is
+then the fold width plus the run-in width but one (81 for a pane of
+85), the column left so that a rule does not touch the pane border.
+
 ### Output Stage
 
 The final stage uses [nup(1)](https://metacpan.org/pod/App%3A%3Anup) to provide multi-column paged output.
 Layout options (`--pane`, `--row`, `--grid`, `--page`) are passed
 directly to nup.
+
+When tables are kept intact, `--intact` is given to ansicolumn after
+the file name `-`, which nup passes on unchanged.  It is not done with
+`--cat-v`, which would show the UNIT SEPARATORs, nor without folding
+or table formatting.
 
 The device (`-T`) and the output file (`-o`) are passed to nup as
 well.  When either is given, mdee first runs nup with `--geometry`,

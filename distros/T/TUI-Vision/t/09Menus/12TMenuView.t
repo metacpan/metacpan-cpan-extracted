@@ -26,6 +26,21 @@ BEGIN {
   $INC{"MyMenuView.pm"} = 1;
 }
 
+BEGIN {
+  package MnemonicMenuView;
+  use TUI::Drivers::Const qw( evKeyDown kbEsc );
+  use TUI::toolkit;
+  extends 'MyMenuView';
+  our @keyCodes;
+  sub getEvent {
+    $_[1]->{what} = evKeyDown;
+    $_[1]->{keyDown}{keyCode} = @keyCodes ? shift @keyCodes : kbEsc;
+  }
+  sub drawView { return; }
+  sub putEvent { return; }
+  $INC{"MnemonicMenuView.pm"} = 1;
+}
+
 # Test object creation with menu and parent
 my $menu = new_TMenu(
   new_TMenuItem( 'One', 1, 0x1234 ),
@@ -44,6 +59,32 @@ isa_ok( $menu_view_no_menu, TMenuView,
 # Test execute method
 can_ok( $menu_view, 'execute' );
 is( $menu_view->execute(), 0, 'execute returns correct value' );
+
+subtest 'Submenu keyboard mnemonics' => sub {
+  my $menu_bar = TMenuView->new(
+    bounds => new_TRect( 0, 0, 80, 1 ),
+    menu => new_TMenu( new_TMenuItem( '~O~ptions', 0, 0 ) ),
+  );
+  for my $case (
+    [ 0x0063, 102, 'Lowercase c selects Colors in the active submenu' ],
+    [ 0x0043, 102, 'Uppercase C selects Colors in the active submenu' ],
+    [ TUI::Drivers::Const::kbAltC(), 0,
+      'Alt+C does not select a submenu mnemonic without a hotkey' ],
+  ) {
+    my $submenu = MnemonicMenuView->new(
+      bounds => new_TRect( 0, 1, 20, 5 ),
+      menu => new_TMenu(
+        TMenuItem->new(
+          name => '~M~ouse...', command => 101, keyCode => 0,
+          next => new_TMenuItem( '~C~olors...', 102, 0 ),
+        ),
+      ),
+      parentMenu => $menu_bar,
+    );
+    local @MnemonicMenuView::keyCodes = ( $case->[0] );
+    is( $submenu->execute(), $case->[1], $case->[2] );
+  }
+};
 
 # Test findItem method
 can_ok( $menu_view, 'findItem' );

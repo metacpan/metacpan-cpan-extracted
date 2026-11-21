@@ -1,26 +1,30 @@
 #ifdef HAVE_NCURSES
 
-#define Uses_TColorAttr
-#include <tvision/tv.h>
-
 #include <internal/ncurdisp.h>
 #include <internal/conctl.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <ncurses.h>
 
 namespace tvision
 {
 
-NcursesDisplay::NcursesDisplay(ConsoleCtl &aCon) noexcept :
-    TerminalDisplay(aCon),
-    ansiScreenWriter(aCon)
+inline NcursesDisplay::NcursesDisplay(ConsoleCtl &aCon, SCREEN *aTerm) noexcept :
+    con(aCon),
+    term(aTerm),
+    ansiScreenWriter(aCon, TermCap::getDisplayCapabilities(con, *this))
+{
+}
+
+NcursesDisplay &NcursesDisplay::create(ConsoleCtl &con) noexcept
 {
     // Start curses mode.
-    term = newterm(nullptr, con.fout(), con.fin());
+    SCREEN *term = newterm(nullptr, con.fout(), con.fin());
     if (!term)
     {
-        fputs("Cannot initialize Ncurses: 'newterm' failed.\n", stderr);
+        const char *termEnv = getenv("TERM");
+        if (!termEnv)
+            termEnv = "";
+        fprintf(stderr, "Cannot initialize Ncurses: 'newterm' failed (TERM is '%s').\n", termEnv);
         exit(1);
     }
     // Enable colors if the terminal supports it.
@@ -30,10 +34,11 @@ NcursesDisplay::NcursesDisplay(ConsoleCtl &aCon) noexcept :
         // Use default colors when clearing the screen.
         use_default_colors();
     }
-    initCapabilities();
     /* Refresh now so that a possible first getch() doesn't make any relevant
      * changes to the screen due to its implicit refresh(). */
     wrefresh(stdscr);
+
+    return *new NcursesDisplay(con, term);
 }
 
 NcursesDisplay::~NcursesDisplay()
@@ -43,26 +48,13 @@ NcursesDisplay::~NcursesDisplay()
     delscreen(term);
 }
 
-void NcursesDisplay::reloadScreenInfo() noexcept
+TPoint NcursesDisplay::reloadScreenInfo() noexcept
 {
     TPoint size = con.getSize();
     // 'resizeterm' causes terrible flickering, so we better use 'resize_term'.
     resize_term(size.y, size.x);
-    ansiScreenWriter.resetAttributes();
-}
-
-TPoint NcursesDisplay::getScreenSize() noexcept
-{
-    int y, x;
-    getmaxyx(stdscr, y, x);
-    return {max(x, 0), max(y, 0)};
-}
-
-int NcursesDisplay::getCaretSize() noexcept
-{
-    int size = curs_set(0);
-    curs_set(size);
-    return size <= 0 ? 0 : size == 1 ? 1 : 100;
+    ansiScreenWriter.reset();
+    return size;
 }
 
 int NcursesDisplay::getColorCount() noexcept
@@ -70,27 +62,28 @@ int NcursesDisplay::getColorCount() noexcept
     return COLORS;
 }
 
+TPoint NcursesDisplay::getFontSize() noexcept
+{
+    return con.getFontSize();
+}
+
 void NcursesDisplay::clearScreen() noexcept
 {
     ansiScreenWriter.clearScreen();
 }
 
-void NcursesDisplay::lowlevelWriteChars(TStringView chars, TColorAttr attr) noexcept
+void NcursesDisplay::writeCell( TPoint pos, TStringView text, TColorAttr attr,
+                                bool doubleWidth ) noexcept
 {
-    ansiScreenWriter.lowlevelWriteChars(chars, attr, termcap);
+    ansiScreenWriter.writeCell(pos, text, attr, doubleWidth);
 }
 
-void NcursesDisplay::lowlevelMoveCursor(uint x, uint y) noexcept
+void NcursesDisplay::setCaretPosition(TPoint pos) noexcept
 {
-    ansiScreenWriter.lowlevelMoveCursor(x, y);
+    ansiScreenWriter.setCaretPosition(pos);
 }
 
-void NcursesDisplay::lowlevelMoveCursorX(uint x, uint) noexcept
-{
-    ansiScreenWriter.lowlevelMoveCursorX(x);
-}
-
-void NcursesDisplay::lowlevelCursorSize(int size) noexcept
+void NcursesDisplay::setCaretSize(int size) noexcept
 {
 /* The caret is the keyboard cursor. If size is 0, the caret is hidden. The
  * other possible values are from 1 to 100, theoretically, and represent the
@@ -103,9 +96,9 @@ void NcursesDisplay::lowlevelCursorSize(int size) noexcept
     curs_set(size > 0 ? size == 100 ? 2 : 1 : 0); // Implies refresh().
 }
 
-void NcursesDisplay::lowlevelFlush() noexcept
+void NcursesDisplay::flush() noexcept
 {
-    ansiScreenWriter.lowlevelFlush();
+    ansiScreenWriter.flush();
 }
 
 } // namespace tvision

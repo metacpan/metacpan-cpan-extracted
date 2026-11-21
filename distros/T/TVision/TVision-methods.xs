@@ -686,23 +686,9 @@ void deleteSelect(TEditor *self)
         self->deleteSelect();
 
 
-int insertMultilineText(TEditor *self,char *a, int b)
-    CODE:
-        RETVAL = self->insertMultilineText(a,  b);
-    OUTPUT:
-        RETVAL
-
-
 int insertBuffer(TEditor *self,char *c, int uint1, int uint2, int Boolean1, int Boolean2)
     CODE:
         RETVAL = self->insertBuffer(c,  uint1,  uint2,  Boolean1,  Boolean2);
-    OUTPUT:
-        RETVAL
-
-
-int insertEOL(TEditor *self,int Boolean)
-    CODE:
-        RETVAL = self->insertEOL( Boolean);
     OUTPUT:
         RETVAL
 
@@ -946,11 +932,6 @@ void unlock(TEditor *self)
 void update(TEditor *self,int uchar)
     CODE:
         self->update( uchar);
-
-
-void detectEol(TEditor *self)
-    CODE:
-        self->detectEol();
 
 MODULE=TVision::TMenuItem PACKAGE=TVision::TMenuItem
 void append(TMenuItem *self,TMenuItem *aNext)

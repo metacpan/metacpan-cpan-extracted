@@ -2,7 +2,7 @@
 # Resolve parity beyond the shared conformance cases: the reference's resolveItems and
 # Skilletor::Resolver on the same homes, projects, sources and locks – what the lock keeps
 # offering, invalid names, bundle var conflicts, failed scans, bundle entries of other sources
-# served by an untrusted one. Needs node and the TypeScript tree beside perl/.
+# served by an untrusted one. Needs node and the TypeScript tree (src/) beside lib/.
 use strict;
 use warnings;
 use Test::More;
@@ -19,10 +19,10 @@ use Skilletor::State;
 use Time::HiRes ();
 
 my $runner = path( $FindBin::Bin, '..', 'maint', 'ts-run.mjs' );
-my $src_ts = path( $FindBin::Bin, '..', '..', 'src', 'engine.ts' );
-plan skip_all => 'needs the skilletor checkout (../src) and maint/ts-run.mjs' unless $runner->exists && $src_ts->exists;
+my $src_ts = path( $FindBin::Bin, '..', 'src', 'engine.ts' );
+plan skip_all => 'needs the skilletor checkout (src/) and maint/ts-run.mjs' unless $runner->exists && $src_ts->exists;
 plan skip_all => 'needs node' unless grep { -x path( $_, 'node' ) } split /:/, $ENV{PATH} // '';
-plan skip_all => 'needs the reference\'s node_modules' unless path( $FindBin::Bin, '..', '..', 'node_modules', 'nunjucks' )->exists;
+plan skip_all => 'needs the reference\'s node_modules' unless path( $FindBin::Bin, '..', 'node_modules', 'nunjucks' )->exists;
 
 sub ts {
   my ( $req ) = @_;

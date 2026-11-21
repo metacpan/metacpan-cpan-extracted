@@ -108,10 +108,30 @@ SKIP: {
   subtest 'setdisk' => sub {
     my $cur = getdisk();
 
-    my $rc = setdisk( $cur + 1 );
+    my $rc = setdisk( $cur );
     ok( $rc >= 0, 'setdisk succeeds for current drive' );
     is( getdisk(), $cur, 'current drive unchanged or restored' );
   };
+
+  subtest 'setdisk switches drive and keeps its directory' => sub {
+    require Cwd;
+    my $cur = getdisk();
+    my $orig = Cwd::getcwd();
+    my ( $other ) = grep { $_ != $cur && defined Cwd::getdcwd( chr( 65 + $_ ) . ':' ) }
+      0 .. 25;
+    plan skip_all => 'no second drive available' unless defined $other;
+
+    my $dir = Cwd::getdcwd( chr( 65 + $other ) . ':' );
+    setdisk( $other );
+    is( getdisk(), $other, 'current drive switched' );
+    ( my $want = lc $dir ) =~ tr{\\}{/};
+    ( my $got = lc Cwd::getcwd() ) =~ tr{\\}{/};
+    is( $got, $want, 'directory is the drive\'s saved directory' );
+
+    setdisk( $cur );
+    is( Cwd::getcwd(), $orig, 'original directory restored' );
+  };
+
 }
 
 #-------------------------

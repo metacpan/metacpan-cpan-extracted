@@ -1,5 +1,5 @@
 package Net::OpenSSH::More;
-$Net::OpenSSH::More::VERSION = '1.06';
+$Net::OpenSSH::More::VERSION = '1.07';
 #ABSTRACT: Net::OpenSSH submodule with many useful features
 
 use strict;
@@ -337,13 +337,28 @@ $init_ssh = sub {
     return $self;
 };
 
+# Reconnects in place.  The caller holds $self and retries on it, so the new
+# master has to end up inside that object: assigning to $self here rebinds only
+# this sub's copy, and the retry then runs on the dead connection.
 my $connection_check = sub {
     my ($self) = @_;
     return 1 if $self->check_master;
     local $@;
     local $disable_destructor = 1;
-    eval { $self = $init_ssh->( __PACKAGE__, $self->{'_opts'} ) };
-    return $@ ? 0 : 1;
+    my $fresh = eval { $init_ssh->( ref $self, $self->{'_opts'} ) };
+    return 0 if !$fresh;
+
+    # What belongs to the caller rather than to the connection.  The shell ran
+    # over the old master, so it goes with it.
+    my %kept = map { $_ => $self->{$_} } grep { exists $self->{$_} } qw{_opts file_backups};
+    $self->{'persistent_shell'}->close() if $self->{'persistent_shell'};
+    %$self = ( %$fresh, %kept );
+
+    # Emptied, so that its destructor finds nothing to tear down, least of all
+    # the master that $self now holds.
+    %$fresh = ();
+    $cache{ $self->{'_opts'}{'_cache_index'} } = $self if !$self->{'_opts'}{'no_cache'};
+    return 1;
 };
 
 # Try calling the function.
@@ -787,7 +802,7 @@ Net::OpenSSH::More - Net::OpenSSH submodule with many useful features
 
 =head1 VERSION
 
-version 1.06
+version 1.07
 
 =head1 SYNOPSIS
 

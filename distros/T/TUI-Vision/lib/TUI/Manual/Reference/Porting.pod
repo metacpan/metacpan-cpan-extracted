@@ -44,6 +44,7 @@ practical usability rather than theoretical completeness.
   [x] Implemented
   [o] Partially implemented
   [+] Port extension
+  [-] Port reduction
 
 The status table is intended as a practical guide rather than a strict
 feature checklist.
@@ -77,6 +78,13 @@ original I<Turbo Vision> implementation. It was introduced to support
 additional functionality provided by modern terminals, color handling or
 the Perl implementation architecture.
 
+=item [-] Port reduction
+
+The class was present in the original I<Turbo Vision> implementation but is
+not included in the Perl port. This may be due to differences in the Perl
+implementation architecture or because the functionality is not required in
+the current framework.
+
 =back
 
 The table focuses on practical relevance. A class marked as implemented
@@ -90,6 +98,7 @@ detail.
  TObject            TUI::Objects::Object         [x]
  TPoint             TUI::Objects::Point          [x]
  TRect              TUI::Objects::Rect           [x]
+ TStream            TUI::Objects::Stream         [x]
  TDrawBuffer        TUI::Views::DrawBuffer       [x]
  TPalette           TUI::Views::Palette          [x]
  TCommandSet        TUI::Views::CommandSet       [x]
@@ -135,6 +144,14 @@ detail.
  TScrollBar         TUI::Views::ScrollBar        [x]
  TScroller          TUI::Views::Scroller         [x]
  TListViewer        TUI::Views::ListViewer       [x]
+
+=head3 Outline System
+
+ Class              Perl Module                  Status
+ ------------------ ---------------------------- ------
+ TNode              TUI::Outline::Node           [x]
+ TOutlineViewer     TUI::Outline::OutlineViewer  [x]
+ TOutline           TUI::Outline::Outline        [x]
 
 =head3 Application Framework
 
@@ -225,7 +242,7 @@ Lists and History
  TMenuView          TUI::Menus::MenuView         [x]
  TMenuBar           TUI::Menus::MenuBar          [x]
  TMenuBox           TUI::Menus::MenuBox          [x]
- TMenuPopup         (missing)                    [ ]
+ TMenuPopup         TUI::Menus::MenuPopup        [x]
  TSubMenu           TUI::Menus::SubMenu          [x]
  TStatusLine        TUI::Menus::StatusLine       [x]
  TStatusItem        TUI::Menus::StatusItem       [x]
@@ -261,20 +278,28 @@ Lists and History
  TLineCollection      TUI::Gadgets::LineCollection      [x]
  TSortedCollection    TUI::Objects::SortedCollection    [x]
  TStringCollection    TUI::Objects::StringCollection    [x]
- TStringList          (missing)                         [ ]
- TStrListMaker        (missing)                         [ ]
- TResourceCollection  (missing)                         [ ]
- TResourceFile        (missing)                         [ ]
+ TStringList          (not ported)                      [-]
+ TStrListMaker        (not ported)                      [-]
+ TResourceCollection  (not ported)                      [-]
+ TResourceFile        (not ported)                      [-]
+
+The resource and string-list classes from the original I<Turbo Vision>
+implementation are currently not ported. The Perl implementation uses its 
+existing storage facilities instead, and no current framework component 
+requires these compatibility classes.
 
 =head3 Editors and Text Devices
 
  Class              Perl Module                  Status
  ------------------ ---------------------------- ------
- TEditor            (missing)                    [ ]
- TMemo              (missing)                    [ ]
- TFileEditor        (missing)                    [ ]
- TEditWindow        (missing)                    [ ]
- TIndicator         (missing)                    [ ]
+ TEditor            TUI::Editors::Editor         [x]
+ TFindDialogRec     TUI::Editors::Editor         [x]
+ TReplaceDialogRec  TUI::Editors::Editor         [x]
+ TMemo              TUI::Editors::Memo           [x]
+ TMemoData          TUI::Editors::Memo           [x]
+ TFileEditor        TUI::Editors::FileEditor     [x]
+ TEditWindow        TUI::Editors::EditWindow     [x]
+ TIndicator         TUI::Editors::Indicator      [x]
  TTextDevice        TUI::TextView::TextDevice    [x]
  TTerminal          TUI::TextView::Terminal      [x]
 
@@ -282,8 +307,13 @@ Lists and History
 
  Class              Perl Module                  Status
  ------------------ ---------------------------- ------
- TCalcDisplay       (missing)                    [ ]
- TCalendarView      (missing)                    [ ]
+ TAsciiChart        TUI::Gadgets::AsciiChart     [x]
+ TTable             TUI::Gadgets::Table          [x]
+ TReport            TUI::Gadgets::Report         [x]
+ TCalculator        TUI::Gadgets::Calculator     [x]
+ TCalcDisplay       TUI::Gadgets::CalcDisplay    [x]
+ TCalendarView      TUI::Gadgets::CalendarView   [x]
+ TCalendarWindow    TUI::Gadgets::CalendarWindow [x]
  TClickTester       TUI::Gadgets::ClickTester    [x]
  TClockView         TUI::Gadgets::ClockView      [x]
  TEventViewer       TUI::Gadgets::EventViewer    [x]
@@ -291,18 +321,22 @@ Lists and History
  TFileWindow        TUI::Gadgets::FileWindow     [x]
  THeapView          TUI::Gadgets::HeapView       [x]
  TMouseDialog       TUI::Gadgets::MouseDialog    [x]
- TPuzzleView        (missing)                    [ ]
+ TPuzzleView        TUI::Gadgets::PuzzleView     [x]
+ TPuzzleWindow      TUI::Gadgets::PuzzleWindow   [x]
 
 =head3 Help System
 
  Class              Perl Module                  Status
  ------------------ ---------------------------- ------
- TParagraph         (missing)                    [ ]
- TCrossRef          (missing)                    [ ]
- THelpTopic         (missing)                    [ ]
- THelpIndex         (missing)                    [ ]
- THelpFile          (missing)                    [ ]
- THelpViewer        (missing)                    [ ]
- THelpWindow        (missing)                    [ ]
+ TParagraph         TUI::Help::HelpBase          [x]
+ TCrossRef          TUI::Help::HelpBase          [x]
+ TReference         TUI::Help::HelpBase          [x]
+ TRefTable          TUI::Help::RefTable          [x]
+ TTopicDefinition   TUI::Help::TopicDefinition   [x]
+ THelpTopic         TUI::Help::HelpTopic         [x]
+ THelpIndex         TUI::Help::HelpIndex         [x]
+ THelpFile          TUI::Help::HelpFile          [o]
+ THelpViewer        TUI::Help::HelpViewer        [x]
+ THelpWindow        TUI::Help::HelpWindow        [x]
 
 =cut

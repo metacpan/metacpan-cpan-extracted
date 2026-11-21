@@ -11,6 +11,13 @@ use Secp256k1Test;
 my $secp = Bitcoin::Secp256k1->new;
 my %t = Secp256k1Test->test_data;
 
+subtest 'should not allow changing the reference address' => sub {
+	my $obj = Bitcoin::Secp256k1->new;
+
+	my $ex = dies { $$obj = 0 };
+	like $ex, qr{modification of a read-only value attempted}i, 'exception ok';
+};
+
 subtest 'should die on constructor with arguments' => sub {
 	my $ex = dies { Bitcoin::Secp256k1->new('argument') };
 	like $ex, qr/\QUsage: Bitcoin::Secp256k1::new(classname)\E/, 'exception ok';
@@ -77,6 +84,13 @@ subtest 'should die on invalid combination of public keys' => sub {
 	like $ex, qr/the input does not appear to be a valid public key/, 'exception ok';
 };
 
+subtest 'should always bless into a classname' => sub {
+	my $o1 = Bitcoin::Secp256k1->new;
+	my $o2 = $o1->new;
+
+	isa_ok $o2, 'Bitcoin::Secp256k1';
+};
+
 # cases in api.t are tweaked, use at least one case from a BIP for Schnorr
 subtest 'should generate the same signatures as BIP340 test cases' => sub {
 	my $priv = pack 'H*', 'b7e151628aed2a6abf7158809cf4f3c762e7160f38b4da56a784d9045190cfef';
@@ -110,6 +124,23 @@ subtest 'should fail on no pubkeys to combine' => sub {
 		qr{usage: \$secp256k1->combine_public_keys\(\$public_key, \[\@more_public_keys\]\)};
 	like dies { $secp->combine_public_keys($t{pubkey}, undef) },
 		qr{usage: \$secp256k1->combine_public_keys\(\$public_key, \[\@more_public_keys\]\)};
+};
+
+subtest 'should disallow broken integers in recovery_id' => sub {
+	my $rec_sig = $secp->sign_message_recoverable($t{privkey}, $t{preimage});
+
+	$rec_sig->{recovery_id} .= 'a';
+	like dies { $secp->recover_public_key_message($rec_sig, $t{preimage}) },
+		qr{recovery_id must be 0, 1, 2, or 3};
+
+	$rec_sig->{recovery_id} = undef;
+	like dies { $secp->recover_public_key_message($rec_sig, $t{preimage}) },
+		qr{recovery_id must be 0, 1, 2, or 3};
+};
+
+subtest 'should verify recoverable digest with uncompressed public key' => sub {
+	my $rec_sig = $secp->sign_message_recoverable($t{privkey}, $t{preimage});
+	ok $secp->verify_message_recoverable($t{pubkey_unc}, $rec_sig, $t{preimage});
 };
 
 done_testing;

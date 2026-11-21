@@ -181,12 +181,12 @@
         "Retry-After": "1"
       },
       "body": {
-        "error": "per-minute limit for Unlimited lookups exceeded; retry shortly, or use a paid plan"
+        "error": "rate limit for Unlimited lookups exceeded; retry shortly, or use a paid plan"
       },
       "expect": {
         "kind": "rate_limited",
         "retryable": true,
-        "message": "per-minute limit for Unlimited lookups exceeded; retry shortly, or use a paid plan",
+        "message": "rate limit for Unlimited lookups exceeded; retry shortly, or use a paid plan",
         "retryAfterSeconds": 1
       }
     },

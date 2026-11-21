@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -15,6 +15,7 @@ our @EXPORT = qw(
   new_TBackground
 );
 
+use Storable;
 use TUI::toolkit;
 use TUI::toolkit::Types qw(
   :Object
@@ -22,6 +23,7 @@ use TUI::toolkit::Types qw(
 );
 
 use TUI::App::Const qw( cpBackground );
+use TUI::Objects::Rect;
 use TUI::Views::Const qw( :gfXXXX );
 use TUI::Views::DrawBuffer;
 use TUI::Views::Palette;
@@ -89,6 +91,39 @@ sub getPalette {    # $palette ()
     size => length( cpBackground )
   );
   return $palette->clone();
+}
+
+sub write :method {    # void ($os)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $os ) = $sig->( @_ );
+  $self->SUPER::write( $os );
+  $os->put( $self->{pattern} );
+  return;
+}
+
+sub read :method {    # $self ($is)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $is ) = $sig->( @_ );
+  $self->SUPER::read( $is );
+  $self->{pattern} = $is->get();
+  return $self;
+}
+
+sub build {    # $obj ()
+  my ( $class ) = @_;
+  assert ( @_ == 1 );
+  assert ( is_Str $class );
+  assert ( Storable::is_retrieving );
+  return $class->new(
+    bounds  => TRect->new(),
+    pattern => '',
+  );
 }
 
 1

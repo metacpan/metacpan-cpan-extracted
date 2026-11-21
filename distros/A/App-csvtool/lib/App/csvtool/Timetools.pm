@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2024 -- leonerd@leonerd.org.uk
 
-package App::csvtool::Timetools 0.04;
+package App::csvtool::Timetools 0.05;
 
 use v5.26;
 use warnings;
@@ -33,6 +33,8 @@ that specifies only the mday, mon and year fields will take a default time of
 
 =head1 COMMON OPTIONS
 
+=for highlighter
+
 Commands in this module recognise the following common options
 
 =head3 --timefmt
@@ -48,9 +50,7 @@ Use UTC instead of local time.
 
 =cut
 
-use POSIX qw( mktime strftime );
-use Time::timegm qw( timegm );
-use POSIX::strptime qw( strptime );
+use Time::Piece;
 
 # Common opts
 use constant COMMON_COMMAND_OPTS => (
@@ -62,27 +62,33 @@ use constant COMMON_COMMAND_OPTS => (
 sub formattime ( $pkg, $opts, $time )
 {
    my $TIMEFMT = $opts->{timefmt};
-   my @t = $opts->{utc} ? gmtime( $time ) : localtime( $time );
+   my $t = $opts->{utc} ? Time::Piece::gmtime( $time ) : Time::Piece::localtime( $time );
 
-   return strftime( $TIMEFMT, @t );
+   return $t->strftime( $TIMEFMT );
 }
+
+# Time::Piece doesn't appear to document how to do local- vs UTC-based
+# strptime+epoch conversions, but by code-diving and emperical testing it
+# appears you can use a precanned instance with isdst set appropriately to
+# call the ->strptime method on
+#   See also https://rt.cpan.org/Ticket/Display.html?id=168828
+use constant {
+   TIME_PIECE_LOCAL => scalar Time::Piece->localtime,
+   TIME_PIECE_UTC   => scalar Time::Piece->gmtime,
+};
 
 sub parsetime ( $pkg, $opts, $str )
 {
    my $TIMEFMT = $opts->{timefmt};
-   my @t = ( strptime $str, $TIMEFMT )[0..5]; # take only sec-year, ignore wday/yday
-   grep { defined } @t or
+
+   # Time::Piece throws exceptions on parse failures;
+   my $t = eval {
+      ( $opts->{utc} ? TIME_PIECE_UTC : TIME_PIECE_LOCAL )->strptime( $str, $TIMEFMT );
+   };
+   defined $t or
       warn( "Unable to parse '$str' as a timestamp\n" ), return undef;
 
-   # Fill in zeroes for undefined smaller fields
-   foreach my $i ( 0 .. 5 ) {
-      last if defined $t[$i];
-      $t[$i] = ( $i == 3 ) ? 1 : 0; # mday is 1-indexed
-   }
-
-   # TODO: warn if any of [0]-[5] left undefined
-
-   return $opts->{utc} ? timegm( @t[0..5] ) : mktime( @t[0..5] );
+   return $t->epoch;
 }
 
 =head1 COMMANDS

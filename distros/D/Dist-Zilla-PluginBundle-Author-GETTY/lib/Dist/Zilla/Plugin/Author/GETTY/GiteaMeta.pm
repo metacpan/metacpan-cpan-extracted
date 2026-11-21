@@ -4,7 +4,7 @@ use Moose;
 use File::Spec;
 with 'Dist::Zilla::Role::MetaProvider';
 
-our $VERSION = '0.328';
+our $VERSION = '0.329';
 
 
 
@@ -161,7 +161,7 @@ Dist::Zilla::Plugin::Author::GETTY::GiteaMeta - Add Gitea/Forgejo (incl. Codeber
 
 =head1 VERSION
 
-version 0.328
+version 0.329
 
 =head1 DESCRIPTION
 

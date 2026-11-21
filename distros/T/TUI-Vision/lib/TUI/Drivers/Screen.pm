@@ -4,6 +4,10 @@ package TUI::Drivers::Screen;
 use strict;
 use warnings;
 
+our $VERSION = '2.000003';
+$VERSION =~ tr/_//d;
+our $AUTHORITY = 'cpan:BRICKPOOL';
+
 use Exporter 'import';
 our @EXPORT = qw(
   TScreen
@@ -50,6 +54,8 @@ sub END {
 sub resume {    # void ($class)
   my $class = shift;
   assert ( $class and !ref $class );
+  THardwareInfo->setUpConsole()
+    if THardwareInfo->can('setUpConsole');
   $startupMode   = $class->getCrtMode();
   $startupCursor = $class->getCursorType();
   if ( $screenMode != $startupMode ) {
@@ -69,6 +75,8 @@ sub suspend {    # void ($class)
     $class->clearScreen();
   }
   $class->setCursorType( $startupCursor );
+  THardwareInfo->restoreConsole()
+    if THardwareInfo->can('restoreConsole');
   return;
 } #/ sub suspend
 

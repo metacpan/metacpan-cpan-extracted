@@ -3,7 +3,7 @@
 require 5.010001;
 use strict;
 package Stats::LikeR;
-our $VERSION = '0.3425';	# quoted: a bare version ending in 0, such as 0.320, is the number 0.32, which the dist would be named
+our $VERSION = '0.3427';	# quoted: a bare version ending in 0, such as 0.320, is the number 0.32, which the dist would be named
 require XSLoader;
 use warnings FATAL => 'all';
 use Exporter 'import';
@@ -2963,8 +2963,10 @@ sub _unzip_member_fast {
 }
 
 # Decode the five predefined XML entities plus numeric character references,
-# the latter as UTF-8 bytes so the result stays byte-consistent with the rest of
-# the file (which we read, and return, as raw UTF-8 bytes). The decoding is
+# the latter as UTF-8 bytes so the result stays byte-consistent with the part it
+# came out of (a relationship's Target names an archive member, which is bytes;
+# a sheet name is decoded to characters afterwards, by _xlsx_text()). The
+# decoding is
 # xlsx_xml_uncat() in LikeR.xs, the one the cells go through: up to 0.320 this
 # was five substitutions in a row, and a reference the first one produced was
 # decoded again by a later one, so "&#38;lt;" came back as "<".
@@ -2972,6 +2974,31 @@ sub _xml_unescape {
 	my ($s) = @_;
 	return $s unless defined $s && index($s, '&') >= 0;
 	return _xml_unescape_xs($s);
+}
+
+# XML text from a workbook part, as characters: the bytes are UTF-8, as an
+# .xlsx's XML is, and a string with no non-ASCII character is the same either
+# way. Text that is not valid UTF-8 is returned as the bytes it holds, which is
+# what utf8::decode() does with it, and what the cells do (xlsx_text_is_utf8()
+# in LikeR.xs). Applied to a sheet name here; the cells are decoded in XS.
+sub _xlsx_text {
+	my ($s) = @_;
+	utf8::decode($s) if defined $s;
+	return $s;
+}
+
+# A caller's name or token as the characters read_table compares an .xlsx's
+# text with, which is what the file's names and cells come back as. A string
+# perl holds as characters is returned as it is. One it holds as bytes is
+# decoded when the bytes are valid UTF-8 and have a non-ASCII byte, so that a
+# name typed in a script without `use utf8`, which is what an .xlsx read
+# required of it up to 0.3425, still matches; any other byte string is returned
+# as it is, and its bytes are then Latin-1 characters, as perl reads them.
+sub _as_chars {
+	my ($s) = @_;
+	return $s if !defined $s || utf8::is_utf8($s);
+	utf8::decode($s);
+	return $s;
 }
 
 # The start tags of every element called $local in $xml, under any namespace
@@ -3094,7 +3121,7 @@ sub _xlsx_sheets {
 			my $name = _xml_attr($at, 'name');
 			my $rid  = _xml_attr($at, '[\w.-]+:id');
 			push @sheets, {
-				name => defined $name ? _xml_unescape($name) : undef,
+				name => defined $name ? _xlsx_text(_xml_unescape($name)) : undef,
 				path => defined $rid ? $target->{$rid} : undef,
 			};
 		}
@@ -3113,11 +3140,12 @@ sub _xlsx_sheets {
 # and up to 0.3213 any all-digit 'sheet' was an index, so of sheets "2024" and
 # "2023" neither key could be asked for again ("sheet index 2023 is out of
 # range"), and with sheets "2" and "1", sheet => '1' quietly returned "2". The
-# name is compared as bytes (see _as_bytes), which is how it was read.
+# name is compared as characters (see _as_chars), which is how it is read since
+# 0.3426; up to 0.3425 it was bytes.
 sub _xlsx_choose_sheet {
 	my ($file, $sheets, $sheet) = @_;
 	return $sheets->[0] unless defined $sheet;
-	my $want = _as_bytes($sheet);
+	my $want = _as_chars($sheet);
 	my ($chosen) = grep { defined $_->{name} && $_->{name} eq $want } @$sheets;
 	return $chosen if $chosen;
 	if ($want =~ /\A[0-9]+\z/) {
@@ -3303,10 +3331,28 @@ sub _open_decompressed {
 # 0.3213 na_strings => "\x{2014}", sheet => "Donn\x{e9}es" and a filter or
 # row_names key of the same kind never matched what the file plainly held. A
 # string perl holds as bytes is returned as it is.
+#
+# The encoded copy is made by stringifying, because the argument may be a copy
+# of a shared hash key (a filter's or colClasses' key), and on perl 5.32
+# utf8::encode() of a plain copy of one leaves it looking up as the key it came
+# from (see the keep_cols spellings in read_table).
 sub _as_bytes {
 	my ($s) = @_;
-	utf8::encode($s) if defined $s && utf8::is_utf8($s);
+	return $s unless defined $s && utf8::is_utf8($s);
+	$s = "$s";
+	utf8::encode($s);
 	return $s;
+}
+
+# warn() of a message that may hold characters past Latin-1, as read_table's
+# can since 0.3426 returns an .xlsx's names as characters. From perl 5.18 on,
+# warn() of such a string warns "Wide character in warn", which this file's
+# FATAL warnings turn into a die; the message is encoded to the UTF-8 perl
+# would have printed instead.
+sub _warn_text {
+	my $m = join '', @_;
+	utf8::encode($m) if utf8::is_utf8($m);
+	warn $m;
 }
 
 sub read_table {
@@ -3345,6 +3391,10 @@ sub read_table {
 	# 0.3213 only .xlsx was recognised, and an .xlsm was read as text and
 	# reported as an alignment error in a ragged row.
 	my $is_xlsx = $file =~ /\.xl(?:sx|sm|tx|tm)\z/i;
+	# What a name or token the caller passes is turned into before it is
+	# compared with a field: the bytes a delimited file holds, but the
+	# characters an .xlsx's names and cells are (see _as_bytes, _as_chars)
+	my $as_field = $is_xlsx ? \&_as_chars : \&_as_bytes;
 	my $codec   = $is_xlsx ? '' : _sniff_compression($file);
 	die "read_table: \"$file\" is $codec-compressed, which read_table cannot "
 	  . "decompress; decompress it first, or recompress it with gzip or bzip2\n"
@@ -3446,7 +3496,7 @@ sub read_table {
 	  . "the row names column is read as an ordinary column")
 		if $otype ne 'hoh' && defined $args{'row_names'};
 	# compared with the header's bytes, both here and in _vcf_explode()
-	$args{'row_names'} = _as_bytes($args{'row_names'}) if defined $args{'row_names'};
+	$args{'row_names'} = $as_field->($args{'row_names'}) if defined $args{'row_names'};
 	# 'sheet' picks a worksheet, which only an .xlsx has; it was ignored on
 	# any other file up to 0.3213, as 'explode' is refused on a non-VCF.
 	_usage_error('read_table', "'sheet' applies only to an .xlsx, and \"$file\" is not "
@@ -3658,7 +3708,7 @@ sub read_table {
 		for my $s (@ns) {
 			_usage_error('read_table', "'na_strings' may not contain an undefined value")
 				unless defined $s;
-			$na_string{ _as_bytes($s) } = 1;
+			$na_string{ $as_field->($s) } = 1;
 		}
 	}
 	my $has_na = %na_string ? 1 : 0;   # skip the hash lookup in the common case
@@ -3783,7 +3833,9 @@ sub read_table {
 		# UTF-8, as the characters they spell, so that a pattern compiled under
 		# `use utf8` and one compiled without it both match "Größe", and so do
 		# a column name written under it and one written without. Each name is
-		# tried once, and every field carrying an excluded name goes.
+		# tried once, and every field carrying an excluded name goes. An .xlsx's
+		# names are already characters, and are tried as those and as the bytes
+		# they encode to, for the same two kinds of caller.
 		@excl = ();
 		@kept_flds = (0 .. $#header);
 		if (%sel) {
@@ -3815,8 +3867,23 @@ sub read_table {
 			};
 			my %out;
 			for my $name (@uniq_header) {
-				my $chars = $name;
-				my $wide  = utf8::decode($chars) && $chars ne $name;
+				# the two spellings a name is tried as: for a delimited file
+				# the bytes it holds and the characters they spell; for an
+				# .xlsx the characters it holds and the bytes they encode to
+				#
+				# The copy is "$name", not $name: an .xlsx's name is a copy of a
+				# shared hash key, and on perl 5.32 utf8::encode() of such a copy
+				# leaves it looking up as the key it was copied from, so its
+				# bytes found the characters' entry and the name was never
+				# marked found (a stringified copy owns its buffer).
+				my $chars = "$name";
+				my $wide;
+				if ($is_xlsx) {
+					utf8::encode($chars);
+					$wide = $chars ne $name;
+				} else {
+					$wide = utf8::decode($chars) && $chars ne $name;
+				}
 				# both are tried, whatever the first says, so that each one's
 				# names are marked as found
 				my $kept    = !$sel{keep} || $hit->('keep', $name, $chars, $wide)
@@ -3845,14 +3912,14 @@ sub read_table {
 				next unless $sel{$k};
 				my @absent = grep { !$named{$k}{$_} } @{ $sel{$k}{names} };
 				push @absent_msg, "read_table: not all columns named in '${k}_cols' exist in $in: "
-				   . join(', ', map { "'" . _as_bytes($_) . "'" } @absent) . "\n"
+				   . join(', ', map { "'" . $as_field->($_) . "'" } @absent) . "\n"
 					if @absent;
 			}
 			if (@absent_msg && defined $args{_sheet_ix}) {
 				die join('', @absent_msg) . "read_table: pass 'sheet' to read one worksheet, "
 				  . "or a qr// regex, which may match no column of a sheet\n";
 			}
-			warn $_ for @absent_msg;
+			_warn_text($_) for @absent_msg;
 			if (%out) {
 				@excl        = map { $out{$_} ? 1 : 0 } @header;
 				@kept_flds   = grep { !$excl[$_] } 0 .. $#header;
@@ -3882,8 +3949,8 @@ sub read_table {
 			"'$_' x $seen_h{$_} (fields " . join(', ', @f) . "$more)"
 		} grep { $seen_h{$_} > 1 } @uniq_header;
 		# an aoa keeps every field, so a repeated name loses nothing there
-		warn "read_table: duplicate column name(s) in $file (later values win): "
-			. join('; ', @dup_cols) . "\n"
+		_warn_text("read_table: duplicate column name(s) in $file (later values win): "
+			. join('; ', @dup_cols) . "\n")
 			if @dup_cols && $otype ne 'aoa';
 		# An aoa's first row is the header -- the shape write_table reads an
 		# AoA as -- in file order and with any repeated name kept.
@@ -3924,7 +3991,7 @@ sub read_table {
 				if ($k eq '0') {
 					$fld = 0;
 				} else {
-					my $kb = _as_bytes($k);
+					my $kb = $as_field->($k);
 					my $idx = $last_field{$kb};
 					if (!defined $idx && length( $args{comment} // '' )) {
 						# A commented-out header has its marker (and any
@@ -3956,7 +4023,7 @@ sub read_table {
 		if (defined $cls_arg) {
 			my $r = ref $cls_arg;
 			if ($r eq 'HASH') {
-				my %by = map { _as_bytes($_) => $cls_of->( $cls_arg->{$_} ) } keys %$cls_arg;
+				my %by = map { $as_field->($_) => $cls_of->( $cls_arg->{$_} ) } keys %$cls_arg;
 				@cls = map { $by{$_} // 3 } @header;
 				my %have = map { $_ => 1 } @header;
 				warn "read_table: not all columns named in 'colClasses' exist\n"
@@ -4308,12 +4375,12 @@ sub read_table {
 		$first_dup_rn ||= [ $plan->{dup_first}, $plan->{dup_row} ];
 	}
 	if ($n_dup_rn == 1) {
-		warn "read_table: duplicate row name '$first_dup_rn->[0]' in $file "
-		   . "(later values win)\n";
+		_warn_text("read_table: duplicate row name '$first_dup_rn->[0]' in $file "
+		   . "(later values win)\n");
 	} elsif ($n_dup_rn) {
-		warn "read_table: $n_dup_rn rows of $file repeat an earlier row's name "
+		_warn_text("read_table: $n_dup_rn rows of $file repeat an earlier row's name "
 		   . "(later values win); the first is '$first_dup_rn->[0]', on data "
-		   . "row $first_dup_rn->[1]\n";
+		   . "row $first_dup_rn->[1]\n");
 	}
 	# header-only files never hit a data row. A provisional (commented-out)
 	# header was never confirmed against a data row, but with no data to
@@ -5590,10 +5657,11 @@ sub _chol_det {
 	return $det;
 }
 
-# vif($data, $formula_or_predictors)
+# vif($data, $formula_or_predictors [, type => 'terms' | 'predictor'])
 #
 # Variance inflation factors, ported from car 3.1-5's vif.default()
-# (R/vif.R), which vif.lm() hands its default type = "terms" to:
+# (R/vif.R), which vif.lm() hands its default type = "terms" to (type =
+# "predictor" is vif.lm()'s own, ported below as _vif_predictor()):
 #
 #   R <- cov2cor(vcov(mod))[-1, -1]       # less the intercept
 #   GVIF_term = det(R[subs, subs]) * det(R[-subs, -subs]) / det(R)
@@ -5620,8 +5688,20 @@ sub _chol_det {
 # predictors"; a factor was never handled; and a response's missing values
 # did not take its rows out, where car's model has none of them.
 sub vif {
-	my ($data, $spec) = @_;
+	my ($data, $spec, @opt) = @_;
 	_usage_error('vif', 'first argument must be a data reference') unless ref $data;
+	_usage_error('vif', 'options after the formula must be name => value pairs') if @opt % 2;
+	_opt_names_defined('vif', @opt);
+	my %opt = @opt;
+	my $type = delete $opt{type};
+	_usage_error('vif', "unknown option '" . (sort keys %opt)[0] . "'") if %opt;
+	# match.arg(type): the full name or any unambiguous start of it
+	$type = 'terms' unless defined $type;
+	{
+		my @hit = ref $type || $type eq '' ? () : grep { index($_, $type) == 0 } qw(terms predictor);
+		_usage_error('vif', "type must be 'terms' or 'predictor'") unless @hit == 1;
+		$type = $hit[0];
+	}
 	my $formula;
 	if (ref $spec eq 'ARRAY') {
 		$formula = '~ ' . join(' + ', @$spec);
@@ -5639,12 +5719,14 @@ sub vif {
 	}
 	die 'vif: there are aliased coefficients in the model (' . join(', ', @{ $ds->{aliased} }) . ")\n"
 		if @{ $ds->{aliased} };
+	return _vif_predictor($ds, $formula, $data) if $type eq 'predictor';
 	# car counts the formula's terms; a factor with one level has no column
 	# here, and lm() leaves it out of the fit, so it is not one of them
 	my @terms = grep { $ds->{order}[$_] } 0 .. $#{ $ds->{term_labels} };
 	die "vif: model contains fewer than 2 terms\n" if @terms < 2;
 	warn "vif: No intercept: vifs may not be sensible.\n" unless $ds->{intercept};
 	warn "vif: there are higher-order terms (interactions) in this model\n"
+		. "consider setting type = 'predictor'; see ?vif\n"
 		if grep { $ds->{order}[$_] > 1 } @terms;
 	my $q = @{ $ds->{names} };
 	my $x = $ds->{cross};
@@ -5688,6 +5770,145 @@ sub vif {
 		Df                => $df{$_},
 		'GVIF^(1/(2*Df))' => $gvif{$_} ** (1 / (2 * $df{$_})),
 	} } keys %gvif };
+}
+
+# _det_lu(\@A): the determinant of a square matrix, by Gaussian elimination with
+# partial pivoting as LAPACK's dgetrf does for R's det(); the empty matrix has
+# determinant 1.  _chol_det() would do for a positive definite matrix, but
+# _vif_predictor() also asks for submatrices that need not be.
+sub _det_lu {
+	my @a = map { [ @$_ ] } @{ $_[0] };
+	my $n = @a;
+	my $det = 1;
+	for my $k (0 .. $n - 1) {
+		my $p = $k;
+		for my $i ($k + 1 .. $n - 1) { $p = $i if abs $a[$i][$k] > abs $a[$p][$k] }
+		return 0 if $a[$p][$k] == 0;
+		if ($p != $k) { @a[$p, $k] = @a[$k, $p]; $det = -$det }
+		$det *= $a[$k][$k];
+		for my $i ($k + 1 .. $n - 1) {
+			my $f = $a[$i][$k] / $a[$k][$k];
+			$a[$i][$_] -= $f * $a[$k][$_] for $k + 1 .. $n - 1;
+		}
+	}
+	return $det;
+}
+
+# _formula_vars($text, $data): R's all.vars() of a formula's text, the names
+# of the variables in order of first appearance.  A name followed by '(' is a
+# function and a token that begins with a digit a number, so log(x + 1) and
+# I(a - b) give x and a, b; '.' gives every column of $data but the row-name
+# columns, in the sorted order lm() expands it in.
+sub _formula_vars {
+	my ($text, $data) = @_;
+	my (@v, %seen);
+	$text =~ s/\s+//g;
+	$text =~ s/%in%/+/g;
+	while ($text =~ /([^-+*\/:^()%,]+)(\()?/g) {
+		my ($tok, $call) = ($1, $2);
+		next if $call || $tok =~ /^[0-9]/;
+		my @names = $tok;
+		if ($tok eq '.') {
+			my $first = ref $data eq 'ARRAY' ? $data->[0] : $data;
+			my @ks = ref $first eq 'HASH' ? keys %$first : ();
+			# a hash of rows (HoH) names its columns by its first row's keys
+			if (ref $data eq 'HASH' && @ks && !grep { ref $first->{$_} eq 'ARRAY' } @ks) {
+				my ($row) = map { $data->{$_} } sort keys %$data;
+				@ks = ref $row eq 'HASH' ? keys %$row : ();
+			}
+			@names = grep { $_ !~ /\A(?:row_names|_row|rownames|\.rownames)\z/ } sort @ks;
+		}
+		for my $n (@names) { push @v, $n unless $seen{$n}++ }
+	}
+	return @v;
+}
+
+# _vif_predictor($ds, $formula, $data): vif(type = "predictor"), ported from
+# car 3.1-5's vif.lm() (R/vif.R).  For each predictor, the GVIF of the columns
+# of the terms it appears in, with the terms of every predictor it does not
+# interact with held out:
+#
+#   related   the variables of the terms the predictor is in
+#   columns   the design's columns, less those of every term that has a
+#             variable the predictor is not related to
+#   GVIF      det(R[columns, columns]) * det(R[-columns, -columns]) / det(R)
+#
+# with R the correlation of the design's columns, less the intercept's.  So a
+# predictor with no interaction gets the GVIF of its own term among all the
+# others, and interacting predictors share one value.  Df is the number of
+# columns, and the result a table with "Interacts With" and "Other
+# Predictors" beside GVIF, Df and GVIF^(1/(2*Df)) -- or, as car's, a plain
+# predictor => GVIF hash when every Df is 1.
+#
+# What car does and this follows, though odd: "Interacts With" lists the
+# related variables after the first, which is the predictor only when its first
+# term starts with it (a predictor b met only in a:b is listed as interacting
+# with b, not with a); a variable in the formula that no term has (`- qsec`) is a
+# predictor of Df 0 whose GVIF^(1/(2*Df)) is Inf; and an empty set of columns
+# has determinant 1.
+#
+# car's refusals, which this keeps: a model with no intercept, where vif.lm()
+# stops at "object 'assign.X' not found" (it defines that only with one), and a
+# model matrix with a single column, where cor() stops at "supply both 'x' and
+# 'y' or a matrix-like 'x'".  An aliased column, which car carries on past
+# into NaN, is refused as type = "terms" refuses it, in vif().
+sub _vif_predictor {
+	my ($ds, $formula, $data) = @_;
+	die "vif: type = 'predictor' needs a model with an intercept; car::vif() stops at "
+	  . "\"object 'assign.X' not found\" without one\n" unless $ds->{intercept};
+	my $q = @{ $ds->{names} };
+	die "vif: type = 'predictor' needs a design with at least two columns besides the intercept; "
+	  . "car::vif() stops at \"supply both 'x' and 'y' or a matrix-like 'x'\"\n" if $q < 2;
+	my $x = $ds->{cross};
+	my @sd = map { sqrt $x->[$_ * $q + $_] } 0 .. $q - 1;
+	my @R;
+	for my $i (0 .. $q - 1) {
+		$R[$i][$_] = $x->[$i * $q + $_] / ($sd[$i] * $sd[$_]) for 0 .. $q - 1;
+	}
+	my $det_r = _det_lu(\@R);
+	my @label = @{ $ds->{term_labels} };
+	my @term_vars = map { [ _formula_vars($_, $data) ] } @label;
+	(my $rhs = $formula) =~ s/\A[^~]*~//;
+	my @predictors = _formula_vars($rhs, $data);
+	my @all_cols = 0 .. $q - 1;
+	my (%row, $table);
+	for my $pred (@predictors) {
+		my @which = grep { my $v = $term_vars[$_]; scalar grep { $_ eq $pred } @$v } 0 .. $#label;
+		my (%seen, @related);
+		for my $part (split /:/, join ':', @label[@which]) { push @related, $part unless $seen{$part}++ }
+		my %rel = map { $_ => 1 } @related;
+		my @unrelated = grep { !$rel{$_} } @predictors;
+		my ($gvif, @columns);
+		if (@unrelated) {
+			my %un = map { $_ => 1 } @unrelated;
+			my %drop = map { $_ + 1 => 1 }
+				grep { my $v = $term_vars[$_]; scalar grep { $un{$_} } @$v } 0 .. $#label;
+			@columns = grep { !$drop{ $ds->{assign}[$_] } } @all_cols;
+			my %in = map { $_ => 1 } @columns;
+			my @out = grep { !$in{$_} } @all_cols;
+			# R[-columns, -columns] with no columns is empty, not everything
+			@out = () unless @columns;
+			$gvif = _det_lu([ map { my $i = $_; [ @{ $R[$i] }[@columns] ] } @columns ])
+			      * _det_lu([ map { my $i = $_; [ @{ $R[$i] }[@out] ] } @out ]);
+			$gvif = $det_r == 0 ? 9**9**9 / 9**9**9 : $gvif / $det_r;
+		} else {
+			@columns = @all_cols;
+			$gvif = 1;
+		}
+		my $p = @columns;
+		my $root = $p == 0 ? ($gvif > 1 ? 9**9**9 : $gvif == 1 ? 1 : 0) : $gvif ** (1 / (2 * $p));
+		my @rest = @related[1 .. $#related];
+		$row{$pred} = {
+			GVIF                => $gvif,
+			Df                  => $p,
+			'GVIF^(1/(2*Df))'   => $root,
+			'Interacts With'    => @rest ? join(', ', @rest) : '--  ',
+			'Other Predictors'  => @unrelated ? join(', ', @unrelated) : '--  ',
+		};
+		$table = 1 if $p != 1;
+	}
+	warn 'vif: ' . ($table ? 'GVIFs' : 'VIFs') . " computed for predictors\n";
+	return $table ? \%row : { map { $_ => $row{$_}{GVIF} } keys %row };
 }
 
 # hosmer_lemeshow(\@observed, \@predicted, g => 10)
@@ -6170,10 +6391,11 @@ sub INFLATE {
 }
 
 # The PerlIO::via layers write_table writes a .gz or .bz2 file through. The XS
-# opens the file as for plain text and pushes :raw:via(<class>):perlio onto it
-# (:crlf in place of :perlio where perl is a CRLF shop, so that Windows gets
-# the CRLF a plain file would), and the rows reach WRITE 8 KB at a time from
-# that buffer above rather than a field or a character at a time.
+# opens the file binary, as for a plain file, and pushes
+# :raw:via(<class>):perlio onto it; the rows bring their own row ends (CR LF
+# where perl is a CRLF shop, WT_EOL in LikeR.xs), so the compressed file holds
+# the bytes a plain one would. They reach WRITE 8 KB at a time from the :perlio
+# buffer above rather than a field or a character at a time.
 #
 # The end of the stream -- zlib's final block and the gzip trailer, bzip2's
 # end-of-stream marker -- cannot be written from FLUSH or CLOSE. The :perlio
@@ -6303,7 +6525,7 @@ Stats::LikeR - Get basic statistical functions, like in R, but with Perl using X
 
 =head1 VERSION
 
-version 0.3425
+version 0.3427
 
 =head1 Synopsis
 
@@ -6964,7 +7186,17 @@ C<log(x)> enter as single regressors. Inside C<I()>, C<log()>, C<exp()>, C<sqrt(
 C<log2()>, C<log10()>, C<log1p()> and C<abs()> a term may use C<+ - * / ^>, numbers
 and nested parentheses with R's precedence, so C<log(x+1)>, C<I(x*2)> and
 C<I(x/z-1)> are each one regressor; a term that cannot be read is a fatal
-"cannot evaluate term" error. A factor is coded by treatment contrasts
+"cannot evaluate term" error. A parenthesis that does not follow a function's
+name groups terms, and the formula algebra is R's (C<terms.formula()>):
+C<(a + b)*c> is C<a + b + c + a:c + b:c>, C<a*(b + c)> and C<(a + b):c> expand the
+same way, C<(a + b + c)^2> is the main effects and every pairwise interaction,
+C<(a + b)/c> is C<a + b + a:b:c>, C<a %in% b> is C<a:b>, groups nest, and
+C<- (a + b)> removes both terms. Terms are ordered by degree and then by
+appearance, and an interaction is named in the order its variables first
+appear in the formula, as R's C<terms()> does. A C</> outside a function is nesting, as in R,
+so a ratio of two columns is C<I(a/b)>; through 0.3425 a bare C<a/b> was read
+as that ratio. A power must be a whole number of at least 2, as in R, and any other C<%op%>, an unbalanced parenthesis or an
+operator with no operand is an error rather than a guess. A factor is coded by treatment contrasts
 or by a full set of indicators exactly as R decides it (its "margin rule"), so
 nested and per-group-slope models come out as in R: C<y ~ a + a:b> gives C<a:b>
 C<levels(a) * (levels(b) - 1)> degrees of freedom, and C<y ~ g + g:x> fits a
@@ -7955,9 +8187,16 @@ you have wins and losses instead of wins and a total.
 
 Every count must be a whole number (to within 1e-7, as in R) that is not
 negative. C<NaN>, an infinity, C<undef> or a string croaks, as R's C<binom.test>
-stops on them. So does a count, or a successes + failures sum, of C<LONG_MAX>
-or more: 9223372036854775807 on most 64-bit systems, but 2147483647 on Windows
-and on 32-bit perls.
+stops on them. So does a count, or a successes + failures sum, of perl's C<IV_MAX>
+or more: 9223372036854775807 on a 64-bit perl, 2147483647 on a perl with 32-bit
+integers. The width of C's C<long> does not matter, so Windows has the same limit
+as Linux. The two-sided p-value finds the far boundary of R's tail-counting rule
+by binary search rather than by visiting every index up to C<n>, so
+C<binom_test(3, 1e18)> returns at once (R tries to allocate 37 GB there), with the
+same answer as R wherever R can run. Above 2**53 a double cannot name every
+count, so on a perl whose NV is a double the boundary, and with it the two-sided
+p-value, is good to about 1e-7 relative at C<n> = 1e18; a long double or
+C<__float128> perl is better.
 
 =head2 cfilter
 
@@ -10272,9 +10511,23 @@ relative terms at any df: up to 0.33 C<pchisq(1e15, 1e15)> was C<0.379> where R
 and the truth are C<0.50000000594708>, C<pt(1.96, 1e15)> was C<0.97448> for
 C<0.97500>, and C<pf(1, 1e15, 1e15)> was C<0.481> for exactly C<0.5>. C<qchisq> is a
 Newton iteration from AS 91's starting value, so C<qchisq(0.5, 1e10)> takes about
-2 microseconds where it took 11 milliseconds. The constants are a double's, as
-R's are, so these agree with R to about C<1e-14> relative on a double,
-long-double and C<__float128> perl alike.
+2 microseconds where it took 11 milliseconds. On a double perl the constants
+are a double's, as R's are, so these agree with R to about C<1e-14> relative.
+
+On a long-double or C<__float128> perl they are the NV's from 0.3426 on: the
+incomplete gamma and beta (and so C<pchisq>, C<pt>, C<pf>, C<pbinom> and the
+C<qchisq>, C<qt>, C<qf> that invert them, C<< log =E<gt> 1 >> included) are accurate to a
+few tens of the NV's epsilon rather than to C<1e-14>. Against mpmath at 110
+digits the worst relative error over a grid of 900 chi-square and 4500 beta
+tails, 60 standard deviations either side of the mean and shapes from 1/1024
+to 1e7 (counting the exponent's own rounding: a tail C<exp(-f)> is good to C<f>
+epsilons) is 8 epsilons of a long double and 39 of a C<__float128> for the gamma
+(it was 5e15 and 3e30) and 64 and 86 for the beta (it was 1e5 and 7e19); the
+quantiles, 31 and 31 (they were 1.7e3 and 1e18). A double perl is not changed
+by a single bit. C<t/incomplete.gamma.beta.mpmath.t> holds the expected
+values, frozen, with the script that made them. A long-double perl whose C
+library lacks the long-double math functions, or whose long double is the
+double-double of ppc64, keeps the double's constants and its C<1e-14>.
 
 C<< log =E<gt> 1 >> is carried through in both directions, as in R:
 
@@ -11078,8 +11331,18 @@ warning:
 
 An all-zero 2x2 table gives p = 1, an odds ratio of 0 and a confidence interval
 of [0, Inf], as R does. An all-zero larger table croaks, as R's does
-("FEXACT error 3"). Where a C C<long> is 32 bits (Windows, 32-bit perls), a
-table whose total passes 2147483647 croaks, where R would still answer it.
+("FEXACT error 3"). The cells, margins and total are 64-bit whatever the width
+of C's C<long>, so a 2x2 table whose total passes 2147483647 is answered on
+Windows as on Linux (R cannot answer it: its margins overflow an integer).
+An r x c table (anything but 2x2) whose total passes 10000000 croaks
+(C<the limit is 10000000>): the network's log weights are sums of C<lgamma> terms
+as large as N log N, and a double's rounding of them overtakes FEXACT's own
+3.45e-7 tolerance as N grows (2.9e-8 relative at N = 1e7, a wrong answer, 0.29
+for 0.73, at 2**31), so it refuses rather than answer silently wrong. R cannot
+answer these either. R's PR#4688 table (4x3, N = 16442) is refused here as R refuses it, and no
+C<workspace> makes R answer it: R 4.6.1 gives FEXACT error 501 at every
+workspace from 2e5 to 2e9, with C<hybrid> true or false, so C<fisher_test> has no
+C<workspace> option.
 
 =head2 friedman_test
 
@@ -13009,7 +13272,7 @@ changes nothing. Only a C<-> outside parentheses removes, and a term that is
 itself the name of a column is that column, so a column named C<a-b> can still be
 written C<y ~ a-b>.
 
-Four details differ from R deliberately:
+Three details differ from R deliberately:
 
 =over
 
@@ -13020,19 +13283,20 @@ the two: on C<c("b", "A", "a")> R takes C<a> and C<lm> takes C<A>. Both
 parameterise the same fit — residual sum of squares, rank and fitted values
 agree — but the coefficient names and values differ.
 
-=item * A term crossed with itself keeps the product, so C<wt:wt> is C<wt> squared and
-C<y ~ wt*wt> fits C<y ~ wt + I(wt^2)>. R's formula algebra collapses C<a:a> to
-C<a>, making the same formula mean C<y ~ wt> there.
+=item * A lone term crossed with itself keeps the product, so C<wt:wt> is C<wt> squared
+and C<y ~ wt*wt> fits C<y ~ wt + I(wt^2)>. R's formula algebra collapses C<a:a>
+to C<a>, making the same formula mean C<y ~ wt> there. Any other product, such
+as C<(a + b)*(a + b)> or C<(a + b)*a>, is R's: the union of the two terms'
+variables.
 
 =item * A categorical column with only one level contributes no column, so
 C<y ~ x + g> fits C<y ~ x>. R refuses the model outright ("contrasts can be
 applied only to factors with 2 or more levels").
 
-=item * An interaction's variables are named in the order they first appear among
-the terms that remain after removals, where R orders them by the whole
-formula. So C<y ~ x*z*w - x*z>, whose first remaining term is C<w>, names its
-interactions C<w:x>, C<w:z> and C<w:x:z> where R has C<x:w>, C<z:w> and C<x:z:w>.
-The fit is the same.
+=item * The intercept markers C<- 1>, C<+ 0>, C<0 +> are read only at the top level of
+the formula. R reads one inside a group, as in C<y ~ (a + 1)*b>, and lets the
+last one win; here it is an error, because the intercept has been decided
+before the groups are expanded.
 
 =back
 
@@ -15276,8 +15540,9 @@ A UTF-8 byte-order mark at the start of a text file, which Excel's "CSV UTF-8"
 export writes, is dropped rather than read as part of the first column's name,
 as pandas' C<read_csv> drops it.
 
-A file is read as bytes and its fields come back as bytes; nothing is decoded.
-Text you pass in to be compared with a field — a C<sep>, a C<comment> marker, an
+A delimited file is read as bytes and its fields come back as bytes; nothing is
+decoded. (An C<.xlsx> is the exception: its text comes back as characters, see
+I<Excel (.xlsx) files> below.) Text you pass in to be compared with a field — a C<sep>, a C<comment> marker, an
 C<na_strings> token, a C<filter> key, C<row_names> or a C<sheet> name — is
 compared as UTF-8 bytes when perl holds it as characters, as it does under
 C<use utf8> or for a string you have decoded. So C<< 'na_strings' =E<gt> '—' >> under
@@ -15876,6 +16141,39 @@ work exactly as they do for text files:
 A C<sheet> is looked up as a name first and as a number only when no sheet has
 that name. So in a workbook whose sheets are C<2024> and C<2023>,
 C<< sheet =E<gt> 2023 >> is the sheet named C<2023>, and C<< sheet =E<gt> 2 >> is the second.
+
+B<Text is characters.> An C<.xlsx> is XML in UTF-8, and its text comes back
+decoded: the sheet names (the keys of the hash a workbook is read into), the
+column names and every string cell, shared or inline, are perl character
+strings, so a workbook that C<write_table> wrote from the keys C<café> and C<αβ>
+reads back with keys of 4 and 2 characters and C<< $book-E<gt>{"\x{3b1}\x{3b2}"} >> finds
+the sheet. Up to 0.3425 they were the raw UTF-8 bytes (5 and 4 of them), and a
+cell C<α> was 2 bytes; a caller that decoded them itself must stop, or it will
+decode twice. ASCII text is the same either way. The names and tokens you pass
+in (C<sheet>, C<row_names>, C<keep_cols>, C<drop_cols>, a C<filter> key, a
+C<colClasses> name and an C<na_strings> token) are compared with these
+characters: a string perl holds as characters is used as it is, and one it
+holds as bytes is decoded first when the bytes are valid UTF-8 with a non-ASCII
+byte, so a name typed in a script without C<use utf8> still matches. Text that is
+not valid UTF-8 (Excel and LibreOffice write none; a damaged or hostile file
+might hold some) is not an error: that string comes back as the bytes it holds,
+with no UTF-8 flag, and the strings beside it are decoded as usual. A delimited
+file is not affected; its fields are still bytes.
+
+B<Blank rows are rows.> A row with no value that lies between the header and
+the last row with a value is a row of C<undef>, whether it is empty
+(C<< E<lt>row r="3"/E<gt> >>, or C<< E<lt>row r="3"E<gt>E<lt>/rowE<gt> >> as C<write_table> writes a row of empty
+cells), holds only cells that have formatting and no value, or is missing from
+the XML altogether, as Excel leaves an empty row out. That is how pandas'
+C<read_excel> reads it, and a table C<write_table> wrote with a row of C<undef> in
+it reads back with that row. Rows past the last row with a value are not read,
+as pandas does not read them either: Excel records rows it has only formatted
+below a table. The header is the first row with a value; pandas instead takes a
+blank first row as the header. With C<< output_type =E<gt> 'hoh' >> a blank row is left
+out, since it has no row name, where a CSV record of empty fields is refused.
+Rows are taken in the order the XML gives them, and a row's C<r=> number only
+says how many blank rows lie before it. Up to 0.3425 every row with no value
+was dropped. Tested in C<t/read_table.xlsx.blank_rows.pandas.t>.
 
 B<Multiple worksheets.> If the workbook has more than one worksheet and no
 C<sheet> is given, C<read_table> returns a B<hashref keyed by worksheet name>,
@@ -17723,8 +18021,8 @@ C<hoh>, the argument errors, and where the table is printed.
 
 Variance inflation factors, the standard multicollinearity diagnostic for a
 regression model; values above ~5–10 flag problematic collinearity. Same as
-C<car::vif()> (car 3.1-5) at its default C<type = "terms">, and validated against
-it.
+C<car::vif()> (car 3.1-5), at its default C<type = "terms"> and at
+C<type = "predictor">, and validated against it.
 
  my $v = vif(\%data, 'sbp ~ age + bmi + chol');      # or [qw(age bmi chol)]
  for my $p (sort { $v->{$b} <=> $v->{$a} } keys %$v) {
@@ -17741,6 +18039,7 @@ factors are all understood:
  vif(\%data, 'sbp ~ age * bmi + chol');      # terms age, bmi, chol, age:bmi
  vif(\%data, 'sbp ~ . - id');
  vif(\%data, [qw(age bmi smoking)]);         # smoking is a factor: a GVIF table
+ vif(\%data, 'sbp ~ (age + bmi)*smoking');   # groups of terms, as in lm()
 
 For each term, with C<C> the correlation matrix of the design's columns less the
 intercept and C<S> the term's own columns,
@@ -17780,11 +18079,69 @@ result becomes a table:
 </table>
 
 As in C<car::vif()>, a model with an interaction warns that "there are
-higher-order terms (interactions) in this model" (car's C<type = "predictor"> is
-not implemented), a model with no intercept warns "No intercept: vifs may not be
+higher-order terms (interactions) in this model" and suggests C<type =
+'predictor'>, a model with no intercept warns "No intercept: vifs may not be
 sensible.", and a model with fewer than two terms, or with an aliased column,
 is an error. A formula whose response is a name the data do not have is an
 error too.
+
+=head3 type = 'predictor'
+
+C<< vif($data, $formula, type =E<gt> 'predictor') >> is what C<car> suggests for a model
+with interactions, where a term's GVIF says little about a variable that
+appears in several. It gives one GVIF per predictor, the variables of the
+formula, from the columns of every term that predictor is in and of the
+variables it interacts with, holding out the terms of every predictor it does
+not interact with (Fox and Monette, as C<car::vif.lm()> does it):
+
+ my $v = vif(\%mtcars, 'mpg ~ wt*hp + disp', type => 'predictor');
+ # $v->{wt}{GVIF} is 7.36, as is $v->{hp}{GVIF}, with Df 3 each;
+ # $v->{disp} has Df 1 and 'Other Predictors' 'wt, hp'
+
+A model whose predictors all have one column each gives a plain
+C<< predictor =E<gt> GVIF >> hash, and otherwise each predictor maps to a hash:
+
+=for html <table>
+<thead>
+<tr>
+  <th>Key</th>
+  <th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>GVIF</code></td>
+  <td>The generalized VIF of the predictor's columns.</td>
+</tr>
+<tr>
+  <td><code>Df</code></td>
+  <td>The number of those columns.</td>
+</tr>
+<tr>
+  <td><code>GVIF^(1/(2*Df))</code></td>
+  <td><code>GVIF</code> to the power <code>1/(2 Df)</code>.</td>
+</tr>
+<tr>
+  <td><code>Interacts With</code></td>
+  <td>The variables it appears with in a term, after the first; <code>--  </code> (two spaces) for none.</td>
+</tr>
+<tr>
+  <td><code>Other Predictors</code></td>
+  <td>The predictors held out, in formula order; <code>--  </code> for none.</td>
+</tr>
+</tbody>
+</table>
+
+C<type> may be abbreviated, as R's C<match.arg()> allows. Like C<car::vif()>,
+this form notes "VIFs computed for predictors" or "GVIFs computed for
+predictors", refuses a model with no intercept (C<car> stops there with
+"object 'assign.X' not found") and a design with a single column besides the
+intercept (C<cor()> has no matrix to read), and reports a variable the formula
+names but removes, as in C<y ~ a + b - b>, with C<Df> 0. It also reports
+C<Interacts With> as C<car> does, which drops the first variable of the first term
+the predictor is in, so a predictor C<c> that appears only in C<a:c> is listed
+as interacting with C<c> rather than with C<a>. Where C<car> goes on into C<NaN> over an aliased
+column, C<vif()> stops with the error C<type = 'terms'> gives.
 
 =head2 wilcox_test
 
@@ -18055,6 +18412,15 @@ A hash of arrays has as many rows as the longest of the arrays it writes; an arr
 
 An empty C<{}> or C<[]> is a table with no rows, and is written as one: the header C<col_names> and C<row_names> give, if any, and otherwise a single empty record. C<< write_table([], 'out.csv', 'col_names' =E<gt> ['A'], 'row_names' =E<gt> 1) >> writes C<,A>, as pandas writes C<DataFrame({"A": []}).to_csv()>.
 
+Delimited output is UTF-8. A string perl holds as characters is written as the
+UTF-8 of its characters, and one it holds as bytes is written as it stands when
+it is valid UTF-8 — so the fields C<read_table> returns from a UTF-8 file are
+written back unchanged — and read as Latin-1 when it is not, so C<"caf\xe9">
+and C<"café">, which are the same string to perl, are both written C<café>. This
+is the reading the C<.xlsx> and LaTeX writers give text too. Up to 0.3425 a
+string held as bytes was written as those bytes, and C<"caf\xe9"> came out as a
+single byte E9, which Python's C<csv>, pandas and R read as C<caf\x{FFFD}>.
+
 Every cell of delimited output is written whole, including one holding a NUL byte, and a cell of a tied hash or array (such as C<Tie::IxHash>) is read through its C<FETCH>. A number is formatted the way perl formats it, but in a copy, so writing a table does not add a string buffer to every numeric scalar in it. Nor does finding an AoH's or a HoH's columns leave an iterator on every row hash, as walking them with C<keys> would. A row that is a restricted hash (C<Hash::Util::lock_keys>) may lack some of the columns; those cells are written empty, where they used to die with I<Attempt to access disallowed key>.
 
 A field is quoted when it holds a quote (which is doubled), a line break or the separator, as Python's C<csv.writer> quotes, and in two more places where C<read_table> would otherwise not see the record at all. With a separator of more than one character, a field is also quoted when its end and the separator written after it would spell the separator early -- C<"a:"> before C<::>, which would otherwise be written C<a:::> and read back cut at the first C<::>. A record of a single field that is empty, C<undef> or nothing but spaces and tabs is written quoted, C<""> or C<"  ">, because a blank line is skipped on reading; C<csv.writer> writes C<['']> and C<[None]> the same way. The first field of a record is quoted when it starts with C<#>, C<read_table>'s default comment character.
@@ -18190,18 +18556,28 @@ A number is written as a number cell, and every other non-empty cell as an
 inline string (C<undef>/empty cells are omitted). A value perl holds as a number
 is a number cell, unless it is infinite or C<NaN>, which are written as text. A
 string is a number cell only when Excel would show it as it stands: a plain
-decimal (an optional C<->, digits with at most one C<.>, an optional exponent),
-with no leading zeros but the one in C<0> or C<0.5>, at most 15 significant
-digits, and a magnitude Excel holds (up to C<9.99999999999999E+307>). So C<007>,
-C<+5> and a 20-digit accession number stay text, where Excel used to show them
-as C<7>, C<5> and C<1.23457E+19>; pandas likewise writes a C<str> as a string. The
-result reads straight back with L<C<read_table>|/"read_table">.
+decimal (an optional C<-> and digits with at most one C<.>, with a digit on each
+side of it and no C<0> as the last digit after it), no exponent, with no leading
+zeros but the one in C<0> or C<0.5>, at most 15 significant digits, a magnitude
+Excel holds (up to C<9.99999999999999E+307>), and no minus sign on zero. So
+C<007>, C<+5> and a 20-digit accession number stay text, where Excel used to show
+them as C<7>, C<5> and C<1.23457E+19>, and so do C<6.10>, C<1.0>, C<1.>, C<.5>, C<1e5>
+and C<-0>, which a number cell shows as C<6.1>, C<1>, C<1>, C<0.5>, C<100000> and C<0>
+(up to 0.3425 they were number cells); C<6.12>, C<0.5> and C<-7> are numbers.
+pandas likewise writes a C<str> as a string. A value perl holds as a number is
+not subject to these rules. The result reads straight back with
+L<C<read_table>|/"read_table">, a workbook's sheet names and a table's text
+included, non-ASCII ones too.
 
 XML 1.0 cannot hold a NUL, most other control characters, the noncharacters
 U+FFFE and U+FFFF, or a surrogate, and a workbook holding one is refused by its
 readers. In a cell each is written as Excel's own escape, C<_xHHHH_> (C<\r> is
 C<_x000D_>), which Excel and LibreOffice turn back into the character, as
-XlsxWriter does. A literal C<_x0041_> in a cell is written C<_x005F_x0041_> so
+XlsxWriter does. A lone surrogate is written the same way, C<_xD800_>, rather
+than refused, but it is not a character any encoding has, and LibreOffice shows
+an empty cell for it; C<read_table> reads it back as written. In a delimited
+file it is written as perl's own UTF-8 for it, three bytes a UTF-8 reader
+replaces. A literal C<_x0041_> in a cell is written C<_x005F_x0041_> so
 that it is not mistaken for one, and so is every other underscore that would
 open an escape, overlapping ones included, so that a reader decoding left to
 right gets back exactly the text written.

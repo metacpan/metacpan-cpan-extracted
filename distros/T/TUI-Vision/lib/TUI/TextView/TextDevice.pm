@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -244,11 +244,11 @@ sub sysseek      { ... }
 
 # stubs for the other methods
 
-sub write        { !!shift->syswrite(@_) }
-sub getlines     { wantarray ? () : Carp::croak('called in a scalar context') }
-sub fileno       { -1 }
-sub clearerr     { 0 }
-sub sysread      { 0 }
+sub write :method { !!shift->syswrite(@_) }
+sub getlines      { wantarray ? () : Carp::croak('called in a scalar context') }
+sub fileno        { -1 }
+sub clearerr      { 0 }
+sub sysread       { 0 }
 
 # tiehandle interface
 

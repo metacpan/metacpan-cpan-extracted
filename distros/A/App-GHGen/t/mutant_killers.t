@@ -112,7 +112,7 @@ subtest 'COND_INV_467_9 — sequential workflow gives sum of durations (kills un
 		jobs => {
 			build => { steps => [{ run => 'npm install' }] },
 			test  => { needs => ['build'],
-			           steps => [{ run => 'npm install' }, { run => 'npm install' }] },
+					   steps => [{ run => 'npm install' }, { run => 'npm install' }] },
 		},
 	};
 	my $result = App::GHGen::CostEstimator::estimate_duration($wf);

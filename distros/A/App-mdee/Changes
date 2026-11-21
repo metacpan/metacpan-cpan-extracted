@@ -1,5 +1,14 @@
 Revision history for Perl extension App-mdee
 
+1.23 2026-11-20T11:00:46Z
+
+    - A <br> in a table cell breaks the cell into lines; the default
+      theme (nomark) hides the <br>, and --no-theme shows it
+    - With nup, tables are kept intact (ansicolumn --intact): the panes
+      do not fold them, and they are fit to the fold width plus the
+      run-in width but one (81 for a pane of 85)
+    - Requires App::ansicolumn 1.69
+
 1.22 2026-11-19T07:51:22Z
 
     - A code block of pandoc-embedz (```embedz, ```{.embedz ...}) is

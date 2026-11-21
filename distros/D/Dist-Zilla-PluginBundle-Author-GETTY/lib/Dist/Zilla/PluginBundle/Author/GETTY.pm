@@ -1,6 +1,6 @@
 package Dist::Zilla::PluginBundle::Author::GETTY;
 # ABSTRACT: BeLike::GETTY when you build your dists
-our $VERSION = '0.328';
+our $VERSION = '0.329';
 use Moose;
 use Dist::Zilla;
 use File::Spec;
@@ -841,7 +841,11 @@ sub configure {
       # @Git::VersionManager's post-release commit only allows ^lib/.*\.pm$ to be
       # dirty. Without this, bumped Perl executables under bin/ are left behind
       # as uncommitted changes, so their source stays one version behind lib/.
-      'post-release commit.allow_dirty_match' => [ '^bin/' ],
+      # script/ likewise: a dist that adds "[ExecDir] dir = script" to its own
+      # dist.ini (App-Briefing, whose bin/ belongs to its Claude Code plugin)
+      # gets those files into :PerlExecFiles, so they are bumped too, and
+      # configure() cannot see the dist's own [ExecDir] to derive the directory.
+      'post-release commit.allow_dirty_match' => [ '^bin/', '^script/' ],
       $self->no_changes ? ( 'NextRelease.format' => '' ) : (),
       @{ $self->commit_files_after_release } ? ( commit_files_after_release => $self->commit_files_after_release ) : (),
       @{ $self->version_finder } ? (
@@ -906,7 +910,7 @@ Dist::Zilla::PluginBundle::Author::GETTY - BeLike::GETTY when you build your dis
 
 =head1 VERSION
 
-version 0.328
+version 0.329
 
 =head1 SYNOPSIS
 
@@ -999,7 +1003,8 @@ In default configuration it is equivalent to:
   [@Git::VersionManager]
   ; handles versioning, changelog (NextRelease), commits, tags
   post-release commit.allow_dirty_match = ^bin/
-  ; ... the bundle adds this on top of the ^lib/.*\.pm$ default
+  post-release commit.allow_dirty_match = ^script/
+  ; ... the bundle adds these on top of the ^lib/.*\.pm$ default
 
   [Git::Push]
   push_to = origin
@@ -1291,10 +1296,11 @@ Multi-value:
 This is B<not> needed for Perl executables: the C<$VERSION> bump after a
 release covers them through the C<:PerlExecFiles> finder, but
 @Git::VersionManager only allows C<^lib/.*\.pm$> to be dirty in the commit that
-records the bump. The bundle therefore passes an additional
-C<allow_dirty_match> of C<^bin/> into that commit, so a bumped Perl executable
-is committed along with the modules instead of being left behind in the
-working tree.
+records the bump. The bundle therefore passes additional
+C<allow_dirty_match> rules of C<^bin/> and C<^script/> into that commit, so a
+bumped Perl executable is committed along with the modules instead of being
+left behind in the working tree. C<script/> covers a dist that installs its
+programs from there with C<[ExecDir] dir = script> in its own F<dist.ini>.
 
 =head2 no_podweaver
 
@@ -1744,9 +1750,29 @@ F<.github/workflows/binaries.yml>, which has to exist before C<dzil release>
 
 A published release builds from the release's CPAN tarball and attaches, per
 binary and platform, C<NAME-VERSION-PLATFORM> (C<.exe> on Windows), plus
-F<SHA256SUMS>, F<install.sh> and F<install.ps1>. Started by hand with an empty
-C<tag>, the workflow is a probe run: it builds the checked-out commit and keeps
-the result as workflow artifacts, touching no release.
+F<SHA256SUMS>, F<install.sh>, F<install.ps1> and F<provenance.json>. Started by
+hand with an empty C<tag>, the workflow is a probe run: it builds the
+checked-out commit and keeps the result as workflow artifacts, touching no
+release.
+
+F<provenance.json> is the build's provenance manifest: the source commit (for
+a release the commit its tag ends at), the commit of the workflow and of the
+scripts it ran, the run, the dist tarball and the hash of every binary, and
+per build leg and smoke run the runner, its image, the machine (OS,
+architecture, libc or kernel ABI), the container image smoked in and the
+packing perl and L<PAR::Packer>. Before it is written, what the plan, the
+build legs and the smoke runs recorded is checked against the build plan, the
+binaries and each other, and a failed check stops the release; the release
+gets its assets only when the manifest matches F<SHA256SUMS>, which does not
+list the manifest. Every run, probe or release, keeps the manifest as the
+workflow artifact C<DIST-VERSION.provenance> (a probe's VERSION is C<probe->
+and seven hex digits of its commit).
+
+The workflow runs its scripts (F<.github/dzil-binary/> of this repository) from
+its own commit, the one the C<uses:> line resolves to, and pins that commit
+once for all of its jobs; the C<bundle_ref> input names another ref of this
+repository to run them from instead. The calling workflow needs no permission
+beyond the C<contents: write> shown above.
 
 Binaries are assets of the GitHub release, so C<binary> forces it: the bundle
 dies when C<no_github> or C<no_github_release> is set, or when no GitHub remote

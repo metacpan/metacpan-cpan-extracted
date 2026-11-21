@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -16,6 +16,7 @@ our @EXPORT = qw(
 );
 
 use Carp ();
+use Storable;
 use TUI::toolkit;
 use TUI::toolkit::Types qw(
   is_Object
@@ -26,6 +27,7 @@ use TUI::Dialogs::Const qw(
   :cpXXXX
   :dpXXXX
 );
+use TUI::Objects::Rect;
 use TUI::Drivers::Const qw(
   :evXXXX
   kbEsc
@@ -178,6 +180,17 @@ sub valid {    # $bool ($command)
   return $command == cmCancel
     ? true
     : $self->SUPER::valid( $command );
+}
+
+sub build {    # $obj ()
+  my ( $class ) = @_;
+  assert ( @_ == 1 );
+  assert ( is_Str $class );
+  assert ( Storable::is_retrieving );
+  return $class->new(
+    bounds => TRect->new(), 
+    title => ''
+  );
 }
 
 1

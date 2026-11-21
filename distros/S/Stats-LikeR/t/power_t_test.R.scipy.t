@@ -42,6 +42,14 @@
 # type => 'paired' shares tsample == 1 with 'one.sample', so the two produce
 # identical numbers; the table carries 'one.sample' and 'paired' is checked
 # separately for the numbers it shares and the method/note strings it does not.
+#
+# This file holds the forward problem (solving for power) and everything that
+# is not a table row. The inverse rows, from the same two references, are in
+# t/power_t_test.solve_n.R.scipy.t, t/power_t_test.solve_delta.R.scipy.t and
+# t/power_t_test.solve_sd_sig_level.R.scipy.t. Each solve costs ~20 noncentral
+# t CDFs at a fixed 30000-step quadrature, ~4 s apiece on a quadmath perl, and
+# one file holding them all ran 470 s there. The harness runs files in
+# parallel, so split four ways none of them is the long pole of a matrix run.
 
 require 5.010;
 use warnings FATAL => 'all';
@@ -86,6 +94,9 @@ sub matches_R {
 	return;
 }
 
+# strict => 1 adds the far tail only when tside == 2 (p_body() in LikeR.xs), so
+# a one-sided strict row is its non-strict partner to the bit, expected values
+# included. One per type is kept to pin that; the other twenty were dropped.
 my @cases = (
 	{ solve => 'power', n => 30.0, delta => 0.5, sd => 1.0, sig_level => 0.05, type => 'two.sample', alternative => 'two.sided', want => 0.4778409859409133, r => 0.4778409859409388 },
 	{ solve => 'power', n => 5.0, delta => 1.0, sd => 1.0, sig_level => 0.05, type => 'two.sample', alternative => 'two.sided', want => 0.2859275976940434, r => 0.2859275976943807 },
@@ -121,16 +132,6 @@ my @cases = (
 	{ solve => 'power', n => 3.0, delta => 0.1, sd => 10.0, sig_level => 0.05, type => 'two.sample', alternative => 'one.sided', want => 0.05107973726407406, r => 0.05107973726408421 },
 	{ solve => 'power', n => 20.0, delta => 5.0, sd => 1.0, sig_level => 0.05, type => 'two.sample', alternative => 'one.sided', want => 1.0, r => 1 },
 	{ solve => 'power', n => 30.0, delta => 0.5, sd => 1.0, sig_level => 0.05, type => 'two.sample', alternative => 'one.sided', strict => 1, want => 0.606025327886786, r => 0.6060253278868073 },
-	{ solve => 'power', n => 5.0, delta => 1.0, sd => 1.0, sig_level => 0.05, type => 'two.sample', alternative => 'one.sided', strict => 1, want => 0.42144826495850457, r => 0.4214482649588239 },
-	{ solve => 'power', n => 2.0, delta => 1.0, sd => 1.0, sig_level => 0.05, type => 'two.sample', alternative => 'one.sided', strict => 1, want => 0.17355047172179056, r => 0.17355047172219384 },
-	{ solve => 'power', n => 10.0, delta => 0.0, sd => 1.0, sig_level => 0.05, type => 'two.sample', alternative => 'one.sided', strict => 1, want => 0.05000000000000001, r => 0.050000000000000044 },
-	{ solve => 'power', n => 100.0, delta => 0.2, sd => 2.0, sig_level => 0.01, type => 'two.sample', alternative => 'one.sided', strict => 1, want => 0.052181705971995625, r => 0.05218170597200167 },
-	{ solve => 'power', n => 1000.0, delta => 0.05, sd => 1.0, sig_level => 0.05, type => 'two.sample', alternative => 'one.sided', strict => 1, want => 0.2990280047894047, r => 0.29902800478940583 },
-	{ solve => 'power', n => 12.0, delta => 3.0, sd => 1.5, sig_level => 0.1, type => 'two.sample', alternative => 'one.sided', strict => 1, want => 0.9997859075469416, r => 0.9997859075469648 },
-	{ solve => 'power', n => 7.0, delta => -0.8, sd => 1.0, sig_level => 0.05, type => 'two.sample', alternative => 'one.sided', strict => 1, want => 0.0010980192129737896, r => 0.0010980192133117628 },
-	{ solve => 'power', n => 50.0, delta => 0.4, sd => 0.25, sig_level => 0.001, type => 'two.sample', alternative => 'one.sided', strict => 1, want => 0.9999987641686149, r => 0.9999987641686554 },
-	{ solve => 'power', n => 3.0, delta => 0.1, sd => 10.0, sig_level => 0.05, type => 'two.sample', alternative => 'one.sided', strict => 1, want => 0.05107973726407406, r => 0.05107973726408421 },
-	{ solve => 'power', n => 20.0, delta => 5.0, sd => 1.0, sig_level => 0.05, type => 'two.sample', alternative => 'one.sided', strict => 1, want => 1.0, r => 1 },
 	{ solve => 'power', n => 30.0, delta => 0.5, sd => 1.0, sig_level => 0.05, type => 'one.sample', alternative => 'two.sided', want => 0.7539627249951286, r => 0.7539627249951668 },
 	{ solve => 'power', n => 5.0, delta => 1.0, sd => 1.0, sig_level => 0.05, type => 'one.sample', alternative => 'two.sided', want => 0.40132028519950486, r => 0.40132028519993324 },
 	{ solve => 'power', n => 2.0, delta => 1.0, sd => 1.0, sig_level => 0.05, type => 'one.sample', alternative => 'two.sided', want => 0.09057971865059411, r => 0.09057971865071845 },
@@ -165,119 +166,6 @@ my @cases = (
 	{ solve => 'power', n => 3.0, delta => 0.1, sd => 10.0, sig_level => 0.05, type => 'one.sample', alternative => 'one.sided', want => 0.05132574328299878, r => 0.051325743283133995 },
 	{ solve => 'power', n => 20.0, delta => 5.0, sd => 1.0, sig_level => 0.05, type => 'one.sample', alternative => 'one.sided', want => 1.0, r => 1 },
 	{ solve => 'power', n => 30.0, delta => 0.5, sd => 1.0, sig_level => 0.05, type => 'one.sample', alternative => 'one.sided', strict => 1, want => 0.8482541909289825, r => 0.848254190929147 },
-	{ solve => 'power', n => 5.0, delta => 1.0, sd => 1.0, sig_level => 0.05, type => 'one.sample', alternative => 'one.sided', strict => 1, want => 0.5797373588621886, r => 0.579737358862325 },
-	{ solve => 'power', n => 2.0, delta => 1.0, sd => 1.0, sig_level => 0.05, type => 'one.sample', alternative => 'one.sided', strict => 1, want => 0.17956248755732757, r => 0.17956248755739923 },
-	{ solve => 'power', n => 10.0, delta => 0.0, sd => 1.0, sig_level => 0.05, type => 'one.sample', alternative => 'one.sided', strict => 1, want => 0.04999999999999996, r => 0.05000000000000001 },
-	{ solve => 'power', n => 100.0, delta => 0.2, sd => 2.0, sig_level => 0.01, type => 'one.sample', alternative => 'one.sided', strict => 1, want => 0.09013154133363165, r => 0.09013154133367962 },
-	{ solve => 'power', n => 1000.0, delta => 0.05, sd => 1.0, sig_level => 0.05, type => 'one.sample', alternative => 'one.sided', strict => 1, want => 0.4741724111210383, r => 0.47417241112127784 },
-	{ solve => 'power', n => 12.0, delta => 3.0, sd => 1.5, sig_level => 0.1, type => 'one.sample', alternative => 'one.sided', strict => 1, want => 0.9999999575265126, r => 0.999999957526535 },
-	{ solve => 'power', n => 7.0, delta => -0.8, sd => 1.0, sig_level => 0.05, type => 'one.sample', alternative => 'one.sided', strict => 1, want => 0.00018666184264119062, r => 0.00018666184277682518 },
-	{ solve => 'power', n => 50.0, delta => 0.4, sd => 0.25, sig_level => 0.001, type => 'one.sample', alternative => 'one.sided', strict => 1, want => 0.9999999999999885, r => 0.9999999999999885 },
-	{ solve => 'power', n => 3.0, delta => 0.1, sd => 10.0, sig_level => 0.05, type => 'one.sample', alternative => 'one.sided', strict => 1, want => 0.05132574328299878, r => 0.051325743283133995 },
-	{ solve => 'power', n => 20.0, delta => 5.0, sd => 1.0, sig_level => 0.05, type => 'one.sample', alternative => 'one.sided', strict => 1, want => 1.0, r => 1 },
-	{ solve => 'n', delta => 0.5, sd => 1.0, sig_level => 0.05, power => 0.8, type => 'two.sample', alternative => 'two.sided', want => 63.76576372485063, r => 63.765763714273874 },
-	{ solve => 'n', delta => 1.0, sd => 1.0, sig_level => 0.05, power => 0.9, type => 'two.sample', alternative => 'two.sided', want => 22.021095570096936, r => 22.02109770385123 },
-	{ solve => 'n', delta => 0.2, sd => 1.0, sig_level => 0.01, power => 0.95, type => 'two.sample', alternative => 'two.sided', want => 892.3686643877469, r => 892.3686644933304 },
-	{ solve => 'n', delta => 0.5, sd => 1.0, sig_level => 0.05, power => 0.5, type => 'two.sample', alternative => 'two.sided', want => 31.71688513064714, r => 31.716885098969467 },
-	{ solve => 'n', delta => 0.3, sd => 1.5, sig_level => 0.05, power => 0.99, type => 'two.sample', alternative => 'two.sided', want => 919.5850707709836, r => 919.5850716046169 },
-	{ solve => 'n', delta => 2.0, sd => 1.0, sig_level => 0.05, power => 0.8, type => 'two.sample', alternative => 'two.sided', want => 5.090000758688685, r => 5.090008148710024 },
-	{ solve => 'n', delta => 0.05, sd => 1.0, sig_level => 0.05, power => 0.8, type => 'two.sample', alternative => 'two.sided', want => 6280.06429630707, r => 6280.064296248465 },
-	{ solve => 'n', delta => 1.2, sd => 0.8, sig_level => 0.1, power => 0.7, type => 'two.sample', alternative => 'two.sided', want => 5.016240394604637, r => 5.016239192472101 },
-	{ solve => 'n', delta => 0.5, sd => 1.0, sig_level => 0.05, power => 0.8, type => 'two.sample', alternative => 'one.sided', want => 50.15078338686112, r => 50.15079949213846 },
-	{ solve => 'n', delta => 1.0, sd => 1.0, sig_level => 0.05, power => 0.9, type => 'two.sample', alternative => 'one.sided', want => 17.847120626538363, r => 17.84712608648425 },
-	{ solve => 'n', delta => 0.2, sd => 1.0, sig_level => 0.01, power => 0.95, type => 'two.sample', alternative => 'one.sided', want => 789.876743619327, r => 789.8767436943195 },
-	{ solve => 'n', delta => 0.5, sd => 1.0, sig_level => 0.05, power => 0.5, type => 'two.sample', alternative => 'one.sided', want => 22.348948189364748, r => 22.348947912100638 },
-	{ solve => 'n', delta => 0.3, sd => 1.5, sig_level => 0.05, power => 0.99, type => 'two.sample', alternative => 'one.sided', want => 789.1994995881087, r => 789.1994996375407 },
-	{ solve => 'n', delta => 2.0, sd => 1.0, sig_level => 0.05, power => 0.8, type => 'two.sample', alternative => 'one.sided', want => 3.987012149150331, r => 3.987012442106156 },
-	{ solve => 'n', delta => 0.05, sd => 1.0, sig_level => 0.05, power => 0.8, type => 'two.sample', alternative => 'one.sided', want => 4946.722310276315, r => 4946.722315516795 },
-	{ solve => 'n', delta => 1.2, sd => 0.8, sig_level => 0.1, power => 0.7, type => 'two.sample', alternative => 'one.sided', want => 3.4795095650385712, r => 3.4795078307850504 },
-	{ solve => 'n', delta => 0.5, sd => 1.0, sig_level => 0.05, power => 0.8, type => 'one.sample', alternative => 'two.sided', want => 33.36720397881093, r => 33.367204088022 },
-	{ solve => 'n', delta => 1.0, sd => 1.0, sig_level => 0.05, power => 0.9, type => 'one.sample', alternative => 'two.sided', want => 12.585463005715868, r => 12.585474548896386 },
-	{ solve => 'n', delta => 0.2, sd => 1.0, sig_level => 0.01, power => 0.95, type => 'one.sample', alternative => 'two.sided', want => 448.6778185846029, r => 448.6778186489428 },
-	{ solve => 'n', delta => 0.5, sd => 1.0, sig_level => 0.05, power => 0.5, type => 'one.sample', alternative => 'two.sided', want => 17.352095777354506, r => 17.352095776453723 },
-	{ solve => 'n', delta => 0.3, sd => 1.5, sig_level => 0.05, power => 0.99, type => 'one.sample', alternative => 'two.sided', want => 461.23817219616666, r => 461.238172658909 },
-	{ solve => 'n', delta => 2.0, sd => 1.0, sig_level => 0.05, power => 0.8, type => 'one.sample', alternative => 'two.sided', want => 4.220719403683978, r => 4.220731336263879 },
-	{ solve => 'n', delta => 0.05, sd => 1.0, sig_level => 0.05, power => 0.8, type => 'one.sample', alternative => 'two.sided', want => 3141.4731640671507, r => 3141.473164054113 },
-	{ solve => 'n', delta => 1.2, sd => 0.8, sig_level => 0.1, power => 0.7, type => 'one.sample', alternative => 'two.sided', want => 3.7969652896027313, r => 3.796988379559186 },
-	{ solve => 'n', delta => 0.5, sd => 1.0, sig_level => 0.05, power => 0.8, type => 'one.sample', alternative => 'one.sided', want => 26.137503805973445, r => 26.137510107001134 },
-	{ solve => 'n', delta => 1.0, sd => 1.0, sig_level => 0.05, power => 0.9, type => 'one.sample', alternative => 'one.sided', want => 10.081070224109228, r => 10.08107040503181 },
-	{ solve => 'n', delta => 0.2, sd => 1.0, sig_level => 0.01, power => 0.95, type => 'one.sample', alternative => 'one.sided', want => 396.97368855240643, r => 396.9736886090751 },
-	{ solve => 'n', delta => 0.5, sd => 1.0, sig_level => 0.05, power => 0.5, type => 'one.sample', alternative => 'one.sided', want => 12.264761691049461, r => 12.264761690285427 },
-	{ solve => 'n', delta => 0.3, sd => 1.5, sig_level => 0.05, power => 0.99, type => 'one.sample', alternative => 'one.sided', want => 395.61873003160383, r => 395.61874378124577 },
-	{ solve => 'n', delta => 2.0, sd => 1.0, sig_level => 0.05, power => 0.8, type => 'one.sample', alternative => 'one.sided', want => 3.3385091172365535, r => 3.3384894217135592 },
-	{ solve => 'n', delta => 0.05, sd => 1.0, sig_level => 0.05, power => 0.8, type => 'one.sample', alternative => 'one.sided', want => 2474.3762276778907, r => 2474.376230296638 },
-	{ solve => 'n', delta => 1.2, sd => 0.8, sig_level => 0.1, power => 0.7, type => 'one.sample', alternative => 'one.sided', want => 2.7067334338742848, r => 2.706736595611079 },
-	{ solve => 'delta', n => 30.0, sd => 1.0, sig_level => 0.05, power => 0.8, type => 'two.sample', alternative => 'two.sided', want => 0.7356219641260183, r => 0.7356289015301828 },
-	{ solve => 'delta', n => 10.0, sd => 2.0, sig_level => 0.05, power => 0.9, type => 'two.sample', alternative => 'two.sided', want => 3.0673845239989928, r => 3.06740159810974 },
-	{ solve => 'delta', n => 100.0, sd => 1.0, sig_level => 0.01, power => 0.95, type => 'two.sample', alternative => 'two.sided', want => 0.601954672197985, r => 0.6019551787701918 },
-	{ solve => 'delta', n => 25.0, sd => 1.0, sig_level => 0.05, power => 0.5, type => 'two.sample', alternative => 'two.sided', want => 0.5656992435244989, r => 0.5656976497908537 },
-	{ solve => 'delta', n => 5.0, sd => 1.0, sig_level => 0.05, power => 0.8, type => 'two.sample', alternative => 'two.sided', want => 2.0244409773588266, r => 2.0244379394941245 },
-	{ solve => 'delta', n => 500.0, sd => 3.0, sig_level => 0.05, power => 0.8, type => 'two.sample', alternative => 'two.sided', want => 0.5320756185731333, r => 0.5320814999330704 },
-	{ solve => 'delta', n => 30.0, sd => 1.0, sig_level => 0.05, power => 0.8, type => 'two.sample', alternative => 'one.sided', want => 0.6496285461948388, r => 0.6496277812694267 },
-	{ solve => 'delta', n => 10.0, sd => 2.0, sig_level => 0.05, power => 0.9, type => 'two.sample', alternative => 'one.sided', want => 2.7224831310254256, r => 2.7225057484923214 },
-	{ solve => 'delta', n => 100.0, sd => 1.0, sig_level => 0.01, power => 0.95, type => 'two.sample', alternative => 'one.sided', want => 0.5654896536559569, r => 0.5654977031202721 },
-	{ solve => 'delta', n => 25.0, sd => 1.0, sig_level => 0.05, power => 0.5, type => 'two.sample', alternative => 'one.sided', want => 0.4719028861068025, r => 0.471887329414011 },
-	{ solve => 'delta', n => 5.0, sd => 1.0, sig_level => 0.05, power => 0.8, type => 'two.sample', alternative => 'one.sided', want => 1.7246073442461853, r => 1.7245818519905847 },
-	{ solve => 'delta', n => 500.0, sd => 3.0, sig_level => 0.05, power => 0.8, type => 'two.sample', alternative => 'one.sided', want => 0.4720955108070633, r => 0.4720952928711648 },
-	{ solve => 'delta', n => 30.0, sd => 1.0, sig_level => 0.05, power => 0.8, type => 'one.sample', alternative => 'two.sided', want => 0.5292362447757996, r => 0.529226615011549 },
-	{ solve => 'delta', n => 10.0, sd => 2.0, sig_level => 0.05, power => 0.9, type => 'one.sample', alternative => 'two.sided', want => 2.3091302276155576, r => 2.3091335910376505 },
-	{ solve => 'delta', n => 100.0, sd => 1.0, sig_level => 0.01, power => 0.95, type => 'one.sample', alternative => 'two.sided', want => 0.42930977646131807, r => 0.42931660918073655 },
-	{ solve => 'delta', n => 25.0, sd => 1.0, sig_level => 0.05, power => 0.5, type => 'one.sample', alternative => 'two.sided', want => 0.4083853204351029, r => 0.4083945522760921 },
-	{ solve => 'delta', n => 5.0, sd => 1.0, sig_level => 0.05, power => 0.8, type => 'one.sample', alternative => 'two.sided', want => 1.6819972822157452, r => 1.6819990382002459 },
-	{ solve => 'delta', n => 500.0, sd => 3.0, sig_level => 0.05, power => 0.8, type => 'one.sample', alternative => 'two.sided', want => 0.3765974198149913, r => 0.3765971045911596 },
-	{ solve => 'delta', n => 30.0, sd => 1.0, sig_level => 0.05, power => 0.8, type => 'one.sample', alternative => 'one.sided', want => 0.4649454675959891, r => 0.4649453616404649 },
-	{ solve => 'delta', n => 10.0, sd => 2.0, sig_level => 0.05, power => 0.9, type => 'one.sample', alternative => 'one.sided', want => 2.0097005994773114, r => 2.009702566461256 },
-	{ solve => 'delta', n => 100.0, sd => 1.0, sig_level => 0.01, power => 0.95, type => 'one.sample', alternative => 'one.sided', want => 0.40265942267360855, r => 0.4026376294114157 },
-	{ solve => 'delta', n => 25.0, sd => 1.0, sig_level => 0.05, power => 0.5, type => 'one.sample', alternative => 'one.sided', want => 0.3385625677011041, r => 0.3385670345182003 },
-	{ solve => 'delta', n => 5.0, sd => 1.0, sig_level => 0.05, power => 0.8, type => 'one.sample', alternative => 'one.sided', want => 1.3594179588549475, r => 1.3594144829521853 },
-	{ solve => 'delta', n => 500.0, sd => 3.0, sig_level => 0.05, power => 0.8, type => 'one.sample', alternative => 'one.sided', want => 0.33404873962012777, r => 0.3340645968872011 },
-	{ solve => 'sd', n => 30.0, delta => 0.5, sig_level => 0.05, power => 0.8, type => 'two.sample', alternative => 'two.sided', want => 0.6796969427007827, r => 0.6796918527979604 },
-	{ solve => 'sd', n => 20.0, delta => 1.0, sig_level => 0.05, power => 0.9, type => 'two.sample', alternative => 'two.sided', want => 0.950576552887166, r => 0.9505796138019411 },
-	{ solve => 'sd', n => 50.0, delta => 2.0, sig_level => 0.01, power => 0.95, type => 'two.sample', alternative => 'two.sided', want => 2.3289098465743043, r => 2.3289039893583916 },
-	{ solve => 'sd', n => 15.0, delta => 0.75, sig_level => 0.05, power => 0.5, type => 'two.sample', alternative => 'two.sided', want => 1.011915404041474, r => 1.0119164645573857 },
-	{ solve => 'sd', n => 8.0, delta => 4.0, sig_level => 0.1, power => 0.8, type => 'two.sample', alternative => 'two.sided', want => 3.058038416277059, r => 3.0580669930692275 },
-	{ solve => 'sd', n => 30.0, delta => 0.5, sig_level => 0.05, power => 0.8, type => 'two.sample', alternative => 'one.sided', want => 0.7696706108879009, r => 0.76966993899846 },
-	{ solve => 'sd', n => 20.0, delta => 1.0, sig_level => 0.05, power => 0.9, type => 'two.sample', alternative => 'one.sided', want => 1.061121889161472, r => 1.061117915410015 },
-	{ solve => 'sd', n => 50.0, delta => 2.0, sig_level => 0.01, power => 0.95, type => 'two.sample', alternative => 'one.sided', want => 2.4831325902928474, r => 2.4831306244990796 },
-	{ solve => 'sd', n => 15.0, delta => 0.75, sig_level => 0.05, power => 0.5, type => 'two.sample', alternative => 'one.sided', want => 1.218416121893955, r => 1.2183899014386326 },
-	{ solve => 'sd', n => 8.0, delta => 4.0, sig_level => 0.1, power => 0.8, type => 'two.sample', alternative => 'one.sided', want => 3.654639092455417, r => 3.6546369538380667 },
-	{ solve => 'sd', n => 30.0, delta => 0.5, sig_level => 0.05, power => 0.8, type => 'one.sample', alternative => 'two.sided', want => 0.9447576671771887, r => 0.944778600545872 },
-	{ solve => 'sd', n => 20.0, delta => 1.0, sig_level => 0.05, power => 0.9, type => 'one.sample', alternative => 'two.sided', want => 1.3081163004534617, r => 1.3081104699539052 },
-	{ solve => 'sd', n => 50.0, delta => 2.0, sig_level => 0.01, power => 0.95, type => 'one.sample', alternative => 'two.sided', want => 3.2357351863281196, r => 3.2357348865842113 },
-	{ solve => 'sd', n => 15.0, delta => 0.75, sig_level => 0.05, power => 0.5, type => 'one.sample', alternative => 'two.sided', want => 1.379909668541831, r => 1.3798816541977543 },
-	{ solve => 'sd', n => 8.0, delta => 4.0, sig_level => 0.1, power => 0.8, type => 'one.sample', alternative => 'two.sided', want => 4.089326907177371, r => 4.089311329682658 },
-	{ solve => 'sd', n => 30.0, delta => 0.5, sig_level => 0.05, power => 0.8, type => 'one.sample', alternative => 'one.sided', want => 1.07539493305583, r => 1.0754192578922093 },
-	{ solve => 'sd', n => 20.0, delta => 1.0, sig_level => 0.05, power => 0.9, type => 'one.sample', alternative => 'one.sided', want => 1.4724244427213713, r => 1.4724363843081958 },
-	{ solve => 'sd', n => 50.0, delta => 2.0, sig_level => 0.01, power => 0.95, type => 'one.sample', alternative => 'one.sided', want => 3.4615472566327394, r => 3.461570961125464 },
-	{ solve => 'sd', n => 15.0, delta => 0.75, sig_level => 0.05, power => 0.5, type => 'one.sample', alternative => 'one.sided', want => 1.679915181922281, r => 1.6799233698344598 },
-	{ solve => 'sd', n => 8.0, delta => 4.0, sig_level => 0.1, power => 0.8, type => 'one.sample', alternative => 'one.sided', want => 5.000641946815355, r => 5.0006211249014285 },
-	{ solve => 'sig_level', n => 30.0, delta => 0.5, sd => 1.0, power => 0.8, type => 'two.sample', alternative => 'two.sided', want => 0.27792837666380965, r => 0.27790317707348083 },
-	{ solve => 'sig_level', n => 20.0, delta => 1.0, sd => 1.0, power => 0.9, type => 'two.sample', alternative => 'two.sided', want => 0.07005359746483382, r => 0.07004583620272126 },
-	{ solve => 'sig_level', n => 50.0, delta => 0.4, sd => 1.0, power => 0.95, type => 'two.sample', alternative => 'two.sided', want => 0.7229619916354408, r => 0.7229632704285954 },
-	{ solve => 'sig_level', n => 12.0, delta => 0.6, sd => 1.5, power => 0.6, type => 'two.sample', alternative => 'two.sided', want => 0.47115525566595323, r => 0.47115226620533407 },
-	{ solve => 'sig_level', n => 30.0, delta => 0.5, sd => 1.0, power => 0.8, type => 'two.sample', alternative => 'one.sided', want => 0.13896418833190483, r => 0.13894997101343887 },
-	{ solve => 'sig_level', n => 20.0, delta => 1.0, sd => 1.0, power => 0.9, type => 'two.sample', alternative => 'one.sided', want => 0.035026798732416944, r => 0.03502288397019566 },
-	{ solve => 'sig_level', n => 50.0, delta => 0.4, sd => 1.0, power => 0.95, type => 'two.sample', alternative => 'one.sided', want => 0.3614809958177223, r => 0.3614816995967671 },
-	{ solve => 'sig_level', n => 12.0, delta => 0.6, sd => 1.5, power => 0.6, type => 'two.sample', alternative => 'one.sided', want => 0.23557762783297678, r => 0.23555910726490628 },
-	{ solve => 'sig_level', n => 40.0, delta => 0.5, sd => 1.0, power => 0.99, type => 'two.sample', alternative => 'one.sided', want => 0.5359909046648442, r => 0.5359870262202796 },
-	{ solve => 'sig_level', n => 30.0, delta => 0.5, sd => 1.0, power => 0.8, type => 'one.sample', alternative => 'two.sided', want => 0.0690642500236002, r => 0.06905708592684968 },
-	{ solve => 'sig_level', n => 20.0, delta => 1.0, sd => 1.0, power => 0.9, type => 'one.sample', alternative => 'two.sided', want => 0.006164685749415106, r => 0.006170974052137374 },
-	{ solve => 'sig_level', n => 50.0, delta => 0.4, sd => 1.0, power => 0.95, type => 'one.sample', alternative => 'two.sided', want => 0.24449594244676448, r => 0.24449587911018197 },
-	{ solve => 'sig_level', n => 12.0, delta => 0.6, sd => 1.5, power => 0.6, type => 'one.sample', alternative => 'two.sided', want => 0.27403569827586816, r => 0.27400540165280934 },
-	{ solve => 'sig_level', n => 40.0, delta => 0.5, sd => 1.0, power => 0.99, type => 'one.sample', alternative => 'two.sided', want => 0.4110537372853186, r => 0.4110565493237006 },
-	{ solve => 'sig_level', n => 30.0, delta => 0.5, sd => 1.0, power => 0.8, type => 'one.sample', alternative => 'one.sided', want => 0.03453212501180006, r => 0.0345284933143366 },
-	{ solve => 'sig_level', n => 20.0, delta => 1.0, sd => 1.0, power => 0.9, type => 'one.sample', alternative => 'one.sided', want => 0.00308234287470755, r => 0.003058129074615677 },
-	{ solve => 'sig_level', n => 50.0, delta => 0.4, sd => 1.0, power => 0.95, type => 'one.sample', alternative => 'one.sided', want => 0.12224797122338214, r => 0.12224792756533148 },
-	{ solve => 'sig_level', n => 12.0, delta => 0.6, sd => 1.5, power => 0.6, type => 'one.sample', alternative => 'one.sided', want => 0.1370178491379342, r => 0.13701915485458005 },
-	{ solve => 'sig_level', n => 40.0, delta => 0.5, sd => 1.0, power => 0.99, type => 'one.sample', alternative => 'one.sided', want => 0.20552686864265912, r => 0.20552826955078907 },
-	{ solve => 'n', delta => 0.5, sd => 1.0, sig_level => 0.05, power => 0.8, type => 'two.sample', alternative => 'two.sided', strict => 1, want => 63.76561019095229, r => 63.76561017078221 },
-	{ solve => 'n', delta => 0.5, sd => 1.0, sig_level => 0.05, power => 0.8, type => 'one.sample', alternative => 'two.sided', strict => 1, want => 33.36712895333084, r => 33.367129103906585 },
-	{ solve => 'delta', n => 30.0, sd => 1.0, sig_level => 0.05, power => 0.8, type => 'two.sample', alternative => 'two.sided', strict => 1, want => 0.735621069597668, r => 0.7356276582144912 },
-	{ solve => 'delta', n => 30.0, sd => 1.0, sig_level => 0.05, power => 0.8, type => 'one.sample', alternative => 'two.sided', strict => 1, want => 0.5292356151129529, r => 0.5292232526673517 },
-	{ solve => 'sd', n => 30.0, delta => 0.5, sig_level => 0.05, power => 0.8, type => 'two.sample', alternative => 'two.sided', strict => 1, want => 0.679697769224397, r => 0.6796975202389116 },
-	{ solve => 'sd', n => 30.0, delta => 0.5, sig_level => 0.05, power => 0.8, type => 'one.sample', alternative => 'two.sided', strict => 1, want => 0.9447587912111444, r => 0.9447609388074347 },
-	{ solve => 'sig_level', n => 30.0, delta => 0.5, sd => 1.0, power => 0.8, type => 'two.sample', alternative => 'two.sided', strict => 1, want => 0.2759479733366265, r => 0.27592543292083577 },
-	{ solve => 'sig_level', n => 30.0, delta => 0.5, sd => 1.0, power => 0.8, type => 'one.sample', alternative => 'two.sided', strict => 1, want => 0.06906239113785696, r => 0.06905513354775511 },
 );
 
 for my $c (@cases) {
@@ -289,22 +177,15 @@ for my $c (@cases) {
 	$args{$_} = $c->{$_} for grep { defined $c->{$_} } qw(n delta sd sig_level power);
 	$args{ $c->{solve} } = undef;   # the one parameter being solved for
 
-	my $key = $c->{solve} eq 'sig_level' ? 'sig_level' : $c->{solve};
 	my $got = power_t_test(%args);
 	my $label = join ' ', "solve=$c->{solve}", $c->{type}, $c->{alternative},
 		($c->{strict} ? 'strict' : ()),
 		map { "$_=$c->{$_}" } grep { defined $c->{$_} } qw(n delta sd sig_level power);
 
-	is_rel($got->{$key}, $c->{want}, $EPS_SCIPY, "scipy: $label");
-	if ($c->{solve} eq 'power') {
-		is_rel($got->{$key}, $c->{r}, $EPS_R_POWER, "R: $label");
-	} else {
-		matches_R($got->{$key}, $c->{r}, "R: $label");
-	}
+	is_rel($got->{power}, $c->{want}, $EPS_SCIPY, "scipy: $label");
+	is_rel($got->{power}, $c->{r}, $EPS_R_POWER, "R: $label");
 
-	# The parameters that were supplied come back unchanged, and the whole
-	# five-tuple is self-consistent: feeding the solved value back in has to
-	# reproduce the power that was asked for.
+	# The parameters that were supplied come back unchanged.
 	for my $k (qw(n delta sd)) {
 		next if $c->{solve} eq $k or not defined $c->{$k};
 		my $want = $c->{alternative} eq 'two.sided' && $k eq 'delta'
@@ -493,6 +374,16 @@ throws_ok { power_t_test(delta => 0.5, n => undef, power => undef) }
 # NULL -- so this is the two-argument call, not a missing-undef error
 is_rel(power_t_test(n => 30, delta => 0.5)->{power}, 0.4778409859409133, 1e-9,
 	"omitting 'power' solves for it (R's default of NULL)");
+# Likewise 'n' and 'delta': the XS tells an absent one (!sv_n, !sv_delta) from
+# an undef one. Before this file was split only t/01.t called power_t_test()
+# without 'n', and nothing called it without 'delta'. sd and sig_level have
+# defaults instead. scipy brentq at xtol 1e-13, the same values as the table's
+# rows in t/power_t_test.solve_n.R.scipy.t and
+# t/power_t_test.solve_delta.R.scipy.t.
+is_rel(power_t_test(power => 0.8, delta => 0.5, sd => 1)->{n}, 63.76576372485063, 1e-9,
+	"omitting 'n' solves for it (R's default of NULL)");
+is_rel(power_t_test(n => 30, sd => 1, power => 0.8)->{delta}, 0.7356219641260183, 1e-9,
+	"omitting 'delta' solves for it (R's default of NULL)");
 throws_ok { power_t_test(n => 30, delta => 0.5, power => undef, bogus => 1) }
 	qr/unknown argument 'bogus'/, 'unknown argument croaks';
 throws_ok { power_t_test(n => 30, delta => 0.5, 'power') }
@@ -598,6 +489,12 @@ unless ($INC{'Devel/Cover.pm'}) {
 		} "no leaks solving for '$solve'";
 	}
 	no_leaks_ok {
+		eval { power_t_test(power => 0.8, delta => 0.5, sd => 1) };
+	} "no leaks solving for an omitted 'n'";
+	no_leaks_ok {
+		eval { power_t_test(n => 30, sd => 1, power => 0.8) };
+	} "no leaks solving for an omitted 'delta'";
+	no_leaks_ok {
 		eval { power_t_test(%base) };                       # nothing left undef
 		eval { power_t_test(n => 1, delta => 0.5) };         # n below 2
 		eval { power_t_test(n => 30, delta => 0.5, sig_level => 2) };
@@ -610,18 +507,27 @@ unless ($INC{'Devel/Cover.pm'}) {
 # alternative => 'greater' and 'less'.  R's power.t.test() has neither -- its
 # alternative is "two.sided" or "one.sided", the latter meaning H1: delta > 0.
 # 'greater' is that same test.  'less' is H1: delta < 0, whose power at delta
-# is the one-sided power at -delta, so every one-sided row of the table above
-# is checked again as 'less' with delta's sign flipped, against the same scipy
+# is the one-sided power at -delta, so a one-sided row of the table above is
+# checked again as 'less' with delta's sign flipped, against the same scipy
 # value; where delta is what is solved for, it has to come back negated.  Up
 # to 0.3217 'less' was computed as 'greater': n => 20, delta => 1 gave 0.9279.
-for my $c (grep { $_->{alternative} eq 'one.sided' } @cases) {
+#
+# One row per solved parameter, not every one-sided row. power_t_test() maps
+# 'greater' onto one.sided's branch outright, and 'less' only negates delta on
+# the way in and back on the way out, which is exact; so a mirrored row repeats
+# its one.sided row's computation to the bit, and adds only the sign handling
+# and the echoed alternative. Mirroring all of them was 182 calls, 96 of them
+# solves, for nothing the table had not already checked.
+my %mirrored;
+for my $c (grep { $_->{alternative} eq 'one.sided' && !$_->{strict}
+		&& !$mirrored{ $_->{solve} }++ } @cases) {
 	for my $alt (qw(greater less)) {
 		my $flip = $alt eq 'less' ? -1 : 1;
-		my %args = (type => $c->{type}, alternative => $alt, ($c->{strict} ? (strict => 1) : ()));
+		my %args = (type => $c->{type}, alternative => $alt);
 		$args{$_} = $c->{$_} for grep { defined $c->{$_} } qw(n delta sd sig_level power);
 		$args{delta} = $flip * $args{delta} if defined $args{delta};
 		$args{ $c->{solve} } = undef;
-		my $label = join ' ', "solve=$c->{solve}", $c->{type}, $alt, ($c->{strict} ? 'strict' : ()),
+		my $label = join ' ', "solve=$c->{solve}", $c->{type}, $alt,
 			map { "$_=$args{$_}" } grep { defined $args{$_} } qw(n delta sd sig_level power);
 		my $got = power_t_test(%args);
 		my $want = $c->{solve} eq 'delta' ? $flip * $c->{want} : $c->{want};

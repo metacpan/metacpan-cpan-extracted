@@ -461,7 +461,7 @@ sub print_help { # void ()
   pod2usage(-verbose => 1);
 }
 
-exit main($#ARGV, $0, @ARGV);
+exit main(@ARGV+1, [ $0, @ARGV ]);
 
 __END__
 

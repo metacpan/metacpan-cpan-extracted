@@ -13,9 +13,9 @@
 #
 #   Duncan       car's own examples, man/vif.Rd: prestige ~ income +
 #                education; + type, a 3-level factor and so a GVIF table; and
-#                (income + education)*type, written out here as its
-#                expansion, because this module's formulas take no
-#                parentheses
+#                (income + education)*type, both as written (0.3426 on, when
+#                a formula may hold a group of terms) and as its expansion,
+#                which is what the test had to say through 0.3425
 #   mtcars       the formulas TODO.md listed as failing through 0.3217: an
 #                interaction (wt*hp), a removed term that is not in the model
 #                (- disp, the shape of car's y ~ x1 + x2 - x3) and one that
@@ -23,6 +23,13 @@
 #   warpbreaks   breaks ~ wool * tension (?warpbreaks), factors crossed
 #   airquality   Ozone ~ Solar.R + Wind + Temp, where car's model drops a
 #                row missing the response as well as one missing a predictor
+#
+# then, from the same generator, car::vif(type = "predictor"), which car's own
+# example runs on (income + education)*type, on Duncan, mtcars, warpbreaks and
+# airquality (@PRED_CASES), and the two models car refuses under it.  The
+# unnamed vector car gives for a model whose every Df is 1 is read here as the
+# plain predictor => GVIF hash that vif() returns, with the names all.vars()
+# gives.
 #
 # and one value from statsmodels 0.14.6, stats/tests/test_outliers_influence.py,
 # test_reset_stata(): Stata's VIF of 16.4394 for urban among the seven columns
@@ -35,7 +42,7 @@
 # piece on the others.  An interaction, a removed term, '.', a factor and
 # '- 1' all died, with lm()'s "0 degrees of freedom" or "need at least two
 # predictors"; and the response's missing values did not take rows out.  Of
-# the ten cases below, 0.3217 got the first right, died on the next eight,
+# the first ten cases below, 0.3217 got the first right, died on the next eight,
 # and gave airquality's VIFs over the 146 rows that have Solar.R rather than
 # car's 111 (Solar.R 1.0893 for car's 1.0953).  Now each term gets car's
 # value, multi-df terms get car's GVIF, Df and GVIF^(1/(2*Df)), and each of
@@ -96,6 +103,7 @@ my %DATA = (
 my @R_CASES = (
 	[ 'Duncan', 'prestige ~ income + education', '', 45, [ 'income', 2.1049004710947665, 1 ], [ 'education', 2.1049004710947665, 1 ] ],
 	[ 'Duncan', 'prestige ~ income + education + type', '', 45, [ 'income', 2.2091779795013635, 1 ], [ 'education', 5.2975837124265759, 1 ], [ 'type', 5.0985918566076949, 2 ] ],
+	[ 'Duncan', 'prestige ~ (income + education)*type', 'interactions', 45, [ 'income', 4.8244380228906785, 1 ], [ 'education', 32.778424268234886, 1 ], [ 'type', 480.93123747987642, 2 ], [ 'income:type', 176.24440296542488, 2 ], [ 'education:type', 1233.7463162008448, 2 ] ],
 	[ 'Duncan', 'prestige ~ income + education + type + income:type + education:type', 'interactions', 45, [ 'income', 4.8244380228906785, 1 ], [ 'education', 32.778424268234886, 1 ], [ 'type', 480.93123747987642, 2 ], [ 'income:type', 176.24440296542488, 2 ], [ 'education:type', 1233.7463162008448, 2 ] ],
 	[ 'mtcars', 'mpg ~ wt*hp + disp', 'interactions', 32, [ 'wt', 12.778516147050082, 1 ], [ 'hp', 19.691007070344195, 1 ], [ 'disp', 7.3559453816438145, 1 ], [ 'wt:hp', 43.241604426123615, 1 ] ],
 	[ 'mtcars', 'mpg ~ wt + hp - disp', '', 32, [ 'wt', 1.7666245792682798, 1 ], [ 'hp', 1.7666245792682798, 1 ] ],
@@ -104,11 +112,26 @@ my @R_CASES = (
 	[ 'mtcars', 'mpg ~ wt + hp + disp - 1', 'intercept', 32, [ 'wt', 16.700825053974519, 1 ], [ 'hp', 13.487569692012999, 1 ], [ 'disp', 19.914970479280608, 1 ] ],
 	[ 'warpbreaks', 'breaks ~ wool * tension', 'interactions', 54, [ 'wool', 2.9999999999999978, 1 ], [ 'tension', 3.9999999999999982, 2 ], [ 'wool:tension', 8.0000000000000018, 2 ] ],
 	[ 'airquality', 'Ozone ~ Solar.R + Wind + Temp', '', 111, [ 'Solar.R', 1.0952528194296984, 1 ], [ 'Wind', 1.3290700366790171, 1 ], [ 'Temp', 1.4313668951347054, 1 ] ],
+);
 
+# car's type = "predictor": [ frame, formula, message, rows used,
+# [ predictor, GVIF, Df, 'Interacts With', 'Other Predictors' ] ... ].  car's
+# vector, for the models whose every Df is 1, has no names; here they are the
+# formula's predictors, as all.vars() gives them.
+my @PRED_CASES = (
+	[ 'Duncan', 'prestige ~ (income + education)*type', 'GVIFs computed for predictors', 45, [ 'income', 375.27450678370906, 5, 'type', 'education' ], [ 'education', 119.25342179077109, 5, 'type', 'income' ], [ 'type', 1, 8, 'income, education', '--  ' ] ],
+	[ 'Duncan', 'prestige ~ income + education + type', 'GVIFs computed for predictors', 45, [ 'income', 2.20917797950136, 1, '--  ', 'education, type' ], [ 'education', 5.2975837124265635, 1, '--  ', 'income, type' ], [ 'type', 5.0985918566076833, 2, '--  ', 'income, education' ] ],
+	[ 'mtcars', 'mpg ~ wt + hp', 'VIFs computed for predictors', 32, [ 'wt', 1.7666245792682789, 1, '', '' ], [ 'hp', 1.7666245792682789, 1, '', '' ] ],
+	[ 'mtcars', 'mpg ~ wt*hp + disp', 'GVIFs computed for predictors', 32, [ 'wt', 7.3559453816438678, 3, 'hp', 'disp' ], [ 'hp', 7.3559453816438678, 3, 'wt', 'disp' ], [ 'disp', 7.3559453816438678, 1, '--  ', 'wt, hp' ] ],
+	[ 'mtcars', 'mpg ~ wt + hp + disp + qsec - qsec', 'GVIFs computed for predictors', 32, [ 'wt', 4.8446175259187791, 1, '--  ', 'hp, disp, qsec' ], [ 'hp', 2.7366326916912307, 1, '--  ', 'wt, disp, qsec' ], [ 'disp', 7.3245171503633903, 1, '--  ', 'wt, hp, qsec' ], [ 'qsec', 12.939672029104017, 0, '--  ', 'wt, hp, disp, qsec' ] ],
+	[ 'mtcars', 'mpg ~ wt:hp + disp + wt', 'GVIFs computed for predictors', 32, [ 'wt', 7.1656926588949172, 2, 'hp', 'disp' ], [ 'hp', 7.1656926588949172, 2, 'hp', 'disp' ], [ 'disp', 7.1656926588949172, 1, '--  ', 'wt, hp' ] ],
+	[ 'mtcars', 'mpg ~ hp:wt + disp', 'VIFs computed for predictors', 32, [ 'hp', 5.3955144959208026, 1, '', '' ], [ 'wt', 5.3955144959208026, 1, '', '' ], [ 'disp', 5.3955144959208026, 1, '', '' ] ],
+	[ 'warpbreaks', 'breaks ~ wool * tension', 'GVIFs computed for predictors', 54, [ 'wool', 1, 5, 'tension', '--  ' ], [ 'tension', 1, 5, 'wool', '--  ' ] ],
+	[ 'airquality', 'Ozone ~ Solar.R*Wind + Temp', 'GVIFs computed for predictors', 111, [ 'Solar.R', 1.4313789150230445, 3, 'Wind', 'Temp' ], [ 'Wind', 1.4313789150230445, 3, 'Solar.R', 'Temp' ], [ 'Temp', 1.4313789150230445, 1, '--  ', 'Solar.R, Wind' ] ],
 );
 
 my %WARNING = (
-	interactions => qr/^vif: there are higher-order terms \(interactions\) in this model$/,
+	interactions => qr/^vif: there are higher-order terms \(interactions\) in this model\nconsider setting type = 'predictor'; see \?vif$/,
 	intercept    => qr/^vif: No intercept: vifs may not be sensible\.$/,
 );
 
@@ -152,6 +175,68 @@ for my $c (@R_CASES) {
 	is(Stats::LikeR::_vif_design($DATA{$frame}, $formula)->{n}, $n, "$frame, $formula: $n complete rows");
 }
 diag(sprintf 'worst relative error vs car::vif(): %.2g (%s)', $worst, $worst_at);
+
+# type = "predictor": car's GVIF, Df, GVIF^(1/(2*Df)) and the two text columns
+# per predictor, or a plain hash when every Df is 1, and car's message.  The
+# 1e-11 tolerance holds: the worst observed is reported below.
+for my $c (@PRED_CASES) {
+	my ($frame, $formula, $message, $n, @rows) = @$c;
+	my @w;
+	my $v = do {
+		local $SIG{__WARN__} = sub { push @w, $_[0] };
+		vif($DATA{$frame}, $formula, type => 'predictor');
+	};
+	is_deeply([ sort keys %$v ], [ sort map { $_->[0] } @rows ], "$frame, $formula, predictor: car's predictors");
+	my $table = grep { $_->[2] != 1 } @rows;
+	is_deeply(\@w, [ "vif: $message\n" ], "$frame, $formula, predictor: car's message");
+	for my $r (@rows) {
+		my ($pred, $gvif, $df, $with, $other) = @$r;
+		if (!$table) {
+			ok(!ref $v->{$pred}, "$frame, $formula, predictor: $pred is a plain number");
+			rel_ok($v->{$pred}, $gvif, "$frame, $formula, predictor: VIF of $pred");
+			next;
+		}
+		my $got = $v->{$pred};
+		rel_ok($got->{GVIF}, $gvif, "$frame, $formula, predictor: GVIF of $pred");
+		is($got->{Df}, $df, "$frame, $formula, predictor: Df of $pred");
+		# Df 0 is car's predictor with no columns: GVIF^(1/0) is Inf
+		if ($df == 0) { is($got->{'GVIF^(1/(2*Df))'}, 9**9**9, "$frame, $formula, predictor: ${pred}'s root is Inf") }
+		else { rel_ok($got->{'GVIF^(1/(2*Df))'}, $gvif ** (1 / (2 * $df)), "$frame, $formula, predictor: GVIF^(1/(2*Df)) of $pred") }
+		is($got->{'Interacts With'}, $with, "$frame, $formula, predictor: what $pred interacts with");
+		is($got->{'Other Predictors'}, $other, "$frame, $formula, predictor: the predictors held out of $pred");
+	}
+}
+# match.arg(): an unambiguous start of the name does, the default is terms
+{
+	local $SIG{__WARN__} = sub {};
+	for my $abbr (qw(p pred predictor)) {
+		is_deeply(vif($DATA{mtcars}, 'mpg ~ wt*hp + disp', type => $abbr),
+			vif($DATA{mtcars}, 'mpg ~ wt*hp + disp', type => 'predictor'), "type => '$abbr' is type => 'predictor'");
+	}
+	is_deeply(vif($DATA{mtcars}, 'mpg ~ wt*hp + disp', type => 't'), vif($DATA{mtcars}, 'mpg ~ wt*hp + disp'),
+		"type => 't' is type => 'terms'");
+	is_deeply(vif($DATA{mtcars}, [qw(wt hp)], type => 'predictor'), vif($DATA{mtcars}, 'mpg ~ wt + hp', type => 'predictor'),
+		'type => predictor with an array of names');
+}
+throws_ok { vif($DATA{mtcars}, 'mpg ~ wt + hp', type => 'both') } qr/\Ausage: vif\(.*^vif: error: type must be 'terms' or 'predictor'\n\z/ms,
+	'an unknown type is refused';
+throws_ok { vif($DATA{mtcars}, 'mpg ~ wt + hp', type => '') } qr/^vif: error: type must be 'terms' or 'predictor'\n\z/m,
+	'an empty type is refused';
+throws_ok { vif($DATA{mtcars}, 'mpg ~ wt + hp', type => undef, 1) } qr/^vif: error: options after the formula must be name => value pairs\n\z/m,
+	'a dangling option is refused';
+throws_ok { vif($DATA{mtcars}, 'mpg ~ wt + hp', sorted => 1) } qr/^vif: error: unknown option 'sorted'\n\z/m,
+	'an unknown option is refused';
+# car's refusals under type = "predictor" (t/vif.R.R's last section): a model
+# with no intercept, and one whose model matrix has a single column
+throws_ok { vif($DATA{mtcars}, 'mpg ~ wt + hp + disp - 1', type => 'predictor') }
+	qr/^vif: type = 'predictor' needs a model with an intercept; car::vif\(\) stops at "object 'assign\.X' not found" without one$/m,
+	"no intercept is refused under type = 'predictor', as car's assign.X error";
+throws_ok { vif($DATA{mtcars}, 'mpg ~ wt', type => 'predictor') }
+	qr/^vif: type = 'predictor' needs a design with at least two columns besides the intercept; car::vif\(\) stops at "supply both 'x' and 'y' or a matrix-like 'x'"$/m,
+	"one column is refused under type = 'predictor', as car's cor() error";
+throws_ok { vif({ %{ $DATA{mtcars} }, wt2 => [ map { 2 * $_ } @{ $DATA{mtcars}{wt} } ] }, 'mpg ~ wt + hp + wt2', type => 'predictor') }
+	qr/^vif: there are aliased coefficients in the model \(wt2\)$/m,
+	"an aliased column is refused under type = 'predictor' too, where car goes on into NaN";
 
 # The array-reference form, and a one-sided formula, name the predictors
 # without a response; the values are the formula form's.
@@ -237,6 +322,9 @@ no_leaks_ok {
 	vif($DATA{mtcars}, 'mpg ~ wt*hp + disp');
 	vif($DATA{warpbreaks}, 'breaks ~ wool * tension');
 	vif($DATA{Duncan}, [qw(income education type)]);
+	vif($DATA{Duncan}, 'prestige ~ (income + education)*type', type => 'predictor');
+	vif($DATA{mtcars}, 'mpg ~ wt + hp', type => 'predictor');
+	eval { vif($DATA{mtcars}, 'mpg ~ wt', type => 'predictor') };
 	eval { vif($DATA{mtcars}, 'mpg ~ wt') };
 	eval { vif({ y => [1, 2, 3, 4], a => [1, 2, 9**9**9, 4], b => [4, 1, 3, 2] }, 'y ~ a + b') };
 } 'vif does not leak' unless $INC{'Devel/Cover.pm'};

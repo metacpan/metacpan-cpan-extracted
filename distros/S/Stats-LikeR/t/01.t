@@ -3204,51 +3204,6 @@ is_approx($chisq_2x2->{statistic}{'X-squared'}, 3.831933, 'chisq_test: 2x2 Yates
 is_approx($chisq_2x2->{parameter}{df}, 1, 'chisq_test: 2x2 df', 1e-14);
 is_approx($chisq_2x2->{'p_value'}, 0.05028492, 'chisq_test: 2x2 p-value', 1e-7);
 like($chisq_2x2->{method}, qr/Yates' continuity correction/, 'chisq_test: method includes Yates correction');
-# power t-test
-$test_data = power_t_test(#ptt <- power.t.test(n = 30, delta=0.5, sd = 1, sig.level=0.05)
-	n  => 30,	delta     => 0.5, 
-	sd => 1.0,	sig_level => 0.05
-);
-is_approx($test_data->{power}, 0.47784098594094, 'power_t_test: power', 1e-9);
-no_leaks_ok {
-	eval {
-		power_t_test(#ptt <- power.t.test(n = 30, delta=0.5, sd = 1, sig.level=0.05)
-			n  => 30,	delta     => 0.5, 
-			sd => 1.0,	sig_level => 0.05
-		);
-	};
-} 'power_t_test: calculating power' unless $INC{'Devel/Cover.pm'};
-$test_data = power_t_test( power => 0.8, delta => 0.5, sd => 1 );
-is_approx($test_data->{n}, 63.76576, 'power_t_test: n', 1e-4);
-no_leaks_ok {
-	eval {
-		power_t_test( power => 0.8, delta => 0.5, sd => 1 );
-	};
-} 'power_t_test: calculating n' unless $INC{'Devel/Cover.pm'};
-@ans = (63.76576371427387, 33.36720408802200, 33.36720408802200);
-$idx = 0;
-foreach my $type ('two.sample', 'one.sample', 'paired') {
-	$test_data = power_t_test( power => 0.8, delta => 0.5, sd => 1, type => $type);
-	is_approx( $test_data->{n}, $ans[$idx], "power_t_test: n w/ type = \"$type\"", 1e-4);
-	no_leaks_ok {
-		eval {
-			power_t_test( power => 0.8, delta => 0.5, sd => 1, type => $type );
-		};
-	} "power_t_test: calculating n with type = \"$type\"" unless $INC{'Devel/Cover.pm'};
-	$idx++;
-}
-@ans = (63.76576371427387, 50.15079949213846);
-$idx = 0;
-foreach my $alt ('two.sided', 'one.sided') {
-	$test_data = power_t_test( power => 0.8, delta => 0.5, sd => 1, alternative => $alt);
-	is_approx( $test_data->{n}, $ans[$idx], "power_t_test: n with alternative = \"$alt\"", 1e-4);
-	no_leaks_ok {
-		eval {
-			power_t_test( power => 0.8, delta => 0.5, sd => 1, alternative => $alt);
-		};
-	} "power_t_test: n with alternative = \"$alt\" with no leaks" unless $INC{'Devel/Cover.pm'};
-	$idx++;
-}
 #  lm & aov: Dot (.) Operator Expansion
 #subtest 'lm & aov: Dot (.) operator formula expansion' => sub {
 my $dot_data = {

@@ -13,20 +13,625 @@ TUI::Manual::05 - Events in TUI::Vision
 
 =head1 EVENTS
 
+The previous chapters described the structural side of L<TUI::Vision>.
+
+Views form a view tree. Groups organize their subviews through
+C<next> and C<last>, while C<current> establishes a selection path
+across nested groups.
+
+This structure alone, however, does not make an application
+interactive.
+
+L<TUI::Vision> is driven by events.
+
+A keystroke, mouse movement or mouse click produces an event.
+Components of the framework may also generate events in order to
+issue commands or notify other views about changes.
+
+All of these events are represented by L<TEvent|TUI::Drivers::Event>.
+
+The C<what> field identifies the type of an event. The fundamental
+event types include:
+
+    evNothing
+
+    evMouseDown
+    evMouseUp
+    evMouseMove
+    evMouseAuto
+
+    evKeyDown
+
+    evCommand
+    evBroadcast
+
+The remaining contents of a L<TEvent|TUI::Drivers::Event> depend on the
+event type.
+
+A keyboard event contains information about the key that was pressed.
+A mouse event contains information about the mouse position and button
+state. Message events carry a command and additional information.
+
+L<TUI::Vision> therefore separates three distinct tasks:
+
+    Event generation
+          │
+          ▼
+        TEvent
+          │
+          ▼
+    Event distribution
+          │
+          ▼
+     Event handling
+
+A view does not need to know how a keyboard or terminal driver is
+queried. It only needs to know which events it is interested in and how
+to react when such an event reaches it.
+
 =head2 The Event Loop
+
+At the center of every running L<TUI::Vision> application is the event
+loop.
+
+In simplified form it can be represented as:
+
+    while application is running
+
+        getEvent()
+            │
+            ▼
+         TEvent
+            │
+            ▼
+       handleEvent()
+
+The classic I<Turbo Vision> implementation expresses the same principle
+essentially as:
+
+    getEvent( event );
+    handleEvent( event );
+
+C<getEvent> obtains the next event.
+
+C<handleEvent> then passes the event into the view system for
+processing.
+
+This creates an important separation between the source of an event
+and the object that eventually handles it.
+
+A L<TWindow|TUI::Views::Window> responding to C<cmClose>, for example,
+does not need to know whether the command originated from a mouse click
+on the close icon, a keyboard shortcut, a menu item or another part of
+the application.
+
+From the perspective of the window, only the resulting event matters:
+
+    input source
+        │
+        ├── mouse
+        ├── keyboard
+        ├── menu
+        └── application
+              │
+              ▼
+           TEvent
+              │
+              ▼
+         handleEvent()
+
+This centralization is one of the fundamental differences between an
+event-driven application and a program in which individual components
+read input devices directly.
+
+The origin of an event is also largely independent of the event model
+used by the application. A backend translates native input into the
+corresponding L<TEvent|TUI::Drivers::Event> representation. Views then
+operate on the
+common I<Turbo Vision> event model regardless of the underlying terminal
+environment.
+
+An event that remains unhandled may eventually return to the modal
+view. Such events may be passed to C<eventError>. The default behavior
+does not normally require application code to take any action, but the
+mechanism provides a defined endpoint for events for which no handler
+was found.
 
 =head2 Event Propagation
 
+Not every event takes the same route through the view tree.
+
+I<Turbo Vision> distinguishes three conceptual routing categories:
+
+    positional events
+
+    focused events
+
+    broadcast events
+
+These categories primarily describe how the event system determines
+which views receive an event.
+
+Positional events are usually mouse events.
+
+A positional event contains a screen position. The framework searches
+the subviews of the modal view for the view whose area contains that
+position. The search walks the subview ring starting with the view at
+the front of the Z-order (C<first>), and the first view whose area
+contains the position receives the event.
+
+The Z-order introduced in the previous chapter is therefore important
+during this search.
+
+Assume that several views overlap the same screen position:
+
+              mouse position
+                    │
+                    ▼
+              ┌───────────┐
+              │  View A   │      front
+              └───────────┘
+                    │
+              ┌───────────┐
+              │  View B   │
+              └───────────┘
+                    │
+              ┌───────────┐
+              │  View C   │      back
+              └───────────┘
+
+The views are examined in ring order, beginning at the front. C<View A>
+therefore gets the first opportunity to receive an event at the
+overlapping position. Its area contains that position, so the search
+stops there and C<View B> and C<View C> are not examined. A view at the
+back is examined only when the views in front of it do not contain the
+position.
+
+If the matching view is itself a group, the search continues among its
+subviews until the view responsible for that position is reached.
+
+Focused events take a different route.
+
+Keyboard events and command events normally belong to this category.
+
+For these events, the selection path introduced in the previous
+chapter becomes significant:
+
+                       application
+                            │
+                         current
+                            │
+                            ▼
+                         deskTop
+                            │
+                         current
+                            │
+                            ▼
+                          window
+                            │
+                         current
+                            │
+                            ▼
+                         scroller
+
+A focused event travels from the modal view along this path toward the
+focused view.
+
+If the focused view does not handle the event, the event is passed back
+up the groups on the selection path. This continues until a view handles
+it or the modal view has been reached.
+
+This route has an important extension.
+
+L<TGroup|TUI::Views::Group> processes focused events in three phases:
+
+    phPreProcess
+          │
+          ▼
+      phFocused
+          │
+          ▼
+    phPostProcess
+
+During the PreProcess phase, subviews whose C<ofPreProcess> option is
+set receive the event in Z-order.
+
+If none of these views handles it, the event follows the selection
+path to the focused view.
+
+If the event is still unhandled, subviews whose C<ofPostProcess>
+option is set receive the event, again according to Z-order.
+
+In simplified form:
+
+    focused event
+         │
+         ▼
+    ofPreProcess views
+         │
+         ▼
+     focused view
+         │
+         ▼
+    ofPostProcess views
+         │
+         ▼
+      unhandled
+
+These phases allow a view to inspect keyboard and other focused events
+even when that view does not itself hold the focus.
+
+Hotkeys are a typical example. A dialog control may need to recognize
+a key combination independently of which input control currently
+holds the focus.
+
+The C<phase> maintained by L<TGroup|TUI::Views::Group> allows a view to
+distinguish whether a focused event is being seen during preprocessing,
+through the focused path or during postprocessing.
+
+Another property determines whether a view is interested in a
+particular class of events at all: C<eventMask>.
+
+The bits in C<eventMask> correspond to event categories. If the
+relevant bit is not enabled, that view ignores events of the
+corresponding type. By default a view's C<eventMask> contains
+C<evMouseDown>, C<evKeyDown> and C<evCommand>. Broadcasts are not part of
+that default, so a view that needs them must add C<evBroadcast>
+explicitly, as L<TFrame|TUI::Views::Frame>,
+L<TScroller|TUI::Views::Scroller> and
+L<TListViewer|TUI::Views::ListViewer> do.
+
 =head2 Command Events
+
+Many direct user-input events are eventually translated into commands.
+
+A click on a status-line entry, the selection of a menu item, a
+keyboard shortcut or the activation of a button may initially be very
+different interactions.
+
+At the application level they can all represent the same operation:
+
+    Mouse
+      │
+    Status Item ─────┐
+                     │
+    Menu Item ───────┼──▶ evCommand
+                     │
+    Hotkey ──────────┤
+                     │
+    Button ──────────┘
+
+The physical form of an interaction is therefore separated from the
+operation requested by the application.
+
+A command event has C<evCommand> in C<what>. The corresponding command
+code is stored in the message part of the event.
+
+For example:
+
+    evCommand
+        │
+        └── cmClose
+
+or:
+
+    evCommand
+        │
+        └── cmOpen
+
+Application-specific commands use the same mechanism.
+
+Code handling C<cmOpen> therefore does not normally need to know
+whether the command was produced by a menu, a hotkey or some other
+view.
+
+I<Turbo Vision> traditionally uses command names beginning with C<cm>.
+Framework commands and application-specific commands share the same
+event mechanism, although applications should keep their own command
+values distinct from those reserved by the framework.
+
+Commands may also be enabled or disabled.
+
+This allows the user interface to reflect whether an operation is
+meaningful in the current application state. C<cmClose>, for example,
+is of little use when no window exists to be closed. Menu and status
+line entries associated with that command can therefore reflect its
+disabled state.
+
+Once a view has completely handled an event, it calls C<clearEvent>.
+
+Conceptually:
+
+    evCommand
+        │
+        ▼
+    handleEvent()
+        │
+        ├── not handled ──▶ continue propagation
+        │
+        └── handled
+              │
+              ▼
+          clearEvent()
+              │
+              ▼
+          evNothing
+
+C<evNothing> therefore does not represent another active event. It
+marks an event that requires no further processing.
+
+This distinction is fundamental. Leaving an event intact means that
+another view may still have an opportunity to handle it. Clearing the
+event means that processing of that event is complete.
 
 =head2 Broadcast Events
 
+Not all communication has a single destination.
+
+C<evBroadcast> is intended for situations in which one view needs to
+inform other views about a change or condition without addressing one
+specific recipient directly.
+
+A broadcast is distributed through the subviews of a group.
+
+If one of those subviews is itself a group, the broadcast continues
+through that part of the view tree.
+
+A sender can also use a broadcast to ask whether a receiver exists.
+C<examples/tvdemo.pl> (around line 728) uses this idiom with
+C<cmFndEventView>: a view that handles the broadcast clears the event,
+and the sender then inspects the event to see whether a receiver
+answered.
+
+In simplified form:
+
+    .                    TGroup
+    .                      │
+    .                 evBroadcast
+    .                      │
+    .         ┌────────────┼────────────┐
+    .         ▼            ▼            ▼
+    .       View A       View B       TGroup
+    .                                    │
+    .                             ┌──────┴──────┐
+    .                             ▼             ▼
+    .                           View C        View D
+
+As with other traversal operations, the Z-order of each group
+determines the order in which its subviews see the broadcast.
+
+Broadcasts are particularly useful for loosely coupled communication
+between views.
+
+A classic example is the relationship between scrollbars and
+scrollers. When the position represented by a scrollbar changes,
+another view may need to update its presentation. A broadcast can
+announce that change without making the sender responsible for the
+implementation of every potential receiver.
+
+Another useful pattern is discovering whether a particular view
+currently exists.
+
+A view that recognizes such a broadcast may call C<clearEvent> to mark
+the message as handled. The sender can use that result to determine
+whether a suitable receiver was present.
+
+The communication therefore changes from a direct dependency:
+
+    View A ───────────────▶ View B
+
+to a message distributed through the existing view structure:
+
+    View A
+       │
+       ▼
+    Broadcast
+       │
+       ▼
+    View tree
+       │
+       ▼
+    interested View
+
+The sender does not necessarily need to know which concrete view will
+respond.
+
 =head2 Focus and Ownership
+
+Focus and ownership were introduced together with the view tree. In
+the event system these relationships acquire their practical meaning.
+
+C<owner> describes the group to which a view belongs.
+
+C<current> identifies the selected subview within a group.
+
+Across several nested groups, these relationships produce the selection
+path described in L<Views|TUI::Manual::04>. The path is not itself an
+event mechanism. It is a property of the view tree used by the event
+system when routing focused events.
+
+The modal view provides another important boundary.
+
+Event routing begins at the current modal view.
+
+During normal application operation this is usually the application
+itself. When a modal dialog is executed, however, that dialog
+temporarily becomes the root of the relevant event-processing context.
+
+    normal operation
+
+        TApplication
+             │
+             ▼
+        view tree
+
+
+    modal dialog
+
+          TDialog
+             │
+             ▼
+        dialog subtree
+
+Views outside the modal context do not participate normally in the
+user interaction controlled by that dialog.
+
+Ownership, selection, focus and modality therefore represent different
+relationships:
+
+    owner       membership in the view tree
+
+    current     selection within a group
+
+    focus       active end of the selection path
+
+    modal       root of the current event scope
+
+Together they determine which view is given the opportunity to handle
+a particular event.
 
 =head2 Writing Event Handlers
 
+Application-specific behavior is commonly added by overriding
+C<handleEvent>.
+
+An event handler does not automatically replace all behavior inherited
+from its base class.
+
+Usually a derived view needs only to handle additional events while
+retaining the standard behavior already implemented by its ancestors.
+
+A typical L<TUI::Vision> handler therefore looks like this sketch:
+
+    sub handleEvent {
+        my ( $self, $event ) = @_;
+
+        $self->SUPER::handleEvent( $event );
+
+        return unless $event->{what} == evCommand;
+        return unless $event->{message}{command} == cmAboutCmd;
+
+        # Perform the application-specific action.
+
+        $self->clearEvent( $event );
+        return;
+    }
+
+The order of these operations is significant.
+
+Calling C<SUPER::handleEvent> gives the base class an opportunity to
+handle the event. If the base class calls C<clearEvent>, the original
+event is no longer available for further processing by the derived
+handler.
+
+This produces two common patterns.
+
+If a derived view merely extends the inherited behavior, the base
+implementation is normally called first:
+
+    sub handleEvent {
+        my ( $self, $event ) = @_;
+
+        $self->SUPER::handleEvent( $event );
+
+        # Additional handling follows here.
+
+        return;
+    }
+
+If the derived class needs to intercept or replace an inherited
+behavior, the relevant event must instead be checked before the base
+handler is called:
+
+    sub handleEvent {
+        my ( $self, $event ) = @_;
+
+        if (
+            $event->{what} == evCommand
+            && $event->{message}{command} == cmSomething
+        ) {
+            # Override inherited handling.
+            $self->clearEvent( $event );
+            return;
+        }
+
+        $self->SUPER::handleEvent( $event );
+        return;
+    }
+
+The relevant question is therefore not whether C<SUPER::handleEvent>
+must always be called first.
+
+The question is:
+
+    Is the inherited behavior being extended,
+    or is it being replaced?
+
+A handler should normally call C<clearEvent> only when it has completed
+the handling of that event.
+
+If the event remains uncleared, the normal event-routing mechanism may
+continue.
+
+A real example of the extending pattern is provided by an event viewer:
+
+    sub handleEvent {
+        my ( $self, $ev ) = @_;
+
+        $self->SUPER::handleEvent( $ev );
+
+        if (
+            $ev->{what} == evBroadcast
+            && $ev->{message}{command} == cmFndEventView
+        ) {
+            $self->clearEvent( $ev );
+        }
+
+        return;
+    }
+
+The view first preserves the normal behavior of
+L<TWindow|TUI::Views::Window>. It then
+recognizes one particular broadcast and marks that event as handled.
+
+This pattern illustrates an important characteristic of the Turbo
+Vision event model: application-specific behavior is usually added by
+specializing existing event handling rather than by replacing the
+entire event mechanism.
+
 =head2 Conclusion
 
-L<next|TUI::Manual::06> chapter.
+Events provide the dynamic side of the L<TUI::Vision> framework.
+
+The view structure described in the previous chapters determines the
+paths through which events may travel.
+
+Different event categories use that structure in different ways.
+Positional events follow position and Z-order, focused events follow the
+selection path and its phases, and broadcasts follow the view tree.
+
+Commands add another level of abstraction by separating the physical
+user interaction from the operation requested by the application.
+
+C<clearEvent> provides the corresponding completion mechanism. Once a
+view has fully handled an event, the event becomes C<evNothing> and no
+longer participates in normal event propagation.
+
+Together, the mechanisms described in chapters 03 through 05 form the
+core of the I<Turbo Vision> programming model:
+
+    Architecture
+         │
+         ▼
+       Views
+         │
+         ▼
+       Events
+         │
+         ▼
+    Application behavior
+
+The L<next chapter|TUI::Manual::06> applies these mechanisms to two of the most 
+important composite views in L<TUI::Vision>: windows and dialogs.
 
 =cut

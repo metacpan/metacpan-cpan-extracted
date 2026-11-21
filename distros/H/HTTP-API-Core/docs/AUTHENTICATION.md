@@ -73,7 +73,7 @@ The key name must be a defined, non-reference, non-empty scalar. The value must 
 
 Query API keys are appended to the request URL after ordinary request query parameters have been encoded. Existing URL fragments are preserved, with the API-key parameter inserted before the fragment. Both the key name and value are percent-encoded as UTF-8 bytes using unreserved URI characters unchanged.
 
-If the exact query parameter name is already present in the URL, including its UTF-8 percent-encoded form, the helper leaves the URL unchanged instead of adding a second credential.
+If the same query parameter name is already present in the URL, the helper leaves the URL unchanged instead of adding a second credential. Existing names are compared as percent-decoded bytes, so lowercase/uppercase percent escapes and escaped unreserved characters match their equivalent UTF-8-encoded names. A parameter without `=` also counts as present. Names remain case-sensitive, and matching text elsewhere in the URL does not count.
 
 ## Composition and precedence
 

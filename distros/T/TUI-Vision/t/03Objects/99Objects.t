@@ -16,5 +16,6 @@ isa_ok( new_TNSSortedCollection(), TNSSortedCollection );
 isa_ok( new_TCollection(), TCollection );
 isa_ok( new_TSortedCollection(), TSortedCollection );
 isa_ok( new_TStringCollection( 0, 0 ), TStringCollection );
+isa_ok( new_TStream(), TStream );
 
 done_testing();

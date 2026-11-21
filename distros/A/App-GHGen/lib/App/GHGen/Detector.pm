@@ -12,7 +12,9 @@ our @EXPORT_OK = qw(
 	get_project_indicators
 );
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
+
+=encoding utf-8
 
 =head1 NAME
 
@@ -157,9 +159,9 @@ None.  Pure lookup function.
 
 =head4 Output
 
-    known type  → { type => 'arrayref' }
-    all types   → { type => 'hashref'  }
-    unknown type → undef
+    known type  -> { type => 'arrayref' }
+    all types   -> { type => 'hashref'  }
+    unknown type -> undef
 
 =head3 FORMAL SPECIFICATION
 

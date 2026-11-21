@@ -69,6 +69,9 @@ if(!$pid) {
 	# The config is found by looking in the current directory, so the generator
 	# has to run where a person would run it: the root of the project.
 	chdir($ROOT) or exit 127;
+	# The Z specifications in the POD are not ASCII; without a UTF-8 layer on
+	# STDOUT the generator warns "Wide character" once for each.
+	$ENV{'PERL_UNICODE'} = 'S';
 	open(STDOUT, '>', $out) or exit 127;
 	open(STDERR, '>', $err) or exit 127;
 	exec($pod2github, $MODULE) or exit 127;
@@ -99,7 +102,7 @@ if($generated ne $committed) {
 	}
 
 	diag('README.md is out of date; regenerate it with:');
-	diag("    pod2github $MODULE > README.md");
+	diag("    PERL_UNICODE=S pod2github $MODULE > README.md");
 	diag('first difference at line ' . ($first + 1) . ':');
 	diag('  generated: ' . ($generated[$first] // '(end of file)'));
 	diag('  README.md: ' . ($committed[$first] // '(end of file)'));

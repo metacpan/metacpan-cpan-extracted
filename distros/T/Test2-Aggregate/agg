@@ -1,0 +1,88 @@
+#!/usr/bin/env perl
+
+=head1 NAME
+
+agg - Test2::Aggregate harness wrapper / helper script
+
+=head1 DESCRIPTION
+
+Pass a list of Perl test files/directories and they will run aggregated via yath
+(or prove if specified). It is not meant to be used for .t files that use Test2::Aggregate
+themselves.
+
+It is useful either to speed up a test run for tests you know can be aggregated,
+or to check whether specific tests can run successfully under Test2::Aggregate.
+
+=head1 SYNOPSIS
+
+ agg [options] <file/dir1 ...>
+
+ Options:
+ --out <s>,          -o <s>  : Specify the test file to be created (tmp file by default).
+ --lists,            -l      : Use files specified as lists.
+ --prove,            -p      : Force prove (default is yath/Test2 if installed).
+ --verbose,          -v      : Verbose (passed to yath/prove)
+ --absolute,         -a      : Use absolute paths in generated files. Disabled with -r.
+ --include_regex <s> -ir <s> : Regex for test paths to include.
+ --exclude_regex <s> -er <s> : Regex for test paths to exclude.
+ --root <s>          -r <s>  : Define a custom root dir.
+ --include <s>,      -I <s>  : Library path to include (repeatable).
+ --test_warnings,    -w      : Fail tests on warnings.
+ --test_bundle <s>,  -t      : Test bundle (def: Test2::V0 or Test::More if -p). Comma-separated list.
+ --pass_output <s>,  -po <s> : Output directory for list of 100% passing tests.
+ --reverse                   : Reverse the test order.
+ --shuffle                   : Shuffle the test order.
+ --sort                      : Run the tests alphabetically.
+ --stats_output <s>, -so <s> : Stats output directory (does not combine with pass_output).
+ --help              -h      : Show basic help and exit.
+
+=cut
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Path::Tiny;
+use Pod::Usage;
+use Test2::Aggregate::Helper;
+
+my %opt;
+GetOptions(
+    \%opt,
+    'absolute|a',
+    'include_regex|ir=s',
+    'exclude_regex|er=s',
+    'help|h',
+    'include|I=s@',
+    'lists|l',
+    'out|o=s',
+    'pass_output|po=s',
+    'prove|p',
+    'reverse',
+    'root|r=s',
+    'shuffle',
+    'sort',
+    'stats_output|so=s',
+    'test_bundle|t=s',
+    'test_warnings|w',
+    'verbose|v',
+) or pod2usage(2);
+
+pod2usage({-verbose => 1, -output => \*STDOUT, -noperldoc => 1})
+    if $opt{help} || !@ARGV;
+
+Test2::Aggregate::Helper::setup_options(\%opt);
+
+$opt{file} = $opt{out} ? path($opt{out}.'.t') : Path::Tiny->tempfile(
+    TEMPLATE => "aggXXXXXX",
+    SUFFIX   => '.t',
+    UNLINK   => 0
+);
+
+print "Writing output to $opt{file}\n" if $opt{verbose};
+
+my $code = Test2::Aggregate::Helper::generate_code(\%opt, @ARGV);
+$opt{file}->spew_utf8($code);
+
+exec(Test2::Aggregate::Helper::create_command(\%opt, $opt{file}));
+die "Cannot execute test harness: $!\n";

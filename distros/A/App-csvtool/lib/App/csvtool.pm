@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021-2024 -- leonerd@leonerd.org.uk
 
-package App::csvtool 0.04;
+package App::csvtool 0.05;
 
 use v5.26;
 use warnings;
@@ -20,6 +20,8 @@ C<App::csvtool> - implements the F<csvtool> core commands
 This module provides the main commands for the F<csvtool> wrapper script.
 
 =head1 COMMANDS
+
+=for highlighter
 
 =cut
 

@@ -1,0 +1,18 @@
+Revision history for Log-Dispatch-Email-DKIM
+
+0.001.0
+	First release: a Log::Dispatch appender that DKIM signs its mail
+	Signs only for the domain in From:, passing over anything else
+	A missing or unreadable key warns and sends the message unsigned
+	Refactored: private helpers enforced with Sub::Private, messages through i18n()
+	Sender may carry a display name; envelope sender and signing domain use the bare address
+	A line break in To, From or Subject can no longer add a header
+	Key lookup no longer uses glob() and works without HOME in the environment
+	A missing From or To loses the message quietly instead of croaking
+	Signing and sending are done by Mail::Send::DKIM (0.004.0 or later)
+	Settings come from the environment: DKIM_DOMAIN (the domain in the signature),
+	DKIM_SELECTOR, DKIM_KEYFILE, DKIM_KEYDIR and DKIM_SENDMAIL (SENDMAIL is the fallback)
+	Added an EXAMPLES section: a complete log4perl configuration
+	Declared the core modules used (Scalar::Util, autodie, base, version) and raised
+	the minimum Perl to 5.026
+	The test key in t/dkim/ is a throwaway made for the tests; it signs nothing real

@@ -1,12 +1,12 @@
 {
-   "abstract" : "Install skills, agents and rules from remote sources \u2013 the Perl port of skilletor",
+   "abstract" : "Install and sync skills, agents and rules for Claude Code, Codex and Hermes Agent",
    "author" : [
-      "Torsten Raudssus <getty@cpan.org>"
+      "Torsten Raudssus <torsten@raudssus.de>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.040, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -38,7 +38,10 @@
             "Errno" : "0",
             "Exporter" : "0",
             "Fcntl" : "0",
+            "File::Spec" : "0",
             "HTTP::Tiny" : "0.083",
+            "Hash::Ordered" : "0",
+            "IO::Handle" : "0",
             "IO::Select" : "0",
             "IO::Socket::SSL" : "1.968",
             "JSON::MaybeXS" : "1.004000",
@@ -49,10 +52,11 @@
             "Path::Tiny" : "0.119",
             "Scalar::Util" : "0",
             "Sys::Hostname" : "0",
+            "Text::Nunjucks" : "0.001",
             "Time::HiRes" : "0",
             "Unicode::Normalize" : "0",
             "namespace::clean" : "0",
-            "perl" : "5.020"
+            "perl" : "5.040"
          }
       },
       "test" : {
@@ -61,218 +65,274 @@
             "IO::Compress::Gzip" : "0",
             "IO::Socket::INET" : "0",
             "IPC::Open2" : "0",
-            "Test::More" : "0.96"
+            "Test::More" : "0.96",
+            "version" : "0.77"
          }
       }
    },
    "provides" : {
       "Skilletor" : {
          "file" : "lib/Skilletor.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
+      },
+      "Skilletor::AgentsMD" : {
+         "file" : "lib/Skilletor/AgentsMD.pm",
+         "version" : "0.008000"
       },
       "Skilletor::Apply" : {
          "file" : "lib/Skilletor/Apply.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
       },
       "Skilletor::Backend" : {
          "file" : "lib/Skilletor/Backend.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
       },
       "Skilletor::Briefing" : {
          "file" : "lib/Skilletor/Briefing.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
       },
       "Skilletor::Bundles" : {
          "file" : "lib/Skilletor/Bundles.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
+      },
+      "Skilletor::CLI" : {
+         "file" : "lib/Skilletor/CLI.pm",
+         "version" : "0.008000"
       },
       "Skilletor::Cache" : {
          "file" : "lib/Skilletor/Cache.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
       },
       "Skilletor::Catalog" : {
          "file" : "lib/Skilletor/Catalog.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
       },
       "Skilletor::ClaudeSettings" : {
          "file" : "lib/Skilletor/ClaudeSettings.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
+      },
+      "Skilletor::Commands" : {
+         "file" : "lib/Skilletor/Commands.pm",
+         "version" : "0.008000"
       },
       "Skilletor::Config" : {
          "file" : "lib/Skilletor/Config.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
+      },
+      "Skilletor::Convert" : {
+         "file" : "lib/Skilletor/Convert.pm",
+         "version" : "0.008000"
       },
       "Skilletor::Engine" : {
          "file" : "lib/Skilletor/Engine.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
       },
       "Skilletor::Entry" : {
          "file" : "lib/Skilletor/Entry.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
       },
       "Skilletor::Error" : {
          "file" : "lib/Skilletor/Error.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
       },
       "Skilletor::Error::Ambiguous" : {
          "file" : "lib/Skilletor/Error/Ambiguous.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
       },
       "Skilletor::Error::Apply" : {
          "file" : "lib/Skilletor/Error/Apply.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
+      },
+      "Skilletor::Error::Block" : {
+         "file" : "lib/Skilletor/Error/Block.pm",
+         "version" : "0.008000"
       },
       "Skilletor::Error::Bundle" : {
          "file" : "lib/Skilletor/Error/Bundle.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
       },
       "Skilletor::Error::CacheRejected" : {
          "file" : "lib/Skilletor/Error/CacheRejected.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
       },
       "Skilletor::Error::Catalog" : {
          "file" : "lib/Skilletor/Error/Catalog.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
+      },
+      "Skilletor::Error::Command" : {
+         "file" : "lib/Skilletor/Error/Command.pm",
+         "version" : "0.008000"
       },
       "Skilletor::Error::Config" : {
          "file" : "lib/Skilletor/Error/Config.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
+      },
+      "Skilletor::Error::Convert" : {
+         "file" : "lib/Skilletor/Error/Convert.pm",
+         "version" : "0.008000"
       },
       "Skilletor::Error::Frontmatter" : {
          "file" : "lib/Skilletor/Error/Frontmatter.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
       },
       "Skilletor::Error::JSON" : {
          "file" : "lib/Skilletor/Error/JSON.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
       },
       "Skilletor::Error::Lock" : {
          "file" : "lib/Skilletor/Error/Lock.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
       },
       "Skilletor::Error::LockTimeout" : {
          "file" : "lib/Skilletor/Error/LockTimeout.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
+      },
+      "Skilletor::Error::Render" : {
+         "file" : "lib/Skilletor/Error/Render.pm",
+         "version" : "0.008000"
       },
       "Skilletor::Error::Source" : {
          "file" : "lib/Skilletor/Error/Source.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
       },
       "Skilletor::Error::Spec" : {
          "file" : "lib/Skilletor/Error/Spec.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
+      },
+      "Skilletor::Error::TOML" : {
+         "file" : "lib/Skilletor/Error/TOML.pm",
+         "version" : "0.008000"
       },
       "Skilletor::Error::Tar" : {
          "file" : "lib/Skilletor/Error/Tar.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
       },
       "Skilletor::Error::Target" : {
          "file" : "lib/Skilletor/Error/Target.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
       },
       "Skilletor::Error::Unsupported" : {
          "file" : "lib/Skilletor/Error/Unsupported.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
       },
       "Skilletor::FSUtil" : {
          "file" : "lib/Skilletor/FSUtil.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
       },
       "Skilletor::Frontmatter" : {
          "file" : "lib/Skilletor/Frontmatter.pm",
-         "version" : "0.001"
-      },
-      "Skilletor::Frontmatter::Float" : {
-         "file" : "lib/Skilletor/Frontmatter.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
       },
       "Skilletor::GitEnv" : {
          "file" : "lib/Skilletor/GitEnv.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
       },
       "Skilletor::Gitignore" : {
          "file" : "lib/Skilletor/Gitignore.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
       },
       "Skilletor::Gzip" : {
          "file" : "lib/Skilletor/Gzip.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
+      },
+      "Skilletor::Hooks" : {
+         "file" : "lib/Skilletor/Hooks.pm",
+         "version" : "0.008000"
       },
       "Skilletor::JSON" : {
          "file" : "lib/Skilletor/JSON.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
       },
       "Skilletor::JSON::OrderedHash" : {
          "file" : "lib/Skilletor/JSON/OrderedHash.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
       },
       "Skilletor::JSString" : {
          "file" : "lib/Skilletor/JSString.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
       },
       "Skilletor::Lock" : {
          "file" : "lib/Skilletor/Lock.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
+      },
+      "Skilletor::Probe" : {
+         "file" : "lib/Skilletor/Probe.pm",
+         "version" : "0.008000"
       },
       "Skilletor::Process" : {
          "file" : "lib/Skilletor/Process.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
       },
       "Skilletor::Render" : {
          "file" : "lib/Skilletor/Render.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
+      },
+      "Skilletor::Render::Loader" : {
+         "file" : "lib/Skilletor/Render/Loader.pm",
+         "version" : "0.008000"
       },
       "Skilletor::Report" : {
          "file" : "lib/Skilletor/Report.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
       },
       "Skilletor::Resolver" : {
          "file" : "lib/Skilletor/Resolver.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
       },
       "Skilletor::Role::Source" : {
          "file" : "lib/Skilletor/Role/Source.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
       },
       "Skilletor::Source::Git" : {
          "file" : "lib/Skilletor/Source/Git.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
       },
       "Skilletor::Source::Local" : {
          "file" : "lib/Skilletor/Source/Local.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
       },
       "Skilletor::Source::Url" : {
          "file" : "lib/Skilletor/Source/Url.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
       },
       "Skilletor::Spec" : {
          "file" : "lib/Skilletor/Spec.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
       },
       "Skilletor::State" : {
          "file" : "lib/Skilletor/State.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
+      },
+      "Skilletor::TOML" : {
+         "file" : "lib/Skilletor/TOML.pm",
+         "version" : "0.008000"
       },
       "Skilletor::Tar" : {
          "file" : "lib/Skilletor/Tar.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
       },
       "Skilletor::Targets" : {
          "file" : "lib/Skilletor/Targets.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
       },
       "Skilletor::URL" : {
          "file" : "lib/Skilletor/URL.pm",
-         "version" : "0.001"
+         "version" : "0.008000"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {},
-      "repository" : {}
+      "bugtracker" : {
+         "web" : "https://github.com/Getty/skilletor/issues"
+      },
+      "homepage" : "https://github.com/Getty/skilletor",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Getty/skilletor.git",
+         "web" : "https://github.com/Getty/skilletor"
+      }
    },
-   "version" : "0.001",
+   "version" : "0.008000",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040001"
@@ -284,10 +344,28 @@
                "Dist::Zilla::Plugin::GatherDir" : {
                   "exclude_filename" : [
                      ".karr",
-                     "README.md"
+                     "README.md",
+                     "install.sh",
+                     "package-lock.json",
+                     "package.json",
+                     "tsconfig.json"
                   ],
                   "exclude_match" : [
-                     "^maint/"
+                     "^assets/",
+                     "^bin/",
+                     "^conformance/",
+                     "^dist/",
+                     "^docs/",
+                     "^evals/",
+                     "^hermes/",
+                     "^hooks/",
+                     "^maint/",
+                     "^node_modules/",
+                     "^scripts/[^/]+\\.m?[jt]s$",
+                     "^skills/",
+                     "^src/",
+                     "^test/",
+                     "^winlaunch/"
                   ],
                   "include_dotfiles" : 1,
                   "prefix" : "",
@@ -304,37 +382,37 @@
          {
             "class" : "Dist::Zilla::Plugin::GatherAgentContext",
             "name" : "@Author::GETTY/GatherAgentContext",
-            "version" : "0.001"
+            "version" : "0.002"
          },
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
             "name" : "@Author::GETTY/@Filter/ManifestSkip",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaYAML",
             "name" : "@Author::GETTY/@Filter/MetaYAML",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::Readme",
             "name" : "@Author::GETTY/@Filter/Readme",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExtraTests",
             "name" : "@Author::GETTY/@Filter/ExtraTests",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@Author::GETTY/@Filter/ExecDir",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::ShareDir",
             "name" : "@Author::GETTY/@Filter/ShareDir",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::MakeMaker",
@@ -344,27 +422,32 @@
                }
             },
             "name" : "@Author::GETTY/@Filter/MakeMaker",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::Manifest",
             "name" : "@Author::GETTY/@Filter/Manifest",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::TestRelease",
             "name" : "@Author::GETTY/@Filter/TestRelease",
-            "version" : "6.037"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::ConfirmRelease",
-            "name" : "@Author::GETTY/@Filter/ConfirmRelease",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::UploadToCPAN",
             "name" : "@Author::GETTY/@Filter/UploadToCPAN",
-            "version" : "6.037"
+            "version" : "6.040"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Author::GETTY::InstallCheck",
+            "name" : "@Author::GETTY/Author::GETTY::InstallCheck",
+            "version" : "0.329"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ConfirmRelease",
+            "name" : "@Author::GETTY/ConfirmRelease",
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::LicenseFile",
@@ -372,19 +455,34 @@
             "version" : "0.002"
          },
          {
+            "class" : "Dist::Zilla::Plugin::Run::BeforeRelease",
+            "config" : {
+               "Dist::Zilla::Plugin::Run::Role::Runner" : {
+                  "fatal_errors" : 1,
+                  "quiet" : 0,
+                  "run" : [
+                     "%x maint/version-tie.pl %v"
+                  ],
+                  "version" : "0.050"
+               }
+            },
+            "name" : "@Author::GETTY/Run::BeforeRelease",
+            "version" : "0.050"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::MetaConfig",
             "name" : "@Author::GETTY/MetaConfig",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
             "name" : "@Author::GETTY/MetaJSON",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "@Author::GETTY/PodSyntaxTests",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::ChangesHasContent",
@@ -399,7 +497,7 @@
                      {
                         "class" : "Dist::Zilla::Plugin::FinderCode",
                         "name" : "@Author::GETTY/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-                        "version" : "6.037"
+                        "version" : "6.040"
                      }
                   ],
                   "include_underscores" : 0
@@ -419,9 +517,9 @@
             "version" : "2.004003"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Repository",
-            "name" : "@Author::GETTY/Repository",
-            "version" : "0.25"
+            "class" : "Dist::Zilla::Plugin::GithubMeta",
+            "name" : "@Author::GETTY/GithubMeta",
+            "version" : "0.58"
          },
          {
             "class" : "Dist::Zilla::Plugin::InstallRelease",
@@ -464,92 +562,92 @@
                      {
                         "class" : "Pod::Weaver::Plugin::EnsurePod5",
                         "name" : "@CorePrep/EnsurePod5",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::H1Nester",
                         "name" : "@CorePrep/H1Nester",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::SingleEncoding",
                         "name" : "@GETTY/SingleEncoding",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Name",
                         "name" : "@GETTY/Name",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Version",
                         "name" : "@GETTY/Version",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Region",
                         "name" : "@GETTY/Prelude",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "@GETTY/Synopsis",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "@GETTY/Description",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "@GETTY/Overview",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "@GETTY/Stability",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Leftovers",
                         "name" : "@GETTY/Leftovers",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Region",
                         "name" : "@GETTY/postlude",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
-                        "class" : "Pod::Weaver::Section::GenerateSection",
+                        "class" : "Pod::Weaver::Section::Author::GETTY::Support",
                         "name" : "@GETTY/Support",
-                        "version" : "4.020"
+                        "version" : "0.329"
                      },
                      {
                         "class" : "Pod::Weaver::Section::GenerateSection",
                         "name" : "@GETTY/Contributing",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Authors",
                         "name" : "@GETTY/Authors",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
-                        "class" : "Pod::Weaver::Section::Legal",
+                        "class" : "Pod::Weaver::Section::Author::GETTY::Legal",
                         "name" : "@GETTY/Legal",
-                        "version" : "4.020"
+                        "version" : "0.329"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::Transformer",
                         "name" : "@GETTY/List",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::Transformer",
                         "name" : "@GETTY/GETTY",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      }
                   ]
                }
@@ -566,7 +664,7 @@
                }
             },
             "name" : "@Author::GETTY/@Git::VersionManager/pluginbundle version",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::RewriteVersion::Transitional",
@@ -636,7 +734,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.001",
+                  "tag" : "0.008000",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },
@@ -670,7 +768,7 @@
          {
             "class" : "Dist::Zilla::Plugin::NextRelease",
             "name" : "@Author::GETTY/@Git::VersionManager/NextRelease",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Commit",
@@ -688,7 +786,8 @@
                   ],
                   "allow_dirty_match" : [
                      "(?^:^bin/)",
-                     "(?^:^lib/.*\\.pm$)"
+                     "(?^:^lib/.*\\.pm$)",
+                     "(?^:^script/)"
                   ],
                   "changelog" : "Changes"
                },
@@ -721,59 +820,74 @@
             "version" : "2.052"
          },
          {
+            "class" : "Dist::Zilla::Plugin::Author::GETTY::GitHubRelease",
+            "name" : "@Author::GETTY/Author::GETTY::GitHubRelease",
+            "version" : "0.329"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Author::GETTY::Binary",
+            "name" : "skilletor/skilletor",
+            "version" : "0.329"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "ScriptDir",
+            "version" : "6.040"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":IncModules",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":TestFiles",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExtraTestFiles",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExecFiles",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":PerlExecFiles",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ShareFiles",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":MainModule",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":AllFiles",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":NoFiles",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : "@Author::GETTY/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-            "version" : "6.037"
+            "version" : "6.040"
          }
       ],
       "zilla" : {
@@ -781,12 +895,41 @@
          "config" : {
             "is_trial" : 0
          },
-         "version" : "6.037"
+         "version" : "6.040"
       }
    },
    "x_authority" : "cpan:GETTY",
+   "x_binaries" : {
+      "binaries" : {
+         "skilletor" : {
+            "modules" : [],
+            "pp_args" : "scripts/binary-pp-args.sh",
+            "require" : [
+               "Skilletor::Source::Url",
+               "Skilletor::Source::Git",
+               "Skilletor::Source::Local",
+               "Skilletor::Render",
+               "Text::Nunjucks",
+               "HTTP::Tiny",
+               "IO::Socket::SSL",
+               "Net::SSLeay",
+               "Mozilla::CA"
+            ],
+            "script" : "script/skilletor",
+            "smoke" : "scripts/binary-smoke.sh",
+            "verify" : "scripts/binary-verify.sh"
+         }
+      },
+      "platforms" : [
+         "linux-x86_64",
+         "linux-arm64",
+         "macos-arm64",
+         "windows-x86_64"
+      ],
+      "prepare" : "scripts/binary-prepare.sh"
+   },
    "x_generated_by_perl" : "v5.40.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.53",
-   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+   "x_spdx_expression" : "Artistic-2.0"
 }
 

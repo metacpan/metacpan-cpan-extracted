@@ -98,9 +98,11 @@ C<MAIL_COMMAND='ssh mail.example.com /usr/sbin/sendmail -t'>.
 The signer the alert is piped through.  Default C<mail-dkim> next to this
 script, which signs for whatever C<DKIM_DOMAINS>, C<DKIM_KEYDIR> and
 C<DKIM_SELECTOR> the site already sets, so the alert authenticates like the
-rest of its mail.  A signer that cannot send - no key, no sendmail behind it -
-falls through to mail(1), mailx(1) and sendmail(1) rather than costing the
-week's report.
+rest of its mail.  The one that ships is run with the perl described under
+C<PERL> below, not with the first perl on C<PATH>, so it finds the same modules
+as the report does; a signer you name yourself is run as it stands.  A signer
+that cannot send - no key, no sendmail behind it - falls through to mail(1),
+mailx(1) and sendmail(1) rather than costing the week's report.
 
 =item C<PERL>
 
@@ -197,7 +199,16 @@ SELF="$SELF_DIR/$(basename "$0")"
 FROM=${MAIL_FROM:-$MAIL_TO}
 # The signer that ships next to this script, which signs for whatever
 # DKIM_DOMAINS, DKIM_KEYDIR and DKIM_SELECTOR say.  MAIL_DKIM names another.
-MAIL_DKIM=${MAIL_DKIM:-$SELF_DIR/mail-dkim}
+# The one that ships is a perl script, so it is run with the perl chosen above
+# and not with whichever perl its #! line finds first on PATH, which on a cron
+# job's PATH is often the system perl, without the modules.  A signer the
+# caller names is run as it is: it may not be perl at all.
+if [ -n "${MAIL_DKIM:-}" ]; then
+	SIGNER_PERL=
+else
+	MAIL_DKIM=$SELF_DIR/mail-dkim
+	SIGNER_PERL=$PERL
+fi
 
 # Printing the crontab line, not installing it: what a crontab needs depends on
 # where the programmes landed and which perl has XML::PP on this machine,
@@ -326,7 +337,11 @@ fi
 # from here.  A signer that fails - no key, no sendmail behind it - falls
 # through to the transports below rather than costing the week's report.
 if [ "$sent" -eq 0 ] && [ -x "$MAIL_DKIM" ]; then
-	printf '%s%s\n' "$headers" "$message" | "$MAIL_DKIM" -t -f "$FROM" && sent=1
+	if [ -n "$SIGNER_PERL" ]; then
+		printf '%s%s\n' "$headers" "$message" | "$SIGNER_PERL" "$MAIL_DKIM" -t -f "$FROM" && sent=1
+	else
+		printf '%s%s\n' "$headers" "$message" | "$MAIL_DKIM" -t -f "$FROM" && sent=1
+	fi
 fi
 
 # mail(1) and mailx(1) add the headers themselves from -s, so they are given

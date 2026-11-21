@@ -4,7 +4,7 @@ package Skilletor::JSON::OrderedHash;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.008000';
 
 # A key is an array index – and so ordered before every other key, ascending by value –
 # when it is the canonical decimal form of an integer 0 .. 2**32 - 2 (ECMA-262 §6.1.7).
@@ -90,7 +90,7 @@ Skilletor::JSON::OrderedHash - A tied hash that keeps a JavaScript object's prop
 
 =head1 VERSION
 
-version 0.001
+version 0.008000
 
 =head1 SYNOPSIS
 
@@ -123,19 +123,25 @@ The keys in property order, without iterating the tied hash.
 
 =head1 SUPPORT
 
+=head2 Issues
+
+Please report bugs and feature requests at
+L<https://github.com/Getty/skilletor/issues>.
+
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <getty@cpan.org>
+Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
+This software is Copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

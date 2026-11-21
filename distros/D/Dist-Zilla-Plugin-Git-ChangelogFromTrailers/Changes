@@ -1,0 +1,6 @@
+Revision history for Dist-Zilla-Plugin-Git-ChangelogFromTrailers
+
+0.001 2026-11-20 TEODESIAN
+    - Initial release.  [Git::ChangelogFromTrailers] builds the Changes
+      entry for a release from the Changelog trailers of the commits since
+      the last release tag.

@@ -1,5 +1,30 @@
 Revision history for Git-Libgit2
 
+0.008     2026-11-21 01:52:59Z
+  - Fix git_stash_save: its out-param is a caller-allocated 20-byte
+    git_oid, bound as opaque instead of opaque*. The old binding handed
+    libgit2 a pointer-sized temporary, so the 20-byte stash commit id
+    overran it and the caller got eight hash bytes back as an "address".
+    The POD now shows the buffer plus oid_to_hex.
+  - git_odb_new is bound with its real C signature, one out-param and no
+    repository. It creates an empty object database without backends;
+    the POD says so and points at git_repository_odb for the ODB of an
+    open repository. New t/35-odb.t covers git_odb_exists on both.
+  - git_merge_base_many and git_merge_analysis take their element count
+    as size_t, as libgit2 declares it, instead of a 32-bit uint that only
+    works where the ABI happens to zero-extend. t/30-merge.t now runs
+    both: a three-tip merge base, and a fast-forward and an up-to-date
+    analysis.
+  - CI: the Debian job builds libgit2 1.9.3 into /usr/local instead of
+    installing apt's libgit2-dev, whose 1.5.1 is below the Alien::Libgit2
+    floor and made ALIEN_INSTALL_TYPE=system fail. README states 1.9.3 as
+    the floor.
+  - POD: the modules declare =encoding utf8, so podchecker no longer
+    trips over the em dashes. New t/40-pod-source.t maps the house POD
+    shortcuts to standard POD the way the build does and requires all
+    three modules to pass podchecker.
+  - Requires Alien::Libgit2 0.003.
+
 0.007     2026-08-30 14:06:50Z
   - New cert_hostkey_offsets: byte offsets of git_cert_hostkey's type,
     hash_sha1 and hash_sha256 fields, for reading host key hashes from

@@ -14,7 +14,7 @@ use Skilletor::FSUtil qw( atomic_write encode_text hash_bytes is_executable path
 use Skilletor::JSON qw( js_ordered );
 use Skilletor::Lock qw( read_lock serialize_lock write_lock );
 
-our $VERSION = '0.001';
+our $VERSION = '0.008000';
 
 our @EXPORT_OK = qw( apply is_valid_item_name );
 
@@ -405,7 +405,7 @@ Skilletor::Apply - Apply a build plan to disk – diff, atomic writes, conflicts
 
 =head1 VERSION
 
-version 0.001
+version 0.008000
 
 =head1 SYNOPSIS
 
@@ -476,19 +476,25 @@ True for a name the apply accepts: ASCII letters, digits, C<.>, C<_>, C<->.
 
 =head1 SUPPORT
 
+=head2 Issues
+
+Please report bugs and feature requests at
+L<https://github.com/Getty/skilletor/issues>.
+
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <getty@cpan.org>
+Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
+This software is Copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

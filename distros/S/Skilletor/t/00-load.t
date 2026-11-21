@@ -5,29 +5,38 @@ use Test::More;
 
 for (qw(
   Skilletor
+  Skilletor::AgentsMD
   Skilletor::Apply
   Skilletor::Backend
   Skilletor::Briefing
   Skilletor::Bundles
   Skilletor::Cache
+  Skilletor::CLI
   Skilletor::Catalog
   Skilletor::ClaudeSettings
+  Skilletor::Commands
   Skilletor::Config
+  Skilletor::Convert
   Skilletor::Engine
   Skilletor::Entry
   Skilletor::Error
   Skilletor::Error::Ambiguous
   Skilletor::Error::Apply
+  Skilletor::Error::Block
   Skilletor::Error::Bundle
   Skilletor::Error::CacheRejected
   Skilletor::Error::Catalog
+  Skilletor::Error::Command
   Skilletor::Error::Config
+  Skilletor::Error::Convert
   Skilletor::Error::Frontmatter
   Skilletor::Error::JSON
   Skilletor::Error::Lock
   Skilletor::Error::LockTimeout
+  Skilletor::Error::Render
   Skilletor::Error::Source
   Skilletor::Error::Spec
+  Skilletor::Error::TOML
   Skilletor::Error::Tar
   Skilletor::Error::Target
   Skilletor::Error::Unsupported
@@ -40,8 +49,10 @@ for (qw(
   Skilletor::JSON::OrderedHash
   Skilletor::JSString
   Skilletor::Lock
+  Skilletor::Probe
   Skilletor::Process
   Skilletor::Render
+  Skilletor::Render::Loader
   Skilletor::Report
   Skilletor::Resolver
   Skilletor::Role::Source
@@ -50,6 +61,7 @@ for (qw(
   Skilletor::Source::Url
   Skilletor::Spec
   Skilletor::State
+  Skilletor::TOML
   Skilletor::Tar
   Skilletor::Targets
   Skilletor::URL

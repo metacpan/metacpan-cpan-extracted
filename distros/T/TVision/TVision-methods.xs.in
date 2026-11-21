@@ -293,9 +293,9 @@ EOS
 	#virtual void handleEvent( TEvent& );
 	#virtual void initBuffer();
 	#virtual TMenuItem& initContextMenu( TPoint );
-	int insertMultilineText( char *a, int b)
+	#?? where it is now?? int insertMultilineText( char *a, int b)
 	int insertBuffer( char *c, int uint1, int uint2, int Boolean1, int Boolean2 )
-	int insertEOL( int Boolean )
+	#?? where it is now?? int insertEOL( int Boolean )
 	#virtual Boolean insertFrom( TEditor * );
 	int insertText( char *cv, int uint, int Boolean )
 	void scrollTo( int x, int y)
@@ -344,7 +344,7 @@ EOS
 	void unlock()
 	void update( int uchar )
 	#void checkScrollBar( const TEvent&, TScrollBar *, int& );
-	void detectEol()
+	#?? where it is now?? void detectEol()
 	#enum EolType { eolCrLf, eolLf, eolCr } eolType;
 	#enum Encoding { encDefault, encSingleByte } encoding;
 	#void nextChar( TStringView, uint &P, uint &width );

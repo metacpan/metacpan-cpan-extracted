@@ -385,9 +385,14 @@ close_to(fisher_test([[1,2,1,0],[4,3,1,6],[2,6,3,5],[4,3,3,6]])->{'p_value'},
 #            to within its sampling error, so this is a case where fisher_test()
 #            answers and R does not.
 #   PR#4688  4x3, N = 16442.  R gives "FEXACT error 501" (it used to report
-#            p.value = Inf), even at workspace = 2e6.  fisher_test() has to
-#            reach its own limit and say so, bounded, with a message that names
-#            the shape rather than leaking an internal error.
+#            p.value = Inf), even at workspace = 2e6.  Checked for 0.3426: R
+#            4.6.1 gives the same FEXACT error 501 ("the largest key is larger
+#            than the largest representable int") at workspace = 2e5, 2e6, 2e7,
+#            2e8 and 2e9, with hybrid = FALSE and with hybrid = TRUE, so no
+#            workspace makes R answer it, and fisher_test() has no workspace
+#            option to expose.  fisher_test() has to reach its own limit and
+#            say so, bounded, with a message that names the shape rather than
+#            leaking an internal error.
 {
 	my $mp6 = [[1,2,2,1,1,0,1],[2,0,0,2,3,0,0],[0,1,1,1,2,7,3],[1,1,2,0,0,0,1],[0,1,1,1,1,0,0]];
 	my $r = fisher_test($mp6);
@@ -491,6 +496,113 @@ ok($@, 'C10 one-dimensional input croaks');
 		my @tt = map { my $j = $_; [ map { $_->[$j] } @$t ] } 0 .. $#{ $t->[0] };
 		close_to(fisher_test(\@tt)->{'p_value'}, $r->{'p_value'}, "C11 $name transposed", $TOL_EXACT);
 	}
+}
+
+# Case 12: totals above 2^31 - 1 (0.3426).  The cells, margins and total are
+# int64_t, so a table whose total (or a margin, a + c or a + b) passes 2^31 - 1
+# no longer croaks where a C long is 32 bits (Windows, 64-bit included).  Each
+# cell is still at most 2^31 - 1, as R's integer matrix requires.
+#
+# R cannot answer these: the margins overflow its integers, or, for a balanced
+# table, it tries to allocate the whole support ("cannot allocate vector of
+# size 18.6 Gb" for [[1.5e9, 1e9], [1e9, 1.5e9]]).  SciPy 1.18.0 fisher_exact()
+# returns, but is off by up to 2.8e-6 at N = 4.3e9 and overflows int32 at the
+# cell limit.  So the expected values are mpmath's (t/fisher_test.big_total.py,
+# beside this file): the exact central hypergeometric sum at 60 digits, and the
+# two-sided p-value by R's rule, pmf <= pmf(x) * (1 + 1e-7).
+#
+# The first table's support is 6 points whatever its total, so it is cheap on
+# any NV width; the second has a support of 2^31 points and is gated.  The
+# tolerance is $TOL_P (1e-11); worst observed 2e-16 for the first and 8e-14 for
+# the second's p-values that are 1 to within the underflow of its far tail.
+#
+# [[2147483647, 2147483647], [2, 3]] and its mirror have x within 2 of the end of
+# a 6-point support.  Up to 0.3425 they were 3e-10 off (0.81249999973 against
+# 0.8125): ft_dhyper_log() formed log1p(-x/n) as R's dbinom_raw() does, which
+# keeps only ~7 digits of (n - x)/n when n - x is 2 and n is 2^31.  Past the
+# midpoint it now takes log((n - x)/n), n - x being exact.  The values are exact
+# rational arithmetic (Python fractions, by ratio recursion over the 6 points),
+# 0.8125 and 0.5000000002182787 for 'less' and 'greater'; worst observed
+# disagreement 8e-16 against $TOL_P of 1e-11.  The change moved no value pinned
+# against R: the suite passes unchanged, and binom_test() p-values and
+# intervals are bit-identical on 2047 cases.
+{
+	my @edge = (
+		[ [[2147483647, 2147483647], [2, 3]], 'two.sided', 1 ],
+		[ [[2147483647, 2147483647], [2, 3]], 'less',      0.8125 ],
+		[ [[2147483647, 2147483647], [2, 3]], 'greater',   0.5000000002182787 ],
+		[ [[2147483647, 2147483647], [3, 2]], 'less',      0.5000000002182787 ],
+		[ [[2147483647, 2147483647], [3, 2]], 'greater',   0.8125 ],
+	);
+	for my $e (@edge) {
+		my ($t, $alt, $p) = @$e;
+		close_to(fisher_test($t, alternative => $alt)->{'p_value'}, $p,
+		         "C12 [[2^31-1,2^31-1],[$t->[1][0],$t->[1][1]]] $alt p-value, x next to the end of the support", $TOL_P);
+	}
+}
+{
+	my @big = (
+		[ 'two.sided', 0.72656249974534148 ],
+		[ 'less',      0.36328125038198777 ],
+		[ 'greater',   0.85546874992360245 ],
+	);
+	for my $b (@big) {
+		my ($alt, $p) = @$b;
+		my $t = [[2147483647, 5], [2147483647, 3]]; # N = 4294967302; a + c = 4294967294
+		my $r = fisher_test($t, alternative => $alt);
+		close_to($r->{'p_value'}, $p, "C12 [[2^31-1,5],[2^31-1,3]] $alt p-value, N > 2^32", $TOL_P);
+		my $h = { r1 => { c1 => 2147483647, c2 => 5 }, r2 => { c1 => 2147483647, c2 => 3 } };
+		close_to(fisher_test($h, alternative => $alt)->{'p_value'}, $p, "C12 same as a hash of hashes, $alt", $TOL_P);
+	}
+	my $r = fisher_test([[2147483647, 5], [2147483647, 3]]);
+	my ($lo, $hi) = @{ $r->{conf_int} };
+	my $or = $r->{estimate}{'odds ratio'};
+	ok($lo < $or && $or < $hi && $or > 0.5 && $or < 0.7, "C12 odds ratio $or inside its CI ($lo, $hi)");
+	# The unconditional estimate is 2147483647 * 3 / (5 * 2147483647) = 0.6; the conditional
+	# MLE is within 1e-5 of it at this size.
+	ok(abs($or - 0.6) < 1e-5, 'C12 conditional MLE is near a*d/(b*c)');
+
+	# One past the cell limit is still refused, with R's wording.
+	my $e = !eval { fisher_test([[2147483648, 5], [1, 3]]); 1 };
+	ok($e && $@ =~ /too large to be integer/, 'C12 a cell of 2^31 is refused as R refuses it') or diag($@);
+}
+SKIP: {
+	skip "C12 support of 2^31 points $SLOW_WHY", 3 unless $EXTENDED;
+	# A table with a support of 2^31 points; its two-sided and 'greater' p-values
+	# underflow to 0 and its 'less' one is 1.
+	my $t = [[2147483647, 1], [1, 2147483647]];
+	my $two = fisher_test($t)->{'p_value'};
+	cmp_ok($two, '<', 1e-300, 'C12 N = 2^32 two-sided p-value underflows to 0');
+	close_to(fisher_test($t, alternative => 'less')->{'p_value'}, 1, 'C12 N = 2^32 less p-value', 1e-9);
+	cmp_ok(fisher_test($t, alternative => 'greater')->{'p_value'}, '<', 1e-300, 'C12 N = 2^32 greater p-value underflows to 0');
+}
+
+# Case 13: the r x c network has a total limit (0.3426).  Its log weights are sums
+# of lgamma(t + 1) terms up to N log N, and a double's rounding of them passes
+# the 3.45e-7 tolerance of FEXACT's merge as N grows: against the same table with
+# a zero column added (which the 2x2 exact test, accurate to 1e-15, answers) the
+# error was 2.9e-8 at N = 1e7, 1.2e-7 at 3e7, 5.9e-2 for one table at 6e7 and
+# 0.29 against 0.73 for [[2^31-1,5,0],[2^31-1,3,0]], which gave the wrong
+# answer silently.  So an r x c table with a total above 1e7 croaks (see
+# FT_RXC_TOTAL_MAX in LikeR.xs, where the measurement is); a 2x2 table has no
+# limit.  R cannot be compared: its integer sum overflows at 2^31 and it
+# allocates the whole support below that.
+# Expected value: the 2x2 p-value of [[4999995,5],[4999995,3]], 0.7265623906249612
+# from this module's 2x2 path, which Case 12 pins against mpmath at the same
+# size.  Tolerance 1e-6 relative; observed 1.5e-8, a factor of 60.
+{
+	close_to(fisher_test([[4999995, 5, 0], [4999995, 3, 0]])->{'p_value'}, 0.7265623906249612,
+	         'C13 2x3 with a zero column at N = 9999998 agrees with the 2x2 test', 1e-6);
+	close_to(fisher_test([[4999995, 5], [4999995, 3]])->{'p_value'}, 0.7265623906249612,
+	         'C13 the 2x2 p-value used above', $TOL_P);
+	my $n13 = 0;
+	for my $t ([[4999997, 5, 0], [4999997, 3, 0]], [[2147483647, 5, 0], [2147483647, 3, 0]],
+	           [[5000001, 5], [5000001, 3], [0, 1]]) {
+		my $e = !eval { fisher_test($t); 1 };
+		ok($e && $@ =~ /is too large for the exact r x c test \(the limit is 10000000; a 2x2 table has none\)/,
+		   'C13 an r x c table with a total above 1e7 is refused (case ' . ++$n13 . ')') or diag($@);
+	}
+	like($@, qr/\dx\d table's total, \d+,/, 'C13 the message names the shape and the total');
 }
 
 done_testing();

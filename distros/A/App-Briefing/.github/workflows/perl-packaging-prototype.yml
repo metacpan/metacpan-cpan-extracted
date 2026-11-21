@@ -1,0 +1,80 @@
+name: Perl Packaging Prototype
+
+# Authorized throwaway test branch; main and releases stay untouched.
+on:
+  workflow_dispatch:
+  push:
+    branches: [spike/perl-packaging]
+
+permissions:
+  contents: read
+
+jobs:
+  native-probe:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            architecture: x86_64
+            runner_arch: X64
+            perl_distribution: default
+            binary: probe
+          - os: macos-15-intel
+            architecture: x86_64
+            runner_arch: X64
+            perl_distribution: default
+            binary: probe
+          - os: windows-2022
+            architecture: x86_64
+            runner_arch: X64
+            perl_distribution: strawberry
+            binary: probe.exe
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os }} / ${{ matrix.architecture }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          architecture: x64
+      - uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: '5.40'
+          distribution: ${{ matrix.perl_distribution }}
+      - name: Check actual runner architecture
+        env:
+          EXPECTED_RUNNER_ARCH: ${{ matrix.runner_arch }}
+        run: python -c "import os,platform; print(platform.platform(), platform.machine(), os.environ['RUNNER_ARCH']); assert os.environ['RUNNER_ARCH'] == os.environ['EXPECTED_RUNNER_ARCH']"
+      - name: Install build dependencies on Linux and macOS
+        if: runner.os != 'Windows'
+        shell: bash
+        run: cpanm --notest --local-lib-contained "$GITHUB_WORKSPACE/prototypes/perl-packaging/.deps" PAR::Packer@1.064 Path::Tiny@0.150
+      - name: Install build dependencies with native Windows Perl
+        if: runner.os == 'Windows'
+        # Git Bash places its own /usr/bin/perl ahead of the configured Strawberry.
+        shell: pwsh
+        run: |
+          Get-Command perl, cpanm | Select-Object Name, Source
+          perl -V:archname
+          cpanm --notest --local-lib-contained "$env:GITHUB_WORKSPACE/prototypes/perl-packaging/.deps" 'PAR::Packer@1.064' 'Path::Tiny@0.150'
+      - name: Build a native binary without cross-compilation
+        env:
+          PERL5LIB: ${{ github.workspace }}/prototypes/perl-packaging/.deps/lib/perl5
+        run: python prototypes/perl-packaging/build.py
+      - name: Compare Windows paths in source and binary
+        if: runner.os == 'Windows'
+        env:
+          PERL5LIB: ${{ github.workspace }}/prototypes/perl-packaging/.deps/lib/perl5
+        run: python prototypes/perl-packaging/path_controls.py prototypes/perl-packaging/build/probe.exe --source prototypes/perl-packaging/probe.pl --report prototypes/perl-packaging/build/path-controls.json
+      - name: Smoke and measure with an empty PATH
+        run: python prototypes/perl-packaging/smoke.py prototypes/perl-packaging/build/${{ matrix.binary }} --expect-arch ${{ matrix.architecture }} --report prototypes/perl-packaging/build/smoke.json
+      - name: Save test reports without publishing binaries
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: perl-probe-${{ matrix.os }}-${{ matrix.architecture }}
+          path: prototypes/perl-packaging/build/*.json
+          if-no-files-found: warn
+          retention-days: 7
+      # Build hosts contain Perl. Absence of an external runtime remains NOT_PROVEN here.

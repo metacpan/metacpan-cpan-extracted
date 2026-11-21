@@ -1,0 +1,9 @@
+# Machine-local permissions are not project configuration.
+/settings.local.json
+
+# >>> skilletor >>>
+agents/**/.local.*
+rules/**/.local.*
+skilletor.local.json
+skilletor.lock.json
+# <<< skilletor <<<

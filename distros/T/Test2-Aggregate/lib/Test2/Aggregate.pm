@@ -3,6 +3,7 @@ package Test2::Aggregate;
 use strict;
 use warnings;
 
+use File::Basename;
 use File::Find;
 use File::Path;
 use Path::Tiny;
@@ -19,18 +20,18 @@ Test2::Aggregate - Aggregate tests for increased speed
     use Test2::V0; # Or 'use Test::More' etc if your suite uses an other framework
 
     Test2::Aggregate::run_tests(
-        dirs => \@test_dirs
+        dirs => [@test_dirs_or_files]
     );
 
     done_testing();
 
 =head1 VERSION
 
-Version 0.17
+See C<$VERSION> in module.
 
 =cut
 
-our $VERSION = '0.17';
+our $VERSION = '1.00';
 
 =head1 DESCRIPTION
 
@@ -76,13 +77,19 @@ have less issues with L<Test2::Suite> (see notes).
         unique        => 1,                   # optional
         repeat        => 1,                   # optional, requires Test2::Plugin::BailOnFail for < 0
         slow          => 0,                   # optional
+        test_warnings => 0,                   # optional
         override      => \%override,          # optional, requires Sub::Override
         stats_output  => $stats_output_path,  # optional
         extend_stats  => 0,                   # optional
-        test_warnings => 0,                   # optional
+        pass_only     => 0,                   # optional
+        absolute      => 0,                   # optional
+        bail_on_fail  => 0,                   # optional, requires Test2::Plugin::BailOnFail
+        no_dot        => 0,                   # optional
+        relative_root => 0,                   # optional
         allow_errors  => 0,                   # optional
         pre_eval      => $code_to_eval,       # optional
         dry_run       => 0,                   # optional
+        recursion     => 0,                   # optional
         slurp_param   => {binmode => $mode}   # optional
     );
 
@@ -131,9 +138,14 @@ Applied after C<exclude>.
 
 =item * C<root> (optional)
 
-If defined, must be a valid root directory that will prefix all C<dirs> and
-C<lists> items. You may want to set it to C<'./'> if you want dirs relative
-to the current directory and the dot is not in your C<@INC>.
+If defined, must be a valid root directory that will prefix all C<dirs> and C<lists>
+items. You may want to set it to C<'./'> if you want dirs relative to the current
+directory and the dot is not in your C<@INC>.
+
+=item * C<relative_root> (optional)
+
+Set to true if you want your root to be relative to the caller script's directory
+(based on C<$0>). It is ignored if you use an absolute root path.
 
 =item * C<load_modules> (optional)
 
@@ -171,6 +183,7 @@ across systems.
 =item * C<shuffle> (optional)
 
 Random order of tests if set to true. Will override C<sort>.
+Uses C<List::Util::shuffle>, so is affected by the C<$RAND> variable.
 
 =item * C<reverse> (optional)
 
@@ -222,8 +235,10 @@ you'd have to do C<use Test2::V0 -no_warnings =E<gt> 1;> to avoid it).
 
 C<stats_output> specifies a path where a file will be created to print out
 running time per test (average if multiple iterations) and passing percentage.
-Output is sorted from slowest test to fastest. On negative C<repeat> the stats
-of each successful run will be written separately instead of the averages.
+With C<repeat == 1>, output is written after each test in execution order, so
+completed results survive an interrupted run. With C<repeat E<gt> 1>, averages
+are written from slowest test to fastest after all iterations complete.
+On negative C<repeat>, each iteration streams its own statistics.
 The name of the file is C<caller_script-YYYYMMDDTHHmmss.txt>.
 If C<'-'> is passed instead of a path, then the output will be written to STDOUT.
 The timing stats are useful because the test harness doesn't normally measure
@@ -241,9 +256,37 @@ Additions with C<extend_stats> as of the current version:
 
 =over 4
 
-- starting date/time in ISO_8601.
+=item * starting date/time in ISO_8601.
 
 =back
+
+=item * C<pass_only> (optional)
+
+Modifies C<stats_output> by making it only print out a list of passing tests.
+Useful for creating lists of aggregateable tests. With C<test_warnings>, tests
+that produced warnings are not considered passing.
+Has no effect if C<stats_output> is not defined.
+
+=item * C<absolute> (optional)
+
+Matches pre-1.00 behaviour by including C<root> in the output of stats.
+
+=item * C<no_dot> (optional)
+
+Current version will add a C<./> at the start of a test file if the full path does
+not start with C</> or C<.> to avoid the C<'.' is no longer in @INC> error.
+Setting C<no_dot> to true matches pre-1.00 behaviour that did not do this.
+
+=item * C<bail_on_fail> (optional)
+
+Will bail (exit) on first test failure. It is implied for repeat < 0.
+Requires L<Test2::Plugin::BailOnFail>; a missing plugin is a fatal error.
+
+=item * C<recursion> (optional)
+
+Setting it to 1 will allow recursion. By default, if C<$ENV{AGGREGATE_TESTS}> is
+true, C<run_tests> will skip the tests to avoid running under a parent aggregator
+C<run_tests>.
 
 =back
 
@@ -251,32 +294,39 @@ Additions with C<extend_stats> as of the current version:
 
 sub run_tests {
     my %args = @_;
+
     Test2::V0::plan skip_all => 'Skipping slow tests.'
         if $args{slow} && $ENV{SKIP_SLOW};
+
+    Test2::V0::plan skip_all => 'Skipping aggregator recursion.'
+        if !$args{recursion} && $ENV{AGGREGATE_TESTS};
 
     eval "use $_;" foreach @{$args{load_modules}};
     local $ENV{AGGREGATE_TESTS} = 1;
 
     my $override = $args{override} ? _override($args{override}) : undef;
     my @dirs     = ();
-    my $root     = $args{root} || '';
+    $args{root} ||= '';
     my @tests;
 
     @dirs = @{$args{dirs}} if $args{dirs};
-    $root .= '/' unless !$root || $root =~ m#/$#;
+    $args{root} .= '/' unless !$args{root} || $args{root} =~ m#/$#;
+    $args{root} = dirname($0) . "/$args{root}"
+        if $args{relative_root} && $args{root} && $args{root} !~ m#^/#;
 
-    if ($root && ! -e $root) {
-        warn "Root '$root' does not exist, no tests are loaded."
+    if ($args{root} && ! -e $args{root}) {
+        warn "Root '$args{root}' does not exist, no tests are loaded."
     } else {
         foreach my $file (@{$args{lists}}) {
             push @dirs,
-              map { /^\s*(?:#|$)/ ? () : $_ }
-              split( /\r?\n/, _read_file("$root$file", $args{slurp_param}) );
+                map {/^\s*(?:#|$)/ ? () : $_}
+                split(/\r?\n/,
+                _read_file($args{root}, $file, $args{slurp_param}));
         }
 
         find(
             sub {push @tests, $File::Find::name if /\.t$/},
-            grep {-e} map {$root . $_} @dirs
+            grep {-e} map {_check_abs_path($args{root}, $_)} @dirs
         )
             if @dirs;
     }
@@ -291,8 +341,10 @@ sub run_tests {
     $args{caller} =~ s#^.*?([^/]+)$#$1#;
 
     my $warnings = [];
+    if ($args{bail_on_fail} || $args{repeat} < 0) {
+        eval 'use Test2::Plugin::BailOnFail; 1' or die $@;
+    }
     if ($args{repeat} < 0) {
-        eval 'use Test2::Plugin::BailOnFail';
         my $iter = 0;
         while (!@$warnings) {
             $iter++;
@@ -326,22 +378,33 @@ sub run_tests {
     return $args{stats};
 }
 
+sub _check_abs_path {
+    my $root = shift;
+    my $path = shift;
+    # Can't use path() below as it removes ./ (required by absolute option)
+    $path = "$root$path" unless !$root || substr($path, 0, 1) eq '/';
+    return $path;
+}
+
 sub _read_file {
+    my $root  = shift;
     my $path  = shift;
     my $param = shift;
-    my $file  = path($path);
-    return $param ? $file->slurp_utf8 : $file->slurp($param);
+    my $file  = path(_check_abs_path($root, $path));
+
+    return $param ? $file->slurp($param) : $file->slurp_utf8;
 }
 
 sub _process_run_order {
     my $tests = shift;
     my $args  = shift;
 
-    @$tests = grep(!/$args->{exclude}/, @$tests) if $args->{exclude};
-    @$tests = grep(/$args->{include}/, @$tests) if $args->{include};
+    @$tests = grep(!_path_match($_, $args->{exclude}, $args->{root}), @$tests)
+        if $args->{exclude};
+    @$tests = grep(_path_match($_, $args->{include}, $args->{root}), @$tests)
+        if $args->{include};
 
     @$tests = _uniq(@$tests)  if $args->{unique};
-    @$tests = reverse @$tests if $args->{reverse};
 
     if ($args->{shuffle}) {
         require List::Util;
@@ -349,6 +412,15 @@ sub _process_run_order {
     } elsif ($args->{sort}) {
         @$tests = sort @$tests;
     }
+
+    @$tests = reverse @$tests if $args->{reverse};
+}
+
+sub _path_match {
+    my ($test, $regex, $root) = @_;
+
+    return 1 if $test =~ /$regex/;
+    return _test_name($test, $root) =~ /$regex/;
 }
 
 sub _process_warnings {
@@ -368,53 +440,104 @@ sub _process_warnings {
 }
 
 sub _run_tests {
-    my $tests  = shift;
-    my $args   = shift;
+    my $tests = shift;
+    my $args  = shift;
 
     my $repeat = $args->{repeat};
     $repeat = 1 if $repeat < 0;
-    my (%stats, $start);
+    my (%stats, %warned, $start, $warned);
+
+    # Track warnings per test, so stats written before the final warning
+    # processing (e.g. streamed pass_only) already see them. Installed once per
+    # run, not per test, so handlers that tests install (e.g. NoWarnings on
+    # first load) stay in place for the following tests.
+    local $SIG{__WARN__} = _warn_tracker(\$warned) if $args->{test_warnings};
 
     require Time::HiRes if $args->{stats_output};
+    my $fh = _stats_fh($args);
 
     for my $i (1 .. $repeat) {
         my $iter = $repeat > 1 ? "Iter: $i/$repeat - " : '';
         my $count = 1;
         foreach my $test (@$tests) {
+            my $test_nm =
+                $args->{absolute} ? $test : _test_name($test, $args->{root});
 
-            warn "$test->Test2::Aggregate\n" if $args->{test_warnings};
+            warn  "$test_nm->Test2::Aggregate\n" if $args->{test_warnings};
 
-            $stats{$test}{test_no} = $count unless $stats{$test}{test_no};
+            $stats{$test_nm}{test_no} = $count unless $stats{$test_nm}{test_no};
             $start = Time::HiRes::time() if $args->{stats_output};
-            $stats{$test}{timestamp} = _timestamp();
+            $stats{$test_nm}{timestamp} = _timestamp();
 
             my $exec_error;
-            my $result = subtest $iter. "Running test $test" => sub {
+            $warned = 0;
+            # aggit uses this marker to distinguish an interrupted test from
+            # harness startup errors and failures after the suite has finished.
+            path($args->{_progress_file})->spew_utf8("$test_nm\n")
+                if $args->{_progress_file};
+            my $result = subtest $iter. "Running test $test_nm" => sub {
                 eval $args->{pre_eval} if $args->{pre_eval};
 
                 if ($args->{dry_run}) {
                     Test2::V0::ok($test);
                 } else {
+                    my $t= $test;
+                    $t = "./$test"
+                        unless $args->{no_dot} || $test =~ m#^[./]#;
                     $args->{package}
-                        ? eval "package Test::$i" . '::' . "$count; do '$test';"
-                        : do $test;
+                        ? eval "package Test::$i" . '::' . "$count; do '$t';"
+                        : do $t;
                     $exec_error = $@;
                 }
                 Test2::V0::is($exec_error, '', 'Execution should not fail/warn')
                         if !$args->{allow_errors} && $exec_error;
             };
 
+            $warned{$test_nm} = 1 if $warned;
             warn "<-Test2::Aggregate\n" if $args->{test_warnings};
 
-            $stats{$test}{time} += (Time::HiRes::time() - $start)/$repeat
+            $stats{$test_nm}{time} += (Time::HiRes::time() - $start)/$repeat
                 if $args->{stats_output};
-            $stats{$test}{pass_perc} += $result ? 100/$repeat : 0;
+            $stats{$test_nm}{pass_perc} += $result ? 100/$repeat : 0;
+            # Matches _process_warnings, which zeroes pass_perc on warnings
+            $stats{$test_nm}{pass_perc} = 0 if $warned{$test_nm};
             $count++;
+
+            # If we have single iteration, no need to collect stats so write
+            # per line to avoid losing them in case of SIG
+            _print_stats($fh, \%stats, $args, $test_nm)
+                if $args->{stats_output} && $repeat == 1;
+            path($args->{_progress_file})->spew_utf8('')
+                if $args->{_progress_file};
         }
     }
 
-    _print_stats(\%stats, $args) if $args->{stats_output};
+    if ($args->{stats_output}) {
+        # Write all stats for many iterations
+        _print_stats($fh, \%stats, $args) if $repeat > 1;
+        _close_stats($fh, $args);
+    }
     $args->{stats} = \%stats;
+}
+
+sub _warn_tracker {
+    my $warned = shift;
+    my $outer  = $SIG{__WARN__};
+
+    return sub {
+        $$warned = 1 if join('', @_) =~ /\S/;
+        return $outer->(@_) if ref $outer eq 'CODE';
+        print STDERR @_;
+    };
+}
+
+sub _test_name {
+    my $test = shift;
+    my $root = shift;
+
+    $test =~ s/^\Q$root\E// if $root;
+
+    return $test;
 }
 
 sub _override {
@@ -428,38 +551,62 @@ sub _override {
     return $override;
 }
 
-sub _print_stats {
-    my ($stats, $args) = @_;
+sub _stats_fh {
+    my $args = shift;
 
-    unless (-e $args->{stats_output}) {
-        my @create = mkpath($args->{stats_output});
-        unless (scalar @create) {
-            warn "Could not create ".$args->{stats_output};
-            return;
-        }
-    }
+    return unless $args->{stats_output};
 
     my $fh;
     if ($args->{stats_output} =~ /^-$/) {
         $fh = *STDOUT
     } else {
+        unless (-e $args->{stats_output}) {
+            my @create = mkpath($args->{stats_output});
+            unless (scalar @create) {
+                warn "Could not create ".$args->{stats_output};
+                return;
+            }
+        }
         my $file = $args->{stats_output}."/".$args->{caller}."-"._timestamp().".txt";
         open($fh, '>', $file) or die "Can't open > $file: $!";
     }
+    select($fh); $| = 1; select(STDOUT);
 
-    my $total = 0;
+    $args->{total_time} = 0;
     my $extra = $args->{extend_stats} ? ' TIMESTAMP' : '';
-    print $fh "TIME PASS%$extra TEST\n";
+    print $fh "TIME PASS%$extra TEST\n" unless $args->{pass_only};
 
-    foreach my $test (sort {$stats->{$b}->{time}<=>$stats->{$a}->{time}} keys %$stats) {
+    return $fh;
+}
+
+sub _close_stats {
+    my ($fh, $args) = @_;
+
+    return unless $fh;
+
+    printf $fh "TOTAL TIME: %.1f sec\n", $args->{total_time}
+        unless $args->{pass_only};
+    close $fh unless $args->{stats_output} =~ /^-$/;
+}
+
+sub _print_stats {
+    my ($fh, $stats, $args, $test) = @_;
+
+    return unless $fh;
+
+    my @tests = $test ? $test : keys %$stats;
+    my $extra = '';
+
+    foreach my $test (sort {$stats->{$b}->{time}<=>$stats->{$a}->{time}} @tests) {
+        if ($args->{pass_only}) {
+            print $fh "$test\n" if $stats->{$test}->{pass_perc} > 99;
+            next;
+        }
         $extra = ' '.$stats->{$test}->{timestamp} if $args->{extend_stats};
-        $total += $stats->{$test}->{time};
+        $args->{total_time} += $stats->{$test}->{time};
         printf $fh "%.2f %d$extra $test\n",
             $stats->{$test}->{time}, $stats->{$test}->{pass_perc};
     }
-
-    printf $fh "TOTAL TIME: %.1f sec\n", $total;
-    close $fh unless $args->{stats_output} =~ /^-$/;
 }
 
 sub _uniq {
@@ -471,6 +618,91 @@ sub _timestamp {
     my ($s, $m, $h, $D, $M, $Y) = localtime(time);
     return sprintf "%04d%02d%02dT%02d%02d%02d", $Y+1900, $M+1, $D, $h, $m, $s;
 }
+
+=head1 HELPER SCRIPTS
+
+=head2 agg (Test2::Aggregate harness wrapper)
+
+ agg [options] <file/dir1 ...>
+
+Pass a list of Perl test files/directories and they will run aggregated via yath
+(or prove if specified). It is not meant to be used for .t files that use Test2::Aggregate
+themselves.
+
+It is useful either to speed up a test run for tests you know can be aggregated,
+or to check whether specific tests can run successfully under Test2::Aggregate.
+
+ Options:
+ --out <s>,          -o <s>  : Specify the test file to be created (tmp file by default).
+ --lists,            -l      : Use files specified as lists.
+ --prove,            -p      : Force prove (default is yath/Test2 if installed).
+ --verbose,          -v      : Verbose (passed to yath/prove)
+ --absolute,         -a      : Use absolute paths in generated files. Disabled with -r.
+ --include_regex <s> -ir <s> : Regex for test paths to include.
+ --exclude_regex <s> -er <s> : Regex for test paths to exclude.
+ --root <s>          -r <s>  : Define a custom root dir (default is current dir).
+ --include <s>,      -I <s>  : Library paths to include.
+ --test_warnings,    -w      : Fail tests on warnings.
+ --test_bundle <s>,  -t      : Test bundle (def: Test2::V0 or Test::More if -p). Can be comma-separated list.
+ --pass_output <s>,  -po <s> : Output directory for list of 100% passing tests.
+ --reverse                   : Reverse the test order.
+ --shuffle                   : Shuffle the test order.
+ --sort                      : Run the tests alphabetically.
+ --stats_output <s>, -so <s> : Stats output directory (does not combine with pass_output).
+ --help              -h      : Show basic help and exit.
+
+=head2 aggit (Test2::Aggregate iterative aggregator)
+
+ aggit [options] <file/dir1 ...>
+
+Runs tests through an aggregate test repeatedly. On each failed run, the active
+test file is removed and the remaining set is tried again. Requires
+L<Test2::Plugin::BailOnFail>. Startup failures and failures after all test files
+have completed abort the command with a nonzero exit status instead of removing
+tests. This is a coarse way to discover a starting list of tests that can be
+aggregated together, not proof that each removed test is independently broken.
+
+C<--sort>, C<--shuffle>, and C<--reverse> are applied once during discovery.
+The resulting order is preserved across retries and in the generated runner.
+By default, list entries are relative to the generated runner's directory;
+C<--absolute> writes absolute paths. C<--root> resolves inputs against a custom
+directory. C<--exclude_regex> and C<--exclude_list> filter the discovered tests.
+
+C<aggit> passes C<--event_timeout SECONDS> (alias C<-et>, default 10) to
+C<yath> as C<--et SECONDS>. This is an inactivity timeout, not a total runtime
+limit; Harness normally defaults to 60 seconds. The timeout applies to the
+generated aggregate runner, so C<# HARNESS-NO-TIMEOUT> comments in individual
+aggregated files do not disable it. Under C<--prove>, or automatic fallback to
+C<prove> when Harness is unavailable, this timeout is not provided and hung
+tests require external supervision.
+
+For C<agg>, C<--pass_output> takes precedence over C<--stats_output> when both
+are supplied.
+
+=head2 Common helper workflows
+
+Try known-safe tests through the default L<Test2::Harness> runner:
+
+ agg t/unit t/lib
+
+Force C<prove> and L<Test::More> compatibility mode:
+
+ agg --prove t/unit
+
+Generate a directory containing a list of tests that passed when aggregated:
+
+ agg --root . --pass_output pass t
+
+C<--root .> makes the passing paths relative to the current project directory,
+rather than the temporary aggregate runner's directory.
+
+Iteratively discover an aggregateable list and generated aggregate test:
+
+ aggit --out aggregate-candidate t
+
+Run the generated aggregate test later (its list paths are runner-relative):
+
+ yath test aggregate-candidate.t
 
 =head1 USAGE NOTES
 
@@ -492,11 +724,23 @@ test continuing after the rest are done will slow down the suite). And in genera
 more tests will run aggregated if they are grouped so that tests that can't be
 aggregated together are in different groups.
 
-In general you can call C<Test2::Aggregate::run_tests> multiple times in a test and
-even load C<run_tests> with tests that already contain another C<run_tests>, the
-only real issue with multiple calls is that if you use C<repeat < 0> on a call,
-L<Test2::Plugin::BailOnFail> is loaded so any subsequent failure, on any following
-C<run_tests> call will trigger a Bail.
+You can call C<Test2::Aggregate::run_tests> multiple times in a test. Nested calls
+are skipped unless the inner call enables C<recursion>. Loading
+L<Test2::Plugin::BailOnFail> through C<bail_on_fail> or C<repeat E<lt> 0> affects
+subsequent tests too: a later failure will also trigger a bail-out.
+
+=head2 Version 1.00 path compatibility
+
+Stats keys and warning labels are root-relative by default in 1.00. Set
+C<absolute> if you need the previous full rooted paths in stats output.
+
+Relative test paths that do not start with C</>, C<.>, or C<./> are now executed
+with a C<./> prefix so they keep working on perls where C<.> is not in C<@INC>.
+Set C<no_dot> if you need the previous behaviour.
+
+Nested aggregate runs are skipped by default when C<$ENV{AGGREGATE_TESTS}> is
+already set. Set C<recursion> only for suites where nested aggregate execution is
+intentional.
 
 =head2 Test::More
 
@@ -509,12 +753,25 @@ Although the module tries to load C<Test2> with minimal imports to not interfere
 it is generally better to do C<use Test::More;> in your aggregating test (i.e.
 alongside with C<use Test2::Aggregate>).
 
+=head2 Test::Builder
+
+To avoid warnings, if you are importing L<Test::Builder> in multiple aggregated
+tests, you will want to import first on the aggregating test.
+It might look like this:
+
+ use Test::Builder;
+ use Test2::V0;
+ use Test2::Aggregate;
+
+ Test2::Aggregate::run_tests( ... );
+
 =head2 BEGIN / END Blocks
 
-C<BEGIN> / C<END> blocks will run at the start/end of each test and any overrides
-etc you might have set will apply to the rest of the tests, so if you use them you
-probably need to make changes for aggregation. An example of such a change is when
-you have a C<*GLOBAL::CORE::exit> override to test scripts that can call C<exit()>.
+C<BEGIN> blocks run as each test file is compiled. C<END> blocks are deferred
+until the aggregate process exits, not the end of each individual test file.
+Cleanup needed between files must therefore happen before the file returns.
+Global overrides can affect later tests. One example is a
+C<*CORE::GLOBAL::exit> override to test scripts that can call C<exit()>.
 A solution is to use something like L<Test::Trap>: 
 
  BEGIN {
@@ -529,7 +786,16 @@ A solution is to use something like L<Test::Trap>:
 L<Test::Class> is sort of an aggregator itself. You make your tests into modules
 and then load them on the same C<.t> file, so ideally you will not end up with many
 C<.t> files that would require further aggregation. If you do, due to the L<Test::Class>
-implementation specifics, those C<.t> files won't run under L<Test2::Aggregator>.
+implementation specifics, those C<.t> files won't run under L<Test2::Aggregate>.
+
+=head2 $0 variable
+
+Remember the C<$0> variable is the aggregate runner, not the test file.
+
+=head2 Mocks, CORE::GLOBAL::* Overrides
+
+Always prefer mocks (Test2::Mock) instead of global built-ins where possible for
+aggregated tests. Remember to clear mocks at the end of test.
 
 =head2 $ENV{AGGREGATE_TESTS}
 
@@ -558,44 +824,49 @@ design time, you know it is not supposed to run aggregated.
 =head2 Example aggregating strategy
 
 There are many approaches you could do to use C<Test2::Aggregate> with an existing
-test suite, so for example you can start by making a list of the test files you
-are trying to aggregate:
+test suite, usually involving an iterative process of trying to run several tests
+aggregated, seeing if you can fix the failing ones, otherwise you remove them from
+the aggregation etc.
 
- find t -name '*.t' > all.lst
+This process can be done with the help of the C<agg> script. For example, to try
+all tests under C<t/> aggregated and a list of passing tests put under the C<pass>
+directory you would do:
 
-If you have a substantial test suite, perhaps try with a portion of it (a subdir?)
-instead of the entire suite. In any case, try running them aggregated like this:
+ > agg --root . --pass_output pass t
 
- use Test2::Aggregate;
- use Test2::V0; # Or Test::More;
+(which will use C<yath> & L<Test2::V0>, you can do
+C<agg --prove --root . --pass_output pass t> for C<prove> & L<Test::More>)
 
- my $stats = Test2::Aggregate::run_tests(
-    lists => ['all.lst'],
+If the run completes, thanks to C<--pass_output> you have a "starting point"
+ i.e. a .txt list that can run under the aggregator with the C<lists> option:
+
+ Test2::Aggregate::run_tests(
+     lists => ['pass/name_of_file.txt']
  );
 
- open OUT, ">pass.lst";
- foreach my $test (sort {$stats->{$a}->{test_no} <=> $stats->{$b}->{test_no}} keys %$stats) {
-     print OUT "$test\n" if $stats->{$test}->{pass_perc};
- }
- close OUT;
+If the run does not complete (e.g. signal 11 on some test), try fewer tests by
+choosing just a subdirectory. If that's not possible, you'll probably have to go
+to the more manual method of getting a full list of your tests
+(C<find t -name '*.t' E<gt> all.lst>) then trying to run parts of it, again with
+the C<lists> option.
 
- done_testing();
-
-Run the above with C<prove> or C<yath> in verbose mode, so that in case the run
-hangs (it can happen), you can see where it did so and edit C<all.lst> removing
-the offending test.
-
-If the run completes, you have a "starting point" - i.e. a list that can run under
-the aggregator in C<pass.lst>.
-You can try adding back some of the failed tests - test failures can be cascading,
-so some might be passing if added back, or have small issues you can address.
+After you have a starting point, you can try see if there is an obvious reason some
+tests fail and address it to add them back to the pass list. You can even try adding
+back some of the failed tests that were not among the first to fail - test failures
+can sometimes be cascading, so some might be passing if added back, or have small
+issues you can address.
 
 Try adding C<test_warnings =E<gt> 1> to C<run_tests> to fix warnings as well, unless
 it is common for your tests to have C<STDERR> output.
 
-To have your entire suite run aggregated tests together once and not repeat them
-along with the other, non-aggregated, tests, it is a good idea to use the
-C<--exclude-list> option of the C<Test2::Harness>.
+In the end, you will end up with part of your tests aggregated in (multiple if you
+want to run them in parallel) list files, with the rest of your tests to be run
+non-aggregated.
+
+You don't actually have to move and separate aggregated/non-aggregated files when
+using lists, you can still have your entire suite run the aggregated tests once and
+not repeat them along with the other, non-aggregated tests, by taking advantage of
+the C<--exclude-list> option of the C<Test2::Harness>.
 
 Hopefully your tests can run in parallel (C<prove/yath -j>), in which case you
 would split your aggregated tests into multiple lists to have them run in parallel.
@@ -620,9 +891,33 @@ You would call it with something like C<--exclude-lists=t/aggregate/*.lst>, and
 the tests listed will be excluded (you will have them running aggregated through
 their own C<.t> files using L<Test2::Aggregate>).
 
+=head1 WINDOWS SUPPORT
+
+Only filesystems with the C</> separator are supported, simply because the author
+does not expect Windows users (many test suites don't work under StrawberryPerl
+etc). However, if you want Windows filesystems to be supported, it should be simple
+enough as long as you are willing to help with testing - just ask.
+
+=head1 DEVELOPMENT AND RELEASES
+
+C<README.md> is generated from this module's POD using L<Pod::Markdown>.
+Install author dependencies, then run:
+
+ perl Makefile.PL
+ make readme
+ AUTHOR_TESTING=1 prove -Ilib xt/author xt/integration
+ make disttest
+
+C<make readme> refreshes the README. C<make distdir> (also used by C<make dist>
+and C<make disttest>) refreshes it automatically before copying distribution
+files. These author targets require L<Pod::Markdown>, but normal installation
+and C<make test> do not. The README author test detects stale generated content;
+review and commit README changes alongside the POD. Set the release date in
+C<Changes> when preparing the final release.
+
 =head1 AUTHOR
 
-Dimitrios Kechagias, C<< <dkechag at cpan.org> >>
+Dimitrios Kechagias, L<https://metacpan.org/author/DKECHAG>
  
 =head1 BUGS
 

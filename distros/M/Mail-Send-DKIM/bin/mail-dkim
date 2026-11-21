@@ -84,6 +84,12 @@ The comparison is case insensitive, and the domain comes from the address, not
 from a display name: C<< From: "Nigel" <alerts@example.org> >> is
 C<example.org>.
 
+=item B<DKIM_SIGNING_DOMAIN>
+
+The domain to put in the signature (its C<d=> tag) when it is not the domain in
+the C<From:> header.  Which messages are signed is still decided by
+B<DKIM_DOMAINS>.  When it is unset the C<From:> domain is used.
+
 =item B<DKIM_KEYDIR>
 
 The directory holding the private keys.  Defaults to F<~/dkim>.  The value is

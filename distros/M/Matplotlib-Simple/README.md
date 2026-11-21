@@ -742,7 +742,20 @@ are named by the inner keys rather than by position, so no `label` is needed:
     );
 
 Both grouped forms accept `stacked => 1` to pile the series on top of one
-another instead of placing them side by side.
+another instead of placing them side by side.  The first series is drawn at
+the bottom of each stack (at the left, for `barh`), and the rest go on top of
+it in order; side by side, the first is at the left.
+
+A hash of hashes takes its series in sorted order, and `label` puts them in
+another: it names every inner key once, in the order to draw them, and that is
+also their order in the legend.
+
+    bar(
+    	output_file => '/tmp/staffing.svg',
+    	data        => { KDC => { authorized => 56, staffed => 12 } },
+    	label       => [ 'staffed', 'authorized' ],    # staffed at the bottom
+    	stacked     => 1,
+    );
 
 ### Error bars
 
@@ -770,7 +783,7 @@ two-element array giving asymmetric `[ lower, upper ]` errors:
 |color| :mpltype:`color` or list of :mpltype:`color`, optional; The colors of the bar faces. This is an alias for *facecolor*. If both are given, *facecolor* takes precedence # if entering multiple colors, quoting isn't needed; as of version 0.23, colors can be given as a hash, whose keys are the bars of a simple hash or the *inner* keys (the series) of a hash of hashes.  A hash of arrays has no series names to key a color hash by, and says so rather than ignoring it |`color => ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'fuchsia'],` or a single color for all bars `color => 'red'`, or as of version 0.23 `color => {A => 'red', B => 'green'}`
 |edgecolor| :mpltype:`color` or list of :mpltype:`color`, optional; The colors of the bar edges.  For a simple hash, may also be a hash of one color per key, as `color` may; a grouped plot refuses a hash, since each of its bars is one key of one series|`edgecolor		=> 'black'`
 |key_order|  define the keys in an order (an array reference)|`key_order          => ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],`
-|label| an array of legend labels for grouped bar plots, indexed like the data arrays; only meaningful for the hash-of-arrays form, since the hash-of-hashes form takes its labels from the inner keys|`label => ['North', 'South'],`
+|label| for a hash of arrays, an array of legend labels, indexed like the data arrays.  For a hash of hashes, an array of its inner keys, every one exactly once, in the order to draw the series: from the bottom of a stack up, left to right, and down the legend; a name that is not an inner key, or an inner key left out, is refused|`label => ['North', 'South'],`
 |linewidth| float or array of one per bar, optional; Width of the bar edge(s). If 0, don't draw edges. Only does anything with defined `edgecolor`|`linewidth => 2,`
 |log| bool, default: False; If *True*, set the y-axis to be log scale.  Give `'True'` or `'False'` (or 1 or 0); anything else is refused, and `'False'` turns the log scale off|`log = 'True',`
 |logscale| a synonym for `log` taking a Perl true/false value rather than Python's `'True'`/`'False'`.  Unlike the `logscale` of `boxplot`, `hist`, `hist2d`, `plot`, `scatter` and `violin`, this one is a scalar and not an array of axis names|`logscale => 1,`

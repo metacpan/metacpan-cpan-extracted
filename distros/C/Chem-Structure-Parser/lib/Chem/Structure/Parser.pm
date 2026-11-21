@@ -3,7 +3,7 @@
 require 5.010001;
 use strict;
 package Chem::Structure::Parser;
-our $VERSION = '0.040';
+our $VERSION = '0.0401';
 require XSLoader;
 use warnings FATAL => 'all';
 # No `use autodie': it would ask every installer for a prerequisite in order to

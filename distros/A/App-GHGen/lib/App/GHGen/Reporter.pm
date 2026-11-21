@@ -11,7 +11,9 @@ our @EXPORT_OK = qw(
 	estimate_savings
 );
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
+
+=encoding utf-8
 
 =head1 NAME
 
@@ -98,49 +100,49 @@ sub generate_markdown_report($issues, $fixes = []) {
 	$report .= "- 📊 **Issues found:** $total_issues\n";
 	$report .= "- ✅ **Fixes applied:** $total_fixes\n\n";
 
-    if (@$issues) {
-        # Group by type
-        my %by_type;
-        push @{$by_type{$_->{type}}}, $_ for @$issues;
+	if (@$issues) {
+		# Group by type
+		my %by_type;
+		push @{$by_type{$_->{type}}}, $_ for @$issues;
 
-        $report .= "## Issues by Category\n\n";
+		$report .= "## Issues by Category\n\n";
 
-        for my $type (sort keys %by_type) {
-            my $count = scalar @{$by_type{$type}};
-            my $emoji = get_type_emoji($type);
-            $report .= "### $emoji " . ucfirst($type) . " ($count)\n\n";
+		for my $type (sort keys %by_type) {
+			my $count = scalar @{$by_type{$type}};
+			my $emoji = get_type_emoji($type);
+			$report .= "### $emoji " . ucfirst($type) . " ($count)\n\n";
 
-            for my $issue (@{$by_type{$type}}) {
-                my $severity_badge = get_severity_badge($issue->{severity});
-                $report .= "**$severity_badge $issue->{message}**\n\n";
+			for my $issue (@{$by_type{$type}}) {
+				my $severity_badge = get_severity_badge($issue->{severity});
+				$report .= "**$severity_badge $issue->{message}**\n\n";
 
-                if ($issue->{fix}) {
-                    $report .= "<details>\n";
-                    $report .= "<summary>💡 Suggested Fix</summary>\n\n";
-                    $report .= "```yaml\n";
-                    $report .= "$issue->{fix}\n";
-                    $report .= "```\n\n";
-                    $report .= "</details>\n\n";
-                }
-            }
-        }
-    }
+				if ($issue->{fix}) {
+					$report .= "<details>\n";
+					$report .= "<summary>💡 Suggested Fix</summary>\n\n";
+					$report .= "```yaml\n";
+					$report .= "$issue->{fix}\n";
+					$report .= "```\n\n";
+					$report .= "</details>\n\n";
+				}
+			}
+		}
+	}
 
-    # Add savings estimate if available
-    my $savings = estimate_savings($issues);
-    if ($savings->{minutes} > 0) {
-        $report .= "## 💰 Estimated Savings\n\n";
-        $report .= "By fixing these issues, you could save:\n\n";
-        $report .= "- ⏱️ **~$savings->{minutes} CI minutes/month**\n";
+	# Add savings estimate if available
+	my $savings = estimate_savings($issues);
+	if ($savings->{minutes} > 0) {
+		$report .= "## 💰 Estimated Savings\n\n";
+		$report .= "By fixing these issues, you could save:\n\n";
+		$report .= "- ⏱️ **~$savings->{minutes} CI minutes/month**\n";
 
-        if ($savings->{cost} > 0) {
-            $report .= "- 💵 **~\$$savings->{cost}/month** (for private repos)\n";
-        }
+		if ($savings->{cost} > 0) {
+			$report .= "- 💵 **~\$$savings->{cost}/month** (for private repos)\n";
+		}
 
-        $report .= "\n";
-    }
+		$report .= "\n";
+	}
 
-    return $report;
+	return $report;
 }
 
 =head2 generate_github_comment($issues, $fixes, $options)
@@ -174,7 +176,7 @@ Reserved for future use; currently unused.
 
 =head3 Returns
 
-A non-empty Markdown string starting with C<## 🔍 GHGen Workflow Analysis>.
+A non-empty Markdown string starting with C<## E<0x1F50D> GHGen Workflow Analysis>.
 
 When C<$issues> is empty, the comment contains the phrase
 C<No issues found!> and is returned early without a table or details block.
@@ -217,93 +219,93 @@ None.  Pure function.
 sub generate_github_comment($issues, $fixes = [], $options = {}) {
 	my $comment = "## 🔍 GHGen Workflow Analysis\n\n";
 
-    my $total_issues = scalar @$issues;
-    my $total_fixes = scalar @$fixes;
+	my $total_issues = scalar @$issues;
+	my $total_fixes = scalar @$fixes;
 
-    if ($total_fixes > 0) {
-        $comment .= "✅ **Applied $total_fixes automatic fix(es)**\n\n";
-    }
+	if ($total_fixes > 0) {
+		$comment .= "✅ **Applied $total_fixes automatic fix(es)**\n\n";
+	}
 
-    if ($total_issues == 0) {
-        $comment .= "🎉 **No issues found!** Your workflows look great.\n\n";
-        return $comment;
-    }
+	if ($total_issues == 0) {
+		$comment .= "🎉 **No issues found!** Your workflows look great.\n\n";
+		return $comment;
+	}
 
-    # Summary table
-    $comment .= "| Category | Count | Auto-fixable |\n";
-    $comment .= "|----------|-------|-------------|\n";
+	# Summary table
+	$comment .= "| Category | Count | Auto-fixable |\n";
+	$comment .= "|----------|-------|-------------|\n";
 
-    my %by_type;
-    push @{$by_type{$_->{type}}}, $_ for @$issues;
+	my %by_type;
+	push @{$by_type{$_->{type}}}, $_ for @$issues;
 
-    for my $type (sort keys %by_type) {
-        my $count = scalar @{$by_type{$type}};
-        my $fixable = grep { $_->{auto_fixable} // 1 } @{$by_type{$type}};
-        my $emoji = get_type_emoji($type);
-        $comment .= "| $emoji " . ucfirst($type) . " | $count | $fixable |\n";
-    }
+	for my $type (sort keys %by_type) {
+		my $count = scalar @{$by_type{$type}};
+		my $fixable = grep { $_->{auto_fixable} // 1 } @{$by_type{$type}};
+		my $emoji = get_type_emoji($type);
+		$comment .= "| $emoji " . ucfirst($type) . " | $count | $fixable |\n";
+	}
 
-    $comment .= "\n";
+	$comment .= "\n";
 
-    # Detailed issues
-    $comment .= "<details>\n";
-    $comment .= "<summary>📋 View Details</summary>\n\n";
+	# Detailed issues
+	$comment .= "<details>\n";
+	$comment .= "<summary>📋 View Details</summary>\n\n";
 
-    for my $type (sort keys %by_type) {
-        $comment .= "### " . get_type_emoji($type) . " " . ucfirst($type) . "\n\n";
+	for my $type (sort keys %by_type) {
+		$comment .= "### " . get_type_emoji($type) . " " . ucfirst($type) . "\n\n";
 
-        for my $issue (@{$by_type{$type}}) {
-            my $badge = get_severity_badge($issue->{severity});
-            $comment .= "- $badge **$issue->{message}**\n";
+		for my $issue (@{$by_type{$type}}) {
+			my $badge = get_severity_badge($issue->{severity});
+			$comment .= "- $badge **$issue->{message}**\n";
 
-            if ($issue->{file}) {
-                $comment .= "  - File: `$issue->{file}`\n";
-            }
-        }
+			if ($issue->{file}) {
+				$comment .= "  - File: `$issue->{file}`\n";
+			}
+		}
 
-        $comment .= "\n";
-    }
+		$comment .= "\n";
+	}
 
-    $comment .= "</details>\n\n";
+	$comment .= "</details>\n\n";
 
-    # Add recommendations
-    if ($total_fixes == 0 && $total_issues > 0) {
-        $comment .= "### 💡 How to Fix\n\n";
-        $comment .= "Run these commands locally:\n\n";
-        $comment .= "```bash\n";
-        $comment .= "# Install ghgen\n";
-        $comment .= "cpanm App::GHGen\n\n";
-        $comment .= "# Analyze and fix\n";
-        $comment .= "ghgen analyze --fix\n";
-        $comment .= "```\n\n";
+	# Add recommendations
+	if ($total_fixes == 0 && $total_issues > 0) {
+		$comment .= "### 💡 How to Fix\n\n";
+		$comment .= "Run these commands locally:\n\n";
+		$comment .= "```bash\n";
+		$comment .= "# Install ghgen\n";
+		$comment .= "cpanm App::GHGen\n\n";
+		$comment .= "# Analyze and fix\n";
+		$comment .= "ghgen analyze --fix\n";
+		$comment .= "```\n\n";
 
-        $comment .= "Or enable auto-fix in this action:\n\n";
-        $comment .= "```yaml\n";
-        $comment .= "- uses: nigelhorne/ghgen-action\@v1\n";
-        $comment .= "  with:\n";
-        $comment .= "    auto-fix: true\n";
-        $comment .= "    create-pr: true\n";
-        $comment .= "```\n\n";
-    }
+		$comment .= "Or enable auto-fix in this action:\n\n";
+		$comment .= "```yaml\n";
+		$comment .= "- uses: nigelhorne/ghgen-action\@v1\n";
+		$comment .= "  with:\n";
+		$comment .= "    auto-fix: true\n";
+		$comment .= "    create-pr: true\n";
+		$comment .= "```\n\n";
+	}
 
-    # Add savings estimate
-    my $savings = estimate_savings($issues);
-    if ($savings->{minutes} > 0) {
-        $comment .= "### 💰 Potential Savings\n\n";
-        $comment .= "By fixing these issues:\n";
-        $comment .= "- ⏱️ Save **~$savings->{minutes} CI minutes/month**\n";
+	# Add savings estimate
+	my $savings = estimate_savings($issues);
+	if ($savings->{minutes} > 0) {
+		$comment .= "### 💰 Potential Savings\n\n";
+		$comment .= "By fixing these issues:\n";
+		$comment .= "- ⏱️ Save **~$savings->{minutes} CI minutes/month**\n";
 
-        if ($savings->{cost} > 0) {
-            $comment .= "- 💵 Save **~\$$savings->{cost}/month** (private repos)\n";
-        }
+		if ($savings->{cost} > 0) {
+			$comment .= "- 💵 Save **~\$$savings->{cost}/month** (private repos)\n";
+		}
 
-        $comment .= "\n";
-    }
+		$comment .= "\n";
+	}
 
-    $comment .= "---\n";
-    $comment .= "*Analysis by [GHGen](https://github.com/your-org/ghgen)*\n";
+	$comment .= "---\n";
+	$comment .= "*Analysis by [GHGen](https://github.com/your-org/ghgen)*\n";
 
-    return $comment;
+	return $comment;
 }
 
 =head2 estimate_savings($issues)

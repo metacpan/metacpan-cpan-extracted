@@ -3,7 +3,7 @@ package PDF::API2::UniWrap;
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '2.048'; # VERSION
+our $VERSION = '2.049'; # VERSION
 
 # Implements UAX#14: Line Breaking Properties
 # David Nesting <david@fastolfe.net>

@@ -9,7 +9,7 @@ namespace tvision
 
 std::atomic<SignalHandlerCallback *> SignalHandler::callback {nullptr};
 const int SignalHandler::handledSignals[HandledSignalCount] =
-    { SIGINT, SIGQUIT, SIGILL, SIGABRT, SIGFPE, SIGSEGV, SIGTERM, SIGTSTP };
+    { SIGINT, SIGQUIT, SIGILL, SIGABRT, SIGBUS, SIGFPE, SIGSEGV, SIGPIPE, SIGTERM, SIGTSTP };
 
 static bool operator==(const struct sigaction &a, const struct sigaction &b) noexcept
 {
@@ -59,8 +59,10 @@ SignalHandler::HandlerInfo &SignalHandler::getHandlerInfo(int signo) noexcept
         case SIGQUIT:   return infos[SigQuit];
         case SIGILL:    return infos[SigIll];
         case SIGABRT:   return infos[SigAbrt];
+        case SIGBUS:    return infos[SigBus];
         case SIGFPE:    return infos[SigFpe];
         case SIGSEGV:   return infos[SigSegv];
+        case SIGPIPE:   return infos[SigPipe];
         case SIGTERM:   return infos[SigTerm];
         case SIGTSTP:   return infos[SigTstp];
         default:        abort();
@@ -78,22 +80,34 @@ void SignalHandler::handleSignal(int signo, siginfo_t *info, void *context)
     if ((callback = SignalHandler::callback) && handlerInfo.running.exchange(true) == false)
     {
         struct sigaction nextAction = handlerInfo.action;
+        // Uninstall the current action, just in case this signal gets raised
+        // again while invoking the callback.
         sigaction(signo, nullptr, &currentAction);
+        // Invoke the callback, which should be signal-safe in theory.
         callback(true);
+        // Install and invoke the action that was in place when we installed
+        // our handler.
         sigaction(signo, &nextAction, nullptr);
         if (invokeHandlerOrDefault(signo, nextAction, info, context))
+            // In some cases it is necessary to exit this handler.
             return;
+        // If the process didn't get killed, get ready to resume normal process
+        // execution.
         callback(false);
+        // Reinstall the action that was in place when this handler was invoked.
         sigaction(signo, &currentAction, nullptr);
         handlerInfo.running = false;
     }
     else
     {
-        // Just invoke the default handler.
+        // In the unexpected case where our handler was invoked even though
+        // it is already running or no callback was specified, just invoke the
+        // default handler.
         struct sigaction sa = makeDefaultAction();
         sigaction(signo, &sa, &currentAction);
         if (invokeDefault(signo, info))
             return;
+        // Reinstall the action that was in place when this handler was invoked.
         sigaction(signo, &currentAction, nullptr);
     }
 }
@@ -121,15 +135,19 @@ bool SignalHandler::invokeHandlerOrDefault( int signo, const struct sigaction &a
 
 bool SignalHandler::invokeDefault(int signo, siginfo_t *info) noexcept
 {
-    // In some cases the signal will be raised again after leaving the handler.
-    if ((signo == SIGILL || signo == SIGFPE || signo == SIGSEGV) && info->si_code > 0)
+    // Allow synchronous signals sent by the kernel to be raised again by exiting
+    // the handler. This will preserve the original stack trace, si_addr, etc.
+    if ( (signo == SIGILL || signo == SIGBUS || signo == SIGFPE || signo == SIGSEGV)
+         && info->si_code > 0 )
         return true;
     // Otherwise, raise the signal manually.
     sigset_t mask, oldMask;
     sigemptyset(&mask);
+    // Unblock this signal.
     sigaddset(&mask, signo);
     sigprocmask(SIG_UNBLOCK, &mask, &oldMask);
     raise(signo);
+    // If the process didn't get killed, restore the original mask.
     sigprocmask(SIG_SETMASK, &oldMask, nullptr);
     return false;
 }

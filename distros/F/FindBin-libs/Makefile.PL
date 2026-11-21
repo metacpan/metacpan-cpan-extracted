@@ -337,7 +337,7 @@ qw
 # after three modules and examples the version has to float
 # independent of just the modules.
 
-  VERSION         => v5.4.1
+  VERSION         => v5.5.1
 , AUTHOR          => 'Steven Lembark <lembark@wrkhors.com>'
 , PREREQ_PM       =>
     {

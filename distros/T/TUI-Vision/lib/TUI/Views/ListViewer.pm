@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -15,6 +15,7 @@ our @EXPORT = qw(
   new_TListViewer
 );
 
+use Storable;
 use TUI::toolkit;
 use TUI::toolkit::Types qw(
   Maybe
@@ -41,6 +42,7 @@ use TUI::Drivers::Util qw(
   ctrlToArrow
 );
 use TUI::Objects::Point;
+use TUI::Objects::Rect;
 use TUI::Views::Const qw(
   cmScrollBarChanged
   cmScrollBarClicked
@@ -579,6 +581,53 @@ sub shutDown {    # void ()
   $self->{vScrollBar} = undef;
   $self->SUPER::shutDown();
   return;
+}
+
+sub read :method {    # $self ($is)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $is ) = $sig->( @_ );
+  $self->SUPER::read( $is );
+  $self->{hScrollBar} = $is->get();
+  $self->{vScrollBar} = $is->get();
+  $self->{numCols}    = $is->get();
+  $self->{topItem}    = $is->get();
+  $self->{focused}    = $is->get();
+  $self->{range}      = $is->get();
+  return $self;
+}
+
+sub write :method {    # void ($os)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $os ) = $sig->( @_ );
+  $self->SUPER::write( $os );
+  $os->put(
+    $self->{hScrollBar},
+    $self->{vScrollBar},
+    $self->{numCols},
+    $self->{topItem},
+    $self->{focused},
+    $self->{range},
+  );
+  return;
+}
+
+sub build {    # $obj ()
+  my ( $class ) = @_;
+  assert ( @_ == 1 );
+  assert ( is_Str $class );
+  assert ( Storable::is_retrieving );
+  return $class->new(
+    bounds     => TRect->new(),
+    numCols    => 0,
+    hScrollBar => undef,
+    vScrollBar => undef,
+  );
 }
 
 1

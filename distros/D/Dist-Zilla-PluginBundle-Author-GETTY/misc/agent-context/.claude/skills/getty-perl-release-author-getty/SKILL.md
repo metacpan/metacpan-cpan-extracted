@@ -1,220 +1,20 @@
 ---
 name: getty-perl-release-author-getty
-description: Load when a dist.ini contains [@Author::GETTY] — bundle options, POD conventions (=attr/=method/=opt), next-version semantics, the dzil release workflow.
+description: "Use when a dist.ini contains [@Author::GETTY] — bundle options, POD conventions (=attr/=method/=opt), next-version semantics, the dzil release workflow."
 user-invocable: false
 allowed-tools: Read, Grep
 model: sonnet
 ---
 
-When working with `[@Author::GETTY]` plugin bundle:
+# `[@Author::GETTY]`
 
-## Required Metadata
+What the bundle adds on top of plain Dist::Zilla; generic `dist.ini` mechanics are skill
+`perl-release-dist-ini`.
 
-```ini
-name = Distribution-Name
-author = Name <email>
-license = Perl_5
-copyright_holder = Copyright Owner
-```
-
-## The LICENSE file
-
-The bundle expects `LICENSE` to be a **committed file in the repository**. It
-removes `[License]` from `@Basic` and adds `[LicenseFile]`, which aborts the
-build when that file is missing or no longer matches the distribution's
-`license`, `copyright_holder` and `copyright_year`:
-
-```
-[@Author::GETTY/LicenseFile] no LICENSE in the distribution:
-run 'dzil genlicense' and commit the file
-```
-
-Write it once, then track it:
-
-```bash
-dzil genlicense
-git add LICENSE
-```
-
-**The `git add` is not optional.** The bundle gathers through `Git::GatherDir`,
-which sees only tracked files, so a LICENSE left untracked in the working
-directory fails with the identical message — which reads as though `genlicense`
-did nothing.
-
-Re-run `genlicense` after changing `license`, `copyright_holder` or
-`copyright_year`. Checking the file against them is the whole point of the
-plugin: a committed LICENSE otherwise keeps serving the old licence silently,
-with no warning and no build failure.
-
-The target is the repository, not the tarball. GitHub, Gitea and Forgejo detect
-a licence only from a committed `LICENSE`, and a generated one never exists
-outside the build — which is why a distribution built the default way shows up
-as unlicensed on its own project page. `genlicense` writes the bare licence
-text, not the `fulltext` that `[License]` generates: the copyright notice
-`fulltext` prefixes is enough to make GitHub report `NOASSERTION` instead of
-naming the licence.
-
-`[LicenseFile]` is a recent addition to the bundle, so distributions that built
-fine before it landed fail on their next build. When picking up an older dist,
-`ls LICENSE` is cheaper than diagnosing it mid-release. For a dist that
-deliberately ships no committed LICENSE, `generate_license = 1` restores the
-generated file and adds no check.
-
-## When the bundle applies
-
-`[@Author::GETTY]` is for Getty's own CPAN work. A distribution that is not
-released to CPAN — a proprietary application, a deploy artefact — lists its
-Dist::Zilla plugins explicitly instead, because the bundle assumes a CPAN
-release. Non-CPAN dists that still use the bundle set `no_cpan = 1`.
-
-## `# ABSTRACT` lines
-
-Every file the bundle processes carries `# ABSTRACT: <one line>` directly under
-`package`, before any `use`; executables in `bin/` carry it under the shebang.
-PodWeaver turns it into the NAME section. Outside a bundle-managed distribution
-the line does nothing — do not scatter it into files Dist::Zilla never sees.
-
-## What the tarball ships
-
-`Git::GatherDir` gathers every tracked file, dotfiles included
-(`gather_include_dotfiles` defaults to 1), so `.claude/`, `CLAUDE.md` and `.github/`
-ship with the dist; `[GatherAgentContext]` adds a snapshot of the agent context under
-`misc/agent-context/` (build provenance, not installed). We keep them in. Out by
-default: `README.md` (see `include_readme`) and `.karr`.
-
-## @Author::GETTY Options
-
-### Feature Toggles (Boolean)
-- `no_cpan` - Skip UploadToCPAN; also defaults `version_finder` to `:MainModule`
-- `no_podweaver` - Skip PodWeaver
-- `no_changes` - Skip NextRelease
-- `no_installrelease` - Skip InstallRelease
-- `no_makemaker` - Skip MakeMaker
-- `xs` - Use ModuleBuildTiny (for pure-Perl XS without Alien deps)
-- `deprecated` - Add Deprecated plugin
-- `adoptme` - Add x_adoptme metadata
-- `no_github` - Skip GithubMeta and GitHub::CreateRelease, use Repository instead. Auto-set to 1 when `.git/config` has no github.com remote; set `no_github = 0` to force GitHub plugins on anyway
-- `no_github_release` - Skip only GitHub::CreateRelease. Same auto-detection; when active, `dzil release` creates a GitHub Release and attaches the tarball, which needs `~/.github-identity` (login + token)
-- `gitea` - Treat the remote host as Gitea/Forgejo (repository/bugtracker/homepage via GiteaMeta). Only needed for self-hosted instances — codeberg.org and the author's own are auto-detected. No effect when a GitHub remote exists
-- `include_readme` - Ship README.md (excluded from the tarball by default)
-- `no_install` - Resulting distribution can't be installed
-- `generate_license` - Go back to a generated LICENSE: `@Basic` keeps its License plugin, no LicenseFile check is added. Default 0 — the bundle expects a committed LICENSE (see above)
-
-### Identity & Metadata
-- `author` - CPAN author name used for the authority
-- `authority` - Override the authority, e.g. `authority = ETHER` when uploading modules owned by another author (default: the `author` value)
-
-### XS with Alien
-- `xs_alien = Alien::Foo` - Auto-configures MakeMaker::Awesome for XS+Alien
-- `xs_object = Name` - Override XS object name (default: derived from Alien name)
-
-### Versioning
-- `task = 1` - TaskWeaver + AutoVersion
-- `manual_version = x.x` - Manual version
-- `major_version = 2` - Major version for AutoVersion
-- `version_finder` - multi-value; forwarded as the `finder` option of RewriteVersion::Transitional + BumpVersionAfterRelease (default path) and PkgVersion (task/manual_version path). Defaults to `:MainModule` when `no_cpan` is set, otherwise unset.
-
-### Build & Release
-- `weaver_config` - PodWeaver `config_plugin` to use (default: the bundle's own)
-- `installrelease_command` - Command used to install after release, instead of cpanm
-
-### Docker
-- `docker_image` - Image repository. Auto-adds one Docker::API plugin, which is a working Releaser on its own (no UploadToCPAN needed for non-CPAN dists)
-- `docker_tags` - Whitespace-separated tag list (default: `latest %V %v`)
-- `docker_local` - Build and tag the image, but don't push
-- `docker_default` - Set to 0 to suppress the auto-added plugin when you configure builds exclusively through `[@Author::GETTY::Docker / name]` subsections
-
-### Binary
-Standalone `pp` binaries of the dist's scripts as assets of the GitHub release. Only `binary` is needed. Packing itself (what `pp` misses, verify and smoke scripts): skill `perl-par-binary-release`.
-- `binary` - Whitespace-separated names, repeatable; each is packed from `bin/NAME`. Turns the binary release on and forces the GitHub release: the bundle dies with `no_github`, `no_github_release` or no GitHub remote
-- `binary_modules` - Extra modules packed into every binary (`-M`). `Foo::*` packs everything below `Foo/` but not `Foo.pm` itself; an empty namespace does not fail
-- `binary_require` - Modules or `Namespace::*` globs that must be inside every finished binary, or the build fails
-- `binary_pp_args` - Shell command whose output is added to the `pp` command line, one argument per line
-- `binary_verify` - Shell command run after packing with the binary's path appended; runs without `PERL5LIB`, the packing perl's is in `DZIL_BINARY_PERL5LIB`
-- `binary_smoke` - Like `binary_verify`, run by the workflow on every platform on a machine without Perl; neither `PERL5LIB` nor `DZIL_BINARY_PERL5LIB`
-- `binary_platforms` - Out of `linux-x86_64 linux-arm64 macos-arm64 macos-x86_64 windows-x86_64` (default: all five). Dist-wide, refused in a subsection
-- `binary_prepare` - Shell command run once per platform before the dependencies are installed; its first word must be a file of the dist. Dist-wide, refused in a subsection
-- `binary_default` - Set to 0 to not add the binaries from `binary` and configure them through `[@Author::GETTY::Binary / name]` subsections
-- `[@Author::GETTY::Binary / name]` - One binary configured on its own, e.g. `script` when it is not `bin/name`; inherits `binary_modules`, `binary_require`, `binary_pp_args`, `binary_verify`, `binary_smoke`
-- Caller workflow - the dist's own `.github/workflows/binaries.yml` calls `Getty/p5-dist-zilla-pluginbundle-author-getty/.github/workflows/dzil-binary.yml@binary-v1` on `release: published`; `dzil release` is refused without that file. Full text in the bundle POD under "Binaries"
-- `DZIL_BINARY_SKIP=1` - `dzil build` packs again as a local check and needs `pp` in the `PATH`; this skips it, including `binary_verify` and `binary_smoke`
-
-### Support
-- `irc = #channel` - IRC channel
-- `irc_server` - Server (default: irc.perl.org)
-- `irc_user` - Username for SUPPORT section
-
-### Git
-- `release_branch` - Branch for releases (default: main)
-- `tag_format` - Release tag format. Default `%v`, the bare `$VERSION` (`0.317`) — *not* a v-prefixed SemVer tag. Use `v%v.0` when the tag must satisfy strict vMAJOR.MINOR.PATCH (Perl's decimal `$VERSION` has only two parts, the `.0` supplies the patch part)
-- `commit_files_after_release` - Multi-value; extra files folded into the release commit (via Git::Commit's `allow_dirty`). For artefacts a `run_before_release` hook rewrites, e.g. a sibling Python/JS version file
-
-### Alien (prefix `alien_`)
-
-- `alien_build = 1` - Alien::Build-based dist: adds AlienBuild (Makefile.PL driven by Alien::Build::MM), implies `no_makemaker`, expects an `alienfile` in the dist root
-
-For wrapping C libraries with Alien::Base:
-
-**Required:**
-- `alien_repo` - URL to download releases from
-
-**Library identification:**
-- `alien_name` - Name of the alien package
-- `alien_bins` - Executables to install (multi-value)
-
-**Archive pattern matching:**
-- `alien_pattern` - Full regex pattern for archive matching
-- `alien_pattern_prefix` - Prefix (e.g., `mylib-`)
-- `alien_pattern_version` - Version regex (default: `([\d\.]+)`)
-- `alien_pattern_suffix` - Suffix (e.g., `\.tar\.gz`)
-
-**Build configuration:**
-- `alien_msys` - Use MSYS on Windows
-- `alien_autoconf_with_pic` - Pass --with-pic to autoconf
-- `alien_isolate_dynamic` - Isolate dynamic libraries
-- `alien_version_check` - Command to check installed version
-
-**Custom build commands (for non-autoconf projects):**
-- `alien_build_command` - Custom build commands (multi-value, use `%s` for prefix)
-- `alien_install_command` - Custom install commands (multi-value)
-- `alien_test_command` - Custom test commands (multi-value)
-
-**Dependencies:**
-- `alien_bin_requires` - Build dependencies (multi-value)
-
-### Run Hooks (prefix `run_`)
-- `run_before_build`, `run_after_build`
-- `run_before_release`, `run_after_release`
-- `run_release`, `run_test`
-
-Use a run hook for the project-specific step that follows a release — a Docker
-build and push, a deploy script — so it travels with `dzil release` instead of
-living in someone's shell history. Never wire up a step the bundle already
-performs; the hook is for what it does *not* know about.
-
-```ini
-[Run::Release]
-run = docker build -t registry/app:%v %d && docker push registry/app:%v
-```
-
-## POD Commands (Pod::Elemental::Transformer::Author::GETTY)
-
-### Section Commands (→ =head1)
-- `=synopsis` → `=head1 SYNOPSIS`
-- `=description` → `=head1 DESCRIPTION`
-- `=seealso` → `=head1 SEE ALSO`
-
-### Inline Commands (→ =head2)
-- `=attr name` → `=head2 name`
-- `=method method_name` → `=head2 method_name`
-- `=func func_name` → `=head2 func_name`
-- `=opt` - CLI options
-- `=env` - Environment variables
-- `=hook` - Hooks
-- `=example` - Examples
-
-**Auto-generated sections (do NOT write manually):**
-NAME, VERSION, AUTHOR, SUPPORT, CONTRIBUTING, COPYRIGHT
+The bundle is for Getty's own CPAN work. A distribution that is not released to CPAN — a
+proprietary application, a deploy artefact — lists its Dist::Zilla plugins explicitly
+instead, because the bundle assumes a CPAN release. Non-CPAN dists that still use the
+bundle set `no_cpan = 1`.
 
 ## Versioning Convention — CRITICAL
 
@@ -228,64 +28,81 @@ Before a release, the files already contain the upcoming version:
 After `dzil release` runs:
 1. `{{$NEXT}}` in Changes is replaced with `1.005` + release date
 2. The version is bumped to `1.006` (or next AutoVersion value)
-3. A Git tag `v1.005` is created
+3. A Git tag `1.005` is created (default `tag_format = %v`, no `v` prefix)
 
-**Do NOT treat the version in dist.ini as the released version.** If the user asks "what version is released?", check CPAN or git tags — not the current `$VERSION` in the files.
-
-**Do NOT bump the version manually before a release** — `dzil release` handles this automatically.
-
-### Every file carries its own `$VERSION`
-
-**Each file under `lib/` and `bin/` needs its own `our $VERSION = '...';`**, set to
-the version that will be released NEXT — one higher than what is on CPAN (or
-higher). A file without a `$VERSION` ships versionless and breaks consumers that
-pin against it.
-
-**Only the FIRST `our $VERSION` in a file gets rewritten.** RewriteVersion::Transitional
-and BumpVersionAfterRelease both stop after the first match, so a file holding two
-packages leaves the second one frozen at whatever version it was written with —
-while MetaProvides::Update happily reports the real release version. The result is
-a distribution whose META and whose code disagree, silently, for as many releases
-as it takes someone to notice.
-
-So: **one package per file.** If you find several `package` statements in one file,
-split them out before releasing.
-
-**Executables belong in `bin/`, never `script/`.** The bundle sets no `ExecDir`, so
-Dist::Zilla's default of `bin` applies: files under `script/` are not installed as
-executables and their `$VERSION` is never rewritten. A distribution with a `script/`
-directory should have it renamed to `bin/` — otherwise none of the above takes
-effect.
+- **Do NOT treat the version in dist.ini as the released version.** If the user asks
+  "what version is released?", check CPAN or git tags — not the current `$VERSION`.
+- **Do NOT bump the version manually before a release** — `dzil release` does it.
+- **Each file under `lib/` and `bin/` needs its own `our $VERSION = '...';`**, set to
+  the NEXT version — one higher than what is on CPAN (or higher). A file without one
+  ships versionless and breaks consumers that pin against it.
+- **One package per file.** RewriteVersion::Transitional and BumpVersionAfterRelease
+  rewrite only the FIRST `our $VERSION` in a file, so a second package stays frozen at
+  the version it was written with — while MetaProvides::Update reports the real release
+  version. META and code then disagree silently, release after release. Split
+  multi-package files before releasing.
+- **Executables belong in `bin/`, never `script/`.** The bundle sets no `ExecDir`, so
+  Dist::Zilla's default of `bin` applies: files under `script/` are not installed as
+  executables and their `$VERSION` is never rewritten. Rename a `script/` directory to
+  `bin/`.
 
 ## Release Workflow
 
-**A human runs `dzil release`, never the agent.** It uploads to CPAN, tags and pushes
-— irreversible, outward-facing, and the maintainer's call every time. Preparing a
-release is in scope (tidy `Changes`, confirm the build and interop pass, stage the
-version); running `dzil release` is not. Never run it on your own initiative, and never
-treat your own offer to run it as a yes — only an explicit instruction from the
-maintainer to release is authorization; absent that, you never assume it.
+**A human runs `dzil release`, never the agent.** It uploads to CPAN, tags and pushes —
+irreversible, outward-facing, and the maintainer's call every time. Preparing a release
+is in scope (tidy `Changes`, confirm the build and interop pass, stage the version);
+running `dzil release` is not. Never run it on your own initiative, and never treat your
+own offer to run it as a yes — only an explicit instruction from the maintainer to
+release is authorization; absent that, you never assume it.
 
 ```bash
 dzil release        # Builds, tests, uploads to CPAN, bumps version, commits, tags
 ```
 
-Read the `{{$NEXT}}` section of `Changes` once as a whole first. It was written bullet
-by bullet over weeks, so this is where entries circling one topic get merged into one
-and over-detailed ones get cut back (skill `getty-git-commit-style`). It is not only a
-changelog: `GitHub::CreateRelease` runs with `notes_from = ChangeLog` and publishes the
-section verbatim as the release notes.
+Read the `{{$NEXT}}` section of `Changes` once as a whole first. It was written bullet by
+bullet over weeks: merge entries circling one topic into one, cut over-detailed ones back
+(skill `getty-git-commit-style`). `GitHub::CreateRelease` runs with
+`notes_from = ChangeLog` and publishes the section verbatim as the release notes.
 
 Fix it in its own commit *before* `dzil release`. `Changes` sits in the release commit's
 `allow_dirty` list, so an uncommitted edit stops nothing — it is folded into the release
 snapshot silently, under a message naming only the version.
 
+## Required Metadata
+
+```ini
+name = Distribution-Name
+author = Name <email>
+license = Perl_5
+copyright_holder = Copyright Owner
+```
+
 ## Conventions
 
-1. `copyright_year` IS used in dist.ini — GETTY has it in ALL distributions, do NOT remove it
-2. No `=head1 SUPPORT/AUTHOR/COPYRIGHT` in POD
-3. Use inline `=attr`/`=method` directly after code
-4. Dependencies in `cpanfile`, not dist.ini
-5. Changes file with `{{$NEXT}}` for unreleased
-6. For XS+Alien modules: use `xs_alien = Alien::Foo` (auto-configures MakeMaker::Awesome)
-7. `LICENSE` is generated once with `dzil genlicense` and **committed** — the build aborts without it
+1. `copyright_year` IS used in dist.ini — GETTY has it in ALL distributions, do NOT
+   remove it
+2. Dependencies in `cpanfile`, not dist.ini
+3. Changes file with `{{$NEXT}}` for unreleased
+4. `LICENSE` is generated once with `dzil genlicense` and **committed** (`git add` is not
+   optional) — the build aborts without it
+5. For XS+Alien modules: use `xs_alien = Alien::Foo` (auto-configures
+   MakeMaker::Awesome)
+6. `Git::GatherDir` ships every *tracked* file, dotfiles included
+   (`gather_include_dotfiles` defaults to 1): `.claude/`, `CLAUDE.md` and `.github/`
+   ship with the dist, and `[GatherAgentContext]` adds a snapshot of the agent context
+   under `misc/agent-context/` (build provenance, not installed). We keep them in. Out
+   by default: `README.md` (see `include_readme`) and `.karr`.
+7. POD: `# ABSTRACT:` under every `package`, `=attr`/`=method` inline directly after the
+   code, no `=head1 SUPPORT/AUTHOR/COPYRIGHT` — skill `getty-perl-pod`
+
+## Read on demand
+
+- Any bundle option — feature toggles, `no_github`/`gitea`, authority, versioning
+  (`task`, `manual_version`, `version_finder`), Git (`tag_format`, `release_branch`,
+  `commit_files_after_release`), XS/Alien, Docker, `pp` binaries, IRC support, run
+  hooks: [references/bundle-options.md](references/bundle-options.md)
+- The build aborts with `no LICENSE in the distribution`, an older dist is picked up,
+  `license`/`copyright_holder`/`copyright_year` changed, or a forge shows the dist as
+  unlicensed: [references/license.md](references/license.md)
+- POD shortcut commands (`=attr`, `=method`, `=opt`, …), `# ABSTRACT` and the sections
+  Pod::Weaver generates: skill `getty-perl-pod`

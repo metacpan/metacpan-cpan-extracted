@@ -147,4 +147,4 @@ HEADER
   return 0;
 }
 
-exit main($#ARGV, $0, @ARGV);
+exit main(@ARGV+1, [ $0, @ARGV ]);

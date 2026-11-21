@@ -31,25 +31,25 @@ no_index:
 provides:
   MIDI::RtMidi::FFI:
     file: lib/MIDI/RtMidi/FFI.pm
-    version: '0.13'
+    version: '0.14'
   MIDI::RtMidi::FFI::AbstractDevice:
     file: lib/MIDI/RtMidi/FFI/AbstractDevice.pm
-    version: '0.13'
+    version: '0.14'
   MIDI::RtMidi::FFI::Device:
     file: lib/MIDI/RtMidi/FFI/Device.pm
-    version: '0.13'
+    version: '0.14'
   MIDI::RtMidi::FFI::Device::In:
     file: lib/MIDI/RtMidi/FFI/Device/In.pm
-    version: '0.13'
+    version: '0.14'
   MIDI::RtMidi::FFI::Device::Out:
     file: lib/MIDI/RtMidi/FFI/Device/Out.pm
-    version: '0.13'
+    version: '0.14'
   RtMidiIn:
     file: lib/MIDI/RtMidi/FFI/Device.pm
-    version: '0.13'
+    version: '0.14'
   RtMidiOut:
     file: lib/MIDI/RtMidi/FFI/Device.pm
-    version: '0.13'
+    version: '0.14'
 requires:
   FFI::CheckLib: '0.25'
   FFI::Platypus: '2.00'
@@ -70,7 +70,7 @@ resources:
   bugtracker: https://codeberg.org/jbarrett/MIDI-RtMidi-FFI/issues
   homepage: https://codeberg.org/jbarrett/MIDI-RtMidi-FFI/
   repository: https://codeberg.org/jbarrett/MIDI-RtMidi-FFI.git
-version: '0.13'
+version: '0.14'
 x_generated_by_perl: v5.44.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

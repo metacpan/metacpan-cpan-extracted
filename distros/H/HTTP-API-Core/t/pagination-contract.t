@@ -43,8 +43,8 @@ dies_like(
 );
 
 dies_like(
-    sub { HTTP::API::Core::Pagination->new(client => $client, path => '/x', mode => 'offset') },
-    qr/unsupported pagination mode: offset/,
+    sub { HTTP::API::Core::Pagination->new(client => $client, path => '/x', mode => 'unknown') },
+    qr/unsupported pagination mode: unknown/,
     'unsupported mode rejected',
 );
 

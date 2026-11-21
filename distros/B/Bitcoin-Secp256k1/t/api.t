@@ -112,13 +112,7 @@ subtest 'should combine one pubkey into itself' => sub {
 };
 
 subtest 'should combine multiple pubkeys' => sub {
-	my @to_combine = (
-		pack('H*', '0311ab47c9252066f0ca5946d70c3aaac1486d65969b90cd57207476963c9f9af3'),
-		pack('H*', '0260213f6d967636c54d8845c23098e0f63d906b7903d23692efa155a155eda169'),
-	);
-	my $combined_pubkey = pack 'H*', '0255c3386d6833d5e1ad6d863afc1cf5d8ffdc0ebc78e4241e845a6c2cbd78157b';
-
-	is $secp->combine_public_keys($t{pubkey}, @to_combine), $combined_pubkey, 'combined pubkey ok';
+	is $secp->combine_public_keys($t{pubkey}, @{$t{to_combine}}), $t{combined}, 'combined pubkey ok';
 };
 
 subtest 'should sign and verify a message (recoverable)' => sub {
@@ -138,7 +132,7 @@ subtest 'should sign and verify a message (recoverable)' => sub {
 	ok $secp->verify_message_recoverable($t{pubkey}, $rec_sig, $t{preimage}), 'recoverable message verified ok';
 
 	# Test with wrong pubkey should fail
-	my $wrong_pubkey = pack 'H*', '025476c2e83188368da1ff3e292e7acafcdb3566bb0ad253f62fc70f07aeee6358';
+	my $wrong_pubkey = pack 'H*', '025476c2e83188368da1ff3e292e7acafcdb3566bb0ad253f62fc70f07aeee6360';
 	ok !$secp->verify_message_recoverable($wrong_pubkey, $rec_sig, $t{preimage}),
 		'wrong pubkey verification fails ok';
 };

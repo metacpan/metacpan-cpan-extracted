@@ -9,9 +9,8 @@
 #
 #   Duncan       car's own man/vif.Rd examples: prestige ~ income +
 #                education, then + type (a 3-level factor, so a GVIF table),
-#                then (income + education)*type, which the test writes out
-#                as its expansion because this module's parser has no
-#                parentheses in a formula
+#                then (income + education)*type, as written and as its
+#                expansion; since 0.3426 the formula parser reads the group
 #   mtcars       the three formula shapes TODO.md listed as failing through
 #                0.3217 -- an interaction, a removed term ('- x3' for a term
 #                that is not there, as car's case had it, and one that is),
@@ -50,6 +49,7 @@ for (f in names(frames)) {
 cases <- list(
     c("Duncan", "prestige ~ income + education", NA),
     c("Duncan", "prestige ~ income + education + type", NA),
+    c("Duncan", "prestige ~ (income + education)*type", NA),
     c("Duncan", "prestige ~ (income + education)*type",
                 "prestige ~ income + education + type + income:type + education:type"),
     c("mtcars", "mpg ~ wt*hp + disp", NA),
@@ -92,5 +92,47 @@ cat(sprintf("# urban: %.17g (Stata, as pinned: 16.4394)\n", 1 / (1 - summary(fit
 cat("== refusals\n")
 for (f in c("mpg ~ wt", "mpg ~ wt + hp + I(2 * wt)")) {
     e <- tryCatch(vif(lm(as.formula(f), data = mtcars)), error = function(e) conditionMessage(e))
+    cat(sprintf("# %s: %s\n", f, e))
+}
+
+# car's type = "predictor", vif.lm() in car 3.1-5.
+# [ frame, formula, message, rows used, [ predictor, GVIF, Df, 'Interacts With',
+# 'Other Predictors' ] ... ]: the message is the one car prints, "VIFs" when
+# car returns a vector (every Df is 1, and the test then reads a plain hash)
+# and "GVIFs" for the table.  Df is 0 for qsec in the fourth case: a variable
+# the formula names and removes, which car carries as a predictor with no
+# columns and so GVIF^(1/(2*Df)) = Inf.
+cat("== @PRED_CASES\n")
+pcases <- list(
+    c("Duncan", "prestige ~ (income + education)*type"),
+    c("Duncan", "prestige ~ income + education + type"),
+    c("mtcars", "mpg ~ wt + hp"),
+    c("mtcars", "mpg ~ wt*hp + disp"),
+    c("mtcars", "mpg ~ wt + hp + disp + qsec - qsec"),
+    c("mtcars", "mpg ~ wt:hp + disp + wt"),
+    c("mtcars", "mpg ~ hp:wt + disp"),
+    c("warpbreaks", "breaks ~ wool * tension"),
+    c("airquality", "Ozone ~ Solar.R*Wind + Temp")
+)
+for (cs in pcases) {
+    d <- frames[[cs[1]]]
+    fit <- lm(as.formula(cs[2]), data = d)
+    msg <- character(0)
+    v <- withCallingHandlers(vif(fit, type = "predictor"),
+        message = function(m) { msg <<- c(msg, sub("\n$", "", conditionMessage(m))); invokeRestart("muffleMessage") })
+    # car's vector is unnamed (vifs[, 1] of a data frame drops the row names),
+    # in the order of all.vars(), so the predictors' names are put back
+    if (!is.data.frame(v)) v <- data.frame(GVIF = v, Df = 1, x = NA, `Interacts With` = NA, `Other Predictors` = NA,
+                                           row.names = all.vars(formula(fit)[-2]), check.names = FALSE)
+    rows <- sprintf("[ '%s', %.17g, %d, '%s', '%s' ]", rownames(v), v[[1]], as.integer(v[[2]]),
+                    ifelse(is.na(v[[4]]), "", v[[4]]), ifelse(is.na(v[[5]]), "", v[[5]]))
+    cat(sprintf("\t[ '%s', '%s', '%s', %d, %s ],\n", cs[1], cs[2], msg[1], nobs(fit), paste(rows, collapse = ", ")))
+}
+
+# car's refusals under type = "predictor"
+cat("== refusals, type = 'predictor'\n")
+for (f in c("mpg ~ wt", "mpg ~ wt + hp + disp - 1")) {
+    e <- tryCatch(suppressWarnings(vif(lm(as.formula(f), data = mtcars), type = "predictor")),
+                  error = function(e) conditionMessage(e))
     cat(sprintf("# %s: %s\n", f, e))
 }

@@ -2,13 +2,16 @@
 #define TVISION_ANSIWRIT_H
 
 #define Uses_TScreenCell
+#define Uses_TPoint
 #include <tvision/tv.h>
 
-#include <internal/termdisp.h>
 #include <internal/endian.h>
 
 namespace tvision
 {
+
+class ConsoleCtl;
+class DisplayAdapter;
 
 // TermColor represents a color that is to be printed to screen
 // using certain ANSI escape sequences.
@@ -65,13 +68,38 @@ struct TermColor
 struct TermAttr
 {
     TermColor fg, bg;
-    TColorAttr::Style style;
+    ushort style;
+};
+
+// Terminal quirk flags.
+
+const ushort
+    qfBoldIsBright  = 0x0001,
+    qfBlinkIsBright = 0x0002,
+    qfNoItalic      = 0x0004,
+    qfNoUnderline   = 0x0008;
+
+enum TermCapColors : uint8_t
+{
+    NoColor,
+    Indexed8,
+    Indexed16,
+    Indexed256,
+    Direct,
+    TermCapColorCount,
+};
+
+struct TermCap
+{
+    TermCapColors colors;
+    ushort quirks;
+
+    static TermCap getDisplayCapabilities( ConsoleCtl &con,
+                                           DisplayAdapter &display ) noexcept;
 };
 
 // AnsiScreenWriter allows printing characters and color attributes directly
 // to screen using ANSI escape codes.
-
-class ConsoleCtl;
 
 class AnsiScreenWriter
 {
@@ -92,28 +120,30 @@ class AnsiScreenWriter
     };
 
     ConsoleCtl &con;
+    TermCap termcap;
     Buffer buf;
+    TPoint caretPos {-1, -1};
     TermAttr lastAttr {};
 
-    void bufWriteCSI1(uint a, char F) noexcept;
-    void bufWriteCSI2(uint a, uint b, char F) noexcept;
+    void bufWriteCSI1(int a, char F) noexcept;
+    void bufWriteCSI2(int a, int b, char F) noexcept;
 
 public:
 
-    AnsiScreenWriter(ConsoleCtl &aCon) noexcept :
-        con(aCon)
+    AnsiScreenWriter(ConsoleCtl &aCon, TermCap aTermcap) noexcept :
+        con(aCon),
+        termcap(aTermcap)
     {
     }
 
     ~AnsiScreenWriter();
 
-    void resetAttributes() noexcept;
+    void reset() noexcept;
     void clearScreen() noexcept;
 
-    void lowlevelWriteChars(TStringView chars, TColorAttr attr, const TermCap &) noexcept;
-    void lowlevelMoveCursor(uint x, uint y) noexcept;
-    void lowlevelMoveCursorX(uint x) noexcept;
-    void lowlevelFlush() noexcept;
+    void writeCell(TPoint, TStringView, TColorAttr, bool) noexcept;
+    void setCaretPosition(TPoint) noexcept;
+    void flush() noexcept;
 };
 
 } // namespace tvision

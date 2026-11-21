@@ -1,0 +1,51 @@
+---
+abstract: 'Log::Dispatch appender that DKIM-signs its mail'
+author:
+  - 'Nigel Horne <njh@nigelhorne.com>'
+build_requires:
+  Config: '0'
+  Errno: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Path: '0'
+  File::Temp: '0'
+  Test::Memory::Cycle: '0'
+  Test::Mockingbird: '0'
+  Test::More: '0'
+  Test::Most: '0'
+  Test::Returns: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-Dispatch-Email-DKIM
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Email::Address::XS: '0'
+  File::Basename: '0'
+  File::HomeDir: '0'
+  File::Spec: '0'
+  Log::Dispatch: '0'
+  Mail::Send::DKIM: v0.4.0
+  Params::Get: '0'
+  Params::Validate::Strict: '0'
+  Readonly: '0'
+  Scalar::Util: '0'
+  Sub::Private: '0.09'
+  Sub::Protected: '0'
+  autodie: '0'
+  base: '0'
+  perl: '5.026'
+  version: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Log-Dispatch-Email-DKIM
+  repository: https://github.com/nigelhorne/Log-Dispatch-Email-DKIM.git
+version: 0.001.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

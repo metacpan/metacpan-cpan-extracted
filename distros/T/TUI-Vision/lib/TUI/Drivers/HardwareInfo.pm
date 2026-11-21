@@ -4,8 +4,14 @@ package TUI::Drivers::HardwareInfo;
 use strict;
 use warnings;
 
+our $VERSION = '2.000003';
+$VERSION =~ tr/_//d;
+our $AUTHORITY = 'cpan:BRICKPOOL';
+
 use Exporter 'import';
-our @EXPORT = qw( THardwareInfo );
+our @EXPORT = qw(
+  THardwareInfo
+);
 
 # Code snippet taken from File::Spec
 my %module = (

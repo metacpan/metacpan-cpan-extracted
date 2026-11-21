@@ -275,12 +275,12 @@ throws_ok { wbytes([['a'], [1]], row_names => [1]) }
 	is(wbytes([{ a => 1 }, \%t, \%u, \%v]),
 		"a,c,caf\xc3\xa9,\xd0\xb6\n1,,,\n6,5,,\n,,7,8\n,,9,\n",
 		'AoH: tied rows and UTF-8 keys are found as before');
-	# Here café is only ever a Latin-1 key, and is written as its one byte,
-	# where the AoH above met it upgraded too, and the last form seen won: the
-	# open question of what encoding write_table writes, unchanged here.
+	# Here café is only ever a Latin-1 key, which up to 0.3425 was written as
+	# its one byte E9; since 0.3426 a field that is not valid UTF-8 is read as
+	# Latin-1, so it is written C3 A9 as the upgraded key above is.
 	is(wbytes({ x => { a => 1 }, y => \%t, z => \%u }, row_names => 'id'),
-		"id,a,c,caf\xe9,\xd0\xb6\nx,1,,,\ny,6,5,,\nz,,,7,8\n",
-		'HoH: likewise');
+		"id,a,c,caf\xc3\xa9,\xd0\xb6\nx,1,,,\ny,6,5,,\nz,,,7,8\n",
+		'HoH: likewise, café written as UTF-8 though only ever a Latin-1 key');
 	# SVf_OOK, the flag of a hash with its iterator allocated: B exports it from
 	# 5.12 on, and it is 0x02000000 in sv.h from 5.10.1 to 5.44.0
 	my $OOK = defined &B::SVf_OOK ? B::SVf_OOK() : 0x02000000;

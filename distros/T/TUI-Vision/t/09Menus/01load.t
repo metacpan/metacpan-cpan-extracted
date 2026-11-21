@@ -12,6 +12,7 @@ BEGIN {
   use_ok 'TUI::Menus::MenuView';
   use_ok 'TUI::Menus::MenuBar';
   use_ok 'TUI::Menus::MenuBox';
+  use_ok 'TUI::Menus::MenuPopup';
   use_ok 'TUI::Menus::StatusItem';
   use_ok 'TUI::Menus::StatusDef';
   use_ok 'TUI::Menus::StatusLine';
@@ -23,6 +24,7 @@ isa_ok( new_TSubMenu( 'Two', 0x2345 ), TSubMenu );
 isa_ok( new_TMenuView( TRect->new() ), TMenuView );
 isa_ok( new_TMenuBar( TRect->new(), TMenu->new() ), TMenuBar );
 isa_ok( new_TMenuBox( TRect->new(), undef, undef ), TMenuBox );
+isa_ok( new_TMenuPopup( TRect->new(), undef ), TMenuPopup );
 isa_ok( new_TStatusItem( 'One', 0x1234, 1 ), TStatusItem );
 isa_ok( new_TStatusDef( 1, 2 ), TStatusDef );
 isa_ok( new_TStatusLine( TRect->new(), undef ), TStatusLine );

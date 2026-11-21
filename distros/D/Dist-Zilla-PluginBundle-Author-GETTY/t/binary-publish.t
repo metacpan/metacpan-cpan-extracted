@@ -245,4 +245,75 @@ sub check_latest {
   unlike(slurp($file), qr/tar\.gz|stray/, 'sums_cover_expected_only: no tarball or stray file line');
 }
 
+# --- provenance.json is never an asset of the checksums (k33) ------------------
+# The manifest rides along as a release asset beside SHA256SUMS but is not listed
+# in it, so a consumer that pins the sums is unaffected; and a release that holds
+# it already is refused by `check` (see the k36 block below).
+
+{ # sums_ignore_provenance
+  my $dl = dl_dir();
+  spew("$dl/provenance.json", "{}\n");
+  spew("$dl/Foo-Bar-1.0.provenance", "{}\n");
+  my ($rc, $out, $err) = run_script('sums', $dl);
+  is($rc, 0, 'sums_ignore_provenance: exit 0') or diag "$out$err";
+  my @lines = split /\n/, slurp("$dl/SHA256SUMS");
+  is_deeply([map { /\A\S+  (\S+)\z/ ? $1 : () } @lines], \@EXPECTED, 'sums_ignore_provenance: exactly the expected binaries');
+  unlike(slurp("$dl/SHA256SUMS"), qr/provenance/, 'sums_ignore_provenance: no provenance line in SHA256SUMS');
+}
+
+{ # check_refuses_existing_provenance: the publish step uploads provenance.json, so a clash must stop `check`
+  my $d = tempdir(CLEANUP => 1);
+  my $dl = dl_dir();
+  spew("$dl/provenance.json", "{}\n");
+  my ($rc, $out, $err) = run_script('check', write_meta($d), '1.0', $dl,
+    release_json(0, 'Foo-Bar-1.0.tar.gz', 'provenance.json'), latest_json(undef));
+  is($rc, 1, 'check_refuses_existing_provenance: exit 1') or diag "$out$err";
+  is($err, "release already has asset: provenance.json\n", 'check_refuses_existing_provenance: STDERR names provenance.json');
+  is($out, '', 'check_refuses_existing_provenance: nothing on STDOUT');
+}
+
+# --- check covers every asset the publish step uploads (k36) -------------------
+# One `gh release upload` carries the binaries plus SHA256SUMS, install.sh,
+# install.ps1 and provenance.json; a name already on the release fails that upload
+# after `check` said go, so `check` refuses on any of them. No --clobber.
+
+for my $name (qw( SHA256SUMS install.sh install.ps1 provenance.json )) {
+  my $d = tempdir(CLEANUP => 1);
+  my ($rc, $out, $err) = run_script('check', write_meta($d), '1.0', dl_dir(),
+    release_json(0, 'Foo-Bar-1.0.tar.gz', $name), latest_json(undef));
+  is($rc, 1, "check_refuses_$name: exit 1") or diag "$out$err";
+  is($err, "release already has asset: $name\n", "check_refuses_$name: STDERR names exactly that asset");
+  is($out, '', "check_refuses_$name: nothing on STDOUT");
+}
+
+{ # all four non-binary assets at once: one line each
+  my @four = qw( SHA256SUMS install.sh install.ps1 provenance.json );
+  my $d = tempdir(CLEANUP => 1);
+  my ($rc, $out, $err) = run_script('check', write_meta($d), '1.0', dl_dir(),
+    release_json(0, 'Foo-Bar-1.0.tar.gz', @four), latest_json(undef));
+  is($rc, 1, 'check_refuses_all_four: exit 1') or diag "$out$err";
+  is_deeply([sort split /\n/, $err], [sort map { "release already has asset: $_" } @four],
+    'check_refuses_all_four: one "release already has asset" line per clash, all four named');
+  is($out, '', 'check_refuses_all_four: nothing on STDOUT');
+}
+
+{ # binary and non-binary clashes are all reported together
+  my $d = tempdir(CLEANUP => 1);
+  my ($rc, $out, $err) = run_script('check', write_meta($d), '1.0', dl_dir(),
+    release_json(0, 'Foo-Bar-1.0.tar.gz', 'foo-1.0-linux-x86_64', 'install.sh'), latest_json(undef));
+  is($rc, 1, 'check_refuses_mixed: exit 1') or diag "$out$err";
+  is_deeply([sort split /\n/, $err],
+    ['release already has asset: foo-1.0-linux-x86_64', 'release already has asset: install.sh'],
+    'check_refuses_mixed: both the binary and install.sh are named');
+}
+
+{ # the dist tarball (Author::GETTY::GitHubRelease) and unrelated assets are not clashes
+  my $d = tempdir(CLEANUP => 1);
+  my ($rc, $out, $err) = run_script('check', write_meta($d), '1.0', dl_dir(),
+    release_json(0, 'Foo-Bar-1.0.tar.gz', 'notes.txt', 'Foo-Bar-1.0.provenance', 'install.sh.sig'), latest_json(undef));
+  is($rc, 0, 'check_passes_unrelated_assets: exit 0') or diag "$out$err";
+  like($out, qr/^latest=true$/m, 'check_passes_unrelated_assets: prints latest=true');
+  is($err, '', 'check_passes_unrelated_assets: nothing on STDERR');
+}
+
 done_testing;

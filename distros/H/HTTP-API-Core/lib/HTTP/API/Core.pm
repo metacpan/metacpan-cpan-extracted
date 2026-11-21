@@ -12,7 +12,7 @@ use HTTP::API::Core::Response;
 use HTTP::API::Core::Error;
 use HTTP::API::Core::Pagination;
 
-our $VERSION = '1.10';
+our $VERSION = '1.13';
 
 sub new {
     my $class = shift;
@@ -37,7 +37,7 @@ sub new {
     die "timeout must be a positive number\n"
         if !defined($timeout)
         || $timeout_ref ne ''
-        || $timeout !~ /\A(?:\d+(?:\.\d*)?|\.\d+)\z/
+        || $timeout !~ /\A(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)\z/
         || $timeout <= 0;
 
     my $transport = delete $args{transport};
@@ -114,7 +114,9 @@ sub request {
     die "headers must be a hash reference\n" if ref($request_headers) ne 'HASH';
     _validate_header_values($request_headers);
     my %headers = %{ $self->{headers} };
-    for my $name (keys %$request_headers) {
+    # A header hash may contain multiple spellings of the same name.
+    # Matching values are safe; deterministic spelling avoids hash-order drift.
+    for my $name (sort keys %$request_headers) {
         my $wanted = lc $name;
         delete @headers{ grep { lc($_) eq $wanted } keys %headers };
         $headers{$name} = $request_headers->{$name};
@@ -203,6 +205,9 @@ sub request {
         my $context_method_ref = ref($context->{method});
         die "method must be a non-empty scalar\n"
             if !defined($context->{method}) || $context_method_ref ne '' || $context->{method} eq '';
+        # Hooks may supply a different method spelling. Normalize the actual
+        # dispatched method before transport, metadata, and retry decisions.
+        $context->{method} = uc($context->{method});
         _validate_request_url($context->{url});
         die "headers must be a hash reference\n"
             if ref($context->{headers}) ne 'HASH';
@@ -308,12 +313,10 @@ sub _request_once {
         || !exists($raw->{status})
         || !defined($raw->{status})
         || ref($raw->{status}) ne ''
-        || $raw->{status} !~ /\A\d{3}\z/
+        || $raw->{status} !~ /\A[0-9]{3}\z/
         || $raw->{status} < 100
         || $raw->{status} > 599
-        || (defined($raw->{headers}) && ref($raw->{headers}) ne 'HASH')
-        || (defined($raw->{headers})
-            && grep { defined($_) && ref($_) ne '' } values %{ $raw->{headers} })
+        || !_valid_response_headers($raw->{headers})
         || (defined($raw->{reason}) && ref($raw->{reason}) ne '')
         || (defined($raw->{content}) && ref($raw->{content}) ne '')) {
         my $elapsed = time - $started_at;
@@ -324,6 +327,28 @@ sub _request_once {
             retryable => 1,
             elapsed   => $elapsed,
             message   => 'HTTP transport returned an invalid response',
+        ), $elapsed);
+    }
+
+    # HTTP::Tiny reports socket, TLS, DNS, and timeout failures as a
+    # pseudo-response instead of throwing. Do not treat that sentinel as
+    # an actual HTTP 599 response from the server. Custom transports
+    # keep their own documented response/status contract.
+    if (!defined($self->{transport})
+        && $raw->{status} == 599
+        && defined($raw->{reason})
+        && $raw->{reason} eq 'Internal Exception') {
+        my $elapsed = time - $started_at;
+        my $cause = defined($raw->{content}) && length($raw->{content})
+            ? $raw->{content}
+            : $raw->{reason};
+        return (undef, HTTP::API::Core::Error->new(
+            category  => 'transport',
+            method    => $method,
+            url       => $url,
+            retryable => 1,
+            elapsed   => $elapsed,
+            message   => "HTTP::Tiny transport failed: $cause",
         ), $elapsed);
     }
 
@@ -436,7 +461,8 @@ sub _normalize_retry {
     my $attempts = exists $copy{attempts} ? delete($copy{attempts}) : 3;
     my $attempts_ref = ref($attempts);
     die "retry attempts must be a positive integer\n"
-        if $attempts_ref ne '' || $attempts !~ /\A\d+\z/ || $attempts < 1;
+        if !defined($attempts) || $attempts_ref ne ''
+        || $attempts !~ /\A[0-9]+\z/ || $attempts < 1;
 
     my $base_delay = exists $copy{base_delay}
         ? delete($copy{base_delay})
@@ -506,7 +532,7 @@ sub _retry_after_delay {
     return undef if !defined $value;
 
     return 0 + $value
-        if $value =~ /\A(?:\d+(?:\.\d*)?|\.\d+)\z/;
+        if $value =~ /\A(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)\z/;
 
     my %month = (
         Jan => 0, Feb => 1, Mar => 2, Apr => 3,
@@ -515,7 +541,7 @@ sub _retry_after_delay {
     );
 
     return undef
-        if $value !~ /\A(Mon|Tue|Wed|Thu|Fri|Sat|Sun), (\d{2}) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) (\d{4}) (\d{2}):(\d{2}):(\d{2}) GMT\z/;
+        if $value !~ /\A(Mon|Tue|Wed|Thu|Fri|Sat|Sun), ([0-9]{2}) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) ([0-9]{4}) ([0-9]{2}):([0-9]{2}):([0-9]{2}) GMT\z/;
 
     my ($weekday, $day, $mon, $year, $hour, $min, $sec) =
         ($1, $2, $3, $4, $5, $6, $7);
@@ -527,13 +553,18 @@ sub _retry_after_delay {
     };
     return undef if $@ || !defined $epoch;
 
+    # Time::Local interprets some small year numbers relative to 1900 or
+    # 2000. An HTTP-date year is literal and must survive the conversion.
+    my @utc = gmtime($epoch);
+    return undef if $utc[5] + 1900 != $year;
+
     # IMF-fixdate includes a weekday, which must agree with the date.
     # Inconsistent values are malformed, so use the normal retry fallback.
     my %weekday_number = (
         Sun => 0, Mon => 1, Tue => 2, Wed => 3,
         Thu => 4, Fri => 5, Sat => 6,
     );
-    return undef if (gmtime($epoch))[6] != $weekday_number{$weekday};
+    return undef if $utc[6] != $weekday_number{$weekday};
 
     my $delay = $epoch - $now;
     return $delay > 0 ? $delay : 0;
@@ -591,7 +622,22 @@ sub _validate_request_url {
     die "url must be a non-empty scalar\n"
         if !defined($url) || $url_ref ne '' || $url eq '';
     die "url must be an absolute HTTP(S) URL\n"
-        if $url !~ m{\Ahttps?://(?:[^/?#\s@]+@)?(?:\[[0-9A-Fa-f:.]+\]|[^/?#\s:@]+)(?::\d+)?(?:[/?#]|\z)}i;
+        if $url !~ m{\Ahttps?://(?:[^/?#\s@]+@)?(?:\[[0-9A-Fa-f:.]+\]|[^/?#\s:@]+)(?::[0-9]+)?(?:[/?#]|\z)}i;
+}
+
+# HTTP::Tiny may return array references for repeated response headers.
+# Request headers retain their stricter scalar-only contract.
+sub _valid_response_headers {
+    my ($headers) = @_;
+    return 1 if !defined $headers;
+    return 0 if ref($headers) ne 'HASH';
+
+    for my $value (values %$headers) {
+        next if !defined($value) || ref($value) eq '';
+        return 0 if ref($value) ne 'ARRAY';
+        return 0 if grep { defined($_) && ref($_) ne '' } @$value;
+    }
+    return 1;
 }
 
 sub _validate_header_values {
@@ -600,6 +646,25 @@ sub _validate_header_values {
         if grep { ref($_) ne '' } keys %$headers;
     die "header values must be scalars or undef\n"
         if grep { defined($_) && ref($_) ne '' } values %$headers;
+
+    # Reject ambiguous case-insensitive names before sending a request.
+    # Equal values (or two undefined values) are not conflicting.
+    my %seen;
+    for my $name (sort keys %$headers) {
+        my $key = lc $name;
+        my $value = $headers->{$name};
+        if (exists $seen{$key}) {
+            my $previous = $seen{$key};
+            die "conflicting case-insensitive header values: $key\n"
+                if (defined($previous) && !defined($value))
+                || (!defined($previous) && defined($value))
+                || (defined($previous) && defined($value)
+                    && $previous ne $value);
+        }
+        else {
+            $seen{$key} = $value;
+        }
+    }
 }
 
 sub _set_header_if_absent {
@@ -613,7 +678,7 @@ sub _non_negative_number {
     my ($value) = @_;
     return defined($value)
         && ref($value) eq ''
-        && $value =~ /\A(?:\d+(?:\.\d*)?|\.\d+)\z/
+        && $value =~ /\A(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)\z/
         && $value >= 0;
 }
 
@@ -710,7 +775,7 @@ Convenience methods around C<request>.
 =head2 paginate
 
 Returns an L<HTTP::API::Core::Pagination> iterator. Supported modes are
-C<next_url>, C<page>, and C<cursor>.
+C<next_url>, C<page>, C<cursor>, and C<offset>.
 
 =head2 request
 

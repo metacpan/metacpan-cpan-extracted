@@ -19,37 +19,37 @@ name: Dist-Zilla-PluginBundle-Author-GETTY
 provides:
   Dist::Zilla::Plugin::Author::GETTY::Binary:
     file: lib/Dist/Zilla/Plugin/Author/GETTY/Binary.pm
-    version: '0.328'
+    version: '0.329'
   Dist::Zilla::Plugin::Author::GETTY::GitHubRelease:
     file: lib/Dist/Zilla/Plugin/Author/GETTY/GitHubRelease.pm
-    version: '0.328'
+    version: '0.329'
   Dist::Zilla::Plugin::Author::GETTY::GiteaMeta:
     file: lib/Dist/Zilla/Plugin/Author/GETTY/GiteaMeta.pm
-    version: '0.328'
+    version: '0.329'
   Dist::Zilla::Plugin::Author::GETTY::InstallCheck:
     file: lib/Dist/Zilla/Plugin/Author/GETTY/InstallCheck.pm
-    version: '0.328'
+    version: '0.329'
   Dist::Zilla::PluginBundle::Author::GETTY:
     file: lib/Dist/Zilla/PluginBundle/Author/GETTY.pm
-    version: '0.328'
+    version: '0.329'
   Dist::Zilla::PluginBundle::Author::GETTY::Binary:
     file: lib/Dist/Zilla/PluginBundle/Author/GETTY/Binary.pm
-    version: '0.328'
+    version: '0.329'
   Dist::Zilla::PluginBundle::Author::GETTY::Docker:
     file: lib/Dist/Zilla/PluginBundle/Author/GETTY/Docker.pm
-    version: '0.328'
+    version: '0.329'
   Pod::Elemental::Transformer::Author::GETTY:
     file: lib/Pod/Elemental/Transformer/Author/GETTY.pm
-    version: '0.328'
+    version: '0.329'
   Pod::Weaver::PluginBundle::Author::GETTY:
     file: lib/Pod/Weaver/PluginBundle/Author/GETTY.pm
-    version: '0.328'
+    version: '0.329'
   Pod::Weaver::Section::Author::GETTY::Legal:
     file: lib/Pod/Weaver/Section/Author/GETTY/Legal.pm
-    version: '0.328'
+    version: '0.329'
   Pod::Weaver::Section::Author::GETTY::Support:
     file: lib/Pod/Weaver/Section/Author/GETTY/Support.pm
-    version: '0.328'
+    version: '0.329'
 recommends:
   PAR::Packer: '1.031'
 requires:
@@ -92,7 +92,7 @@ resources:
   bugtracker: https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty/issues
   homepage: https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty
   repository: https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty.git
-version: '0.328'
+version: '0.329'
 x_Dist_Zilla:
   perl:
     version: '5.040001'
@@ -174,7 +174,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Author::GETTY::InstallCheck
       name: '@Author::GETTY/Author::GETTY::InstallCheck'
-      version: '0.328'
+      version: '0.329'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Author::GETTY/ConfirmRelease'
@@ -387,7 +387,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.328'
+          tag: '0.329'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -428,6 +428,7 @@ x_Dist_Zilla:
           allow_dirty_match:
             - (?^:^bin/)
             - (?^:^lib/.*\.pm$)
+            - (?^:^script/)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
           git_version: 2.47.3
@@ -451,7 +452,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Author::GETTY::GitHubRelease
       name: '@Author::GETTY/Author::GETTY::GitHubRelease'
-      version: '0.328'
+      version: '0.329'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'

@@ -1,5 +1,10 @@
 Revision history for Bitcoin-Secp256k1
 
+0.012 - 2026-11-20
+	- Fixed verify_digest_recoverable and verify_message_recoverable failing for uncompressed public keys
+	- verify_digest_recoverable and verify_message_recoverable now croak if passed a bad public key
+	- Hardened the module against various rare edge cases that could cause crashes or memory leaks
+
 0.011 - 2025-11-30
 	- Added argument checking, all functions now croak their usage on missing or undef arguments
 	- Fixed a bug where passing undef to some functions caused them to use previous data

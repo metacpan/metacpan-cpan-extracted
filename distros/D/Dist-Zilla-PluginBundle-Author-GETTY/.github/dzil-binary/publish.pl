@@ -14,6 +14,8 @@ use File::Basename ();
 use File::Spec ();
 
 my @PLATFORMS = qw( linux-x86_64 linux-arm64 macos-arm64 macos-x86_64 windows-x86_64 );
+# what the workflow's publish step uploads beside the binaries; keep in step with its `gh release upload`
+my @BESIDE = qw( SHA256SUMS install.sh install.ps1 provenance.json );
 
 sub read_meta {
   my ($file) = @_;
@@ -120,7 +122,9 @@ sub check {
   my %have = map { $_->{name} => 1 } grep { ref $_ eq 'HASH' && defined $_->{name} } @{ $rel->{assets} || [] };
   my @bad;
   push @bad, map { "missing binary: $_" } grep { !-f File::Spec->catfile($dl, $_) } @want;
-  push @bad, map { "release already has asset: $_" } grep { $have{$_} } @want;
+  # every name the upload sends: a clash would fail it after check said go, and
+  # overwriting (--clobber) SHA256SUMS would swap the pins' trust root
+  push @bad, map { "release already has asset: $_" } grep { $have{$_} } @want, @BESIDE;
   if (@bad) { print STDERR "$_\n" for @bad; return 1 }
   print 'latest=', (latest_rule($rel, $latest_file) ? 'true' : 'false'), "\n";
   return 0;

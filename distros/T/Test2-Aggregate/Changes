@@ -1,69 +1,79 @@
 Revision history for Test2-Aggregate
 
+1.00    2026-11-21
+        - Helper scripts 'agg' and 'aggit' to help aggregating tests.
+        - Write stats per test file (repeat==1) to avoid losing them on SIG exit.
+        - Test names without $root for stats, 'absolute' option for old behaviour.
+        - Add './' to start of paths when required, 'no_dot' option for old behaviour.
+        - Aggregator recursion protection ('recursion' option to allow it).
+        - Added 'pass_only', 'bail_on_fail', 'relative_root' options.
+        - Option 'reverse' applied after 'sort'.
+        - Fix helper runner fallback, absolute paths and custom roots.
+        - Preserve aggit discovery order and stop on harness infrastructure errors.
+        - Fail explicitly when BailOnFail is required but unavailable.
+        - Generate README.md from module POD when creating a distribution.
+
 0.17    2022-02-10
-        Ignore empty lines in list files.
+        - Ignore empty lines in list files.
 
 0.16    2021-08-26
-        Replaced File::Slurp with Path::Tiny (adding 'slurp_param' option).
+        - Replaced File::Slurp with Path::Tiny (adding 'slurp_param' option).
 
 0.15    2020-08-10
-        Fix for test_warnings output showing only first line of STDERR.
+        - Fix for test_warnings output showing only first line of STDERR.
 
 0.14    2020-07-21
-        Fix for a CPAN tester.
-        POD update.
+        - Fix for a CPAN tester.
+        - POD update.
 
 0.13    2020-06-27
-        Fail on tests that are passing with errors - this is now default,
-        'allow_errors' option added to force old behavior if needed.
-        POD update.
+        - Fail on tests that are passing with errors - this is now default,
+          'allow_errors' option added to force old behavior if needed.
+        - POD update.
 
 0.12    2020-02-21
-        'dry_run' option.
-        'pre_eval' option.
-        'include' regex option, 'excludes' changed to 'exclude' for symmetry.
-        Comments in list files, POD update, test coverage.
+        - 'dry_run' option.
+        - 'pre_eval' option.
+        - 'include' regex option, 'excludes' changed to 'exclude' for symmetry.
+        - Comments in list files, POD update, test coverage.
 
 0.11    2019-12-04
-        Remove duplicate tests by default, add 'unique' option.
-        'excludes' option.
+        - Remove duplicate tests by default, add 'unique' option.
+        - 'excludes' option.
 
 0.10    2019-11-23
-        'sort' option for fixed order.
-        'package' option fixes & tests.
+        - 'sort' option for fixed order.
+        - 'package' option fixes & tests.
 
 0.09    2019-11-22
-        Warnings added to stats of test run.
-        'package' option.
+        - Warnings added to stats of test run.
+        - 'package' option.
 
 0.08    2019-07-05
-        Return stats of test run to caller.
+        - Return stats of test run to caller.
 
 0.07    2019-07-04
-        Fix stats bug from 0.06.
+        - Fix stats bug from 0.06.
 
 0.06    2019-07-04
-        'extend_stats' option.
-        Fix repeat<0.
-        Perl critic test & fix.
+        - 'extend_stats' option.
+        - Fix repeat<0.
+        - Perl critic test & fix.
 
 0.05    2019-06-21
-        Avoid Test::More redefine warnings.
-        Defaults shown in POD method description.
+        - Avoid Test::More redefine warnings.
+        - Defaults shown in POD method description.
 
 0.04    2019-06-14
-        Don't warn on non-existent paths, warn on invalid root.
-        STDOUT option for 'stats_output'.
-        Fix tests for @INC not containing '.'.
-        Don't warn on non-existent paths, warn on invalid root.
-        STDOUT option for 'stats_output'.
-        Fix tests for @INC not containing '.'.
+        - Don't warn on non-existent paths, warn on invalid root.
+        - STDOUT option for 'stats_output'.
+        - Fix tests for @INC not containing '.'.
 
 0.03    2019-06-10
-        File::Find fix for Perl <= 5.22.
+        - File::Find fix for Perl <= 5.22.
 
 0.02    2019-06-10
-        Fix 'root' option, add 'load_modules', no implicit done_testing().
+        - Fix 'root' option, add 'load_modules', no implicit done_testing().
 
 0.01    2019-06-06
-        First version, released on an unsuspecting world.
+        - First version, released on an unsuspecting world.

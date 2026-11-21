@@ -1,0 +1,30 @@
+{
+  "hooks": {
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/bin/briefing hook subagent-start",
+            "additionalContextLimit": 0
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/bin/briefing hook marketplace-notice"
+          },
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/bin/briefing hook session-start",
+            "timeout": 90
+          }
+        ]
+      }
+    ]
+  }
+}

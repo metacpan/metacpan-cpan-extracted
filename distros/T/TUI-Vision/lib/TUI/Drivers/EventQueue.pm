@@ -5,6 +5,10 @@ use 5.010;
 use strict;
 use warnings;
 
+our $VERSION = '2.000003';
+$VERSION =~ tr/_//d;
+our $AUTHORITY = 'cpan:BRICKPOOL';
+
 use Exporter 'import';
 our @EXPORT = qw(
   TEventQueue

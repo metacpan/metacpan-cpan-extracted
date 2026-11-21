@@ -2,7 +2,7 @@
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
-# ABSTRACT: Work with Tag databases, plugin base package
+# ABSTRACT: Work with Tag databases, includeable base package
 
 package Data::TagDB::Interface::Includeable;
 
@@ -10,7 +10,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = v0.15;
+our $VERSION = v0.16;
 
 
 
@@ -29,11 +29,11 @@ __END__
 
 =head1 NAME
 
-Data::TagDB::Interface::Includeable - Work with Tag databases, plugin base package
+Data::TagDB::Interface::Includeable - Work with Tag databases, includeable base package
 
 =head1 VERSION
 
-version v0.15
+version v0.16
 
 =head1 SYNOPSIS
 

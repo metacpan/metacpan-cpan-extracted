@@ -19,7 +19,7 @@ use File::FStore::File;
 
 use parent 'File::FStore::Base';
 
-our $VERSION = v0.07;
+our $VERSION = v0.08;
 
 
 sub link_in {
@@ -251,7 +251,7 @@ File::FStore::Adder - Module for interacting with file stores
 
 =head1 VERSION
 
-version v0.07
+version v0.08
 
 =head1 SYNOPSIS
 

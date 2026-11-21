@@ -1,5 +1,65 @@
 Revision history for Mail::Send::DKIM - Sign mail with DKIM, and summarise DMARC reports
 
+0.004.0	Fri Nov 20 11:52:28 AM EST 2026
+	[ Enhancements ]
+	- Added bin/dmarc-summary
+	- Added the signing_domain option to new (and DKIM_SIGNING_DOMAIN), to put
+	  a domain other than the From: domain in the signature
+
+0.003.0	Fri Nov 20 10:31:38 AM EST 2026
+	- Refactor of Mail::Send::DKIM.  Every message it says now comes from one
+	  catalogue through the new public method i18n, with named sprintf
+	  placeholders, plural forms chosen by count and variants (gender); the
+	  new "messages" option to new replaces or adds to it.  Warnings go
+	  through Carp.
+	- send: a sendmail that refuses a message without reading it no longer
+	  kills the caller with SIGPIPE; its exit status is returned, as
+	  documented.  A sendmail that cannot be run gives one warning, not two.
+	- log_send: sendmail's options are parsed as getopt would, so a value
+	  containing t (-FNigelTest) or -bt no longer turns on -t, and an empty
+	  -f is logged as a null sender instead of the From: address.
+	- from_domain: addresses are read with Mail::Address, so a comment or a
+	  quoted display name holding an @ no longer supplies the domain, and the
+	  first address of From: is the one used.  It can be called as a method.
+	- sign returns undef, not an empty list, when there is nothing to sign.
+	- Helpers are private (Sub::Private, enforce mode) and the warning writer
+	  is protected (Sub::Protected); constants are Readonly; header parsing
+	  is done once and shared; new, sign and from_domain validate their
+	  arguments with Params::Validate::Strict.
+	- POD: EXAMPLE, API SPECIFICATION, MESSAGES and PSEUDOCODE sections for
+	  the public routines; more SYNOPSIS patterns; COMMON PITFALLS, ENCODING,
+	  LIMITATIONS, FORMAL SPECIFICATION (all the Z notation, in one place)
+	  and STATE DIAGRAM sections.
+	- Fixes found by the new function tests: $@ and $? are no longer
+	  clobbered by sign and send; syslog is closed even when writing to it
+	  fails; a directory or a bare ".private" is no longer taken for a key;
+	  a sendmail named "" is a clean failure; an empty or undefined message
+	  key, a non-numeric count, an undefined argument value, a stray percent
+	  sign in a message, and an empty catalogue entry no longer make Perl
+	  warn; the message "bad_arguments" reports arguments that are not a hash
+	  reference; "undisclosed-recipients:;" is no recipient; a From: header
+	  holding a control character is not trusted for a domain.
+	- dmarc-weekly.sh: the signer that ships is now run with the perl the
+	  wrapper chose (PERL), not the first perl on PATH its #! line finds,
+	  so the alert is signed on a machine whose system perl lacks Mail::DKIM.
+	  Reported by CPAN Testers (perl 5.42.2, t/dmarc-weekly.t).  The test of
+	  --crontab no longer assumes the perl running the tests is findable.
+	- Tests: t/function.t (every function, with mocks), t/i18n.t, t/headers.t and t/locales.t (OS error strings under
+	  en_US, de_DE, ja_JP and zh_CN locales).  readme.t sets PERL_UNICODE=S
+	  because the POD now contains Z notation.
+	- The minimum perl is now 5.026: Params::Validate::Strict, which the
+	  module needs, will not install on an older one.
+	- New prerequisites: Mail::Address, Params::Validate::Strict (0.43),
+	  Sub::Private (0.09), Sub::Protected (0.03), IPC::System::Simple, and the
+	  core modules the module and its programs already used, now declared:
+	  autodie, Errno, File::Spec, FindBin, Getopt::Long, Pod::Usage, POSIX,
+	  Scalar::Util, Sys::Hostname.  The tests need Test::Mockingbird (0.14),
+	  Test::Returns (0.05), Test::Memory::Cycle and Test::Needs (0.002010),
+	  and use Test::Needs, not eval, to skip when Mail::DKIM is missing.
+	- POD: the home option of new is documented; so are the key being a
+	  regular file, the way log_send reads sendmail's options, the values
+	  i18n accepts, and the effect of HARNESS_ACTIVE on private methods.
+
 0.002.0 Thu Nov 19 08:12:25 PM EST 2026
 	- mail-dkim: log the sender, recipients and subject of each message
 	  sendmail accepts to syslog (identity mail-dkim, facility mail), through

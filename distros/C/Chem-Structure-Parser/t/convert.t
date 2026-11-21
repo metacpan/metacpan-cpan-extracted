@@ -555,7 +555,13 @@ for my $f (qw(mini.pdb mini.cif nmr.pdb nmr.cif iface.pdb)) {
 	my $io = IO::File->new($file, '>') or die "Can't open '$file' with mode '>': '$!'";
 	convert("$data/mini.cif", $io, to => 'pdb');
 	$io->close or die "Can't close '$file': '$!'";
-	is(-s $file, length $got, 'and so is an IO::File');
+	# Read back through the same layers it was written with, not measured with
+	# -s: both handles are text mode, so on Windows each newline is two bytes
+	# on disk and one in $got.  0.040 compared the sizes and failed there.
+	open $in, '<', $file or die "Can't open '$file' with mode '<': '$!'";
+	my $again = do { local $/; <$in> };
+	close $in or die "Can't close '$file': '$!'";
+	is($again, $got, 'and so is an IO::File');
 }
 {
 	my ($text, $r) = text_of("$data/mini.cif", to => 'pdb');

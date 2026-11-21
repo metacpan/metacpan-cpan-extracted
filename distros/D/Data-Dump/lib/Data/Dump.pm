@@ -1,23 +1,29 @@
 package Data::Dump;
 
 use strict;
-use vars qw(@EXPORT @EXPORT_OK $VERSION $DEBUG);
-use subs qq(dump);
+use subs qw(dump);
 
 require Exporter;
 *import = \&Exporter::import;
-@EXPORT = qw(dd ddx);
-@EXPORT_OK = qw(dump pp dumpf quote);
+our @EXPORT = qw(dd ddx);
+our @EXPORT_OK = qw(dump pp dumpf quote);
 
-$VERSION = "1.25";
-$DEBUG = 0;
+our $VERSION = "1.26";
+our $DEBUG = 0;
 
 use overload ();
-use vars qw(%seen %refcnt @dump @fixup %require $TRY_BASE64 @FILTERS $INDENT $LINEWIDTH);
+our (%seen, %refcnt, @dump, @fixup, %require, $TRY_BASE64, @FILTERS, $INDENT, $LINEWIDTH);
 
 $TRY_BASE64 = 50 unless defined $TRY_BASE64;
 $INDENT = "  " unless defined $INDENT;
 $LINEWIDTH = 60 unless defined $LINEWIDTH;
+
+use constant HAVE_BOOLEANS => $^V ge v5.36.0;
+sub _is_bool
+{
+    no if HAVE_BOOLEANS, warnings => "experimental::builtin";
+    return HAVE_BOOLEANS ? builtin::is_bool($_[0]) : 0;
+}
 
 sub dump
 {
@@ -196,10 +202,9 @@ sub _dump
 		my $v = "$rval";
 
 		my $mod = "";
-		if ($v =~ /^\(\?\^?([msix-]*):([\x00-\xFF]*)\)\z/) {
+		if ($v =~ /^\(\?\^?([a-z]*):([\x00-\xFF]*)\)\z/) {
 		    $mod = $1;
 		    $v = $2;
-		    $mod =~ s/-.*//;
 		}
 
 		my $sep = '/';
@@ -218,6 +223,9 @@ sub _dump
 		}
 		$v =~ s/\Q$sep\E/\\$sep/g;
 
+		# quote sigils so eval'ing the dump doesn't interpolate them.
+		$v =~ s/(\\.)|(\@(?:[\{\[]+|(?=[\$\'\@:0-9A-Za-z_]|[^\x00-\x7F]))|\$(?![()| \t\r\n]|\z)[\{\[]*)/$1?$1:'${\\q(' . $2 . ')}'/ge;
+
 		$out = "qr$sep$v$sep$mod";
 		undef($class);
 	    }
@@ -229,6 +237,9 @@ sub _dump
 	} else {
 	    if (!defined $$rval) {
 		$out = "undef";
+	    }
+	    elsif (_is_bool $$rval) {
+	        $out = $$rval ? '!!1' : '!!0';
 	    }
 	    elsif ($$rval =~ /^-?(?:nan|inf)/i) {
 		$out = str($$rval);

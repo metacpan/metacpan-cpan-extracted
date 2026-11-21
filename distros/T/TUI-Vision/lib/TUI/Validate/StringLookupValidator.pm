@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -15,6 +15,7 @@ our @EXPORT = qw(
   new_TStringLookupValidator
 );
 
+use Storable;
 use TUI::toolkit;
 use TUI::toolkit::Types qw(
   Maybe
@@ -45,7 +46,7 @@ sub BUILDARGS {    # \%args (%args)
   state $sig = signature(
     method => 1,
     named  => [
-      strings => Object, { alias => 'aStrings' },
+      strings => Maybe[Object], { alias => 'aStrings' },
     ],
     caller_level => +1,
   );
@@ -53,10 +54,10 @@ sub BUILDARGS {    # \%args (%args)
   return { %$args };
 }
 
-sub from {    # $obj ($aStrings)
+sub from {    # $obj ($aStrings|undef)
   state $sig = signature(
     method => 1,
-    pos    => [Object],
+    pos    => [Maybe[Object]],
   );
   my ( $class, $aStrings ) = $sig->( @_ );
   return $class->new( strings => $aStrings );
@@ -109,6 +110,36 @@ sub newStringList {    # void ($aStrings|undef)
     if ( $self->{strings} );
   $self->{strings} = $aStrings;
   return;
+}
+
+sub write :method {    # void ($os)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $os ) = $sig->( @_ );
+  $self->SUPER::write( $os );
+  $os->put( $self->{strings} );
+  return;
+}
+
+sub read :method {    # $self ($is)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $is ) = $sig->( @_ );
+  $self->SUPER::read( $is );
+  $self->{strings} = $is->get();
+  return $self;
+}
+
+sub build {    # $obj ()
+  my ( $class ) = @_;
+  assert ( @_ == 1 );
+  assert ( is_Str $class );
+  assert ( Storable::is_retrieving );
+  return $class->new( strings => undef );
 }
 
 1

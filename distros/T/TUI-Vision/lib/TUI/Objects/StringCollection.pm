@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -15,8 +15,12 @@ our @EXPORT = qw(
   new_TStringCollection
 );
 
+use Storable;
 use TUI::toolkit;
-use TUI::toolkit::Types qw( :types );
+use TUI::toolkit::Types qw(
+  is_Str
+  :types
+);
 
 use TUI::Objects::Const qw( ccNotFound );
 use TUI::Objects::SortedCollection;
@@ -26,28 +30,7 @@ sub name() { 'TStringCollection' };
 sub new_TStringCollection { __PACKAGE__->from(@_) }
 
 extends TSortedCollection;
-
-sub BUILDARGS {    # \%args (%args)
-  state $sig = signature(
-    method => 1,
-    named => [
-      limit => Int, { alias => 'aLimit' },
-      delta => Int, { alias => 'aDelta' },
-    ],
-    caller_level => +1,
-  );
-  my ( $class, $args ) = $sig->( @_ );
-  return { %$args };
-}
-
-sub from {    # $obj ($aLimit, $aDelta)
-  state $sig = signature(
-    method => 1,
-    pos => [Int, Int],
-  );
-  my ( $class, @args ) = $sig->( @_ );
-  return $class->new( limit => $args[0], delta => $args[1] );
-}
+with: *DOES = TStreamable->can('DOES');
 
 sub compare {    # $cmp ($key1, $key2)
   state $sig = signature(
@@ -56,6 +39,28 @@ sub compare {    # $cmp ($key1, $key2)
   );
   my ( $self, $key1, $key2 ) = $sig->( @_ );
   return $key1 cmp $key2;
+}
+
+sub writeItem {    # void ($item, $os)
+  state $sig = signature(
+    method => Object,
+    pos    => [Item, Object],
+  );
+  my ( $self, $item, $os ) = $sig->( @_ );
+  assert ( Storable::is_storing );
+  $os->put( defined $item ? "$item" : undef );
+  return;
+}
+
+sub readItem {    # $item ($is)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $is ) = $sig->( @_ );
+  assert ( Storable::is_retrieving );
+  my $item = $is->get();
+  return defined $item ? "$item" : undef;
 }
 
 1

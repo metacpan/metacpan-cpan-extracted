@@ -1,3 +1,10 @@
+v0.08   2026-11-20Z
+    - Added experimental use_contentise option to $migration->import_data
+    - Added experimental support for bundle import/export
+    - Improved automatic tests
+    - Updated list of media subtypes
+    - Hardened regex
+
 v0.07   2026-06-30Z
     - Improved documentation
     - Fixed inodeise property

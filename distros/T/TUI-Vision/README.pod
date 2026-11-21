@@ -71,18 +71,17 @@ README - Turbo Vision inspired TUI framework for Perl
 
 =head1 DESCRIPTION
 
-TUI::Vision provides a Perl port of the classic Turbo Vision framework.
-It is designed as a modular and portable text user interface (TUI)
-framework for Perl applications, based on Turbo Vision 2.0.
+L<TUI::Vision> provides a Perl port of the classic I<Turbo Vision> framework.
+It is designed as a modular and portable text user interface (TUI) framework 
+for Perl applications, based on I<Turbo Vision> 2.0.
 
-The framework is a clean and native Perl implementation,
-adapted for contemporary Perl environments while preserving the
-original architectural concepts.
+The framework is a clean and native Perl implementation, adapted for 
+contemporary Perl environments while preserving the original architectural 
+concepts.
 
-The goal of TUI::Vision is to provide a complete and extensible TUI
-framework. All modules included in this release are under active
-development. Additional functionality will be delivered incrementally
-in future versions.
+The goal of L<TUI::Vision> is to provide a complete and extensible TUI
+framework. All modules included in this release are under active development. 
+Additional functionality will be delivered incrementally in future versions.
 
 The following framework modules and namespace entry points are included in the 
 distribution:
@@ -109,9 +108,11 @@ distribution:
 
 =item * Text rendering subsystem (L<TextView|TUI::TextView>)
 
-=item * Editor components (L<Editor|TUI::Editor>)
-
 =item * Color selection components (L<ColorSel|TUI::ColorSel>)
+
+=item * Editor components (L<Editors|TUI::Editors>)
+
+=item * Outline components (L<Outline|TUI::Outline>)
 
 =item * Help system (L<Help|TUI::Help>)
 
@@ -127,7 +128,13 @@ distribution:
 
 =head1 STATUS
 
-This distribution is under active development. 
+This distribution is under active development.
+
+The Perl port implements most of the core 
+L<Turbo Vision subsystems|TUI::Manual::Reference::Porting>. Some legacy
+resource classes are intentionally not ported because they are not required by
+the current storage architecture. Implementation status does not imply complete
+behavioral parity with the original C++ implementation.
 
 =head1 AUTHORS
 

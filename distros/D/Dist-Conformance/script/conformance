@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-package Dist::Conformance::Program 0.006;
+package Dist::Conformance::Program 0.007;
 
 use 5.040;
 use warnings FATAL => 'all';
@@ -13,6 +13,7 @@ use Getopt::Long();
 use List::Util();
 use Mojo::File();
 use Pod::Usage();
+use YAML::XS();
 
 use Dist::Conformance();
 use Dist::Conformance::Check::SystemPackages();
@@ -27,14 +28,15 @@ sub main (@arguments) {
     my $parsed  = Getopt::Long::GetOptionsFromArray( \@arguments, \%options, qw{root=s json dry-run offline cache=s standards=s} );
     return show_synopsis(2) if !$parsed || @arguments;
     return show_synopsis(0) if $command eq 'help';
-    return show_synopsis(2) if $command ne 'check' && $command ne 'update';
+    my %report = ( check => \&report_check, update => \&report_update, adopt => \&report_adopt );
+    return show_synopsis(2) if !$report{$command};
 
     my $conformance = Dist::Conformance->new(
         root    => $options{root},
         offline => $options{offline} // 0,
         ( map { defined $options{$_} ? ( $_ => $options{$_} ) : () } qw{cache standards} ),
     );
-    my ( $output, $status ) = eval { $command eq 'check' ? report_check( $conformance, \%options ) : report_update( $conformance, \%options ) };
+    my ( $output, $status ) = eval { $report{$command}->( $conformance, \%options ) };
     if ( !defined $output ) {
         warn "conformance: $@";
         return 2;
@@ -119,6 +121,13 @@ sub report_update ( $conformance, $options ) {
 }
 
 
+sub report_adopt ( $conformance, $options ) {
+    my $adopted = $conformance->adopt;
+    return ( json_of( $conformance, command => 'adopt', adopted => $adopted ), 0 ) if $options->{json};
+    return ( YAML::XS::Dump( { checks => $adopted } ), 0 );
+}
+
+
 sub heading ($conformance) {
     return 'Flavor ' . $conformance->flavor->name . ' from ' . $conformance->source->describe . "\n";
 }
@@ -148,12 +157,13 @@ conformance - Check a repository against its flavor of the standards, and bring 
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
     conformance check  [--root DIR] [--json] [--offline] [--cache DIR] [--standards DIR]
     conformance update [--root DIR] [--dry-run] [--json] [--offline] [--cache DIR] [--standards DIR]
+    conformance adopt  [--root DIR] [--json] [--offline] [--cache DIR] [--standards DIR]
     conformance packages [--packager NAME] [--distro ID --release VERSION_ID --codename CODENAME] [--os-release FILE] [--programs | --sources | --needs] [DIR]
     conformance help
 
@@ -187,6 +197,10 @@ C<($conformance, \%options)>.  The output of C<check>, and the exit status.
 
 C<($conformance, \%options)>.  The output of C<update>, and the exit status.
 
+=head2 report_adopt
+
+C<($conformance, \%options)>.  The output of C<adopt>, and the exit status.
+
 =head2 heading
 
 C<($conformance)>.  The first line of a report: the flavor and the source.
@@ -217,6 +231,17 @@ files that the checks can write, and installs the git hooks.  Prints one line
 for each change, and each thing that only a person can do.  With C<--dry-run>
 it changes nothing, and prints what it would change.  Exits 0 when it ran,
 whatever it left for a person; run C<check> afterwards to see what still fails.
+
+=item adopt
+
+Prints, as YAML, the configuration under C<checks> of F<.conformance.yml> that
+would make the checks accept the checkout as it is now, such as the
+C<overrides> of L<Dist::Conformance::Check::CriticProfile> for a profile that
+departs from its template.  It writes nothing.  Merge what it prints into
+F<.conformance.yml> before the first C<update> of a repository whose files
+have changes of their own, because the update replaces them.  It prints
+C<checks: {}> when there is nothing to adopt.  With C<--json> it prints the
+same mapping as JSON, under C<adopted>.
 
 =item packages
 

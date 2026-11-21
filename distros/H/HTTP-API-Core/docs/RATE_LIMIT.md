@@ -20,7 +20,7 @@ Header names are case-insensitive. When different spellings of the **same** name
 
 ## Numeric parsing
 
-Only non-negative decimal numeric header values are normalized as numbers. Missing or invalid numeric values become `undef` rather than raising an exception.
+Only non-negative decimal numeric header values using ASCII digits (`0`–`9`) are normalized as numbers. Unicode decimal digits are not valid HTTP numeric metadata: they become `undef` rather than being coerced to zero or raising an exception. This prevents a malformed remaining-quota value from incorrectly making a `403` retryable.
 
 ## Accessors
 

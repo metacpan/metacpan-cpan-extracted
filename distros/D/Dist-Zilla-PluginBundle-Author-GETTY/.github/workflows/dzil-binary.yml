@@ -5,10 +5,17 @@ name: dzil-binary
 # Called from the dist's .github/workflows/binaries.yml:
 #   uses: Getty/p5-dist-zilla-pluginbundle-author-getty/.github/workflows/dzil-binary.yml@binary-v1
 # tag set:   build from the release's CPAN tarball, upload the binaries, SHA256SUMS,
-#            install.sh and install.ps1 to that release.
+#            install.sh, install.ps1 and provenance.json to that release.
 # tag empty: probe run - dzil build of the checked-out commit through this repo's
-#            in-development bundle (bundle_ref); artifacts only, no release touched.
-# Scripts: .github/dzil-binary/ of this repo, checked out at bundle_ref.
+#            in-development bundle (the scripts' commit); artifacts only, no release touched.
+# Scripts: .github/dzil-binary/ of this repo at the commit of this workflow file
+# (job.workflow_sha), or at bundle_ref when that is set. The plan job pins that
+# commit once (output bundle_commit); every other job checks the scripts out at it.
+# Provenance: plan, build and smoke each record a part (facts.sh, build-leg.sh
+# provenance); the provenance job cross-checks and merges them into provenance.json,
+# kept as the artifact <dist>-<version>.provenance (probe and release) and attached
+# to the release beside SHA256SUMS, not listed in it. The caller's permissions stay
+# as they are (contents: write for a release).
 on:
   workflow_call:
     inputs:
@@ -18,10 +25,10 @@ on:
         required: false
         default: ''
       bundle_ref:
-        description: Ref of p5-dist-zilla-pluginbundle-author-getty the scripts come from
+        description: Ref of p5-dist-zilla-pluginbundle-author-getty the scripts come from; empty = the commit of this workflow
         type: string
         required: false
-        default: binary-v1
+        default: ''
 
 permissions:
   contents: read
@@ -41,6 +48,7 @@ jobs:
       prepare_key: ${{ steps.plan.outputs.prepare_key }}
       binaries: ${{ steps.plan.outputs.binaries }}
       version: ${{ steps.plan.outputs.version }}
+      bundle_commit: ${{ steps.pin.outputs.bundle_commit }}
     defaults:
       run:
         shell: bash
@@ -49,6 +57,24 @@ jobs:
       # The probe's dzil build: a docker_image dist would build its image.
       DZIL_DOCKER_API_SKIP: 1
     steps:
+      # The scripts' ref: bundle_ref, else this workflow file's own commit. A fork's
+      # copy has no commit in Getty's repository, so it has to pass bundle_ref.
+      - name: Resolve the bundle commit
+        id: resolve
+        env:
+          BUNDLE_REF: ${{ inputs.bundle_ref }}
+          WORKFLOW_SHA: ${{ job.workflow_sha }}
+          WORKFLOW_REPOSITORY: ${{ job.workflow_repository }}
+        run: |
+          set -euo pipefail
+          if [ -n "$BUNDLE_REF" ]; then
+            { echo "ref=$BUNDLE_REF"; echo source=input; } >>"$GITHUB_OUTPUT"; exit 0
+          fi
+          [ "$WORKFLOW_REPOSITORY" = Getty/p5-dist-zilla-pluginbundle-author-getty ] ||
+            { echo "::error::dzil-binary.yml runs from '$WORKFLOW_REPOSITORY', not Getty/p5-dist-zilla-pluginbundle-author-getty: pass bundle_ref"; exit 1; }
+          printf '%s' "$WORKFLOW_SHA" | grep -Eqx '[0-9a-f]{40}' ||
+            { echo "::error::cannot resolve the commit of dzil-binary.yml (job.workflow_sha='$WORKFLOW_SHA')"; exit 1; }
+          { echo "ref=$WORKFLOW_SHA"; echo source=workflow; } >>"$GITHUB_OUTPUT"
       # The dist first, at the workspace root: a later checkout there would wipe the bundle.
       - name: Check out the dist (probe)
         if: inputs.tag == ''
@@ -56,12 +82,28 @@ jobs:
         with:
           persist-credentials: false
       - name: Check out the bundle scripts
+        id: bundle
         uses: actions/checkout@v7
         with:
           repository: Getty/p5-dist-zilla-pluginbundle-author-getty
-          ref: ${{ inputs.bundle_ref }}
+          ref: ${{ steps.resolve.outputs.ref }}
           path: .dzil-binary
           persist-credentials: false
+      # The commit every other job checks the scripts out at: a moving bundle_ref is read once.
+      - name: Pin the bundle commit
+        id: pin
+        env:
+          COMMIT: ${{ steps.bundle.outputs.commit }}
+          SOURCE: ${{ steps.resolve.outputs.source }}
+          WORKFLOW_SHA: ${{ job.workflow_sha }}
+        run: |
+          set -euo pipefail
+          printf '%s' "$COMMIT" | grep -Eqx '[0-9a-f]{40}' ||
+            { echo "::error::the bundle checkout names no commit ('$COMMIT')"; exit 1; }
+          if [ "$SOURCE" = workflow ] && [ "$COMMIT" != "$WORKFLOW_SHA" ]; then
+            echo "::error::the bundle checkout is at $COMMIT, not at the workflow's commit $WORKFLOW_SHA"; exit 1
+          fi
+          echo "bundle_commit=$COMMIT" | tee -a "$GITHUB_OUTPUT"
       - name: Set up perl (probe)
         if: inputs.tag == ''
         uses: shogo82148/actions-setup-perl@v1
@@ -84,15 +126,15 @@ jobs:
       - name: Collect the built tarball (probe)
         if: inputs.tag == ''
         run: |
-          mkdir dl
-          mv ./*.tar.gz dl/
+          mkdir "$RUNNER_TEMP/dl"
+          mv ./*.tar.gz "$RUNNER_TEMP/dl/"
       - name: Download the release tarball
         if: inputs.tag != ''
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           for i in $(seq 1 30); do
-            if gh release download "$TAG" -R "$GITHUB_REPOSITORY" -p '*.tar.gz' -D dl --clobber; then
+            if gh release download "$TAG" -R "$GITHUB_REPOSITORY" -p '*.tar.gz' -D "$RUNNER_TEMP/dl" --clobber; then
               exit 0
             fi
             [ "$i" -lt 30 ] && sleep 10
@@ -103,18 +145,19 @@ jobs:
         id: plan
         run: |
           set -euo pipefail
-          set -- dl/*.tar.gz
+          set -- "$RUNNER_TEMP"/dl/*.tar.gz
           if [ $# -ne 1 ] || [ ! -f "$1" ]; then
             echo "::error::want exactly one dist tarball, found: $*"
             exit 1
           fi
-          mkdir src
-          tar xzf "$1" -C src --strip-components=1
-          perl .dzil-binary/.github/dzil-binary/plan.pl src/META.json | tee -a "$GITHUB_OUTPUT"
+          dist_src=$RUNNER_TEMP/dist-src
+          mkdir "$dist_src"
+          tar xzf "$1" -C "$dist_src" --strip-components=1
+          perl .dzil-binary/.github/dzil-binary/plan.pl "$dist_src/META.json" | tee -a "$GITHUB_OUTPUT"
           version=$(perl -MJSON::PP -e '
             open my $fh, "<:raw", $ARGV[0] or die "cannot read $ARGV[0]: $!\n";
             print JSON::PP->new->decode(do { local $/; <$fh> })->{version} // "";
-          ' src/META.json)
+          ' "$dist_src/META.json")
           [ -n "$version" ] || { echo "::error::META.json has no version"; exit 1; }
           if [ -n "$TAG" ]; then
             case $TAG in
@@ -129,6 +172,7 @@ jobs:
           else
             sha=$(git rev-parse HEAD)
             slot=probe-${sha:0:7}
+            echo "source_commit=$sha" >>"$GITHUB_OUTPUT"
           fi
           echo "version=$slot" | tee -a "$GITHUB_OUTPUT"
           perl -MJSON::PP -e '
@@ -137,12 +181,34 @@ jobs:
             die "x_binaries has no binaries\n" unless ref $bins eq "HASH" && %$bins;
             my @b = map { { name => $_, defined $bins->{$_}{smoke} ? (smoke => $bins->{$_}{smoke}) : () } } sort keys %$bins;
             print "binaries=", JSON::PP->new->canonical->encode(\@b), "\n";
-          ' src/META.json | tee -a "$GITHUB_OUTPUT"
+          ' "$dist_src/META.json" | tee -a "$GITHUB_OUTPUT"
       - name: Keep the tarball for the legs
         uses: actions/upload-artifact@v7
         with:
           name: dist-tarball
-          path: dl/*.tar.gz
+          path: ${{ runner.temp }}/dl/*.tar.gz
+          if-no-files-found: error
+      # A release's source commit is the one its tag ends at, read through gh api.
+      - name: Record the plan's provenance
+        env:
+          VERSION_SLOT: ${{ steps.plan.outputs.version }}
+          SOURCE_COMMIT: ${{ steps.plan.outputs.source_commit }}
+          GH_TOKEN: ${{ github.token }}
+          CALLER_WORKFLOW_REF: ${{ github.workflow_ref }}
+          CALLER_WORKFLOW_SHA: ${{ github.workflow_sha }}
+          WORKFLOW_REPOSITORY: ${{ job.workflow_repository }}
+          WORKFLOW_PATH: ${{ job.workflow_file_path }}
+          WORKFLOW_REF: ${{ job.workflow_ref }}
+          WORKFLOW_SHA: ${{ job.workflow_sha }}
+          BUNDLE_REF: ${{ inputs.bundle_ref }}
+          BUNDLE_SOURCE: ${{ steps.resolve.outputs.source }}
+          BUNDLE_COMMIT: ${{ steps.pin.outputs.bundle_commit }}
+        run: sh .dzil-binary/.github/dzil-binary/facts.sh plan "$RUNNER_TEMP/provenance/plan.txt"
+      - name: Keep the plan's provenance part
+        uses: actions/upload-artifact@v7
+        with:
+          name: provenance.plan
+          path: ${{ runner.temp }}/provenance/
           if-no-files-found: error
 
   build:
@@ -180,10 +246,11 @@ jobs:
           echo "::error::dnf install failed three times"
           exit 1
       - name: Check out the bundle scripts
+        id: bundle
         uses: actions/checkout@v7
         with:
           repository: Getty/p5-dist-zilla-pluginbundle-author-getty
-          ref: ${{ inputs.bundle_ref }}
+          ref: ${{ needs.plan.outputs.bundle_commit }}
           path: .dzil-binary
           persist-credentials: false
       - name: Fetch the dist tarball
@@ -269,6 +336,19 @@ jobs:
         with:
           name: ${{ steps.pack.outputs.artifact }}
           path: out/
+          if-no-files-found: error
+      # BUNDLE_COMMIT: the commit the checkout reports; provenance.pl wants the plan's.
+      - name: Record the leg's provenance
+        env:
+          RUNNER_LABEL: ${{ matrix.runner }}
+          LEG_CONTAINER: ${{ matrix.container }}
+          BUNDLE_COMMIT: ${{ steps.bundle.outputs.commit }}
+        run: bash .dzil-binary/.github/dzil-binary/build-leg.sh provenance
+      - name: Keep the leg's provenance part
+        uses: actions/upload-artifact@v7
+        with:
+          name: provenance.build.${{ matrix.platform }}
+          path: provenance/
           if-no-files-found: error
 
   smoke:
@@ -357,10 +437,90 @@ jobs:
           echo "smoke PATH: $PATH"
           cd dist
           sh -c "$SMOKE \"\$@\"" sh "$bin"
+      # Only after both smoke steps: the bundle is not on the machine while the
+      # binary runs. On Linux the target facts come from a fresh container of the
+      # smoked image; on macOS and Windows the target is the runner.
+      - name: Check out the bundle scripts
+        id: bundle
+        uses: actions/checkout@v7
+        with:
+          repository: Getty/p5-dist-zilla-pluginbundle-author-getty
+          ref: ${{ needs.plan.outputs.bundle_commit }}
+          path: .dzil-binary
+          persist-credentials: false
+      - name: Record the smoke's provenance
+        env:
+          ASSET: ${{ steps.unpack.outputs.asset }}
+          RUNNER_LABEL: ${{ matrix.cell.runner }}
+          BUNDLE_COMMIT: ${{ steps.bundle.outputs.commit }}
+          JOB_INDEX: ${{ strategy.job-index }}
+        run: sh .dzil-binary/.github/dzil-binary/facts.sh smoke "provenance/smoke-$JOB_INDEX.txt" "bins/$ASSET"
+      - name: Keep the smoke's provenance part
+        uses: actions/upload-artifact@v7
+        with:
+          name: provenance.smoke.${{ strategy.job-index }}
+          path: provenance/
+          if-no-files-found: error
+
+  provenance:
+    needs: [plan, build, smoke]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    outputs:
+      artifact: ${{ steps.merge.outputs.artifact }}
+    defaults:
+      run:
+        shell: bash
+    env:
+      VERSION: ${{ needs.plan.outputs.version }}
+    steps:
+      - name: Check out the bundle scripts
+        uses: actions/checkout@v7
+        with:
+          repository: Getty/p5-dist-zilla-pluginbundle-author-getty
+          ref: ${{ needs.plan.outputs.bundle_commit }}
+          path: .dzil-binary
+          persist-credentials: false
+      - name: Fetch the dist tarball
+        uses: actions/download-artifact@v8
+        with:
+          name: dist-tarball
+          path: ${{ runner.temp }}/tarball
+      - name: Fetch the binaries
+        uses: actions/download-artifact@v8
+        with:
+          pattern: '*-${{ needs.plan.outputs.version }}-*'
+          merge-multiple: true
+          path: ${{ runner.temp }}/assets
+      - name: Fetch the provenance parts
+        uses: actions/download-artifact@v8
+        with:
+          pattern: 'provenance.*'
+          merge-multiple: true
+          path: ${{ runner.temp }}/parts
+      # Cross-checks the parts against plan.pl, the artifact files and each other.
+      - name: Merge the manifest
+        id: merge
+        run: |
+          set -euo pipefail
+          p=.dzil-binary/.github/dzil-binary/provenance.pl
+          dist_src=$RUNNER_TEMP/dist-src
+          mkdir "$dist_src" "$RUNNER_TEMP/provenance"
+          tar xzf "$RUNNER_TEMP"/tarball/*.tar.gz -C "$dist_src" --strip-components=1
+          perl "$p" merge "$dist_src/META.json" "$VERSION" "$RUNNER_TEMP/parts" "$RUNNER_TEMP/assets" \
+            "$RUNNER_TEMP/tarball" "$GITHUB_RUN_ATTEMPT" >"$RUNNER_TEMP/provenance/provenance.json"
+          artifact=$(perl "$p" artifact "$dist_src/META.json" "$VERSION")
+          echo "artifact=$artifact" | tee -a "$GITHUB_OUTPUT"
+      - name: Keep the manifest
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ steps.merge.outputs.artifact }}
+          path: ${{ runner.temp }}/provenance/provenance.json
+          if-no-files-found: error
 
   publish:
     if: inputs.tag != ''
-    needs: [plan, build, smoke]
+    needs: [plan, build, smoke, provenance]
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
@@ -377,41 +537,53 @@ jobs:
         uses: actions/checkout@v7
         with:
           repository: Getty/p5-dist-zilla-pluginbundle-author-getty
-          ref: ${{ inputs.bundle_ref }}
+          ref: ${{ needs.plan.outputs.bundle_commit }}
           path: .dzil-binary
           persist-credentials: false
       - name: Fetch the dist tarball
         uses: actions/download-artifact@v8
         with:
           name: dist-tarball
-          path: tarball
+          path: ${{ runner.temp }}/tarball
       - name: Fetch the binaries
         uses: actions/download-artifact@v8
         with:
           pattern: '*-${{ needs.plan.outputs.version }}-*'
           merge-multiple: true
-          path: assets
+          path: ${{ runner.temp }}/assets
+      - name: Fetch the provenance manifest
+        uses: actions/download-artifact@v8
+        with:
+          name: ${{ needs.provenance.outputs.artifact }}
+          path: ${{ runner.temp }}/provenance
+      # provenance.json goes up beside SHA256SUMS, once its assets are exactly those sums.
       - name: Upload to the release
         run: |
           set -euo pipefail
           p=.dzil-binary/.github/dzil-binary/publish.pl
-          mkdir src
-          tar xzf tarball/*.tar.gz -C src --strip-components=1
-          gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG" >release.json
+          dist_src=$RUNNER_TEMP/dist-src
+          assets=$RUNNER_TEMP/assets
+          release_json=$RUNNER_TEMP/release.json
+          latest_json=$RUNNER_TEMP/latest.json
+          latest_err=$RUNNER_TEMP/latest.err
+          mkdir "$dist_src"
+          tar xzf "$RUNNER_TEMP"/tarball/*.tar.gz -C "$dist_src" --strip-components=1
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG" >"$release_json"
           # only a 404 means "no latest release yet" (an empty file); any other failure stops here
-          if ! gh api "repos/$GITHUB_REPOSITORY/releases/latest" >latest.json 2>latest.err; then
-            cat latest.err >&2
-            grep -Eq '\(HTTP 404\)$|^gh: HTTP 404$' latest.err || { echo "::error::cannot read releases/latest"; exit 1; }
-            : >latest.json
+          if ! gh api "repos/$GITHUB_REPOSITORY/releases/latest" >"$latest_json" 2>"$latest_err"; then
+            cat "$latest_err" >&2
+            grep -Eq '\(HTTP 404\)$|^gh: HTTP 404$' "$latest_err" || { echo "::error::cannot read releases/latest"; exit 1; }
+            : >"$latest_json"
           fi
-          latest=$(perl "$p" check src/META.json "$VERSION" assets release.json latest.json)
-          perl "$p" sums assets
-          perl "$p" render src/META.json "${GITHUB_REPOSITORY%%/*}" "${GITHUB_REPOSITORY#*/}" "$TAG" assets
-          list=$(perl "$p" expected src/META.json "$VERSION")
+          latest=$(perl "$p" check "$dist_src/META.json" "$VERSION" "$assets" "$release_json" "$latest_json")
+          perl "$p" sums "$assets"
+          perl .dzil-binary/.github/dzil-binary/provenance.pl verify "$RUNNER_TEMP/provenance/provenance.json" "$assets/SHA256SUMS" "$TAG" "$VERSION"
+          perl "$p" render "$dist_src/META.json" "${GITHUB_REPOSITORY%%/*}" "${GITHUB_REPOSITORY#*/}" "$TAG" "$assets"
+          list=$(perl "$p" expected "$dist_src/META.json" "$VERSION")
           [ -n "$list" ] || { echo "::error::publish.pl expected listed no binaries"; exit 1; }
           files=()
-          while IFS= read -r name; do files+=("assets/$name"); done <<<"$list"
-          gh release upload "$TAG" -R "$GITHUB_REPOSITORY" "${files[@]}" assets/SHA256SUMS assets/install.sh assets/install.ps1
+          while IFS= read -r name; do files+=("$assets/$name"); done <<<"$list"
+          gh release upload "$TAG" -R "$GITHUB_REPOSITORY" "${files[@]}" "$assets/SHA256SUMS" "$assets/install.sh" "$assets/install.ps1" "$RUNNER_TEMP/provenance/provenance.json"
           if [ "$latest" = latest=true ]; then
             gh release edit "$TAG" -R "$GITHUB_REPOSITORY" --latest
           fi

@@ -2575,7 +2575,7 @@ example:
 END
 
 $SCREEN{vif} = <<'END';
-usage: vif(DF, FORMULA)
+usage: vif(DF, FORMULA [, type => TYPE])
 
 Variance inflation factors of a model's terms, as car::vif().
 
@@ -2584,6 +2584,11 @@ positional arguments:
   FORMULA                a formula read as lm() reads it, such as 'y ~ a + b +
                          c', or an array ref of column names, which is '~ a + b
                          + c'
+
+options:
+  type => TYPE           {terms,predictor}: a GVIF for each term, or for each
+                         predictor with the interactions it is in (default:
+                         terms)
 
 example:
   vif({ a => [1, 2, 3, 4, 5, 6], b => [2, 1, 4, 3, 6, 5],
@@ -3069,7 +3074,7 @@ Stats::LikeR::Usage
 
 =head1 VERSION
 
-version 0.3425
+version 0.3427
 
 =head1 AUTHOR
 

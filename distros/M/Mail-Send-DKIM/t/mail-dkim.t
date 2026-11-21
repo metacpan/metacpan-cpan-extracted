@@ -12,6 +12,7 @@ use strict;
 use warnings;
 
 use Test::Most;
+use Test::Needs;
 
 use Config;
 use File::Basename qw(dirname);
@@ -28,8 +29,8 @@ my $SCRIPT = File::Spec->catfile($Bin, File::Spec->updir(), 'bin', 'mail-dkim');
 
 BAIL_OUT("Cannot find $SCRIPT") unless(-r $SCRIPT);
 
-plan skip_all => 'Mail::DKIM is needed to sign and verify'
-	unless(eval { require Mail::DKIM::Signer; require Mail::DKIM::Verifier; require Mail::DKIM::DNS; require Net::DNS::RR; 1 });
+# What signing and verifying need; the suite is skipped, not failed, without them.
+test_needs qw(Mail::DKIM::Signer Mail::DKIM::Verifier Mail::DKIM::DNS Net::DNS::RR);
 
 my $openssl;
 foreach my $dir (File::Spec->path()) {
@@ -213,6 +214,28 @@ subtest 'a message from a domain we sign for is signed, and the signature verifi
 	like($signed, qr/^Subject: Registration$/m, 'the headers are still there');
 	like($signed, qr/^Body line two\.$/m, 'so is the body');
 	unlike($signed, qr/\r/, 'and no carriage return is handed to sendmail');
+};
+
+subtest 'signing_domain replaces the From: domain in the signature' => sub {
+	my $signer = signer(domains => ['example.org'], signing_domain => 'Mail.Example.NET');
+	my $signed = $signer->sign(message(from => 'alerts@example.org'));
+
+	ok(defined($signed), 'a message from a domain in domains is still signed');
+	like($signed, qr/d=mail\.example\.net/, 'the signature is for the signing domain, in lower case');
+	unlike($signed, qr/d=example\.org/, 'and not for the From: domain');
+
+	my $other = signer(domains => ['example.org'], signing_domain => 'mail.example.net');
+	is($other->sign(message(from => 'alerts@example.com')), undef, 'domains still decides which messages are signed');
+};
+
+subtest 'signing_domain comes from the environment when the caller gives none' => sub {
+	local $ENV{'DKIM_SIGNING_DOMAIN'} = 'mail.example.net';
+	my $signed = signer(domains => ['example.org'])->sign(message(from => 'alerts@example.org'));
+	like($signed, qr/d=mail\.example\.net/, 'DKIM_SIGNING_DOMAIN is used');
+
+	local $ENV{'DKIM_SIGNING_DOMAIN'} = ' ';
+	$signed = signer(domains => ['example.org'])->sign(message(from => 'alerts@example.org'));
+	like($signed, qr/d=example\.org/, 'a blank value counts as not set');
 };
 
 subtest 'a display name, and a domain in another case, are understood' => sub {

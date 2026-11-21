@@ -1,7 +1,7 @@
 # ABSTRACT: Wraps git_error_last() into a Perl structure
 
 package Git::Libgit2::Error;
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 use strict;
 use warnings;
 use FFI::Platypus 2.00;
@@ -81,7 +81,7 @@ Git::Libgit2::Error - Wraps git_error_last() into a Perl structure
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -138,7 +138,7 @@ and when thrown.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-git-libgit2/issues>.
 
 =head1 CONTRIBUTING

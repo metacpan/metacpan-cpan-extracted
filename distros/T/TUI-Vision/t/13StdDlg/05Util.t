@@ -4,7 +4,10 @@ use warnings;
 use Test::More;
 
 BEGIN {
-  use_ok 'TUI::StdDlg::Util', qw( fexpand );
+  use_ok 'TUI::StdDlg::Util', qw(
+    driveValid
+    fexpand
+  );
 }
 
 subtest 'fexpand basic expansion' => sub {
@@ -152,5 +155,15 @@ subtest 'fexpand idempotency' => sub {
     'fexpand is idempotent (second call does not change path)'
   );
 };
+
+SKIP: {
+  skip 'The emulated C: drive is used on Unix-like systems', 1
+    if $^O eq 'MSWin32';
+
+  subtest 'driveValid recognizes the emulated C: drive' => sub {
+    ok( driveValid( 'C' ), 'emulated C: drive is valid' );
+    ok( !driveValid( 'D' ), 'other drive letters are invalid' );
+  };
+}
 
 done_testing();

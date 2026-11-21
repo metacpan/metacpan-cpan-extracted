@@ -1,6 +1,6 @@
 package Pod::Weaver::PluginBundle::Author::GETTY;
 # ABSTRACT: GETTY's default Pod::Weaver config
-our $VERSION = '0.328';
+our $VERSION = '0.329';
 use strict;
 use warnings;
 
@@ -88,7 +88,7 @@ Pod::Weaver::PluginBundle::Author::GETTY - GETTY's default Pod::Weaver config
 
 =head1 VERSION
 
-version 0.328
+version 0.329
 
 =head1 SYNOPSIS
 

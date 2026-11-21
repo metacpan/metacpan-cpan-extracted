@@ -27,10 +27,10 @@ Instead, it aims to provide a practical and modern foundation for developing
 text user interface applications in Perl while preserving the architectural 
 principles that made I<Turbo Vision> successful.
 
-From the beginning, L<TUI::Vision> was designed as a native Perl project rather 
-than a wrapper around an existing implementation. While technologies such as 
-XS and FFI provide excellent solutions for integrating external libraries, they 
-solve a different problem.
+From the beginning, L<TUI::Vision> was designed as a native Perl project
+rather than a wrapper around an existing implementation. While technologies
+such as XS and FFI provide excellent solutions for integrating external
+libraries, they solve a different problem.
 
 The objective of L<TUI::Vision> is to bring the I<Turbo Vision> architecture, 
 programming model and development experience into the Perl ecosystem itself. 
@@ -77,12 +77,12 @@ Although simple, this example already demonstrates one of the most important
 ideas behind L<TUI::Vision> applications are constructed from reusable 
 framework components rather than from direct terminal operations.
 
-A deliberate design goal of L<TUI::Vision> is to keep dependencies low and 
-avoid compiled components wherever practical. This makes it easier to study the 
-implementation, understand the framework and adapt it to specific application 
-requirements.
+A deliberate design goal of L<TUI::Vision> is to keep dependencies low and
+avoid compiled components wherever practical. This makes it easier to study
+the implementation, understand the framework and adapt it to specific
+application requirements.
 
-=head2 Turbo Vision Heritage
+=head2 I<Turbo Vision> Heritage
 
 L<TUI::Vision> preserves many of the concepts that defined the original 
 I<Turbo Vision> framework.
@@ -132,9 +132,9 @@ application.
 
 =head2 Conclusion
 
-L<TUI::Vision> brings the architecture and programming model of I<Turbo Vision> 
-into the Perl ecosystem while embracing modern development practices and 
-contemporary terminal environments.
+L<TUI::Vision> brings the architecture and programming model of
+I<Turbo Vision> into the Perl ecosystem while embracing modern development
+practices and contemporary terminal environments.
 
 The framework combines a familiar object-oriented design with the flexibility 
 of Perl, allowing applications to be built from reusable views, dialogs, 
@@ -144,6 +144,7 @@ The next chapter introduces the basic steps required to create and run a
 L<TUI::Vision> application and provides the foundation for the more detailed 
 discussions that follow throughout this manual.
 
-L<next|TUI::Manual::02> chapter.
+The L<next chapter|TUI::Manual::02> introduces the basic steps required to 
+create and run a L<TUI::Vision> application.
 
 =cut

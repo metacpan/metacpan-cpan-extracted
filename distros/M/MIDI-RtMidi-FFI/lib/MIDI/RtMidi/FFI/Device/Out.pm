@@ -6,7 +6,7 @@ use experimental qw/ signatures /;
 package MIDI::RtMidi::FFI::Device::Out;
 class MIDI::RtMidi::FFI::Device::Out :isa( MIDI::RtMidi::FFI::AbstractDevice );
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 # ABSTRACT: OO interface for MIDI::RtMidi::FFI output deviced
 
@@ -84,7 +84,7 @@ sub panic {
     my @channels = defined $channel
         ? ( $channel )
         : ( 0..15 );
-    $self->cc( 123, $_, 0 ) for @channels;
+    $self->cc( $_, 123, 0 ) for @channels;
 }
 
 
@@ -94,7 +94,7 @@ sub PANIC {
         ? ( $channel )
         : ( 0..15 );
     for my $ch ( @channels ) {
-        $self->note_off( $ch, $_ ) for 0..127;
+        $self->note_off( $ch, $_, 0 ) for 0..127;
     }
 }
 
@@ -123,10 +123,10 @@ method continue { $self->send_event( continue => @_ ) };
 *polytouch = \&key_after_touch;
 *pitch_bend = \&pitch_wheel_change;
 
-method DESTROY {
-    $self->close_port;
-    #rtmidi_out_free( $self->device );
-}
+#method DESTROY {
+#    $self->close_port;
+#    #rtmidi_out_free( $self->device );
+#}
 
 
 1;
@@ -143,7 +143,7 @@ MIDI::RtMidi::FFI::Device::Out - OO interface for MIDI::RtMidi::FFI output devic
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 SYNOPSIS
 

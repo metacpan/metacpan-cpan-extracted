@@ -69,7 +69,7 @@
  * is small enough that a tableful of 64 MiB (or even 8 MiB) stacks cannot be reserved. Treat it like OpenBSD below:
  * use a smaller stack and clamp the default fiber count to what the data-segment budget actually holds.
  */
-#if (defined(__gnu_hurd__) || defined(__HURD__)) && !defined(PARA_GNU_HURD)
+#if (defined(__gnu_hurd__) || defined(__HURD__) || defined(__GNU__)) && !defined(PARA_GNU_HURD)
 #define PARA_GNU_HURD 1
 #endif
 
@@ -593,6 +593,12 @@ typedef struct {
  *  demand, so memory (64MB of lazily mapped stack per fiber) runs out long before this does. Adjustable with
  *  set_max_fibers(). */
 #define DEFAULT_FIBER_LIMIT 65536
+/** @brief Conservative default for GNU/Hurd, where RLIMIT_DATA is often unlimited (or its raise target is), so the
+ *  generic clamp has no finite budget to divide by while the Mach task and physical memory still cap the mappings at
+ *  well under a thousand 2 MiB frames. This only bounds the autodetected default; set_max_fibers() may still raise it. */
+#if defined(PARA_GNU_HURD)
+#define HURD_FIBER_CEILING 512
+#endif
 /** @brief Absolute bound on table growth, independent of the limit above. Growth only ever happens when every
  *  allocated slot is already in use, so the table stays within a doubling of the fibers actually present and this is
  *  never approached in practice. */
@@ -3005,36 +3011,45 @@ static void stack_guard_handler(int sig, siginfo_t * si, void * uc) {
  * Every fiber reserves FIBER_STACK_SZ plus one guard page of anonymous memory. Where MAP_NORESERVE is a real flag
  * (Linux, FreeBSD) the mapping is a free reservation and RLIMIT_DATA does not count it, so this is a no-op. OpenBSD
  * defines MAP_NORESERVE as 0, a legacy no-op the preprocessor sees but that reserves nothing, and its RLIMIT_DATA
- * counts every anonymous mmap at full size; GNU/Hurd has no MAP_NORESERVE at all and likewise counts every mapping
- * against a much smaller default data-segment limit. On both, the generous DEFAULT_FIBER_LIMIT would let the very
- * first big spawn explode the process budget; the failing mmap then surfaces as a confusing table-full message.
- * DragonFly has no MAP_NORESERVE but charges only brk/sbrk to RLIMIT_DATA, so it never clamps. The clamp raises the
- * soft limit to the hard limit when permitted and cuts max_fibers to the number of full frames that actually fit:
- * each frame is the stack plus the per-fiber charge FIBER_CHARGED_OVERHEAD, and four frames stay free as headroom
- * for perl, the tables, the worker pool and the guard handler's alt stack. Keying on the MAP_NORESERVE macro itself
- * would compile this OUT on OpenBSD (defined as 0) and IN on DragonFly (undefined), the exact inversion of the
- * intent, so the guard names the affected platforms directly.
+ * counts every anonymous mmap at full size. On both, the generous DEFAULT_FIBER_LIMIT would let the very first big
+ * spawn explode the process budget; the failing mmap then surfaces as a confusing table-full message. DragonFly has
+ * no MAP_NORESERVE but charges only brk/sbrk to RLIMIT_DATA, so it never clamps. GNU/Hurd is the awkward case: it has
+ * no MAP_NORESERVE, but RLIMIT_DATA is routinely RLIM_INFINITY (or has an infinite hard limit), so there is no finite
+ * budget to divide by even though the Mach task and physical memory cap the mappings well below a tableful. The clamp
+ * therefore falls back to HURD_FIBER_CEILING there. Otherwise it raises the soft limit to a finite hard limit when
+ * permitted and cuts max_fibers to the number of full frames that actually fit: each frame is the stack plus the
+ * per-fiber charge FIBER_CHARGED_OVERHEAD, and four frames stay free as headroom for perl, the tables, the worker pool
+ * and the guard handler's alt stack. Keying on the MAP_NORESERVE macro itself would compile this OUT on OpenBSD
+ * (defined as 0) and IN on DragonFly (undefined), the exact inversion of the intent, so the guard names the affected
+ * platforms directly.
  */
 static void rightsize_fiber_limit(void) {
 #ifndef _WIN32
 #if defined(__OpenBSD__) || defined(PARA_GNU_HURD)
     struct rlimit rl;
-    if (getrlimit(RLIMIT_DATA, &rl) != 0 || rl.rlim_cur == RLIM_INFINITY)
+    /* Raising a finite soft limit to a finite hard limit is fine. Never raise it to infinity: that destroys the budget
+       we are about to clamp against, and on Hurd there was often no finite budget in the first place. */
+    if (getrlimit(RLIMIT_DATA, &rl) != 0 || rl.rlim_cur == RLIM_INFINITY) {
+#if defined(PARA_GNU_HURD)
+        max_fibers = HURD_FIBER_CEILING;
+#endif
         return;
-    if (rl.rlim_max > rl.rlim_cur) {
+    }
+    if (rl.rlim_max > rl.rlim_cur && rl.rlim_max != RLIM_INFINITY) {
         struct rlimit nr = rl;
         nr.rlim_cur = rl.rlim_max;
         if (setrlimit(RLIMIT_DATA, &nr) == 0)
             rl.rlim_cur = rl.rlim_max;
     }
-    /* A hard infinity made the raise go unlimited too; nothing to clamp against. */
-    if (rl.rlim_cur == RLIM_INFINITY)
-        return;
     init_guard_sz();
     size_t frame = FIBER_STACK_SZ + fiber_guard_sz + FIBER_CHARGED_OVERHEAD;
     long cap = (long)( rl.rlim_cur / (rlim_t)frame ) - 4;
     if (cap < 8)
         cap = 8;
+#if defined(PARA_GNU_HURD)
+    if (cap > HURD_FIBER_CEILING)
+        cap = HURD_FIBER_CEILING;
+#endif
     if (cap < DEFAULT_FIBER_LIMIT)
         max_fibers = (int)cap;
 #endif

@@ -31,6 +31,12 @@ subtest schema => sub {
     is( Dist::Conformance::Check->config_schema,  { properties => {} },         'the base class takes no keys of its own' );
 };
 
+subtest '$MODULE' => sub {
+    my $is_module = sub ($name) { return Dist::Conformance::Schema::matches( $Dist::Conformance::Check::MODULE, $name ) };
+    ok( $is_module->($_), "$_ is a module name" ) for qw{Foo Foo::Bar _Foo::Bar1};
+    ok( !$is_module->($_), "'$_' is not a module name" ) for q{}, qw{1Foo Foo:: Foo::::Bar}, "Foo::B\N{LATIN SMALL LETTER A WITH DIAERESIS}r", "F\N{LATIN SMALL LETTER O WITH DIAERESIS}o";
+};
+
 subtest from_config => sub {
     my $check = fake( file => 'x' );
     is( $check->config, { file => 'x', flag => F(), level => 'fail' }, 'the defaults are filled in' );

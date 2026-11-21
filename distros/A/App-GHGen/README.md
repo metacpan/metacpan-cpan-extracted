@@ -4,7 +4,7 @@ App::GHGen - GitHub Actions workflow generator, analyzer, and optimizer
 
 ## Version
 
-Version 0.12
+Version 0.13
 
 ## Synopsis
 
@@ -14,6 +14,9 @@ ghgen generate --auto                   # Auto-detect project type
 ghgen generate --type=perl              # Generate Perl workflow
 ghgen generate --type=perl --customize  # Interactive customization
 ghgen generate --interactive            # Choose type interactively
+ghgen generate --type=perl --os=linux,macos        # Skip Windows jobs
+ghgen generate --type=node --versions=20,22        # Choose versions tested
+ghgen generate --type=perl --timeout=45            # Job timeout in minutes
 
 # Analyze workflows
 ghgen analyze                           # Analyze for issues
@@ -118,11 +121,11 @@ Detection looks for:
 If multiple types are detected, it shows alternatives:
 
 ```
-✓ Detected project type: PERL
+[ok] Detected project type: PERL
   Evidence: cpanfile, lib, t
 
 Other possibilities:
-  • docker (confidence: 65%)
+  - docker (confidence: 65%)
 
 Generate PERL workflow? [Y/n]:
 ```
@@ -141,6 +144,35 @@ ghgen generate --type=ruby
 ghgen generate --type=docker
 ghgen generate --type=static
 ```
+
+### Choosing Operating Systems and Versions
+
+`--os` restricts the operating systems of a Perl workflow and `--versions`
+chooses the language versions tested.  Both take comma-separated lists.
+
+```
+ghgen generate --type=perl --os=linux,macos
+ghgen generate --type=perl --versions=5.40,5.42
+ghgen generate --type=python --versions=3.12,3.13
+```
+
+`--os` accepts `linux`, `macos` and `windows` (case-insensitive, with
+`ubuntu` as an alias for `linux`) or a literal runner label such as
+`ubuntu-22.04`.  The default is `linux,macos,windows`.
+
+`--versions` replaces the version matrix.  The defaults are:
+
+- perl 5.36, 5.38, 5.40, 5.42
+- node 18.x, 20.x, 22.x
+- python 3.9, 3.10, 3.11, 3.12
+- ruby 3.1, 3.2, 3.3
+- java 11, 17, 21
+- php 8.1, 8.2, 8.3
+- go 1.22 (a single version; `--versions` turns it into a matrix)
+- rust stable (a single toolchain; `--versions` turns it into a matrix)
+
+`--versions` has no effect for `cpp`, `docker` and `static`; a warning is
+printed.  A value may contain only letters, digits and `. + * - _`.
 
 ### Interactive Mode
 
@@ -192,9 +224,9 @@ Example session:
 Perl Versions to Test:
 Which Perl versions?
 (Enter numbers separated by commas, or 'all')
-  ✓ 1. 5.40
-  ✓ 2. 5.38
-  ✓ 3. 5.36
+  [ok] 1. 5.40
+  [ok] 2. 5.38
+  [ok] 3. 5.36
     4. 5.34
     5. 5.32
 
@@ -202,9 +234,9 @@ Enter choices [1,2,3]: 1,2,3
 
 Operating Systems:
 Which operating systems?
-  ✓ 1. ubuntu-latest
-  ✓ 2. macos-latest
-  ✓ 3. windows-latest
+  [ok] 1. ubuntu-latest
+  [ok] 2. macos-latest
+  [ok] 3. windows-latest
 
 Enter choices [1,2,3]: 1,2
 
@@ -250,18 +282,18 @@ ghgen analyze
 GitHub Actions Workflow Analyzer
 ==================================================
 
-📄 Analyzing: perl-ci.yml
-  ⚠ No dependency caching found - increases build times
-     💡 Fix:
+[file] Analyzing: perl-ci.yml
+  [warn] No dependency caching found - increases build times
+     [tip] Fix:
      - uses: actions/cache@v5
        with:
          path: ~/perl5
          key: ${{ runner.os }}-${{ matrix.perl }}-${{ hashFiles('cpanfile') }}
 
-  ⚠ Found 2 outdated action(s)
-     💡 Fix:
+  [warn] Found 2 outdated action(s)
+     [tip] Fix:
      Update to latest versions:
-       actions/cache@v4 → actions/cache@v5
+       actions/cache@v4 -> actions/cache@v5
 
 ==================================================
 Summary:
@@ -283,8 +315,8 @@ The analyzer checks for:
     - - Overly broad triggers (runs on every push without filters)
     - - Inefficient matrix strategies
 - **Maintenance Issues**
-    - - Outdated action versions (v4 → v5, v5 → v6)
-    - - Outdated runner versions (ubuntu-18.04 → ubuntu-latest)
+    - - Outdated action versions (v4 -> v5, v5 -> v6)
+    - - Outdated runner versions (ubuntu-18.04 -> ubuntu-latest)
 
 ### Auto-Fix
 
@@ -297,9 +329,9 @@ GitHub Actions Workflow Analyzer
 (Auto-fix mode enabled)
 ==================================================
 
-📄 Analyzing: perl-ci.yml
-  ⚙ Applying 3 fix(es)...
-  ✓ Applied 3 fix(es)
+[file] Analyzing: perl-ci.yml
+  [fix] Applying 3 fix(es)...
+  [ok] Applied 3 fix(es)
 
 ==================================================
 Summary:
@@ -311,7 +343,7 @@ Summary:
 Auto-fix can:
 
 - **Add caching** - Detects project type and adds appropriate dependency caching
-- **Update actions** - Updates to latest versions (cache@v4→v5, checkout@v5→v6, etc.)
+- **Update actions** - Updates to latest versions (cache@v4->v5, checkout@v5->v6, etc.)
 - **Pin versions** - Converts @master/@main to specific version tags
 - **Add permissions** - Adds `permissions: contents: read` for security
 - **Add concurrency** - Adds concurrency groups to cancel superseded runs
@@ -336,7 +368,7 @@ GitHub Actions Workflow Analyzer
 (Cost estimation mode)
 ==================================================
 
-📊 Estimating current CI usage...
+[stats] Estimating current CI usage...
 
 Current Monthly Usage:
   Total CI minutes: 1,247
@@ -344,34 +376,34 @@ Current Monthly Usage:
   Estimated cost: $0.00
 
 Per-Workflow Breakdown:
-  Perl CI      840 min/month (100 runs × 8.4 min/run)
-  Node.js CI   300 min/month ( 60 runs × 5.0 min/run)
-  Docker       107 min/month ( 20 runs × 5.4 min/run)
+  Perl CI      840 min/month (100 runs x 8.4 min/run)
+  Node.js CI   300 min/month ( 60 runs x 5.0 min/run)
+  Docker       107 min/month ( 20 runs x 5.4 min/run)
 
-📄 Analyzing: node-ci.yml
-  ⚠ No dependency caching found
-  ⚠ No concurrency group defined
+[file] Analyzing: node-ci.yml
+  [warn] No dependency caching found
+  [warn] No concurrency group defined
 
 ==================================================
 Summary:
   Workflows analyzed: 3
   Total issues found: 2
 
-💰 Potential Savings:
+[savings] Potential Savings:
   With recommended changes: 647 CI minutes/month
   Reduction: -600 minutes (48%)
   Cost savings: $4.80/month (for private repos)
 
   Breakdown:
-    • Adding dependency caching: ~75 min/month
-    • Adding concurrency controls: ~525 min/month
+    - Adding dependency caching: ~75 min/month
+    - Adding concurrency controls: ~525 min/month
 ```
 
 The cost estimator considers:
 
 - Workflow trigger frequency (push, PR, schedule)
 - Estimated duration per run (based on steps and commands)
-- Matrix build multipliers (e.g., 3 OS × 8 Perl versions = 24 jobs)
+- Matrix build multipliers (e.g., 3 OS x 8 Perl versions = 24 jobs)
 - Parallel vs sequential job execution
 - GitHub Actions pricing ($0.008/minute for private repos, 2000 free minutes/month)
 
@@ -410,18 +442,18 @@ jobs:
 This posts a comment like:
 
 ```
-## 🔍 GHGen Workflow Analysis
+## [search] GHGen Workflow Analysis
 
 | Category | Count | Auto-fixable |
 |----------|-------|--------------|
-| ⚡ Performance | 2 | 2 |
-| 🔒 Security | 1 | 1 |
+| [fast] Performance | 2 | 2 |
+| [lock] Security | 1 | 1 |
 
-### 💰 Potential Savings
-- ⏱️ Save **~650 CI minutes/month**
-- 💵 Save **~$5/month** (private repos)
+### [savings] Potential Savings
+- [time] Save **~650 CI minutes/month**
+- [cost] Save **~$5/month** (private repos)
 
-### 💡 How to Fix
+### [tip] How to Fix
 Run locally: `ghgen analyze --fix`
 ```
 
@@ -454,7 +486,7 @@ jobs:
           create-pr: true
 ```
 
-This creates a PR titled "🤖 Optimize GitHub Actions workflows" with all fixes applied.
+This creates a PR titled "\[bot\] Optimize GitHub Actions workflows" with all fixes applied.
 
 ### Mode 3: CI Quality Gate
 
@@ -498,7 +530,7 @@ Comprehensive Perl testing with modern best practices.
 - Multiple Perl versions (5.22 through 5.42, customizable)
 - Smart minimum-version detection from cpanfile, Makefile.PL, or dist.ini
 - CPAN module caching with local::lib
-- **Syntax linting** with `perl -c` across every matrix cell — catches compile-time errors on every tested OS and Perl version with no extra CPAN dependencies
+- **Syntax linting** with `perl -c` across every matrix cell - catches compile-time errors on every tested OS and Perl version with no extra CPAN dependencies
 - Optional **unused-variable check** via [warnings::unused](https://metacpan.org/pod/warnings%3A%3Aunused) (latest Perl + Ubuntu only)
 - Perl::Critic integration for code quality (latest Perl + Ubuntu only)
 - Devel::Cover for test coverage (latest Perl + Ubuntu only)
@@ -514,15 +546,15 @@ ghgen generate --type=perl --customize
 **Generated workflow step order:**
 
 - 1. `actions/checkout@v6`
-- 2. Setup Perl — `shogo82148/actions-setup-perl@v1.44.2`
-- 3. Cache CPAN modules — `actions/cache@v5`
+- 2. Setup Perl - `shogo82148/actions-setup-perl@v1.44.5`
+- 3. Cache CPAN modules - `actions/cache@v5`
 - 4. Install cpanm and `local::lib`
 - 5. Install project dependencies
-- 6. **Lint and syntax check** — all matrix cells (enabled by default)
+- 6. **Lint and syntax check** - all matrix cells (enabled by default)
 - 7. Run tests
-- 8. **Check for unused variables** — latest Perl + Ubuntu only (opt-in)
-- 9. Run Perl::Critic — latest Perl + Ubuntu only (enabled by default)
-- 10. Test coverage — latest Perl + Ubuntu only (enabled by default)
+- 8. **Check for unused variables** - latest Perl + Ubuntu only (opt-in)
+- 9. Run Perl::Critic - latest Perl + Ubuntu only (enabled by default)
+- 10. Test coverage - latest Perl + Ubuntu only (enabled by default)
 - 11. Show cpanm build log on failure
 
 **Workflow-level features:**
@@ -749,6 +781,9 @@ ghgen generate --type=perl --customize
 # Perl::Critic: Yes
 # Coverage: Yes
 # Branches: main
+
+# Or without prompts: no Windows, newest two Perls
+ghgen generate --type=perl --os=linux,macos --versions=5.40,5.42
 ```
 
 ### Example 5: CI Quality Gate
@@ -816,6 +851,21 @@ Generate a new GitHub Actions workflow.
 
     List all available workflow types with descriptions.
 
+- `--os=LIST`
+
+    Comma-separated operating systems for Perl workflows: `linux`, `macos`,
+    `windows` (default: all three).  Overrides the OS choice made with
+    `--customize`.
+
+- `--versions=LIST`
+
+    Comma-separated language versions to test against.  Overrides the defaults
+    described in ["Choosing Operating Systems and Versions"](#choosing-operating-systems-and-versions).
+
+- `--timeout=MINUTES`
+
+    Job `timeout-minutes` for Perl workflows (default: 60).
+
 **Examples:**
 
 ```
@@ -823,6 +873,7 @@ ghgen generate --auto
 ghgen generate --type=perl --customize
 ghgen generate --interactive
 ghgen generate --type=node --output=custom.yml
+ghgen generate --type=perl --os=linux,macos --versions=5.40,5.42
 ```
 
 ### Analyze
@@ -972,6 +1023,7 @@ on:
 - [Path::Tiny](https://metacpan.org/pod/Path%3A%3ATiny) - File and directory operations
 - [Term::ANSIColor](https://metacpan.org/pod/Term%3A%3AANSIColor) - Colored terminal output
 - [Getopt::Long](https://metacpan.org/pod/Getopt%3A%3ALong) - Command-line option parsing
+- [Readonly](https://metacpan.org/pod/Readonly) - Named constants
 
 ### Test Dependencies
 
@@ -1086,6 +1138,45 @@ You can also look for information at:
 ### Commercial Support
 
 For commercial support, consulting, or custom development, contact the author.
+
+## Programmatic Interface
+
+`App::GHGen` itself only carries the release version.  The programmatic
+interface lives in the submodules, each documented in its own POD:
+
+- [App::GHGen::Generator](https://metacpan.org/pod/App%3A%3AGHGen%3A%3AGenerator) - `generate_workflow`, `list_workflow_types`, `parse_os_list`, `parse_version_list`
+- [App::GHGen::PerlCustomizer](https://metacpan.org/pod/App%3A%3AGHGen%3A%3APerlCustomizer) - `generate_custom_perl_workflow`, `detect_perl_requirements`
+- [App::GHGen::Detector](https://metacpan.org/pod/App%3A%3AGHGen%3A%3ADetector) - `detect_project_type`, `get_project_indicators`
+- [App::GHGen::Analyzer](https://metacpan.org/pod/App%3A%3AGHGen%3A%3AAnalyzer) - `analyze_workflow`, `find_workflows`
+- [App::GHGen::Fixer](https://metacpan.org/pod/App%3A%3AGHGen%3A%3AFixer) - `apply_fixes`, `fix_workflow`, `can_auto_fix`
+- [App::GHGen::CostEstimator](https://metacpan.org/pod/App%3A%3AGHGen%3A%3ACostEstimator) - `estimate_current_usage`, `estimate_savings`
+- [App::GHGen::Reporter](https://metacpan.org/pod/App%3A%3AGHGen%3A%3AReporter) - GitHub Action comment formatting
+- [App::GHGen::Interactive](https://metacpan.org/pod/App%3A%3AGHGen%3A%3AInteractive) - `customize_workflow` and the prompts
+
+#### Api Specification
+
+##### Input
+
+```
+# App::GHGen exports no functions and takes no arguments.
+{ }
+```
+
+##### Output
+
+```perl
+# The release version, available as $App::GHGen::VERSION or
+# App::GHGen->VERSION.
+{ VERSION => { type => 'scalar', matches => qr/\A\d+\.\d+\z/ } }
+```
+
+#### Formal Specification
+
+```
+VERSION : seq CHAR           (the release version, e.g. "0.13")
+
+∀ m ∈ { App::GHGen::* } • m.VERSION = App::GHGen.VERSION
+```
 
 ## Author
 

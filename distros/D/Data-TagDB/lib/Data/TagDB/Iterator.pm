@@ -12,7 +12,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.15;
+our $VERSION = v0.16;
 
 
 
@@ -177,7 +177,7 @@ Data::TagDB::Iterator - Work with Tag databases
 
 =head1 VERSION
 
-version v0.15
+version v0.16
 
 =head1 SYNOPSIS
 

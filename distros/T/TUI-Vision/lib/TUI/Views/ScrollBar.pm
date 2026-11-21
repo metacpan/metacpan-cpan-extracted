@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -32,6 +32,7 @@ use TUI::Drivers::Util qw( ctrlToArrow );
 use TUI::Views::DrawBuffer;
 use TUI::Objects::Point;
 use TUI::Objects::Rect;
+use TUI::Objects::Stream;
 use TUI::Views::Const qw(
   :cmXXXX
   cpScrollBar
@@ -430,6 +431,40 @@ $getPartCode = sub {    # $int ()
   } #/ if ( $extent->...)
   return $part;
 };
+
+sub write :method {    # void ($os)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $os ) = $sig->( @_ );
+  $self->SUPER::write( $os );
+  $os->put(
+    $self->{value},  
+    $self->{minVal}, 
+    $self->{maxVal}, 
+    $self->{pgStep},
+    $self->{arStep}, 
+    $self->{chars},
+  );
+  return;
+}
+
+sub read :method {    # $self ($is)
+  state $sig = signature(
+    method => Object,
+    pos    => [Object],
+  );
+  my ( $self, $is ) = $sig->( @_ );
+  $self->SUPER::read( $is );
+  $self->{value}  = $is->get();
+  $self->{minVal} = $is->get();
+  $self->{maxVal} = $is->get();
+  $self->{pgStep} = $is->get();
+  $self->{arStep} = $is->get();
+  $self->{chars}  = $is->get();
+  return $self;
+}
 
 1
 

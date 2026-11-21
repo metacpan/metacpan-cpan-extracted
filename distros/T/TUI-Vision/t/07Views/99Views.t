@@ -15,6 +15,7 @@ isa_ok( new_TView( TRect->new() ), TView );
 isa_ok( new_TGroup( TRect->new() ), TGroup );
 isa_ok( new_TFrame( TRect->new() ), TFrame );
 isa_ok( new_TScrollBar( TRect->new() ), TScrollBar );
+isa_ok( new_TScroller( TRect->new(), undef, undef ), TScroller );
 isa_ok( new_TWindowInit( sub { } ), TWindowInit );
 isa_ok( new_TWindow( TRect->new(), '', 0 ), TWindow );
 isa_ok( new_TListViewer( TRect->new(), 0, undef, undef ), TListViewer );

@@ -13,18 +13,642 @@ TUI::Manual::08 - Collections and Containers in TUI::Vision
 
 =head1 COLLECTIONS AND CONTAINERS
 
+The previous chapters have dealt primarily with the visible parts of a
+L<TUI::Vision> application.
+
+Not every structure in a L<TUI::Vision> program, however, is a view.
+
+Many parts of the framework need to manage a set of objects whose size
+and contents change at runtime. File lists, entries presented by list
+boxes, resources and application-specific objects cannot usefully be
+represented as fixed parts of the view hierarchy.
+
+L<TUI::Vision> provides collections for this purpose.
+
+At its simplest, a collection is a container holding references to
+other objects:
+
+    TCollection
+        │
+        ├── item
+        ├── item
+        ├── item
+        │
+        └── ...
+
+Unlike a L<TGroup|TUI::Views::Group>, this relationship does not
+describe a user interface:
+
+    TGroup                         TCollection
+       │                               │
+       ├── TView                       ├── object
+       ├── TView                       ├── object
+       └── TView                       └── object
+
+       View tree                      container
+
+A L<TGroup|TUI::Views::Group> organizes views as part of the running
+user interface. A L<TCollection|TUI::Objects::Collection>, on the other
+hand, organizes data or objects regardless of whether those objects
+ever appear directly on the screen.
+
+This distinction is important. Collections are not an alternative
+representation of the view tree. They provide a general-purpose
+infrastructure for managing sets of objects.
+
 =head2 Why Collections Exist
+
+Classic I<Turbo Vision> collections address two practical requirements.
+
+First, the number of elements is often not known when an application
+is created.
+
+A file list may contain five entries or five thousand. A fixed array
+would either have to reserve sufficient capacity in advance or require
+additional code to manage its size dynamically.
+
+A collection performs this management itself.
+
+Conceptually:
+
+    empty
+      │
+      ▼
+    [ . . . . . . ]
+      │
+      │ insert
+      ▼
+    [ A . . . . . ]
+      │
+      │ insert
+      ▼
+    [ A B . . . . ]
+      │
+      │ ...
+      ▼
+    [ A B C D E . ]
+      │
+      │ growth required
+      ▼
+    [ A B C D E . . . . . ]
+
+Borland's I<Turbo Vision> describes this growth strategy using C<limit> 
+and C<delta>.
+
+C<limit> represents the currently allocated capacity. When that
+capacity is no longer sufficient, the collection increases it by
+C<delta> entries.
+
+The number of entries actually stored in the collection is maintained
+separately in C<count>.
+
+Three different quantities must therefore be distinguished:
+
+=over
+
+=item C<count>
+
+The number of stored entries.
+
+=item C<limit>
+
+The currently available capacity.
+
+=item C<delta>
+
+The growth increment.
+
+=back
+
+In I<Turbo Vision>, a C<delta> of zero means that the collection does
+not grow. L<TUI::Vision> does not enforce this limit: an insertion
+beyond C<limit> still succeeds, and C<count> can then exceed C<limit>.
+
+The second reason for collections concerns the type of data being
+stored.
+
+Collections do not store the values of a conventional typed array. Instead, 
+they hold references to objects or other data.
+
+This makes it possible for a collection to contain objects of
+different concrete classes when those objects share a meaningful
+common abstraction.
+
+For example:
+
+                         TObject
+                            ▲
+             ┌──────────────┼──────────────┐
+             │              │              │
+          Circle          Point        Rectangle
+
+
+                       TCollection
+                            │
+             ┌──────────────┼──────────────┐
+             │              │              │
+          Circle          Point        Rectangle
+
+The collection does not need to know how C<Circle>, C<Point> or
+C<Rectangle> are implemented internally.
+
+It manages the objects as entries. The interpretation and polymorphic
+behavior of those objects remain the responsibility of the
+application.
 
 =head2 TCollection
 
+L<TCollection|TUI::Objects::Collection> provides the general
+foundation for such object containers.
+
+Classic I<Turbo Vision> distinguishes between
+L<TNSCollection|TUI::Objects::NSCollection> and
+L<TCollection|TUI::Objects::Collection>.
+
+L<TNSCollection|TUI::Objects::NSCollection> implements the fundamental
+collection mechanisms. L<TCollection|TUI::Objects::Collection> adds the
+ability to participate in stream I/O.
+
+Conceptually:
+
+                      TNSCollection
+                            ▲
+                            │
+                       TCollection
+                            │
+                            └── streamable
+
+For ordinary collection handling, this distinction is less important
+than the common collection model shared by both classes.
+
+Entries can be inserted, addressed by their index and removed again.
+
+A basic collection may therefore be viewed as an ordered sequence of
+entries:
+
+    index       0       1       2       3
+
+              ┌─────┬─────┬─────┬─────┐
+    items     │  A  │  B  │  C  │  D  │
+              └─────┴─────┴─────┴─────┘
+
+    count = 4
+
+C<insert> adds a new entry. In an ordinary collection, the entry is
+normally appended to the existing sequence:
+
+    before
+
+        [ A ][ B ][ C ]
+
+    insert(D)
+
+        [ A ][ B ][ C ][ D ]
+
+Other operations allow an entry to be inserted at a particular
+position, retrieved by its index or removed from the collection.
+
+The distinction between an index and the object stored at that index
+is important:
+
+    indexOf(B)
+        │
+        └──▶ 1
+
+    at(1)
+        │
+        └──▶ B
+
+The index represents the position within the collection. It is not the
+identity of the stored object.
+
+A removal operation may change the indices of the remaining entries.
+Application code should therefore not treat a collection index as a
+permanent object identifier.
+
+The following fragment from the test suite creates a string collection and
+inserts three entries. It also shows that C<new_TStringCollection> takes
+C<limit> and C<delta> as its arguments:
+
+    my $coll = new_TStringCollection( 5, 5 );
+    $coll->insert( $_ ) for qw( apple banana carrot );
+
+Collections also provide operations that distinguish between removing
+an entry and disposing of the corresponding object. This distinction
+becomes important when ownership is discussed later in this chapter.
+
+The general collection model is useful throughout L<TUI::Vision>.
+
+A L<TListBox|TUI::Dialogs::ListBox>, for example, may obtain the entries it
+presents from a collection. The collection organizes the data while the view is
+responsible for presenting and interacting with it:
+
+    TCollection
+         │
+         │ data
+         ▼
+      TListBox
+         │
+         │ presentation
+         ▼
+       screen
+
+This preserves a distinction encountered throughout L<TUI::Vision>:
+
+    data management != screen representation
+
 =head2 TSortedCollection
+
+An ordinary collection preserves the order in which entries are
+inserted.
+
+Some applications instead require an order determined by the contents
+of those entries.
+
+L<TSortedCollection|TUI::Objects::SortedCollection> provides this model.
+
+A sorted collection determines the position of a newly inserted entry
+from its sort key rather than from the time at which the entry was
+added.
+
+Suppose a collection contains:
+
+    Adams
+    Miller
+    Smith
+
+Inserting C<Brown> does not produce:
+
+    Adams
+    Miller
+    Smith
+    Brown
+
+Instead, the resulting order is:
+
+    Adams
+    Brown
+    Miller
+    Smith
+
+Two separate operations make this possible.
+
+First, the collection must determine which part of a stored object is
+relevant for sorting.
+
+Conceptually, this is the purpose of C<keyOf>:
+
+    object
+      │
+      ▼
+    keyOf()
+      │
+      ▼
+     key
+
+The relationship between two keys must then be determined.
+
+This is the purpose of C<compare>:
+
+    key A ───┐
+             ├──▶ compare() ──▶ before / equal / after
+    key B ───┘
+
+L<TSortedCollection|TUI::Objects::SortedCollection> is therefore not
+limited to strings or numeric values.
+
+A collection of client objects might use the client's name as its key:
+
+    TClient
+       │
+       └── name ──▶ keyOf()
+
+The same objects could instead be sorted by account number simply by
+using a different key:
+
+    TClient
+       │
+       └── account ──▶ keyOf()
+
+The objects themselves do not need to change. Only the definition of
+the key and, where necessary, its comparison changes.
+
+The known ordering also permits more efficient lookup.
+
+Instead of inspecting every entry sequentially,
+L<TSortedCollection|TUI::Objects::SortedCollection> can use the
+ordering defined by C<compare> to perform a binary search.
+
+This is exposed through C<search>.
+
+The treatment of identical keys is controlled separately.
+
+C<duplicates> determines whether several entries having the same key
+may coexist in the collection.
+
+Sorting, searching and duplicate handling therefore belong to the
+same model:
+
+                        keyOf()
+                           │
+                           ▼
+    object ────────────▶ key
+                           │
+              ┌────────────┼────────────┐
+              ▼            ▼            ▼
+           compare       search      duplicates
+
+Specialized collections build upon this mechanism.
+
+A string collection, for example, can define the string itself as the
+key and provide the appropriate lexical comparison. Application code
+can then use the collection without having to reimplement sorting and
+searching each time.
 
 =head2 Ownership of Objects
 
+One question is particularly important when working with collections:
+
+    Who owns the stored objects?
+
+Although this resembles the ownership question in the view tree, it
+represents a different relationship.
+
+A collection stores references to its entries:
+
+    TCollection
+         │
+         ├──▶ Object A
+         ├──▶ Object B
+         └──▶ Object C
+
+Removing a reference from the collection and disposing of the object
+it refers to are conceptually separate operations.
+
+The classic I<Turbo Vision> collection API makes this distinction
+explicit.
+
+An entry can be removed from the collection while leaving the object
+itself intact:
+
+    remove
+
+    Collection ──X──▶ Object
+
+                      Object continues to exist
+
+Alternatively, the entry can be removed together with the object it
+contains:
+
+    free
+
+    Collection ──X──▶ Object
+                      │
+                      ▼
+                   disposed
+
+The same distinction exists for the complete contents of a collection:
+
+    removeAll
+
+removes the entries, whereas:
+
+    freeAll
+
+also disposes of the corresponding objects.
+
+This separation is important whenever the same object is referenced
+elsewhere in an application.
+
+An object removed from a collection may still be required:
+
+    Other object ───────────▶ Item
+                               ▲
+                               │
+    Collection ────────────────┘
+
+After removing the collection entry:
+
+    Other object ───────────▶ Item
+
+    Collection
+
+the item must remain usable.
+
+Conversely, a collection may act as the logical owner of its entries,
+in which case disposing of the collection should also dispose of the
+objects it contains.
+
+Classic I<Turbo Vision> expresses this behavior through C<shouldDelete>.
+
+When C<shouldDelete> is enabled, destroying the collection also
+disposes of its entries. When it is disabled, the container can
+disappear while the stored objects remain in existence.
+
+L<TUI::Vision> preserves this collection model while implementing object
+lifetime within Perl's reference and garbage-collection semantics.
+
+The distinction therefore remains conceptually important even though
+Perl does not require application code to release heap memory in the
+same way as the original Pascal and C++ implementations.
+
+Two lifetimes must still be considered separately:
+
+    container lifetime
+
+and
+
+    item lifetime
+
+A reference held by a collection does not by itself mean that no other
+part of the application may refer to the same object.
+
+Likewise, removing an entry from a collection does not necessarily
+mean that the item has ceased to exist.
+
+The wider Perl-specific consequences of ownership, garbage collection
+and reference cycles are discussed in
+L<TUI::Manual::10>.
+
 =head2 Collection Patterns
+
+Collections are rarely useful merely because entries can be inserted
+and later retrieved by numeric index.
+
+I<Turbo Vision> provides several patterns for operating on the contents
+of a collection as a whole.
+
+One fundamental pattern is applying the same operation to every
+entry.
+
+C<forEach> implements this traversal:
+
+    TCollection
+         │
+         ├── Object A ──▶ action()
+         ├── Object B ──▶ action()
+         ├── Object C ──▶ action()
+         └── Object D ──▶ action()
+
+The caller can therefore perform an operation on all entries without
+having to reproduce the collection's own indexing and traversal logic.
+
+This is particularly useful when the individual objects provide the
+behavior themselves.
+
+Consider a collection containing several related graphical objects:
+
+                         TObject
+                            ▲
+                ┌───────────┼───────────┐
+                │           │           │
+              Point       Circle      Rectangle
+                │           │           │
+                └───────────┼───────────┘
+                            ▼
+                       TCollection
+                            │
+                         forEach
+                            │
+                            ▼
+                          draw()
+
+The collection does not need to determine whether a particular entry
+is a point, circle or rectangle. Each object provides the appropriate
+implementation of its own operation.
+
+This combines collections with one of the fundamental principles of
+object-oriented I<Turbo Vision> programs:
+
+    The collection manages the objects.
+
+    The objects provide the behavior.
+
+A second common pattern is finding an entry that satisfies an
+application-specific condition.
+
+C<firstThat> begins at the first entry:
+
+    A ──▶ test() false
+    B ──▶ test() false
+    C ──▶ test() true
+                     │
+                     └──▶ return C
+
+The search stops when the first matching item is found.
+
+C<lastThat> follows the same principle in the opposite direction,
+starting from the end of the collection.
+
+These operations serve a different purpose from
+C<search> of L<TSortedCollection|TUI::Objects::SortedCollection>.
+
+C<search> operates on the known ordering and key of a sorted
+collection.
+
+C<firstThat> and C<lastThat>, on the other hand, can evaluate an
+arbitrary application-specific condition:
+
+    sorted key
+
+        search()
+
+
+    arbitrary condition
+
+        firstThat()
+        lastThat()
+
+These patterns make collections useful well beyond their role as
+dynamically sized arrays.
+
+Collections also provide the foundation for several more specialized
+framework concepts.
+
+List boxes can obtain their data from collections. String collections
+specialize the model for textual data. Sorted collections provide
+indexes for resources. Streamable collections allow complete sets of
+objects to participate in persistence.
+
+The relationships can be summarized as:
+
+    TCollection
+         │
+         ├──▶ lists and data models
+         │
+         ├──▶ TSortedCollection
+         │       │
+         │       └──▶ resource indexes
+         │
+         └──▶ streamable collections
+                  │
+                  ▼
+              persistence
+
+The last branch is particularly significant.
+
+A collection can contain polymorphic objects whose concrete types are
+not known by the collection itself. Persisting such a collection
+therefore requires more than simply writing a sequence of values.
+
+I<Turbo Vision>'s stream system supplies the additional type and object
+management required for this purpose.
+
+The following chapter examines that mechanism in detail.
 
 =head2 Conclusion
 
-L<next|TUI::Manual::09> chapter.
+Collections complement the view system by providing a general-purpose
+infrastructure for dynamic sets of objects.
+
+L<TGroup|TUI::Views::Group> organizes visible views as part of a user
+interface. L<TCollection|TUI::Objects::Collection> organizes data and
+objects independently of their presentation.
+
+An ordinary collection provides an ordered, dynamically sized sequence
+of entries:
+
+    TCollection
+         │
+         ├── item
+         ├── item
+         └── item
+
+Its size can grow as required, while C<count>, C<limit> and C<delta>
+describe the relationship between the number of stored entries and the
+capacity reserved for them.
+
+L<TSortedCollection|TUI::Objects::SortedCollection> adds keys, ordering
+and efficient searching:
+
+    object
+      │
+      ▼
+    keyOf()
+      │
+      ▼
+     key
+      │
+      ├──▶ compare()
+      └──▶ search()
+
+Operations such as C<forEach>, C<firstThat> and C<lastThat> make it
+possible to work with the stored objects without reimplementing the
+collection's internal traversal.
+
+Equally important is the distinction between the container and its
+contents. Removing an entry and ending the lifetime of the stored
+object are different operations, and the ownership model determines
+which behavior is appropriate.
+
+Collections become particularly powerful when combined with
+polymorphism and persistence.
+
+The following chapter builds directly upon this relationship and
+examines how collections and other object structures can be preserved
+beyond the lifetime of a running application.
+
+The L<next chapter|TUI::Manual::09> examines how collections and other object 
+structures can be preserved beyond the lifetime of a running application.
 
 =cut

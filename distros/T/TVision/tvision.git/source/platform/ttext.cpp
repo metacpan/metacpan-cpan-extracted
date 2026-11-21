@@ -3,12 +3,7 @@
 
 #include <internal/codepage.h>
 #include <internal/platform.h>
-#include <internal/unixcon.h>
-#include <internal/linuxcon.h>
-#include <internal/win32con.h>
-#include <internal/winwidth.h>
 #include <internal/utf8.h>
-#include <wchar.h>
 
 namespace ttext
 {
@@ -110,54 +105,11 @@ static mbstat_r mbstat(TStringView text) noexcept
     int length = mbtowc(wc, text);
     int width = 1;
     if (length > 1)
-        width = Platform::charWidth(wc);
+        width = Platform::charOps.width(wc);
     return {length, width};
 }
 
 } // namespace ttext
-
-namespace tvision
-{
-
-#ifdef _TV_UNIX
-int UnixConsoleStrategy::charWidth(uint32_t wc) noexcept
-{
-    return wcwidth(wc);
-}
-#endif // _TV_UNIX
-
-#ifdef __linux__
-int LinuxConsoleStrategy::charWidth(uint32_t wc) noexcept
-{
-    // The Linux Console does not support zero-width characters. It assumes
-    // all characters are either single or double-width. Additionally, the
-    // double-width characters are the same as in the wcwidth() implementation by
-    // Markus Kuhn from 2007-05-26 (https://www.cl.cam.ac.uk/~mgk25/ucs/wcwidth.c).
-    return 1 +
-        (wc >= 0x1100 &&
-         (wc <= 0x115f ||
-          wc == 0x2329 || wc == 0x232a ||
-          (wc >= 0x2e80 && wc <= 0xa4cf &&
-           wc != 0x303f) ||
-          (wc >= 0xac00 && wc <= 0xd7a3) ||
-          (wc >= 0xf900 && wc <= 0xfaff) ||
-          (wc >= 0xfe10 && wc <= 0xfe19) ||
-          (wc >= 0xfe30 && wc <= 0xfe6f) ||
-          (wc >= 0xff00 && wc <= 0xff60) ||
-          (wc >= 0xffe0 && wc <= 0xffe6) ||
-          (wc >= 0x20000 && wc <= 0x2fffd) ||
-          (wc >= 0x30000 && wc <= 0x3fffd)));
-}
-#endif // __linux__
-
-#ifdef _WIN32
-int Win32ConsoleStrategy::charWidth(uint32_t wc) noexcept
-{
-    return WinWidth::width(wc);
-}
-#endif // _WIN32
-
-} // namespace tvision
 
 size_t TText::width(TStringView text) noexcept
 {
@@ -209,7 +161,7 @@ TText::Lw TText::nextImpl(TSpan<const uint32_t> text) noexcept
     using namespace tvision;
     if (text.size())
     {
-        int width = Platform::charWidth(text[0]);
+        int width = Platform::charOps.width(text[0]);
         return {
             1,
             size_t(width ? max(width, 1) : 0)
@@ -236,15 +188,64 @@ size_t TText::prev(TStringView text, size_t index) noexcept
     return 0;
 }
 
+bool TText::equalsIgnoreCase(TStringView a, TStringView b) noexcept
+{
+    using namespace tvision;
+    while (!a.empty() && !b.empty())
+    {
+        // Convert the first character in each string to UTF-32.
+        // If the conversion fails, assume the character to be in extended ASCII.
+        uint32_t wcA = 0;
+        int lenA;
+        if ((lenA = ttext::mbtowc(wcA, a)) == -1)
+        {
+            ttext::mbtowc(wcA, {CpTranslator::toUtf8(a[0]), 4});
+            lenA = 1;
+        }
+
+        uint32_t wcB = 0;
+        int lenB;
+        if ((lenB = ttext::mbtowc(wcB, b)) == -1)
+        {
+            ttext::mbtowc(wcB, {CpTranslator::toUtf8(b[0]), 4});
+            lenB = 1;
+        }
+
+        // Convert both characters to lowercase. This is the recommended way
+        // of doing case-insensitive comparison.
+        if ( Platform::charOps.toLower(wcA) !=
+             Platform::charOps.toLower(wcB) )
+            break;
+
+        a = a.substr(lenA);
+        b = b.substr(lenB);
+    }
+
+    return a.empty() && b.empty();
+}
+
 char TText::toCodePage(TStringView text) noexcept
 {
     using namespace tvision;
     size_t length = TText::next(text);
-    if (length == 0)
-        return '\0';
-    if (length == 1 && (text[0] < ' ' || '\x7F' <= text[0]))
+    // ASCII characters must not be converted, let them through.
+    if (length == 1 && (uchar) text[0] <= 0x7F)
         return text[0];
     return CpTranslator::fromUtf8(text.substr(0, length));
+}
+
+TStringView TText::fromCodePage(char c) noexcept
+{
+    using namespace tvision;
+    const char (&s)[4] = CpTranslator::toUtf8(c);
+    size_t length = 1 + (s[1] != 0) + (s[2] != 0) + (s[3] != 0);
+    return TStringView(s, length);
+}
+
+void TText::setCodePageTranslation(const char (*codePageToUtf8)[256][4]) noexcept
+{
+    using namespace tvision;
+    CpTranslator::setTranslation(codePageToUtf8);
 }
 
 template <class Text>
@@ -310,9 +311,9 @@ TText::Lw TText::drawOneImpl( TSpan<TScreenCell> cells, size_t i,
                 // We need to convert control characters here since we
                 // might later try to append combining characters to them.
                 if (text[j] < ' ' || '\x7F' <= text[j])
-                    cells[i]._ch.moveMultiByteChar(CpTranslator::toPackedUtf8(text[j]));
+                    cells[i].character.initWithMultiByteChar(CpTranslator::toPackedUtf8(text[j]));
                 else
-                    cells[i]._ch.moveChar(text[j]);
+                    cells[i].character.initWithChar(text[j]);
                 return {1, 1};
             }
         }
@@ -322,7 +323,7 @@ TText::Lw TText::drawOneImpl( TSpan<TScreenCell> cells, size_t i,
             {
                 if (i < cells.size())
                 {
-                    cells[i]._ch.moveMultiByteChar("�");
+                    cells[i].character.initWithMultiByteChar("�");
                     return {(size_t) mb.length, 1};
                 }
             }
@@ -333,8 +334,8 @@ TText::Lw TText::drawOneImpl( TSpan<TScreenCell> cells, size_t i,
                 if (i > 0 && !isZeroWidthJoiner(zwc))
                 {
                     size_t k = i;
-                    while (cells[--k]._ch.isWideCharTrail() && k > 0);
-                    cells[k]._ch.appendZeroWidthChar(zwc);
+                    while (cells[--k].character.isWideCharTrail() && k > 0);
+                    cells[k].character.appendZeroWidthChar(zwc);
                 }
                 return {(size_t) mb.length, 0};
             }
@@ -343,10 +344,10 @@ TText::Lw TText::drawOneImpl( TSpan<TScreenCell> cells, size_t i,
                 if (i < cells.size())
                 {
                     bool wide = mb.width > 1;
-                    cells[i]._ch.moveMultiByteChar({&text[j], (size_t) mb.length}, wide);
+                    cells[i].character.initWithMultiByteChar({&text[j], (size_t) mb.length}, wide);
                     bool drawTrail = (wide && i + 1 < cells.size());
                     if (drawTrail)
-                        cells[i + 1]._ch.moveWideCharTrail();
+                        cells[i + 1].character.initAsWideCharTrail();
                     return {(size_t) mb.length, size_t(1 + drawTrail)};
                 }
             }
@@ -365,12 +366,12 @@ TText::Lw TText::drawOneImpl( TSpan<TScreenCell> cells, size_t i,
         char utf8[4] = {};
         size_t length = utf32To8(textU32[j], utf8);
         TStringView textU8(utf8, length);
-        int width = Platform::charWidth(textU32[j]);
+        int width = Platform::charOps.width(textU32[j]);
         if (width < 0)
         {
             if (i < cells.size())
             {
-                cells[i]._ch.moveMultiByteChar("�");
+                cells[i].character.initWithMultiByteChar("�");
                 return {1, 1};
             }
         }
@@ -380,8 +381,8 @@ TText::Lw TText::drawOneImpl( TSpan<TScreenCell> cells, size_t i,
             if (i > 0 && !isZeroWidthJoiner(textU8))
             {
                 size_t k = i;
-                while (cells[--k]._ch.isWideCharTrail() && k > 0);
-                cells[k]._ch.appendZeroWidthChar(textU8);
+                while (cells[--k].character.isWideCharTrail() && k > 0);
+                cells[k].character.appendZeroWidthChar(textU8);
             }
             return {1, 0};
         }
@@ -390,10 +391,10 @@ TText::Lw TText::drawOneImpl( TSpan<TScreenCell> cells, size_t i,
             if (i < cells.size())
             {
                 bool wide = width > 1;
-                cells[i]._ch.moveMultiByteChar(textU8, wide);
+                cells[i].character.initWithMultiByteChar(textU8, wide);
                 bool drawTrail = (wide && i + 1 < cells.size());
                 if (drawTrail)
-                    cells[i + 1]._ch.moveWideCharTrail();
+                    cells[i + 1].character.initAsWideCharTrail();
                 return {1, size_t(1 + drawTrail)};
             }
         }

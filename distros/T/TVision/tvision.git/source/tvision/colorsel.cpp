@@ -344,10 +344,12 @@ TColorDisplay::~TColorDisplay()
 
 void TColorDisplay::draw()
 {
-    uchar c = *color;
+    TColorAttr c = *color;
+    // BIOS color 0 has a special meaning in TDrawBuffer functions, so display
+    // it as an invalid color.
     if( c == 0 )
         c = errorAttr;
-    const int len = strlen( text );
+    const int len = strwidth( text );
     TDrawBuffer b;
     for( int i = 0; i <= size.x/len; i++ )
         b.moveStr( i*len, text, c );
@@ -374,7 +376,7 @@ void TColorDisplay::handleEvent( TEvent& event )
 void TColorDisplay::setColor( TColorAttr *aColor )
 {
     color = aColor;
-    message( owner, evBroadcast, cmColorSet, (void *)(size_t)(*color) );
+    message( owner, evBroadcast, cmColorSet, (void *)(size_t) *color );
     drawView();
 }
 
@@ -451,18 +453,21 @@ void TColorGroupList::focusItem( short item )
 {
     TListViewer::focusItem( item );
     TColorGroup *curGroup = groups;
-    while( item-- > 0 )
+    while( curGroup && item-- > 0 )
         curGroup = curGroup->next;
-    message( owner, evBroadcast, cmNewColorItem, curGroup);
+    if( curGroup )
+        message( owner, evBroadcast, cmNewColorItem, curGroup );
 }
 
 void TColorGroupList::getText( char *dest, short item, short maxChars )
 {
     TColorGroup *curGroup = groups;
-    while( item-- > 0 )
+    while( curGroup && item-- > 0 )
         curGroup = curGroup->next;
-    strncpy( dest, curGroup->name, maxChars );
-    dest[maxChars] = '\0';
+    if( curGroup )
+        strnzcpy( dest, curGroup->name, maxChars + 1 );
+    else
+        *dest = EOS;
 }
 
 #if !defined(NO_STREAMABLE)
@@ -515,7 +520,16 @@ void TColorGroupList::setGroupIndex(uchar groupNum, uchar itemNum)
 {
     TColorGroup* g = getGroup(groupNum);
     if (g)
-        g->index = itemNum;
+        {
+        uchar index = 0;
+        TColorItem *cur = g->items;
+
+        if (cur)
+            while (index < itemNum && (cur = cur->next) != 0)
+                ++index;
+
+        g->index = index;
+        }
 }
 
 uchar TColorGroupList::getGroupIndex(uchar groupNum)
@@ -531,7 +545,7 @@ TColorGroup* TColorGroupList::getGroup(uchar groupNum)
 {
     TColorGroup* g = groups;
 
-    while (groupNum--)
+    while (g && groupNum--)
         g = g->next;
 
     return g;
@@ -568,7 +582,7 @@ TColorItem *TColorGroupList::readItems( ipstream& is )
         uchar index;
         is >> index;
         *cur = new TColorItem( nm, index );
-        delete nm;
+        delete[] nm;
         cur = &((*cur)->next);
         }
     *cur = 0;
@@ -587,7 +601,7 @@ TColorGroup *TColorGroupList::readGroups( ipstream& is )
         TColorItem *grp = readItems( is );
         *cur = new TColorGroup( nm, grp );
         cur = &((*cur)->next);
-        delete nm;
+        delete[] nm;
         }
     *cur = 0;
     return groups;
@@ -635,18 +649,21 @@ void TColorItemList::focusItem( short item )
     message(owner,evBroadcast, cmSaveColorIndex, (void*)(size_t)item);
 
     TColorItem *curItem = items;
-    while( item-- > 0 )
+    while( curItem && item-- > 0 )
         curItem = curItem->next;
-    message( owner, evBroadcast, cmNewColorIndex, (void *)(size_t)(curItem->index));
+    if( curItem )
+        message( owner, evBroadcast, cmNewColorIndex, (void *)(size_t)curItem->index );
 }
 
 void TColorItemList::getText( char *dest, short item, short maxChars )
 {
     TColorItem *curItem = items;
-    while( item-- > 0 )
+    while( curItem && item-- > 0 )
         curItem = curItem->next;
-    strncpy( dest, curItem->name, maxChars );
-    dest[maxChars] = '\0';
+    if( curItem )
+        strnzcpy( dest, curItem->name, maxChars + 1 );
+    else
+        *dest = EOS;
 }
 
 void TColorItemList::handleEvent( TEvent& event )
@@ -764,7 +781,7 @@ void TColorDialog::handleEvent( TEvent& event )
 
 ushort TColorDialog::dataSize()
 {
-    return *pal->data + 1;
+    return pal->data[0] + 1;
 }
 
 void TColorDialog::getData( void *rec )

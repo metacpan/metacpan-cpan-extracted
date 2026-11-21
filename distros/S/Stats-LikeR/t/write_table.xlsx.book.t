@@ -134,10 +134,10 @@ SKIP: {
 	my $f = path();
 	write_table({ "caf\x{e9}" => [ { a => 1 } ], "\x{394}elta" => [ { a => 2 } ] }, $f, quiet => 1);
 	my $back = read_table($f);
-	# read_table gives a sheet name as the UTF-8 bytes workbook.xml holds
+	# read_table gives a sheet name as the characters workbook.xml holds (as
+	# UTF-8 bytes, which it read as bytes up to 0.3425), so the keys round-trip
 	my @want = ("caf\x{e9}", "\x{394}elta");
-	utf8::encode($_) for @want;
-	is_deeply( [ sort keys %$back ], [ sort @want ], 'non-ASCII sheet names are written as UTF-8' );
+	is_deeply( [ sort keys %$back ], [ sort @want ], 'non-ASCII sheet names are written as UTF-8 and read back as characters' );
 }
 
 # A tied workbook hash, and tied sheets in it

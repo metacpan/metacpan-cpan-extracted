@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000002';
+our $VERSION = '2.000003';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -13,6 +13,11 @@ use Import::Into;
 
 use TUI::Gadgets::Const;
 use TUI::Gadgets::PrintConstants;
+use TUI::Gadgets::AsciiChart;
+use TUI::Gadgets::CalcDisplay;
+use TUI::Gadgets::Calculator;
+use TUI::Gadgets::CalendarView;
+use TUI::Gadgets::CalendarWindow;
 use TUI::Gadgets::ClickTester;
 use TUI::Gadgets::ClockView;
 use TUI::Gadgets::EventViewer;
@@ -21,11 +26,20 @@ use TUI::Gadgets::FileWindow;
 use TUI::Gadgets::HeapView;
 use TUI::Gadgets::LineCollection;
 use TUI::Gadgets::MouseDialog;
+use TUI::Gadgets::PuzzleView;
+use TUI::Gadgets::PuzzleWindow;
+use TUI::Gadgets::Report;
+use TUI::Gadgets::Table;
 
 sub import {
   my $target = caller;
   TUI::Gadgets::Const->import::into( $target, qw( :all ) );
   TUI::Gadgets::PrintConstants->import::into( $target );
+  TUI::Gadgets::AsciiChart->import::into( $target );
+  TUI::Gadgets::CalcDisplay->import::into( $target );
+  TUI::Gadgets::Calculator->import::into( $target );
+  TUI::Gadgets::CalendarView->import::into( $target );
+  TUI::Gadgets::CalendarWindow->import::into( $target );
   TUI::Gadgets::ClickTester->import::into( $target );
   TUI::Gadgets::ClockView->import::into( $target );
   TUI::Gadgets::EventViewer->import::into( $target );
@@ -34,12 +48,21 @@ sub import {
   TUI::Gadgets::HeapView->import::into( $target );
   TUI::Gadgets::LineCollection->import::into( $target );
   TUI::Gadgets::MouseDialog->import::into( $target );
+  TUI::Gadgets::PuzzleView->import::into( $target );
+  TUI::Gadgets::PuzzleWindow->import::into( $target );
+  TUI::Gadgets::Report->import::into( $target );
+  TUI::Gadgets::Table->import::into( $target );
 }
 
 sub unimport {
   my $caller = caller;
   TUI::Gadgets::Const->unimport::out_of( $caller );
   TUI::Gadgets::PrintConstants->unimport::out_of( $caller );
+  TUI::Gadgets::AsciiChart->unimport::out_of( $caller );
+  TUI::Gadgets::CalcDisplay->unimport::out_of( $caller );
+  TUI::Gadgets::Calculator->unimport::out_of( $caller );
+  TUI::Gadgets::CalendarView->unimport::out_of( $caller );
+  TUI::Gadgets::CalendarWindow->unimport::out_of( $caller );
   TUI::Gadgets::ClickTester->unimport::out_of( $caller );
   TUI::Gadgets::ClockView->unimport::out_of( $caller );
   TUI::Gadgets::EventViewer->unimport::out_of( $caller );
@@ -48,6 +71,10 @@ sub unimport {
   TUI::Gadgets::HeapView->unimport::out_of( $caller );
   TUI::Gadgets::LineCollection->unimport::out_of( $caller );
   TUI::Gadgets::MouseDialog->unimport::out_of( $caller );
+  TUI::Gadgets::PuzzleView->unimport::out_of( $caller );
+  TUI::Gadgets::PuzzleWindow->unimport::out_of( $caller );
+  TUI::Gadgets::Report->unimport::out_of( $caller );
+  TUI::Gadgets::Table->unimport::out_of( $caller );
 }
 
 1
@@ -102,11 +129,38 @@ including:
 
 =over 4
 
+=item * L<TAsciiChart|TUI::Gadgets::AsciiChart> -
+A window showing an ASCII table and the focused character.
+
+=item * L<TCalcDisplay|TUI::Gadgets::CalcDisplay> -
+The display view of the calculator gadget.
+
+=item * L<TCalculator|TUI::Gadgets::Calculator> -
+A calculator dialog with a display and twenty buttons.
+
+=item * L<TCalendarView|TUI::Gadgets::CalendarView> -
+A view showing a month calendar.
+
+=item * L<TCalendarWindow|TUI::Gadgets::CalendarWindow> -
+A window containing a month calendar.
+
+=item * L<TPuzzleView|TUI::Gadgets::PuzzleView> -
+A view showing a sliding tile puzzle.
+
+=item * L<TPuzzleWindow|TUI::Gadgets::PuzzleWindow> -
+A window containing a sliding tile puzzle.
+
 =item * L<Const|TUI::Gadgets::Const> -
 Symbolic constants for gadget behavior.
 
 =item * L<PrintConstants|TUI::Gadgets::PrintConstants> -
 Utility for printing symbolic values.
+
+=item * L<TReport|TUI::Gadgets::Report> -
+A status line showing the code of the focused character.
+
+=item * L<TTable|TUI::Gadgets::Table> -
+A 32 x 8 grid of the characters of the character set.
 
 =item * L<TClickTester|TUI::Gadgets::ClickTester> -
 A widget for testing mouse click interactions.

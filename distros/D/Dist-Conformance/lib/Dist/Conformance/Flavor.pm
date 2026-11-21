@@ -1,4 +1,4 @@
-package Dist::Conformance::Flavor 0.006;
+package Dist::Conformance::Flavor 0.007;
 
 # ABSTRACT: A named set of checks and their configuration, read from a standards source
 
@@ -118,7 +118,7 @@ Dist::Conformance::Flavor - A named set of checks and their configuration, read 
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -260,7 +260,6 @@ This is F<troglodyne-5.040.yml> from the fixtures of this distribution:
       CriticProfile:
         file: .perlcriticrc
         template: templates/perlcriticrc
-        replace: false
 
 And this is a flavor that differs for a reason other than the perl: a service,
 which is deployed and not released to CPAN.  It runs the 5.040 standards and

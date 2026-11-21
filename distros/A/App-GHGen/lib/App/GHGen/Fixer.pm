@@ -16,9 +16,11 @@ our @EXPORT_OK = qw(
 	%ACTION_UPDATES
 );
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 Readonly my $DEFAULT_TIMEOUT_MINUTES => 60;
+
+=encoding utf-8
 
 =head1 PACKAGE DATA
 
@@ -31,7 +33,7 @@ Canonical mapping of outdated action strings to their current replacements.
 This hash is the B<single source of truth> for action version knowledge.
 Both C<find_outdated_actions> (detection) and C<update_actions> (mutation)
 consume it so that detecting an outdated action always implies the ability
-to fix it — and vice versa.
+to fix it - and vice versa.
 
 Premise 1: the Analyzer reports every key in this hash as "outdated".
 Premise 2: the Fixer replaces every key with its value.
@@ -154,7 +156,7 @@ The issues to process.  Each must have C<type> and C<message> keys.
 
 =head3 Returns
 
-The number of individual fix operations applied (an integer ≥ 0).
+The number of individual fix operations applied (an integer >= 0).
 
 =head3 Side Effects
 
@@ -252,7 +254,7 @@ Issues to fix, each with C<type> and C<message> keys.
 
 =head3 Returns
 
-The number of fixes applied (an integer ≥ 0).  The file is only rewritten
+The number of fixes applied (an integer >= 0).  The file is only rewritten
 when the count is greater than zero.
 
 =head3 Side Effects
@@ -297,7 +299,7 @@ sub fix_workflow($file, $issues) {
 		DumpFile($file, $workflow);
 	}
 
-    return $fixes;
+	return $fixes;
 }
 
 # Fix implementations
@@ -306,113 +308,113 @@ sub add_caching($workflow) {
 	my $jobs = $workflow->{jobs} or return 0;
 	my $modified = 0;
 
-    for my $job (values %$jobs) {
-        my $steps = $job->{steps} or next;
+	for my $job (values %$jobs) {
+		my $steps = $job->{steps} or next;
 
-        # Check if already has caching
-        my $has_cache = grep { $_->{uses} && $_->{uses} =~ /actions\/cache/ } @$steps;
-        next if $has_cache;
+		# Check if already has caching
+		my $has_cache = grep { $_->{uses} && $_->{uses} =~ /actions\/cache/ } @$steps;
+		next if $has_cache;
 
-        # Detect project type and add appropriate cache
-        my $cache_step = detect_and_create_cache_step($steps);
-        next unless $cache_step;
+		# Detect project type and add appropriate cache
+		my $cache_step = detect_and_create_cache_step($steps);
+		next unless $cache_step;
 
-        # Insert cache step after checkout
-        my $insert_at = 0;
-        for my $i (0 .. $#$steps) {
-            if ($steps->[$i]->{uses} && $steps->[$i]->{uses} =~ /actions\/checkout/) {
-                $insert_at = $i + 1;
-                last;
-            }
-        }
+		# Insert cache step after checkout
+		my $insert_at = 0;
+		for my $i (0 .. $#$steps) {
+			if ($steps->[$i]->{uses} && $steps->[$i]->{uses} =~ /actions\/checkout/) {
+				$insert_at = $i + 1;
+				last;
+			}
+		}
 
-        splice @$steps, $insert_at, 0, $cache_step;
-        $modified++;
-    }
+		splice @$steps, $insert_at, 0, $cache_step;
+		$modified++;
+	}
 
-    return $modified;
+	return $modified;
 }
 
 sub detect_and_create_cache_step($steps) {
-    # Detect project type from steps
-    for my $step (@$steps) {
-        my $run = $step->{run} // '';
+	# Detect project type from steps
+	for my $step (@$steps) {
+		my $run = $step->{run} // '';
 
-        # Node.js
-        if ($run =~ /npm (?:install|ci)/ || ($step->{uses} && $step->{uses} =~ /setup-node/)) {
-            return {
-                name => 'Cache dependencies',
-                uses => 'actions/cache@v5',
-                with => {
-                    path => '~/.npm',
-                    key => '${{ runner.os }}-node-${{ hashFiles(\'**/package-lock.json\') }}',
-                    'restore-keys' => '${{ runner.os }}-node-',
-                },
-            };
-        }
+		# Node.js
+		if ($run =~ /npm (?:install|ci)/ || ($step->{uses} && $step->{uses} =~ /setup-node/)) {
+			return {
+				name => 'Cache dependencies',
+				uses => 'actions/cache@v5',
+				with => {
+					path => '~/.npm',
+					key => '${{ runner.os }}-node-${{ hashFiles(\'**/package-lock.json\') }}',
+					'restore-keys' => '${{ runner.os }}-node-',
+				},
+			};
+		}
 
-        # Python
-        if ($run =~ /pip install/ || ($step->{uses} && $step->{uses} =~ /setup-python/)) {
-            return {
-                name => 'Cache pip packages',
-                uses => 'actions/cache@v5',
-                with => {
-                    path => '~/.cache/pip',
-                    key => '${{ runner.os }}-pip-${{ hashFiles(\'**/requirements.txt\') }}',
-                    'restore-keys' => '${{ runner.os }}-pip-',
-                },
-            };
-        }
+		# Python
+		if ($run =~ /pip install/ || ($step->{uses} && $step->{uses} =~ /setup-python/)) {
+			return {
+				name => 'Cache pip packages',
+				uses => 'actions/cache@v5',
+				with => {
+					path => '~/.cache/pip',
+					key => '${{ runner.os }}-pip-${{ hashFiles(\'**/requirements.txt\') }}',
+					'restore-keys' => '${{ runner.os }}-pip-',
+				},
+			};
+		}
 
-        # Rust
-        if ($run =~ /cargo (?:build|test)/) {
-            return {
-                name => 'Cache cargo',
-                uses => 'actions/cache@v5',
-                with => {
-                    path => "~/.cargo/bin/\n~/.cargo/registry/index/\n~/.cargo/registry/cache/\n~/.cargo/git/db/\ntarget/",
-                    key => '${{ runner.os }}-cargo-${{ hashFiles(\'**/Cargo.lock\') }}',
-                },
-            };
-        }
+		# Rust
+		if ($run =~ /cargo (?:build|test)/) {
+			return {
+				name => 'Cache cargo',
+				uses => 'actions/cache@v5',
+				with => {
+					path => "~/.cargo/bin/\n~/.cargo/registry/index/\n~/.cargo/registry/cache/\n~/.cargo/git/db/\ntarget/",
+					key => '${{ runner.os }}-cargo-${{ hashFiles(\'**/Cargo.lock\') }}',
+				},
+			};
+		}
 
-        # Go
-        if ($run =~ /go (?:build|test)/ || ($step->{uses} && $step->{uses} =~ /setup-go/)) {
-            return {
-                name => 'Cache Go modules',
-                uses => 'actions/cache@v5',
-                with => {
-                    path => '~/go/pkg/mod',
-                    key => '${{ runner.os }}-go-${{ hashFiles(\'**/go.sum\') }}',
-                    'restore-keys' => '${{ runner.os }}-go-',
-                },
-            };
-        }
-    }
+		# Go
+		if ($run =~ /go (?:build|test)/ || ($step->{uses} && $step->{uses} =~ /setup-go/)) {
+			return {
+				name => 'Cache Go modules',
+				uses => 'actions/cache@v5',
+				with => {
+					path => '~/go/pkg/mod',
+					key => '${{ runner.os }}-go-${{ hashFiles(\'**/go.sum\') }}',
+					'restore-keys' => '${{ runner.os }}-go-',
+				},
+			};
+		}
+	}
 
-    return undef;
+	return undef;
 }
 
 sub fix_unpinned_actions($workflow) {
 	my $jobs = $workflow->{jobs} or return 0;
 	my $modified = 0;
 
-    for my $job (values %$jobs) {
-        my $steps = $job->{steps} or next;
-        for my $step (@$steps) {
-            next unless $step->{uses};
+	for my $job (values %$jobs) {
+		my $steps = $job->{steps} or next;
+		for my $step (@$steps) {
+			next unless $step->{uses};
 
-            if ($step->{uses} =~ /^(.+?)\@(?:master|main)$/) {
-                my $action = $1;
-                # Map to appropriate version
-                my $version = get_latest_version($action);
-                $step->{uses} = "$action\@$version";
-                $modified++;
-            }
-        }
-    }
+			if ($step->{uses} =~ /^(.+?)\@(?:master|main)$/) {
+				my $action = $1;
+				# Map to appropriate version
+				my $version = get_latest_version($action);
+				$step->{uses} = "$action\@$version";
+				$modified++;
+			}
+		}
+	}
 
-    return $modified;
+	return $modified;
 }
 
 sub add_permissions($workflow) {
@@ -447,54 +449,54 @@ sub update_actions($workflow) {
 sub add_concurrency($workflow) {
 	return 0 if $workflow->{concurrency};
 
-    $workflow->{concurrency} = {
-        group => '${{ github.workflow }}-${{ github.ref }}',
-        'cancel-in-progress' => 'true',
-    };
-    return 1;
+	$workflow->{concurrency} = {
+		group => '${{ github.workflow }}-${{ github.ref }}',
+		'cancel-in-progress' => 'true',
+	};
+	return 1;
 }
 
 sub add_trigger_filters($workflow) {
 	my $on = $workflow->{on} or return 0;
 	my $modified = 0;
 
-    # If 'on' is just 'push', expand it
-    if (ref $on eq 'ARRAY' && grep { $_ eq 'push' } @$on) {
-        $workflow->{on} = {
-            push => {
-                branches => ['main', 'master'],
-            },
-            pull_request => {
-                branches => ['main', 'master'],
-            },
-        };
-        $modified++;
-    }
-    elsif (ref $on eq 'HASH' && $on->{push} && ref $on->{push} eq '') {
-        # 'push' with no filters
-        $on->{push} = {
-            branches => ['main', 'master'],
-        };
-        $modified++;
-    }
+	# If 'on' is just 'push', expand it
+	if (ref $on eq 'ARRAY' && grep { $_ eq 'push' } @$on) {
+		$workflow->{on} = {
+			push => {
+				branches => ['main', 'master'],
+			},
+			pull_request => {
+				branches => ['main', 'master'],
+			},
+		};
+		$modified++;
+	}
+	elsif (ref $on eq 'HASH' && $on->{push} && ref $on->{push} eq '') {
+		# 'push' with no filters
+		$on->{push} = {
+			branches => ['main', 'master'],
+		};
+		$modified++;
+	}
 
-    return $modified;
+	return $modified;
 }
 
 sub add_missing_timeout($workflow) {
 	my $jobs = $workflow->{jobs} or return 0;
 	my $modified = 0;
 
-    for my $job_name (keys %$jobs) {
-        my $job = $jobs->{$job_name};
+	for my $job_name (keys %$jobs) {
+		my $job = $jobs->{$job_name};
 
-        # Skip if timeout already exists
-        next if exists $job->{'timeout-minutes'};
+		# Skip if timeout already exists
+		next if exists $job->{'timeout-minutes'};
 
-        # Insert default timeout
-        $job->{'timeout-minutes'} = $DEFAULT_TIMEOUT_MINUTES;
-        $modified++;
-    }
+		# Insert default timeout
+		$job->{'timeout-minutes'} = $DEFAULT_TIMEOUT_MINUTES;
+		$modified++;
+	}
 
 	return $modified;
 }
@@ -503,37 +505,37 @@ sub update_runners($workflow) {
 	my $jobs = $workflow->{jobs} or return 0;
 	my $modified = 0;
 
-    my %runner_updates = (
-        'ubuntu-18.04' => 'ubuntu-latest',
-        'ubuntu-16.04' => 'ubuntu-latest',
-        'macos-10.15'  => 'macos-latest',
-        'windows-2016' => 'windows-latest',
-    );
+	my %runner_updates = (
+		'ubuntu-18.04' => 'ubuntu-latest',
+		'ubuntu-16.04' => 'ubuntu-latest',
+		'macos-10.15'  => 'macos-latest',
+		'windows-2016' => 'windows-latest',
+	);
 
-    for my $job (values %$jobs) {
-        my $runs_on = $job->{'runs-on'} or next;
+	for my $job (values %$jobs) {
+		my $runs_on = $job->{'runs-on'} or next;
 
-        if (exists $runner_updates{$runs_on}) {
-            $job->{'runs-on'} = $runner_updates{$runs_on};
-            $modified++;
-        }
-    }
+		if (exists $runner_updates{$runs_on}) {
+			$job->{'runs-on'} = $runner_updates{$runs_on};
+			$modified++;
+		}
+	}
 
-    return $modified;
+	return $modified;
 }
 
 sub get_latest_version($action) {
-    my %versions = (
-        'actions/checkout' => 'v6',
-        'actions/cache' => 'v5',
-        'actions/setup-node' => 'v4',
-        'actions/setup-python' => 'v5',
-        'actions/setup-go' => 'v5',
-        'actions/upload-artifact' => 'v4',
-        'actions/download-artifact' => 'v4',
-    );
+	my %versions = (
+		'actions/checkout' => 'v6',
+		'actions/cache' => 'v5',
+		'actions/setup-node' => 'v4',
+		'actions/setup-python' => 'v5',
+		'actions/setup-go' => 'v5',
+		'actions/upload-artifact' => 'v4',
+		'actions/download-artifact' => 'v4',
+	);
 
-    return $versions{$action} // 'v4';  # Default fallback
+	return $versions{$action} // 'v4';  # Default fallback
 }
 
 =head1 AUTHOR

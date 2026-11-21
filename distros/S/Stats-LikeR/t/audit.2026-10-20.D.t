@@ -128,16 +128,12 @@ sub warnings_of {
 	my ($neg0) = warnings_of(sub { fisher_test([[-0.0, 1], [3, 4]]) });
 	is($neg0->{p_value}, fisher_test([[0, 1], [3, 4]])->{p_value}, 'fisher -0 is 0, as in R');
 
-	# R's limit is .Machine$integer.max, which is a cell, not a total: the 2x2
-	# margins are longs here, so a total past 2^31 - 1 is refused where long
-	# is 32 bits (Windows, 32-bit perls) and answered as R does elsewhere.
-	if ($Config{longsize} >= 8) {
-		near(fisher_test([[2147483647, 1], [3, 4]])->{p_value}, 1.9748304869431231e-34,
-		     'fisher a cell of 2^31 - 1 is taken, as R', 1e-11);
-	} else {
-		eval { fisher_test([[2147483647, 1], [3, 4]]) };
-		like($@, qr/the table's total, \d+, is too large/, 'fisher a total past a 32-bit long croaks');
-	}
+	# R's limit is .Machine$integer.max, which is a cell, not a total. Up to
+	# 0.3425 the 2x2 margins were longs, so a total past 2^31 - 1 was refused
+	# where long is 32 bits (Windows, 32-bit perls); since 0.3426 they are
+	# int64_t, and every platform answers as R does.
+	near(fisher_test([[2147483647, 1], [3, 4]])->{p_value}, 1.9748304869431231e-34,
+	     'fisher a cell of 2^31 - 1 is taken, as R', 1e-11);
 }
 
 # fisher_test(): an all-zero table croaked "table is all zeros".  R answers a
@@ -168,7 +164,7 @@ no_leaks_ok { fisher_test([[0, 1, 8, 4], [4, 7, 6, 3], [4, 0, 8, 7], [7, 4, 5, 5
 # binom_test(): Inf and NaN passed bt_check_count(), whose integer test is
 # false for both (Inf - Inf is NaN), and the cast to long was undefined.
 {
-	my $big = 2**64;	# past LONG_MAX on every platform
+	my $big = 2**64;	# past IV_MAX on every platform
 	for my $c ([ 'x = Inf', [$INF, 10], qr/x must be a nonnegative integer/ ],
 		   [ 'x = NaN', [$NAN, 10], qr/x must be a nonnegative integer/ ],
 		   [ 'x = "inf"', ['inf', 10], qr/x must be a nonnegative integer/ ],
@@ -183,10 +179,11 @@ no_leaks_ok { fisher_test([[0, 1, 8, 4], [4, 7, 6, 3], [4, 0, 8, 7], [7, 4, 5, 5
 		eval { binom_test(@$args) };
 		like($@, $re, "binom_test $name croaks, as R stops");
 	}
-	# Each count fits a long, but the sum does not.
-	my $half = $Config{longsize} >= 8 ? 2**62 : 2**30;
+	# Each count fits an IV, but the sum does not (the limit was LONG_MAX up to
+	# 0.3425, and is IV_MAX since).
+	my $half = $Config{ivsize} >= 8 ? 2**62 : 2**30;
 	eval { binom_test([$half, $half]) };
-	like($@, qr/successes \+ failures is too large/, 'binom_test successes + failures past LONG_MAX croaks');
+	like($@, qr/successes \+ failures is too large/, 'binom_test successes + failures past IV_MAX croaks');
 	no_leaks_ok { eval { binom_test($INF, 10) } } 'binom_test Inf croak leaks nothing';
 }
 

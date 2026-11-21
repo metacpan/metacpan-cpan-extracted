@@ -162,6 +162,12 @@ THardwareInfo::THardwareInfo()
 
     consoleMode |= ENABLE_WINDOW_INPUT; // Report changes in buffer size
     consoleMode &= ~ENABLE_PROCESSED_INPUT; // Report CTRL+C and SHIFT+Arrow events.
+    consoleMode &= ~(ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT); // Report Ctrl+S.
+    SetConsoleMode( consoleHandle[cnInput], consoleMode );
+    // The following flags were introduced in later Windows versions, so use a
+    // separate call to SetConsoleMode, just in case it fails.
+    consoleMode |= ENABLE_EXTENDED_FLAGS;   /* Disable the Quick Edit mode, */
+    consoleMode &= ~ENABLE_QUICK_EDIT_MODE; /* which inhibits the mouse.    */
     SetConsoleMode( consoleHandle[cnInput], consoleMode );
 
     pSetConsoleActiveScreenBuffer =
@@ -273,13 +279,13 @@ void THardwareInfo::setCaretSize( ushort size )
     SetConsoleCursorInfo( consoleHandle[cnOutput], &crInfo );
 }
 
-void THardwareInfo::screenWrite( ushort x, ushort y, ushort *buf, DWORD len )
+void THardwareInfo::screenWrite( ushort x, ushort y, CHAR_INFO *buf, DWORD len )
 {
     COORD size = {len,1};
     COORD from = {0,0};
     SMALL_RECT to = {x,y,x+len-1,y};
 
-    WriteConsoleOutput( consoleHandle[cnOutput], (CHAR_INFO *) buf, size, from, &to);
+    WriteConsoleOutput( consoleHandle[cnOutput], buf, size, from, &to);
 }
 
 // Event functions.
@@ -346,16 +352,21 @@ BOOL THardwareInfo::getKeyEvent( TEvent& event )
                     event.keyDown.keyCode == 0x5C00 )
                     // Discard standalone Shift, Ctrl, Alt, Caps Lock, Windows keys.
                     event.keyDown.keyCode = kbNoKey;
-                else if( event.keyDown.controlKeyState & kbRightAlt )
-                    {
-                    if( event.keyDown.charScan.charCode == '\0' )
-                        // When AltGr+Key does not produce a character, an unwanted keyCode
-                        // may be read instead, so discard it.
-                        event.keyDown.keyCode = kbNoKey;
-                    else
-                        // Otherwise, discard the Ctrl modifier that is automatically added.
-                        event.keyDown.controlKeyState &= ~kbLeftCtrl;
-                    }
+                else if( (event.keyDown.controlKeyState & kbLeftCtrl) &&
+                         (event.keyDown.controlKeyState & kbRightAlt) &&
+                         event.keyDown.charScan.charCode == '\0' )
+                    // We cannot tell for sure if the right Alt key is AltGr, since
+                    // that depends on the keyboard layout, but it is certain that
+                    // AltGr automatically adds the left Ctrl flag.
+                    // If both of these are set but no text is produced, discard the
+                    // whole event since we don't want AltGr to be handled as Ctrl+Alt.
+                    event.keyDown.keyCode = kbNoKey;
+                else if( (event.keyDown.controlKeyState & kbCtrlShift) &&
+                         (event.keyDown.controlKeyState & kbAltShift) &&
+                         event.keyDown.charScan.charCode != '\0' )
+                    // If Ctrl+Alt produces text, we are dealing with AltGr. In this case,
+                    // discard the Ctrl and Alt modifiers.
+                    event.keyDown.controlKeyState &= ~(kbCtrlShift | kbAltShift);
                 else if( irBuffer.Event.KeyEvent.wVirtualScanCode < 89 )
                     {
                     // Convert NT style virtual scan codes to PC BIOS codes.
@@ -451,13 +462,18 @@ BOOL THardwareInfo::requestClipboardText( void (&accept)( TStringView ) )
     return result;
 }
 
+uint32_t THardwareInfo::getTickCountMs()
+{
+    return GetTickCount();
+}
+
 #endif  // __BORLANDC__
 
 uint32_t THardwareInfo::getTickCount() noexcept
 {
     // To change units from ms to clock ticks.
     //   X ms * 1s/1000ms * 18.2ticks/s = X/55 ticks, roughly.
-    return GetTickCount() / 55;
+    return getTickCountMs() / 55;
 }
 
 BOOL __stdcall THardwareInfo::ctrlBreakHandler( DWORD dwCtrlType ) noexcept
