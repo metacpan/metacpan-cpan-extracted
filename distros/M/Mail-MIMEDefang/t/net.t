@@ -9,6 +9,8 @@ use Sys::Hostname;
 
 use Mail::MIMEDefang;
 use Mail::MIMEDefang::Net;
+use Mail::MIMEDefang::Net qw(md_shared_resolver md_caching_resolver md_dns_query md_dns_cache_clear);
+use Net::DNS;
 
 init_globals;
 $Features{"Net::DNS"} = 1;
@@ -73,16 +75,34 @@ sub t_reverse_ip : Test(2)
   is(reverse_ip_address_for_rbl($ipv6), 'e.4.6.a.9.3.b.f.b.d.4.3.1.2.1.1.0.0.0.0.0.0.0.0.0.0.0.0.0.8.e.f');
 }
 
-sub t_get_ptr_record : Test(1)
+sub t_get_ptr_record : Test(2)
 {
   my $ipv4 = '1.1.1.1';
+  my $ipv6 = '2606:4700:4700::1111';
 
   SKIP: {
     if ( (not defined $ENV{'NET_TEST'}) or ($ENV{'NET_TEST'} ne 'yes' )) {
-      skip "Net test disabled", 1
+      skip "Net test disabled", 2
     }
     is(Mail::MIMEDefang::Net::get_ptr_record($ipv4), 'one.one.one.one');
+    is(Mail::MIMEDefang::Net::get_ptr_record($ipv6), 'one.one.one.one');
   }
+}
+
+sub t_get_ptr_record_ipv6_zone : Test(2)
+{
+  my @asked;
+  md_dns_cache_clear();
+  no warnings 'redefine';
+  local *Net::DNS::Resolver::Base::send = sub {
+    my (undef, $name, $type) = @_;
+    push(@asked, $name);
+    return _fake_reply($name, $type, 'NOERROR', "$name. 300 IN PTR host.example.org.");
+  };
+  is(Mail::MIMEDefang::Net::get_ptr_record('2001:db8::1'), 'host.example.org');
+  is($asked[0], '1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.b.d.0.1.0.0.2.ip6.arpa',
+     'IPv6 PTR lookups go to ip6.arpa');
+  md_dns_cache_clear();
 }
 
 sub t_relay_is_blacklisted_multi : Test(1)
@@ -171,6 +191,247 @@ sub t_get_mx_ip_addresses : Test(1)
     my @res = get_mx_ip_addresses($domain);
     is(scalar @res, 1);
   }
+}
+
+# --- shared resolver and DNS answer cache (no network: send() is stubbed) ---
+
+sub _fake_reply
+{
+  my ($name, $type, $rcode, @rdata) = @_;
+  my $pkt = Net::DNS::Packet->new($name, $type);
+  $pkt->header->qr(1);
+  $pkt->header->rcode($rcode);
+  foreach my $r (@rdata) {
+    $pkt->push(answer => Net::DNS::RR->new($r));
+  }
+  return $pkt;
+}
+
+sub t_shared_resolver : Test(3)
+{
+  my $r1 = md_shared_resolver();
+  isa_ok($r1, 'Net::DNS::Resolver');
+  is(md_shared_resolver(), $r1, 'the resolver is reused');
+  ok(!$r1->{defnames}, 'search list is not appended to lookups');
+}
+
+sub t_dns_query_cache : Test(11)
+{
+  my $calls = 0;
+  my $reply;
+  my $res = md_shared_resolver();
+  md_dns_cache_clear();
+  no warnings 'redefine';
+  local *Net::DNS::Resolver::Base::send = sub { $calls++; return $reply; };
+
+  # positive answer is cached, and the trailing dot / case do not matter
+  $reply = _fake_reply('a.example.org', 'A', 'NOERROR', 'a.example.org. 120 IN A 192.0.2.1');
+  my $p = md_dns_query($res, 'a.example.org', 'A');
+  is(($p->answer)[0]->address, '192.0.2.1');
+  md_dns_query(undef, 'A.Example.ORG.', 'A');
+  is($calls, 1, 'second lookup answered from the cache');
+
+  # NXDOMAIN: query() semantics (undef), cached; send() semantics (packet)
+  $calls = 0;
+  $reply = _fake_reply('nx.example.org', 'TXT', 'NXDOMAIN');
+  is(md_dns_query($res, 'nx.example.org', 'TXT'), undef, 'NXDOMAIN gives undef with query');
+  my $s = md_dns_query($res, 'nx.example.org', 'TXT', 'send');
+  is($s->header->rcode, 'NXDOMAIN', 'NXDOMAIN packet is returned with send');
+  is($calls, 1, 'negative answer was cached');
+
+  # SERVFAIL and timeouts are never cached
+  $calls = 0;
+  $reply = _fake_reply('sf.example.org', 'A', 'SERVFAIL');
+  md_dns_query($res, 'sf.example.org', 'A') for 1..2;
+  is($calls, 2, 'SERVFAIL is not cached');
+  $reply = undef;
+  md_dns_query($res, 'to.example.org', 'A') for 1..2;
+  is($calls, 4, 'timeout is not cached');
+
+  # TTL expiry
+  $calls = 0;
+  $reply = _fake_reply('ttl.example.org', 'A', 'NOERROR', 'ttl.example.org. 1 IN A 192.0.2.9');
+  md_dns_query($res, 'ttl.example.org', 'A');
+  sleep(2);
+  md_dns_query($res, 'ttl.example.org', 'A');
+  is($calls, 2, 'entry expired after its TTL');
+
+  # a resolver supplied by the caller is never cached
+  $calls = 0;
+  my $mine = Net::DNS::Resolver->new;
+  $reply = _fake_reply('b.example.org', 'A', 'NOERROR', 'b.example.org. 120 IN A 192.0.2.2');
+  md_dns_query($mine, 'b.example.org', 'A') for 1..2;
+  is($calls, 2, 'caller-supplied resolver bypasses the cache');
+
+  md_dns_cache_clear();
+  $calls = 0;
+  $reply = _fake_reply('a.example.org', 'A', 'NOERROR', 'a.example.org. 120 IN A 192.0.2.1');
+  md_dns_query($res, 'a.example.org', 'A');
+  md_dns_cache_clear();
+  md_dns_query($res, 'a.example.org', 'A');
+  is($calls, 2, 'md_dns_cache_clear empties the cache');
+}
+
+sub t_caching_resolver : Test(7)
+{
+  my $calls = 0;
+  my $reply;
+  my $res = md_shared_resolver();
+  md_dns_cache_clear();
+  no warnings 'redefine';
+  local *Net::DNS::Resolver::Base::send = sub { $calls++; return $reply; };
+
+  my $cr = md_caching_resolver();
+  $reply = _fake_reply('c.example.org', 'TXT', 'NOERROR', 'c.example.org. 120 IN TXT "v=spf1 -all"');
+  my $p = $cr->send('c.example.org', 'TXT');
+  is(($p->answer)[0]->txtdata, 'v=spf1 -all');
+  $cr->send('c.example.org.', 'TXT', 'IN');
+  is($calls, 1, 'send answered from the cache');
+
+  # errorstring describes the last lookup, not the shared resolver state
+  $res->errorstring('query timed out');
+  $cr->send('c.example.org', 'TXT');
+  is($cr->errorstring, 'NOERROR', 'errorstring of a cached answer');
+  $reply = undef;
+  $res->errorstring('query timed out');
+  is($cr->send('to.example.org', 'A'), undef);
+  is($cr->errorstring, 'query timed out', 'errorstring of a failed lookup');
+
+  # non-IN classes are not cached
+  $calls = 0;
+  $reply = _fake_reply('ch.example.org', 'TXT', 'NOERROR');
+  $cr->send('ch.example.org', 'TXT', 'CH') for 1..2;
+  is($calls, 2, 'CH class bypasses the cache');
+
+  # other methods are passed to the shared resolver
+  is($cr->defnames, $res->defnames, 'unknown methods are delegated');
+  md_dns_cache_clear();
+}
+
+sub t_dns_txt_uses_cache : Test(2)
+{
+  my $calls = 0;
+  my $res = md_shared_resolver();
+  md_dns_cache_clear();
+  no warnings 'redefine';
+  local *Net::DNS::Resolver::Base::send = sub {
+    $calls++;
+    return _fake_reply('_dmarc.example.net', 'TXT', 'NOERROR',
+                       '_dmarc.example.net. 300 IN TXT "v=DMARC1; p=none"');
+  };
+  is(scalar(md_dns_txt($res, '_dmarc.example.net', qr/^v=DMARC1/)), 'v=DMARC1; p=none');
+  md_dns_txt($res, '_dmarc.example.net', qr/^v=DMARC1/);
+  is($calls, 1, 'md_dns_txt goes through the cache');
+}
+
+sub t_dns_txt_multiple : Test(5)
+{
+  my $res = md_shared_resolver();
+  md_dns_cache_clear();
+  no warnings 'redefine';
+  local *Net::DNS::Resolver::Base::send = sub {
+    return _fake_reply('multi.example.net', 'TXT', 'NOERROR',
+                       'multi.example.net. 300 IN TXT "google-site-verification=abc"',
+                       'multi.example.net. 300 IN TXT "v=spf1 " "-all"',
+                       'multi.example.net. 300 IN TXT "v=spf1 +all"');
+  };
+  my @all = md_dns_txt($res, 'multi.example.net');
+  is(scalar(@all), 3, 'list context returns every TXT record');
+  my @spf = md_dns_txt($res, 'multi.example.net', qr/^v=spf1\b/);
+  is_deeply(\@spf, ['v=spf1 -all', 'v=spf1 +all'], 'filter applies to every record, strings concatenated');
+  is(scalar(md_dns_txt($res, 'multi.example.net', qr/^v=spf1\b/)), 'v=spf1 -all', 'scalar context returns the first match');
+  my @none = md_dns_txt($res, 'multi.example.net', qr/^v=DMARC1/);
+  is(scalar(@none), 0, 'no match is an empty list');
+  ok(!defined scalar(md_dns_txt($res, 'multi.example.net', qr/^v=DMARC1/)), 'no match is undef in scalar context');
+}
+
+sub t_dns_query_nocache : Test(3)
+{
+  my $calls = 0;
+  my $res = md_shared_resolver();
+  md_dns_cache_clear();
+  no warnings 'redefine';
+  local *Net::DNS::Resolver::Base::send = sub {
+    $calls++;
+    return _fake_reply('nc.example.org', 'A', 'NOERROR', 'nc.example.org. 120 IN A 192.0.2.3');
+  };
+
+  my $p = md_dns_query($res, 'nc.example.org', 'A', 'query', 1);
+  is(($p->answer)[0]->address, '192.0.2.3');
+  md_dns_query(undef, 'nc.example.org', 'A', 'query', 1);
+  is($calls, 2, 'nocache lookups always go to the network');
+  md_dns_query($res, 'nc.example.org', 'A');
+  is($calls, 3, 'nocache lookups do not fill the cache');
+}
+
+sub t_rbl_multi_uses_md_dns_query : Test(3)
+{
+  my @resolvers;
+  pipe(my $rd, my $wr) or die "pipe: $!";
+  no warnings 'redefine';
+  local *Net::DNS::Resolver::Base::bgsend = sub { push(@resolvers, $_[0]); return $rd; };
+
+  my $ans = relay_is_blacklisted_multi('192.0.2.1', 0, 0, ['rbl.example.org']);
+  is($ans->{'rbl.example.org'}, 'SERVFAIL', 'no answer within the timeout');
+  is(scalar(@resolvers), 1, 'one bgsend per blocklist');
+  is($resolvers[0], md_shared_resolver(), 'the shared resolver is used');
+}
+
+# Fake zone for the MX tests: name/type => list of RRs
+my %MX_ZONE = (
+  'mx.example.org MX'      => ['mx.example.org. 300 IN MX 10 mail.example.org.',
+                               'mx.example.org. 300 IN MX 20 mail6.example.org.'],
+  'mail.example.org A'     => ['mail.example.org. 300 IN A 192.0.2.10'],
+  'mail.example.org AAAA'  => ['mail.example.org. 300 IN AAAA 2001:4860:0:0::10'],
+  'mail6.example.org AAAA' => ['mail6.example.org. 300 IN AAAA fe80::1'],
+  'nomx.example.org A'     => ['nomx.example.org. 300 IN A 10.0.0.1'],
+  'nomx.example.org AAAA'  => ['nomx.example.org. 300 IN AAAA 2001:4860::20'],
+  'pref.example.org MX'    => ['pref.example.org. 300 IN MX 20 backup.example.org.',
+                               'pref.example.org. 300 IN MX 10 primary.example.org.',
+                               'pref.example.org. 300 IN MX 20 backup2.example.org.'],
+  'primary.example.org A'  => ['primary.example.org. 300 IN A 192.0.2.1'],
+  'backup.example.org A'   => ['backup.example.org. 300 IN A 192.0.2.2'],
+  'backup2.example.org A'  => ['backup2.example.org. 300 IN A 192.0.2.3'],
+);
+
+sub _fake_mx_send
+{
+  my (undef, $name, $type) = @_;
+  $name =~ s/\.$//;
+  my $rrs = $MX_ZONE{"$name $type"} // [];
+  return _fake_reply($name, $type, 'NOERROR', @$rrs);
+}
+
+sub t_get_mx_ip_addresses_ipv6 : Test(3)
+{
+  md_dns_cache_clear();
+  no warnings 'redefine';
+  local *Net::DNS::Resolver::Base::send = \&_fake_mx_send;
+
+  my @res = get_mx_ip_addresses('mx.example.org');
+  is_deeply(\@res, ['192.0.2.10', '2001:4860::10', 'fe80::1'],
+            'A and AAAA records of every MX host');
+  @res = get_mx_ip_addresses('nomx.example.org');
+  is_deeply(\@res, ['10.0.0.1', '2001:4860::20'],
+            'no MX: A and AAAA records of the domain');
+  @res = md_get_bogus_mx_hosts('mx.example.org');
+  is_deeply(\@res, ['fe80::1'], 'IPv6 MX hosts are checked as IPv6');
+  md_dns_cache_clear();
+}
+
+sub t_get_mx_ip_addresses_sorted : Test(2)
+{
+  md_dns_cache_clear();
+  no warnings 'redefine';
+  local *Net::DNS::Resolver::Base::send = \&_fake_mx_send;
+
+  my @res = get_mx_ip_addresses('pref.example.org');
+  is_deeply(\@res, ['192.0.2.2', '192.0.2.1', '192.0.2.3'],
+            'without the flag the DNS answer order is kept');
+  @res = get_mx_ip_addresses('pref.example.org', undef, 1);
+  is_deeply(\@res, ['192.0.2.1', '192.0.2.2', '192.0.2.3'],
+            'with the flag addresses are sorted by MX preference');
+  md_dns_cache_clear();
 }
 
 __PACKAGE__->runtests();

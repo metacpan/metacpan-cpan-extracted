@@ -20,6 +20,36 @@ my $all = $pager->all;
 
 In list context, `all()` returns the items as a list. In scalar context, it returns an array reference.
 
+`all()` preserves JSON `null` elements (decoded as Perl `undef`) within item arrays, including at page boundaries. `next()` retains its existing contract of returning `undef` at exhaustion; it therefore cannot distinguish an actual `undef` item from the end of iteration. Use `all()` when preserving nullable elements matters, or normalize them to explicit values in a custom `items` extractor before using `next()`.
+
+## Optional page limit
+
+Use `max_pages` to bound the number of successfully validated pages fetched by
+any pagination mode. The default is unlimited, preserving existing behavior.
+
+```perl
+my $pager = $api->paginate(
+    '/users',
+    mode      => 'page',
+    has_more  => 'has_more',
+    max_pages => 50,
+);
+```
+
+If more pages remain after the limit is reached, the next attempt to fetch a
+page throws `pagination maximum page count exceeded` **before** issuing
+another HTTP request. Items already buffered by the last permitted page can
+still be consumed with `next()`. A pagination sequence that finishes on the
+last permitted page completes normally.
+
+Failed pages do not count against this limit: the iterator can retry a page
+whose response or continuation metadata was rejected without exhausting its
+page allowance. In page-number mode, an empty page with `has_more` true
+can legitimately precede a populated page; without `max_pages` the iterator
+still honors that flag. Set a limit when the API could repeatedly claim more
+pages without returning useful data.
+
+
 ## Supported modes
 
 Four modes are supported:
@@ -44,11 +74,15 @@ my $pager = $api->paginate(
 );
 ```
 
-After the first page, continuation URLs are requested as returned by the API. Relative continuation URLs continue to pass through the client request layer and therefore use the configured base URL.
+After the first page, continuation URLs are requested as returned by the API. Absolute HTTP(S) continuation URLs are recognized even when the scheme uses uppercase or mixed-case letters (for example, `HTTPS://api.example.com/users?page=2`). Relative continuation URLs continue to pass through the client request layer and therefore use the configured base URL.
 
 An undefined or empty continuation marks the pagination sequence complete.
 
 Absolute continuation URLs are restricted to the client's configured origin by default. This prevents client-level credentials and other default headers from being forwarded to an unrelated origin when a continuation URL comes from a response. Set `allow_cross_origin => 1` only when the API intentionally paginates across origins and forwarding the client's request configuration is expected.
+
+Origin comparisons use the scheme and host, treating an omitted port as equivalent to the scheme's default port (`80` for HTTP, `443` for HTTPS), including zero-padded spellings such as `:080` and `:0443`. Query strings and fragments do not affect the origin, including absolute continuations without a path such as `https://api.example.com?page=2`. Different schemes, hosts, and non-default ports remain restricted.
+
+For safety, cross-origin rejection errors do not echo the rejected continuation URL: its query string may contain credentials or other private data. Treat continuation URLs received from APIs as untrusted input.
 
 ### `page`
 
@@ -88,7 +122,7 @@ my $pager = $api->paginate(
     page_size_param => 'maxResults',
     page_size       => 1000,
     query => {
-        jql    => 'filter=415607',
+        jql    => 'filter=12345',
         fields => 'summary,description,components',
     },
 );
@@ -179,7 +213,7 @@ A page is accepted only after its items and continuation metadata are both valid
 
 Repeated next URLs or cursor values are rejected instead of looping forever. This includes a continuation that returns to the initial requested URL (including pagination query options) or to an explicitly supplied initial cursor; the duplicate request is avoided. Detection compares the URL and cursor values directly, without URL canonicalization.
 
-A repeated continuation throws an error containing `pagination continuation repeated`.
+A repeated continuation throws an error containing `pagination continuation repeated` and identifies whether the repeated value was a URL or cursor. The exception deliberately does **not** include the original URL or cursor value, because server-supplied continuation metadata can contain secrets.
 
 ## Validation
 
@@ -191,6 +225,7 @@ The constructor rejects:
 - non-hash `query`
 - non-hash `request`
 - non-positive `page_size`
+- non-positive, non-integer, or non-ASCII `max_pages`
 - non-positive `start_page`
 - non-ASCII digits in `page_size` or `start_page`
 - invalid or negative `start_offset`

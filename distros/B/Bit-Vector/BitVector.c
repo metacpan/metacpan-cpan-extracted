@@ -629,7 +629,7 @@ N_word BitVector_Mask(N_int bits)           /* bit vector mask (unused bits) */
 
 charptr BitVector_Version(void)
 {
-    return((charptr)"7.4");
+    return((charptr)"7.5");
 }
 
 N_int BitVector_Word_Bits(void)
@@ -3838,11 +3838,12 @@ void Matrix_Transpose(wordptr X, N_int rowsX, N_int colsX,
 }
 
 /*****************************************************************************/
-/*  VERSION:  7.4                                                            */
+/*  VERSION:  7.5                                                            */
 /*****************************************************************************/
 /*  VERSION HISTORY:                                                         */
 /*****************************************************************************/
 /*                                                                           */
+/*    Version 7.5  21 11 26  No changes.                                     */
 /*    Version 7.4  03.09.13  No changes.                                     */
 /*    Version 7.3  01.06.13  No changes.                                     */
 /*    Version 7.2  17.05.12  No changes.                                     */

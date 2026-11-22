@@ -1,5 +1,15 @@
 Revision history for Google-Auth
 
+0.13    2026-11-21
+    - [Security / CVE-2026-74759] Hardened Google::Auth::ExternalAccountCredentials::Aws against SSRF and path traversal by pinning IMDSv2 URLs (imdsv2_session_token_url, credential_source.url, credential_source.region_url) to link-local hosts (169.254.169.254 / fd00:ec2::254) and validating/URI-escaping EC2 IAM role names.
+    - [Security / CVE-2026-74760] Hardened gcloud-auth CLI loopback OAuth login callback to generate PKCE/state tokens using OpenSSL RAND_bytes CSPRNG (Google::Auth::get_secure_random_bytes) and strictly verify the returned OAuth state parameter before accepting authorization codes.
+    - [Security] Enforced strict https scheme validation across credential and JWKS endpoints (_validate_url).
+    - [Security] Added JWT algorithm allowlisting (RS256, ES256), key-algorithm binding, and mandatory numeric exp/nbf/iat claim checks in Google::Auth::IDTokens::Verifier.
+    - [Security] Validated XSRF state before session mutation in Google::Auth::WebUserAuthorizer::handle_auth_callback_deferred.
+    - Hardened XS.xs cryptographic memory handling (SvPVbyte, ECDSA DER vs raw R||S disambiguation, dynamic EVP_PKEY_size allocation, DESTROY zeroing, CLONE_SKIP).
+    - Added RFC 3339 expireTime parsing in Google::Auth::ImpersonatedServiceAccountCredentials.
+    - Refactored Auth layer to support the Pluggable Transport Architecture.
+
 0.12    Wed Aug 12 2026
     - Expanded Workload Identity Federation (WIF) support with AWS ECS Container Task Roles and EC2 IMDSv2.
     - Security hardening for AWS Container Credentials Full URI (Protocol Scheme enforcement).

@@ -1,5 +1,5 @@
                     =====================================
-                      Package "Bit::Vector" Version 7.4
+                      Package "Bit::Vector" Version 7.5
                     =====================================
 
 
@@ -9,6 +9,12 @@
 
 Version history:
 ----------------
+
+Version 7.5   21.11.2026
+
+ +  Fixed compilation with C23 compilers:
+     - https://rt.cpan.org/Public/Bug/Display.html?id=165142
+     - Thanks to BIGFOOT for the report and patch.
 
 Version 7.4   03.09.2013
 

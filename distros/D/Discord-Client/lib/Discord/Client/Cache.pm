@@ -4,10 +4,11 @@ use v5.26;
 use strict;
 use warnings;
 use Carp qw(croak);
+use Discord::Client::Model::Channel ();
 use JSON::PP ();
 use Time::HiRes qw(clock_gettime CLOCK_MONOTONIC);
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 sub new {
     my ( $class, %args ) = @_;
@@ -185,6 +186,14 @@ sub _store_observed {
     # Ignore event fragments without a valid resource identity.
     return
         unless ref($data) eq 'HASH' && defined( $data->{id} ) && !ref( $data->{id} ) && $data->{id} =~ /\A\d{1,20}\z/;
+
+    # Obfuscated updates and the full update restoring visibility each carry their own snapshot.
+    if ( $type eq 'channel' && $options{merge} ) {
+        my $entry = $self->{entries}{ _key( $type, $data->{id} ) };
+        $options{merge} = 0
+            if Discord::Client::Model::Channel::_has_obfuscated_flag($data)
+            || ( $entry && Discord::Client::Model::Channel::_has_obfuscated_flag( $entry->{data} ) );
+    }
     $self->put( $type, $data, %options );
 }
 
@@ -346,6 +355,11 @@ snapshots marked C<unavailable> until expiry.
 Guild snapshots omit members, presences, voice states, channels and threads.
 Observed channels and threads have separate entries. There are no guild/member
 scans, presence or voice-state caches.
+
+Channel updates normally merge supplied fields. If either the incoming channel
+or the cached channel is L<obfuscated|Discord::Client::Model::Channel/is_obfuscated>,
+the incoming snapshot replaces the cached one. Omitted fields are discarded,
+including placeholder permission overwrites when visibility returns.
 
 =head2 clear
 

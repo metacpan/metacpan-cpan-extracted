@@ -50,6 +50,14 @@ is_deeply decode_json($calls[0][2]{content}), { name => 'Alice' }, 'JSON encoded
 my $absolute = $api->get('https://other.example.test/status');
 is $calls[1][1], 'https://other.example.test/status', 'absolute URL accepted';
 
+$api->get('HTTPS://other.example.test/status?state=active');
+is $calls[2][1], 'HTTPS://other.example.test/status?state=active',
+    'uppercase HTTPS scheme is treated as an absolute URL';
+
+$api->get('hTtP://other.example.test/items');
+is $calls[3][1], 'hTtP://other.example.test/items',
+    'mixed-case HTTP scheme is treated as an absolute URL';
+
 my $bad_json_api = HTTP::API::Core->new(
     base_url => 'https://api.example.test',
     retry => { attempts => 1 },

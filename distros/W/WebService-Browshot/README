@@ -12,6 +12,41 @@ To install this module type the following:
    make test
    make install
 
+API 1.32
+
+New capture options are passed as named arguments to the existing screenshot,
+multiple, batch, and crawl methods. No request format change is needed.
+
+Download PDF and video output with:
+
+   $browshot->screenshot_pdf(id => $id);
+   $browshot->screenshot_pdf_file(id => $id, file => 'capture.pdf');
+   $browshot->screenshot_video(id => $id);
+   $browshot->screenshot_video_file(id => $id, file => 'capture.webm');
+
+Video supports WebM (default), MP4, and animated GIF. Wait for status=finished
+before downloading. See the module documentation for options and credit costs.
+
+TESTS
+
+Run the offline unit tests without an API key:
+
+   prove -l t
+
+Run the read-only API 1.32 tests against your account:
+
+   BROWSHOT_REMOTE_TESTS=1 BROWSHOT_KEY=your_api_key prove -lv t/API-1.32-remote.t
+
+To test successful downloads, also set BROWSHOT_PDF_ID, BROWSHOT_WEBM_ID,
+BROWSHOT_MP4_ID, and/or BROWSHOT_GIF_ID to finished test captures belonging to
+your account. BROWSHOT_SCREENSHOT_ID enables checks of an existing screenshot
+and thumbnail. BROWSHOT_BASE can override the API base for a private test server.
+The test creates no captures, shares, hosting jobs, batches, or crawls.
+
+The original remote tests in t/WebService-Browshot.t assume the historical
+zero-balance test account. Run the API 1.32 remote test separately for a regular
+customer account.
+
 DEPENDENCIES
 
 This module requires these other modules and libraries:

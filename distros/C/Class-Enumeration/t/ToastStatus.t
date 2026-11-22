@@ -1,58 +1,53 @@
 ## no critic (ProhibitMagicNumbers)
-
-use strict;
-use warnings;
-
-use Test::Lib;
-use Test::More import => [ qw( BAIL_OUT cmp_ok is_deeply isa_ok note plan subtest use_ok ) ], tests => 4;
+use Test2::V1
+  -pragmas,
+  -target => { CLASS => 'ToastStatus' },
+  qw( cmp_ok dies imported_ok is isa_ok note ok plan subtest );
+BEGIN { CLASS->import( ':all' ) }
 use Test::API import => [ qw( class_api_ok ) ];
-use Test::Fatal qw( dies_ok );
 
-my $class;
-
-BEGIN {
-  $class = 'ToastStatus';
-  use_ok $class, ':all' or BAIL_OUT "Cannot load class '$class'!";
-}
+plan 4;
 
 # Class::Enumeration methods + enum constants
-class_api_ok $class, qw( name ordinal value_of values names to_string bread burnt toast toasting );
+class_api_ok CLASS, qw( name ordinal value_of values names to_string bread burnt toast toasting );
+
+imported_ok qw( bread burnt toast toasting );
 
 subtest 'Class method invocations' => sub {
-  plan tests => 18;
+  plan 18;
 
-  for my $self ( $class->values ) {
+  for my $self ( CLASS->values ) {
     note my $name = $self->name;
     cmp_ok "$self", 'eq', $name, 'Check default stringification';
-    isa_ok $self, $class;
+    isa_ok $self, CLASS;
     isa_ok $self, 'Class::Enumeration';
-    cmp_ok $self, '==', $class->value_of( $self->name ), 'Get enum object reference by name'
+    cmp_ok $self, '==', CLASS->value_of( $self->name ), 'Get enum object reference by name'
   }
 
-  is_deeply [ $class->names ], [ qw( bread toasting toast burnt ) ], 'Get names of enum objects';
+  is [ CLASS->names ], [ qw( bread toasting toast burnt ) ], 'Get names of enum objects';
 
-  dies_ok { $class->value_of( 'initial' ) } 'No such enum object for the given name'
+  ok defined( dies { CLASS->value_of( 'initial' ) } ), 'No such enum object for the given name'
 };
 
 subtest 'Access enum attributes and enum constants' => sub {
-  plan tests => 12;
+  plan 12;
 
-  my $self = $class->value_of( 'bread' );
+  my $self = CLASS->value_of( 'bread' );
   cmp_ok $self,          '==', bread,   'Access enum constant';
   cmp_ok $self->name,    'eq', 'bread', 'Get name';
   cmp_ok $self->ordinal, '==', 0,       'Get ordinal';
 
-  $self = $class->value_of( 'toasting' );
+  $self = CLASS->value_of( 'toasting' );
   cmp_ok $self,          '==', toasting,   'Access enum constant';
   cmp_ok $self->name,    'eq', 'toasting', 'Get name';
   cmp_ok $self->ordinal, '==', 1,          'Get ordinal';
 
-  $self = $class->value_of( 'toast' );
+  $self = CLASS->value_of( 'toast' );
   cmp_ok $self,          '==', toast,   'Access enum constant';
   cmp_ok $self->name,    'eq', 'toast', 'Get name';
   cmp_ok $self->ordinal, '==', 2,       'Get ordinal';
 
-  $self = $class->value_of( 'burnt' );
+  $self = CLASS->value_of( 'burnt' );
   cmp_ok $self,          '==', burnt,   'Access enum constant';
   cmp_ok $self->name,    'eq', 'burnt', 'Get name';
   cmp_ok $self->ordinal, '==', 3,       'Get ordinal'

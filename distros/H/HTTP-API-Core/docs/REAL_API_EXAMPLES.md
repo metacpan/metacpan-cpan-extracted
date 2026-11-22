@@ -172,7 +172,7 @@ my $jira = HTTP::API::Core::Example::Jira->new(
 );
 
 my $pager = $jira->issues_pager(
-    jql => 'filter=415607',
+    jql => 'filter=12345',
     max_results => 1000,
     fields => [qw(summary description components)],
 );

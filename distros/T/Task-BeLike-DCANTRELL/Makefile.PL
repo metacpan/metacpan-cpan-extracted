@@ -2,8 +2,10 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     NAME => 'Task::BeLike::DCANTRELL',
-    META_MERGE => {
+    META_ADD => {
         license => 'open_source',
+},
+META_MERGE => {
         resources => {
             repository => 'https://github.com/DrHyde/perl-modules-Task-BeLike-DCANTRELL',
             bugtracker => 'https://github.com/DrHyde/perl-modules-Task-BeLike-DCANTRELL/issues'
@@ -17,6 +19,7 @@ WriteMakefile(
 
 __DATA__
 Color::ANSI::Util
+String::Tagged::Terminal
 CPAN::DistnameInfo
 Data::Dumper::Concise
 Date::Roman

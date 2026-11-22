@@ -91,6 +91,6 @@
          "web" : "https://mimedefang.org"
       }
    },
-   "version" : "v3.7.3",
+   "version" : "v3.8.0",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

@@ -6,7 +6,7 @@ use 5.026;
 use warnings;
 use utf8;
 
-our $VERSION = "1.23";
+our $VERSION = "1.25";
 
 =encoding utf-8
 
@@ -288,6 +288,9 @@ Available parameters:
                     below the header; simple: columns separated by
                     spaces, a rule per column below the header and
                     below the table
+    table_gap       columns between a cell and the mark place of the
+                    next column, the column separator included
+                    (default: 1)
     rule            box-drawing characters (default: 1)
     osc8            OSC 8 hyperlinks (default: 1)
     heading_markup  inline markup in headings (default: 0)
@@ -603,6 +606,7 @@ my $config = Getopt::EX::Config->new(
     intact          => '',       # parts kept intact by ansicolumn --intact (table)
     rule            => 1,        # box-drawing characters for tables
     table_style     => 'lattice', # lattice (or pipe): column separators; 3line, simple: spaces and rules only
+    table_gap       => 1,        # columns from a cell to the mark place of the next column
     nofork          => 1,        # use nofork+raw for code ref calls
     highlight       => 1,        # syntax highlight of fenced code: 1, the name of a highlighter, or 0
     heading_markup  => 0,        # inline formatting in headings
@@ -699,7 +703,7 @@ sub finalize {
                        "mode|m=s", "base_color|B=s",
                        "colorize!", "nofork!", "fold!", "refill!", "refill_parser=s", "front_matter!", "fold_width=i", "fold_runin=i", "fold_runout=i",
                        "table!", "table_trim!",
-                       "table_width=i", "table_cell=s", "table_wrap_mark=s", "table_cell_mark=s", "rule!", "table_style=s",
+                       "table_width=i", "table_cell=s", "table_wrap_mark=s", "table_cell_mark=s", "rule!", "table_style=s", "table_gap=i",
                        "table_runin=i", "table_runout=i", "table_boundary=s", "table_linebreak=s", "intact=s",
                        "heading_markup|hm:s", "cjk_friendly!", "tick_open=s", "tick_close=s",
                        "hashed=s%",
@@ -1456,7 +1460,14 @@ sub format_table {
         # An escaped pipe (\|) is not a column separator (GFM).  It is
         # left as written: backslash escapes are not processed yet.
         if ($config->{table_trim}) {
-            @sep_opt = ('-rs', '\s*(?<!\\\\)\|\s*', '--item-format= %s ', '--table-remove=1,-0', '--padding');
+            # A cell has a space at its left, where the marks are put,
+            # and table_gap columns to that place of the next column:
+            # the last of them is the column separator (a space in
+            # 3line and simple).  With table_gap of 2 or more, the
+            # spaces at the right end go when the table does not fit
+            # the width with them (ansicolumn 1.70).
+            my $pad = ' ' x (($config->{table_gap} || 1) - 1);
+            @sep_opt = ('-rs', '\s*(?<!\\\\)\|\s*', "--item-format= %s$pad", '--table-remove=1,-0', '--padding');
         } else {
             $_++ for @$right, @$center;
             @sep_opt = ('-rs', '(?<!\\\\)\|');

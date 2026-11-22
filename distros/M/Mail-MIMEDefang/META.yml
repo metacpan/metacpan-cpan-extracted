@@ -57,5 +57,5 @@ requires:
 resources:
   bugtracker: https://github.com/The-McGrail-Foundation/MIMEDefang/issues
   repository: https://github.com/The-McGrail-Foundation/MIMEDefang.git
-version: v3.7.3
+version: v3.8.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

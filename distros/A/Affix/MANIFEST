@@ -8,11 +8,14 @@ META.json
 META.yml
 README.md
 SECURITY.md
+TODO.md
 builder/Affix/Builder.pm
 cpanfile
 eg/affix_build.pl
 eg/affix_wrap.pl
 eg/benchmark.pl
+eg/benchmarks/bindings.pl
+eg/benchmarks/multi_arg.pl
 eg/ithreads.pl
 eg/libm.pl
 eg/qsort.pl
@@ -136,6 +139,7 @@ t/092_struct_signature_layout.t
 t/093_malloc_lifeline.t
 t/094_cast_cycle.t
 t/095_union_sync.t
+t/096_multi_arg_scalar.t
 t/900_leak.t
 t/999_marshaller_2.t
 t/src/std.h

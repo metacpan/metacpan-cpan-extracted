@@ -62,6 +62,9 @@ void PerlUpb_Arena_Release(pTHX_ upb_Arena* arena,
 
 SV* PerlUpb_Arena_New(pTHX);
 SV* PerlUpb_Arena_WrapRaw(pTHX_ upb_Arena* arena);
+SV* PerlUpb_Arena_WrapInternal(pTHX_ void* raw, bool is_tmpfs, bool read_only);
+void PerlUpb_Arena_AttachMagic(pTHX_ SV* sv, void* raw, bool is_tmpfs);
+void* PerlUpb_Arena_GetWrapperRaw(pTHX_ SV* sv, bool* out_is_tmpfs);
 SV* PerlUpb_Arena_NewTmpfs(pTHX_ const char* path, size_t size);
 SV* PerlUpb_Arena_AttachTmpfs(pTHX_ const char* path, size_t size);
 upb_Arena* PerlUpb_Arena_Get(pTHX_ SV* sv);
@@ -76,6 +79,7 @@ bool PerlUpb_Arena_IsTmpfs(pTHX_ SV* arena_sv);
 const char* PerlUpb_Arena_GetPath(pTHX_ SV* arena_sv);
 bool PerlUpb_Arena_VerifySELinux(pTHX_ SV* arena_sv);
 size_t PerlUpb_Arena_GetOffset(pTHX_ SV* arena_sv, void* ptr);
+size_t PerlUpb_Arena_WriteSharedMessage(pTHX_ SV* arena_sv, SV* msg_sv);
 SV* PerlUpb_Arena_AttachMessage(pTHX_ SV* arena_sv, const char* name,
                                 size_t offset);
 

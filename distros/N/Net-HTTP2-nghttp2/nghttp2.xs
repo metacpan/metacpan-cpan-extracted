@@ -46,6 +46,8 @@ typedef struct {
     char *send_buf;
     size_t send_buf_len;
     size_t send_buf_cap;
+    /* Most bytes the current mem_send may return; 0 = no limit */
+    size_t send_limit;
     /* Data providers for active streams (simple linear array) */
     nghttp2_perl_data_provider **data_providers;
     int data_providers_count;
@@ -536,6 +538,18 @@ static ssize_t perl_send_callback(nghttp2_session *session,
                                   const uint8_t *data, size_t length,
                                   int flags, void *user_data) {
     nghttp2_perl_session *ps = (nghttp2_perl_session *)user_data;
+
+    /* Under a mem_send limit, take only what fits; with no room, nghttp2
+       keeps the rest for the next call. */
+    if (ps->send_limit) {
+        size_t room = ps->send_limit - ps->send_buf_len;
+        if (room == 0) {
+            return NGHTTP2_ERR_WOULDBLOCK;
+        }
+        if (length > room) {
+            length = room;
+        }
+    }
 
     /* Grow buffer if needed */
     if (ps->send_buf_len + length > ps->send_buf_cap) {
@@ -1319,18 +1333,31 @@ mem_recv(self, data)
     OUTPUT:
         RETVAL
 
-# Get data to send
+# Get data to send: everything ready, or at most max_bytes of it
 SV *
-mem_send(self)
+mem_send(self, max_bytes = NULL)
         SV *self
+        SV *max_bytes
     PREINIT:
         nghttp2_perl_session *ps;
         int rv;
+        NV limit;
     CODE:
         ps = (nghttp2_perl_session *)SvIV(SvRV(self));
         SESSION_ALIVE_OR_CROAK(ps);
         if (ps->in_session_call) {
             croak("mem_send called from inside a session callback");
+        }
+
+        /* Set on every call, so a limit never outlives the call it was
+           given to, even if a callback died out of the last one. */
+        ps->send_limit = 0;
+        if (max_bytes) {
+            if (!looks_like_number(max_bytes)
+                    || (limit = SvNV(max_bytes)) < 1 || limit != (NV)(UV)limit) {
+                croak("mem_send's limit must be a positive number of bytes");
+            }
+            ps->send_limit = (size_t)limit;
         }
 
         /* Clear send buffer */
@@ -1344,6 +1371,7 @@ mem_send(self)
         ps->in_session_call = 1;
         rv = nghttp2_session_send(ps->session);
         LEAVE;
+        ps->send_limit = 0;
         drain_pending_free(aTHX_ ps);
 
         if (rv != 0) {

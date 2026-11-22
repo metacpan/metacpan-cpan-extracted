@@ -24,6 +24,7 @@ use strict;
 use warnings;
 
 use Socket;
+use Scalar::Util qw(refaddr);
 
 use IO::Select;
 use Net::DNS;
@@ -37,7 +38,18 @@ our @EXPORT = qw(expand_ipv6_address reverse_ip_address_for_rbl relay_is_blackli
                  relay_is_blacklisted_multi relay_is_blacklisted_multi_count relay_is_blacklisted_multi_list
                  is_public_ip4_address is_public_ip6_address md_get_bogus_mx_hosts get_mx_ip_addresses
                  md_get_dmarc_record md_dns_txt);
-our @EXPORT_OK = qw(get_host_name get_ptr_record md_init);
+our @EXPORT_OK = qw(get_host_name get_ptr_record md_init
+                    md_shared_resolver md_caching_resolver md_dns_query md_dns_cache_clear);
+
+# Shared resolver and DNS answer cache, see md_shared_resolver() and
+# md_dns_query().  Both live as long as the worker process does.
+use constant {
+  DNS_CACHE_MAX_ENTRIES => 512,  # the cache is flushed when it gets this big
+  DNS_CACHE_MAX_TTL     => 300,  # upper bound for a positive answer
+  DNS_CACHE_NEG_TTL     => 60,   # NXDOMAIN / NODATA
+};
+my ($SharedResolver, $SharedResolverPid);
+my %DnsCache;
 
 sub md_init {
   my $digest_md5 = 0;
@@ -219,8 +231,12 @@ sub get_host_name {
 
   $PrivateMyHostName = "localhost" unless defined($PrivateMyHostName);
 
-  # Now make it FQDN
-  my($fqdn) = gethostbyname($PrivateMyHostName);
+  # Now make it FQDN; getaddrinfo() also works on IPv6-only hosts
+  my $fqdn;
+  my ($err, @ai) = Socket::getaddrinfo($PrivateMyHostName, undef,
+                                       { flags => Socket::AI_CANONNAME() });
+  $fqdn = $ai[0]->{canonname} if (!$err and @ai);
+  ($fqdn) = gethostbyname($PrivateMyHostName) unless defined($fqdn);
   $PrivateMyHostName = $fqdn if (defined $fqdn) and length($fqdn) > length($PrivateMyHostName);
 
   return $PrivateMyHostName;
@@ -315,40 +331,67 @@ sub is_public_ip6_address {
 	return 1;
 }
 
-=item get_mx_ip_addresses $domain [$resolver_object]
+# Return the IPv4 (A) and then the IPv6 (AAAA) addresses of $host.
+sub _md_host_addresses {
+	my ($res, $host) = @_;
+	my @addrs;
+	foreach my $type ('A', 'AAAA') {
+		my $packet = md_dns_query($res, $host, $type);
+		next unless defined($packet);
+		next if $packet->header->rcode eq 'SERVFAIL';
+		next if $packet->header->rcode eq 'NXDOMAIN';
+		foreach my $rr ($packet->answer) {
+			next unless $rr->type eq $type;
+			if ($type eq 'AAAA' and $rr->can('address_short')) {
+				push(@addrs, $rr->address_short);
+			} else {
+				push(@addrs, $rr->address);
+			}
+		}
+	}
+	return @addrs;
+}
 
-Get IP addresses of all MX hosts for given domain.  If there are
-no MX hosts, then return A records.
+=item get_mx_ip_addresses $domain [$resolver_object] [$sort_by_pref]
+
+Get the IPv4 and IPv6 addresses (A and AAAA records) of all MX hosts
+for given domain.  If there are no MX hosts, then return the A and
+AAAA records of the domain itself.
+
+If C<$sort_by_pref> is true, the addresses are returned in ascending
+order of MX preference (hosts with equal preference keep the resolver
+order).  Otherwise they are returned in the order of the DNS answer.
+Pass C<undef> as C<$resolver_object> to use the shared resolver.
 
 =cut
 
 sub get_mx_ip_addresses {
-	my($domain, $res) = @_;
+	my($domain, $res, $sort_by_pref) = @_;
 	my @results;
 	unless ($Features{"Net::DNS"}) {
     md_syslog('err', "Attempted to call get_mx_ip_addresses, but Perl module Net::DNS is not installed");
 		return(@results);
 	}
-	if (!defined($res)) {
-		$res = Net::DNS::Resolver->new;
-		$res->defnames(0);
-	}
+	$res = md_shared_resolver() unless defined($res);
 
-	my $packet = $res->query($domain, 'MX');
+	my $packet = md_dns_query($res, $domain, 'MX');
 	if (!defined($packet) ||
 	    $packet->header->rcode eq 'SERVFAIL' ||
 	    $packet->header->rcode eq 'NXDOMAIN' ||
 	    !defined($packet->answer)) {
-		# No MX records; try A records
-		$packet = $res->query($domain, 'A');
-		if (!defined($packet) ||
-		    $packet->header->rcode eq 'SERVFAIL' ||
-		    $packet->header->rcode eq 'NXDOMAIN' ||
-		    !defined($packet->answer)) {
-			return (@results);
-		}
+		# No MX records; try A and AAAA records
+		return _md_host_addresses($res, $domain);
 	}
-	foreach my $item ($packet->answer) {
+	my @answer = $packet->answer;
+	if ($sort_by_pref) {
+		# Perl's sort is stable: equal preferences keep resolver order.
+		# Non-MX records go last.
+		@answer = sort {
+			($a->type eq 'MX' ? $a->preference : 65536) <=>
+			($b->type eq 'MX' ? $b->preference : 65536)
+		} @answer;
+	}
+	foreach my $item (@answer) {
 		if ($item->type eq 'MX') {
 
 			# Weird MX record of "." or ""
@@ -373,18 +416,21 @@ sub get_mx_ip_addresses {
 				}
 			}
 
-			my $packet2 = $res->query($item->exchange, 'A');
-			next unless defined($packet2);
-			next if $packet2->header->rcode eq 'SERVFAIL';
-			next if $packet2->header->rcode eq 'NXDOMAIN';
-			next unless defined($packet2->answer);
-			foreach my $item2 ($packet2->answer) {
-				if ($item2->type eq 'A') {
-					push(@results, $item2->address);
+			# Same for something that looks like an IPv6 address
+			if ($item->exchange =~ /:/) {
+				my $ip6 = $item->exchange;
+				$ip6 =~ s/\.$//;
+				if (defined(Socket::inet_pton(Socket::AF_INET6(), $ip6))) {
+					push(@results, $ip6);
+					next;
 				}
 			}
+
+			push(@results, _md_host_addresses($res, $item->exchange));
 		} elsif ($item->type eq 'A') {
 			push(@results, $item->address);
+		} elsif ($item->type eq 'AAAA') {
+			push(@results, $item->can('address_short') ? $item->address_short : $item->address);
 		}
 	}
 	return (@results);
@@ -394,6 +440,7 @@ sub get_mx_ip_addresses {
 
 Returns a list of "bogus" IP addresses that are in $domain's list of MX
 records.  A "bogus" IP address is loopback/private/multicast/etc.
+Both IPv4 and IPv6 addresses are checked.
 
 =cut
 
@@ -402,7 +449,9 @@ sub md_get_bogus_mx_hosts {
 	my @bogus_hosts = ();
 	my @mx = get_mx_ip_addresses($domain);
 	foreach my $mx (@mx) {
-		if (!is_public_ip4_address($mx)) {
+		my $public = ($mx =~ /:/) ? is_public_ip6_address($mx)
+		                          : is_public_ip4_address($mx);
+		if (!$public) {
 			push(@bogus_hosts, $mx);
 		}
 	}
@@ -411,7 +460,7 @@ sub md_get_bogus_mx_hosts {
 
 =item get_ptr_record $ip_address [$resolver_object]
 
-Get PTR record for given IP address.
+Get PTR record for given IPv4 or IPv6 address.
 
 =cut
 
@@ -421,12 +470,10 @@ sub get_ptr_record {
                 md_syslog('err', "Attempted to call get_ptr_record, but Perl module Net::DNS is not installed");
                 return;
         }
-        if (!defined($res)) {
-                $res = Net::DNS::Resolver->new;
-                $res->defnames(0);
-        }
+        $res = md_shared_resolver() unless defined($res);
 
-        my $packet = $res->query(reverse_ip_address_for_rbl($ip) . ".in-addr.arpa", 'PTR');
+        my $suffix = ($ip =~ /:/) ? '.ip6.arpa' : '.in-addr.arpa';
+        my $packet = md_dns_query($res, reverse_ip_address_for_rbl($ip) . $suffix, 'PTR');
         if (!defined($packet) ||
             $packet->header->rcode eq 'SERVFAIL' ||
             $packet->header->rcode eq 'NXDOMAIN' ||
@@ -450,48 +497,56 @@ Returns the DMARC record of a domain.
 
 sub md_get_dmarc_record {
         my ($domain) = @_;
-        my $res;
 
         unless ($Features{"Net::DNS"}) {
                 md_syslog('err', "Attempted to call md_get_dmarc_record, but Perl module Net::DNS is not installed");
                 return;
         }
-        if (!defined($res)) {
-                $res = Net::DNS::Resolver->new;
-                $res->defnames(0);
-        }
-	      return if not defined $domain;
+        return if not defined $domain;
 
-        my $packet = $res->query('_dmarc.' . $domain, 'TXT');
+        my @records = _md_get_dmarc_txt_records($domain);
+        return wantarray ? @records : $records[0];
+}
+
+sub _md_get_dmarc_txt_records {
+        my ($domain) = @_;
+
+        my $res = md_shared_resolver();
+
+        my $packet = md_dns_query($res, '_dmarc.' . $domain, 'TXT');
         if (!defined($packet) ||
             $packet->header->rcode eq 'NXDOMAIN') {
 	          my @dots = $domain =~ /\./g;
-	          return if (scalar @dots eq 1);
+	          return () if (scalar @dots eq 1);
             $domain =~ s/(.*?)\.//;
-	          return md_get_dmarc_record($domain);
+	          return _md_get_dmarc_txt_records($domain);
         } elsif ($packet->header->rcode eq 'SERVFAIL' ||
             !defined($packet->answer)) {
-	          return;
+	          return ();
 	      }
-        my $answer = ($packet->answer)[0];
-        if (defined $answer && $answer->type eq 'CNAME') {
-                my $cname_target = $answer->cname;
-                my $cname_packet = $res->query($cname_target, 'TXT');
+
+        my @answer = $packet->answer;
+        if (scalar(@answer) == 1 && $answer[0]->type eq 'CNAME') {
+                my $cname_target = $answer[0]->cname;
+                my $cname_packet = md_dns_query($res, $cname_target, 'TXT');
                 if (!defined($cname_packet) ||
                     $cname_packet->header->rcode eq 'NXDOMAIN' ||
                     $cname_packet->header->rcode eq 'SERVFAIL' ||
                     !defined($cname_packet->answer)) {
-                        return;
+                        return ();
                 }
-                $answer = ($cname_packet->answer)[0];
+                @answer = $cname_packet->answer;
         }
-        if (defined $answer) {
-                my $res = $answer->rdstring;
-                chomp $res;
-                $res =~ s/^"|"$//g;
-                return $res;
+
+        my @records;
+        foreach my $ans (@answer) {
+                next unless $ans->type eq 'TXT';
+                my $txt = $ans->rdstring;
+                chomp $txt;
+                $txt =~ s/^"|"$//g;
+                push(@records, $txt);
         }
-        return;
+        return @records;
 }
 
 =item relay_is_blacklisted_multi
@@ -542,15 +597,15 @@ sub relay_is_blacklisted_multi {
 
   # If user did not pass in a Net::DNS::Resolver object, generate one.
   unless (defined($res and (UNIVERSAL::isa($res, "Net::DNS::Resolver")))) {
-    $res = Net::DNS::Resolver->new;
-    $res->defnames(0);
+    $res = md_shared_resolver();
   }
 
   my $sel = IO::Select->new();
 
   # Send out the queries
   foreach my $domain (@{$domains}) {
-    $sock = $res->bgsend("$addr.$domain", 'A');
+    # Never cached: blocklist answers must always be fresh
+    $sock = md_dns_query($res, "$addr.$domain", 'A', 'bgsend');
     $sock_to_domain{$sock} = $domain;
     $sel->add($sock);
   }
@@ -674,11 +729,13 @@ sub relay_is_blacklisted_multi_list {
 =item md_dns_txt($resolver, $name [, $filter])
 
 Query C<$name> for TXT records using the supplied C<Net::DNS::Resolver>
-object and return the first TXT string found, or C<undef> on any error
-(NXDOMAIN, SERVFAIL, no TXT records).
+object.  In list context it returns every TXT string found, in scalar
+context only the first one; on any error (NXDOMAIN, SERVFAIL, no TXT
+records) it returns an empty list or C<undef>.  The character-strings
+of a TXT record are concatenated without separators (RFC 7208 3.3).
 
 The optional C<$filter> argument is a C<Regexp> (e.g. C<qr/^v=spf1\b/i>);
-when given, only a TXT record whose text matches C<$filter> is returned,
+when given, only TXT records whose text matches C<$filter> are returned,
 which lets callers pick a specific record type (SPF, BIMI, ...) out of a
 domain that publishes several unrelated TXT records.
 
@@ -686,25 +743,195 @@ domain that publishes several unrelated TXT records.
 
 sub md_dns_txt {
     my ($res, $name, $filter) = @_;
-    my $packet = $res->query($name, 'TXT');
+    my $packet = md_dns_query($res, $name, 'TXT');
     return unless defined $packet;
     return if $packet->header->rcode eq 'NXDOMAIN';
     return if $packet->header->rcode eq 'SERVFAIL';
     return unless defined $packet->answer;
 
+    my @txt;
     for my $rr ($packet->answer) {
         next unless $rr->type eq 'TXT';
-        my $txt = $rr->rdstring;
-        $txt =~ s/^"|"$//g;
-        $txt =~ s/"\s*"//g;
+        my $txt = join('', $rr->txtdata);
         next if defined $filter and $txt !~ $filter;
-        return $txt;
+        push @txt, $txt;
     }
-    return;
+    return wantarray ? @txt : $txt[0];
+}
+
+=item md_shared_resolver()
+
+Returns a C<Net::DNS::Resolver> (with C<defnames(0)>) that is created
+once per worker process and then reused (and created again after a
+C<fork()>).  It is the resolver whose answers L</md_dns_query> caches.
+
+=cut
+
+sub md_shared_resolver {
+  if (!defined($SharedResolver) or $SharedResolverPid != $$) {
+    # A forked child must not trust answers cached by its parent
+    %DnsCache = () if defined($SharedResolverPid);
+    $SharedResolver = Net::DNS::Resolver->new;
+    $SharedResolver->defnames(0);
+    $SharedResolverPid = $$;
+  }
+  return $SharedResolver;
+}
+
+=item md_caching_resolver()
+
+Returns an object that can be used where a C<Net::DNS::Resolver> is
+expected by modules that only call its C<send> and C<errorstring>
+methods, like C<Mail::SPF::Server> (C<dns_resolver> option) and
+C<Mail::DKIM::DNS::resolver()>.  Lookups go through C<md_dns_query> on
+the resolver returned by C<md_shared_resolver>, so their answers are
+cached; C<errorstring> refers to the last lookup made through the object.
+Every other method is passed to the shared resolver.
+
+=cut
+
+sub md_caching_resolver {
+  return Mail::MIMEDefang::Net::CachingResolver->new;
+}
+
+=item md_dns_cache_clear()
+
+Empties the DNS answer cache used by L</md_dns_query>.
+
+=cut
+
+sub md_dns_cache_clear {
+  %DnsCache = ();
+  return;
+}
+
+=item md_dns_query($resolver, $name, $type [, $method [, $nocache]])
+
+Looks up C<$name>/C<$type> like the C<query> (default), C<send> or
+C<bgsend> method of C<Net::DNS::Resolver>, chosen by C<$method>, and with
+the same return values: a C<Net::DNS::Packet> for C<query> and C<send>,
+a socket to pass to C<bgread> for C<bgsend>.
+
+When C<$resolver> is undefined or is the object returned by
+L</md_shared_resolver>, definitive answers are cached in the worker for
+as long as their TTL allows, but never longer than five minutes:
+positive answers use the smallest TTL of the answer section and
+NXDOMAIN or empty answers are kept for one minute.  Timeouts, SERVFAIL
+and other errors are never cached.  A resolver passed in by the caller is
+used as is, with no caching.
+
+Nothing is cached, and the cache is not consulted, when C<$nocache> is
+true or C<$method> is C<bgsend>.  C<relay_is_blacklisted_multi> uses
+C<bgsend>, so blocklist answers are always fresh.
+
+The returned packet may be shared with other callers and must be treated
+as read-only.
+
+=cut
+
+sub md_dns_query {
+  my ($res, $name, $type, $method, $nocache) = @_;
+  $method = 'query' unless (defined($method) and ($method eq 'send' or $method eq 'bgsend'));
+
+  $res = md_shared_resolver() unless defined($res);
+  if ($nocache or $method eq 'bgsend' or
+      !(defined($SharedResolver) and refaddr($res) == refaddr($SharedResolver))) {
+    # Uncached lookup, or caller-supplied resolver: no caching.
+    return $res->$method($name, $type);
+  }
+
+  my $key = uc($type) . ' ' . lc($name);
+  $key =~ s/\.$//;
+  my $now = time();
+  my $hit = $DnsCache{$key};
+  my $packet;
+  if (defined($hit) and $hit->[0] > $now) {
+    $packet = $hit->[1];
+  } else {
+    # query() is send() that turns an empty answer into undef; use send()
+    # so that NXDOMAIN and NODATA replies can be cached as well.
+    $packet = $res->send($name, $type);
+    my $ttl = _dns_cache_ttl($packet);
+    if ($ttl > 0) {
+      %DnsCache = () if (scalar(keys %DnsCache) >= DNS_CACHE_MAX_ENTRIES);
+      $DnsCache{$key} = [$now + $ttl, $packet];
+    } else {
+      delete $DnsCache{$key};
+    }
+  }
+  return $packet if ($method eq 'send');
+  return (defined($packet) and $packet->header->ancount) ? $packet : undef;
+}
+
+# Number of seconds a reply may be cached; 0 means do not cache.
+sub _dns_cache_ttl {
+  my ($packet) = @_;
+  return 0 unless defined($packet);
+  my $rcode = $packet->header->rcode;
+  if ($rcode eq 'NXDOMAIN' or ($rcode eq 'NOERROR' and !$packet->header->ancount)) {
+    return DNS_CACHE_NEG_TTL;
+  }
+  return 0 unless $rcode eq 'NOERROR';
+  my $ttl = DNS_CACHE_MAX_TTL;
+  foreach my $rr ($packet->answer) {
+    $ttl = $rr->ttl if $rr->ttl < $ttl;
+  }
+  return $ttl;
 }
 
 =back
 
 =cut
+
+# Net::DNS::Resolver look-alike returned by md_caching_resolver()
+package Mail::MIMEDefang::Net::CachingResolver;
+
+use strict;
+use warnings;
+
+our $AUTOLOAD;
+
+sub new {
+  my ($class) = @_;
+  return bless { errorstring => undef }, $class;
+}
+
+sub _lookup {
+  my ($self, $method, $name, $type, $class) = @_;
+  my $res = Mail::MIMEDefang::Net::md_shared_resolver();
+  $type = 'A' unless defined($type);
+  if (defined($class) and uc($class) ne 'IN') {
+    # Only IN answers are cached
+    my $packet = $res->$method($name, $type, $class);
+    $self->{errorstring} = $res->errorstring;
+    return $packet;
+  }
+  my $packet = Mail::MIMEDefang::Net::md_dns_query($res, $name, $type, $method);
+  # A cached answer does not touch the shared resolver, whose errorstring
+  # could be left over from an unrelated failed lookup
+  if (defined($packet)) {
+    $self->{errorstring} = $packet->header->rcode;
+  } else {
+    $self->{errorstring} = $res->errorstring;
+  }
+  return $packet;
+}
+
+sub send  { my $self = shift; return $self->_lookup('send', @_); }
+sub query { my $self = shift; return $self->_lookup('query', @_); }
+
+sub errorstring {
+  my ($self) = @_;
+  return $self->{errorstring} // Mail::MIMEDefang::Net::md_shared_resolver()->errorstring;
+}
+
+sub AUTOLOAD {
+  my $self = shift;
+  my $method = $AUTOLOAD;
+  $method =~ s/.*:://;
+  return Mail::MIMEDefang::Net::md_shared_resolver()->$method(@_);
+}
+
+sub DESTROY { }
 
 1;

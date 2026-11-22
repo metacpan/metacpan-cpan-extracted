@@ -1,0 +1,18 @@
+#!/bin/sh
+set -eu
+
+if [ "$#" -ne 1 ]; then
+    echo "Usage: check-postcodes-no /path/to/postnummerregister-ansi.txt" >&2
+    exit 64
+fi
+
+SCRIPT_DIR=$(CDPATH= cd "$(dirname "$0")" && pwd)
+if [ -d "$SCRIPT_DIR/../lib/Geo/Postcodes/NO" ]; then
+    PERL5LIB="$SCRIPT_DIR/../lib${PERL5LIB:+:$PERL5LIB}"
+    export PERL5LIB
+fi
+
+GEO_POSTCODES_NO_DATA=$1
+export GEO_POSTCODES_NO_DATA
+
+exec perl -MGeo::Postcodes::NO::Check -e 'exit Geo::Postcodes::NO::Check->main(@ARGV)' "$1"

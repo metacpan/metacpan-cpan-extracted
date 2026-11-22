@@ -1,0 +1,19 @@
+# Server URL and path to the scanner's private token file.
+server: https://mogura.example.com
+token_file: /etc/mogura/scanner-token
+
+# Maximum number of simultaneous scans.
+jobs: 2
+
+# Time limit in seconds for each Syft or Grype analysis command.
+command_timeout: 3600
+
+# Time limit in seconds for one artifact upload. The default is 300.
+# Allow longer for large SBOMs on a slow connection.
+upload_timeout: 1800
+
+# Literal paths within each scanned root, in addition to the standard exclusions.
+# Software under these paths will be absent from the SBOM and vulnerability results.
+exclude_paths:
+  - /srv/backups # Backup copies
+  - /var/lib/example/cache # Cache outside this scanner's inspection scope

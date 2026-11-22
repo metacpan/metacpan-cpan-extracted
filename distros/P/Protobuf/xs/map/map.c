@@ -21,6 +21,7 @@ SV* PerlUpb_Map_New(pTHX_ upb_Map* map, const upb_FieldDef* f, SV* arena_sv, uin
     PerlUpb_Registry* reg = PerlUpb_Registry_Get(aTHX);
     HV* stash = (reg && reg->stash_map) ? reg->stash_map : gv_stashpv("Protobuf::Internal::Map", GV_ADD);
     SV* self = PerlUpb_WrapArenaBoundObject(aTHX_ map, arena_sv, stash, flags);
+    PerlUpb_SetArenaBoundMeta(aTHX_ self, f);
     HV* hv = (HV*)SvRV(self);
     hv_store(hv, "_fdef", 5, newSViv(PTR2IV(f)), 0);
 
@@ -32,10 +33,7 @@ static upb_Map* GetMap(pTHX_ SV* sv) {
 }
 
 static const upb_FieldDef* GetFieldDef(pTHX_ SV* sv) {
-    if (!sv || !SvROK(sv)) return NULL;
-    HV* hv = (HV*)SvRV(sv);
-    SV** svp = hv_fetch(hv, "_fdef", 5, 0);
-    return svp ? (const upb_FieldDef*)SvIV(*svp) : NULL;
+    return (const upb_FieldDef*)PerlUpb_GetArenaBoundMeta(aTHX_ sv, "Protobuf::Internal::Map");
 }
 
 static void GetMapEntryDefs(const upb_FieldDef* f, const upb_FieldDef** key_f, const upb_FieldDef** val_f) {

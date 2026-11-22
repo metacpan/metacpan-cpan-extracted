@@ -1,19 +1,24 @@
 MODULE = Protobuf::DescriptorPool  PACKAGE = Protobuf::DescriptorPool
 
-IV
-_xs_create_raw()
+void
+_xs_alloc_pool(self)
+    SV* self
     CODE:
-        RETVAL = PTR2IV(PerlUpb_DescriptorPool_CreateRaw(aTHX));
-
-    OUTPUT:
-        RETVAL
-
+        if (!sv_isa(self, "Protobuf::DescriptorPool") || !SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVHV) {
+            croak("Invalid target for _xs_alloc_pool");
+        }
+        if (!PerlUpb_DescriptorPool_GetPool(aTHX_ self)) {
+            void* raw = PerlUpb_DescriptorPool_CreateRaw(aTHX);
+            HV* hv = (HV*)SvRV(self);
+            hv_store(hv, "_pool_ptr", 9, newSViv(PTR2IV(raw)), 0);
+            PerlUpb_DescriptorPool_AttachMagic(aTHX_ self, raw, true);
+        }
 
 void
-_xs_destroy_raw(ptr_iv)
-    IV ptr_iv
+_xs_destroy(self)
+    SV* self
     CODE:
-        PerlUpb_DescriptorPool_DestroyRaw(aTHX_ INT2PTR(void*, ptr_iv));
+        PerlUpb_DescriptorPool_Free(aTHX_ self);
 
 SV*
 _xs_generated_pool()

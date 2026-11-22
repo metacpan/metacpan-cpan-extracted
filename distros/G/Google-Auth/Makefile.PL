@@ -58,6 +58,7 @@ WriteMakefile(
   },
   PREREQ_PM => {
     'Capture::Tiny' => '0.48',
+    'Future'        => '0',
     'JSON::MaybeXS' => '0',
     'Log::Any'      => '0',
     'Moo'           => '0',

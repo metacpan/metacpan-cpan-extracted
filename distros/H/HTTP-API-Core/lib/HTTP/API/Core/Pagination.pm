@@ -45,6 +45,7 @@ sub new {
         page_param      => exists($args{page_param}) ? delete($args{page_param}) : 'page',
         page_size_param => exists($args{page_size_param}) ? delete($args{page_size_param}) : 'per_page',
         page_size       => delete($args{page_size}),
+        max_pages       => delete($args{max_pages}),
         current_page    => exists($args{start_page}) ? delete($args{start_page}) : 1,
         offset_param    => exists($args{offset_param}) ? delete($args{offset_param}) : 'offset',
         current_offset  => exists($args{start_offset}) ? delete($args{start_offset}) : 0,
@@ -55,6 +56,7 @@ sub new {
         buffer          => [],
         finished        => 0,
         started         => 0,
+        pages_fetched   => 0,
         seen            => {},
     }, $class;
 
@@ -74,6 +76,11 @@ sub new {
     die "request must be a hash reference\n" if ref($self->{request}) ne 'HASH';
     die "page_size must be a positive integer\n"
         if defined($self->{page_size}) && (ref($self->{page_size}) ne '' || $self->{page_size} !~ /\A[0-9]+\z/ || $self->{page_size} < 1);
+    die "max_pages must be a positive integer\n"
+        if defined($self->{max_pages})
+        && (ref($self->{max_pages}) ne ''
+            || $self->{max_pages} !~ /\A[0-9]+\z/
+            || $self->{max_pages} < 1);
     die "start_page must be a positive integer\n"
         if ref($self->{current_page}) ne '' || $self->{current_page} !~ /\A[0-9]+\z/ || $self->{current_page} < 1;
     die "start_offset must be a non-negative integer\n"
@@ -87,19 +94,27 @@ sub new {
 
 sub next {
     my ($self) = @_;
+    my ($has_item, $item) = $self->_take_item;
+    return $item;
+}
+
+# Keep item availability separate from item value: a decoded JSON null
+# is undef, but it is still a real item in the page.
+sub _take_item {
+    my ($self) = @_;
     while (!@{ $self->{buffer} }) {
-        return undef if $self->{finished};
+        return (0, undef) if $self->{finished};
         $self->_fetch_page;
     }
-    return shift @{ $self->{buffer} };
+    return (1, shift @{ $self->{buffer} });
 }
 
 sub all {
     my ($self) = @_;
     my @items;
     while (1) {
-        my $item = $self->next;
-        last if !defined $item;
+        my ($has_item, $item) = $self->_take_item;
+        last if !$has_item;
         push @items, $item;
     }
     return wantarray ? @items : \@items;
@@ -107,6 +122,11 @@ sub all {
 
 sub _fetch_page {
     my ($self) = @_;
+    # A page limit guards against a server that keeps reporting more pages,
+    # including empty pages with has_more set. Do not send another request.
+    die "pagination maximum page count exceeded\n"
+        if defined($self->{max_pages})
+        && $self->{pages_fetched} >= $self->{max_pages};
     my $url = $self->_request_url;
     my $first_page = !$self->{started};
     my $response = $self->{client}->get($url, %{ $self->{request} });
@@ -117,7 +137,11 @@ sub _fetch_page {
 
     # Stage iterator updates until the continuation is fully validated.
     # A failed page must not leave items in the buffer or advance the cursor.
-    my %update = (buffer => [ @$items ], started => 1);
+    my %update = (
+        buffer => [ @$items ],
+        started => 1,
+        pages_fetched => $self->{pages_fetched} + 1,
+    );
     my %seen = %{ $self->{seen} };
 
     # Continuations must not revisit the initial page or a supplied cursor.
@@ -235,19 +259,34 @@ sub _guard_next_url_origin {
     return if $next !~ m{\Ahttps?://}i;
 
     my $base = $self->{client}->base_url;
-    return if !defined($base) || $base !~ m{\A(https?)://([^/]+)}i;
+    return if !defined($base) || $base !~ m{\A(https?)://([^/?#]+)}i;
     my ($base_scheme, $base_authority) = (lc($1), lc($2));
 
-    $next =~ m{\A(https?)://([^/]+)}i;
+    die "invalid pagination continuation URL\n"
+        if $next !~ m{\A(https?)://([^/?#]+)}i;
     my ($next_scheme, $next_authority) = (lc($1), lc($2));
-    die "cross-origin pagination continuation rejected: $next\n"
+
+    # Explicit default ports (including leading zeros) and omitted ports
+    # represent the same origin. Keep other authority forms conservative.
+    if ($base_scheme eq $next_scheme) {
+        my $default_port = $base_scheme eq 'https' ? 443 : 80;
+        $base_authority =~ s/:0*$default_port\z//;
+        $next_authority =~ s/:0*$default_port\z//;
+    }
+    # The server-controlled continuation may contain credentials.
+    die "cross-origin pagination continuation rejected\n"
         if $base_scheme ne $next_scheme || $base_authority ne $next_authority;
 }
 
 sub _guard_continuation {
     my ($self, $key, $seen) = @_;
     $seen = $self->{seen} if !defined $seen;
-    die "pagination continuation repeated: $key\n" if $seen->{$key}++;
+    if ($seen->{$key}++) {
+        # Keep the error useful without echoing a token or URL from an API.
+        my ($type) = $key =~ /\A(url|cursor):/;
+        $type = 'unknown' if !defined $type;
+        die "pagination continuation repeated: $type\n";
+    }
 }
 
 sub _extract {

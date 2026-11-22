@@ -207,6 +207,16 @@ static XS(PerlUpb_FastClear) {
     XSRETURN_EMPTY;
 }
 
+static void install_fast_xs(pTHX_ const char* perl_class, const char* prefix, const char* name,
+                            XSUBADDR_t fn, const upb_FieldDef* f) {
+    size_t len = strlen(perl_class) + 2 + strlen(prefix) + strlen(name) + 1;
+    char* full_name = (char*)safemalloc(len);
+    snprintf(full_name, len, "%s::%s%s", perl_class, prefix, name);
+    CV* cv = newXS(full_name, fn, __FILE__);
+    CvXSUBANY(cv).any_ptr = (void*)f;
+    safefree(full_name);
+}
+
 void PerlUpb_InstallFastAccessors(pTHX_ const char* perl_class, const upb_MessageDef* mdef) {
     int field_count = upb_MessageDef_FieldCount(mdef);
 
@@ -215,35 +225,17 @@ void PerlUpb_InstallFastAccessors(pTHX_ const char* perl_class, const upb_Messag
         const char* name = upb_FieldDef_Name(f);
 
         // 1. Install primary accessor (getter/setter)
-        {
-            char full_name[512];
-            snprintf(full_name, sizeof(full_name), "%s::%s", perl_class, name);
-            CV* cv = newXS(full_name, PerlUpb_FastAccessor, __FILE__);
-            CvXSUBANY(cv).any_ptr = (void*)f;
-        }
+        install_fast_xs(aTHX_ perl_class, "", name, PerlUpb_FastAccessor, f);
 
         // 2. Install explicit setter
-        {
-            char full_name[512];
-            snprintf(full_name, sizeof(full_name), "%s::set_%s", perl_class, name);
-            CV* cv = newXS(full_name, PerlUpb_FastSetter, __FILE__);
-            CvXSUBANY(cv).any_ptr = (void*)f;
-        }
+        install_fast_xs(aTHX_ perl_class, "set_", name, PerlUpb_FastSetter, f);
 
         // 3. Install has_ (if applicable)
         if (upb_FieldDef_HasPresence(f)) {
-            char full_name[512];
-            snprintf(full_name, sizeof(full_name), "%s::has_%s", perl_class, name);
-            CV* cv = newXS(full_name, PerlUpb_FastHas, __FILE__);
-            CvXSUBANY(cv).any_ptr = (void*)f;
+            install_fast_xs(aTHX_ perl_class, "has_", name, PerlUpb_FastHas, f);
         }
 
         // 4. Install clear_
-        {
-            char full_name[512];
-            snprintf(full_name, sizeof(full_name), "%s::clear_%s", perl_class, name);
-            CV* cv = newXS(full_name, PerlUpb_FastClear, __FILE__);
-            CvXSUBANY(cv).any_ptr = (void*)f;
-        }
+        install_fast_xs(aTHX_ perl_class, "clear_", name, PerlUpb_FastClear, f);
     }
 }

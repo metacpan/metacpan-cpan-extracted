@@ -118,6 +118,55 @@ Public behavior should be explicitly documented and protected by regression test
 
 Internal implementation details remain free to evolve as long as documented public behavior is preserved.
 
+## Responsible dependencies and long-term stewardship
+
+Using a library always creates a dependency. Replacing a service-specific
+client such as a Jira SDK with `HTTP::API::Core` does not eliminate that risk;
+it transfers responsibility to a different maintainable layer.
+
+Our aim is therefore **not to make other projects depend on us forever**. It is
+to make this dependency understandable, sustainable, and replaceable:
+
+* **Understandable:** keep the code small and conventional enough that a new
+  maintainer can understand the design without private knowledge from the
+  original author.
+* **Maintainable by others:** preserve clear public contracts, offline tests,
+  contribution guidance, and a documented release process. The project should
+  not require its original author to diagnose a failure or prepare a release.
+* **Easy to leave:** rely on standard HTTP and JSON semantics, avoid unnecessary
+  proprietary abstractions, and keep service-specific behavior outside the
+  core. Users should be able to replace the library with another HTTP client
+  or direct HTTP requests without rethinking their entire application.
+* **Careful with dependencies:** minimize external dependencies, but do not
+  reimplement well-established transport, security, or protocol machinery
+  merely to claim there are no dependencies. Each dependency should have a
+  clear reason to exist.
+* **Stable for downstream users:** honor the compatibility policy, document
+  behavioral changes, and supply migration paths when an incompatible change
+  is unavoidable.
+
+A library is trustworthy not because its author promises to maintain it
+forever, but because other people can inspect it, maintain it, and ultimately
+replace it when their needs change.
+
+### Learning from other language ecosystems
+
+This direction has parallels with general-purpose HTTP client infrastructure
+in other ecosystems, without implying identical features or APIs:
+
+* Ruby [Faraday](https://github.com/lostisland/faraday): separates HTTP
+  transport from reusable middleware and client behavior.
+* JavaScript/TypeScript [Ky](https://github.com/sindresorhus/ky): adds focused
+  client conveniences around the platform's Fetch API.
+* Go [Resty](https://github.com/go-resty/resty): offers reusable HTTP/REST
+  client capabilities on top of the language's HTTP ecosystem.
+* Python [HTTPX](https://github.com/encode/httpx): provides a general-purpose
+  HTTP client with explicit transport boundaries.
+
+These projects are useful reference points, not a feature checklist. We should
+adopt a pattern only when it improves clarity, correctness, and longevity for
+Perl users. Growing to match another library's feature count is not a goal.
+
 ## Scope
 
 The core covers reusable API-client infrastructure such as:

@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 1.6.1 are described by their release commits.
 
+## 1.18.0 - 2026-11-22
+
+### Features
+
+- Read is_bot on every answer, and a paid answer's bot ([`70ad2e1`](https://github.com/internetdata/sdk-perl/commit/70ad2e1904909d59754863adac45ae6e4c528abe))
+
 ## 1.17.1 - 2026-11-21
 
 ### Fixes

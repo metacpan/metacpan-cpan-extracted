@@ -18,7 +18,7 @@ Requires Perl 5.22 or newer. [Mojolicious](https://metacpan.org/dist/Mojolicious
 
 ## Usage
 
-**No API key needed to start.** Unlimited, the free plan, answers `ip`, `is_bogon`, the Tor, relay, anycast, carrier, satellite and service flags, `location` to the country, `asn`, `company`, `hostname` and the abuse email, with no daily or monthly cap, with a key or without one.
+**No API key needed to start.** Unlimited, the free plan, answers `ip`, `is_bogon`, the Tor, relay, bot, anycast, carrier, satellite and service flags, `location` to the country, `asn`, `company`, `hostname` and the abuse email, with no daily or monthly cap, with a key or without one.
 
 ```perl
 use InternetData;
@@ -329,7 +329,7 @@ Each redirect URI must be https on a public host name, or http on a loopback add
 
 ### Absent is not false
 
-Unlimited leaves out `is_vpn`, `is_hosting`, `is_cdn` and the four proxy flags, the detail behind them, and the paid members inside `location`, `asn`, `company` and `abuse`, such as `location->{city}`; a free-plan key's answer carries `trial_expired`, true once its trial is spent. A paid key's carries `cap_reached`, true once its organization's overage cap is reached, when the answer has Unlimited's fields and isn't billed. A field your plan does not include is absent, which never means "we checked and found nothing". Perl makes that easy to miss, since `undef` and `0` are both false.
+Unlimited leaves out `is_vpn`, `is_hosting`, `is_cdn` and the four proxy flags, the detail behind them, `bot` (whose bot uses the address, behind `is_bot`), and the paid members inside `location`, `asn`, `company` and `abuse`, such as `location->{city}`; a free-plan key's answer carries `trial_expired`, true once its trial is spent. A paid key's carries `cap_reached`, true once its organization's overage cap is reached, when the answer has Unlimited's fields and isn't billed. A field your plan does not include is absent, which never means "we checked and found nothing". Perl makes that easy to miss, since `undef` and `0` are both false.
 
 ```perl
 if ($result->is_hosting // 0) { ... }          # absent counts as false

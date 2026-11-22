@@ -4,7 +4,7 @@
       "Graham Barr <gbarr@pobox.com>, Steve Hay <shay@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "perl_5"
    ],
@@ -154,6 +154,6 @@
          "web" : "https://github.com/steve-m-hay/perl-libnet"
       }
    },
-   "version" : "3.16",
+   "version" : "3.17",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

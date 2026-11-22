@@ -1,5 +1,5 @@
 This archive contains the distribution perl-critic-policy-prohibitunusedimports,
-version 1.002:
+version 1.003:
 
   An import nobody uses is a dependency nobody knew they had.
 

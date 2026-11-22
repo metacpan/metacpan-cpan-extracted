@@ -1,5 +1,10 @@
 Revision history for Perl extension App-nup
 
+1.22 2026-11-22T06:07:18Z
+
+    - -L: +Gg of the default pager is left out.  With the less of
+      tecolicom/tap it left the row at its right end, the last page
+
 1.21 2026-11-19T07:03:27Z
 
     - A style of the highlighter can be given after its name and a

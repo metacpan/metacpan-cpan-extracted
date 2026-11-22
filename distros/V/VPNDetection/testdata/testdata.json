@@ -1438,6 +1438,7 @@
       "is_relay",
       "is_tor",
       "is_cdn",
+      "is_bot",
       "is_resproxy",
       "is_dcproxy",
       "is_mobproxy",
@@ -1457,6 +1458,7 @@
       "relay",
       "tor",
       "cdn",
+      "bot",
       "resproxy",
       "dcproxy",
       "mobproxy",
@@ -1864,7 +1866,9 @@
           "name": "M247 Europe SRL",
           "domain": "m247global.com",
           "type": "hosting",
-          "prefix": "146.70.116.0/24"
+          "prefix": "146.70.116.0/24",
+          "country": "US",
+          "rpki_status": "valid"
         }
       },
       "expect": {
@@ -1912,7 +1916,9 @@
           "name": "M247 Europe SRL",
           "domain": "m247global.com",
           "type": "hosting",
-          "prefix": "146.70.116.0/24"
+          "prefix": "146.70.116.0/24",
+          "country": "US",
+          "rpki_status": "valid"
         }
       }
     },
@@ -1950,7 +1956,9 @@
           "name": "M247 Europe SRL",
           "domain": "m247global.com",
           "type": "hosting",
-          "prefix": "146.70.116.0/24"
+          "prefix": "146.70.116.0/24",
+          "country": "US",
+          "rpki_status": "valid"
         }
       },
       "expect": {
@@ -1997,7 +2005,9 @@
           "name": "M247 Europe SRL",
           "domain": "m247global.com",
           "type": "hosting",
-          "prefix": "146.70.116.0/24"
+          "prefix": "146.70.116.0/24",
+          "country": "US",
+          "rpki_status": "valid"
         }
       }
     },
@@ -2050,7 +2060,9 @@
           "name": "M247 Europe SRL",
           "domain": "m247global.com",
           "type": "hosting",
-          "prefix": "146.70.116.0/24"
+          "prefix": "146.70.116.0/24",
+          "country": "US",
+          "rpki_status": "valid"
         },
         "trial_expired": false
       },
@@ -2100,7 +2112,9 @@
           "name": "M247 Europe SRL",
           "domain": "m247global.com",
           "type": "hosting",
-          "prefix": "146.70.116.0/24"
+          "prefix": "146.70.116.0/24",
+          "country": "US",
+          "rpki_status": "valid"
         }
       }
     },
@@ -2132,7 +2146,9 @@
           "name": "M247 Europe SRL",
           "domain": "m247global.com",
           "type": "hosting",
-          "prefix": "146.70.116.0/24"
+          "prefix": "146.70.116.0/24",
+          "country": "US",
+          "rpki_status": "valid"
         },
         "trial_expired": true
       },
@@ -2181,7 +2197,9 @@
           "name": "M247 Europe SRL",
           "domain": "m247global.com",
           "type": "hosting",
-          "prefix": "146.70.116.0/24"
+          "prefix": "146.70.116.0/24",
+          "country": "US",
+          "rpki_status": "valid"
         }
       }
     },
@@ -2213,7 +2231,9 @@
           "name": "M247 Europe SRL",
           "domain": "m247global.com",
           "type": "hosting",
-          "prefix": "146.70.116.0/24"
+          "prefix": "146.70.116.0/24",
+          "country": "US",
+          "rpki_status": "valid"
         },
         "is_bogon": false,
         "cap_reached": true
@@ -2263,13 +2283,15 @@
           "name": "M247 Europe SRL",
           "domain": "m247global.com",
           "type": "hosting",
-          "prefix": "146.70.116.0/24"
+          "prefix": "146.70.116.0/24",
+          "country": "US",
+          "rpki_status": "valid"
         }
       }
     },
     {
       "name": "unlimited-anycast-hostname",
-      "why": "Unlimited's answer, with a key or without one, also carries is_anycast, hostname, and the AS's country and RPKI status. The paid members stay absent, never false or empty.",
+      "why": "Unlimited's answer, with a key or without one, also carries is_bot, is_anycast, hostname, and the AS's country and RPKI status. The paid members stay absent, never false or empty.",
       "status": 200,
       "body": {
         "ip": "1.1.1.1",
@@ -2277,6 +2299,7 @@
         "is_vpn": false,
         "is_relay": false,
         "is_tor": false,
+        "is_bot": false,
         "is_anycast": true,
         "relay": {},
         "tor": {},
@@ -2310,6 +2333,7 @@
           "is_vpn": false,
           "is_relay": false,
           "is_tor": false,
+          "is_bot": false,
           "is_anycast": true
         },
         "absent": [
@@ -2341,7 +2365,8 @@
           "bittorrent",
           "web",
           "company",
-          "abuse"
+          "abuse",
+          "bot"
         ],
         "emptyPresent": [
           "relay",
@@ -2383,6 +2408,7 @@
         "is_relay": false,
         "is_tor": false,
         "is_cdn": false,
+        "is_bot": false,
         "is_resproxy": false,
         "is_dcproxy": false,
         "is_mobproxy": false,
@@ -2400,6 +2426,7 @@
         "relay": {},
         "tor": {},
         "cdn": {},
+        "bot": {},
         "resproxy": {},
         "dcproxy": {},
         "mobproxy": {},
@@ -2508,6 +2535,7 @@
           "is_anycast": true,
           "is_carrier": false,
           "is_satellite": false,
+          "is_bot": false,
           "is_ssh": false,
           "is_smtp": false,
           "is_web": true,
@@ -2523,7 +2551,8 @@
           "satellite",
           "ssh",
           "smtp",
-          "bittorrent"
+          "bittorrent",
+          "bot"
         ],
         "web": [
           {
@@ -2629,6 +2658,7 @@
         "is_relay": false,
         "is_tor": false,
         "is_cdn": false,
+        "is_bot": false,
         "is_resproxy": false,
         "is_dcproxy": false,
         "is_mobproxy": false,
@@ -2646,6 +2676,7 @@
         "relay": {},
         "tor": {},
         "cdn": {},
+        "bot": {},
         "resproxy": {},
         "dcproxy": {},
         "mobproxy": {},
@@ -2747,6 +2778,7 @@
           "is_anycast": false,
           "is_carrier": true,
           "is_satellite": false,
+          "is_bot": false,
           "is_ssh": true,
           "is_smtp": true,
           "is_web": false,
@@ -2756,7 +2788,8 @@
         "absent": [],
         "emptyPresent": [
           "satellite",
-          "dns_resolver"
+          "dns_resolver",
+          "bot"
         ],
         "carrier": {
           "name": "T-Mobile US",
@@ -2858,6 +2891,7 @@
         "is_relay": false,
         "is_tor": false,
         "is_cdn": false,
+        "is_bot": false,
         "is_resproxy": false,
         "is_dcproxy": false,
         "is_mobproxy": false,
@@ -2875,6 +2909,7 @@
         "relay": {},
         "tor": {},
         "cdn": {},
+        "bot": {},
         "resproxy": {},
         "dcproxy": {},
         "mobproxy": {},
@@ -2949,6 +2984,7 @@
         "isBogon": false,
         "present": {
           "is_satellite": true,
+          "is_bot": false,
           "is_carrier": false,
           "is_web": false
         },
@@ -2958,7 +2994,8 @@
           "ssh",
           "smtp",
           "dns_resolver",
-          "bittorrent"
+          "bittorrent",
+          "bot"
         ],
         "satellite": {
           "provider": "starlink",
@@ -3018,6 +3055,262 @@
           "unvalidated_since": ""
         },
         "hostname": "customer.lsancax1.isp.starlinkisp.net"
+      }
+    },
+    {
+      "name": "unlimited-bot",
+      "why": "Unlimited answers is_bot, true for an address a bot uses, here a verified Googlebot crawler's; whose bot it is, the bot object, is a paid plan's and stays absent, never empty.",
+      "status": 200,
+      "body": {
+        "ip": "66.249.66.1",
+        "is_bogon": false,
+        "is_vpn": false,
+        "is_relay": false,
+        "is_tor": false,
+        "is_bot": true,
+        "is_anycast": false,
+        "relay": {},
+        "tor": {},
+        "location": {
+          "continent": "NA",
+          "continent_name": "North America",
+          "country": "US",
+          "country_name": "United States",
+          "timezone": "America/Los_Angeles",
+          "currency_code": "USD",
+          "currency_name": "Dollar",
+          "currency_symbol": "$",
+          "flag_emoji": "🇺🇸",
+          "flag_unicode": "U+1F1FA U+1F1F8"
+        },
+        "asn": {
+          "asn": 15169,
+          "name": "Google LLC",
+          "domain": "google.com",
+          "type": "hosting",
+          "prefix": "66.249.64.0/20",
+          "country": "US",
+          "rpki_status": "valid"
+        },
+        "hostname": "crawl-66-249-66-1.googlebot.com"
+      },
+      "expect": {
+        "ip": "66.249.66.1",
+        "isBogon": false,
+        "present": {
+          "is_vpn": false,
+          "is_relay": false,
+          "is_tor": false,
+          "is_bot": true,
+          "is_anycast": false
+        },
+        "absent": [
+          "is_hosting",
+          "is_cdn",
+          "is_resproxy",
+          "is_dcproxy",
+          "is_mobproxy",
+          "is_pubproxy",
+          "is_carrier",
+          "is_satellite",
+          "is_ssh",
+          "is_smtp",
+          "is_web",
+          "is_dns_resolver",
+          "is_bittorrent",
+          "vpn",
+          "hosting",
+          "cdn",
+          "resproxy",
+          "dcproxy",
+          "mobproxy",
+          "pubproxy",
+          "carrier",
+          "satellite",
+          "ssh",
+          "smtp",
+          "dns_resolver",
+          "bittorrent",
+          "web",
+          "company",
+          "abuse",
+          "bot"
+        ],
+        "emptyPresent": [
+          "relay",
+          "tor"
+        ],
+        "location": {
+          "continent": "NA",
+          "continent_name": "North America",
+          "country": "US",
+          "country_name": "United States",
+          "timezone": "America/Los_Angeles",
+          "currency_code": "USD",
+          "currency_name": "Dollar",
+          "currency_symbol": "$",
+          "flag_emoji": "🇺🇸",
+          "flag_unicode": "U+1F1FA U+1F1F8"
+        },
+        "asn": {
+          "asn": 15169,
+          "name": "Google LLC",
+          "domain": "google.com",
+          "type": "hosting",
+          "prefix": "66.249.64.0/20",
+          "country": "US",
+          "rpki_status": "valid"
+        },
+        "hostname": "crawl-66-249-66-1.googlebot.com"
+      }
+    },
+    {
+      "name": "paid-verified-bot",
+      "why": "A paid answer names whose bot uses the address in bot: the operator by ID and name, the bots by their user agents' names, what they do, and whether the operator vouches for the address (verified, identity, verified_by), with the confidence and the first and last day. agents and categories are lists, which a client keeps in order.",
+      "status": 200,
+      "body": {
+        "ip": "66.249.66.1",
+        "is_bogon": false,
+        "is_vpn": false,
+        "is_hosting": false,
+        "is_relay": false,
+        "is_tor": false,
+        "is_cdn": false,
+        "is_bot": true,
+        "is_resproxy": false,
+        "is_dcproxy": false,
+        "is_mobproxy": false,
+        "is_pubproxy": false,
+        "is_anycast": false,
+        "is_carrier": false,
+        "is_satellite": false,
+        "is_ssh": false,
+        "is_smtp": false,
+        "is_web": false,
+        "is_dns_resolver": false,
+        "is_bittorrent": false,
+        "vpn": {},
+        "hosting": {},
+        "relay": {},
+        "tor": {},
+        "cdn": {},
+        "bot": {
+          "provider": "google",
+          "provider_name": "Google",
+          "agents": [
+            "Google-CloudVertexBot",
+            "GoogleOther",
+            "Googlebot"
+          ],
+          "categories": [
+            "ai_search",
+            "other",
+            "search_engine"
+          ],
+          "verified": true,
+          "identity": "verified",
+          "verified_by": "list",
+          "confidence": "high",
+          "first_seen": "2026-11-21",
+          "last_seen": "2026-11-21"
+        },
+        "resproxy": {},
+        "dcproxy": {},
+        "mobproxy": {},
+        "pubproxy": {},
+        "carrier": {},
+        "satellite": {},
+        "ssh": {},
+        "smtp": {},
+        "web": [],
+        "dns_resolver": {},
+        "bittorrent": {},
+        "location": {
+          "continent": "NA",
+          "continent_name": "North America",
+          "country": "US",
+          "country_name": "United States",
+          "timezone": "America/Los_Angeles",
+          "currency_code": "USD",
+          "currency_name": "US Dollar",
+          "currency_symbol": "$",
+          "flag_emoji": "🇺🇸",
+          "flag_unicode": "U+1F1FA U+1F1F8",
+          "region": "California",
+          "region_code": "US-CA",
+          "city": "Los Angeles",
+          "postal_code": "90001",
+          "latitude": 34.05223,
+          "longitude": -118.24368,
+          "accuracy_radius": 500,
+          "geoname_id": "5368361",
+          "dma_code": "803",
+          "last_changed": "2026-10-20"
+        },
+        "asn": {
+          "asn": 14593,
+          "name": "Space Exploration Technologies Corporation",
+          "domain": "spacex.com",
+          "type": "isp",
+          "prefix": "98.97.0.0/20",
+          "country": "US",
+          "rpki_status": "valid"
+        },
+        "company": {
+          "name": "Starlink",
+          "domain": "starlink.com",
+          "type": "isp",
+          "country": "US"
+        },
+        "hostname": "customer.lsancax1.isp.starlinkisp.net",
+        "abuse": {
+          "email": "abuse@spacex.com",
+          "name": "SpaceX Abuse",
+          "phone": "",
+          "address": "Hawthorne, CA, US",
+          "country": "US",
+          "network": "98.97.0.0-98.97.15.255",
+          "validated": true,
+          "unvalidated_since": ""
+        },
+        "cap_reached": false
+      },
+      "expect": {
+        "ip": "66.249.66.1",
+        "isBogon": false,
+        "present": {
+          "is_vpn": false,
+          "is_bot": true,
+          "is_hosting": false,
+          "is_satellite": false
+        },
+        "absent": [],
+        "emptyPresent": [
+          "vpn",
+          "hosting",
+          "satellite",
+          "cdn"
+        ],
+        "bot": {
+          "provider": "google",
+          "provider_name": "Google",
+          "agents": [
+            "Google-CloudVertexBot",
+            "GoogleOther",
+            "Googlebot"
+          ],
+          "categories": [
+            "ai_search",
+            "other",
+            "search_engine"
+          ],
+          "verified": true,
+          "identity": "verified",
+          "verified_by": "list",
+          "confidence": "high",
+          "first_seen": "2026-11-21",
+          "last_seen": "2026-11-21"
+        }
       }
     }
   ],
@@ -8072,7 +8365,9 @@
             "name": "M247 Europe SRL",
             "domain": "m247global.com",
             "type": "hosting",
-            "prefix": "146.70.116.0/24"
+            "prefix": "146.70.116.0/24",
+            "country": "US",
+            "rpki_status": "valid"
           }
         },
         "condition": {
@@ -8112,7 +8407,9 @@
             "name": "M247 Europe SRL",
             "domain": "m247global.com",
             "type": "hosting",
-            "prefix": "146.70.116.0/24"
+            "prefix": "146.70.116.0/24",
+            "country": "US",
+            "rpki_status": "valid"
           }
         },
         "condition": {
@@ -8155,7 +8452,9 @@
             "name": "M247 Europe SRL",
             "domain": "m247global.com",
             "type": "hosting",
-            "prefix": "146.70.116.0/24"
+            "prefix": "146.70.116.0/24",
+            "country": "US",
+            "rpki_status": "valid"
           }
         },
         "condition": {
@@ -8195,7 +8494,9 @@
             "name": "M247 Europe SRL",
             "domain": "m247global.com",
             "type": "hosting",
-            "prefix": "146.70.116.0/24"
+            "prefix": "146.70.116.0/24",
+            "country": "US",
+            "rpki_status": "valid"
           }
         },
         "condition": {
@@ -8235,7 +8536,9 @@
             "name": "M247 Europe SRL",
             "domain": "m247global.com",
             "type": "hosting",
-            "prefix": "146.70.116.0/24"
+            "prefix": "146.70.116.0/24",
+            "country": "US",
+            "rpki_status": "valid"
           }
         },
         "condition": {

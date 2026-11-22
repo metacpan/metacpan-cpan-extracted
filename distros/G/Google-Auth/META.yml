@@ -23,10 +23,11 @@ no_index:
     - inc
 requires:
   Capture::Tiny: '0.48'
+  Future: '0'
   JSON::MaybeXS: '0'
   Log::Any: '0'
   Moo: '0'
   URI: '0'
   perl: '5.006'
-version: '0.12'
+version: '0.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

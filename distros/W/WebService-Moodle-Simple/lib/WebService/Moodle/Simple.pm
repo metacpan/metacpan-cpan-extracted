@@ -1,10 +1,9 @@
 package WebService::Moodle::Simple;
 
 use 5.008_005;
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 use namespace::clean;
 
-use HTTP::Request;
 use JSON;
 use List::Util qw/first/;
 use LWP::UserAgent;
@@ -14,7 +13,7 @@ use URI;
 use Sys::SigAction qw( timeout_call );
 
 
-# ABSTRACT: API client for Stripe
+# ABSTRACT: Client API and CLI for Moodle Web Services
 
 
 my $REST_FORMAT = 'json';
@@ -57,8 +56,11 @@ sub dns_uri {
     return URI->new($self->scheme.'://'.$self->domain.':'.$self->port);
 }
 
+# Parameters are always POSTed as form data: Moodle 5.3's login/token.php
+# rejects credentials in the query string, and POST keeps passwords out of
+# web server and proxy logs.
 sub rest_call {
-    my ($self, $dns_uri) = @_;
+    my ($self, $dns_uri, $params) = @_;
 
     my $timeout = $self->timeout + 1;
 
@@ -66,12 +68,9 @@ sub rest_call {
 
     if ( timeout_call( $timeout,
         sub {
-            my $req = HTTP::Request->new (GET => $dns_uri);
-            $req->content_type('application/json');
-
             my $lwp = LWP::UserAgent->new;
             $lwp->timeout($timeout);
-            $res = $lwp->request( $req );
+            $res = $lwp->post( $dns_uri, $params || {} );
         }
     )) {
             ouch 408, 'Timeout: no response from '.$self->domain;
@@ -106,11 +105,24 @@ sub set_password {
 
     my $dns_uri = $self->dns_uri;
     $dns_uri->path('webservice/rest/server.php');
-    $dns_uri->query_form( $params );
+    my $res = $self->rest_call($dns_uri, $params);
 
-    my $res = $self->rest_call($dns_uri);
+    return { ok => _update_succeeded($res) };
+}
 
-    return { ok => $res->is_success };
+# core_user_update_users returns null on Moodle 3.2 and { warnings => [...] }
+# on Moodle 5.3, where per-user failures are reported as warnings rather than
+# an exception.
+sub _update_succeeded {
+    my ($res) = @_;
+
+    my $data = eval { JSON->new->allow_nonref->decode($res->content) };
+    return 0 if $@;
+    return 1 unless defined $data;
+    return 0 unless ref($data) eq 'HASH';
+    return 0 if $data->{exception};
+    return 0 if $data->{warnings} && @{ $data->{warnings} };
+    return 1;
 }
 
 
@@ -143,9 +155,7 @@ sub add_user {
 
     my $dns_uri = $self->dns_uri;
     $dns_uri->path('webservice/rest/server.php');
-    $dns_uri->query_form( $params );
-
-    my $res = $self->rest_call($dns_uri);
+    my $res = $self->rest_call($dns_uri, $params);
 
     my $response = from_json($res->content);
 
@@ -178,9 +188,7 @@ sub get_user {
 
     my $dns_uri = $self->dns_uri;
     $dns_uri->path('webservice/rest/server.php');
-    $dns_uri->query_form( $params );
-
-    my $res = $self->rest_call($dns_uri);
+    my $res = $self->rest_call($dns_uri, $params);
 
     my $dat = from_json($res->content);
     unless ($dat && ref($dat) eq 'ARRAY' && scalar(@$dat)) {
@@ -217,9 +225,7 @@ sub enrol_student {
 
     my $dns_uri = $self->dns_uri;
     $dns_uri->path('webservice/rest/server.php');
-    $dns_uri->query_form( $params );
-
-    my $res = $self->rest_call($dns_uri);
+    my $res = $self->rest_call($dns_uri, $params);
     unless ($res->is_success) {
         ouch $res->code, $res->message;
     }
@@ -237,13 +243,11 @@ sub get_course_id {
 
     my $dns_uri = $self->dns_uri;
     $dns_uri->path('webservice/rest/server.php');
-    $dns_uri->query_form( {
+    my $res = $self->rest_call($dns_uri, {
         wstoken            =>  $self->token,
         wsfunction         => 'core_course_get_courses',
         moodlewsrestformat => $REST_FORMAT,
     } );
-
-    my $res = $self->rest_call($dns_uri);
     my $ra_courses = from_json($res->content);
     foreach my $rh_course (@$ra_courses) {
         if ($rh_course->{shortname} eq $args{short_cname}) {
@@ -279,11 +283,9 @@ sub suspend_user {
 
     my $dns_uri = $self->dns_uri;
     $dns_uri->path('webservice/rest/server.php');
-    $dns_uri->query_form( $params );
+    my $res = $self->rest_call($dns_uri, $params);
 
-    $self->rest_call($dns_uri);
-
-    return;
+    return { ok => _update_succeeded($res) };
 }
 
 
@@ -307,9 +309,7 @@ sub check_password  {
 
     my $dns_uri = $self->dns_uri;
     $dns_uri->path('login/token.php');
-    $dns_uri->query_form( $params );
-
-    my $res = $self->rest_call($dns_uri);
+    my $res = $self->rest_call($dns_uri, $params);
 
     my $content = $res->content;
 
@@ -348,11 +348,11 @@ __END__
 
 =head1 NAME
 
-WebService::Moodle::Simple - API client for Stripe
+WebService::Moodle::Simple - Client API and CLI for Moodle Web Services
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -383,11 +383,10 @@ Example
 
 WebService::Moodle::Simple is Client API and CLI for Moodle Web Services
 
+It works with Moodle 3.2 and Moodle 5.3. All requests are sent as POST form
+data, which Moodle 5.3 requires for C<check_password>.
+
 __THIS IS A DEVELOPMENT RELEASE. API MAY CHANGE WITHOUT NOTICE__.
-
-=head1 NAME
-
-WebService::Moodle::Simple - Client API and CLI for Moodle Web Services
 
 =head1 USAGE
 
@@ -512,7 +511,9 @@ Returns an integer
         suspend  => <bool default TRUE>
     )
 
-Always returns undef
+Returns
+
+    { ok => <bool> }
 
 If suspend is true/nonzero (which is the default) it kills the user's session
 and suspends their account preventing them from logging in. If suspend is false
@@ -522,26 +523,11 @@ they are given permission to login.
 
 =head1 AUTHOR
 
-Andrew Solomon E<lt>andrew@geekuni.comE<gt>
-
-=head1 COPYRIGHT
-
-Copyright 2014- Andrew Solomon
-
-=head1 LICENSE
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=head1 SEE ALSO
-
-=head1 AUTHOR
-
-Andrew Solomon
+Andrew Solomon <andrew@geekuni.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Copyright 2014- Andrew Solomon.
+This software is copyright (c) 2014 by Andrew Solomon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

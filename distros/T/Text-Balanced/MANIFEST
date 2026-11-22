@@ -17,6 +17,7 @@ t/06_extqlk.t                            Test script
 t/07_exttag.t                            Test script
 t/08_extvar.t                            Test script
 t/09_gentag.t                            Test script
+t/10_depth.t                             Test script
 t/94_changes.t                           See if Changes file format is OK
 t/95_critic.t                            See if coding style is OK
 t/96_pmv.t                               Test script

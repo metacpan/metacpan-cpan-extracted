@@ -4,9 +4,12 @@
 #include "XSUB.h"
 #include "xs/protobuf/arena.h"
 #include "xs/protobuf/message.h"
+#include "xs/protobuf/utils.h"
 #include "xs/descriptor_pool/pool.h"
 #include "upb/mem/arena.h"
 #include "upb/mem/alloc.h"
+#include "upb/wire/encode.h"
+#include "upb/wire/decode.h"
 
 #ifndef _WIN32
 #include <sys/mman.h>
@@ -93,6 +96,9 @@ static void* PerlUpb_BlockAlloc_Func(upb_alloc* alloc, void* ptr, size_t oldsize
     if (use_guard_pages) {
 #ifndef _WIN32
         size_t data_size = size;
+        if (page_size > SIZE_MAX / 2 || data_size > SIZE_MAX - page_size * 2) {
+            return NULL;
+        }
         size_t total_alloc = page_size * 2 + data_size;
         b->mmap_size = total_alloc;
 
@@ -123,10 +129,11 @@ static void* PerlUpb_BlockAlloc_Func(upb_alloc* alloc, void* ptr, size_t oldsize
         return NULL;
 #endif
     } else {
-        // Original canary-based logic
+        // Original canary-based logic with overflow guards
+        if (size > SIZE_MAX - 2 * PERL_UPB_CANARY_SIZE - 15) return NULL;
         size_t requested_size = size + 2 * PERL_UPB_CANARY_SIZE;
-        size_t aligned_size = (requested_size + 15) & ~15;
-        if (b->offset + aligned_size > b->size) return NULL;
+        size_t aligned_size = (requested_size + 15) & ~(size_t)15;
+        if (b->offset > b->size || aligned_size > b->size - b->offset) return NULL;
 
         void* raw = (char*)b->region + b->offset;
         PerlUpb_WriteCanaries(raw, size);
@@ -139,12 +146,37 @@ static void* PerlUpb_BlockAlloc_Func(upb_alloc* alloc, void* ptr, size_t oldsize
     }
 }
 
+#define PERL_UPB_SHM_WIRE_MAGIC 0x5550425749524531ULL
+
+typedef struct {
+    uint64_t magic;
+    uint64_t wire_len;
+} PerlUpb_ShmWireFrame;
+
 SV* PerlUpb_Arena_NewTmpfs(pTHX_ const char* path, size_t size) {
 #ifdef _WIN32
     croak("Tmpfs arenas are not supported on Windows");
     return &PL_sv_undef;
 #else
-    int fd = open(path, O_RDWR | O_CREAT, 0666);
+    int flags = O_RDWR | O_CREAT | O_EXCL;
+#ifdef O_NOFOLLOW
+    flags |= O_NOFOLLOW;
+#endif
+    int fd = open(path, flags, 0600);
+    if (fd < 0 && errno == EEXIST) {
+        int reopen_flags = O_RDWR;
+#ifdef O_NOFOLLOW
+        reopen_flags |= O_NOFOLLOW;
+#endif
+        fd = open(path, reopen_flags, 0600);
+        if (fd >= 0) {
+            struct stat st;
+            if (fstat(fd, &st) != 0 || !S_ISREG(st.st_mode) || st.st_uid != geteuid() || (st.st_mode & 0077) != 0) {
+                close(fd);
+                croak("Unsafe existing tmpfs file %s (must be regular file owned by current uid with mode 0600)", path);
+            }
+        }
+    }
     if (fd < 0) croak("Failed to open tmpfs file %s: %s", path, strerror(errno));
 
     if (ftruncate(fd, size) != 0) {
@@ -179,16 +211,11 @@ SV* PerlUpb_Arena_NewTmpfs(pTHX_ const char* path, size_t size) {
     }
 
     PerlUpb_Arena_Custom* wrapper = (PerlUpb_Arena_Custom*)safemalloc(sizeof(PerlUpb_Arena_Custom));
+    memset(wrapper, 0, sizeof(PerlUpb_Arena_Custom));
     wrapper->base.arena = arena;
     wrapper->alloc = b_alloc;
 
-    HV* hv = newHV();
-    hv_store(hv, "_arena_ptr", 10, newSViv(PTR2IV(wrapper)), 0);
-    hv_store(hv, "_is_tmpfs", 9, newSViv(1), 0);
-
-    SV* rv = newRV_noinc((SV*)hv);
-    sv_bless(rv, gv_stashpv("Protobuf::Arena", GV_ADD));
-    return rv;
+    return PerlUpb_Arena_WrapInternal(aTHX_ wrapper, true, false);
 #endif
 }
 
@@ -231,8 +258,30 @@ SV* PerlUpb_Arena_AttachTmpfs(pTHX_ const char* path, size_t size) {
     croak("Tmpfs arenas are not supported on Windows");
     return &PL_sv_undef;
 #else
-    int fd = open(path, O_RDONLY);
+    if (size == 0) {
+        croak("Tmpfs arena size must be greater than 0");
+    }
+    int open_flags = O_RDONLY;
+#ifdef O_NOFOLLOW
+    open_flags |= O_NOFOLLOW;
+#endif
+    int fd = open(path, open_flags);
     if (fd < 0) croak("Failed to open existing tmpfs file %s: %s", path, strerror(errno));
+
+    struct stat st;
+    if (fstat(fd, &st) != 0 || !S_ISREG(st.st_mode)) {
+        close(fd);
+        croak("Tmpfs path %s is not a regular file", path);
+    }
+    if (st.st_uid != geteuid() || (st.st_mode & 0077) != 0) {
+        close(fd);
+        croak("Unsafe permissions or ownership on tmpfs file %s", path);
+    }
+    if (st.st_size < 0 || (uint64_t)st.st_size < (uint64_t)size) {
+        close(fd);
+        croak("Tmpfs file %s is smaller (%lld bytes) than requested size %zu",
+              path, (long long)st.st_size, size);
+    }
 
     void* region = mmap(NULL, size, PROT_READ, MAP_SHARED, fd, 0);
     if (region == MAP_FAILED) {
@@ -261,17 +310,11 @@ SV* PerlUpb_Arena_AttachTmpfs(pTHX_ const char* path, size_t size) {
     }
 
     PerlUpb_Arena_Custom* wrapper = (PerlUpb_Arena_Custom*)safemalloc(sizeof(PerlUpb_Arena_Custom));
+    memset(wrapper, 0, sizeof(PerlUpb_Arena_Custom));
     wrapper->base.arena = arena;
     wrapper->alloc = b_alloc;
 
-    HV* hv = newHV();
-    hv_store(hv, "_arena_ptr", 10, newSViv(PTR2IV(wrapper)), 0);
-    hv_store(hv, "_is_tmpfs", 9, newSViv(1), 0);
-    hv_store(hv, "_read_only", 10, newSViv(1), 0);
-
-    SV* rv = newRV_noinc((SV*)hv);
-    sv_bless(rv, gv_stashpv("Protobuf::Arena", GV_ADD));
-    return rv;
+    return PerlUpb_Arena_WrapInternal(aTHX_ wrapper, true, true);
 #endif
 }
 
@@ -306,19 +349,22 @@ void PerlUpb_Arena_DestroyRaw_Tmpfs(pTHX_ void* ptr, bool is_tmpfs) {
 #endif
 }
 
+static PerlUpb_Arena_Custom* _get_tmpfs_wrapper(pTHX_ SV* arena_sv) {
+    bool is_tmpfs = false;
+    void* raw = PerlUpb_Arena_GetWrapperRaw(aTHX_ arena_sv, &is_tmpfs);
+    if (!raw || !is_tmpfs) return NULL;
+    PerlUpb_Arena_Custom* wrapper = (PerlUpb_Arena_Custom*)raw;
+    if (!wrapper->alloc || !wrapper->alloc->region) return NULL;
+    return wrapper;
+}
+
 bool PerlUpb_Arena_IsTmpfs(pTHX_ SV* arena_sv) {
-    if (!arena_sv || !SvROK(arena_sv)) return false;
-    HV* hv = (HV*)SvRV(arena_sv);
-    SV** svp = hv_fetch(hv, "_is_tmpfs", 9, 0);
-    return svp && SvIV(*svp);
+    return _get_tmpfs_wrapper(aTHX_ arena_sv) != NULL;
 }
 
 const char* PerlUpb_Arena_GetPath(pTHX_ SV* arena_sv) {
-    if (!PerlUpb_Arena_IsTmpfs(aTHX_ arena_sv)) return NULL;
-    HV* hv = (HV*)SvRV(arena_sv);
-    SV** svp = hv_fetch(hv, "_arena_ptr", 10, 0);
-    if (!svp) return NULL;
-    PerlUpb_Arena_Custom* wrapper = (PerlUpb_Arena_Custom*)SvIV(*svp);
+    PerlUpb_Arena_Custom* wrapper = _get_tmpfs_wrapper(aTHX_ arena_sv);
+    if (!wrapper) return NULL;
     return wrapper->alloc->path;
 }
 
@@ -334,27 +380,121 @@ bool PerlUpb_Arena_VerifySELinux(pTHX_ SV* arena_sv) {
 #endif
 }
 
+static size_t _encode_msg_to_tmpfs_frame(pTHX_ PerlUpb_Arena_Custom* wrapper, const upb_Message* msg, const upb_MessageDef* mdef) {
+    if (!wrapper || !wrapper->base.arena || !msg || !mdef) return 0;
+    if (wrapper->alloc->offset >= wrapper->alloc->size) {
+        croak("Cannot write shared message to read-only or full tmpfs arena");
+    }
+    const upb_MiniTable* mt = upb_MessageDef_MiniTable(mdef);
+    if (!mt) croak("Message MiniTable missing");
+
+    upb_Arena* tmp_arena = upb_Arena_New();
+    if (!tmp_arena) croak("Failed to allocate temporary arena for IPC serialization");
+    char* wire_buf = NULL;
+    size_t wire_size = 0;
+    upb_EncodeStatus st = upb_Encode(msg, mt, 0, tmp_arena, &wire_buf, &wire_size);
+    if (st != kUpb_EncodeStatus_Ok) {
+        upb_Arena_Free(tmp_arena);
+        croak("Failed to serialize message into tmpfs shared frame");
+    }
+    if (wire_size > SIZE_MAX - sizeof(PerlUpb_ShmWireFrame)) {
+        upb_Arena_Free(tmp_arena);
+        croak("Serialized message too large for tmpfs frame");
+    }
+    size_t total_frame = sizeof(PerlUpb_ShmWireFrame) + wire_size;
+    char* frame_mem = (char*)upb_Arena_Malloc(wrapper->base.arena, total_frame);
+    if (!frame_mem) {
+        upb_Arena_Free(tmp_arena);
+        croak("Tmpfs arena exhausted while writing %zu-byte shared message frame", total_frame);
+    }
+    if ((void*)frame_mem < wrapper->alloc->region ||
+        frame_mem + total_frame > (char*)wrapper->alloc->region + wrapper->alloc->size) {
+        upb_Arena_Free(tmp_arena);
+        croak("Shared message frame allocated outside tmpfs mapped region (arena size too small)");
+    }
+    PerlUpb_ShmWireFrame hdr;
+    hdr.magic = PERL_UPB_SHM_WIRE_MAGIC;
+    hdr.wire_len = (uint64_t)wire_size;
+    memcpy(frame_mem, &hdr, sizeof(hdr));
+    if (wire_size > 0 && wire_buf) {
+        memcpy(frame_mem + sizeof(hdr), wire_buf, wire_size);
+    }
+    upb_Arena_Free(tmp_arena);
+    return (size_t)(frame_mem - (char*)wrapper->alloc->region);
+}
+
+size_t PerlUpb_Arena_WriteSharedMessage(pTHX_ SV* arena_sv, SV* msg_sv) {
+    PerlUpb_Arena_Custom* wrapper = _get_tmpfs_wrapper(aTHX_ arena_sv);
+    if (!wrapper) croak("Arena is not a valid tmpfs arena");
+    const upb_Message* msg = PerlUpb_Message_GetMsg(aTHX_ msg_sv);
+    const upb_MessageDef* mdef = PerlUpb_Message_GetDef(aTHX_ msg_sv);
+    if (!msg || !mdef) croak("Invalid message passed to WriteSharedMessage");
+    return _encode_msg_to_tmpfs_frame(aTHX_ wrapper, msg, mdef);
+}
+
 size_t PerlUpb_Arena_GetOffset(pTHX_ SV* arena_sv, void* ptr) {
-    if (!PerlUpb_Arena_IsTmpfs(aTHX_ arena_sv)) return 0;
-    HV* hv = (HV*)SvRV(arena_sv);
-    SV** svp = hv_fetch(hv, "_arena_ptr", 10, 0);
-    if (!svp) return 0;
-    PerlUpb_Arena_Custom* wrapper = (PerlUpb_Arena_Custom*)SvIV(*svp);
+    PerlUpb_Arena_Custom* wrapper = _get_tmpfs_wrapper(aTHX_ arena_sv);
+    if (!wrapper || !ptr) return 0;
     if (ptr < wrapper->alloc->region || (char*)ptr >= (char*)wrapper->alloc->region + wrapper->alloc->size) {
         return 0;
     }
-    return (char*)ptr - (char*)wrapper->alloc->region;
+
+    // Safe IPC upgrade: if ptr corresponds to a live wrapped Message, write a pointer-free
+    // wire-serialized frame into the shared tmpfs region and return the frame's offset!
+    SV* cached_msg_sv = PerlUpb_MaybeGetMessage(aTHX_ (const upb_Message*)ptr);
+    if (cached_msg_sv) {
+        const upb_MessageDef* mdef = PerlUpb_Message_GetDef(aTHX_ cached_msg_sv);
+        if (mdef && wrapper->alloc->offset < wrapper->alloc->size) {
+            size_t frame_off = _encode_msg_to_tmpfs_frame(aTHX_ wrapper, (const upb_Message*)ptr, mdef);
+            SvREFCNT_dec(cached_msg_sv);
+            return frame_off;
+        }
+        SvREFCNT_dec(cached_msg_sv);
+    }
+
+    return (size_t)((char*)ptr - (char*)wrapper->alloc->region);
 }
 
 SV* PerlUpb_Arena_AttachMessage(pTHX_ SV* arena_sv, const char* name, size_t offset) {
-    if (!PerlUpb_Arena_IsTmpfs(aTHX_ arena_sv)) croak("Arena is not a tmpfs arena");
-    HV* hv = (HV*)SvRV(arena_sv);
-    SV** svp = hv_fetch(hv, "_arena_ptr", 10, 0);
-    PerlUpb_Arena_Custom* wrapper = (PerlUpb_Arena_Custom*)SvIV(*svp);
-    if (offset >= wrapper->alloc->size) croak("Offset %zu out of bounds for arena size %zu", offset, wrapper->alloc->size);
+    PerlUpb_Arena_Custom* wrapper = _get_tmpfs_wrapper(aTHX_ arena_sv);
+    if (!wrapper) croak("Arena is not a valid tmpfs arena");
+    size_t region_size = wrapper->alloc->size;
+    if (offset >= region_size || region_size - offset < sizeof(PerlUpb_ShmWireFrame)) {
+        croak("Offset %zu out of bounds for tmpfs arena size %zu", offset, region_size);
+    }
+    if ((offset % sizeof(uint64_t)) != 0) {
+        croak("Unaligned offset %zu for tmpfs message frame", offset);
+    }
+
     const upb_DefPool* pool = PerlUpb_DescriptorPool_GetPool(aTHX_ PerlUpb_DescriptorPool_GeneratedPool(aTHX));
     const upb_MessageDef* mdef = upb_DefPool_FindMessageByName(pool, name);
     if (!mdef) croak("Message definition not found: %s", name);
-    upb_Message* msg = (upb_Message*)((char*)wrapper->alloc->region + offset);
+    const upb_MiniTable* mt = upb_MessageDef_MiniTable(mdef);
+    if (!mt) croak("Message MiniTable not found: %s", name);
+
+    const char* base = (const char*)wrapper->alloc->region + offset;
+    PerlUpb_ShmWireFrame hdr;
+    memcpy(&hdr, base, sizeof(hdr));
+    if (hdr.magic != PERL_UPB_SHM_WIRE_MAGIC) {
+        croak("Refusing to reify unframed raw pointer at offset %zu in shared memory (expected wire frame header)", offset);
+    }
+    size_t remaining = region_size - offset - sizeof(PerlUpb_ShmWireFrame);
+    if (hdr.wire_len > remaining || hdr.wire_len > (64ULL * 1024ULL * 1024ULL)) {
+        croak("Invalid shared message wire frame length %llu at offset %zu",
+              (unsigned long long)hdr.wire_len, offset);
+    }
+
+    upb_Arena* dst_arena = wrapper->base.arena;
+    if (!dst_arena) croak("Invalid target arena on tmpfs wrapper");
+    upb_Message* msg = upb_Message_New(mt, dst_arena);
+    if (!msg) croak("Failed to allocate message for shared frame decode");
+
+    const upb_FileDef* file = upb_MessageDef_File(mdef);
+    const upb_ExtensionRegistry* extreg = file ? upb_DefPool_ExtensionRegistry(upb_FileDef_Pool(file)) : NULL;
+    upb_DecodeStatus status = upb_Decode(base + sizeof(PerlUpb_ShmWireFrame), (size_t)hdr.wire_len,
+                                         msg, mt, extreg, 0, dst_arena);
+    if (status != kUpb_DecodeStatus_Ok) {
+        PerlUpb_DecodeStatus_Die(aTHX_ status, "decode shared tmpfs message frame");
+    }
     return PerlUpb_WrapMessage(aTHX_ msg, mdef, arena_sv, 0);
 }

@@ -111,4 +111,11 @@ Revision history for Perl extension WebService::Browshot.
 	- screenshot_thumbnail_file creates the directory structure as needed
 
 1.29.0 Wed Nov 22 18:20:00
-	- add suport for crawls
+	- add support for crawls
+
+1.32.0 Sat Nov 21 2026
+	- Browshot API 1.32
+	- Add screenshot_pdf and screenshot_pdf_file
+	- Add screenshot_video and screenshot_video_file for WebM, MP4 and GIF
+	- Document new capture options and country-specific instance IDs
+	- Add offline unit tests and opt-in remote tests for API 1.32

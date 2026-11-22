@@ -4,8 +4,8 @@
 #include <inttypes.h>
 #include <pthread.h>
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 #ifndef _WIN32
 #define PCRE2_CODE_UNIT_WIDTH 8
@@ -17,8 +17,8 @@
 #endif
 
 #include "EXTERN.h"
-#include "perl.h"  // NOLINT(build/include)
 #include "XSUB.h"
+#include "perl.h"  // NOLINT(build/include)
 #include "upb/mem/arena.h"
 
 // #include "ppport.h"

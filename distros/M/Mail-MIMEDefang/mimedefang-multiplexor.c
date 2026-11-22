@@ -15,6 +15,8 @@
 #include "config.h"
 #include "event_tcp.h"
 #include "mimedefang.h"
+#include "json_out.h"
+#include "autoscale.h"
 
 #ifdef HAVE_GETOPT_H
 #include <getopt.h>
@@ -41,6 +43,22 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <stdlib.h>
+
+/* For the resource guard of the autoscaler (-k max_load / min_mem) */
+#ifdef __sun
+#include <sys/loadavg.h>
+#endif
+#if defined(__FreeBSD__) || defined(__DragonFly__)
+#include <sys/sysctl.h>
+#elif defined(__OpenBSD__)
+#include <sys/param.h>
+#include <sys/sysctl.h>
+#include <uvm/uvmexp.h>
+#elif defined(__NetBSD__)
+#include <sys/param.h>
+#include <sys/sysctl.h>
+#include <uvm/uvm_extern.h>
+#endif
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
@@ -151,9 +169,16 @@ static int Old_NumFreeWorkers = -1;
 int NumUnprivConnections = 0;
 
 /* Autoscaling state */
-static time_t LastScaleOut = 0;
-static time_t LastScaleIn  = 0;
-static double EMABusyRatio = 0.0;
+static AutoscaleState AsState;
+static int AsPeakBusy = 0;      /* Most busy workers since the last tick    */
+static int AsPeakQueued = 0;    /* Longest request queue since the last tick*/
+static int AsRejected = 0;      /* Requests refused since the last tick     */
+static int AsPendingOut = 0;    /* Workers left to start in a multi-step    */
+                                /* scale-out, one every slewTime seconds    */
+static int AsStepScheduled = 0; /* Is the step timer pending?               */
+static time_t AsLastGuardLog = 0; /* When we last reported a blocked scale-out */
+static int AsDesired = 0;       /* Pool size the last decision called for   */
+static time_t AsLastSatLog = 0; /* When we last warned about saturation     */
 
 static pid_t ParentPid = (pid_t) -1;
 
@@ -195,12 +220,7 @@ struct Settings_t {
     int wantStatusReports;      /* Do we want status reports from workers?   */
     int debugWorkerScheduling;   /* Log details about worker scheduling       */
     int    autoscaling;          /* 1 = adaptive autoscaling enabled (-k)     */
-    int    autoscaleInterval;    /* Seconds between autoscale checks          */
-    double scaleOutBusyRatio;    /* Busy ratio threshold to trigger scale-out */
-    double scaleInBusyRatio;     /* Busy ratio threshold to trigger scale-in  */
-    int    scaleOutCooldown;     /* Min seconds between consecutive scale-outs*/
-    int    scaleInCooldown;      /* Min seconds between consecutive scale-ins */
-    double emaAlpha;             /* EMA smoothing factor (0,1)                */
+    AutoscaleParams autoscale;   /* Autoscaling parameters (see autoscale.h)  */
 } Settings;
 
 /* Structure for keeping statistics on number of messages processed in
@@ -318,6 +338,7 @@ static void doLoad(EventSelector *es, int fd, int cmd);
 static void doLoad1(EventSelector *es, int fd, int back);
 static void doHourlyLoad(EventSelector *es, int fd, int cmd);
 static void doHistogram(EventSelector *es, int fd);
+static int doJson(EventSelector *es, int fd, char const *what, int unpriv);
 
 static void doWorkerCommand(EventSelector *es, int fd, char *cmd);
 static void doWorkerCommandAux(EventSelector *es, int fd, char *cmd, int queueable);
@@ -339,6 +360,10 @@ static void sigterm(int sig);
 static void newGeneration(void);
 static void handleAutoscale(EventSelector *es,
 				int fd, unsigned int flags, void *data);
+static void handleAutoscaleStep(EventSelector *es,
+				    int fd, unsigned int flags, void *data);
+static int autoscaleGuardSupported(AutoscaleParams const *p,
+				   char *err, size_t errlen);
 
 static void handleIdleTimeout(EventSelector *es, int fd, unsigned int flags,
 			      void *data);
@@ -557,7 +582,8 @@ usage(void)
     fprintf(stderr, "  -P n              -- Run 'n' parallel tick requests\n");
     fprintf(stderr, "  -Y label          -- Set syslog label to 'label'\n");
     fprintf(stderr, "  -G                -- Make sockets group-writable\n");
-    fprintf(stderr, "  -k                -- Enable adaptive autoscaling of the worker pool\n");
+    fprintf(stderr, "  -k [key=val,...]  -- Enable adaptive autoscaling of the worker pool,\n");
+    fprintf(stderr, "                       optionally tuned (see the man page)\n");
 #ifdef EMBED_PERL
     fprintf(stderr, "  -E                -- Use embedded Perl interpreter\n");
 #endif
@@ -666,12 +692,8 @@ main(int argc, char *argv[], char **env)
     Settings.wantStatusReports = 0;
     Settings.debugWorkerScheduling = 0;
     Settings.autoscaling       = 0;
-    Settings.autoscaleInterval = 15;
-    Settings.scaleOutBusyRatio = 0.80;
-    Settings.scaleInBusyRatio  = 0.30;
-    Settings.scaleOutCooldown  = 5;
-    Settings.scaleInCooldown   = 30;
-    Settings.emaAlpha          = 0.25;
+    autoscale_params_default(&Settings.autoscale);
+    autoscale_state_init(&AsState);
 
 #ifndef HAVE_SETRLIMIT
     options = "GAa:Tt:um:x:y:r:i:b:c:s:hdlf:p:o:w:F:W:U:S:q:Q:I:DEO:X:Y:N:vZP:z:V:k";
@@ -690,6 +712,25 @@ main(int argc, char *argv[], char **env)
 	    break;
 	case 'k':
 	    Settings.autoscaling = 1;
+	    /* Optional settings: the next word, if it is key=value[,...].
+	       getopt() has no portable optional argument, so it is taken
+	       here and skipped. */
+	    if (optind < argc && argv[optind][0] != '-'
+		&& strchr(argv[optind], '=')) {
+		char kerr[128];
+		if (autoscale_params_parse(&Settings.autoscale, argv[optind],
+					   kerr, sizeof(kerr)) < 0) {
+		    fprintf(stderr, "%s: -k: %s\n", argv[0], kerr);
+		    exit(EXIT_FAILURE);
+		}
+		/* Refuse limits that could never be enforced here */
+		if (!autoscaleGuardSupported(&Settings.autoscale,
+					     kerr, sizeof(kerr))) {
+		    fprintf(stderr, "%s: -k: %s\n", argv[0], kerr);
+		    exit(EXIT_FAILURE);
+		}
+		optind++;
+	    }
 	    break;
 	case 'z':
 	    Settings.spoolDir = strdup(optarg);
@@ -1358,13 +1399,13 @@ main(int argc, char *argv[], char **env)
     /* Set up adaptive autoscaling timer if enabled (-k flag) */
     if (Settings.autoscaling) {
 	t.tv_usec = 0;
-	t.tv_sec  = Settings.autoscaleInterval;
+	t.tv_sec  = Settings.autoscale.interval;
 	Event_AddTimerHandler(es, t, handleAutoscale, NULL);
 	syslog(LOG_INFO,
-	       "Autoscaling enabled: interval=%ds scale_out=%.0f%% scale_in=%.0f%%",
-	       Settings.autoscaleInterval,
-	       Settings.scaleOutBusyRatio * 100.0,
-	       Settings.scaleInBusyRatio  * 100.0);
+	       "Autoscaling enabled: interval=%ds window=%ds spare=%d",
+	       Settings.autoscale.interval,
+	       Settings.autoscale.window,
+	       Settings.autoscale.spare);
     }
 
     /* Set up a timer handler to log status, if desired */
@@ -1926,6 +1967,13 @@ handleCommand(EventSelector *es,
 	return;
     }
 
+    /* Native JSON commands.  jsonstatus/jsonload* are reformatted by
+       md-mx-ctrl itself and are not answered here. */
+    if (len > 4 && !strncmp(buf, "json", 4) &&
+	doJson(es, fd, buf+4, (data != NULL))) {
+	return;
+    }
+
     /* This is an awful hack used by watch-multiple-mimedefangs.tcl.
        We handle it here so we don't have to waste a worker */
     if (len == 19 && !strcmp(buf, "foo_no_such_command")) {
@@ -2073,6 +2121,7 @@ doScanAux(EventSelector *es, int fd, char *cmd, int queueable)
 	    }
 	}
 
+	AsRejected++;
 	if (DOLOG) {
 	    syslog(LOG_WARNING, "No free workers");
 	}
@@ -2082,6 +2131,7 @@ doScanAux(EventSelector *es, int fd, char *cmd, int queueable)
 
     if (activateWorker(s, "About to perform scan") == (pid_t) -1) {
 	char *answer = "error: Unable to activate worker\n";
+	AsRejected++;
 	if (DOLOG) {
 	    syslog(LOG_ERR, "Unable to activate worker %d",
 		   WORKERNO(s));
@@ -2231,6 +2281,7 @@ doWorkerCommandAux(EventSelector *es, int fd, char *cmd, int queueable)
 	    }
 	}
 
+	AsRejected++;
 	if (DOLOG) {
 	    syslog(LOG_WARNING, "No free workers");
 	}
@@ -2240,6 +2291,7 @@ doWorkerCommandAux(EventSelector *es, int fd, char *cmd, int queueable)
 
     if (activateWorker(s, reason) == (pid_t) -1) {
 	char *answer = "error: Unable to activate worker\n";
+	AsRejected++;
 	if (DOLOG) {
 	    syslog(LOG_ERR, "Unable to activate worker %d",
 		   WORKERNO(s));
@@ -2553,6 +2605,9 @@ putOnList(Worker *s, int state)
 
     /* Update busy histogram if worker was made busy */
     if (state == STATE_BUSY) {
+	if (WorkerCount[STATE_BUSY] > AsPeakBusy) {
+	    AsPeakBusy = WorkerCount[STATE_BUSY];
+	}
 	AllWorkers[WorkerCount[STATE_BUSY]-1].histo++;
 	/* Also update firstReqTime */
 	if (s->firstReqTime == (time_t) -1) {
@@ -2745,15 +2800,15 @@ activateWorker(Worker *s, char const *reason)
 	    LastWorkerActivation = now;
 	}
 	/* Every STOPPED->running transition is effectively a scale-out
-	 * event.  Log it consistently and update LastScaleOut so the
-	 * scale-in cooldown is honoured against lazy-spawn activations
-	 * (findFreeWorker -> activateWorker) just as it is for the
-	 * explicit EMA / queued-request paths. */
+	 * event.  Log it consistently and record its time so the
+	 * time of the last one is reported whether the worker was started
+	 * for a request (findFreeWorker -> activateWorker), for the queue
+	 * or by the autoscaler. */
 	if (Settings.autoscaling) {
-	    LastScaleOut = (now != (time_t) 0) ? now : time(NULL);
+	    autoscale_note_out(&AsState, (now != (time_t) 0) ? now : time(NULL));
 	    syslog(LOG_INFO,
-		   "Autoscale: scaled out to %d workers (ema_busy=%.2f queued=%d)",
-		   NUM_RUNNING_WORKERS, EMABusyRatio, NumQueuedRequests);
+		   "Autoscale: scaled out to %d workers (desired=%d queued=%d)",
+		   NUM_RUNNING_WORKERS, AsDesired, NumQueuedRequests);
 	}
 	return s->pid;
     }
@@ -3285,9 +3340,11 @@ handleIdleTimeout(EventSelector *es,
 	s = next;
     }
 
-    /* Next pass: Kill workers that have been idle for too long */
+    /* Next pass: Kill workers that have been idle for too long, but not
+       below the pool size the autoscaler calls for */
     s = Workers[STATE_IDLE];
-    while(s && numAlive > Settings.minWorkers) {
+    while(s && numAlive > Settings.minWorkers
+	  && !(Settings.autoscaling && numAlive <= AsDesired)) {
 	next = s->next;
 	if ((unsigned long) now - (unsigned long) s->idleTime >= Settings.maxIdleTime) {
 	    numAlive--;
@@ -3648,6 +3705,276 @@ newGeneration(void)
 }
 
 /**********************************************************************
+* %FUNCTION: sysLoad1
+* %ARGUMENTS:
+*  None
+* %RETURNS:
+*  The 1-minute load average, or -1.0 if it is unknown.
+* %DESCRIPTION:
+*  Uses getloadavg(3) (Linux, *BSD, macOS, Solaris), or /proc/loadavg on
+*  Linux if the build did not detect getloadavg().
+***********************************************************************/
+static double
+sysLoad1(void)
+{
+#if defined(HAVE_GETLOADAVG)
+    double l[1];
+
+    if (getloadavg(l, 1) == 1 && l[0] >= 0.0) {
+	return l[0];
+    }
+    return -1.0;
+#elif defined(__linux__)
+    char buf[256];
+    FILE *fp = fopen("/proc/loadavg", "r");
+    size_t n;
+
+    if (!fp) {
+	return -1.0;
+    }
+    n = fread(buf, 1, sizeof(buf) - 1, fp);
+    fclose(fp);
+    buf[n] = 0;
+    return autoscale_parse_loadavg(buf);
+#else
+    return -1.0;
+#endif
+}
+
+/**********************************************************************
+* %FUNCTION: sysMemAvailMB
+* %ARGUMENTS:
+*  None
+* %RETURNS:
+*  An estimate of the memory available for new processes, in MiB, or -1
+*  if it is unknown.
+* %DESCRIPTION:
+*  Linux: MemAvailable from /proc/meminfo.  The BSDs: free plus inactive
+*  pages, which the kernel can reclaim without swapping.
+***********************************************************************/
+static int
+sysMemAvailMB(void)
+{
+#if defined(__linux__)
+    char buf[8192];
+    FILE *fp = fopen("/proc/meminfo", "r");
+    size_t n;
+
+    if (!fp) {
+	return -1;
+    }
+    n = fread(buf, 1, sizeof(buf) - 1, fp);
+    fclose(fp);
+    buf[n] = 0;
+    return autoscale_parse_meminfo(buf);
+#elif defined(__FreeBSD__) || defined(__DragonFly__)
+    u_int freep, inact, psize;
+    size_t len;
+
+    len = sizeof(freep);
+    if (sysctlbyname("vm.stats.vm.v_free_count", &freep, &len, NULL, 0) < 0) {
+	return -1;
+    }
+    len = sizeof(inact);
+    if (sysctlbyname("vm.stats.vm.v_inactive_count", &inact, &len, NULL, 0) < 0) {
+	return -1;
+    }
+    len = sizeof(psize);
+    if (sysctlbyname("vm.stats.vm.v_page_size", &psize, &len, NULL, 0) < 0) {
+	return -1;
+    }
+    return (int) (((double) freep + (double) inact) * (double) psize
+		  / (1024.0 * 1024.0));
+#elif defined(__OpenBSD__)
+    int mib[2] = { CTL_VM, VM_UVMEXP };
+    struct uvmexp u;
+    size_t len = sizeof(u);
+
+    if (sysctl(mib, 2, &u, &len, NULL, 0) < 0) {
+	return -1;
+    }
+    return (int) (((double) u.free + (double) u.inactive) * (double) u.pagesize
+		  / (1024.0 * 1024.0));
+#elif defined(__NetBSD__)
+    int mib[2] = { CTL_VM, VM_UVMEXP2 };
+    struct uvmexp_sysctl u;
+    size_t len = sizeof(u);
+
+    if (sysctl(mib, 2, &u, &len, NULL, 0) < 0) {
+	return -1;
+    }
+    return (int) (((double) u.free + (double) u.inactive) * (double) u.pagesize
+		  / (1024.0 * 1024.0));
+#else
+    return -1;
+#endif
+}
+
+/**********************************************************************
+* %FUNCTION: autoscaleGuardSupported
+* %ARGUMENTS:
+*  p -- autoscaling parameters
+*  err, errlen -- buffer for an error message
+* %RETURNS:
+*  1 if the resource limits that are set can be measured on this system,
+*  0 (with a message in err) otherwise.
+***********************************************************************/
+static int
+autoscaleGuardSupported(AutoscaleParams const *p, char *err, size_t errlen)
+{
+    if (p->max_load > 0.0 && sysLoad1() < 0.0) {
+	snprintf(err, errlen, "max_load: the load average cannot be read on this system");
+	return 0;
+    }
+    if (p->min_mem > 0 && sysMemAvailMB() < 0) {
+	snprintf(err, errlen, "min_mem: the available memory cannot be read on this system");
+	return 0;
+    }
+    return 1;
+}
+
+/**********************************************************************
+* %FUNCTION: autoscaleResourceBlock
+* %ARGUMENTS:
+*  load1 -- set to the 1-minute load average, or -1.0 if unknown
+*  mem -- set to the available memory in MiB, or -1 if unknown
+* %RETURNS:
+*  AUTOSCALE_BLOCK_NONE, _LOAD or _MEM
+* %DESCRIPTION:
+*  Reads the load and memory of the machine, only when a limit is
+*  configured, and applies the guard.
+***********************************************************************/
+static int
+autoscaleResourceBlock(double *load1, int *mem)
+{
+    *load1 = -1.0;
+    *mem = -1;
+    if (Settings.autoscale.max_load > 0.0) {
+	*load1 = sysLoad1();
+    }
+    if (Settings.autoscale.min_mem > 0) {
+	*mem = sysMemAvailMB();
+    }
+    return autoscale_guard(&Settings.autoscale, *load1, *mem);
+}
+
+/**********************************************************************
+* %FUNCTION: pickScaleInVictim
+* %ARGUMENTS:
+*  None
+* %RETURNS:
+*  The idle worker to stop, or NULL if none is eligible.
+* %DESCRIPTION:
+*  Workers younger than the min_age setting are spared, so that a worker
+*  that has just paid for starting a Perl process is not thrown away at once.
+***********************************************************************/
+static Worker *
+pickScaleInVictim(void)
+{
+    AutoscaleCandidate c, best;
+    Worker *s;
+    Worker *victim = NULL;
+
+    for (s = Workers[STATE_IDLE]; s; s = s->next) {
+	c.age = worker_age(s);
+	c.requests = s->numRequests;
+	c.activated = s->activated;
+	if (autoscale_victim_better(&c, victim ? &best : NULL,
+				    Settings.autoscale.min_age)) {
+	    best = c;
+	    victim = s;
+	}
+    }
+    return victim;
+}
+
+/**********************************************************************
+* %FUNCTION: autoscaleStartWorker
+* %ARGUMENTS:
+*  why -- text for the log
+* %RETURNS:
+*  1 if a worker was started, 0 if not.
+* %DESCRIPTION:
+*  Starts one stopped worker on behalf of the autoscaler.
+***********************************************************************/
+static int
+autoscaleStartWorker(EventSelector *es, char const *why)
+{
+    Worker *s = Workers[STATE_STOPPED];
+    char reason[160];
+    char msg[32];
+
+    if (!s) {
+	return 0;
+    }
+    snprintf(reason, sizeof(reason), "Autoscale: scale-out (%s)", why);
+    /* The scale-out is logged and its time recorded by activateWorker()
+     * itself for every STOPPED->running transition. */
+    if (activateWorker(s, reason) == (pid_t) -1) {
+	return 0;
+    }
+    snprintf(msg, sizeof(msg), "A out %d\n", NUM_RUNNING_WORKERS);
+    notify_listeners(es, msg);
+    return 1;
+}
+
+/**********************************************************************
+* %FUNCTION: scheduleAutoscaleStep
+* %ARGUMENTS:
+*  es -- event selector
+* %RETURNS:
+*  Nothing
+* %DESCRIPTION:
+*  Arranges for the next worker of a multi-step scale-out to be started in
+*  slewTime seconds, as for the workers brought up to minWorkers, or in
+*  waitTime (-W) seconds if that is longer, since activateWorker() would
+*  refuse to start it any sooner.
+***********************************************************************/
+static void
+scheduleAutoscaleStep(EventSelector *es)
+{
+    struct timeval t;
+
+    if (AsStepScheduled) return;
+    AsStepScheduled = 1;
+    t.tv_usec = 0;
+    t.tv_sec = (Settings.waitTime > Settings.slewTime)
+	? Settings.waitTime : Settings.slewTime;
+    Event_AddTimerHandler(es, t, handleAutoscaleStep, NULL);
+}
+
+static void
+handleAutoscaleStep(EventSelector *es,
+		    int fd,
+		    unsigned int flags,
+		    void *data)
+{
+    char why[64];
+    double load1;
+    int mem;
+
+    AsStepScheduled = 0;
+    if (AsPendingOut <= 0) {
+	return;
+    }
+    snprintf(why, sizeof(why), "window_peak=%d", AsState.peak);
+    if (autoscaleResourceBlock(&load1, &mem) != AUTOSCALE_BLOCK_NONE) {
+	AsPendingOut = 0;
+	return;
+    }
+    if (NUM_RUNNING_WORKERS < Settings.maxWorkers
+	&& (WorkerCount[STATE_IDLE] + WorkerCount[STATE_BUSY]) < AsDesired
+	&& autoscaleStartWorker(es, why)) {
+	AsPendingOut--;
+    } else {
+	AsPendingOut = 0;
+    }
+    if (AsPendingOut > 0) {
+	scheduleAutoscaleStep(es);
+    }
+}
+
+/**********************************************************************
 * %FUNCTION: handleAutoscale
 * %ARGUMENTS:
 *  es -- event selector
@@ -3655,11 +3982,10 @@ newGeneration(void)
 * %RETURNS:
 *  Nothing
 * %DESCRIPTION:
-*  Called periodically when autoscaling is enabled (-k flag).
-*  Uses an exponential moving average (EMA) of the busy-worker ratio
-*  to make scale-out and scale-in decisions with AIMD-style cooldowns.
-*  Scale out when the EMA exceeds scaleOutBusyRatio; scale in when it
-*  falls below scaleInBusyRatio and both cooldown timers have elapsed.
+*  Called periodically when autoscaling is enabled (-k flag).  Gathers
+*  what happened since the previous call (peak number of busy workers,
+*  queued and refused requests), asks autoscale_decide() what to do and
+*  does it.  See autoscale.c for the sizing rules.
 ***********************************************************************/
 static void
 handleAutoscale(EventSelector *es,
@@ -3669,50 +3995,109 @@ handleAutoscale(EventSelector *es,
 {
     time_t now    = time(NULL);
     struct timeval t;
-    int nRunning  = NUM_RUNNING_WORKERS;
-    int nBusy     = WorkerCount[STATE_BUSY];
-    double rawBusy = (nRunning > 0) ? (double)nBusy / nRunning : 0.0;
+    AutoscaleInput in;
+    AutoscaleDecision d;
     char reason[128];
+    int busyNow = WorkerCount[STATE_BUSY];
+    int i, n;
     Worker *s;
 
-    /* Update exponential moving average of busy ratio */
-    EMABusyRatio = EMABusyRatio * (1.0 - Settings.emaAlpha)
-                 + rawBusy      *        Settings.emaAlpha;
+    in.now          = now;
+    in.running      = NUM_RUNNING_WORKERS;
+    in.live         = WorkerCount[STATE_IDLE] + WorkerCount[STATE_BUSY];
+    in.busy         = busyNow;
+    in.busy_peak    = busyNow;
+    in.queued_peak  = NumQueuedRequests;
+    if (AsPeakBusy > in.busy_peak) in.busy_peak = AsPeakBusy;
+    if (AsPeakQueued > in.queued_peak) in.queued_peak = AsPeakQueued;
+    in.rejected     = AsRejected;
+    in.min_workers  = Settings.minWorkers;
+    in.max_workers  = Settings.maxWorkers;
+    in.have_stopped = (Workers[STATE_STOPPED] != NULL);
+    in.have_idle    = (pickScaleInVictim() != NULL);
+    (void) autoscaleResourceBlock(&in.load1, &in.mem_avail_mb);
 
-    /* Scale OUT: pool is saturated */
-    if (EMABusyRatio > Settings.scaleOutBusyRatio
-	    && nRunning < Settings.maxWorkers
-	    && (now - LastScaleOut) > (time_t)Settings.scaleOutCooldown) {
-	s = Workers[STATE_STOPPED];
-	if (s) {
-	    snprintf(reason, sizeof(reason),
-		     "Autoscale: scale-out (ema_busy=%.2f)", EMABusyRatio);
-	    activateWorker(s, reason);
-	    /* LastScaleOut is updated and the scale-out is logged by
-	     * activateWorker() itself for every STOPPED->running
-	     * transition.  No duplicate bookkeeping needed here. */
+    /* Start a new observation window */
+    AsPeakBusy = busyNow;
+    AsPeakQueued = NumQueuedRequests;
+    AsRejected = 0;
+
+    d = autoscale_decide(&Settings.autoscale, &AsState, &in);
+    AsDesired = d.desired;
+
+    /* Unfinished steps of an earlier scale-out are dropped once the pool
+       no longer needs to grow; a new scale-out replaces them (below). */
+    if (d.desired <= in.live) {
+	AsPendingOut = 0;
+    }
+
+    if (d.saturated && (now - AsLastSatLog) >= 60) {
+	AsLastSatLog = now;
+	syslog(LOG_WARNING,
+	       "Autoscale: demand reached maxWorkers (%d) with requests waiting or refused; consider raising -x",
+	       Settings.maxWorkers);
+    }
+
+    if (d.blocked != AUTOSCALE_BLOCK_NONE && (now - AsLastGuardLog) >= 60) {
+	AsLastGuardLog = now;
+	if (d.blocked == AUTOSCALE_BLOCK_LOAD) {
+	    syslog(LOG_NOTICE,
+		   "Autoscale: scale-out blocked: load average %.2f exceeds max_load %.2f",
+		   in.load1, Settings.autoscale.max_load);
+	} else {
+	    syslog(LOG_NOTICE,
+		   "Autoscale: scale-out blocked: %d MiB available is below min_mem %d",
+		   in.mem_avail_mb, Settings.autoscale.min_mem);
 	}
     }
-    /* Scale IN: pool is under-utilised */
-    else if (EMABusyRatio < Settings.scaleInBusyRatio
-	     && nRunning  > Settings.minWorkers
-	     && (now - LastScaleIn)  > (time_t)Settings.scaleInCooldown
-	     && (now - LastScaleOut) > (time_t)Settings.scaleInCooldown) {
-	s = Workers[STATE_IDLE];
-	if (s) {
-	    snprintf(reason, sizeof(reason),
-		     "Autoscale: scale-in (ema_busy=%.2f)", EMABusyRatio);
-	    killWorker(s, reason);
-	    LastScaleIn = now;
-	    syslog(LOG_INFO,
-		   "Autoscale: scaled in to %d workers (ema_busy=%.2f)",
-		   NUM_RUNNING_WORKERS, EMABusyRatio);
+
+    if (d.action == AUTOSCALE_OUT) {
+	snprintf(reason, sizeof(reason), "window_peak=%d desired=%d",
+		 AsState.peak, d.desired);
+	AsPendingOut = 0;
+	if (autoscaleStartWorker(es, reason) && d.count > 1) {
+	    /* The other workers are started one every slewTime seconds */
+	    AsPendingOut = d.count - 1;
+	    scheduleAutoscaleStep(es);
 	}
+    } else if (d.action == AUTOSCALE_IN) {
+	snprintf(reason, sizeof(reason),
+		 "Autoscale: scale-in (window_peak=%d desired=%d)",
+		 AsState.peak, d.desired);
+	n = 0;
+	for (i = 0; i < d.count; i++) {
+	    s = pickScaleInVictim();
+	    if (!s) break;
+	    killWorker(s, reason);
+	    autoscale_note_in(&AsState, now);
+	    n++;
+	}
+	if (n) {
+	    char msg[32];
+	    syslog(LOG_INFO,
+		   "Autoscale: scaled in to %d workers (window_peak=%d)",
+		   NUM_RUNNING_WORKERS, AsState.peak);
+	    snprintf(msg, sizeof(msg), "A in %d\n", NUM_RUNNING_WORKERS);
+	    notify_listeners(es, msg);
+	}
+    }
+
+    /* One line in the statistics file for every tick that did something */
+    if (d.action != AUTOSCALE_HOLD || d.blocked != AUTOSCALE_BLOCK_NONE
+	|| d.saturated) {
+	statsLog("Autoscale", -1,
+		 "action=%s count=%d demand=%d window_peak=%d desired=%d blocked=%s saturated=%d",
+		 d.action == AUTOSCALE_OUT ? "out"
+		 : (d.action == AUTOSCALE_IN ? "in" : "hold"),
+		 d.count, AsState.demand, AsState.peak, d.desired,
+		 d.blocked == AUTOSCALE_BLOCK_LOAD ? "load"
+		 : (d.blocked == AUTOSCALE_BLOCK_MEM ? "mem" : "none"),
+		 d.saturated);
     }
 
     /* Reschedule */
     t.tv_usec = 0;
-    t.tv_sec  = Settings.autoscaleInterval;
+    t.tv_sec  = Settings.autoscale.interval;
     Event_AddTimerHandler(es, t, handleAutoscale, NULL);
 }
 
@@ -3972,17 +4357,25 @@ doStatus(EventSelector *es, int fd)
 static void
 doAutoscaleStatus(EventSelector *es, int fd)
 {
-    char ans[256];
+    char ans[768];
     snprintf(ans, sizeof(ans),
-             "enabled=%d interval=%d ema_busy=%.4f scale_out=%.2f scale_in=%.2f out_cool=%d in_cool=%d ema_alpha=%.4f\n",
+             "enabled=%d interval=%d window=%d spare=%d min_age=%d max_load=%.2f min_mem=%d demand=%d window_peak=%d desired=%d last_out_ago=%ld last_in_ago=%ld started=%lu stopped=%lu blocked=%lu saturated=%lu\n",
              Settings.autoscaling,
-             Settings.autoscaleInterval,
-             EMABusyRatio,
-             Settings.scaleOutBusyRatio,
-             Settings.scaleInBusyRatio,
-             Settings.scaleOutCooldown,
-             Settings.scaleInCooldown,
-             Settings.emaAlpha);
+             Settings.autoscale.interval,
+             Settings.autoscale.window,
+             Settings.autoscale.spare,
+             Settings.autoscale.min_age,
+             Settings.autoscale.max_load,
+             Settings.autoscale.min_mem,
+             AsState.demand,
+             AsState.peak,
+             AsState.last_desired,
+             AsState.last_out ? (long) (time(NULL) - AsState.last_out) : -1L,
+             AsState.last_in ? (long) (time(NULL) - AsState.last_in) : -1L,
+             AsState.out_events,
+             AsState.in_events,
+             AsState.blocked_ticks,
+             AsState.saturated_ticks);
     reply_to_mimedefang(es, fd, ans);
 }
 
@@ -4025,6 +4418,11 @@ doHelp(EventSelector *es, int fd, int unpriv)
 	"busyworkers      -- Display busy workers with process-IDs\n"
         "workerinfo n     -- Display information about a particular worker\n"
 	"autoscale        -- Display autoscaling configuration and runtime state\n"
+	"jsonworkers      -- Display all workers in JSON format\n"
+	"jsonhisto        -- Display histogram of busy workers in JSON format\n"
+	"jsonmsgs         -- Display message and activation counters in JSON format\n"
+	"jsonhload        -- Display hourly load in JSON format (also -relayok etc.)\n"
+	"jsonsnapshot     -- Display counters, load, histogram and workers in JSON format\n"
 	"(Analogous hload commands provide hourly information)\n");
     } else {
 	reply_to_mimedefang(es, fd,
@@ -4052,6 +4450,12 @@ doHelp(EventSelector *es, int fd, int unpriv)
 	"busyworkers      -- Display busy workers with process-IDs\n"
 	"workerinfo n     -- Display information about a particular worker\n"
 	"autoscale        -- Display autoscaling configuration and runtime state\n"
+	"jsonworkers      -- Display all workers in JSON format\n"
+	"jsonhisto        -- Display histogram of busy workers in JSON format\n"
+	"jsonmsgs         -- Display message and activation counters in JSON format\n"
+	"jsonhload        -- Display hourly load in JSON format (also -relayok etc.)\n"
+	"jsonsnapshot     -- Display counters, load, histogram and workers in JSON format\n"
+	"jsonautoscale    -- Display autoscaling state in JSON format\n"
 	"scan /path       -- Run a scan (do not invoke using md-mx-ctrl)\n"
 	"(Analogous hload commands provide hourly information)\n");
     }
@@ -4137,72 +4541,61 @@ doLoad1(EventSelector *es, int fd, int back)
 *
 * NOTE: Activations and reaps (aN, rN) are only valid if cmd == SCAN_CMD
 ***********************************************************************/
+/* Load figures for the 10s/1m/5m/10m windows (index 0..3) */
+typedef struct {
+    int msgs[4];
+    double avg[4];   /* Average busy workers per command */
+    double ams[4];   /* Average milliseconds per command */
+    int act[4];      /* Worker activations (SCAN_CMD only) */
+    int reap[4];     /* Worker reaps (SCAN_CMD only) */
+} LoadStats;
+
+static void
+compute_load(int cmd, time_t now, LoadStats *ls)
+{
+    /* Tricky... get slices of history so as not to overlap */
+    static int const start[4] = {0, 10, 1*60, 5*60};
+    static int const back[4] = {10, 1*60-10, 5*60-1*60, 10*60-5*60};
+    int workers[4];
+    BIG_INT ms[4];
+    int i;
+
+    for (i=0; i<4; i++) {
+	get_history_totals(cmd, now-start[i], back[i], &ls->msgs[i],
+			   &workers[i], &ms[i], &ls->act[i], &ls->reap[i]);
+	/* Accumulate partial sums */
+	if (i > 0) {
+	    ls->msgs[i] += ls->msgs[i-1];
+	    workers[i] += workers[i-1];
+	    ms[i] += ms[i-1];
+	    ls->act[i] += ls->act[i-1];
+	    ls->reap[i] += ls->reap[i-1];
+	}
+	if (!ls->msgs[i]) {
+	    ls->avg[i] = 1.0;
+	    ls->ams[i] = 0.0;
+	} else {
+	    ls->avg[i] = (double) workers[i] / (double) ls->msgs[i];
+	    ls->ams[i] = (double) ms[i] / (double) ls->msgs[i];
+	}
+    }
+}
+
 static void
 doLoad(EventSelector *es, int fd, int cmd)
 {
     char ans[1024];
     time_t now = time(NULL);
-    int msgs_0, msgs_1, msgs_5, msgs_10, worker_0, worker_1, worker_5, worker_10;
-    BIG_INT ms_0, ms_1, ms_5, ms_10;
-    int a0, a1, a5, a10; /* Activations */
-    int r0, r1, r5, r10; /* Reaps */
-    double ams_0, ams_1, ams_5, ams_10;
-    double avg_0, avg_1, avg_5, avg_10;
+    LoadStats ls;
 
-    /* Tricky... get slices of history so as not to overlap */
-
-    /*                       start     go_back_by  results....                 */
-    get_history_totals(cmd, now,      10,         &msgs_0,  &worker_0,  &ms_0,  &a0,  &r0);
-    get_history_totals(cmd, now-10,   1*60-10,    &msgs_1,  &worker_1,  &ms_1,  &a1,  &r1);
-    get_history_totals(cmd, now-1*60, 5*60-1*60,  &msgs_5,  &worker_5,  &ms_5,  &a5,  &r5);
-    get_history_totals(cmd, now-5*60, 10*60-5*60, &msgs_10, &worker_10, &ms_10, &a10, &r10);
-
-    /* Accumulate partial sums */
-    msgs_1 += msgs_0;
-    worker_1 += worker_0;
-    ms_1 += ms_0;
-    a1 += a0;
-    r1 += r0;
-
-    msgs_5 += msgs_1;
-    worker_5 += worker_1;
-    ms_5 += ms_1;
-    a5 += a1;
-    r5 += r1;
-
-    msgs_10 += msgs_5;
-    worker_10 += worker_5;
-    ms_10 += ms_5;
-    a10 += a5;
-    r10 += r5;
-
-    if (!msgs_0) avg_0 = 1.0;
-    else avg_0 = (double) worker_0 / (double) msgs_0;
-
-    if (!msgs_1) avg_1 = 1.0;
-    else avg_1 = (double) worker_1 / (double) msgs_1;
-
-    if (!msgs_5) avg_5 = 1.0;
-    else avg_5 = (double) worker_5 / (double) msgs_5;
-
-    if (!msgs_10) avg_10 = 1.0;
-    else avg_10 = (double) worker_10 / (double) msgs_10;
-
-    if (!msgs_0) ams_0 = 0.0;
-    else ams_0 = (double) ms_0 / (double) msgs_0;
-
-    if (!msgs_1) ams_1 = 0.0;
-    else ams_1 = (double) ms_1 / (double) msgs_1;
-
-    if (!msgs_5) ams_5 = 0.0;
-    else ams_5 = (double) ms_5 / (double) msgs_5;
-
-    if (!msgs_10) ams_10 = 0.0;
-    else ams_10 = (double) ms_10 / (double) msgs_10;
+    compute_load(cmd, now, &ls);
 
     snprintf(ans, sizeof(ans), "%d %d %d %d %f %f %f %f %f %f %f %f %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n",
-	     msgs_0, msgs_1, msgs_5, msgs_10, avg_0, avg_1, avg_5, avg_10,
-	     ams_0, ams_1, ams_5, ams_10, a0, a1, a5, a10, r0, r1, r5, r10,
+	     ls.msgs[0], ls.msgs[1], ls.msgs[2], ls.msgs[3],
+	     ls.avg[0], ls.avg[1], ls.avg[2], ls.avg[3],
+	     ls.ams[0], ls.ams[1], ls.ams[2], ls.ams[3],
+	     ls.act[0], ls.act[1], ls.act[2], ls.act[3],
+	     ls.reap[0], ls.reap[1], ls.reap[2], ls.reap[3],
 	     WorkerCount[STATE_BUSY],
 	     WorkerCount[STATE_IDLE],
 	     WorkerCount[STATE_STOPPED],
@@ -4229,59 +4622,48 @@ doLoad(EventSelector *es, int fd, int cmd)
 *    ams_1 ams_4 ams_12 ams_24      - Avg ms/cmd last N hours
 *    secs_1 secs_4 secs_12 secs_24  - Total elapsed seconds in output
 ***********************************************************************/
+/* Hourly load figures for the 1h/4h/12h/24h windows (index 0..3) */
+typedef struct {
+    int msgs[4];
+    double avg[4];
+    double ams[4];
+    int secs[4];
+} HourlyLoadStats;
+
+static int const HourlyWindows[4] = {1, 4, 12, 24};
+
+static void
+compute_hourly_load(int cmd, time_t now, HourlyLoadStats *hs)
+{
+    int workers;
+    BIG_INT ms;
+    int i;
+
+    for (i=0; i<4; i++) {
+	get_hourly_history_totals(cmd, now, HourlyWindows[i], &hs->msgs[i],
+				  &workers, &ms, &hs->secs[i]);
+	if (hs->msgs[i]) {
+	    hs->avg[i] = ((double) workers) / ((double) hs->msgs[i]);
+	    hs->ams[i] = ((double) ms) / ((double) hs->msgs[i]);
+	} else {
+	    hs->avg[i] = 0.0;
+	    hs->ams[i] = 0.0;
+	}
+    }
+}
+
 static void
 doHourlyLoad(EventSelector *es, int fd, int cmd)
 {
-    int msgs_1, msgs_4, msgs_12, msgs_24;
-    double ams_1, ams_4, ams_12, ams_24;
-    double avg_1, avg_4, avg_12, avg_24;
-    int secs_1, secs_4, secs_12, secs_24;
-    int workers;
-    BIG_INT ms;
-
+    HourlyLoadStats hs;
     char ans[1024];
-    time_t now = time(NULL);
 
-    get_hourly_history_totals(cmd, now, 1, &msgs_1, &workers, &ms, &secs_1);
-    if (msgs_1) {
-	avg_1 = ((double) workers) / ((double) msgs_1);
-	ams_1 = ((double) ms) / ((double) msgs_1);
-    } else {
-	avg_1 = 0.0;
-	ams_1 = 0.0;
-    }
-
-    get_hourly_history_totals(cmd, now, 4, &msgs_4, &workers, &ms, &secs_4);
-    if (msgs_4) {
-	avg_4 = ((double) workers) / ((double) msgs_4);
-	ams_4 = ((double) ms) / ((double) msgs_4);
-    } else {
-	avg_4 = 0.0;
-	ams_4 = 0.0;
-    }
-
-    get_hourly_history_totals(cmd, now, 12, &msgs_12, &workers, &ms, &secs_12);
-    if (msgs_12) {
-	avg_12 = ((double) workers) / ((double) msgs_12);
-	ams_12 = ((double) ms) / ((double) msgs_12);
-    } else {
-	avg_12 = 0.0;
-	ams_12 = 0.0;
-    }
-
-    get_hourly_history_totals(cmd, now, 24, &msgs_24, &workers, &ms, &secs_24);
-    if (msgs_24) {
-	avg_24 = ((double) workers) / ((double) msgs_24);
-	ams_24 = ((double) ms) / ((double) msgs_24);
-    } else {
-	avg_24 = 0.0;
-	ams_24 = 0.0;
-    }
+    compute_hourly_load(cmd, time(NULL), &hs);
     snprintf(ans, sizeof(ans), "%d %d %d %d %f %f %f %f %f %f %f %f %d %d %d %d\n",
-	     msgs_1, msgs_4, msgs_12, msgs_24,
-	     avg_1, avg_4, avg_12, avg_24,
-	     ams_1, ams_4, ams_12, ams_24,
-	     secs_1, secs_4, secs_12, secs_24);
+	     hs.msgs[0], hs.msgs[1], hs.msgs[2], hs.msgs[3],
+	     hs.avg[0], hs.avg[1], hs.avg[2], hs.avg[3],
+	     hs.ams[0], hs.ams[1], hs.ams[2], hs.ams[3],
+	     hs.secs[0], hs.secs[1], hs.secs[2], hs.secs[3]);
     reply_to_mimedefang(es, fd, ans);
 }
 
@@ -4330,6 +4712,253 @@ doHistogram(EventSelector *es, int fd)
   }
   reply_to_mimedefang(es, fd, ans);
   free(ans);
+}
+
+/**********************************************************************
+* JSON control commands
+*
+* These are answered by the multiplexor itself (unlike the jsonstatus
+* and jsonload* commands of md-mx-ctrl, which reformat the text output
+* on the client side), so that any client of the control socket, such
+* as mimedefang-dashboard, can consume them directly.
+***********************************************************************/
+
+static void
+json_add_load(json_writer *jw, char const *key, int cmd, time_t now)
+{
+    static char const *const suffix[4] = {"0", "1", "5", "10"};
+    static double const secs[4] = {10.0, 60.0, 5*60.0, 10*60.0};
+    char name[16];
+    LoadStats ls;
+    int i;
+
+    compute_load(cmd, now, &ls);
+    json_obj_begin(jw, key);
+    for (i=0; i<4; i++) {
+	snprintf(name, sizeof(name), "msgs_%s", suffix[i]);
+	json_int(jw, name, ls.msgs[i]);
+    }
+    for (i=0; i<4; i++) {
+	snprintf(name, sizeof(name), "mps_%s", suffix[i]);
+	json_dbl(jw, name, (double) ls.msgs[i] / secs[i], 2);
+    }
+    for (i=0; i<4; i++) {
+	snprintf(name, sizeof(name), "ams_%s", suffix[i]);
+	json_dbl(jw, name, ls.ams[i], 1);
+    }
+    for (i=0; i<4; i++) {
+	snprintf(name, sizeof(name), "avg_%s", suffix[i]);
+	json_dbl(jw, name, ls.avg[i], 2);
+    }
+    if (cmd == SCAN_CMD) {
+	for (i=0; i<4; i++) {
+	    snprintf(name, sizeof(name), "activated_%s", suffix[i]);
+	    json_int(jw, name, ls.act[i]);
+	}
+	for (i=0; i<4; i++) {
+	    snprintf(name, sizeof(name), "reaped_%s", suffix[i]);
+	    json_int(jw, name, ls.reap[i]);
+	}
+    }
+    json_obj_end(jw);
+}
+
+static void
+json_add_hload(json_writer *jw, char const *key, int cmd, time_t now)
+{
+    char name[16];
+    HourlyLoadStats hs;
+    int i;
+
+    compute_hourly_load(cmd, now, &hs);
+    json_obj_begin(jw, key);
+    for (i=0; i<4; i++) {
+	snprintf(name, sizeof(name), "msgs_%d", HourlyWindows[i]);
+	json_int(jw, name, hs.msgs[i]);
+    }
+    for (i=0; i<4; i++) {
+	snprintf(name, sizeof(name), "avg_%d", HourlyWindows[i]);
+	json_dbl(jw, name, hs.avg[i], 2);
+    }
+    for (i=0; i<4; i++) {
+	snprintf(name, sizeof(name), "ams_%d", HourlyWindows[i]);
+	json_dbl(jw, name, hs.ams[i], 1);
+    }
+    for (i=0; i<4; i++) {
+	snprintf(name, sizeof(name), "secs_%d", HourlyWindows[i]);
+	json_int(jw, name, hs.secs[i]);
+    }
+    json_obj_end(jw);
+}
+
+static void
+json_add_counts(json_writer *jw, time_t now)
+{
+    json_int(jw, "time", (long) now);
+    json_int(jw, "uptime", (long) (now - TimeOfProgramStart));
+    json_int(jw, "msgs", NumMsgsProcessed);
+    json_int(jw, "activations", Activations);
+    json_int(jw, "queue_size", Settings.requestQueueSize);
+    json_int(jw, "queued", NumQueuedRequests);
+    json_obj_begin(jw, "worker_states");
+    json_int(jw, "max", Settings.maxWorkers);
+    json_int(jw, "min", Settings.minWorkers);
+    json_int(jw, "busy", WorkerCount[STATE_BUSY]);
+    json_int(jw, "idle", WorkerCount[STATE_IDLE]);
+    json_int(jw, "stopped", WorkerCount[STATE_STOPPED]);
+    json_int(jw, "killed", WorkerCount[STATE_KILLED]);
+    json_obj_end(jw);
+}
+
+static void
+json_add_workers(json_writer *jw)
+{
+    int i;
+    Worker *s;
+
+    json_arr_begin(jw, "workers");
+    for (i=0; i<Settings.maxWorkers; i++) {
+	s = &AllWorkers[i];
+	json_obj_begin(jw, NULL);
+	json_int(jw, "id", i);
+	json_str(jw, "state", state_name_lc(s->state));
+	json_int(jw, "pid", (long) s->pid);
+	json_int(jw, "requests", s->numRequests);
+	json_int(jw, "scans", s->numScans);
+	json_int(jw, "age", worker_age(s));
+	json_int(jw, "first_req_age", worker_request_age(s));
+	json_int(jw, "state_age", (long) (time(NULL) - s->lastStateChange));
+	json_str(jw, "status_tag", s->status_tag);
+	json_obj_end(jw);
+    }
+    json_arr_end(jw);
+}
+
+static void
+json_add_histo(json_writer *jw)
+{
+    int i;
+
+    json_arr_begin(jw, "histo");
+    for (i=0; i<Settings.maxWorkers; i++) {
+	json_int(jw, NULL, (long) AllWorkers[i].histo);
+    }
+    json_arr_end(jw);
+}
+
+static void
+json_add_autoscale(json_writer *jw)
+{
+    json_obj_begin(jw, "autoscale");
+    json_bool(jw, "enabled", Settings.autoscaling);
+    json_int(jw, "interval", Settings.autoscale.interval);
+    json_int(jw, "window", Settings.autoscale.window);
+    json_int(jw, "spare", Settings.autoscale.spare);
+    json_int(jw, "min_age", Settings.autoscale.min_age);
+    json_dbl(jw, "max_load", Settings.autoscale.max_load, 2);
+    json_int(jw, "min_mem", Settings.autoscale.min_mem);
+    json_int(jw, "demand", AsState.demand);
+    json_int(jw, "window_peak", AsState.peak);
+    json_int(jw, "desired", AsState.last_desired);
+    json_int(jw, "last_out_ago",
+             AsState.last_out ? (long) (time(NULL) - AsState.last_out) : -1L);
+    json_int(jw, "last_in_ago",
+             AsState.last_in ? (long) (time(NULL) - AsState.last_in) : -1L);
+    json_int(jw, "started", (long) AsState.out_events);
+    json_int(jw, "stopped", (long) AsState.in_events);
+    json_int(jw, "blocked", (long) AsState.blocked_ticks);
+    json_int(jw, "saturated", (long) AsState.saturated_ticks);
+    json_obj_end(jw);
+}
+
+/**********************************************************************
+* %FUNCTION: doJson
+* %ARGUMENTS:
+*  es -- event selector
+*  fd -- socket
+*  what -- command name without the "json" prefix
+*  unpriv -- true on the unprivileged socket
+* %RETURNS:
+*  1 if the command was answered, 0 if it is not a known JSON command
+*  (it is then handled like any other command)
+* %DESCRIPTION:
+*  Answers the json* control commands: jsonworkers, jsonhisto,
+*  jsonmsgs, jsonautoscale, jsonhload[-relayok|-senderok|-recipok]
+*  and jsonsnapshot.  Autoscale data, like the "autoscale" command,
+*  is only available on the privileged socket.
+***********************************************************************/
+static int
+doJson(EventSelector *es, int fd, char const *what, int unpriv)
+{
+    json_writer jw;
+    char const *ans;
+    time_t now = time(NULL);
+
+    json_init(&jw);
+    json_obj_begin(&jw, NULL);
+
+    if (!strcmp(what, "workers")) {
+	json_int(&jw, "time", (long) now);
+	json_int(&jw, "max_workers", Settings.maxWorkers);
+	json_add_workers(&jw);
+    } else if (!strcmp(what, "histo")) {
+	json_int(&jw, "time", (long) now);
+	json_add_histo(&jw);
+    } else if (!strcmp(what, "msgs")) {
+	json_int(&jw, "time", (long) now);
+	json_int(&jw, "msgs", NumMsgsProcessed);
+	json_int(&jw, "activations", Activations);
+	json_int(&jw, "uptime", (long) (now - TimeOfProgramStart));
+    } else if (!strcmp(what, "autoscale") && !unpriv) {
+	json_int(&jw, "time", (long) now);
+	json_add_autoscale(&jw);
+    } else if (!strcmp(what, "hload")) {
+	json_add_hload(&jw, "hload", SCAN_CMD, now);
+    } else if (!strcmp(what, "hload-relayok")) {
+	json_add_hload(&jw, "hload", RELAYOK_CMD, now);
+    } else if (!strcmp(what, "hload-senderok")) {
+	json_add_hload(&jw, "hload", SENDEROK_CMD, now);
+    } else if (!strcmp(what, "hload-recipok")) {
+	json_add_hload(&jw, "hload", RECIPOK_CMD, now);
+    } else if (!strcmp(what, "snapshot")) {
+	json_str(&jw, "version", VERSION);
+	json_add_counts(&jw, now);
+	json_obj_begin(&jw, "load");
+	json_add_load(&jw, "scan", SCAN_CMD, now);
+	json_add_load(&jw, "relayok", RELAYOK_CMD, now);
+	json_add_load(&jw, "senderok", SENDEROK_CMD, now);
+	json_add_load(&jw, "recipok", RECIPOK_CMD, now);
+	json_obj_end(&jw);
+	json_obj_begin(&jw, "hload");
+	json_add_hload(&jw, "scan", SCAN_CMD, now);
+	json_add_hload(&jw, "relayok", RELAYOK_CMD, now);
+	json_add_hload(&jw, "senderok", SENDEROK_CMD, now);
+	json_add_hload(&jw, "recipok", RECIPOK_CMD, now);
+	json_obj_end(&jw);
+	json_add_histo(&jw);
+	json_add_workers(&jw);
+	if (!unpriv) {
+	    json_add_autoscale(&jw);
+	}
+    } else {
+	json_free(&jw);
+	if (!strcmp(what, "autoscale")) {
+	    reply_to_mimedefang(es, fd, "error: Attempt to use privileged command on unprivileged socket\n");
+	    return 1;
+	}
+	return 0;
+    }
+
+    json_obj_end(&jw);
+    ans = json_finish(&jw);
+    if (ans) {
+	/* EventTcp_WriteBuf copies the buffer */
+	reply_to_mimedefang(es, fd, ans);
+    } else {
+	reply_to_mimedefang(es, fd, "error: Out of memory\n");
+    }
+    json_free(&jw);
+    return 1;
 }
 
 
@@ -4600,11 +5229,13 @@ got_map_request(EventSelector *es,
     s = findFreeWorker(OTHER_CMD);
     if (!s) {
 	free(cmd);
+	AsRejected++;
 	reply_to_map(es, fd, "TEMP No free workers");
 	return;
     }
     if (activateWorker(s, "About to handle map request") == (pid_t) -1) {
 	free(cmd);
+	AsRejected++;
 	syslog(LOG_WARNING, "map command failed: No free workers");
 	reply_to_map(es, fd, "TEMP Unable to activate worker");
 	return;
@@ -4699,6 +5330,9 @@ static void
 enqueue_request(Request *slot)
 {
     NumQueuedRequests++;
+    if (NumQueuedRequests > AsPeakQueued) {
+	AsPeakQueued = NumQueuedRequests;
+    }
     slot->next = NULL;
     if (!RequestHead) {
 	RequestHead = slot;

@@ -1,3 +1,6 @@
+.perltidyrc
+bin/gcloud-auth.pl
+bin/gcloud-auth.PL
 Changes
 CONTRIBUTING.md
 cpanfile
@@ -26,12 +29,19 @@ lib/Google/Auth/Stores/TokenStore.pm
 lib/Google/Auth/UserAuthorizer.pm
 lib/Google/Auth/UserRefreshCredentials.pm
 lib/Google/Auth/WebUserAuthorizer.pm
+maint/release_lint.pl
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
+META.yml
 README.md
 SECURITY.md
 t/00-load.t
+t/01-xs.t
+t/02-exceptions.t
+t/03-env-vars.t
+t/04-key-sources.t
+t/05-default-credentials.t
 t/10-verifier-oidc.t
 t/11-verifier-iap.t
 t/12-verifier-custom.t
@@ -41,27 +51,18 @@ t/15-aws-wif-credentials.t
 t/16-pluggable-credentials.t
 t/17-logging-verification.t
 t/18-sa-token-uri-ssrf.t
-t/05-default-credentials.t
-t/03-env-vars.t
-t/02-exceptions.t
-t/04-key-sources.t
+t/19-gcloud-auth-cli-execution.t
 t/90-manifest.t
 t/91-perl-critic.t
-t/93-pod-coverage.t
 t/92-pod.t
-t/01-xs.t
+t/93-pod-coverage.t
 tests.yml
+THANKS.md
 TODO.txt
 XS.xs
-.perltidyrc
-maint/release_lint.pl
 xt/00_changes.t
 xt/00_kwalitee.t
 xt/00_perl-critic.t
 xt/00_perltidy.t
-META.yml
-bin/gcloud-auth.PL
-bin/gcloud-auth.pl
 xt/05_live_e2e.t
-t/19-gcloud-auth-cli-execution.t
 META.json                                Module JSON meta-data (added by MakeMaker)

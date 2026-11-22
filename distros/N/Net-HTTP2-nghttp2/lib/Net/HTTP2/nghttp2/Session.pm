@@ -359,9 +359,17 @@ Triggers registered callbacks as frames are parsed.
 =head2 mem_send
 
     my $data = $session->mem_send();
+    my $data = $session->mem_send($max_bytes);
 
 Get outgoing data from the session. Returns bytes to send to peer
 (empty string if nothing pending).
+
+With C<$max_bytes>, returns at most that many bytes. Whatever does not fit
+stays queued in the session, C<want_write> stays true, and a later call
+returns it, so a server writing to a non-blocking socket can keep its own
+output buffer small and ask for more only once the socket has taken what it
+has. C<$max_bytes> must be a positive whole number; anything else croaks with
+C<mem_send's limit must be a positive number of bytes>.
 
 =head2 submit_request
 

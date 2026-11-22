@@ -23,6 +23,7 @@ use Log::Any      qw($log);
 use IO::Socket::INET;
 use IO::Select;
 use URI;
+use MIME::Base64 ();
 
 use Google::Auth;
 use Google::Auth::ClientId;
@@ -136,8 +137,17 @@ sub _start_listener {
   return $listener;
 }
 
+sub _generate_secure_token {
+  my ($num_bytes) = @_;
+  my $raw         = Google::Auth::get_secure_random_bytes($num_bytes);
+  my $b64         = MIME::Base64::encode_base64($raw, '');
+  $b64 =~ tr{+/}{-_};
+  $b64 =~ s/=+$//;
+  return $b64;
+}
+
 sub _wait_for_code {
-  my ($listener, $timeout) = @_;
+  my ($listener, $timeout, $expected_state) = @_;
   $timeout //= 5;    # Fallback default
 
   my $select = IO::Select->new($listener);
@@ -166,10 +176,23 @@ sub _wait_for_code {
   $log->tracef('Received request: %s', $request);
 
   my $code;
+  my $received_state;
   if ($request =~ /^GET\s+([^\s]+)/) {
-    my $uri    = URI->new("http://127.0.0.1$1");
+    my $uri    = URI->new('http://127.0.0.1' . $1);
     my %params = $uri->query_form;
-    $code = $params{code};
+    $code           = $params{code};
+    $received_state = $params{state};
+  }
+
+  if (defined $expected_state
+    && (!defined $received_state || $received_state ne $expected_state))
+  {
+    $log->error('OAuth state mismatch in loopback callback');
+    print $client
+"HTTP/1.1 400 Bad Request\r\nConnection: close\r\nContent-Type: text/plain\r\n\r\nError: State mismatch.\r\n";
+    close $client;
+    close $listener;
+    die "Error: OAuth state mismatch in callback.\n";
   }
 
   if ($code) {
@@ -224,9 +247,8 @@ sub do_login {
 
   my $code_verifier;
   if ($use_oob) {
-    $redirect_uri = 'https://sdk.cloud.google.com/authcode.html';
-    my @chars = ('A' .. 'Z', 'a' .. 'z', '0' .. '9', '-', '.', '_', '~');
-    $code_verifier = join('', map { $chars[rand @chars] } 1 .. 64);
+    $redirect_uri  = 'https://sdk.cloud.google.com/authcode.html';
+    $code_verifier = _generate_secure_token(48);
   } else {
     $listener = _start_listener($options{port});
     my $port = $listener->sockport();
@@ -248,8 +270,7 @@ sub do_login {
   $auth_options{additional_parameters} = {token_usage => 'remote'}
     if $use_oob;
 
-  my @state_chars = ('A' .. 'Z', 'a' .. 'z', '0' .. '9');
-  my $state       = join('', map { $state_chars[rand @state_chars] } 1 .. 32);
+  my $state = _generate_secure_token(24);
   $auth_options{state} = $state;
 
   my $auth_url = $auth->get_authorization_url(%auth_options);
@@ -263,7 +284,7 @@ sub do_login {
     chomp $code if $code;
   } else {
     $log->info('Waiting for authorization code...');
-    $code = _wait_for_code($listener, $options{timeout});
+    $code = _wait_for_code($listener, $options{timeout}, $state);
   }
 
   if ($code) {
@@ -328,8 +349,7 @@ sub do_adc_login {
   if ($use_oob) {
     $redirect_uri =
       'https://sdk.cloud.google.com/applicationdefaultauthcode.html';
-    my @chars = ('A' .. 'Z', 'a' .. 'z', '0' .. '9', '-', '.', '_', '~');
-    $code_verifier = join('', map { $chars[rand @chars] } 1 .. 64);
+    $code_verifier = _generate_secure_token(48);
   } else {
     $listener = _start_listener($options{port});
     my $port = $listener->sockport();
@@ -351,8 +371,7 @@ sub do_adc_login {
   $auth_options{additional_parameters} = {token_usage => 'remote'}
     if $use_oob;
 
-  my @state_chars = ('A' .. 'Z', 'a' .. 'z', '0' .. '9');
-  my $state       = join('', map { $state_chars[rand @state_chars] } 1 .. 32);
+  my $state = _generate_secure_token(24);
   $auth_options{state} = $state;
 
   my $auth_url = $auth->get_authorization_url(%auth_options);
@@ -366,7 +385,7 @@ sub do_adc_login {
     chomp $code if $code;
   } else {
     $log->info('Waiting for authorization code...');
-    $code = _wait_for_code($listener, $options{timeout});
+    $code = _wait_for_code($listener, $options{timeout}, $state);
   }
 
   if ($code) {

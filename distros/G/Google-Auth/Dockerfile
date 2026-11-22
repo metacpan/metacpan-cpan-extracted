@@ -23,6 +23,8 @@ RUN apt-get update && \
             libnet-ssleay-perl \
             libscope-guard-perl \
             libssl-dev \
+            libnghttp2-dev \
+            libcurl4-openssl-dev \
             libsub-info-perl \
             libterm-table-perl \
             libtest-exception-perl \
@@ -38,4 +40,4 @@ RUN apt-get update && \
 
 RUN cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
 
-RUN cpanm Crypt::OpenSSL::CA
+RUN cpanm Crypt::OpenSSL::CA AnyEvent Net::HTTP2::nghttp2 Net::Curl

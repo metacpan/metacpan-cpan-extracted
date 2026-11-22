@@ -21,6 +21,7 @@ SV* PerlUpb_Repeated_New(pTHX_ upb_Array* arr, const upb_FieldDef* f, SV* arena_
     PerlUpb_Registry* reg = PerlUpb_Registry_Get(aTHX);
     HV* stash = (reg && reg->stash_repeated) ? reg->stash_repeated : gv_stashpv("Protobuf::Internal::Repeated", GV_ADD);
     SV* self = PerlUpb_WrapArenaBoundObject(aTHX_ arr, arena_sv, stash, flags);
+    PerlUpb_SetArenaBoundMeta(aTHX_ self, f);
     HV* hv = (HV*)SvRV(self);
     hv_store(hv, "_fdef", 5, newSViv(PTR2IV(f)), 0);
 
@@ -32,10 +33,7 @@ static upb_Array* GetArray(pTHX_ SV* sv) {
 }
 
 static const upb_FieldDef* GetFieldDef(pTHX_ SV* sv) {
-    if (!sv || !SvROK(sv)) return NULL;
-    HV* hv = (HV*)SvRV(sv);
-    SV** svp = hv_fetch(hv, "_fdef", 5, 0);
-    return svp ? (const upb_FieldDef*)SvIV(*svp) : NULL;
+    return (const upb_FieldDef*)PerlUpb_GetArenaBoundMeta(aTHX_ sv, "Protobuf::Internal::Repeated");
 }
 
 SV* PerlUpb_Repeated_GetItem(pTHX_ SV* self, int index) {

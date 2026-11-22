@@ -4,7 +4,7 @@ use integer;
 use strict 'vars';
 package Text::Bidi::Constants;
 # ABSTRACT: Constants for Text::Bidi
-$Text::Bidi::Constants::VERSION = '3.02';
+$Text::Bidi::Constants::VERSION = '3.03';
 
 use Text::Bidi::private;
 SYM: for my $sym ( keys %Text::Bidi::private:: ) {
@@ -47,7 +47,7 @@ Text::Bidi::Constants - Constants for Text::Bidi
 
 =head1 VERSION
 
-version 3.02
+version 3.03
 
 =head1 DESCRIPTION
 

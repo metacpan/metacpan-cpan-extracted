@@ -18,7 +18,7 @@ my $response = $api->get('/users',
 
 Values are percent-encoded. Values may be scalars, array references containing only scalars or `undef`, or `undef`. Array references generate repeated keys, undefined values are omitted, existing query strings are preserved, and parameters are inserted before URL fragments.
 
-`before_request` hooks see the final encoded URL.
+`before_request` hooks see the final encoded URL. Absolute HTTP(S) URLs are accepted with case-insensitive schemes (for example, `HTTPS://api.example.com/users`) and are not joined to `base_url`; relative paths are joined to `base_url`.
 
 ## Request headers
 

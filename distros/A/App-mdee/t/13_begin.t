@@ -30,16 +30,16 @@ sub md_run {
 }
 
 my $base = md_run('');
-like($base, qr/^ X │ y $/m, 'without --begin');
+like($base, qr/^ X│ y$/m, 'without --begin');
 
 # before the table is formatted: the column follows the new width
 my $out = md_run(q(--begin 'sub{ s/X/XXXX/ }'));
-like($out, qr/^ XXXX │ y $/m, 'sub{...} runs before the table is formatted');
-like($out, qr/^ z    │ w $/m, 'and the other rows are aligned to it');
+like($out, qr/^ XXXX│ y$/m, 'sub{...} runs before the table is formatted');
+like($out, qr/^ z   │ w$/m, 'and the other rows are aligned to it');
 
 # in the order given
 $out = md_run(q(--begin 'sub{ s/X/A/ }' --begin 'sub{ s/A/B/ }'));
-like($out, qr/^ B │ y $/m, 'more than one, in the order given');
+like($out, qr/^ B│ y$/m, 'more than one, in the order given');
 
 # before refill too: refill sees the text after the function
 $out = plain(run("'-Mmd::config(colorize=0,refill=1)' --begin 'sub{ s/two/two\\nthree/ }' -- --filter $md")->stdout);
@@ -59,14 +59,14 @@ close $fh;
 {
     local $ENV{PERL5LIB} = "$dir:" . ($ENV{PERL5LIB} // '');
     $out = plain(run("-Mmdbegintest '-Mmd::config(colorize=0)' --begin '&App::Greple::mdbegintest::f(to=Q)' -- --filter $md")->stdout);
-    like($out, qr/^ Q │ y $/m, '&function with a parameter');
+    like($out, qr/^ Q│ y$/m, '&function with a parameter');
 }
 
 # the package of a function is loaded when it is not defined
 {
     local $ENV{PERL5LIB} = "$dir:" . ($ENV{PERL5LIB} // q());
     $out = plain(run("'-Mmd::config(colorize=0)' --begin '&App::Greple::mdbegintest::f(to=Q)' -- --filter $md")->stdout);
-    like($out, qr/^ Q │ y $/m, q(the package is loaded without -M));
+    like($out, qr/^ Q│ y$/m, q(the package is loaded without -M));
 
     # a name without a package: in main first, and then the module named
     # after the function
@@ -75,12 +75,12 @@ close $fh;
     print $short "package App::Greple::md::mdtestshort;\nsub mdtestshort { my %a = \@_; s/X/\$a{to}/; }\n1;\n";
     close $short;
     $out = plain(run("'-Mmd::config(colorize=0)' --begin '&mdtestshort(to=S)' -- --filter $md")->stdout);
-    like($out, qr/^ S │ y $/m, q(a short name finds the module named after it));
+    like($out, qr/^ S│ y$/m, q(a short name finds the module named after it));
     open $short, q(>), "$dir/App/Greple/mdbeginmain.pm" or die;
     print $short "package App::Greple::mdbeginmain;\nsub main::mdtestshort { s/X/M/ }\n1;\n";
     close $short;
     $out = plain(run("-Mmdbeginmain '-Mmd::config(colorize=0)' --begin '&mdtestshort' -- --filter $md")->stdout);
-    like($out, qr/^ M │ y $/m, q(main comes first));
+    like($out, qr/^ M│ y$/m, q(main comes first));
     open $short, q(>), "$dir/App/Greple/md/mdtestbroken.pm" or die;
     print $short "package App::Greple::md::mdtestbroken;\nsub mdtestbroken { \n";
     close $short;
@@ -94,12 +94,12 @@ close $fh;
         is($r->status, 0, "$func: normal exit");
         my $o = plain($r->stdout);
         like($o, qr/--begin: \Q$name\E: function not found/, "$func: a warning");
-        like($o, qr/^ X │ y $/m, "$func: the text is still formatted");
+        like($o, qr/^ X│ y$/m, "$func: the text is still formatted");
     }
 
     # the other functions still run, and the warning is given only once
     my $o = plain(run("'-Mmd::config(colorize=0)' --begin '&nosuch' --begin 'sub{ s/X/Z/ }' -- --filter $md $md")->stdout);
-    is(() = $o =~ /^ Z │ y $/mg, 2, q(the next function runs on each file));
+    is(() = $o =~ /^ Z│ y$/mg, 2, q(the next function runs on each file));
     is(() = $o =~ /function not found/g, 1, q(the warning is given once));
 
     # a module that exists and does not compile is an error

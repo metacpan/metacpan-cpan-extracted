@@ -9,7 +9,7 @@ unless ( $ENV{RELEASE_TESTING} ) {
 }
 
 # Ensure a recent version of Test::Pod::Coverage
-my $min_tpc = 1.08;
+my $min_tpc = 1.10;
 eval "use Test::Pod::Coverage $min_tpc";
 plan skip_all => "Test::Pod::Coverage $min_tpc required for testing POD coverage"
     if $@;

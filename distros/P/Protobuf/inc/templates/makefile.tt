@@ -20,9 +20,9 @@ BUILD.bazel: maint/gen_build_bazel.pl inc/templates/BUILD.bazel.tt inc/templates
 
 .PHONY: bazel_build_protoc_plugin
 bazel_build_protoc_plugin: BUILD.bazel
-	bazel --output_base=/usr/local/google/home/cjac/.gemini/tmp/protobuf/bazel_output_base build //perl:protoc-gen-perl-pb
+	bazel $(if $(BAZEL_OUTPUT_BASE),--output_base=$(BAZEL_OUTPUT_BASE),) build //perl:protoc-gen-perl-pb
 	@echo "Copying Bazel-built plugin to $(CURDIR)/protoc-gen-perl-pb"
-	@cp -f $(shell bazel --output_base=/usr/local/google/home/cjac/.gemini/tmp/protobuf/bazel_output_base info bazel-bin)/perl/protoc-gen-perl-pb $(CURDIR)/protoc-gen-perl-pb
+	@cp -f $(shell bazel $(if $(BAZEL_OUTPUT_BASE),--output_base=$(BAZEL_OUTPUT_BASE),) info bazel-bin)/perl/protoc-gen-perl-pb $(CURDIR)/protoc-gen-perl-pb
 [% END %]
 
 [% BLOCK build_aggregator_targets %]

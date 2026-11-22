@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 BEGIN {
     $ENV{PACKAGE_STASH_IMPLEMENTATION} ||= 'PP';
     $ENV{MOO_XS_DISABLE} ||= '1';
@@ -110,6 +110,9 @@ if ($is_dev) {
     print "Regenerating MANIFEST...\n";
     unlink 'MANIFEST';
     ExtUtils::Manifest::mkmanifest();
+} elsif (!-f 'Protobuf.xs' && -f 'maint/generate_xs.pl') {
+    print "Generating Protobuf.xs from .xs.part fragments...\n";
+    system($perl, 'maint/generate_xs.pl') == 0 or die "Failed to run generate_xs.pl: $!";
 }
 # --- End Dev Environment Automation ---
 

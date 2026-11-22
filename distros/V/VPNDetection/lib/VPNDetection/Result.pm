@@ -5,18 +5,18 @@ use warnings;
 
 use Carp ();
 
-our $VERSION = '3.17.0';
+our $VERSION = '3.18.0';
 
 our @FLAGS = qw(
-    is_vpn is_hosting is_relay is_tor is_cdn is_resproxy is_dcproxy is_mobproxy
+    is_vpn is_hosting is_relay is_tor is_cdn is_bot is_resproxy is_dcproxy is_mobproxy
     is_pubproxy is_anycast is_carrier is_satellite is_ssh is_smtp is_web is_dns_resolver
     is_bittorrent
 );
 # Each flag's detail: an object, or for `web` a list of the ports that answered.
 # `is_anycast` has none.
 our @DETAILS = qw(
-    vpn hosting relay tor cdn resproxy dcproxy mobproxy pubproxy carrier satellite ssh smtp
-    web dns_resolver bittorrent
+    vpn hosting relay tor cdn bot resproxy dcproxy mobproxy pubproxy carrier satellite ssh
+    smtp web dns_resolver bittorrent
 );
 # Where the address is and the AS announcing it, on every answer, with or without
 # a key, each with every member present: an empty string, or AS 0, where nothing
@@ -116,6 +116,8 @@ VPNDetection::Result - what a lookup answers
     $result->asn->{name};           # who runs the announcing network
     $result->hostname;              # the reverse DNS name, '' where it has none
 
+    $result->is_bot;                # 1 when an automated client uses the address
+    $result->bot->{provider_name};  # whose bot, on a paid plan
     $result->is_hosting;            # 1, 0, or undef when your plan omits it
     $result->is_hosting // 0;       # read an absent field as false
     $result->has('is_hosting');     # 1 if your plan carries it at all
@@ -156,6 +158,23 @@ On Unlimited, the free plan, with a key or without one, C<is_tor> and C<is_relay
 back beside C<is_vpn>; every paid plan answers every flag. C<is_pubproxy> is whether a
 public proxy, one anyone can connect through, listens on the address or sends
 its traffic out from it.
+
+=head2 is_bot
+
+On every answer, with or without a key: C<1> when an automated client uses the
+address, such as a search engine's or an AI company's crawler, an uptime monitor,
+an internet scanner or a webhook sender, C<0> when none does, and C<undef> on an
+answer that does not carry it.
+
+=head2 bot
+
+The detail behind C<is_bot>, on a paid plan's answers, or C<undef> when your plan
+omits it: a plain hash reference, C<{}> when C<is_bot> is false. It carries
+C<provider> and C<provider_name> (the bot's operator, empty where none is known),
+C<agents> (an array reference of the bots the address serves, as their user agents
+name them, in the order served), C<categories> (an array reference of what those
+bots do), C<verified> (whether the operator vouches for the address),
+C<identity>, C<verified_by>, C<confidence>, C<first_seen> and C<last_seen>.
 
 =head2 is_anycast, is_carrier, is_satellite, is_ssh, is_smtp, is_web, is_dns_resolver, is_bittorrent
 

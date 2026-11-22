@@ -2,8 +2,8 @@
 #define PERL_PROTOBUF_CONVERT_TEST_UTIL_H_
 
 #include "EXTERN.h"
-#include "perl.h"  // NOLINT(build/include)
 #include "XSUB.h"
+#include "perl.h"  // NOLINT(build/include)
 #include "t/c/upb-perl-test.h"
 #include "upb/mem/arena.h"
 #include "upb/reflection/def.h"

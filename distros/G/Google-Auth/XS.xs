@@ -79,8 +79,6 @@ static int generate_mock_cert(pTHX_ char **cert_pem_out, char **key_pem_out) {
     Newx(*key_pem_out, key_len + 1, char);
     memcpy(*key_pem_out, key_pem, key_len);
     (*key_pem_out)[key_len] = '\0';
-    memcpy(*key_pem_out, key_pem, key_len);
-    (*key_pem_out)[key_len] = '\0';
 
     ret = 1;
 
@@ -91,6 +89,14 @@ cleanup:
     if (pkey) EVP_PKEY_free(pkey);
     if (pctx) EVP_PKEY_CTX_free(pctx);
     return ret;
+}
+
+static int no_passphrase_cb(char *buf, int size, int rwflag, void *u) {
+    PERL_UNUSED_VAR(buf);
+    PERL_UNUSED_VAR(size);
+    PERL_UNUSED_VAR(rwflag);
+    PERL_UNUSED_VAR(u);
+    return 0;
 }
 
 MODULE = Google::Auth   PACKAGE = Google::Auth
@@ -485,27 +491,33 @@ verify_signature(SV *key_obj_sv, SV *message_sv, SV *signature_sv)
         unsigned char *der_buf = NULL;
         ECDSA_SIG *ec_sig = NULL;
     CODE:
-        if (sv_derived_from(key_obj_sv, "Google::Auth::PublicKey")) {
-            IV tmp = SvIV((SV*)SvRV(key_obj_sv));
-            pkey = INT2PTR(EVP_PKEY *, tmp);
+        if (sv_isobject(key_obj_sv) && sv_derived_from(key_obj_sv, "Google::Auth::PublicKey") && SvROK(key_obj_sv)) {
+            SV *inner = SvRV(key_obj_sv);
+            if (inner && SvIOK(inner)) {
+                IV tmp = SvIV(inner);
+                pkey = INT2PTR(EVP_PKEY *, tmp);
+            }
         }
         if (!pkey) XSRETURN_NO;
 
-        msg_str = SvPV(message_sv, msg_len);
-        sig_str = SvPV(signature_sv, sig_len);
+        msg_str = SvPVbyte(message_sv, msg_len);
+        sig_str = SvPVbyte(signature_sv, sig_len);
 
         actual_sig = (unsigned char *)sig_str;
-        actual_sig_len = sig_len;
+        actual_sig_len = (unsigned int)sig_len;
 
         if (EVP_PKEY_base_id(pkey) == EVP_PKEY_EC) {
-            if (sig_len % 2 == 0) {
-                int half_len = sig_len / 2;
-                BIGNUM *r_bn = BN_bin2bn((unsigned char *)sig_str, half_len, NULL);
-                BIGNUM *s_bn = BN_bin2bn((unsigned char *)sig_str + half_len, half_len, NULL);
+            size_t field_len = (size_t)((EVP_PKEY_bits(pkey) + 7) / 8);
+            int looks_like_der = (sig_len >= 6 &&
+                                  (unsigned char)sig_str[0] == 0x30 &&
+                                  (size_t)(unsigned char)sig_str[1] + 2 == sig_len &&
+                                  (unsigned char)sig_str[2] == 0x02);
+            if (field_len > 0 && sig_len == 2 * field_len && !looks_like_der) {
+                BIGNUM *r_bn = BN_bin2bn((const unsigned char *)sig_str, (int)field_len, NULL);
+                BIGNUM *s_bn = BN_bin2bn((const unsigned char *)sig_str + field_len, (int)field_len, NULL);
                 if (r_bn && s_bn) {
                     ec_sig = ECDSA_SIG_new();
-                    if (ec_sig) {
-                        ECDSA_SIG_set0(ec_sig, r_bn, s_bn);
+                    if (ec_sig && ECDSA_SIG_set0(ec_sig, r_bn, s_bn)) {
                         int der_len = i2d_ECDSA_SIG(ec_sig, NULL);
                         if (der_len > 0) {
                             Newx(der_buf, der_len, unsigned char);
@@ -513,13 +525,20 @@ verify_signature(SV *key_obj_sv, SV *message_sv, SV *signature_sv)
                                 unsigned char *p = der_buf;
                                 i2d_ECDSA_SIG(ec_sig, &p);
                                 actual_sig = der_buf;
-                                actual_sig_len = der_len;
+                                actual_sig_len = (unsigned int)der_len;
                             }
                         }
                     } else {
+                        if (ec_sig) {
+                            ECDSA_SIG_free(ec_sig);
+                            ec_sig = NULL;
+                        }
                         BN_free(r_bn);
                         BN_free(s_bn);
                     }
+                } else {
+                    if (r_bn) BN_free(r_bn);
+                    if (s_bn) BN_free(s_bn);
                 }
             }
         }
@@ -551,19 +570,26 @@ rsa_sign_sha256(SV *private_key_pem_sv, SV *message_sv)
         BIO *bio = NULL;
         EVP_PKEY *pkey = NULL;
         EVP_MD_CTX *mdctx = NULL;
-        unsigned char sig[4096];
+        unsigned char *sig = NULL;
+        int max_sig_len = 0;
         unsigned int sig_len = 0;
         SV *retval = NULL;
     CODE:
-        pem_str = SvPV(private_key_pem_sv, pem_len);
-        msg_str = SvPV(message_sv, msg_len);
+        pem_str = SvPVbyte(private_key_pem_sv, pem_len);
+        msg_str = SvPVbyte(message_sv, msg_len);
 
-        bio = BIO_new_mem_buf(pem_str, pem_len);
+        bio = BIO_new_mem_buf(pem_str, (int)pem_len);
         if (!bio) XSRETURN_UNDEF;
 
-        pkey = PEM_read_bio_PrivateKey(bio, NULL, NULL, NULL);
+        pkey = PEM_read_bio_PrivateKey(bio, NULL, no_passphrase_cb, NULL);
         BIO_free(bio);
         if (!pkey) XSRETURN_UNDEF;
+
+        max_sig_len = EVP_PKEY_size(pkey);
+        if (max_sig_len <= 0) {
+            EVP_PKEY_free(pkey);
+            XSRETURN_UNDEF;
+        }
 
         mdctx = EVP_MD_CTX_new();
         if (!mdctx) {
@@ -571,9 +597,17 @@ rsa_sign_sha256(SV *private_key_pem_sv, SV *message_sv)
             XSRETURN_UNDEF;
         }
 
+        Newx(sig, max_sig_len, unsigned char);
+        if (!sig) {
+            EVP_MD_CTX_free(mdctx);
+            EVP_PKEY_free(pkey);
+            XSRETURN_UNDEF;
+        }
+
         if (EVP_SignInit_ex(mdctx, EVP_sha256(), NULL) <= 0 ||
             EVP_SignUpdate(mdctx, msg_str, msg_len) <= 0 ||
             EVP_SignFinal(mdctx, sig, &sig_len, pkey) <= 0) {
+            Safefree(sig);
             EVP_MD_CTX_free(mdctx);
             EVP_PKEY_free(pkey);
             XSRETURN_UNDEF;
@@ -582,7 +616,8 @@ rsa_sign_sha256(SV *private_key_pem_sv, SV *message_sv)
         EVP_MD_CTX_free(mdctx);
         EVP_PKEY_free(pkey);
 
-        retval = newSVpv((char *)sig, sig_len);
+        retval = newSVpvn((const char *)sig, sig_len);
+        Safefree(sig);
         RETVAL = retval;
     OUTPUT:
         RETVAL
@@ -595,10 +630,22 @@ DESTROY(self)
     PREINIT:
         EVP_PKEY *pkey = NULL;
     CODE:
-        if (sv_derived_from(self, "Google::Auth::PublicKey")) {
-            IV tmp = SvIV((SV*)SvRV(self));
-            pkey = INT2PTR(EVP_PKEY *, tmp);
-            if (pkey) {
-                EVP_PKEY_free(pkey);
+        if (sv_isobject(self) && sv_derived_from(self, "Google::Auth::PublicKey") && SvROK(self)) {
+            SV *inner = SvRV(self);
+            if (inner && SvIOK(inner)) {
+                IV tmp = SvIV(inner);
+                pkey = INT2PTR(EVP_PKEY *, tmp);
+                sv_setiv(inner, 0);
+                if (pkey) {
+                    EVP_PKEY_free(pkey);
+                }
             }
         }
+
+int
+CLONE_SKIP(...)
+    CODE:
+        PERL_UNUSED_VAR(items);
+        RETVAL = 1;
+    OUTPUT:
+        RETVAL

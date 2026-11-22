@@ -340,29 +340,55 @@ SV* PerlUpb_Message_FromHandle(pTHX_ SV* descriptor_sv, SV* fh_sv, bool length_p
     char* buf = NULL;
     size_t total_to_read = 0;
 
+    const size_t kMaxHandleMessageSize = 64u * 1024u * 1024u;
     if (length_prefixed) {
         bool ok;
-        total_to_read = (size_t)ReadVarint(aTHX_ fp, &ok);
+        uint64_t raw_len = ReadVarint(aTHX_ fp, &ok);
         if (!ok) {
             SvREFCNT_dec(arena_sv);
             return &PL_sv_undef; // EOF or error reading length
         }
-        buf = upb_Arena_Malloc(arena, total_to_read);
-        SSize_t n = PerlIO_read(fp, buf, total_to_read);
-        if (n < (SSize_t)total_to_read) {
+        if (raw_len > kMaxHandleMessageSize || raw_len > (uint64_t)SSIZE_MAX) {
             SvREFCNT_dec(arena_sv);
-            croak("Unexpected EOF reading length-prefixed message: expected %zu, got %zd", total_to_read, n);
+            croak("Length-prefixed message size %" PRIu64 " exceeds limit (%zu)", raw_len, kMaxHandleMessageSize);
+        }
+        total_to_read = (size_t)raw_len;
+        buf = (char*)upb_Arena_Malloc(arena, total_to_read ? total_to_read : 1);
+        if (!buf) {
+            SvREFCNT_dec(arena_sv);
+            croak("Arena allocation failed for length-prefixed message (%zu bytes)", total_to_read);
+        }
+        size_t got = 0;
+        while (got < total_to_read) {
+            SSize_t n = PerlIO_read(fp, buf + got, total_to_read - got);
+            if (n <= 0) {
+                SvREFCNT_dec(arena_sv);
+                croak("Unexpected EOF reading length-prefixed message: expected %zu, got %zu", total_to_read, got);
+            }
+            got += (size_t)n;
         }
     } else {
         // Read until EOF
         size_t capacity = 4096;
         size_t total_read = 0;
-        buf = upb_Arena_Malloc(arena, capacity);
+        buf = (char*)upb_Arena_Malloc(arena, capacity);
+        if (!buf) {
+            SvREFCNT_dec(arena_sv);
+            croak("Arena allocation failed reading message from handle");
+        }
 
         while (1) {
             if (total_read == capacity) {
+                if (capacity >= kMaxHandleMessageSize || capacity > SIZE_MAX / 2) {
+                    SvREFCNT_dec(arena_sv);
+                    croak("Message read from handle exceeds maximum allowed size (%zu)", kMaxHandleMessageSize);
+                }
                 size_t new_capacity = capacity * 2;
-                char* new_buf = upb_Arena_Malloc(arena, new_capacity);
+                char* new_buf = (char*)upb_Arena_Malloc(arena, new_capacity);
+                if (!new_buf) {
+                    SvREFCNT_dec(arena_sv);
+                    croak("Arena allocation failed growing message buffer (%zu bytes)", new_capacity);
+                }
                 memcpy(new_buf, buf, total_read);
                 buf = new_buf;
                 capacity = new_capacity;
@@ -370,13 +396,21 @@ SV* PerlUpb_Message_FromHandle(pTHX_ SV* descriptor_sv, SV* fh_sv, bool length_p
 
             SSize_t n = PerlIO_read(fp, buf + total_read, capacity - total_read);
             if (n <= 0) break;
-            total_read += n;
+            total_read += (size_t)n;
         }
         total_to_read = total_read;
     }
 
     const upb_MiniTable* mt = upb_MessageDef_MiniTable(mdef);
+    if (!mt) {
+        SvREFCNT_dec(arena_sv);
+        croak("Missing MiniTable for message descriptor");
+    }
     upb_Message* msg = upb_Message_New(mt, arena);
+    if (!msg) {
+        SvREFCNT_dec(arena_sv);
+        croak("Arena allocation failed creating message");
+    }
 
     upb_DecodeStatus status = upb_Decode(buf, total_to_read, msg, mt, NULL, 0, arena);
     if (status != kUpb_DecodeStatus_Ok) {

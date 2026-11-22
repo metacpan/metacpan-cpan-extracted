@@ -137,6 +137,49 @@ subtest 'Custom Verifier Instantiation and Validation' => sub {
   }
   qr/IssuerMismatchError: Token iss mismatch/, 'throws IssuerMismatchError';
 
+  # Fails with unsupported alg (e.g. alg: none / HS256)
+  require MIME::Base64;
+  my $b64u = sub {
+    my $enc = MIME::Base64::encode_base64($_[0], '');
+    $enc =~ tr{+/}{-_};
+    $enc =~ s/=+\z//;
+    return $enc;
+  };
+  my $bad_alg_token =
+    $b64u->('{"alg":"none","kid":"492710a7fcdb153960ce01f760520a32c8455dff"}')
+    . '.' . $b64u->('{"exp":1591342776}') . '.sig';
+  throws_ok {
+    $verifier->verify($bad_alg_token, time_now => $unexpired_oidc_test_time);
+  }
+  qr/VerificationError: Unsupported or missing alg claim/,
+    'throws VerificationError on alg=none';
+
+  # Fails when exp claim is missing even with a valid signature
+  my $kp      = Google::Auth::generate_self_signed_cert();
+  my $pubkey  = Google::Auth::load_pubkey_from_x509_cert($kp->{cert});
+  my $key_obj = Google::Auth::IDTokens::KeyInfo->new({
+    id        => 'no-exp-kid',
+    key       => $pubkey,
+    algorithm => 'RS256',
+  });
+  my $static_ks =
+    Google::Auth::IDTokens::StaticKeySource->new({keys => [$key_obj]});
+  my $hdr_b64 = $b64u->('{"alg":"RS256","kid":"no-exp-kid","typ":"JWT"}');
+  my $no_exp_b64 =
+    $b64u->('{"iss":"https://accounts.google.com","aud":"http://example.com"}');
+  my $signing_msg = $hdr_b64 . '.' . $no_exp_b64;
+  my $sig_raw     = Google::Auth::rsa_sign_sha256($kp->{key}, $signing_msg);
+  my $no_exp_jwt  = $signing_msg . '.' . $b64u->($sig_raw);
+  throws_ok {
+    $verifier->verify(
+      $no_exp_jwt,
+      key_source => $static_ks,
+      time_now   => $unexpired_oidc_test_time
+    );
+  }
+  qr/VerificationError: Missing or invalid exp claim/,
+    'throws VerificationError when exp claim is absent';
+
   done_testing();
 };
 

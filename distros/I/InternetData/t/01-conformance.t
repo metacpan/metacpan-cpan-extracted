@@ -511,4 +511,35 @@ subtest 'an IPv4-mapped address is the IPv4 address it carries' => sub {
     }
 };
 
+# A value no published list holds, in an answer, comes back as served: the API
+# may add one, and a client that refused it would break the day it did.
+subtest 'an answer value outside a published vocabulary comes back as served' => sub {
+    my $cases = $corpus->{vocabulary}{cases};
+    ok($cases && @$cases, 'the corpus carries vocabulary cases at all') or return;
+    my %calls = (
+        myEntitlement => [sub { $_[0]->my_entitlement }, undef],
+        listDatabases => [sub { $_[0]->database->list }, 'databases'],
+        listDownloads => [sub { $_[0]->database->downloads }, 'downloads'],
+    );
+    for my $case (@$cases) {
+        my $call = $calls{ $case->{call} };
+        ok($call, "$case->{name}: the call $case->{call} is driven here") or next;
+        my ($run, $unwrapped) = @$call;
+        serve({ body => $case->{answer} });
+        my $answer = eval { $run->(client(retries => 0)) };
+        ok(defined $answer, "$case->{name}: the call answers") or do { diag($@); next };
+        for my $path (sort keys %{ $case->{expect} }) {
+            my @steps = split /\./, $path;
+            # The database calls hand back the member they are named for.
+            shift @steps if defined $unwrapped && $steps[0] eq $unwrapped;
+            my $value = $answer;
+            for my $step (@steps) {
+                $value = ref $value eq 'ARRAY' ? $value->[$step]
+                    : ref $value eq 'HASH' ? $value->{$step} : undef;
+            }
+            is($value, $case->{expect}{$path}, "$case->{name}: $path");
+        }
+    }
+};
+
 done_testing();

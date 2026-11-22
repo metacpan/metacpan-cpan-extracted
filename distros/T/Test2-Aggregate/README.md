@@ -251,8 +251,9 @@ The parameters to pass:
 
 - `no_dot` (optional)
 
-    Current version will add a `./` at the start of a test file if the full path does
-    not start with `/` or `.` to avoid the `'.' is no longer in @INC` error.
+    Current version will add a `./` at the start of a test file if the path is
+    not absolute (e.g. `/...`, or `C:/...` on Windows) and does not start with
+    `.`, to avoid the `'.' is no longer in @INC` error.
     Setting `no_dot` to true matches pre-1.00 behaviour that did not do this.
 
 - `bail_on_fail` (optional)
@@ -287,10 +288,10 @@ or to check whether specific tests can run successfully under Test2::Aggregate.
     --absolute,         -a      : Use absolute paths in generated files. Disabled with -r.
     --include_regex <s> -ir <s> : Regex for test paths to include.
     --exclude_regex <s> -er <s> : Regex for test paths to exclude.
-    --root <s>          -r <s>  : Define a custom root dir (default is current dir).
-    --include <s>,      -I <s>  : Library paths to include.
+    --root <s>          -r <s>  : Define a custom root dir.
+    --include <s>,      -I <s>  : Library path to include (repeatable).
     --test_warnings,    -w      : Fail tests on warnings.
-    --test_bundle <s>,  -t      : Test bundle (def: Test2::V0 or Test::More if -p). Can be comma-separated list.
+    --test_bundle <s>,  -t      : Test bundle (def: Test2::V0 or Test::More if -p). Comma-separated list.
     --pass_output <s>,  -po <s> : Output directory for list of 100% passing tests.
     --reverse                   : Reverse the test order.
     --shuffle                   : Shuffle the test order.
@@ -308,6 +309,23 @@ test file is removed and the remaining set is tried again. Requires
 have completed abort the command with a nonzero exit status instead of removing
 tests. This is a coarse way to discover a starting list of tests that can be
 aggregated together, not proof that each removed test is independently broken.
+
+    Options:
+    --out <s>,          -o <s>  : Specify the test file to be created (tmp file by default).
+    --lists,            -l      : Use files specified as lists.
+    --prove,            -p      : Force prove (default is yath/Test2 if installed).
+    --verbose,          -v      : Verbose (passed to yath/prove)
+    --absolute,         -a      : Use absolute paths in generated files. Disabled with -r.
+    --exclude_regex <s> -er <s> : Regex for test paths to exclude.
+    --exclude_list <s>  -el <s> : File with test paths to exclude (one per line).
+    --event_timeout <i> -et <i> : Event timeout for yath (to determine hung tests). Default 10.
+    --root <s>          -r <s>  : Define a custom root dir (default is current dir).
+    --include <s>,      -I <s>  : Library path to include (repeatable).
+    --test_bundle <s>,  -t      : Test bundle (def: Test2::V0 or Test::More if -p). Comma-separated list.
+    --reverse                   : Reverse the test order.
+    --shuffle                   : Shuffle the test order.
+    --sort                      : Run the tests alphabetically.
+    --help              -h      : Show basic help and exit.
 
 `--sort`, `--shuffle`, and `--reverse` are applied once during discovery.
 The resulting order is preserved across retries and in the generated runner.

@@ -1,4 +1,4 @@
-Podlite version 1.00
+Podlite version 2.00
 ====================
 
 Podlite is a lightweight block-based markup language designed for flexibility
@@ -56,7 +56,7 @@ Task lists with checkboxes:
 
 Tables with captions:
 
-    =begin table :caption<Performance Benchmarks>
+    =begin table :caption('Performance Benchmarks')
     Operation      Time (ms)   Memory (MB)
     Parse          45          12
     Render         23          8
@@ -64,7 +64,7 @@ Tables with captions:
 
 Notification blocks (callouts):
 
-    =begin nested :notify<warning> :caption<Important Note>
+    =begin nested :notice<warning> :caption('Important Note')
     This feature is experimental and may change in future releases.
     =end nested
 
@@ -94,7 +94,8 @@ DEPENDENCIES
 
 This module requires:
 
-  * Filter::Simple
+  * Perl 5.10.1 or later
+  * Filter::Util::Call and Carp (core modules)
 
 
 SUPPORT AND DOCUMENTATION
@@ -118,9 +119,9 @@ You can also look for information at:
 
 PODLITE ECOSYSTEM
 
-  Official Specification:
-    https://podlite.org/specification
-    https://github.com/podlite/podlite-specs
+  Specification 2.0:
+    https://podlite.org/v2.0/specification
+    https://github.com/podlite/podlite-specs/blob/v2.0.1/Specification.pod6
 
   Main implementation:
     https://github.com/podlite/podlite

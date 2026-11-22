@@ -4,3 +4,5 @@
 ^MYMETA\.
 ^Podlite-\d
 ^\.
+^Build$
+\.bak$

@@ -1,0 +1,39 @@
+# mise manages the local development interpreter; production uses Ubuntu Perl.
+[tools]
+"aqua:skaji/relocatable-perl" = "5.38.2.0"
+
+[env]
+PERL_CPANM_HOME = "{{config_root}}/.cache/cpanm"
+PERL_CARTON_MIRROR = "https://cpan.metacpan.org"
+
+# Bootstrap Carton separately from the application dependencies it isolates.
+[tasks.setup]
+description = "Install Carton for the development Perl and restore locked dependencies"
+run = [
+    "cpanm --mirror https://cpan.metacpan.org --mirror-only --local-lib-contained .tools/carton Carton@v1.0.35",
+    "perl -I '{{config_root}}/.tools/carton/lib/perl5' '{{config_root}}/.tools/carton/bin/carton' install --deployment",
+]
+
+[tasks.test]
+description = "Run tests with the development Perl and Carton dependencies"
+run = "perl -I '{{config_root}}/.tools/carton/lib/perl5' '{{config_root}}/.tools/carton/bin/carton' exec prove -lr t"
+
+[tasks."test:results"]
+description = "Test IndexedDB and paged results in Chromium (npm ci and playwright install required)"
+run = "node t/results-cache.mjs"
+
+[tasks.format]
+description = "Format Perl sources with the repository style"
+run = "perl -I '{{config_root}}/.tools/carton/lib/perl5' '{{config_root}}/.tools/carton/bin/carton' exec perl local/bin/perltidy -b -bext=/ Makefile.PL cpanfile script/mogura lib/Mogura.pm lib/Mogura/*.pm lib/Mogura/Server/*.pm lib/Mogura/Scanner/*.pm t/*.t t/lib/*.pl"
+
+[tasks."format:check"]
+description = "Check Perl source formatting without changing files"
+run = """
+for source_file in Makefile.PL cpanfile script/mogura lib/Mogura.pm lib/Mogura/*.pm lib/Mogura/Server/*.pm lib/Mogura/Scanner/*.pm t/*.t t/lib/*.pl; do
+    perl -I '{{config_root}}/.tools/carton/lib/perl5' '{{config_root}}/.tools/carton/bin/carton' exec perl local/bin/perltidy --assert-tidy -st "$source_file" > /dev/null || exit 1
+done
+"""
+
+[tasks."deps:update"]
+description = "Resolve cpanfile changes and update cpanfile.snapshot for review"
+run = "perl -I '{{config_root}}/.tools/carton/lib/perl5' '{{config_root}}/.tools/carton/bin/carton' install"

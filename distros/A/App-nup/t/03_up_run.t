@@ -221,6 +221,17 @@ SH
     like(optex('-Mup', '-L', "--pager=$bin/less -R", @cmd)->run->stdout,
          qr/^ARGS: -R -S --shift=@{[ $fit->(85) ]} --rscroll=-$/m,
          '-L, less given by --pager with a path, default pane width');
+    # +Gg of the default pager is left out: g and G are keys of the
+    # row there, and would leave less at its right end
+    {
+        local $ENV{NUP_PAGER};
+        delete $ENV{NUP_PAGER};
+        like(optex('-Mup', '--lateral', '-S20', @cmd)->run->stdout,
+             qr/^ARGS: -F -S --shift=@{[ $fit->(20) ]} --rscroll=-$/m,
+             '--lateral: no +Gg in the default pager');
+        like(optex('-Mup', '-S20', @cmd)->run->stdout,
+             qr/^ARGS: -F \+Gg$/m, '+Gg stays without --lateral');
+    }
     like(optex('-Mup', '--lateral', '-C4', @cmd)->run->stdout,
          qr/^ARGS: --file-size -S --shift=@{[ $pane->(4) ]} --rscroll=-$/m,
          '-C4 shows four panes on the screen');

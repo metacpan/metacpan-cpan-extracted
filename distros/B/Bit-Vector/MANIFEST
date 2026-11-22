@@ -48,3 +48,4 @@ t/50_freeze_thaw.t
 t/51_file_nstore.t
 typemap
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

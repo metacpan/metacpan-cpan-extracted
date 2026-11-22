@@ -1,0 +1,138 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Praxo::Core - embeddable AI agent framework for Perl
+
+=head1 SYNOPSIS
+
+    use Praxo::Models ();
+    use Praxo::Agent ();
+
+    my $model = Praxo::Agent::StaticModel->new('hello');
+    my $options = Praxo::Agent::AgentOptions->new($model);
+    my $result = Praxo::Agent::run_agent(
+        $options,
+        Praxo::Models::session(id => 'demo'),
+        'hello',
+    );
+    print $result->{output};
+
+=head1 DESCRIPTION
+
+PRAXO-CORE is an embeddable, MIT-licensed AI agent framework. This distribution
+is its native Perl Core: an agent loop with tool registration and dispatch,
+policy hooks, human-in-the-loop interrupt decisions, typed events, memory,
+checkpoints, context budgets, middleware, OpenTelemetry and Harmovela sinks,
+MCP, retriever and synchronous delegation seams, JSON Schema validation, and
+plugin manifest parsing.
+
+It is not an HTTP user agent, web crawler, or hosted AI agent service. HTTP is
+used by optional adapters to communicate with model providers and external
+services.
+
+=head1 FEATURES
+
+=over 4
+
+=item * Native Perl agent loop with tool registration and dispatch.
+
+=item * Policy hooks, explicit tool scope, final-argument reauthorization, and
+human-in-the-loop approve, edit, reject, and respond decisions.
+
+=item * Typed events, memory, checkpoints, context budgets, middleware, JSON
+Schema, and plugin manifests.
+
+=item * OpenAI-compatible, Anthropic, and Gemini adapters with SSE streaming.
+
+=item * MCP, OpenTelemetry, Harmovela, retriever, and synchronous delegation
+seams.
+
+=item * MIT-licensed and Perl core modules only.
+
+=back
+
+=head1 QUICK START
+
+Install the distribution:
+
+    cpanm Praxo::Core
+
+Then run the smallest deterministic example:
+
+    use lib 'language/perl/lib';
+    use Praxo::Models ();
+    use Praxo::Agent ();
+
+    my $model = Praxo::Agent::StaticModel->new('hello');
+    my $options = Praxo::Agent::AgentOptions->new($model);
+    my $result = Praxo::Agent::run_agent(
+        $options,
+        Praxo::Models::session(id => 'demo'),
+        'hello',
+    );
+    print $result->{output};
+
+Tools register on the options object:
+
+    my $registry = Praxo::Agent::ToolRegistry->new;
+    $registry->register(Praxo::Agent::FuncTool->new('echo', 'Echo arguments', sub {
+        return $_[0];
+    }));
+    $options->{tools} = $registry;
+
+=head1 EXAMPLES
+
+Runnable examples are in the repository:
+
+=over 4
+
+=item * Consumer starter (allow/deny):
+L<https://github.com/axisvela/praxo-core/tree/main/language/perl/examples/consumer>
+
+=item * Live model:
+L<https://github.com/axisvela/praxo-core/tree/main/language/perl/examples/live-model>
+
+=item * Full example index:
+L<https://github.com/axisvela/praxo-core/tree/main/language/perl/examples>
+
+=back
+
+=head1 LIMITS
+
+=over 4
+
+=item * Core is an execution framework, not a model provider, hosted agent
+service, crawler, workflow engine, or production sandbox.
+
+=item * Checkpoints are recovery hints, not transactions. Core does not provide
+durable execution, exactly-once effects, or an effect ledger.
+
+=item * Provider credentials, authentication, retries, and durable state remain
+application-owned.
+
+=item * Go remains the reference implementation; full Go feature parity is not
+claimed.
+
+=back
+
+=head1 DOCUMENTATION
+
+=over 4
+
+=item * Language documentation:
+L<https://axisvela.github.io/praxo-core/languages/perl/>
+
+=item * Contract and scope:
+L<https://axisvela.github.io/praxo-core/languages/matrix/>
+
+=item * Registry introduction:
+L<https://github.com/axisvela/praxo-core/blob/main/language/perl/REGISTRY.md>
+
+=back
+
+=head1 LICENSE
+
+MIT. See F<LICENSE>.
+
+=cut

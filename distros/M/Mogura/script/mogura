@@ -1,0 +1,188 @@
+#!/usr/bin/perl -T
+
+BEGIN {
+    if (${^TAINT}) {
+        my ($program) = $0 =~ /\A([^\x00]+)\z/;
+        my ($perl) = $^X =~ m{\A(/[^\x00]+)\z};
+        my @args = map { /\A([^\x00]*)\z/s; $1 } @ARGV;
+        $ENV{PATH} = "/usr/sbin:/usr/bin:/sbin:/bin";
+        delete @ENV{qw(IFS CDPATH ENV BASH_ENV)};
+        if ($> == 0) {
+            die "Use an absolute path for the privileged CLI\n" unless $program =~ m{\A/};
+            %ENV = (PATH => '/usr/sbin:/usr/bin:/sbin:/bin', HOME => '/root', LANG => 'C.UTF-8');
+            chdir '/' or die "chdir: $!";
+        }
+        exec {$perl} $perl, '-f', '-e',
+            'my $file=shift; $file="./$file" unless $file =~ m{^/}; $0=$file; do $file; die $@ || $!;',
+            '--', $program, @args;
+        die "Start interpreter: $!";
+    }
+    my @inherited_inc = @INC;
+
+    if ($> == 0) {
+
+        # Bootstrap only through root-owned module search paths. The dedicated
+        # installation below supplies the non-core dependencies.
+        my $trusted = sub {
+            my ($file) = @_;
+            return unless $file =~ m{^/} && $file !~ m{(?:^|/)\.\.?(?:/|$)};
+            while (1) {
+                my @st = lstat $file;
+                return unless @st && !-l _ && $st[4] == 0 && !($st[2] & 0022);
+                return 1 if $file eq '/';
+                $file =~ s{/[^/]+/?\z}{};
+                $file ||= '/';
+            }
+        };
+        {
+            local @INC = (
+                sub {
+                    my (undef, $module) = @_;
+                    for my $directory (grep { !ref($_) } @inherited_inc) {
+                        my $file = "$directory/$module";
+                        next unless $trusted->($file);
+                        open my $source, '<', $file or next;
+                        $INC{$module} = $file;
+                        return $source;
+                    }
+                    return;
+                }
+            );
+            require Config;
+        }
+        @INC = @Config::Config{qw(archlibexp privlibexp)};
+    }
+    require FindBin;
+    require lib;
+    my $library = "$FindBin::RealBin/../lib/perl5";
+    if (-f "$library/Mogura.pm") {
+        if ($> == 0) {
+            require Cwd;
+            require File::Find;
+            require File::Spec;
+            my $verify = sub {
+                my ($file) = @_;
+                my $resolved = Cwd::abs_path($file) or die "Missing trusted path: $file\n";
+                for my $path (File::Spec->rel2abs($file), $resolved) {
+                    while (1) {
+                        my @stat = stat $path;
+                        die "Root must own $path and deny group/other writes\n"
+                            unless @stat && $stat[4] == 0 && !($stat[2] & 0022);
+                        last if $path eq '/';
+                        $path =~ s{/[^/]+/?\z}{};
+                        $path = '/' unless length $path;
+                    }
+                }
+            };
+
+            # Validate every dependency, including modules loaded later and
+            # XS libraries, before importing application code as root.
+            $verify->($0);
+            File::Find::find(
+                {
+                    wanted => sub {
+                        die
+                            "Symbolic links are not allowed in the dedicated runtime: $File::Find::name\n"
+                            if -l $File::Find::name;
+                        $verify->($File::Find::name);
+                    },
+                    no_chdir => 1
+                },
+                Cwd::abs_path("$FindBin::RealBin/..")
+            );
+        }
+        @INC = @inherited_inc if $>;
+        lib->import($library);
+    }
+    else {
+        # Source/Carton and ordinary site installations retain their existing
+        # dependency environment. Only a contained prefix isolates @INC.
+        die "Install scanner into a dedicated root-owned prefix\n"
+            if $> == 0;
+        @INC = @inherited_inc;
+        my $source = "$FindBin::RealBin/../lib";
+        lib->import($source) if -f "$source/Mogura.pm";
+    }
+}
+
+use strict;
+use warnings;
+use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
+use Mogura;
+
+my $help = <<'HELP';
+Usage:
+  mogura server [--state DIR] [--listen URL]
+  mogura register|issue SCANNER_ID --token-file NEW_FILE [--state DIR]
+  mogura revoke SCANNER_ID [--state DIR]
+  mogura scanner [--config FILE] [--server URL] [--token-file FILE] [--state DIR] [--runtime DIR]
+                 [--jobs N] [--spool-limit BYTES] [--syft PATH] [--grype PATH]
+                 [--command-timeout SECONDS] [--upload-timeout SECONDS] [--exclude-path PATH]...
+  Scanner options override YAML. Supply server and token_file in either place.
+HELP
+if (grep { $_ eq '--help' } @ARGV) {
+    print $help;
+    exit 0;
+}
+if (@ARGV == 1 && $ARGV[0] eq '--version') { print "Mogura $Mogura::VERSION\n"; exit 0 }
+my $mode = shift // '';
+my %opts;
+if ($mode eq 'scanner') {
+    GetOptionsFromArray(
+        \@ARGV, \%opts,
+        qw(config=s server=s token-file=s state=s runtime=s jobs=s spool-limit=s syft=s grype=s
+            command-timeout=s upload-timeout=s exclude-path=s@)
+        )
+        && !@ARGV
+        or die $help;
+    require Mogura::Scanner;
+    my $config = Mogura::Scanner::Config->from_options(\%opts);
+    my $scanner = Mogura::Scanner->new(config => $config);
+    $scanner->initialize;
+    $scanner->run;
+    exit 0;
+}
+die $help unless $mode =~ /\A(?:server|register|issue|revoke)\z/;
+die "Run the server and token administration as its unprivileged owner\n" unless $>;
+my $id = $mode eq 'server' ? undef : shift;
+my @options = ('state=s', $mode eq 'server' ? 'listen=s' : $mode eq 'revoke' ? () : 'token-file=s');
+GetOptionsFromArray(\@ARGV, \%opts, @options) && !@ARGV or die $help;
+umask 0077;
+require Mogura::Server::Store;
+my $store = Mogura::Server::Store->new(defined $opts{state} ? (state => $opts{state}) : ());
+
+if ($mode eq 'server') {
+    require Mogura::Server;
+    require Mojo::Server::Daemon;
+    Mojo::Server::Daemon->new(
+        app => Mogura::Server->new(store => $store),
+        listen => [$opts{listen} // 'http://127.0.0.1:8080']
+    )->run;
+    exit 0;
+}
+die $help unless ($id // '') =~ /\A[A-Za-z0-9_-]{1,64}\z/;
+$store->initialize;
+if ($mode eq 'revoke') {
+    die "Unknown scanner\n"
+        unless 0 +
+        $store->db->do('UPDATE scanners SET digest=NULL, seen=NULL WHERE id=?', undef, $id);
+    exit 0;
+}
+require Fcntl;
+require Digest::SHA;
+my $file = $opts{'token-file'} or die $help;
+sysopen my $fh, $file, Fcntl::O_WRONLY() | Fcntl::O_CREAT() | Fcntl::O_EXCL(), 0600
+    or die "Create token file: $!";
+my $token = Mogura::Protocol::random_id() . Mogura::Protocol::random_id();
+eval {
+    print {$fh} "$token\n" or die "Write token: $!";
+    close $fh or die "Close token: $!";
+    if ($mode eq 'register') { $store->register($id, $token) }
+    else {
+        die "Unknown scanner\n"
+            unless 0 + $store->db->do('UPDATE scanners SET digest=?,seen=NULL WHERE id=?',
+            undef, Digest::SHA::sha256_hex($token), $id);
+    }
+    1;
+} or do { my $error = $@; unlink $file; die $error };
+exit 0;

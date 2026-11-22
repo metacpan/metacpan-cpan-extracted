@@ -73,6 +73,7 @@ sub handle_auth_callback_deferred {
   my ($class, $request) = @_;
   my ($callback_state, $redirect_uri) =
     $class->extract_callback_state($request);
+  $class->validate_callback_state($callback_state, $request);
 
   my $session = _get_session($request);
   Google::Auth::Error->throw('Sessions must be enabled') unless $session;
@@ -136,8 +137,6 @@ sub get_credentials {
     my $state_json     = delete $session->{+CALLBACK_STATE_KEY};
     my $callback_state = $coder->decode($state_json);
 
-    $self->validate_callback_state($callback_state, $request);
-
     return $self->get_and_store_credentials_from_code(
       user_id  => $user_id,
       code     => $callback_state->{+AUTH_CODE_KEY},
@@ -153,7 +152,10 @@ sub extract_callback_state {
   my ($class, $request) = @_;
 
   my $state_json = _get_param($request, STATE_PARAM) // '{}';
-  my $state      = $coder->decode($state_json);
+  my $state      = eval { $coder->decode($state_json) };
+  if ($@ || ref($state) ne 'HASH') {
+    Google::Auth::Error->throw('Invalid state parameter in callback request');
+  }
 
   my $redirect_uri = $state->{+CURRENT_URI_KEY};
 
@@ -190,6 +192,8 @@ sub validate_callback_state {
   {
     Google::Auth::Error->throw('State token does not match expected value');
   }
+
+  delete $session->{+XSRF_KEY};
 }
 
 package Google::Auth::WebUserAuthorizer::CallbackApp;

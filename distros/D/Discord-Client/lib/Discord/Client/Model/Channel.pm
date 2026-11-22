@@ -5,9 +5,13 @@ use strict;
 use warnings;
 use parent 'Discord::Client::Model';
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
+use constant CHANNEL_OBFUSCATED => 1 << 17;
+
 sub name { $_[0]->get('name') }
 sub mention { '<#' . $_[0]->id . '>' }
+sub _has_obfuscated_flag { !!( ( $_[0]->{flags} // 0 ) & CHANNEL_OBFUSCATED ) }
+sub is_obfuscated { _has_obfuscated_flag( $_[0]->{data} ) }
 
 sub send {
     my ( $self, $body ) = @_;
@@ -64,6 +68,17 @@ L<Discord::Client::Model>. REST operations use its associated REST client.
 =head2 name
 
 Returns the name or undef when absent.
+
+=head2 is_obfuscated
+
+Returns true when the snapshot has the C<CHANNEL_OBFUSCATED> flag, and false
+when the bit is clear or C<flags> is absent. A channel named C<___hidden___>
+can be visible. Use this method to distinguish the placeholder from a real name.
+
+On an L<obfuscated Gateway channel|https://docs.discord.com/developers/resources/channel#obfuscated-channels>,
+C<permission_overwrites> contains a placeholder denying C<VIEW_CHANNEL> to
+C<@everyone>. Use the full channel update sent when visibility returns for
+the channel's actual overwrites.
 
 =head2 mention
 

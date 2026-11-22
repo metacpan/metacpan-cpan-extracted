@@ -130,21 +130,44 @@ sub fetch_access_token {
 
   my $ua = $self->ua;
 
-  my $response = Google::Auth::RetryHelper->execute_with_retry(
+  require URI;
+  my $u = URI->new('http:');
+  $u->query_form(%$post_body);
+  my $encoded_body = $u->query;
+
+  my $response_body = Google::Auth::RetryHelper->execute_with_retry(
     sub {
-      my $res = $ua->post($token_uri, $post_body);
-      if (!$res->is_success) {
-        $log->warnf('Token request failed at %s: status %s',
-          $token_uri, $res->code);
-        Google::Auth::Error->throw('HTTP request failed with status ' .
-            $res->code . ': ' . $res->decoded_content);
+      my $future = $self->transport->request(
+        method  => 'POST',
+        url     => $token_uri,
+        headers => {'Content-Type' => 'application/x-www-form-urlencoded'},
+        body    => $encoded_body,
+      );
+
+      my ($body, $headers);
+      my $future_res = eval { ($body, $headers) = $future->get(); 1 };
+
+      if (!$future_res) {
+        my ($err_msg, $cat, $details) = $future->failure;
+        my $code       = 0;
+        my $error_body = '';
+        if (ref($details) eq 'HASH') {
+          $code       = $details->{code} // 0;
+          $error_body = $details->{body} // '';
+        } elsif (eval { $details->can('code') }) {
+          $code       = $details->code // 0;
+          $error_body = $details->decoded_content // $details->content // '';
+        }
+        $log->warnf('Token request failed at %s: status %s', $token_uri, $code);
+        Google::Auth::Error->throw(
+          'HTTP request failed with status ' . $code . ': ' . $error_body);
       }
-      return $res;
+      return $body;
     },
     %options
   );
 
-  my $res_data = decode_json($response->decoded_content);
+  my $res_data = decode_json($response_body);
   my $token    = $res_data->{access_token};
   my $expires  = $res_data->{expires_in} // 3600;
 

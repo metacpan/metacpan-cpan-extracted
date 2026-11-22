@@ -1,5 +1,8 @@
 Revision history for Test2-Aggregate
 
+1.01    2026-11-21
+        - Test suite fixes for Win32 and Android.
+
 1.00    2026-11-21
         - Helper scripts 'agg' and 'aggit' to help aggregating tests.
         - Write stats per test file (repeat==1) to avoid losing them on SIG exit.

@@ -9,7 +9,7 @@ my $pattrn = 'stats.t.*txt';
 my $tmpdir = File::Temp->newdir;
 
 plan skip_all => "Cannot create temp directory" unless -e $tmpdir;
-plan(20);
+plan(21);
 
 foreach my $extend (0 .. 1) {
     stdout_like(sub {
@@ -40,7 +40,7 @@ stdout_like(sub {
 {
     local $ENV{AGGREGATE_TEST_WARN} = 1;
     my $out;
-    warnings {
+    my $w = warnings {
         intercept {
             $out = stdout_from(sub {
                 Test2::Aggregate::run_tests(
@@ -55,6 +55,7 @@ stdout_like(sub {
         };
     };
     is($out, "xt/aggregate/check_plan.t\n", "pass_only omits tests with warnings");
+    ok((grep {/^AGGREGATE_TEST_WARN$/m} @$w), "Test warnings were captured");
 }
 
 {

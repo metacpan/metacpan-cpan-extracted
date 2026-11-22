@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use overload '""' => sub { $_[0]->{message} }, fallback => 1;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 sub new {
     my ( $class, %args ) = @_;

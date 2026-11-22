@@ -439,6 +439,61 @@ T2->subtest(
 );
 
 T2->subtest(
+    'staggered replay deadlines reclaim completed IDs after expired running work',
+    sub {
+        my $fixture = fixture( max_seen => 2, replay_ttl => 10 );
+        my $http = $fixture->{service};
+        my $work = Future->new;
+        my $calls = 0;
+        $http->command(
+            slow => description => 'Slow',
+            handler => sub {
+                ++$calls;
+                $_[0]->defer;
+                return $work;
+            }
+        );
+        $http->command(
+            ping => description => 'Ping',
+            handler => sub {
+                ++$calls;
+                return $_[0]->reply('Pong');
+            }
+        );
+
+        # Retain a running ID before a second, later-expiring completed response.
+        my ( $headers, $body ) = signed( $fixture, payload( 800, 'slow' ) );
+        T2->is( json( $http->handle( $headers, $body )->get )->{type}, 5, 'first handler stays active' );
+        $fixture->{clock}->advance(2);
+        ( $headers, $body ) = signed( $fixture, payload( 801, 'ping' ) );
+        T2->is( $http->handle( $headers, $body )->get->[0], 200, 'later completed ID fills capacity' );
+        $fixture->{clock}->advance(8);
+        ( $headers, $body ) = signed( $fixture, payload( 800, 'slow' ) );
+        T2->is( json( $http->handle( $headers, $body )->get )->{type}, 5, 'expired running ID remains protected' );
+        T2->is( $calls, 2, 'running duplicate never invokes again' );
+        ( $headers, $body ) = signed( $fixture, payload( 802, 'ping' ) );
+        T2->is( $http->handle( $headers, $body )->get->[0], 503, 'expired running ID still occupies capacity' );
+
+        # Completion must free the expired slot without waiting for the later deadline.
+        $work->done;
+        T2->is( $http->handle( $headers, $body )->get->[0], 200, 'completion reclaims capacity at the same time' );
+        T2->is( $calls, 3, 'new handler runs once after capacity is reclaimed' );
+        T2->is( $http->dispatcher->stats->{replay_entries}, 2, 'dispatcher also reclaims the expired ID' );
+
+        # A later deadline must still expire exactly, preserving newer cached responses.
+        $fixture->{clock}->advance(2);
+        ( $headers, $body ) = signed( $fixture, payload( 801, 'ping' ) );
+        T2->is( $http->handle( $headers, $body )->get->[0], 200, 'second ID can run again at its deadline' );
+        T2->is( $calls, 4, 'second expiry invokes its handler again' );
+        ( $headers, $body ) = signed( $fixture, payload( 802, 'ping' ) );
+        T2->is( json( $http->handle( $headers, $body )->get )->{data}{content},
+            'Pong', 'newer response remains cached' );
+        T2->is( $calls, 4, 'newer duplicate does not invoke again' );
+        $http->close->get;
+    }
+);
+
+T2->subtest(
     'concurrent duplicates share work and handler failures remain protected',
     sub {
         my $fixture = fixture();

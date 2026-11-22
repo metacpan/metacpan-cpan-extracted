@@ -14,19 +14,35 @@ my $builder = Module::Build->new(
         'Module::Build' => '0.4004',
     },
     test_requires => {
-        'Test::More' => '0',
+        'Test::More' => '0.88',
+        'File::Temp' => '0',
     },
     requires => {
-        'Filter::Simple' => 0,
-        'Test::Pod'    => 1.22,
-        'Test::Pod::Coverage' => 1.10,
+        'perl'               => '5.010001',
+        'Filter::Util::Call' => '0',
+        'Carp'               => '0',
     },
     add_to_cleanup => ['Podlite-*'],
     meta_merge     => {
+        'meta-spec' => { version => 2 },
+        prereqs     => {
+            develop => {
+                requires => {
+                    'Test::Pod'           => '1.22',
+                    'Test::Pod::Coverage' => '1.10',
+                    'Pod::Coverage'       => '0.18',
+                    'Test::CheckManifest' => '0.9',
+                },
+            },
+        },
         resources => {
-            repository => 'git://github.com/zag/p5-Podlite.git',
-            bugtracker => 'https://github.com/zag/p5-Podlite/issues'
-        }
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/zag/p5-Podlite.git',
+                web  => 'https://github.com/zag/p5-Podlite',
+            },
+            bugtracker => { web => 'https://github.com/zag/p5-Podlite/issues' },
+        },
     },
 );
 

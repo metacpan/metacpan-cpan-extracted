@@ -25,15 +25,38 @@ use Time::Piece;
 use JSON::PP;
 use MIME::Base64 qw(encode_base64);
 use URI;
+use URI::Escape qw(uri_escape);
 use HTTP::Request;
 use Google::Auth::Exceptions;
 use Log::Any qw($log);
+
+sub _validate_aws_imds_url {
+  my ($self, $url_str, $name) = @_;
+  my $uri    = URI->new($url_str);
+  my $scheme = lc($uri->scheme // '');
+  unless ($scheme eq 'http' || $scheme eq 'https') {
+    $log->errorf('Security violation: %s scheme %s is not permitted',
+      $name, $scheme);
+    Google::Auth::Error->throw(
+      $name . ' scheme ' . $scheme . ' carries security violation');
+  }
+  my $host = lc($uri->can('host') ? ($uri->host // '') : '');
+  $host =~ s/^[\[\s]+|[\]\s]+$//g;
+  unless ($host eq '169.254.169.254' || $host eq 'fd00:ec2::254') {
+    $log->errorf('Security violation: %s host %s is not permitted',
+      $name, $host);
+    Google::Auth::Error->throw(
+      $name . ' host ' . $host . ' carries security violation');
+  }
+  return;
+}
 
 sub _get_imdsv2_token {
   my ($self, $imdsv2_url) = @_;
 
   $imdsv2_url = 'http://169.254.169.254/latest/api/token'
     unless defined $imdsv2_url && length $imdsv2_url;
+  $self->_validate_aws_imds_url($imdsv2_url, 'imdsv2_session_token_url');
   $log->debugf('Attempting to fetch AWS IMDSv2 token from: %s', $imdsv2_url);
 
   my $req = HTTP::Request->new(PUT => $imdsv2_url);
@@ -152,6 +175,7 @@ sub _get_aws_security_credentials {
   my $sec_url = $source->{url};
 
   if ($sec_url) {
+    $self->_validate_aws_imds_url($sec_url, 'credential_source.url');
     $log->debugf('Fetching AWS EC2 metadata credentials from: %s', $sec_url);
     my $imdsv2_token =
       $self->_get_imdsv2_token($source->{imdsv2_session_token_url});
@@ -167,9 +191,15 @@ sub _get_aws_security_credentials {
       $role_name =~ s/^\s+|\s+$//g if defined $role_name;
 
       if (defined $role_name && length $role_name) {
+        unless ($role_name =~ /\A[\w+=,.@-]+\z/ && $role_name !~ /\.\./) {
+          $log->errorf('Security violation: Invalid AWS IAM role name: %s',
+            $role_name);
+          Google::Auth::Error->throw(
+            'AWS IAM role name carries security violation');
+        }
         my $cred_url = $sec_url;
         $cred_url .= '/' unless $cred_url =~ m{/$};
-        $cred_url .= $role_name;
+        $cred_url .= uri_escape($role_name);
 
         my $cred_req = HTTP::Request->new(GET => $cred_url);
         $cred_req->header('X-aws-ec2-metadata-token' => $imdsv2_token)
@@ -221,6 +251,7 @@ sub _get_aws_region {
   my $region_url = $source->{region_url};
 
   if ($region_url) {
+    $self->_validate_aws_imds_url($region_url, 'credential_source.region_url');
     $log->debugf('Fetching AWS region from metadata: %s', $region_url);
     my $imdsv2_token =
       $self->_get_imdsv2_token($source->{imdsv2_session_token_url});

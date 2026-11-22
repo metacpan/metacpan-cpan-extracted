@@ -39,25 +39,25 @@ no_index:
 provides:
   Text::Bidi:
     file: lib/Text/Bidi.pm
-    version: '3.02'
+    version: '3.03'
   Text::Bidi::Array:
     file: lib/Text/Bidi/Array.pm
-    version: '3.02'
+    version: '3.03'
   Text::Bidi::Array::Byte:
     file: lib/Text/Bidi/Array/Byte.pm
-    version: '3.02'
+    version: '3.03'
   Text::Bidi::Array::Long:
     file: lib/Text/Bidi/Array/Long.pm
-    version: '3.02'
+    version: '3.03'
   Text::Bidi::Constants:
     file: lib/Text/Bidi/Constants.pm
-    version: '3.02'
+    version: '3.03'
   Text::Bidi::Paragraph:
     file: lib/Text/Bidi/Paragraph.pm
-    version: '3.02'
+    version: '3.03'
   Text::Bidi::Selection:
     file: lib/Text/Bidi/Selection.pm
-    version: '3.02'
+    version: '3.03'
 requires:
   Carp: '0'
   Encode: '0'
@@ -79,7 +79,7 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Text-Bidi
   homepage: https://github.com/mkamensky/Text-Bidi
   repository: https://github.com/mkamensky/Text-Bidi.git
-version: '3.02'
+version: '3.03'
 x_generated_by_perl: v5.44.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

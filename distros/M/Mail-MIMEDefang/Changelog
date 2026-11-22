@@ -2,6 +2,141 @@ WARNING: Before upgrading MIMEDefang, please search this file for
 *** NOTE INCOMPATIBILITY ** to see if anything has changed that might
 affect your filter.
 
+2026-11-18 Giovanni Bechis <gbechis@pccc.com>
+
+        * `action_*_header_now` accept an optional last `inputmsg_only`
+          argument to patch only ./INPUTMSG without changing the email
+          delivered by the MTA, useful for headers that should only be
+          parsed by SpamAssassin/rspamd
+        * `md_spf_verify` and `md_dkim_verify` look up DNS records through
+          the new `md_caching_resolver`, so their answers are cached in the
+          worker like the other `md_dns_query` lookups.  `md_dkim_verify`
+          keeps a resolver set by the filter with `Mail::DKIM::DNS::resolver`
+
+2026-11-07 Giovanni Bechis <g.bechis@snb.it>
+
+        * mimedefang-multiplexor: the adaptive autoscaler (`-k`) keeps the
+          pool sized for the highest demand of the last 10 minutes, instead
+          of following an average of the busy ratio, so the workers needed
+          by recent bursts are not stopped and started again.  It can be
+          tuned with `-k key=value,...` (`window`, `spare`, `interval`)
+          and kept from adding workers to an overloaded machine
+          (`max_load`, `min_mem`).
+
+        * mimedefang-multiplexor(8) explains how to choose `-x`, and
+          `contrib/mimedefang-tune` suggests `-x`, `-m`, `-q`, `-Q` and `-k`
+          settings for a running system.
+
+2026-11-07 Giovanni Bechis <g.bechis@snb.it>
+
+        * Mail::SpamAssassin is never loaded when the filter sets
+          `$Features{"SpamAssassin"} = 0`.
+
+2026-11-07 Giovanni Bechis <g.bechis@snb.it>
+
+        * Mail::MIMEDefang::Net: DNS lookups go through a per-worker
+          shared resolver (`md_shared_resolver`) and a new
+          `md_dns_query` wrapper, which caches definitive answers for
+          their TTL (at most 5 minutes, NXDOMAIN/NODATA for 1 minute);
+          SERVFAIL and timeouts are never cached.
+          Mail::MIMEDefang::Net: DNS blocklist answers are never cached.
+        * Mail::MIMEDefang::Mail: IO::Socket::SSL is loaded only when
+          `md_check_against_smtp_server` is first called, saving about
+          8 MB per worker; the function returns TEMPFAIL if the module
+          is not available.
+
+2026-11-06 Giovanni Bechis <g.bechis@snb.it>
+
+        * md_graphdefang_log, md_graphdefang_log_array: `$per_message = 2`
+          logs a single line with all the recipients separated by ";"
+          instead of "rcpts=N"; mimedefang-dashboard counts them as
+          recipients.
+
+2026-11-05 Giovanni Bechis <g.bechis@snb.it>
+
+        * Mail::MIMEDefang::Async: add `md_async_check_clamd`,
+          `md_async_check_clamdscan`, `md_async_check_spamc` and
+          `md_async_check_rspamd` check builders, so virus and spam scans
+          can run in parallel in a single `md_async_run_checks()` batch.
+        * Mail::MIMEDefang::Async: `md_async_interpret_clamav` understands
+          SCAN/nSCAN replies (`/path: Name FOUND`) and clamdscan process
+          results; an unrecognized clamd reply is now reported as an
+          error instead of as clean.
+
+2026-11-04 Giovanni Bechis <g.bechis@snb.it>
+
+        * MIMEDefang 3.7.2 released (3.7 maintenance release)
+
+2026-10-16 Giovanni Bechis <g.bechis@snb.it>
+
+        * split `Mail::MIMEDefang::Antivirus` into one module per scanner:
+          `Mail::MIMEDefang::Antivirus::ClamAV`,
+          `Mail::MIMEDefang::Antivirus::NAI` and, for scanners no longer
+          maintained, `Mail::MIMEDefang::Antivirus::Legacy::*` (BDC,
+          CarrierScan, CSAV, FProt, FSAV, HBEDV, Kaspersky, NOD32, NVCC,
+          Sophos, Trend, Vexira).  The code of each scanner is compiled
+          only when that scanner is initialized or used; the original
+          function names are still exported, so filters do not need to
+          change.
+
+2026-10-14 Giovanni Bechis <g.bechis@snb.it>
+
+        * add `mimedefang-dashboard`, a live web console for the mail flow
+          (throughput by event, top senders/recipients/domains, live event
+          log, workers, spam and ML score distributions, Prometheus
+          `/metrics`).  It runs its own HTTP server, keeps data in memory
+          (optionally saved with `--state`), never reads the mail log and
+          refuses to run as root; a systemd unit is in `systemd-units/`.
+        * add `md_graphdefang_feed_enable()`: `md_graphdefang_log` events
+          are sent to the dashboard over a non-blocking UNIX datagram
+          socket, with or without syslog logging.
+        * mimedefang-multiplexor answers new JSON commands: `jsonworkers`,
+          `jsonhisto`, `jsonmsgs`, `jsonautoscale`, `jsonhload*` and
+          `jsonsnapshot`.
+
+2026-10-07 Giovanni Bechis <g.bechis@snb.it>
+
+        * add `Mail::MIMEDefang::ML`, a provider-neutral ham/spam/phishing
+          classifier API (`ml_build_state`, `ml_classify`) configured through
+          `%Mail::MIMEDefang::ML::Config`; backends: Laya, GLiClass and any
+          self-hosted OpenAI-compatible server (Ollama, llama.cpp, vLLM,
+          LM Studio).  Backend failures or low-confidence answers are
+          returned as "no opinion", so mail flow is never blocked.
+        * add `mimedefang-laya-server` and `mimedefang-gliclass-server`
+          Python model servers in `script/ml-servers/` with their systemd
+          units, installed with `--enable-ml-servers` (`ML_SERVERS=1` with
+          Makefile.PL).
+        * add `contrib/ml-benchmark/ml-benchmark` to measure backends against
+          a ham/spam corpus and `gliclass-train` to fine-tune a GLiClass model.
+
+2026-09-24 Giovanni Bechis <gbechis@pccc.com>
+
+        * detect base64 parts made of concatenated streams and ambiguous MIME structures;
+          add `md_concatenated_base64` and `md_mime_suspicious`.
+
+2026-08-26 Giovanni Bechis <g.bechis@snb.it>
+
+        * add `jsonload`, `jsonload-relayok`, `jsonload-senderok` and
+          `jsonload-recipok` commands to md-mx-ctrl, reporting the same
+          data as `load`/`load-relayok`/`load-senderok`/`load-recipok`
+          in JSON format
+
+2026-07-31 Giovanni Bechis <gbechis@pccc.com>
+
+        * md_spf_verify() called in scalar context now returns a hashref
+          with a `dns_lookups` (and `helo_dns_lookups`) field, exposing the
+          number of DNS-interactive SPF terms evaluated during the check.
+          List-context callers are unaffected.
+
+2026-07-16 Giovanni Bechis <g.bechis@snb.it>
+
+        * add `action_insert_header_now` in order to add an header to the email
+          that SpamAssassin/rspamd will be able to parse
+
+2026-07-14 Giovanni Bechis <g.bechis@snb.it>
+
+        * MIMEDefang 3.7.1 released
+
 2026-07-14 Giovanni Bechis <gbechis@pccc.com>
 
 	* md_spf_verify() now falls back to a raw DNS TXT lookup for the
@@ -489,7 +624,7 @@ affect your filter.
 
 	* Remove dead "connect_to_socket" routine in mimedefang.pl
 
-	* Do not invokve smfi_setsymlist unless "-y" option to
+	* Do not invoke smfi_setsymlist unless "-y" option to
 	mimedefang is given.  smfi_setsymlist leaks memory in versions
 	of Sendmail prior to 8.14.4.
 
@@ -1294,7 +1429,7 @@ affect your filter.
 
 	* Version 2.48 RELEASED
 
-	* Fix dumb bugs introducted in 2.46 and 2.47 related to
+	* Fix dumb bugs introduced in 2.46 and 2.47 related to
 	worker status reports.
 
 	* embperl.c: Detect if user opens file descriptors inside his/her
@@ -1636,7 +1771,7 @@ affect your filter.
 
 	* mimedefang-multiplexor.c (activateWorker): Call closelog() so
 	embedded Perl interpreter doesn't accidentally reuse syslog
-	file decriptor (Josh Kelley)
+	file descriptor (Josh Kelley)
 
 2004-03-16  Dianne Skoll  <dfs@roaringpenguin.com>
 
@@ -3053,7 +3188,7 @@ affect your filter.
 2002-05-15  Dianne Skoll  <dfs@roaringpenguin.com>
 
 	* Move default stats location to /var/log/mimedefang/stats to
-	more easily accomodate -U option.
+	more easily accommodate -U option.
 
 	* mimedefang.c: Added -U option to run as non-root user.
 
@@ -3307,7 +3442,7 @@ affect your filter.
 	filter_multipart to examine the headers of parts with
 	sub-parts.
 
-	(interpret_avp_code): Updated intepretation of AVP return
+	(interpret_avp_code): Updated interpretation of AVP return
 	codes.
 
 2002-04-26  Dianne Skoll  <dfs@roaringpenguin.com>

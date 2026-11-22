@@ -1,0 +1,65 @@
+# docker-compose-ml.yml
+# ---------------------
+# Laya and GLiClass inference servers, used to run the live tests of
+# Mail::MIMEDefang::ML (t/ml.t) against the published images.  The tests
+# themselves run in the mimedefang-ml-ci container (profile ci), which
+# reaches the servers by service name.
+#
+# Usage:
+#   sh t/run-tests.sh ml
+#
+# or by hand:
+#   docker compose -f t/docker/docker-compose-ml.yml --project-directory . up -d
+#   docker compose -f t/docker/docker-compose-ml.yml --project-directory . \
+#       --profile ci run --rm mimedefang-ml-ci
+#   docker compose -f t/docker/docker-compose-ml.yml --project-directory . down
+#
+# The servers have no authentication: the ports are published on 127.0.0.1 only.
+# On the first start the models are downloaded from Hugging Face into the
+# mdml-hf volume, which is kept between runs.
+
+name: mimedefang-ml
+
+services:
+
+  # ── CI / test service ──────────────────────────────────────────────────────
+  mimedefang-ml-ci:
+    profiles: [ci]
+    image: mimedefang/postfix:ci
+    container_name: mimedefang-ml-ci
+    working_dir: /tests
+    environment:
+      ML_WAIT_TIMEOUT: ${ML_WAIT_TIMEOUT:-1200}
+    volumes:
+      - .:/tests                        # mount full repo so t/ml.t can run
+    depends_on:
+      - laya
+      - gliclass
+    command: sh t/docker/dockerML.sh
+
+  laya:
+    image: mimedefang/laya:${ML_IMAGE_TAG:-latest}
+    container_name: mimedefang-ml-laya
+    environment:
+      LAYA_THREADS: "2"
+    ports:
+      - "127.0.0.1:8687:8687"
+    volumes:
+      - mdml-hf:/var/lib/MIMEDefang/ml/huggingface
+
+  gliclass:
+    image: mimedefang/gliclass:${ML_IMAGE_TAG:-latest}
+    container_name: mimedefang-ml-gliclass
+    environment:
+      GLICLASS_THREADS: "2"
+      # A multilingual checkpoint, e.g. knowledgator/gliclass-multilang-mini
+      # (check its token limit: GLICLASS_MAX_LENGTH=512 if it is 512).
+      GLICLASS_MODEL: ${GLICLASS_MODEL:-knowledgator/gliclass-modern-base-v2.0}
+      GLICLASS_MAX_LENGTH: ${GLICLASS_MAX_LENGTH:-4096}
+    ports:
+      - "127.0.0.1:8688:8688"
+    volumes:
+      - mdml-hf:/var/lib/MIMEDefang/ml/huggingface
+
+volumes:
+  mdml-hf:

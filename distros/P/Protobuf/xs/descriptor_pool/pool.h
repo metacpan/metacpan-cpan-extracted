@@ -40,5 +40,6 @@ SV* PerlUpb_DescriptorPool_GetFile(pTHX_ SV* sv, int index);
 // Low-level XS helpers
 void* PerlUpb_DescriptorPool_CreateRaw(pTHX);
 void PerlUpb_DescriptorPool_DestroyRaw(pTHX_ void* ptr);
+void PerlUpb_DescriptorPool_AttachMagic(pTHX_ SV* self, void* raw, bool owned);
 
 #endif  // PERL_PROTOBUF_DESCRIPTOR_POOL_POOL_H_

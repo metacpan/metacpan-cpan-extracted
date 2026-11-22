@@ -1,0 +1,4 @@
+% layout 'default';
+% title l('not_found') . ' — Mogura';
+<h1 class="mb-6 text-2xl font-semibold"><%= l('not_found') %></h1>
+<p><%= l('not_found_message') %></p>

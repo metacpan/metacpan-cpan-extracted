@@ -52,7 +52,8 @@ void PerlUpb_Message_MergeFrom(pTHX_ SV* dst_sv, SV* src_sv) {
 
     const upb_MiniTable* mt = upb_MessageDef_MiniTable(mdef);
     const upb_FileDef* file = upb_MessageDef_File(mdef);
-    const upb_ExtensionRegistry* extreg = (const upb_ExtensionRegistry*)upb_FileDef_Pool(file);
+    const upb_ExtensionRegistry* extreg =
+        upb_DefPool_ExtensionRegistry(upb_FileDef_Pool(file));
 
     if (!upb_Message_MergeFrom(dst_msg, src_msg, mt, extreg, dst_arena)) {
         croak("Failed to merge messages");

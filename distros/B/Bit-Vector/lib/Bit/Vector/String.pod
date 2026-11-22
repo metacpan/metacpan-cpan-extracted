@@ -363,7 +363,7 @@ Bit::Vector(3), Bit::Vector::Overload(3).
 
 =head1 VERSION
 
-This man page documents "Bit::Vector::String" version 7.4.
+This man page documents "Bit::Vector::String" version 7.5.
 
 =head1 AUTHOR
 

@@ -64,13 +64,18 @@ subtest 'Impersonated Credentials Loading and Token Exchange' => sub {
       ['Content-Type' => 'application/json'],
       encode_json({
           accessToken => 'mock-impersonated-token',
-          expireTime  => '2026-06-02T08:30:00Z'
+          expireTime  => '2030-06-02T08:30:00Z'
         })));
 
-  my $token = $creds->fetch_access_token();
+  require Time::Local;
+  my $expected_epoch = Time::Local::timegm(0, 30, 8, 2, 5, 2030);
+  my $token          = $creds->fetch_access_token();
   is($token, 'mock-impersonated-token', 'exchanged token matches');
   is($creds->access_token, 'mock-impersonated-token', 'cached token matches');
-  is($creds->expires_at,   '2026-06-02T08:30:00Z', 'expiration time matches');
+  is($creds->expires_at, $expected_epoch,
+    'expiration time parsed into epoch seconds');
+  ok(!$creds->is_expired(),
+    'future impersonated token is not immediately treated as expired');
 };
 
 subtest 'Load from JSON configuration' => sub {

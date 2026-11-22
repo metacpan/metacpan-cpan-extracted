@@ -93,10 +93,19 @@ typedef  Z_longword         *Z_longwordptr;
     #elif PERL_DARWIN
         #define boolean bool
     #else
-	typedef int boolean;
-	#ifndef I_STDBOOL
-	    enum { false, true };
-	#endif
+        typedef int boolean;
+        #ifndef I_STDBOOL
+            #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+                #include <stdbool.h>
+            #else
+                #ifndef false
+                    #define false 0
+                #endif
+                #ifndef true
+                    #define true 1
+                #endif
+            #endif
+        #endif
     #endif
 #endif
 

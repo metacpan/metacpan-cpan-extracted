@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 2;
+use Test::More tests => 3;
 use Test::LWP::UserAgent;
 use JSON::PP;
 use Google::Auth;
@@ -90,4 +90,34 @@ subtest 'ServiceAccountCredentials token_uri Valid Domain' => sub {
   my $token = eval { $sa->fetch_access_token() };
   is($@,     '',            'no exception thrown for valid URL');
   is($token, 'valid-token', 'token fetched successfully');
+};
+
+# 3. Test non-HTTPS scheme on valid host (Downgrade / SSRF Prevention)
+subtest 'ServiceAccountCredentials token_uri Non-HTTPS Scheme Rejected' => sub {
+  plan tests => 2;
+
+  my $mock_ua = Test::LWP::UserAgent->new();
+
+  my $sa = Google::Auth::DefaultCredentials->make_creds(
+    json_key => {
+      type           => 'service_account',
+      project_id     => 'victim-project',
+      private_key_id => 'victim-key-id',
+      private_key    => $valid_pkey,
+      client_email   => 'victim-sa@victim-project.iam.gserviceaccount.com',
+      token_uri      => 'http://oauth2.googleapis.com/token',
+    },
+    scope => 'https://www.googleapis.com/auth/cloud-platform',
+    ua    => $mock_ua,
+  );
+
+  my $token = eval { $sa->fetch_access_token() };
+  my $err   = $@;
+
+  ok(!defined $token, 'fetch_access_token rejected non-HTTPS token_uri');
+  like(
+    $err,
+    qr/scheme must be https/,
+    'Expected scheme must be https violation'
+  );
 };

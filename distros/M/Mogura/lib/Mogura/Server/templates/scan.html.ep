@@ -1,0 +1,198 @@
+% layout 'default';
+% my $heading = l('scan_heading', id => substr($scan->{id}, 0, 8));
+% title $heading . ' — Mogura';
+% my $db = ref($scan->{grype_db}{status}) eq 'HASH' ? $scan->{grype_db}{status} : ($scan->{grype_db} // {});
+<h1 class="mb-6 text-2xl font-semibold tracking-tight wrap-anywhere sm:text-3xl"><%= $heading %></h1>
+
+<section class="grid divide-y divide-slate-200 rounded-lg border border-slate-200 bg-white sm:grid-cols-3 sm:divide-x sm:divide-y-0 [&>div]:px-4 [&>div]:py-4 sm:[&>div]:px-6 [&_strong]:text-lg [&_strong]:wrap-anywhere [&_span]:mb-2 [&_span]:block [&_span]:text-xs [&_span]:text-slate-500" aria-label="<%= l('execution_status') %>">
+    <div>
+        <span><%= l('status') %></span>
+        <strong class="data-[status=completed]:text-emerald-700 data-[status=partial]:text-amber-700 data-[status=interrupted]:text-amber-700 data-[status=failed]:text-red-700" data-status="<%= $scan->{status} %>"><%= label($scan->{status}) %></strong>
+    </div>
+    <div>
+        <span><%= l('phase') %></span>
+        <strong><%= label($scan->{phase}) %></strong>
+    </div>
+    <div>
+        <span><%= l('mount_status') %></span>
+        <strong><%= label($scan->{cleanup_status}) %></strong>
+    </div>
+</section>
+% if (($scan->{status}//'') eq 'transferring') {
+<p><%= l('artifacts_received', count => scalar grep { $artifacts->{$_} } qw(syft cdx grype)) %></p>
+% }
+
+% if ($scan->{cleanup_status} eq 'needs_cleanup' || $scan->{cleanup_status} eq 'mounted') {
+<aside class="my-5 rounded-md border border-red-200 bg-red-50 p-4 text-red-900 wrap-anywhere">
+    <strong><%= l('do_not_disconnect') %></strong>
+    <%= l('inspect_mounts') %>
+</aside>
+% }
+% if ($scan->{error} && $scan->{status} ne 'cancelled') {
+<aside class="my-5 rounded-md border border-red-200 bg-red-50 p-4 text-red-900 wrap-anywhere">
+    <strong><%= l('phase_failed', phase => label($scan->{failed_phase})) %></strong>
+    <details>
+        <summary class="cursor-pointer font-semibold group-open:mb-5"><%= l('error_details') %></summary>
+        <pre class="mt-3 font-mono text-xs whitespace-pre-wrap wrap-anywhere"><%= $scan->{error} %></pre>
+    </details>
+</aside>
+% }
+% my @warnings = @{$scan->{warnings} // []};
+% if (@warnings) {
+<details class="my-5 rounded-md border border-amber-200 bg-amber-50 p-4 text-amber-900 wrap-anywhere">
+    <summary class="cursor-pointer font-semibold group-open:mb-5"><%= l('warnings', count => scalar @warnings) %></summary>
+    <ul class="mt-3 list-disc space-y-1 pl-5">
+    % for my $warning (@warnings) {
+        <li><%= $warning %></li>
+    % }
+    </ul>
+</details>
+% }
+
+<div data-results>
+% for my $kind (qw(packages matches)) {
+% my $packages = $kind eq 'packages';
+% my $artifact = $packages ? 'syft' : 'grype';
+% my @columns = $packages ? (l('name'), l('version'), l('type'), l('cataloger'), l('detected_path')) : (l('vulnerability_id'), l('affected_package'), l('version'), l('severity'), l('fixed_version'));
+<section class="my-6 min-w-0 rounded-lg border border-slate-200 bg-white p-4 sm:p-6" data-result-table="<%= $kind %>" data-source="<%= $versions->{$artifact} ? '/scans/' . $scan->{id} . '/results/' . $artifact . '?version=' . $versions->{$artifact} : '' %>">
+    <div class="flex flex-wrap items-center justify-between gap-4 [&>h2]:mb-0">
+        <h2 class="mb-5 text-lg font-semibold"><%= $packages ? l('packages') : l('matches') %></h2>
+        <span class="text-xs text-slate-500" data-result-count></span>
+    </div>
+    <label class="my-4 block">
+        <span class="sr-only"><%= $packages ? l('search_packages') : l('search_matches') %></span>
+        <input class="mt-1 block w-full min-w-0 rounded-md border border-slate-300 bg-white px-3 py-2 disabled:bg-slate-100" type="search" placeholder="<%= l('search') %>" data-result-search disabled>
+    </label>
+    <p class="mt-4 text-slate-600" role="status" data-result-status><%= $versions->{$artifact} ? l('loading') : ($artifacts->{$artifact} ? l('list_not_built') : ($packages ? l('no_sbom') : l('not_evaluated'))) %></p>
+    <progress class="mt-2 w-full accent-blue-600" data-result-progress aria-label="<%= l('loading_label') %>" <%= $versions->{$artifact} ? '' : 'hidden' %>></progress>
+    <div data-result-viewport class="h-[572px] overflow-auto rounded-md border border-slate-200 [overflow-anchor:none]" tabindex="0" aria-label="<%= $packages ? l('package_list') : l('match_list') %>" hidden>
+        <table class="w-full min-w-[960px] table-fixed border-collapse text-left text-xs">
+            <thead class="sticky top-0 z-10"><tr>
+                % for my $index (0 .. $#columns) {
+                <th class="h-11 truncate border-b border-slate-200 bg-slate-50 px-3 text-slate-600 last:w-[30%] aria-[sort=ascending]:text-blue-700 aria-[sort=descending]:text-blue-700" scope="col" aria-sort="none"><button class="w-full cursor-pointer text-left font-semibold disabled:cursor-not-allowed" type="button" data-sort="<%= $index %>" disabled><%= $columns[$index] %><span aria-hidden="true" data-sort-indicator> ↕</span></button></th>
+                % }
+            </tr></thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    <nav class="mt-3 flex items-center justify-end gap-3 text-sm" data-result-pager aria-label="<%= $packages ? l('package_pages') : l('match_pages') %>" hidden>
+        <button class="cursor-pointer rounded border border-slate-300 px-3 py-2 disabled:opacity-40" type="button" data-page-step="-1"><%= l('previous') %></button>
+        <span data-page-range></span>
+        <button class="cursor-pointer rounded border border-slate-300 px-3 py-2 disabled:opacity-40" type="button" data-page-step="1"><%= l('next') %></button>
+    </nav>
+</section>
+% }
+</div>
+<noscript><p class="my-5 rounded-md border border-slate-200 bg-slate-100 p-4 wrap-anywhere"><%= l('download_json') %></p></noscript>
+
+<section class="my-6 min-w-0 rounded-lg border border-slate-200 bg-white p-4 sm:p-6" data-tag-editor data-action="/scans/<%= $scan->{id} %>/tags">
+    <h2 class="mb-5 text-lg font-semibold"><%= l('tags') %></h2>
+    <div class="flex flex-wrap gap-1.5 not-empty:mb-4" data-scan-tags>
+        % for my $tag (@{$scan->{tags} // []}) {
+        <span class="inline-flex max-w-full items-center rounded-full border border-slate-200 bg-slate-100 px-2.5 py-0.5 text-xs text-slate-700 wrap-anywhere gap-1.5 pr-1">
+            <a class="min-w-0 wrap-anywhere hover:underline" href="<%= url_for('/history')->query(tag => $tag) %>"><%= $tag %></a>
+            <form class="flex shrink-0" method="post" action="/scans/<%= $scan->{id} %>/tags" data-tag-operation>
+                %= csrf_field
+                <input type="hidden" name="operation" value="remove">
+                <input type="hidden" name="tag" value="<%= $tag %>">
+                <button class="size-7 shrink-0 cursor-pointer rounded-full text-lg leading-none text-slate-500 hover:bg-slate-200 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-50" type="submit" aria-label="<%= l('remove_tag', tag => $tag) %>">×</button>
+            </form>
+        </span>
+        % }
+    </div>
+    <form class="flex flex-wrap items-end gap-3 [&>label]:min-w-0 [&>label]:grow" method="post" action="/scans/<%= $scan->{id} %>/tags" data-tag-operation>
+        %= csrf_field
+        <input type="hidden" name="operation" value="add">
+        <label class="text-sm"><span class="sr-only"><%= l('tags') %></span>
+            <input class="mt-1 block w-full min-w-0 rounded-md border border-slate-300 bg-white px-3 py-2 disabled:bg-slate-100" name="tag" maxlength="120" placeholder="<%= l('enter_tag') %>" required>
+        </label>
+        <button class="inline-flex min-h-10 items-center justify-center rounded-md border px-4 py-2 font-medium cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 border-slate-300 bg-white text-slate-700 enabled:hover:bg-slate-100" type="submit"><%= l('add') %></button>
+    </form>
+    <span class="mt-2 block text-xs text-slate-600" role="status" data-tag-status></span>
+</section>
+
+<section class="my-6 min-w-0 rounded-lg border border-slate-200 bg-white p-4 sm:p-6">
+    <h2 class="mb-5 text-lg font-semibold"><%= l('notes') %></h2>
+    <form method="post" action="/scans/<%= $scan->{id} %>/note" data-note-editor>
+        %= csrf_field
+        <label class="sr-only" for="scan-note"><%= l('scan_notes') %></label>
+        <textarea class="mt-1 block w-full min-w-0 rounded-md border border-slate-300 bg-white px-3 py-2 disabled:bg-slate-100" id="scan-note" name="note" rows="4" maxlength="2000"><%= $scan->{note} // '' %></textarea>
+        <div class="mt-3 flex flex-wrap items-center gap-4">
+            <button class="inline-flex min-h-10 items-center justify-center rounded-md border px-4 py-2 font-medium cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 border-slate-300 bg-white text-slate-700 enabled:hover:bg-slate-100" type="submit"><%= l('save') %></button>
+            <span class="mt-2 block text-xs text-slate-600" role="status" data-note-status></span>
+        </div>
+    </form>
+</section>
+
+<section class="my-6 min-w-0 rounded-lg border border-slate-200 bg-white p-4 sm:p-6">
+    <h2 class="mb-5 text-lg font-semibold"><%= l('scan_information') %></h2>
+    <dl class="grid gap-x-6 gap-y-1 text-xs sm:grid-cols-[180px_1fr] sm:gap-y-3">
+        <dt class="text-slate-500"><%= l('scan_id') %></dt>
+        <dd class="mb-3 min-w-0 font-mono text-xs wrap-anywhere sm:mb-0"><%= $scan->{id} %></dd>
+        <dt class="text-slate-500"><%= l('scanner') %></dt>
+        <dd class="mb-3 min-w-0 wrap-anywhere sm:mb-0"><%= $scan->{scanner_id} %></dd>
+        <dt class="text-slate-500"><%= l('connection') %></dt>
+        <dd class="mb-3 min-w-0 wrap-anywhere sm:mb-0"><%= l($scan->{online} ? 'online' : 'offline') %></dd>
+        <dt class="text-slate-500"><%= l('scan_submitted_utc') %></dt>
+        <dd class="mb-3 min-w-0 wrap-anywhere sm:mb-0"><%= date_time($scan->{created_at}) %></dd>
+        <dt class="text-slate-500"><%= l('scan_started_utc') %></dt>
+        <dd class="mb-3 min-w-0 wrap-anywhere sm:mb-0"><%= date_time($scan->{started_at}) %></dd>
+        <dt class="text-slate-500"><%= l('scan_finished_utc') %></dt>
+        <dd class="mb-3 min-w-0 wrap-anywhere sm:mb-0"><%= date_time($scan->{finished_at}) %></dd>
+        <dt class="text-slate-500"><%= l('disk') %></dt>
+        <dd class="mb-3 min-w-0 wrap-anywhere sm:mb-0"><%= display($scan->{target}{disk}{name}) %></dd>
+        <dt class="text-slate-500"><%= l('root_device') %></dt>
+        <dd class="mb-3 min-w-0 wrap-anywhere sm:mb-0"><%= display($scan->{target}{partition}{name}) %></dd>
+        <dt class="text-slate-500"><%= l($scan->{removal} eq 'system_volume' ? 'volume_type' : 'disk_removal') %></dt>
+        <dd class="mb-3 min-w-0 wrap-anywhere sm:mb-0"><%= l($scan->{removal}) %></dd>
+        <dt class="text-slate-500"><%= l('serial_number') %></dt>
+        <dd class="mb-3 min-w-0 wrap-anywhere sm:mb-0"><%= display($scan->{target}{disk}{serial}) %></dd>
+        <dt class="text-slate-500"><%= l('wwn') %></dt>
+        <dd class="mb-3 min-w-0 wrap-anywhere sm:mb-0"><%= display($scan->{target}{disk}{wwn}) %></dd>
+        <dt class="text-slate-500"><%= l('syft_version') %></dt>
+        <dd class="mb-3 min-w-0 wrap-anywhere sm:mb-0"><%= display($scan->{syft_version}) %></dd>
+        <dt class="text-slate-500"><%= l('grype_version') %></dt>
+        <dd class="mb-3 min-w-0 wrap-anywhere sm:mb-0"><%= display($scan->{grype_version}) %></dd>
+        <dt class="text-slate-500"><%= l('input_sbom_sha256') %></dt>
+        <dd class="mb-3 min-w-0 font-mono text-xs wrap-anywhere sm:mb-0"><%= display($scan->{sbom_sha256}) %></dd>
+        <dt class="text-slate-500"><%= l('db_built') %></dt>
+        <dd class="mb-3 min-w-0 wrap-anywhere sm:mb-0"><%= date_time($db->{built}) %></dd>
+        <dt class="text-slate-500"><%= l('db_schema') %></dt>
+        <dd class="mb-3 min-w-0 wrap-anywhere sm:mb-0"><%= display($db->{schemaVersion}) %></dd>
+        <dt class="text-slate-500"><%= defined $db->{checksum} ? l('db_checksum') : l('db_source') %></dt>
+        <dd class="mb-3 min-w-0 wrap-anywhere sm:mb-0"><%= display($db->{checksum} // $db->{from}) %></dd>
+    </dl>
+</section>
+
+<section class="my-6 min-w-0 rounded-lg border border-slate-200 bg-white p-4 sm:p-6">
+    <h2 class="mb-5 text-lg font-semibold"><%= l('actions') %></h2>
+    <div class="flex flex-wrap items-center gap-2.5">
+        % for my $kind (qw(syft cdx grype metadata log)) {
+        % next unless $kind eq 'metadata' || $artifacts->{$kind};
+        <a class="inline-flex min-h-10 items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-2 font-medium text-slate-700 hover:bg-slate-100" href="/scans/<%= $scan->{id} %>/download/<%= $kind %>"><%= l('download_' . $kind) %></a>
+        % }
+        <button class="inline-flex min-h-10 cursor-pointer items-center justify-center rounded-md border border-red-700 bg-red-700 px-4 py-2 font-medium text-white enabled:hover:bg-red-800 disabled:cursor-not-allowed disabled:opacity-50" type="button" data-clear-cache hidden><%= l('clear_cache') %></button>
+        % if ($scan->{status} eq 'queued' || $scan->{status} eq 'running') {
+        <form method="post" action="/scans/<%= $scan->{id} %>/cancel">
+            %= csrf_field
+            <button class="inline-flex min-h-10 items-center justify-center rounded-md border border-red-700 bg-white px-4 py-2 font-medium text-red-700 cursor-pointer hover:bg-red-50" type="submit"><%= l('cancel_scan') %></button>
+        </form>
+        % }
+    </div>
+    % for my $kind (qw(packages matches)) {
+    % my $packages = $kind eq 'packages';
+    % my $artifact = $packages ? 'syft' : 'grype';
+    % my $build_state = $result_states->{$artifact} // {};
+    % my $building = ($build_state->{state} // '') eq 'running';
+    % my $can_build = $artifacts->{$artifact} && $scan->{status} ne 'running' && $scan->{status} ne 'queued';
+    % if ($can_build) {
+    <form class="mt-3 flex flex-wrap items-center gap-3" method="post" action="/scans/<%= $scan->{id} %>/results/<%= $artifact %>/rebuild" data-result-build="<%= $kind %>" data-build-status="<%= $building ? '/scans/' . $scan->{id} . '/results/' . $artifact . '/build?token=' . $build_state->{token} : '' %>">
+        %= csrf_field
+        <button class="cursor-pointer rounded-md border border-slate-300 px-3 py-2 text-sm hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50" type="submit"><%= l(($versions->{$artifact} ? 'rebuild_' : 'build_') . $kind) %></button>
+        <span class="text-sm text-slate-600" role="status" data-build-message><%= ($build_state->{state} // '') eq 'failed' ? l('build_failed') : '' %></span>
+        <progress class="w-24 accent-blue-600" data-build-progress aria-label="<%= l('building_label') %>" hidden></progress>
+    </form>
+    % }
+    % }
+    <p class="mt-4 text-slate-600" role="status" data-cache-status hidden></p>
+</section>

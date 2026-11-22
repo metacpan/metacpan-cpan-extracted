@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="<%= locale %>">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/mogura.css">
+    <script src="/i18n.js" data-messages="<%= locale_messages %>" defer></script>
+    <script src="/mogura.js" defer></script>
+    <script src="/results.js" defer></script>
+</head>
+<body class="bg-slate-50 font-sans text-sm leading-6 text-slate-900 scheme-light [&_:focus-visible]:outline-2 [&_:focus-visible]:outline-offset-2 [&_:focus-visible]:outline-blue-600">
+    % my $path = url_for->path->to_string;
+    <header class="border-b border-slate-200 bg-white">
+        <div class="mx-auto flex max-w-7xl flex-wrap items-center gap-x-8 gap-y-2 px-4 py-3 sm:px-6">
+            <span class="text-base font-semibold tracking-tight">Mogura</span>
+            <nav class="flex gap-1" aria-label="<%= l('main_navigation') %>">
+                <a class="rounded-md px-3 py-2 font-medium text-slate-600 hover:bg-slate-100 aria-[current=true]:bg-blue-50 aria-[current=true]:text-blue-700" href="/" aria-current="<%= $path eq '/' ? 'true' : 'false' %>"><%= l('scan') %></a>
+                <a class="rounded-md px-3 py-2 font-medium text-slate-600 hover:bg-slate-100 aria-[current=true]:bg-blue-50 aria-[current=true]:text-blue-700" href="/history" aria-current="<%= $path eq '/history' || $path =~ m{^/scans/} ? 'true' : 'false' %>"><%= l('history') %></a>
+            </nav>
+            <form class="ml-auto" method="get" action="<%= $path %>" data-language-form>
+                % my $query = url_with->query->clone;
+                % $query->remove('lang');
+                % my @parameters = @{$query->pairs};
+                % while (@parameters) {
+                % my ($name, $value) = splice @parameters, 0, 2;
+                <input type="hidden" name="<%= $name %>" value="<%= $value %>">
+                % }
+                <label class="sr-only" for="language"><%= l('language') %></label>
+                <select class="cursor-pointer rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-700" id="language" name="lang" data-language-select>
+                % for my $language (qw(en ja)) {
+                    <option value="<%= $language %>" lang="<%= $language %>" <%= locale eq $language ? 'selected' : '' %>><%= $language eq 'ja' ? '日本語' : 'English' %></option>
+                % }
+                </select>
+                <noscript><button class="ml-2 cursor-pointer rounded-md border border-slate-300 px-3 py-2" type="submit"><%= l('save') %></button></noscript>
+            </form>
+        </div>
+    </header>
+    <main class="mx-auto max-w-7xl px-4 py-8 sm:px-6"><%= content %></main>
+</body>
+</html>

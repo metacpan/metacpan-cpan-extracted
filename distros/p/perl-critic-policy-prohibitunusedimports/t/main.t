@@ -60,6 +60,8 @@ my %allowed = (
     'constant'              => qq{use constant PI => 3;\nmy \$x = 1;\n},
     'import tag'            => qq{use POSIX qw{:sys_wait_h};\nWNOHANG();\n},
     'ampersand call'        => qq{use List::Util qw{first};\n\&first;\n},
+    'import from Exporter'  => qq{use Exporter qw{import};\nour \@EXPORT_OK = qw{f};\n},
+    'unimport as well'      => qq{use Exporter qw{import unimport};\nmy \$x = 1;\n},
 );
 
 foreach my $case ( sort keys %allowed ) {

@@ -7,12 +7,29 @@
 #include "xs/descriptor_containers/by_name_map.h"
 #include "xs/descriptor_containers/by_number_map.h"
 
+static int desc_map_iter_cleanup(pTHX_ SV* sv, MAGIC* mg) {
+    PerlUpb_DescriptorMapIterator* iter = (PerlUpb_DescriptorMapIterator*)mg->mg_ptr;
+    if (iter) {
+        mg->mg_ptr = NULL;
+        if (!PL_dirty && iter->container_sv) {
+            SvREFCNT_dec(iter->container_sv);
+        }
+        safefree(iter);
+    }
+    return 0;
+}
+
+static MGVTBL desc_map_iter_vtbl = {
+    NULL, NULL, NULL, NULL, desc_map_iter_cleanup
+};
+
 SV* PerlUpb_DescriptorMapIterator_New(pTHX_ SV* container_sv) {
-    PerlUpb_DescriptorMapIterator* iter = (PerlUpb_DescriptorMapIterator*)malloc(sizeof(PerlUpb_DescriptorMapIterator));
+    PerlUpb_DescriptorMapIterator* iter = (PerlUpb_DescriptorMapIterator*)safemalloc(sizeof(PerlUpb_DescriptorMapIterator));
     iter->container_sv = newSVsv(container_sv);
     iter->index = 0;
 
-    SV* sv = newSViv((IV)iter);
+    SV* sv = newSViv(PTR2IV(iter));
+    sv_magicext(sv, NULL, PERL_MAGIC_ext, &desc_map_iter_vtbl, (const char*)iter, 0);
     SV* obj = newRV_noinc(sv);
     sv_bless(obj, gv_stashpv("Protobuf::Internals::DescriptorMapIterator", GV_ADD));
     return obj;
@@ -22,7 +39,8 @@ PerlUpb_DescriptorMapIterator* PerlUpb_DescriptorMapIterator_Get(pTHX_ SV* sv) {
     if (!sv || !SvROK(sv) || !sv_derived_from(sv, "Protobuf::Internals::DescriptorMapIterator")) {
         return NULL;
     }
-    return (PerlUpb_DescriptorMapIterator*)SvIV(SvRV(sv));
+    MAGIC* mg = mg_findext(SvRV(sv), PERL_MAGIC_ext, &desc_map_iter_vtbl);
+    return (mg && mg->mg_ptr) ? (PerlUpb_DescriptorMapIterator*)mg->mg_ptr : NULL;
 }
 
 SV* PerlUpb_DescriptorMapIterator_NextKey(pTHX_ SV* self) {
@@ -75,10 +93,13 @@ SV* PerlUpb_DescriptorMapIterator_NextValue(pTHX_ SV* self) {
 }
 
 void PerlUpb_DescriptorMapIterator_Free(pTHX_ SV* sv) {
-    PerlUpb_DescriptorMapIterator* iter = PerlUpb_DescriptorMapIterator_Get(aTHX_ sv);
-    if (iter) {
-        SvREFCNT_dec(iter->container_sv);
-        free(iter);
+    if (PL_dirty || !sv || !SvROK(sv) || !sv_derived_from(sv, "Protobuf::Internals::DescriptorMapIterator")) return;
+    MAGIC* mg = mg_findext(SvRV(sv), PERL_MAGIC_ext, &desc_map_iter_vtbl);
+    if (mg && mg->mg_ptr) {
+        PerlUpb_DescriptorMapIterator* iter = (PerlUpb_DescriptorMapIterator*)mg->mg_ptr;
+        mg->mg_ptr = NULL;
+        if (iter->container_sv) SvREFCNT_dec(iter->container_sv);
+        safefree(iter);
         sv_setiv(SvRV(sv), 0);
     }
 }

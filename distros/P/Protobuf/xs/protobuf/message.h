@@ -26,6 +26,11 @@ SV* PerlUpb_Message_GetArena(pTHX_ SV* message_sv);
 // Cross-process fingerprint for object identity
 SV* PerlUpb_Message_GetFingerprint(pTHX_ SV* message_sv);
 
+// Safe detach/attach registry helpers
+SV* PerlUpb_Message_Detach(pTHX_ SV* message_sv);
+SV* PerlUpb_Message_Attach(pTHX_ const char* class_name, SV* info_rv,
+                           SV* arena_sv);
+
 // Runtime XSUB generation for performance
 void PerlUpb_InstallFastAccessors(pTHX_ const char* perl_class,
                                   const upb_MessageDef* mdef);

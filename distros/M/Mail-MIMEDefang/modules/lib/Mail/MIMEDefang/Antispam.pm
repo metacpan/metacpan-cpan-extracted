@@ -10,7 +10,7 @@ Mail::MIMEDefang::Antispam - antispam related methods for email filters
 =head1 DESCRIPTION
 
 Mail::MIMEDefang::Antispam are a set of methods that can be called
-from F<mimedefang-filter> to check email messages with antispam softwares.
+from F<mimedefang-filter> to check email messages with antispam software.
 
 =head1 METHODS
 
@@ -147,6 +147,9 @@ sub spam_assassin_status {
 =item spam_assassin_init
 
 Initialize Apache SpamAssassin and returns a C<Mail::SpamAssassin> object.
+The config file path should be absolute: filter callbacks run from
+the per-message working directory, so a relative path is unlikely to
+be found. A warning is logged if the config file cannot be read.
 
 =cut
 
@@ -168,7 +171,11 @@ sub spam_assassin_init {
     }
 
     if (!defined($SASpamTester)) {
-        if (!defined($config)) {
+        if (defined($config)) {
+            # SpamAssassin silently ignores a missing prefs file.
+            md_syslog('warning', "SpamAssassin config file $config is not readable, ignoring it")
+                unless -r $config;
+        } else {
             if (-r $Features{'Path:CONFDIR'} . '/sa-mimedefang.cf') {
                 $config = $Features{'Path:CONFDIR'} . '/sa-mimedefang.cf';
             } elsif (-r $Features{'Path:CONFDIR'} . '/spamassassin/sa-mimedefang.cf') {
@@ -307,7 +314,7 @@ sub md_spamc_init {
 
 =item md_spamc_check
 
-Method that scans the message using SpamAssassin Perl client and returns an array of four elemets:
+Method that scans the message using SpamAssassin Perl client and returns an array of four elements:
 
 =over 4
 
@@ -382,7 +389,7 @@ sub md_spamc_check {
 
 =item rspamd_check
 
-Method that scans the message using Rspamd and returns an array of six elemets:
+Method that scans the message using Rspamd and returns an array of six elements:
 
 =over 4
 

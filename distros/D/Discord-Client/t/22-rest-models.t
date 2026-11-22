@@ -205,6 +205,21 @@ T2->subtest(
 );
 
 T2->subtest(
+    'channel obfuscation is identified by its flag',
+    sub {
+
+        # The bit can be combined with other flags, and a visible channel can have the placeholder name.
+        my $flagged = Discord::Client::Model->wrap( channel => { id => '2', flags => ( 1 << 17 ) | 16 } );
+        my $unflagged =
+            Discord::Client::Model->wrap( channel => { id => '2', flags => 16, name => '___hidden___' } );
+        my $partial = Discord::Client::Model->wrap( channel => { id => '2' } );
+        T2->ok( $flagged->is_obfuscated, 'flag set alongside another bit' );
+        T2->ok( !$unflagged->is_obfuscated, 'other flags and placeholder name do not indicate obfuscation' );
+        T2->ok( !$partial->is_obfuscated, 'absent flags report no obfuscation' );
+    }
+);
+
+T2->subtest(
     'channel send returns a message snapshot',
     sub {
         my ( $rest, $http ) = client();

@@ -1,15 +1,16 @@
 ---
-abstract: 'API client for Moodle'
+abstract: 'Client API and CLI for Moodle Web Services'
 author:
-  - 'Andrew Solomon'
+  - 'Andrew Solomon <andrew@geekuni.com>'
 build_requires:
+  HTTP::Response: '0'
   Test::More: '0'
-  perl: '5.010'
+  perl: v5.10.0
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.010'
+  perl: v5.10.0
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.040, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,32 +19,31 @@ name: WebService-Moodle-Simple
 provides:
   WebService::Moodle::Simple:
     file: lib/WebService/Moodle/Simple.pm
-    version: '0.06'
+    version: '0.07'
   WebService::Moodle::Simple::CLI:
     file: lib/WebService/Moodle/Simple/CLI.pm
-    version: '0.06'
+    version: '0.07'
   WebService::Moodle::Simple::CLI::add_user:
     file: lib/WebService/Moodle/Simple/CLI/add_user.pm
-    version: '0.06'
+    version: '0.07'
   WebService::Moodle::Simple::CLI::check_password:
     file: lib/WebService/Moodle/Simple/CLI/check_password.pm
-    version: '0.06'
+    version: '0.07'
   WebService::Moodle::Simple::CLI::enrol:
     file: lib/WebService/Moodle/Simple/CLI/enrol.pm
-    version: '0.06'
+    version: '0.07'
   WebService::Moodle::Simple::CLI::get_user:
     file: lib/WebService/Moodle/Simple/CLI/get_user.pm
-    version: '0.06'
+    version: '0.07'
   WebService::Moodle::Simple::CLI::set_password:
     file: lib/WebService/Moodle/Simple/CLI/set_password.pm
-    version: '0.06'
+    version: '0.07'
   WebService::Moodle::Simple::CLI::suspend:
     file: lib/WebService/Moodle/Simple/CLI/suspend.pm
-    version: '0.06'
+    version: '0.07'
 requires:
   Data::Dump: '0'
   FindBin: '0'
-  HTTP::Request: '0'
   JSON: '0'
   LWP::UserAgent: '0'
   List::Util: '0'
@@ -55,11 +55,15 @@ requires:
   feature: '0'
   lib: '0'
   namespace::clean: '0'
-  perl: '5.010'
+  perl: v5.10.0
   strict: '0'
   warnings: '0'
-version: '0.06'
+resources:
+  homepage: https://github.com/andrewsolomon/WebService-Moodle-Simple
+  repository: https://github.com/andrewsolomon/WebService-Moodle-Simple.git
+version: '0.07'
 x_contributors:
-  - 'Andrew Solomon <andrew@geekuni.com>'
   - 'Andrew Solomon <andrew@illywhacker.net>'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_generated_by_perl: v5.40.1
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

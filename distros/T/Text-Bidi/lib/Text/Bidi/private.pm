@@ -1,5 +1,5 @@
 package Text::Bidi::private;
-$Text::Bidi::private::VERSION = '3.02';
+$Text::Bidi::private::VERSION = '3.03';
 use 5.010;
 use strict;
 use warnings;
@@ -255,7 +255,7 @@ Text::Bidi::private - Private FFI bindings for FriBidi
 
 =head1 VERSION
 
-version 3.02
+version 3.03
 
 =head1 DESCRIPTION
 

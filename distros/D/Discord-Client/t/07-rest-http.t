@@ -1,6 +1,8 @@
 use v5.26;
 use warnings;
 use Test2::V1;
+use lib 't/lib';
+use TestDiscordLoop qw(await_future);
 use Future;
 use IO::Async::Loop;
 use IO::Async::Listener;
@@ -124,13 +126,5 @@ T2->done_testing;
 
 sub await_http {
     my ( $future, $description ) = @_;
-
-    # Bound broken I/O and shutdown independently of the controlled adapter deadline.
-    my $watchdog = $loop->timeout_future( after => 5 );
-    $loop->await( Future->wait_any( $future, $watchdog ) );
-    $watchdog->cancel unless $watchdog->is_ready;
-
-    # wait_any cancels the losing Future, so its readiness alone cannot prove completion.
-    die "Timed out waiting for $description\n" if $watchdog->is_failed;
-    return $future;
+    return await_future( $loop, $future, $description );
 }

@@ -15,8 +15,33 @@
 #include <string_view>
 namespace absl {
 using string_view = std::string_view;
+
+namespace internal_strcat {
+inline void AppendPiece(std::string* out, string_view piece) {
+  out->append(piece.data(), piece.size());
+}
+}  // namespace internal_strcat
+
+template <typename... Pieces>
+inline std::string StrCat(const Pieces&... pieces) {
+  std::string out;
+  size_t total = 0;
+  ((total += string_view(pieces).size()), ...);
+  out.reserve(total);
+  (internal_strcat::AppendPiece(&out, string_view(pieces)), ...);
+  return out;
+}
+
+template <typename... Pieces>
+inline void StrAppend(std::string* out, const Pieces&... pieces) {
+  size_t add = 0;
+  ((add += string_view(pieces).size()), ...);
+  out->reserve(out->size() + add);
+  (internal_strcat::AppendPiece(out, string_view(pieces)), ...);
+}
 }  // namespace absl
 #else
+#include "third_party/absl/strings/str_cat.h"
 #include "third_party/absl/strings/string_view.h"
 #endif
 

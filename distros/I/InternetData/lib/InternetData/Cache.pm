@@ -6,7 +6,7 @@ use warnings;
 use Scalar::Util ();
 use Time::HiRes ();
 
-our $VERSION = '1.17.1';
+our $VERSION = '1.18.0';
 
 # A node is [key, value, expires_at, older, newer]. The hash finds a node, the
 # links order them by recency, so a get, a set and an eviction are each O(1). A
@@ -69,7 +69,7 @@ sub expiry {
     return $node ? $node->[EXPIRES] : undef;
 }
 
-# A reduced answer, a spent trial's or a reached cap's, ends with a new UTC day
+# A reduced answer, a spent trial's or a reached cap's, ends with a new UTC month
 # or a raised cap, so it stays a minute at most rather than the TTL. It is still
 # cached, or a busy process would send every repeat of an address to the API.
 sub _life_of {

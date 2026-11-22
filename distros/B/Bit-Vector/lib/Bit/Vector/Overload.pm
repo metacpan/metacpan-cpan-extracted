@@ -24,7 +24,7 @@ require Exporter;
 
 @EXPORT_OK = qw();
 
-$VERSION = '7.4';
+$VERSION = '7.5';
 
 package Bit::Vector;
 

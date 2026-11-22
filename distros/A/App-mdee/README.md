@@ -54,7 +54,7 @@ mdee - em·dee, Markdown Easy on the Eyes
 
 # VERSION
 
-Version 1.23
+Version 1.25
 
 # DESCRIPTION
 
@@ -355,8 +355,9 @@ Use [tecolicom/tap](https://github.com/tecolicom/homebrew-tap):
     sent to nup to be kept intact, not folded (see `--intact` of
     [ansicolumn(1)](https://metacpan.org/pod/App%3A%3Aansicolumn)); `--cat-v` does not do it, and
     the table width is the fold width there.  Columns that fit keep
-    their width, and the cells of over-wide columns are wrapped.  A
-    table that already fits is not changed.  Use `--config
+    their width, and the cells of over-wide columns are wrapped.  A cell
+    has no space at its right, so the text of the last column goes up to
+    the end of the width (see `table_gap` in `--table-style`).  Use `--config
     table_width=0` to disable wrapping, or `--config table_width=N` to
     use a different width.  Per-column
     widths can be given with `--config table_cell=SPEC`, where SPEC
@@ -402,29 +403,38 @@ Use [tecolicom/tap](https://github.com/tecolicom/homebrew-tap):
     between the columns, `│` or `|` depending on `--rule`.  `pipe` is
     another name of it, kept for compatibility:
 
-         Left │ Center │ Right │ Default
-        ──────┼────────┼───────┼─────────
-         a    │   b    │     c │ d
+         Left│ Center│ Right│ Default
+        ─────┼───────┼──────┼────────
+         a   │   b   │     c│ d
 
     `3line` separates the columns by spaces only and draws three rules: a
     rule the width of the table above and below it, and a rule per column
     below the header.
 
-        ─────────────────────────────────
-         Left   Center   Right   Default
-        ────── ──────── ─────── ─────────
-         a        b          c   d
-        ─────────────────────────────────
+        ─────────────────────────────
+         Left  Center  Right  Default
+        ───── ─────── ────── ────────
+         a       b         c  d
+        ─────────────────────────────
 
     `simple` also separates the columns by spaces only, and draws the
     rule per column below the header and below the table.
 
-         Left   Center   Right   Default
-        ────── ──────── ─────── ─────────
-         a        b          c   d
-        ────── ──────── ─────── ─────────
+         Left  Center  Right  Default
+        ───── ─────── ────── ────────
+         a       b         c  d
+        ───── ─────── ────── ────────
 
     The rules are drawn with `-` with `--no-rule`.
+
+    In every style a cell has a space at its left, where the marks of
+    `--table-wrap-mark` and `--table-cell-mark` are put, and no space at
+    its right.  `--config table_gap=N` sets the number of columns between
+    the text of a cell and that place of the next column (default 1): the
+    last of them is the column separator, and the others are spaces at the
+    right of the cell.  With `table_gap=2` a cell of `lattice` has a
+    space on both sides; the spaces at the right end of the table are then
+    left out when the table does not fit the width with them.
 
 - **--cat-v**
 

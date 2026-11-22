@@ -18,7 +18,7 @@ IO::Socket::SSL::set_ctx_defaults(
      verify_mode => 0,
 );
 
-our $VERSION = '1.29.0';
+our $VERSION = '1.32.0';
 
 =head1 NAME
 
@@ -27,7 +27,7 @@ WebService::Browshot - Perl extension for Browshot (L<https://browshot.com/>), a
 =head1 SYNOPSIS
 
   use WebService::Browshot;
-  
+
   my $browshot = WebService::Browshot->new(key => 'my_key');
   my $screenshot = $browshot->screenshot_create(url => 'http://www.google.com/');
   [...]
@@ -47,8 +47,6 @@ The source code is available on github at L<https://github.com/juliensobrier/bro
 
 
 =head1 METHODS
-
-=over 4
 
 =head2 new()
 
@@ -295,6 +293,34 @@ sub browser_info  {
 
 Request a screenshot. See L<http://browshot.com/api/documentation#screenshot_create> for the response format.
 Note: by default, screenshots are cached for 24 hours. You can tune this value with the cache=X parameter.
+
+API 1.32 capture options are accepted as named arguments without conversion:
+C<pdf>, C<pdf_format>, C<pdf_background>, C<pdf_landscape>, C<pdf_one_page>,
+C<pdf_margin>, C<pdf_margin_top>, C<pdf_margin_bottom>, C<pdf_margin_left>,
+C<pdf_margin_right>, C<video>, C<video_format>, C<video_duration>,
+C<video_quality>, C<video_fps>, C<video_scale>, C<device_scale>, and C<hide_ads>.
+These options also work with C<screenshot_multiple()>, C<batch_create()>, and
+C<crawl_create()>.
+
+Use C<pdf =E<gt> 1> to generate a PDF (1 additional credit), or
+C<video =E<gt> 1> to record WebM, MP4, or animated GIF with
+C<video_format =E<gt> 'webm'>, C<'mp4'>, or C<'gif'>. WebM is the default.
+C<video_duration> is 1-30 seconds (default 15); video adds 1 credit per started
+5 seconds of requested duration, for every format. PDF and video require a paid
+Chrome-based instance. Wait for C<status> to be C<finished> before downloading.
+
+C<device_scale =E<gt> 2> enables retina screenshots and C<hide_ads =E<gt> 1>
+enables ad blocking, without an additional charge. Retina cannot be combined
+with video. For additional countries, select the appropriate C<instance_id>
+from C<instance_list()>; do not relocate an instance with a country override.
+For example, instance 373 is Chrome in France and 377 is Chrome in India.
+
+  my $screenshot = $browshot->screenshot_create(
+    url => 'https://example.org/', instance_id => 373,
+    pdf => 1, pdf_format => 'a4', device_scale => 2, hide_ads => 1,
+  );
+
+See L<https://browshot.com/api/documentation> for option defaults and limits.
 
 Arguments:
 
@@ -640,6 +666,126 @@ sub screenshot_html {
 	return $self->return_string(action => 'screenshot/html', parameters => { %args });
 }
 
+=head2 screenshot_pdf()
+
+  my $pdf = $browshot->screenshot_pdf(id => 12345);
+
+Retrieve the PDF generated with C<pdf =E<gt> 1>.
+Wait until C<screenshot_info()> reports C<status =E<gt> 'finished'>.
+Returns the raw file bytes, or an empty string on failure with C<last_error>
+set. Downloading does not cost additional credits.
+See L<https://browshot.com/api/documentation#screenshot_pdf>.
+
+Arguments:
+
+=over 4
+
+=item id
+
+Required. Screenshot ID belonging to your account.
+
+=back
+
+=cut
+
+sub screenshot_pdf {
+	my ($self, %args) 	= @_;
+	return $self->error("Missing id in screenshot_pdf") if (! defined($args{id}) || $args{id} eq '');
+
+	return $self->return_binary(action => 'screenshot/pdf', parameters => { %args }, content_type => qr{^application/pdf(?:\s*;|\s*$)}i);
+}
+
+=head2 screenshot_pdf_file()
+
+  $browshot->screenshot_pdf_file(id => 12345, file => '/tmp/capture.pdf');
+
+Retrieve the PDF and save it in binary mode. Missing parent
+directories are created as with C<screenshot_thumbnail_file()>.
+Returns the file name on success, or an empty string on failure with
+C<last_error> set. Failed API responses are not saved as files.
+
+Arguments:
+
+=over 4
+
+=item id
+
+Required. Screenshot ID belonging to your account.
+
+=item file
+
+Required. Local file name to write to. Use the extension for the recorded format.
+
+=back
+
+=cut
+
+sub screenshot_pdf_file {
+	my ($self, %args) 	= @_;
+
+	return $self->save_binary(method => 'screenshot_pdf', parameters => { %args });
+}
+
+=head2 screenshot_video()
+
+  my $video = $browshot->screenshot_video(id => 12345);
+
+Retrieve the WebM or MP4 video, or animated GIF generated with C<video =E<gt> 1>.
+Wait until C<screenshot_info()> reports C<status =E<gt> 'finished'>.
+Returns the raw file bytes, or an empty string on failure with C<last_error>
+set. Downloading does not cost additional credits.
+See L<https://browshot.com/api/documentation#screenshot_video>.
+
+Arguments:
+
+=over 4
+
+=item id
+
+Required. Screenshot ID belonging to your account.
+
+=back
+
+=cut
+
+sub screenshot_video {
+	my ($self, %args) 	= @_;
+	return $self->error("Missing id in screenshot_video") if (! defined($args{id}) || $args{id} eq '');
+
+	return $self->return_binary(action => 'screenshot/video', parameters => { %args }, content_type => qr{^(?:video/(?:webm|mp4)|image/gif)(?:\s*;|\s*$)}i);
+}
+
+=head2 screenshot_video_file()
+
+  $browshot->screenshot_video_file(id => 12345, file => '/tmp/capture.webm');
+
+Retrieve the WebM or MP4 video, or animated GIF and save it in binary mode. Missing parent
+directories are created as with C<screenshot_thumbnail_file()>.
+Returns the file name on success, or an empty string on failure with
+C<last_error> set. Failed API responses are not saved as files.
+
+Arguments:
+
+=over 4
+
+=item id
+
+Required. Screenshot ID belonging to your account.
+
+=item file
+
+Required. Local file name to write to. Use the extension for the recorded format.
+
+=back
+
+=cut
+
+sub screenshot_video_file {
+	my ($self, %args) 	= @_;
+
+	return $self->save_binary(method => 'screenshot_video', parameters => { %args });
+}
+
 =head2 screenshot_multiple()
 
   $browshot->screenshot_multiple(urls => ['http://mobilito.net/'], instances => [22, 30])
@@ -803,6 +949,43 @@ sub account_info {
 
 # Private methods
 
+sub return_binary {
+	my ($self, %args) 	= @_;
+	my $url	= $self->make_url(%args);
+	my $res;
+
+	eval { $res = $self->{_ua}->get($url); };
+	return $self->error("Cannot retrieve $args{action}") if ($@ || ! defined($res));
+	return $self->error("Server sent back an error: " . $res->code) if (! $res->is_success);
+	return $self->error("Unexpected content type in $args{action}") if (($res->header('Content-Type') || '') !~ $args{content_type});
+
+	my $content;
+	eval { $content = $res->decoded_content(charset => 'none'); };
+	return $self->error("No file retrieved from $args{action}") if ($@ || ! defined($content) || $content eq '');
+	return $content;
+}
+
+sub save_binary {
+	my ($self, %args) 	= @_;
+	my %parameters	= %{$args{parameters}};
+	my $method	= $args{method};
+	my $file	= delete $parameters{file};
+	return $self->error("Missing file in ${method}_file") if (! defined($file) || $file eq '');
+	return $self->error("You must specify a file path, not a folder, to save the file") if (-d $file);
+
+	my $content = $self->$method(%parameters);
+	return '' if ($content eq '');
+	my $dir = dirname($file);
+	eval { make_path($dir) if (! -d $dir); };
+	return $self->error("Cannot create directory $dir") if ($@);
+	open my $target, '>', $file or return $self->error("Cannot open $file for writing: $!");
+	binmode $target;
+	my $written = print {$target} $content;
+	my $closed = close $target;
+	return $self->error("Cannot write $file: $!") if (! $written || ! $closed);
+	return $file;
+}
+
 sub return_string {
 	my ($self, %args) 	= @_;
 
@@ -960,6 +1143,11 @@ sub generic_error {
 =head1 CHANGES
 
 =over 4
+
+=item 1.32.0
+
+API 1.32. Add C<screenshot_pdf>, C<screenshot_pdf_file>, C<screenshot_video>,
+and C<screenshot_video_file>. Document new capture options and native instance IDs.
 
 =item 1.24.0
 

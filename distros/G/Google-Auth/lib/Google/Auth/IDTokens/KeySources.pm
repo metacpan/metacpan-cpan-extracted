@@ -55,6 +55,7 @@ sub new {
     id        => $params->{id}        // undef,
     key       => $params->{key}       // undef,
     algorithm => $params->{algorithm} // undef,
+    key_type  => $params->{key_type}  // undef,
   }, $class;
   return $self;
 }
@@ -78,6 +79,12 @@ sub key { return $_[0]->{key} }
 sub algorithm { return $_[0]->{algorithm} }
 
 ##
+# The public key family (`RSA` or `EC`).
+# @return [String]
+#
+sub key_type { return $_[0]->{key_type} }
+
+##
 # Create a KeyInfo from a single JWK, which may be given as either a
 # hash or an unparsed JSON string.
 #
@@ -92,17 +99,18 @@ sub from_jwk {
 
   my $instance = ref $self ? $self : $self->new();
 
-  if ($jwk->{kty} eq 'RSA') {
+  if (!defined $jwk->{kty}) {
+    die 'Key type not found';
+  } elsif ($jwk->{kty} eq 'RSA') {
     $instance->{key} = $instance->extract_rsa_key($jwk);
   } elsif ($jwk->{kty} eq 'EC') {
     $instance->{key} = $instance->extract_ec_key($jwk);
-  } elsif (!defined $jwk->{kty}) {
-    die 'Key type not found';
   } else {
     die 'Cannot use key type ' . $jwk->{kty};
   }
   $instance->{id}        = $jwk->{kid};
   $instance->{algorithm} = $jwk->{alg};
+  $instance->{key_type}  = $jwk->{kty};
 
   return $instance;
 }
@@ -278,7 +286,7 @@ sub new {
   if (exists $ENV{TESTING} && $ENV{TESTING}) {
     $self->{ua} = $KeySourcesTest::useragent;
   } else {
-    $self->{ua} = HTTP::Tiny->new(timeout => 10);
+    $self->{ua} = HTTP::Tiny->new(timeout => 10, verify_SSL => 1);
   }
 
   return $self;
@@ -389,9 +397,11 @@ sub interpret_json {
     my $pubkey = Google::Auth::load_pubkey_from_x509_cert($data->{$_});
     die "Failed to load X509 certificate for key $_" unless defined $pubkey;
     Google::Auth::IDTokens::KeyInfo->new({
-        id        => $_,
-        key       => $pubkey,
-        algorithm => $self->{algorithm}});
+      id        => $_,
+      key       => $pubkey,
+      algorithm => $self->{algorithm},
+      key_type  => 'RSA'
+    });
   } sort keys %$data;
 }
 
@@ -429,7 +439,7 @@ sub interpret_json {
 # The URI from which to download keys.
 # @return [Array<KeyInfo>]
 #
-sub uri { return $_[0]->SUPER->uri }
+sub uri { return $_[0]->SUPER::uri }
 
 package Google::Auth::IDTokens::AggregateKeySource;
 ##

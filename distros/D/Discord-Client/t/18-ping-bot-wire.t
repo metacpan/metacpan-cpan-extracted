@@ -9,6 +9,7 @@ use JSON::PP;
 use Net::Async::WebSocket::Server;
 use Discord::Client::REST;
 use lib 't/lib';
+use TestDiscordLoop qw(await_future);
 use TestDiscordTLS qw(certificate_directory);
 use TestDiscordExamples qw(load_example);
 
@@ -170,7 +171,7 @@ my $bot = load_example(
     on_error => sub { push @errors, $_[0] }
 );
 my $started = $bot->start;
-$loop->await( Future->wait_any( $done, $loop->timeout_future( after => 5 ) ) );
+await_future( $loop, $done, 'bot interaction reply' );
 T2->ok( $started->is_done && $done->is_done,
     'documented example handles slash and button over actual REST/TLS Gateway' );
 T2->is( $bot->interactions->stats->{handled}, 2, 'both handlers and acknowledgements complete' );

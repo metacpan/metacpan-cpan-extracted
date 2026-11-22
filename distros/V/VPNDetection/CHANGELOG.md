@@ -2,6 +2,17 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 3.3.2 are described by their release commits.
 
+## 3.18.0 - 2026-11-22
+
+### Features
+
+- Re-pin the spec to 2026.11.21: is_bot and bot, and the AS's required members ([`5eff463`](https://github.com/vpndetection-io/sdk-perl/commit/5eff4634eda6858165821e26bb384dd736767b7d))
+- Read is_bot and bot on every answer ([`cb62cb2`](https://github.com/vpndetection-io/sdk-perl/commit/cb62cb29e661ad5e65b9eda584260277493fa2eb))
+
+### Fixes
+
+- Require the AS's country and RPKI status in every answer ([`d1b5ce7`](https://github.com/vpndetection-io/sdk-perl/commit/d1b5ce722d72df2dcbbb6e785dd75a472160a56e))
+
 ## 3.17.0 - 2026-11-20
 
 ### Features

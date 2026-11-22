@@ -204,6 +204,9 @@ struct Affix {
     const infix_type * unwrapped_ret_type;  // Pre-unwrapped for OP_RET_PTR
     Affix_Pull ret_pull_handler;            ///< Cached handler for marshalling the return value.
     Affix_Opcode ret_opcode;                ///< Optimized return opcode.
+    XSUBADDR_t fast_xsub;                   ///< Specialized monolithic XSUB, or nullptr for generic dispatch.
+    bool maybe_lazy_args;                   ///< True when an argument can carry lazy aggregate magic.
+    bool all_plain_scalars;                 ///< True when every argument is a primitive pass-by-value.
     bool ret_readonly;                      ///< Should the returned aggregate prevent perl-side mutations?
     void ** c_args;
 

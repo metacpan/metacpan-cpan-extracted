@@ -10,6 +10,7 @@ typedef struct {
     upb_DefPool* pool;
     bool frozen;
     bool poisoned;
+    bool owned;
 } PerlUpb_DescriptorPool;
 
 static upb_DefPool *generated_pool_ptr = NULL;
@@ -19,6 +20,7 @@ void* PerlUpb_DescriptorPool_CreateRaw(pTHX) {
     p->pool = upb_DefPool_New();
     p->frozen = false;
     p->poisoned = false;
+    p->owned = true;
     if (!p->pool) {
         safefree(p);
         croak("Failed to create upb_DefPool");
@@ -30,7 +32,7 @@ void PerlUpb_DescriptorPool_DestroyRaw(pTHX_ void* ptr) {
     if (PL_dirty) return;
     PerlUpb_DescriptorPool* p = (PerlUpb_DescriptorPool*)ptr;
     if (p) {
-        if (p->pool && p->pool != generated_pool_ptr) {
+        if (p->owned && p->pool && p->pool != generated_pool_ptr) {
             PerlUpb_ObjCache_Delete(aTHX_ p->pool);
             upb_DefPool_Free(p->pool);
         }
@@ -38,23 +40,56 @@ void PerlUpb_DescriptorPool_DestroyRaw(pTHX_ void* ptr) {
     }
 }
 
+static int pool_cleanup(pTHX_ SV* sv, MAGIC* mg) {
+    if (PL_dirty) return 0;
+    void* ptr = (void*)mg->mg_ptr;
+    if (ptr) {
+        mg->mg_ptr = NULL;
+        PerlUpb_DescriptorPool_DestroyRaw(aTHX_ ptr);
+    }
+    return 0;
+}
+
+static MGVTBL pool_vtbl = {
+    NULL, NULL, NULL, NULL, pool_cleanup
+};
+
+void PerlUpb_DescriptorPool_AttachMagic(pTHX_ SV* self, void* raw, bool owned) {
+    if (!self || !SvROK(self) || !raw) return;
+    SV* rv = SvRV(self);
+    if (!rv || SvTYPE(rv) != SVt_PVHV) return;
+    PerlUpb_DescriptorPool* p = (PerlUpb_DescriptorPool*)raw;
+    p->owned = owned;
+    MAGIC* mg = mg_findext(rv, PERL_MAGIC_ext, &pool_vtbl);
+    if (mg) {
+        mg->mg_ptr = (char*)raw;
+    } else {
+        sv_magicext(rv, NULL, PERL_MAGIC_ext, &pool_vtbl, (const char*)raw, 0);
+    }
+}
+
+static inline PerlUpb_DescriptorPool* _get_wrapper_raw(pTHX_ SV* pool_sv) {
+    if (!pool_sv || !SvROK(pool_sv) || !sv_isa(pool_sv, "Protobuf::DescriptorPool")) return NULL;
+    SV* rv = SvRV(pool_sv);
+    if (!rv || SvTYPE(rv) != SVt_PVHV) return NULL;
+    MAGIC* mg = mg_findext(rv, PERL_MAGIC_ext, &pool_vtbl);
+    if (!mg || !mg->mg_ptr) return NULL;
+    return (PerlUpb_DescriptorPool*)mg->mg_ptr;
+}
+
 void PerlUpb_DescriptorPool_Freeze(pTHX_ SV* sv) {
     const upb_DefPool* pool = PerlUpb_DescriptorPool_GetPool(aTHX_ sv);
     if (pool) {
-        SV* rv = SvRV(sv);
-        SV** svp = hv_fetch((HV*)rv, "_pool_ptr", 9, 0);
-        PerlUpb_DescriptorPool* p = INT2PTR(PerlUpb_DescriptorPool*, SvIV(*svp));
-        p->frozen = true;
+        PerlUpb_DescriptorPool* p = _get_wrapper_raw(aTHX_ sv);
+        if (p) p->frozen = true;
     }
 }
 
 bool PerlUpb_DescriptorPool_IsFrozen(pTHX_ SV* sv) {
     const upb_DefPool* pool = PerlUpb_DescriptorPool_GetPool(aTHX_ sv);
     if (pool) {
-        SV* rv = SvRV(sv);
-        SV** svp = hv_fetch((HV*)rv, "_pool_ptr", 9, 0);
-        PerlUpb_DescriptorPool* p = INT2PTR(PerlUpb_DescriptorPool*, SvIV(*svp));
-        return p->frozen;
+        PerlUpb_DescriptorPool* p = _get_wrapper_raw(aTHX_ sv);
+        return p ? p->frozen : false;
     }
     return false;
 }
@@ -63,6 +98,7 @@ SV* PerlUpb_DescriptorPool_New(pTHX) {
     PerlUpb_DescriptorPool* raw = (PerlUpb_DescriptorPool*)PerlUpb_DescriptorPool_CreateRaw(aTHX);
     HV* hv = newHV();
     hv_store(hv, "_pool_ptr", 9, newSViv(PTR2IV(raw)), 0);
+    sv_magicext((SV*)hv, NULL, PERL_MAGIC_ext, &pool_vtbl, (const char*)raw, 0);
 
     SV* obj = newRV_noinc((SV*)hv);
     sv_bless(obj, gv_stashpv("Protobuf::DescriptorPool", GV_ADD));
@@ -79,29 +115,20 @@ SV* PerlUpb_DescriptorPool_GetWrapper(pTHX_ const upb_DefPool* pool) {
         return cached;
     }
 
-    // If it's not cached, it's likely the generated pool or we're wrapping a pointer from C.
-    // For now, we'll create a new wrapper.
     HV* hv = newHV();
     PerlUpb_DescriptorPool* p = (PerlUpb_DescriptorPool*)safemalloc(sizeof(PerlUpb_DescriptorPool));
     p->pool = (upb_DefPool*)pool;
     p->frozen = false;
     p->poisoned = false;
+    p->owned = false;
     hv_store(hv, "_pool_ptr", 9, newSViv(PTR2IV(p)), 0);
+    sv_magicext((SV*)hv, NULL, PERL_MAGIC_ext, &pool_vtbl, (const char*)p, 0);
 
     SV* obj = newRV_noinc((SV*)hv);
     sv_bless(obj, gv_stashpv("Protobuf::DescriptorPool", GV_ADD));
 
     PerlUpb_ObjCache_Add(aTHX_ pool, obj);
     return obj;
-}
-
-static inline PerlUpb_DescriptorPool* _get_wrapper_raw(pTHX_ SV* pool_sv) {
-    if (!pool_sv || !SvROK(pool_sv)) return NULL;
-    SV* rv = SvRV(pool_sv);
-    if (SvTYPE(rv) != SVt_PVHV) return NULL;
-    SV** svp = hv_fetch((HV*)rv, "_pool_ptr", 9, 0);
-    if (!svp || !SvIOK(*svp)) return NULL;
-    return INT2PTR(PerlUpb_DescriptorPool*, SvIV(*svp));
 }
 
 void PerlUpb_DescriptorPool_Poison(pTHX_ SV* pool_sv) {
@@ -132,13 +159,15 @@ void PerlUpb_DescriptorPool_Free(pTHX_ SV* sv) {
     }
 
     SV* rv = SvRV(sv);
-    if (SvTYPE(rv) != SVt_PVHV) return;
+    if (!rv || SvTYPE(rv) != SVt_PVHV) return;
 
-    SV** svp = hv_fetch((HV*)rv, "_pool_ptr", 9, 0);
-    if (svp && SvIOK(*svp)) {
-        void* ptr = INT2PTR(void*, SvIV(*svp));
+    MAGIC* mg = mg_findext(rv, PERL_MAGIC_ext, &pool_vtbl);
+    if (mg && mg->mg_ptr) {
+        void* ptr = (void*)mg->mg_ptr;
+        mg->mg_ptr = NULL;
         PerlUpb_DescriptorPool_DestroyRaw(aTHX_ ptr);
-        sv_setiv(*svp, 0);
+        SV** svp = hv_fetch((HV*)rv, "_pool_ptr", 9, 0);
+        if (svp) sv_setiv(*svp, 0);
     }
 }
 

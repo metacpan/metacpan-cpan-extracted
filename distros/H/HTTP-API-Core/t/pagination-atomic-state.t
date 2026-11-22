@@ -138,7 +138,7 @@ sub error_from {
         client => $client, path => '/loop',
     );
     like error_from(sub { $pager->next }),
-        qr/pagination continuation repeated: url:\/loop/,
+        qr/pagination continuation repeated: url/,
         'initial self-loop is rejected';
     is_deeply scalar($pager->all), [1, 2],
         'corrected loop metadata may be retried without stale page data';

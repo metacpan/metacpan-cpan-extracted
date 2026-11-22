@@ -31,6 +31,8 @@ subtest 'an ordinary public address, an AS and a domain without a key' => sub {
 
     my $result = $client->lookup('1.1.1.1');
     is($result->has('is_anycast'), 1, 'is_anycast is on every answer');
+    is($result->has('is_bot'), 1, 'is_bot is on every answer');
+    is($result->has('bot'), 0, 'and the bot detail is paid');
     is($result->has('is_hosting'), 0, 'the hosting flag is ABSENT without a key');
     is($result->is_hosting, undef, 'so it reads as undef, not as false');
     is($result->is_hosting // 0, 0, 'and as false only when you ask for that');

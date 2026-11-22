@@ -1,5 +1,18 @@
 Revision history for Perl distribution Text-Balanced.
 
+2.08 2026-11-21
+
+    - Fix quadratic time complexity (DoS) in extract_multiple when processing
+      input containing no matched fields.  _update_patvalid was called with the
+      entire growing unmatched prefix on each step; it now receives only a short
+      tail, since it only inspects the end of the string.
+
+    - Fix unbounded memory use (DoS) when extract_codeblock or extract_tagged is
+      called with deeply nested or maliciously crafted input.  _match_codeblock
+      and _match_tagged now enforce a recursion depth limit via the new
+      $Text::Balanced::MAX_DEPTH package variable (default 10,000).  Callers
+      that need a different limit can set it before calling.
+
 2.07 2025-08-03
 
     - Fix "uninitialized value $unkpos" warnings.  [michal-josef-spacek, PR#8]

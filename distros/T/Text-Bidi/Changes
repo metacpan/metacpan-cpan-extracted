@@ -1,4 +1,7 @@
 Revision history for Perl module Text::Bidi
+3.03      2026-11-21 20:18:19+02:00 Asia/Jerusalem
+        * Match mirror test expectations to the Unicode version used by FriBidi.
+
 3.02      2026-11-19 13:02:02+02:00 Asia/Jerusalem
         * Check for the FriBidi shared library before generating a Makefile
           so missing system dependencies do not cause CPAN Testers failures.

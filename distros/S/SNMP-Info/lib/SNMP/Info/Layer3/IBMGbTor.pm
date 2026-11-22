@@ -40,7 +40,7 @@ use SNMP::Info::Layer3;
 
 our ($VERSION, %GLOBALS, %FUNCS, %MIBS, %MUNGE);
 
-$VERSION = '3.985002';
+$VERSION = '3.985003';
 
 %MIBS = (
     %SNMP::Info::Layer3::MIBS,
@@ -198,6 +198,14 @@ sub lldp_ip {
         }
     }
     return \%lldp_ip;
+}
+
+sub lldp_addrs {
+    my $ibm     = shift;
+    my $partial = shift;
+
+    return $ibm->SUPER::lldp_addrs($partial) if $ibm->_ibm_lldp_standard;
+    return $ibm->_lldp_addrs_from_families($partial);
 }
 
 # The LLDP-MIB local port number is the bridge port, and lldpLocPortDesc
@@ -490,6 +498,12 @@ reference (C<lldpInfoRemoteDevicesLocalPort>) with (C<ifDescr>) and
 
 Returns remote IPv4 address.  Returns for all other address types, use
 lldp_addr if you want any return address type.
+
+=item $ibm->lldp_addrs()
+
+Returns reference to hash of array references. Every remote management
+address when F<LLDP-MIB> has neighbors; otherwise the address
+C<lldp_ip()> returns for each neighbor.
 
 =item $ibm->lldp_platform()
 

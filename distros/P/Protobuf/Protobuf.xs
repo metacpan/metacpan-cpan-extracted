@@ -21,22 +21,31 @@
 #include "xs/repeated/repeated.h"
 
 #define GET_FIELD_DEF_OR_CROAK(mdef, field_name, fdef_var) \
-    const upb_FieldDef* fdef_var = upb_MessageDef_FindFieldByName(mdef, field_name); \
+    if (!(mdef)) { \
+        croak("Invalid or detached message object (missing MessageDef)"); \
+    } \
+    const upb_FieldDef* fdef_var = upb_MessageDef_FindFieldByName((mdef), (field_name)); \
     if (!fdef_var) { \
-        croak("Field '%s' not found in message '%s'", field_name, upb_MessageDef_FullName(mdef)); \
+        croak("Field '%s' not found in message '%s'", (field_name), upb_MessageDef_FullName((mdef))); \
     }
 
 
 
 MODULE = Protobuf::Arena  PACKAGE = Protobuf::Arena
 
-IV
-_xs_create_raw()
+void
+_xs_alloc_arena(self)
+    SV* self
     CODE:
-        RETVAL = PTR2IV(PerlUpb_Arena_CreateRaw(aTHX));
-
-    OUTPUT:
-        RETVAL
+        if (!sv_isa(self, "Protobuf::Arena") || !SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVHV) {
+            croak("Invalid target for _xs_alloc_arena");
+        }
+        if (!PerlUpb_Arena_GetWrapperRaw(aTHX_ self, NULL)) {
+            void* raw = PerlUpb_Arena_CreateRaw(aTHX);
+            HV* hv = (HV*)SvRV(self);
+            hv_store(hv, "_arena_ptr", 10, newSViv(PTR2IV(raw)), 0);
+            PerlUpb_Arena_AttachMagic(aTHX_ self, raw, false);
+        }
 
 
 SV*
@@ -60,12 +69,6 @@ _xs_attach_tmpfs_raw(path, size)
     OUTPUT:
         RETVAL
 
-
-void
-_xs_destroy_raw(ptr_iv)
-    IV ptr_iv
-    CODE:
-        PerlUpb_Arena_DestroyRaw(aTHX_ INT2PTR(void*, ptr_iv));
 
 void
 _xs_destroy(self)
@@ -144,11 +147,11 @@ void
 _xs_test_block_canary(self)
     SV* self
     CODE:
-        SV* rv = SvRV(self);
-        SV** svp = hv_fetch((HV*)rv, "_arena_ptr", 10, 0);
-        if (!svp || !SvIOK(*svp)) croak("Invalid arena object");
-        void* raw_ptr = INT2PTR(void*, SvIV(*svp));
+        bool is_tmpfs = false;
+        void* raw_ptr = PerlUpb_Arena_GetWrapperRaw(aTHX_ self, &is_tmpfs);
+        if (!raw_ptr || !is_tmpfs) croak("Invalid tmpfs arena object");
         PerlUpb_Arena_Custom* wrapper = (PerlUpb_Arena_Custom*)raw_ptr;
+        if (!wrapper->alloc) croak("Missing block allocator");
         size_t size = 64;
         void* p = wrapper->alloc->base.func(&wrapper->alloc->base, NULL, 0, size, NULL);
         if (p) {
@@ -163,18 +166,13 @@ _xs_set_numa_node(self, node)
     SV* self
     int node
     CODE:
-        if (!sv_derived_from(self, "Protobuf::Arena")) croak("Not a Protobuf::Arena");
-        SV* rv = SvRV(self);
-        if (SvTYPE(rv) != SVt_PVHV) croak("Arena must be a hash ref");
-        SV** svp = hv_fetch((HV*)rv, "_arena_ptr", 10, 0);
-        if (!svp || !SvIOK(*svp)) croak("Invalid arena object");
-        // Only managed arenas (PerlUpb_Arena) support NUMA node setting for now.
-        // Tmpfs arenas are mmapped on a file and policy is different.
-        SV** is_tmpfs = hv_fetch((HV*)rv, "_is_tmpfs", 9, 0);
-        if (is_tmpfs && SvTRUE(*is_tmpfs)) {
+        bool is_tmpfs = false;
+        void* raw_ptr = PerlUpb_Arena_GetWrapperRaw(aTHX_ self, &is_tmpfs);
+        if (!raw_ptr) croak("Invalid arena object");
+        if (is_tmpfs) {
              croak("set_numa_node not supported for tmpfs arenas");
         }
-        PerlUpb_Arena* a = INT2PTR(PerlUpb_Arena*, SvIV(*svp));
+        PerlUpb_Arena* a = (PerlUpb_Arena*)raw_ptr;
         a->stats_alloc.numa_node = node;
 
 void
@@ -182,11 +180,11 @@ _xs_set_chaos_fail_probability(self, p)
     SV* self
     double p
     CODE:
-        if (!sv_derived_from(self, "Protobuf::Arena")) croak("Not a Protobuf::Arena");
-        SV* rv = SvRV(self);
-        SV** svp = hv_fetch((HV*)rv, "_arena_ptr", 10, 0);
-        if (svp && SvIOK(*svp)) {
-            PerlUpb_Arena* a = INT2PTR(PerlUpb_Arena*, SvIV(*svp));
+        bool is_tmpfs = false;
+        void* raw_ptr = PerlUpb_Arena_GetWrapperRaw(aTHX_ self, &is_tmpfs);
+        if (!raw_ptr) croak("Not a valid Protobuf::Arena");
+        if (!is_tmpfs) {
+            PerlUpb_Arena* a = (PerlUpb_Arena*)raw_ptr;
             a->stats_alloc.fail_probability = p;
         }
 
@@ -195,11 +193,11 @@ _xs_set_chaos_delay_probability(self, p)
     SV* self
     double p
     CODE:
-        if (!sv_derived_from(self, "Protobuf::Arena")) croak("Not a Protobuf::Arena");
-        SV* rv = SvRV(self);
-        SV** svp = hv_fetch((HV*)rv, "_arena_ptr", 10, 0);
-        if (svp && SvIOK(*svp)) {
-            PerlUpb_Arena* a = INT2PTR(PerlUpb_Arena*, SvIV(*svp));
+        bool is_tmpfs = false;
+        void* raw_ptr = PerlUpb_Arena_GetWrapperRaw(aTHX_ self, &is_tmpfs);
+        if (!raw_ptr) croak("Not a valid Protobuf::Arena");
+        if (!is_tmpfs) {
+            PerlUpb_Arena* a = (PerlUpb_Arena*)raw_ptr;
             a->stats_alloc.delay_probability = p;
         }
 
@@ -244,6 +242,16 @@ _xs_get_offset(self, ptr_iv)
     OUTPUT:
         RETVAL
 
+size_t
+_xs_write_shared_message(self, msg_sv)
+    SV* self
+    SV* msg_sv
+    CODE:
+        RETVAL = PerlUpb_Arena_WriteSharedMessage(aTHX_ self, msg_sv);
+
+    OUTPUT:
+        RETVAL
+
 
 SV*
 _xs_attach_message(self, name, offset)
@@ -261,20 +269,25 @@ _xs_attach_message(self, name, offset)
 
 MODULE = Protobuf::DescriptorPool  PACKAGE = Protobuf::DescriptorPool
 
-IV
-_xs_create_raw()
+void
+_xs_alloc_pool(self)
+    SV* self
     CODE:
-        RETVAL = PTR2IV(PerlUpb_DescriptorPool_CreateRaw(aTHX));
-
-    OUTPUT:
-        RETVAL
-
+        if (!sv_isa(self, "Protobuf::DescriptorPool") || !SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVHV) {
+            croak("Invalid target for _xs_alloc_pool");
+        }
+        if (!PerlUpb_DescriptorPool_GetPool(aTHX_ self)) {
+            void* raw = PerlUpb_DescriptorPool_CreateRaw(aTHX);
+            HV* hv = (HV*)SvRV(self);
+            hv_store(hv, "_pool_ptr", 9, newSViv(PTR2IV(raw)), 0);
+            PerlUpb_DescriptorPool_AttachMagic(aTHX_ self, raw, true);
+        }
 
 void
-_xs_destroy_raw(ptr_iv)
-    IV ptr_iv
+_xs_destroy(self)
+    SV* self
     CODE:
-        PerlUpb_DescriptorPool_DestroyRaw(aTHX_ INT2PTR(void*, ptr_iv));
+        PerlUpb_DescriptorPool_Free(aTHX_ self);
 
 SV*
 _xs_generated_pool()
@@ -513,6 +526,9 @@ _xs_which_oneof(self, oneof_name)
     const char* oneof_name
     CODE:
         const upb_MessageDef* mdef = PerlUpb_Message_GetDef(aTHX_ self);
+        if (!mdef) {
+            croak("Invalid or detached message object (missing MessageDef)");
+        }
         const upb_OneofDef* odef = upb_MessageDef_FindOneofByName(mdef, oneof_name);
         if (!odef) {
             croak("Oneof '%s' not found in message '%s'", oneof_name, upb_MessageDef_FullName(mdef));
@@ -768,7 +784,7 @@ _xs_parse(class_name, data, options_sv = &PL_sv_undef)
         // If zero-copy was used, we MUST keep the input data SV alive
         if (flags & PERL_UPB_MG_PROFILE_ZERO_COPY) {
             HV* hv = (HV*)SvRV(RETVAL);
-            hv_store(hv, "_input_data_sv", 11, newSVsv(data), 0);
+            hv_store(hv, "_input_data_sv", 14, newSVsv(data), 0);
         }
 
         SvREFCNT_dec(arena_sv);
@@ -838,16 +854,15 @@ _xs_migrate_to_arena(self, arena_sv)
     CODE:
         const upb_Message* src_msg = PerlUpb_Message_GetMsg(aTHX_ self);
         const upb_MessageDef* mdef = PerlUpb_Message_GetDef(aTHX_ self);
-        upb_Arena* arena = PerlUpb_Arena_Get(aTHX_ arena_sv);
-        const upb_MiniTable* mt = upb_MessageDef_MiniTable(mdef);
-        upb_Message* dst_msg = upb_Message_New(mt, arena);
-        /*
-        if (!upb_Message_DeepCopy(dst_msg, src_msg, mt, arena)) {
-            croak("Failed to migrate message to shared arena");
+        if (!src_msg || !mdef) {
+            croak("Invalid message object passed to _xs_migrate_to_arena");
         }
-        */
+        upb_Arena* arena = PerlUpb_Arena_Get(aTHX_ arena_sv);
+        if (!arena) {
+            croak("Invalid arena passed to _xs_migrate_to_arena");
+        }
         croak("Message migration requires upb_Message_DeepCopy (not available in current upb)");
-        RETVAL = PerlUpb_WrapMessage(aTHX_ dst_msg, mdef, arena_sv, 0);
+        RETVAL = &PL_sv_undef;
 
     OUTPUT:
         RETVAL
@@ -860,12 +875,17 @@ _xs_coerce_to(self, target_class_name)
     CODE:
         const upb_Message* msg = PerlUpb_Message_GetMsg(aTHX_ self);
         const upb_MessageDef* mdef = PerlUpb_Message_GetDef(aTHX_ self);
+        if (!msg || !mdef) {
+            croak("Invalid message object passed to _xs_coerce_to");
+        }
+        HV* expected_stash = PerlUpb_GetMessageStash(aTHX_ mdef);
+        HV* target_stash = gv_stashpv(target_class_name, 0);
+        if (!target_stash || target_stash != expected_stash) {
+            croak("Cannot coerce message of type '%s' to incompatible class '%s'",
+                  upb_MessageDef_FullName(mdef), target_class_name);
+        }
         SV* arena_sv = PerlUpb_Message_GetArena(aTHX_ self);
-        // Identity check: target class must agree with current underlying descriptor
-        // (This is a shallow coercion, we just bless into a new class with the same memory)
-        RETVAL = PerlUpb_WrapMessage(aTHX_ (upb_Message*)msg, mdef, arena_sv, 0);
-
-        sv_bless(RETVAL, gv_stashpv(target_class_name, GV_ADD));
+        RETVAL = PerlUpb_WrapMessage_NoCache(aTHX_ msg, mdef, arena_sv, 0);
 
     OUTPUT:
         RETVAL
@@ -901,24 +921,7 @@ SV*
 _xs_detach(self)
     SV* self
     CODE:
-    {
-        const upb_Message* msg = PerlUpb_Message_GetMsg(aTHX_ self);
-        const upb_MessageDef* mdef = PerlUpb_Message_GetDef(aTHX_ self);
-        if (!msg || !mdef) croak("Cannot detach invalid message");
-
-        HV* hv = (HV*)SvRV(self);
-        
-        // Remove from cache and clear magic to prevent double-free/interference
-        PerlUpb_ObjCache_Delete(aTHX_ msg);
-        MAGIC* mg = PerlUpb_GetMagic(aTHX_ self);
-        if (mg) mg->mg_ptr = NULL;
-        
-        // Return info needed to re-attach
-        HV* res = newHV();
-        hv_store(res, "upb_ptr", 7, newSViv(PTR2IV(msg)), 0);
-        hv_store(res, "mdef_ptr", 8, newSViv(PTR2IV(mdef)), 0);
-        RETVAL = newRV_noinc((SV*)res);
-    }
+        RETVAL = PerlUpb_Message_Detach(aTHX_ self);
     OUTPUT:
         RETVAL
 
@@ -928,20 +931,7 @@ _xs_attach(class_name, info_rv, arena_sv)
     SV* info_rv
     SV* arena_sv
     CODE:
-    {
-        if (!SvROK(info_rv) || SvTYPE(SvRV(info_rv)) != SVt_PVHV)
-            croak("attach() info must be a hash ref");
-        HV* info = (HV*)SvRV(info_rv);
-        
-        SV** p_upb = hv_fetch(info, "upb_ptr", 7, 0);
-        SV** p_mdef = hv_fetch(info, "mdef_ptr", 8, 0);
-        if (!p_upb || !p_mdef) croak("Invalid attach() info");
-        
-        const upb_Message* msg = INT2PTR(const upb_Message*, SvIV(*p_upb));
-        const upb_MessageDef* mdef = INT2PTR(const upb_MessageDef*, SvIV(*p_mdef));
-        
-        RETVAL = PerlUpb_WrapMessage(aTHX_ msg, mdef, arena_sv, 0);
-    }
+        RETVAL = PerlUpb_Message_Attach(aTHX_ class_name, info_rv, arena_sv);
     OUTPUT:
         RETVAL
 

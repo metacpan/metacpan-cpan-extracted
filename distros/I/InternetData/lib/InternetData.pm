@@ -21,7 +21,7 @@ use InternetData::Error;
 use InternetData::Oauth;
 use InternetData::Result;
 
-our $VERSION = '1.17.1';
+our $VERSION = '1.18.0';
 our @EXPORT_OK = ('is_bogon');
 
 use constant DEFAULT_BASE_URL => 'https://api.internetdata.io';
@@ -59,6 +59,12 @@ my $CARRIER_DETAIL = [fields => [map { [$_ => ['string']] } qw(name mcc mnc coun
 my $SATELLITE_DETAIL = [fields => [
     (map { [$_ => ['string']] } qw(provider provider_name orbit segment country)),
     [asn => ['integer']], [confidence => ['string']],
+]];
+# Whose bot uses the address, what its bots do and whether the operator vouches for it.
+my $BOT_DETAIL = [fields => [
+    (map { [$_ => ['string']] } qw(provider provider_name)),
+    (map { [$_ => [list => ['string']]] } qw(agents categories)), [verified => ['boolean']],
+    (map { [$_ => ['string']] } qw(identity verified_by confidence first_seen last_seen)),
 ]];
 my $SSH_DETAIL = [fields => [
     [port => ['integer']], (map { [$_ => ['string']] } qw(banner host_key_fp)),
@@ -117,11 +123,11 @@ our $LOOKUP = [fields => [
     (map { [$_ => ['boolean'], 1] } qw(is_tor is_relay)),
     (map { [$_ => ['boolean']] } qw(is_resproxy is_dcproxy is_mobproxy is_pubproxy is_hosting is_cdn)),
     (map { [$_ => ['boolean'], 1] } qw(
-        is_anycast is_carrier is_satellite is_ssh is_smtp is_web is_dns_resolver is_bittorrent
+        is_bot is_anycast is_carrier is_satellite is_ssh is_smtp is_web is_dns_resolver is_bittorrent
     )),
     [vpn => $CLASS_DETAIL], (map { [$_ => $CLASS_DETAIL, 1] } qw(tor relay)),
     (map { [$_ => $PROXY_DETAIL] } qw(resproxy dcproxy mobproxy)), [pubproxy => $PUBPROXY_DETAIL],
-    (map { [$_ => $CLASS_DETAIL] } qw(hosting cdn)), [carrier => $CARRIER_DETAIL],
+    (map { [$_ => $CLASS_DETAIL] } qw(hosting cdn)), [bot => $BOT_DETAIL], [carrier => $CARRIER_DETAIL],
     [satellite => $SATELLITE_DETAIL], [ssh => $SSH_DETAIL], [smtp => $SMTP_DETAIL],
     [web => [list => $WEB_SERVER]], [dns_resolver => $DNS_RESOLVER_DETAIL], [bittorrent => $BITTORRENT_DETAIL],
     [location => $LOCATION, 1], [asn => $ASN, 1], [company => $COMPANY, 1], [hostname => ['string'], 1],
@@ -967,7 +973,7 @@ before writing an C<if>.
 =item api_key
 
 Your API key. Without one a lookup is on Unlimited, the free plan: C<ip>,
-C<is_bogon>, the Tor, relay, anycast, carrier, satellite and service flags,
+C<is_bogon>, the Tor, relay, bot, anycast, carrier, satellite and service flags,
 C<location> to the country, C<asn>, C<company>, C<hostname> and the abuse email,
 with no daily or monthly cap. Every paid plan answers every field, and a batch
 needs one. The database calls need a key carrying the C<db.download> scope, and
@@ -1080,7 +1086,7 @@ without an API key gets an unauthorized error rather than a partial one.
 
 Usage counts against the allowance window - on a paid plan the anniversary of
 the subscription, not the calendar month and not the billing period, and on a
-free plan the UTC day - and it is the same number a lookup is gated on.
+free plan the UTC month - and it is the same number a lookup is gated on.
 C<hard_limit> is C<undef> when we never stop serving, which is not the same as a
 limit of zero.
 

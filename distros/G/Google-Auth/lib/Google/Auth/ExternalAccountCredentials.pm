@@ -193,25 +193,28 @@ sub retrieve_subject_token {
   } else {
     $source_name = $source->{url};
     my $headers = $source->{headers} // {};
-    my $ua      = $self->ua;
-
-    my @header_list;
-    while (my ($k, $v) = each %$headers) {
-      push @header_list, $k => $v;
-    }
-
     $log->tracef('Retrieving subject token from URL: %s...', $source_name);
     $self->_validate_url($source_name, 'credential_source.url');
-    my $response = $ua->get($source_name, @header_list);
-    if (!$response->is_success) {
+
+    my $future = $self->transport->request(
+      method  => 'GET',
+      url     => $source_name,
+      headers => $headers,
+    );
+
+    my ($body, $response_headers);
+    my $future_res = eval { ($body, $response_headers) = $future->get(); 1 };
+
+    if (!$future_res) {
+      my ($err_msg, $cat, $details) = $future->failure;
       $log->errorf('Failed to fetch subject token from URL %s: %s',
-        $source_name, $response->status_line);
+        $source_name, $err_msg);
       Google::Auth::Error->throw(
         'Failed to retrieve subject token from URL ' .
           $source_name . ': ' .
-          $response->status_line);
+          $err_msg);
     }
-    $content = $response->decoded_content;
+    $content = $body;
   }
 
   my $format      = $source->{format} // {};
@@ -261,28 +264,47 @@ sub fetch_access_token {
     scope                => join(' ', @scopes_list),
   };
 
-  my $ua = $self->ua;
+  require URI;
+  my $u = URI->new('http:');
+  $u->query_form(%$sts_payload);
+  my $encoded_sts_payload = $u->query;
+
   $log->infof('Exchanging subject token for GCP STS access token at %s...',
     $self->token_url);
   $self->_validate_url($self->token_url, 'token_url');
-  my $response = Google::Auth::RetryHelper->execute_with_retry(
+  my $response_body = Google::Auth::RetryHelper->execute_with_retry(
     sub {
-      my $res = $ua->post(
-        $self->token_url,
-        'Content-Type' => 'application/x-www-form-urlencoded',
-        'Content'      => $sts_payload
+      my $future = $self->transport->request(
+        method  => 'POST',
+        url     => $self->token_url,
+        headers => {'Content-Type' => 'application/x-www-form-urlencoded'},
+        body    => $encoded_sts_payload,
       );
-      if (!$res->is_success) {
-        $log->warnf('STS token exchange request failed: status %s', $res->code);
-        Google::Auth::Error->throw('Token exchange failed with status ' .
-            $res->code . ': ' . $res->decoded_content);
+
+      my ($body, $headers);
+      my $future_res = eval { ($body, $headers) = $future->get(); 1 };
+
+      if (!$future_res) {
+        my ($err_msg, $cat, $details) = $future->failure;
+        my $code       = 0;
+        my $error_body = '';
+        if (ref($details) eq 'HASH') {
+          $code       = $details->{code} // 0;
+          $error_body = $details->{body} // '';
+        } elsif (eval { $details->can('code') }) {
+          $code       = $details->code // 0;
+          $error_body = $details->decoded_content // $details->content // '';
+        }
+        $log->warnf('STS token exchange request failed: status %s', $code);
+        Google::Auth::Error->throw(
+          'Token exchange failed with status ' . $code . ': ' . $error_body);
       }
-      return $res;
+      return $body;
     },
     %options
   );
 
-  my $sts_data  = decode_json($response->decoded_content);
+  my $sts_data  = decode_json($response_body);
   my $sts_token = $sts_data->{access_token};
 
   if ($self->service_account_impersonation_url) {
@@ -298,29 +320,45 @@ sub fetch_access_token {
       $self->service_account_impersonation_url,
       'service_account_impersonation_url'
     );
-    my $impers_res = Google::Auth::RetryHelper->execute_with_retry(
+    my $impers_res_body = Google::Auth::RetryHelper->execute_with_retry(
       sub {
-        my $res = $ua->post(
-          $self->service_account_impersonation_url,
-          'Content-Type'  => 'application/json',
-          'Authorization' => 'Bearer ' . $sts_token,
-          'Content'       => $impersonation_body
+        my $future = $self->transport->request(
+          method  => 'POST',
+          url     => $self->service_account_impersonation_url,
+          headers => {
+            'Content-Type'  => 'application/json',
+            'Authorization' => 'Bearer ' . $sts_token,
+          },
+          body => $impersonation_body,
         );
-        if (!$res->is_success) {
+
+        my ($body, $headers);
+        my $future_res = eval { ($body, $headers) = $future->get(); 1 };
+
+        if (!$future_res) {
+          my ($err_msg, $cat, $details) = $future->failure;
+          my $code       = 0;
+          my $error_body = '';
+          if (ref($details) eq 'HASH') {
+            $code       = $details->{code} // 0;
+            $error_body = $details->{body} // '';
+          } elsif (eval { $details->can('code') }) {
+            $code       = $details->code // 0;
+            $error_body = $details->decoded_content // $details->content // '';
+          }
           $log->warnf(
-            'Delegated service account impersonation failed: status %s',
-            $res->code);
+            'Delegated service account impersonation failed: status %s', $code);
           Google::Auth::Error->throw(
             'Service account impersonation failed with status ' .
-              $res->code . ': ' .
-              $res->decoded_content);
+              $code . ': ' .
+              $error_body);
         }
-        return $res;
+        return $body;
       },
       %options
     );
 
-    my $impers_data = decode_json($impers_res->decoded_content);
+    my $impers_data = decode_json($impers_res_body);
     $self->access_token($impers_data->{accessToken});
     $self->expires_at($impers_data->{expireTime});
     $log->infof('Delegated impersonation completed successfully.');

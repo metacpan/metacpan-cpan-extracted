@@ -10,7 +10,7 @@ use InternetData;
 use InternetDataTest;
 use InternetDataTest::Origin;
 
-# A spent trial's or a reached cap's answer ends with a new UTC day or a raised
+# A spent trial's or a reached cap's answer ends with a new UTC month or a raised
 # cap, so it is cached for a minute at most rather than for the client's TTL.
 
 my %FLAGS = (

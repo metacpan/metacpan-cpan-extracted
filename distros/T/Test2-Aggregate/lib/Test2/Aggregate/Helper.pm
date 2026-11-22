@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Carp;
+use File::Spec;
 use Path::Tiny;
 
 =head1 NAME
@@ -16,7 +17,7 @@ See L<agg> and L<aggit> helper scripts.
 
 =cut
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 =head1 FUNCTIONS
 
@@ -155,7 +156,7 @@ sub _absolute_paths {
     my @norm;
     foreach my $input (@_) {
         my $path = $input;
-        unless (substr($path, 0, 1) eq '/') {
+        unless (File::Spec->file_name_is_absolute($path)) {
             if ($opt->{relative_root}) {
                 my $abs = path($opt->{root}, $path)->absolute;
                 # List entries also use root, so retain the input root for lists.

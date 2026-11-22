@@ -105,17 +105,14 @@ To run a full clean test cycle, including rebuilding the plugin:
 ```bash
 # From the perl/ directory
 # Clean up previous Bazel run for the plugin
-bazel --output_base=/usr/local/google/home/cjac/.gemini/tmp/protobuf/bazel_output_base clean --expunge
+bazel clean --expunge
 # Clean up MakeMaker build
 make clean
 # Regenerate Makefile and build everything including the plugin, then test
 perl Makefile.PL && make -j$(nproc) && make test
 ```
 
-**Note:** We use a specific Bazel `output_base` to ensure cache consistency
-between different shells. If you run Bazel commands manually in this workspace,
-you should use the same output base: `alias bazel='bazel
---output_base=/usr/local/google/home/cjac/.gemini/tmp/protobuf/bazel_output_base'`
+**Note:** To override Bazel's output base, set `BAZEL_OUTPUT_BASE=/path/to/output_base` when invoking `make`.
 
 ## Code Generation
 

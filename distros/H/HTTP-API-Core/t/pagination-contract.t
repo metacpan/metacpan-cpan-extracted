@@ -12,7 +12,7 @@ use HTTP::API::Core::Pagination;
 {
     package T::PagerClient;
     sub new { bless { calls => [], pages => $_[1] || {} }, $_[0] }
-    sub base_url { 'https://api.example.com' }
+    sub base_url { defined($_[0]->{base_url}) ? $_[0]->{base_url} : 'https://api.example.com' }
     sub get {
         my ($self, $url, %opts) = @_;
         push @{ $self->{calls} }, [$url, { %opts }];
@@ -176,7 +176,7 @@ my $repeat = HTTP::API::Core::Pagination->new(
 );
 dies_like(
     sub { $repeat->all },
-    qr/pagination continuation repeated: url:\/r/,
+    qr/pagination continuation repeated: url/,
     'repeated continuation is rejected',
 );
 
@@ -205,6 +205,77 @@ my $same_origin = HTTP::API::Core::Pagination->new(
 );
 is_deeply(scalar($same_origin->all), [1, 2],
     'same-origin absolute continuation is allowed');
+
+# Query-only and fragment-only absolute URLs still have the same host.
+# Explicit default ports are equivalent to omitted ports in either direction.
+for my $case (
+    [ 'https://api.example.com', 'https://api.example.com?page=2',
+      'query-only absolute continuation remains same-origin' ],
+    [ 'https://api.example.com', 'https://api.example.com#next',
+      'fragment-only absolute continuation remains same-origin' ],
+    [ 'https://api.example.com', 'https://api.example.com:443/items?page=2',
+      'explicit HTTPS default port is same-origin' ],
+    [ 'https://api.example.com:443', 'https://api.example.com/items?page=2',
+      'omitted HTTPS default port is same-origin' ],
+    [ 'http://api.example.com', 'http://api.example.com:80/items?page=2',
+      'explicit HTTP default port is same-origin' ],
+    [ 'http://api.example.com:80', 'http://api.example.com/items?page=2',
+      'omitted HTTP default port is same-origin' ],
+    [ 'https://api.example.com', 'https://api.example.com:0443/items?page=2',
+      'zero-padded HTTPS default port is same-origin' ],
+    [ 'https://api.example.com:000443', 'https://api.example.com/items?page=2',
+      'zero-padded HTTPS port on base is same-origin' ],
+    [ 'https://api.example.com:0443', 'https://api.example.com:000443/items?page=2',
+      'equivalent padded HTTPS default ports are same-origin' ],
+    [ 'http://api.example.com', 'http://api.example.com:080/items?page=2',
+      'zero-padded HTTP default port is same-origin' ],
+    [ 'http://api.example.com:00080', 'http://api.example.com/items?page=2',
+      'zero-padded HTTP port on base is same-origin' ],
+) {
+    my ($base, $next, $label) = @$case;
+    my $origin_client = T::PagerClient->new({
+        '/start' => { items => [1], next => $next },
+        $next => { items => [2], next => undef },
+    });
+    $origin_client->{base_url} = $base;
+    my $pager = HTTP::API::Core::Pagination->new(
+        client => $origin_client, path => '/start',
+    );
+    is_deeply(scalar($pager->all), [1, 2], $label);
+}
+
+# A default-port match must not permit a different host, non-default
+# port, or scheme to receive the client's authenticated requests.
+for my $case (
+    [ 'https://api.example.com', 'https://api.example.com:444/items',
+      'non-default port remains cross-origin' ],
+    [ 'https://api.example.com', 'https://api.example.com:0444/items',
+      'zero-padded non-default HTTPS port remains cross-origin' ],
+    [ 'http://api.example.com', 'http://api.example.com:0800/items',
+      'zero-padded non-default HTTP port remains cross-origin' ],
+    [ 'https://api.example.com', 'https://evil.example:0443/items',
+      'zero-padded default port does not allow a different host' ],
+    [ 'https://api.example.com', 'http://api.example.com:80/items',
+      'scheme change remains cross-origin' ],
+    [ 'https://api.example.com', 'https://api.example.com:443@evil.example/items',
+      'userinfo does not disguise a different host' ],
+) {
+    my ($base, $next, $label) = @$case;
+    my $origin_client = T::PagerClient->new({
+        '/start' => { items => [1], next => $next },
+    });
+    $origin_client->{base_url} = $base;
+    my $pager = HTTP::API::Core::Pagination->new(
+        client => $origin_client, path => '/start',
+    );
+    dies_like(
+        sub { $pager->all },
+        qr/cross-origin pagination continuation rejected/,
+        $label,
+    );
+    is scalar(@{ $origin_client->{calls} }), 1,
+        "$label: no request to rejected continuation";
+}
 
 my $allowed_cross_origin_client = T::PagerClient->new({
     '/allowed' => { items => [1], next => 'https://cdn.example/items?page=2' },
@@ -281,5 +352,65 @@ dies_like(
     qr/pagination cursor continuation must be a scalar/,
     'reference-valued cursor continuation rejected',
 );
+
+
+# Continuation values are server-controlled. Tokens must not be echoed in
+# ordinary exception messages when a loop or cross-origin URL is rejected.
+my $secret_continuation = 'opaque-secret-123abc';
+
+{
+    my $url = "/private?token=$secret_continuation";
+    my $secret_client = T::PagerClient->new({
+        $url => { items => [1], next => $url },
+    });
+    my $pager = HTTP::API::Core::Pagination->new(
+        client => $secret_client, path => $url,
+    );
+    my $error;
+    eval { $pager->next; 1 } or $error = $@;
+    like $error, qr/pagination continuation repeated: url/,
+        'URL loop identifies the repeated continuation type';
+    unlike $error, qr/\Q$secret_continuation\E/,
+        'URL loop error does not include the query token';
+    is scalar(@{ $secret_client->{calls} }), 1,
+        'repeated sensitive URL is never fetched a second time';
+}
+
+{
+    my $url = "/cursor?cursor=$secret_continuation";
+    my $secret_client = T::PagerClient->new({
+        $url => { items => [1], next_cursor => $secret_continuation },
+    });
+    my $pager = HTTP::API::Core::Pagination->new(
+        client => $secret_client, path => '/cursor',
+        mode => 'cursor', cursor => $secret_continuation,
+    );
+    my $error;
+    eval { $pager->next; 1 } or $error = $@;
+    like $error, qr/pagination continuation repeated: cursor/,
+        'cursor loop identifies the repeated continuation type';
+    unlike $error, qr/\Q$secret_continuation\E/,
+        'cursor loop error does not include the opaque cursor';
+    is scalar(@{ $secret_client->{calls} }), 1,
+        'repeated sensitive cursor is never fetched a second time';
+}
+
+{
+    my $next = "https://evil.example/items?token=$secret_continuation";
+    my $secret_client = T::PagerClient->new({
+        '/origin' => { items => [1], next => $next },
+    });
+    my $pager = HTTP::API::Core::Pagination->new(
+        client => $secret_client, path => '/origin',
+    );
+    my $error;
+    eval { $pager->next; 1 } or $error = $@;
+    like $error, qr/cross-origin pagination continuation rejected/,
+        'cross-origin rejection remains explicit';
+    unlike $error, qr/\Q$secret_continuation\E/,
+        'cross-origin error does not include the rejected URL token';
+    is scalar(@{ $secret_client->{calls} }), 1,
+        'rejected sensitive URL is never requested';
+}
 
 done_testing;

@@ -53,21 +53,29 @@ sub _build_project_id {
 
   return $ENV{GOOGLE_CLOUD_PROJECT} if $ENV{GOOGLE_CLOUD_PROJECT};
 
-  my $ua   = $self->ua;
   my $host = $ENV{GCE_METADATA_HOST} // 'metadata.google.internal';
 
-  $ua->no_proxy($host, '169.254.169.254');
+  $self->ua->no_proxy($host, '169.254.169.254');
 
   my $url = "http://$host/computeMetadata/v1/project/project-id";
 
   $log->infof('Fetching project ID from GCE metadata server at %s', $url);
 
-  my $response = $ua->get($url, 'Metadata-Flavor' => 'Google');
-  if ($response->is_success) {
-    return $response->decoded_content;
+  my $future = $self->transport->request(
+    method  => 'GET',
+    url     => $url,
+    headers => {'Metadata-Flavor' => 'Google'},
+  );
+
+  my ($body, $headers);
+  my $future_res = eval { ($body, $headers) = $future->get(); 1 };
+
+  if ($future_res) {
+    return $body;
   } else {
+    my ($err_msg, $cat, $details) = $future->failure;
     $log->warnf('Failed to fetch project ID from GCE metadata server: %s',
-      $response->status_line);
+      $err_msg);
     return;
   }
 }
@@ -81,53 +89,83 @@ sub on_gce {
     return $_on_gce;
   }
 
-  my $ua = LWP::UserAgent->new(timeout => 1);
-  $ua->no_proxy('metadata.google.internal', '169.254.169.254');
+  my $transport = $options{transport};
+  if (!$transport) {
+    require Google::Cloud::Transport::Adapter::LWP;
+    my $ua = LWP::UserAgent->new(timeout => 1);
+    $ua->no_proxy('metadata.google.internal', '169.254.169.254');
+    $transport = Google::Cloud::Transport::Adapter::LWP->new(user_agent => $ua);
+  }
 
-  my $host     = 'metadata.google.internal';
-  my $response = $ua->get("http://$host/computeMetadata/v1/instance/",
-    'Metadata-Flavor' => 'Google');
+  my $host   = 'metadata.google.internal';
+  my $future = $transport->request(
+    method  => 'GET',
+    url     => 'http://' . $host . '/computeMetadata/v1/instance/',
+    headers => {'Metadata-Flavor' => 'Google'},
+  );
 
-  if ($response->is_success) {
+  my $future_res = eval { $future->get(); 1 };
+  if ($future_res) {
     $_on_gce = 1;
     return $_on_gce;
   }
 
-  $host     = '169.254.169.254';
-  $response = $ua->get("http://$host/computeMetadata/v1/instance/",
-    'Metadata-Flavor' => 'Google');
+  $host   = '169.254.169.254';
+  $future = $transport->request(
+    method  => 'GET',
+    url     => 'http://' . $host . '/computeMetadata/v1/instance/',
+    headers => {'Metadata-Flavor' => 'Google'},
+  );
 
-  $_on_gce = $response->is_success ? 1 : 0;
+  $future_res = eval { $future->get(); 1 };
+  $_on_gce    = $future_res ? 1 : 0;
   return $_on_gce;
 }
 
 sub fetch_access_token {
   my ($self, %options) = @_;
 
-  my $ua   = $self->ua;
   my $host = $ENV{GCE_METADATA_HOST} // 'metadata.google.internal';
 
   # Ensure no proxy for metadata server
-  $ua->no_proxy($host, '169.254.169.254');
+  $self->ua->no_proxy($host, '169.254.169.254');
 
   my $url =
     "http://$host/computeMetadata/v1/instance/service-accounts/default/token";
 
   $log->infof("Fetching access token from GCE metadata server at $url");
 
-  my $response = Google::Auth::RetryHelper->execute_with_retry(
+  my $response_body = Google::Auth::RetryHelper->execute_with_retry(
     sub {
-      my $res = $ua->get($url, 'Metadata-Flavor' => 'Google');
-      if (!$res->is_success) {
-        Google::Auth::Error->throw('HTTP request failed with status ' .
-            $res->code . ': ' . $res->decoded_content);
+      my $future = $self->transport->request(
+        method  => 'GET',
+        url     => $url,
+        headers => {'Metadata-Flavor' => 'Google'},
+      );
+
+      my ($body, $headers);
+      my $future_res = eval { ($body, $headers) = $future->get(); 1 };
+
+      if (!$future_res) {
+        my ($err_msg, $cat, $details) = $future->failure;
+        my $code       = 0;
+        my $error_body = '';
+        if (ref($details) eq 'HASH') {
+          $code       = $details->{code} // 0;
+          $error_body = $details->{body} // '';
+        } elsif (eval { $details->can('code') }) {
+          $code       = $details->code // 0;
+          $error_body = $details->decoded_content // $details->content // '';
+        }
+        Google::Auth::Error->throw(
+          'HTTP request failed with status ' . $code . ': ' . $error_body);
       }
-      return $res;
+      return $body;
     },
     %options
   );
 
-  my $res_data = decode_json($response->decoded_content);
+  my $res_data = decode_json($response_body);
   my $token    = $res_data->{access_token};
   my $expires  = $res_data->{expires_in} // 3600;
 

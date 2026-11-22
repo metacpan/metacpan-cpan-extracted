@@ -40,7 +40,7 @@ const char* PerlUpb_VerifyStrData(pTHX_ SV *sv) {
 #ifdef HAS_X86_INTRINSICS
 // Helper to check for dots or colons in 32-byte chunks
 __attribute__((target("avx2")))
-static inline uint32_t find_special_chars_avx2(pTHX_ const char* s) {
+static uint32_t find_special_chars_avx2(pTHX_ const char* s) {
     AVX2_INSTRUMENT("find_special_chars_avx2");
     __m256i chunk = _mm256_loadu_si256((const __m256i*)s);
     __m256i dots = _mm256_cmpeq_epi8(chunk, _mm256_set1_epi8('.'));
@@ -48,11 +48,49 @@ static inline uint32_t find_special_chars_avx2(pTHX_ const char* s) {
     __m256i special = _mm256_or_si256(dots, colons);
     return (uint32_t)_mm256_movemask_epi8(special);
 }
+
+__attribute__((target("avx2")))
+static void copy_plain_chunks_avx2(pTHX_ const char** sp, char** dp, STRLEN* remaining) {
+    const char* s = *sp;
+    char* d = *dp;
+    while (*remaining >= 32) {
+        uint32_t mask = find_special_chars_avx2(aTHX_ s);
+        if (mask == 0) {
+            _mm256_storeu_si256((__m256i*)d, _mm256_loadu_si256((const __m256i*)s));
+            d += 32;
+            s += 32;
+            *remaining -= 32;
+        } else {
+            break;
+        }
+    }
+    *sp = s;
+    *dp = d;
+}
+
+__attribute__((target("sse4.1")))
+static void copy_plain_chunks_sse41(const char** sp, char** dp, STRLEN* remaining) {
+    const char* s = *sp;
+    char* d = *dp;
+    while (*remaining >= 16) {
+        __m128i chunk = _mm_loadu_si128((const __m128i*)s);
+        __m128i dots = _mm_cmpeq_epi8(chunk, _mm_set1_epi8('.'));
+        __m128i colons = _mm_cmpeq_epi8(chunk, _mm_set1_epi8(':'));
+        uint32_t mask = (uint32_t)_mm_movemask_epi8(_mm_or_si128(dots, colons));
+        if (mask == 0) {
+            _mm_storeu_si128((__m128i*)d, chunk);
+            d += 16;
+            s += 16;
+            *remaining -= 16;
+        } else {
+            break;
+        }
+    }
+    *sp = s;
+    *dp = d;
+}
 #endif
 
-#ifdef HAS_X86_INTRINSICS
-__attribute__((target("avx2")))
-#endif
 char* PerlUpb_ClassNameToFullName(pTHX_ const char* class_name) {
     if (!class_name) return NULL;
     STRLEN len = strlen(class_name);
@@ -62,33 +100,12 @@ char* PerlUpb_ClassNameToFullName(pTHX_ const char* class_name) {
 
 #ifdef HAS_X86_INTRINSICS
     STRLEN remaining = len;
-    // AVX2 Optimization for 32-byte chunks
-    while (remaining >= 32) {
-        uint32_t mask = find_special_chars_avx2(aTHX_ s);
-        if (mask == 0) {
-            _mm256_storeu_si256((__m256i*)d, _mm256_loadu_si256((const __m256i*)s));
-            d += 32;
-            s += 32;
-            remaining -= 32;
-        } else {
-            break;
-        }
+    uint32_t feats = PerlUpb_GetCpuFeatures();
+    if (feats & PERL_UPB_HAS_AVX2) {
+        copy_plain_chunks_avx2(aTHX_ &s, &d, &remaining);
     }
-
-    // SSE4.1 Fallback for 16-byte chunks
-    while (remaining >= 16) {
-        __m128i chunk = _mm_loadu_si128((const __m128i*)s);
-        __m128i dots = _mm_cmpeq_epi8(chunk, _mm_set1_epi8('.'));
-        __m128i colons = _mm_cmpeq_epi8(chunk, _mm_set1_epi8(':'));
-        uint32_t mask = (uint32_t)_mm_movemask_epi8(_mm_or_si128(dots, colons));
-        if (mask == 0) {
-            _mm_storeu_si128((__m128i*)d, chunk);
-            d += 16;
-            s += 16;
-            remaining -= 16;
-        } else {
-            break;
-        }
+    if (feats & PERL_UPB_HAS_SSE41) {
+        copy_plain_chunks_sse41(&s, &d, &remaining);
     }
 #endif
 
@@ -104,9 +121,6 @@ char* PerlUpb_ClassNameToFullName(pTHX_ const char* class_name) {
     return full_name;
 }
 
-#ifdef HAS_X86_INTRINSICS
-__attribute__((target("avx2")))
-#endif
 char* PerlUpb_FullNameToClassName(pTHX_ const char* full_name) {
     if (!full_name) return NULL;
     STRLEN len = strlen(full_name);
@@ -119,17 +133,12 @@ char* PerlUpb_FullNameToClassName(pTHX_ const char* full_name) {
 
 #ifdef HAS_X86_INTRINSICS
     STRLEN remaining = len;
-    // AVX2 Optimization for 32-byte chunks (no dots)
-    while (remaining >= 32) {
-        uint32_t mask = find_special_chars_avx2(aTHX_ s);
-        if (mask == 0) {
-            _mm256_storeu_si256((__m256i*)d, _mm256_loadu_si256((const __m256i*)s));
-            d += 32;
-            s += 32;
-            remaining -= 32;
-        } else {
-            break;
-        }
+    uint32_t feats = PerlUpb_GetCpuFeatures();
+    if (feats & PERL_UPB_HAS_AVX2) {
+        copy_plain_chunks_avx2(aTHX_ &s, &d, &remaining);
+    }
+    if (feats & PERL_UPB_HAS_SSE41) {
+        copy_plain_chunks_sse41(&s, &d, &remaining);
     }
 #endif
 
@@ -242,9 +251,11 @@ HV* PerlUpb_GetMessageStash(pTHX_ const upb_MessageDef* mdef) {
 
     // Set up inheritance: push "Protobuf::Message" to @ISA if not already present
     {
-        char isa_name[1024];
-        snprintf(isa_name, sizeof(isa_name), "%s::ISA", class_name);
+        size_t isa_len = strlen(class_name) + 6; // "::ISA\0"
+        char* isa_name = (char*)safemalloc(isa_len);
+        snprintf(isa_name, isa_len, "%s::ISA", class_name);
         AV* isa = get_av(isa_name, GV_ADD);
+        safefree(isa_name);
         bool found = false;
         for (int i = 0; i <= av_len(isa); i++) {
             SV** svp = av_fetch(isa, i, 0);
@@ -318,9 +329,36 @@ static MGVTBL wrapper_vtbl = {
     NULL, NULL, NULL, NULL, wrapper_cleanup
 };
 
+static MGVTBL wrapper_meta_vtbl = {
+    NULL, NULL, NULL, NULL, NULL
+};
+
 MAGIC* PerlUpb_GetMagic(pTHX_ SV* sv) {
     if (!sv || !SvROK(sv)) return NULL;
     return mg_findext(SvRV(sv), PERL_MAGIC_ext, &wrapper_vtbl);
+}
+
+void PerlUpb_SetArenaBoundMeta(pTHX_ SV* sv, const void* meta_def) {
+    if (!sv || !SvROK(sv)) return;
+    SV* rv = SvRV(sv);
+    if (!rv || SvTYPE(rv) != SVt_PVHV) return;
+    MAGIC* mg = mg_findext(rv, PERL_MAGIC_ext, &wrapper_meta_vtbl);
+    if (mg) {
+        mg->mg_ptr = (char*)meta_def;
+    } else {
+        sv_magicext(rv, NULL, PERL_MAGIC_ext, &wrapper_meta_vtbl, (const char*)meta_def, 0);
+    }
+}
+
+const void* PerlUpb_GetArenaBoundMeta(pTHX_ SV* sv, const char* class_name) {
+    if (!sv || !SvROK(sv)) return NULL;
+    SV* rv = SvRV(sv);
+    if (!rv || SvTYPE(rv) != SVt_PVHV) return NULL;
+    if (class_name && !sv_derived_from(sv, class_name)) return NULL;
+    MAGIC* owner_mg = mg_findext(rv, PERL_MAGIC_ext, &wrapper_vtbl);
+    if (!owner_mg || !owner_mg->mg_ptr) return NULL;
+    MAGIC* meta_mg = mg_findext(rv, PERL_MAGIC_ext, &wrapper_meta_vtbl);
+    return meta_mg ? (const void*)meta_mg->mg_ptr : NULL;
 }
 
 SV* PerlUpb_WrapArenaBoundObject(pTHX_ const void* ptr, SV* arena_sv, HV* stash, uint16_t flags) {
@@ -378,24 +416,23 @@ const void* PerlUpb_GetArenaBoundObject(pTHX_ SV* sv, const char* class_name) {
 const void* PerlUpb_GetArenaBoundObject_Silent(pTHX_ SV* sv, const char* class_name) {
     if (!sv || !SvROK(sv)) return NULL;
     SV* rv = SvRV(sv);
-    if (!rv || SvTYPE(rv) != SVt_PVHV) return NULL;
+    if (!rv || SvTYPE(rv) != SVt_PVHV || !SvOBJECT(rv)) return NULL;
     if (class_name && !sv_derived_from(sv, class_name)) return NULL;
-    HV* hv = (HV*)rv;
 
     // Native C-allocated upb objects have PERL_MAGIC_ext magic with &wrapper_vtbl attached.
-    // Thawed/deserialized dummy objects from Data::Dumper lack &wrapper_vtbl and must be ignored.
-    MAGIC* mg = mg_findext((SV*)hv, PERL_MAGIC_ext, &wrapper_vtbl);
-    if (!mg) return NULL;
+    // Read the native pointer strictly from mg->mg_ptr rather than mutable hash keys.
+    MAGIC* mg = mg_findext(rv, PERL_MAGIC_ext, &wrapper_vtbl);
+    if (!mg || !mg->mg_ptr) return NULL;
 
-    SV** svp = hv_fetch(hv, "_upb_ptr", 8, 0);
-    return (svp && *svp && SvIOK(*svp)) ? (const void*)INT2PTR(void*, SvIV(*svp)) : NULL;
+    return (const void*)mg->mg_ptr;
 }
 
 bool PerlUpb_IsXSBacked(pTHX_ SV* sv) {
-    if (!sv || !SvROK(sv)) return false;
-    HV* hv = (HV*)SvRV(sv);
-    if (SvTYPE(hv) != SVt_PVHV) return false;
-    return hv_exists(hv, "_upb_ptr", 8);
+    if (!sv || !SvROK(sv) || !sv_isobject(sv)) return false;
+    SV* rv = SvRV(sv);
+    if (!rv || SvTYPE(rv) != SVt_PVHV) return false;
+    MAGIC* mg = mg_findext(rv, PERL_MAGIC_ext, &wrapper_vtbl);
+    return mg != NULL && mg->mg_ptr != NULL;
 }
 
 SV* PerlUpb_GetArenaFromObject(pTHX_ SV* sv) {
@@ -477,10 +514,7 @@ uint32_t PerlUpb_GetCpuFeatures(void) {
 }
 
 void PerlUpb_DetectCpuFeatures(void) {
-    dTHX;
-    // TODO: Implement actual CPU feature detection logic here
-    // For now, set to 0
-    cpu_features = 0;
+    PerlUpb_InitCpuFeatures();
     if (getenv("PROTOBUF_PERL_DUMP_CPU_FEATURES")) {
       fprintf(stderr, "[CPUID] Detected features: 0x%x\n", cpu_features);
     }
@@ -488,36 +522,49 @@ void PerlUpb_DetectCpuFeatures(void) {
 
 #ifdef HAS_X86_INTRINSICS
 __attribute__((target("sse4.1")))
-#endif
-bool PerlUpb_ValidateIntRange_SSE41(const int32_t* vals, size_t count, int32_t min, int32_t max) {
-#ifdef HAS_X86_INTRINSICS
+static bool validate_int_range_sse41_impl(const int32_t* vals, size_t count, int32_t min, int32_t max) {
     __m128i vmin = _mm_set1_epi32(min);
     __m128i vmax = _mm_set1_epi32(max);
     size_t i = 0;
     for (; i + 4 <= count; i += 4) {
         __m128i v = _mm_loadu_si128((const __m128i*)&vals[i]);
-        // v < min  =>  min > v
-        // v > max
         __m128i mask = _mm_or_si128(_mm_cmpgt_epi32(vmin, v), _mm_cmpgt_epi32(v, vmax));
         if (_mm_movemask_epi8(mask) != 0) return false;
     }
     for (; i < count; i++) {
         if (vals[i] < min || vals[i] > max) return false;
     }
-#else
-    for (size_t i = 0; i < count; i++) {
-        if (vals[i] < min || vals[i] > max) return false;
-    }
-#endif
     return true;
 }
 
-#ifdef HAS_X86_INTRINSICS
 __attribute__((target("avx2")))
-#endif
-bool PerlUpb_ValidateStrings_AVX2(const char** strings, const size_t* lens, size_t count) {
-    dTHX;
+static bool validate_strings_avx2_impl(const char** strings, const size_t* lens, size_t count) {
     AVX2_INSTRUMENT("PerlUpb_ValidateStrings_AVX2");
+    for (size_t i = 0; i < count; i++) {
+        if (!strings[i] || lens[i] == 0) return false;
+    }
+    return true;
+}
+#endif
+
+bool PerlUpb_ValidateIntRange_SSE41(const int32_t* vals, size_t count, int32_t min, int32_t max) {
+#ifdef HAS_X86_INTRINSICS
+    if (PerlUpb_GetCpuFeatures() & PERL_UPB_HAS_SSE41) {
+        return validate_int_range_sse41_impl(vals, count, min, max);
+    }
+#endif
+    for (size_t i = 0; i < count; i++) {
+        if (vals[i] < min || vals[i] > max) return false;
+    }
+    return true;
+}
+
+bool PerlUpb_ValidateStrings_AVX2(const char** strings, const size_t* lens, size_t count) {
+#ifdef HAS_X86_INTRINSICS
+    if (PerlUpb_GetCpuFeatures() & PERL_UPB_HAS_AVX2) {
+        return validate_strings_avx2_impl(strings, lens, count);
+    }
+#endif
     for (size_t i = 0; i < count; i++) {
         if (!strings[i] || lens[i] == 0) return false;
     }
@@ -540,6 +587,7 @@ void PerlUpb_VerifyBinaryDiff(pTHX_ const char* a, size_t a_len, const char* b, 
 }
 
 PerlUpb_FieldVector* PerlUpb_FieldVector_New(pTHX_ size_t capacity) {
+    if (capacity == 0) capacity = 8;
     PerlUpb_FieldVector* v = (PerlUpb_FieldVector*)safemalloc(sizeof(PerlUpb_FieldVector));
     v->count = 0;
     v->capacity = capacity;
@@ -550,7 +598,11 @@ PerlUpb_FieldVector* PerlUpb_FieldVector_New(pTHX_ size_t capacity) {
 
 void PerlUpb_FieldVector_Add(pTHX_ PerlUpb_FieldVector* v, const upb_FieldDef* f, SV* val) {
     if (v->count >= v->capacity) {
-        v->capacity *= 2;
+        size_t new_cap = v->capacity ? v->capacity * 2 : 8;
+        if (new_cap < v->capacity || new_cap > SIZE_MAX / sizeof(SV*)) {
+            croak("PerlUpb_FieldVector capacity overflow");
+        }
+        v->capacity = new_cap;
         v->fields = (const upb_FieldDef**)saferealloc((void*)v->fields, sizeof(upb_FieldDef*) * v->capacity);
         v->values = (SV**)saferealloc((void*)v->values, sizeof(SV*) * v->capacity);
     }

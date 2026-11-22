@@ -6,7 +6,7 @@ Protobuf - High-performance Google Protocol Buffers implementation
 
 =head1 VERSION
 
-version 0.09
+version 0.13
 
 =head1 SYNOPSIS
 
@@ -51,7 +51,7 @@ use strict;
 use warnings;
 use Log::Any qw($log);
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 our $HAS_XS;
 {

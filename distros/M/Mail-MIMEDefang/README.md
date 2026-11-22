@@ -1,6 +1,13 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="images/mimedefang-logo-dark.png">
+    <img src="images/mimedefang-logo.png" alt="MIMEDefang logo" width="300">
+  </picture>
+</p>
+
 # MIMEDefang
 
-[![CI for MIMEDefang](https://github.com/The-McGrail-Foundation/MIMEDefang/actions/workflows/main.yml/badge.svg)](https://github.com/The-McGrail-Foundation/MIMEDefang/actions/workflows/main.yml) [![GitHub license](https://img.shields.io/github/license/The-McGrail-Foundation/MIMEDefang)](https://github.com/The-McGrail-Foundation/MIMEDefang/blob/master/LICENSE) [![GitHub release](https://img.shields.io/github/release/The-McGrail-Foundation/MIMEDefang.svg)](https://GitHub.com/The-McGrail-Foundation/MIMEDefang/releases/)
+[![CI for MIMEDefang](https://github.com/The-McGrail-Foundation/MIMEDefang/actions/workflows/main.yml/badge.svg)](https://github.com/The-McGrail-Foundation/MIMEDefang/actions/workflows/main.yml) [![GitHub license](https://img.shields.io/github/license/The-McGrail-Foundation/MIMEDefang)](https://github.com/The-McGrail-Foundation/MIMEDefang/blob/master/LICENSE) [![GitHub release](https://img.shields.io/github/release/The-McGrail-Foundation/MIMEDefang.svg)](https://GitHub.com/The-McGrail-Foundation/MIMEDefang/releases/) [![Last commit](https://img.shields.io/github/last-commit/The-McGrail-Foundation/MIMEDefang)](https://github.com/The-McGrail-Foundation/MIMEDefang/commits/master)
 
 1. INTRODUCTION
 ---------------
@@ -65,7 +72,7 @@ MIMEDefang has the following software requirements:
 	Crypt::OpenSSL::Random - Needed to generate a truly random ipheader file
 	HTML::Parser (CPAN) - Needed for append_html_boilerplate function
 	IO::Socket::SSL - Needed for md_check_against_smtp_server SSL checks
-	JSON and LWP::UserAgent - Needed for rspamd support
+	JSON and LWP::UserAgent - Needed for rspamd and Mail::MIMEDefang::ML support
 	Mail::BIMI - Needed for BIMI checks
 	Mail::DKIM - Needed for DKIM and ARC verification and signing
 	Mail::SPF - Needed for SPF checks
@@ -183,6 +190,9 @@ Summary of useful ./configure options:
   --with-quarantinedir=DIR
                           specify location of quarantine directory
                           (/var/spool/MD-Quarantine)
+
+  --enable-ml-servers     Install the Python ML model servers used by
+                          Mail::MIMEDefang::ML (see script/ml-servers)
 
   --enable-poll           Use poll(2) instead of select(2) in multiplexor
 

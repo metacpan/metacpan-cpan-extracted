@@ -4,8 +4,11 @@ use warnings;
 on configure => sub {
   requires 'CPAN::Meta'                    => '0';
   requires 'ExtUtils::MakeMaker'           => '6.76';    # Offers the RECURSIVE_TEST_FILES, NO_PERLLOCAL features
-  requires 'ExtUtils::MakeMaker::CPANfile' => '0';       # Needs at least ExtUtils::MakeMaker 6.52
+  requires 'ExtUtils::MakeMaker::CPANfile' => '0.10';    # Needs at least ExtUtils::MakeMaker 6.52
+  requires 'File::Basename'                => '0';
   requires 'File::Spec::Functions'         => '0';
+  requires 'Module::Load::Conditional'     => '0';
+  requires 'Module::Loaded'                => '0';
   requires 'strict'                        => '0';
   requires 'warnings'                      => '0'
 };
@@ -21,15 +24,20 @@ on runtime => sub {
 };
 
 on test => sub {
-  requires 'Exporter'       => '0';
-  requires 'Exporter::Tiny' => '0';
-  requires 'Test::API'      => '0';
-  # https://github.com/charsbar/ExtUtils-MakeMaker-CPANfile/issues/1
-  # Tricked by "# TODO: better range handling"
-  requires 'Test::Fatal' => ( $] < 5.012000 ? '== 0.017' : '0' );
-  requires 'Test::Lib'   => '0';
-  requires 'Test::More'  => '1.001005';                             # Subtests accept args
-  requires 'Test::Needs' => '0';
-  requires 'Test::Warn'  => '0';
-  requires 'parent'      => '0'
+  requires 'Config'                         => '0';
+  requires 'Exporter'                       => '0';
+  requires 'Exporter::Tiny'                 => '0';
+  requires 'Importer'                       => '0';
+  requires 'Test::API'                      => '0';
+  requires 'Test::Fatal'                    => '<= 0.017';
+  requires 'Test::Warn'                     => '0';
+  requires 'Test2::Require::ReleaseTesting' => '0';
+  requires 'Test2::V1'                      => '0';
+  requires 'constant'                       => '0';
+  requires 'parent'                         => '0'
+};
+
+on develop => sub {
+  requires 'Perl::Tidy'         => '0';
+  requires 'Test::Perl::Critic' => '0'
 }

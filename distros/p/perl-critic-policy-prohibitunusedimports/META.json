@@ -73,7 +73,7 @@
    "provides" : {
       "Perl::Critic::Policy::ProhibitUnusedImports" : {
          "file" : "lib/Perl/Critic/Policy/ProhibitUnusedImports.pm",
-         "version" : "1.002"
+         "version" : "1.003"
       }
    },
    "release_status" : "stable",
@@ -88,7 +88,7 @@
          "web" : "https://github.com/teodesian/perl-critic-policy-prohibitunusedimports"
       }
    },
-   "version" : "1.002",
+   "version" : "1.003",
    "x_contributors" : [
       "troglodyne-robot <trogbot@troglodyne.net>"
    ],

@@ -1,5 +1,23 @@
 Revision history for Perl extension App-mdee
 
+1.25 2026-11-22T07:04:02Z
+
+    - A table cell has no space at its right in the lattice style
+      too, as in 3line and simple: the text is next to the column
+      separator, and the columns are one column closer.  The config
+      table_gap now works in every style (2 is the former lattice)
+
+1.24 2026-11-21T17:01:28Z
+
+    - The space at the right end of a table is left out when the
+      table does not fit the width with it (ansicolumn 1.70):
+      the text of the last column can go up to the end of the width
+    - The 3line and simple table styles have no space at the right
+      of a cell, so the columns are one column closer.  The config
+      table_gap is the number of spaces between a cell and the place
+      of the marks of the next column (default 1; 2 is the former
+      spacing)
+
 1.23 2026-11-20T11:00:46Z
 
     - A <br> in a table cell breaks the cell into lines; the default

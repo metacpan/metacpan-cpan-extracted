@@ -37,6 +37,8 @@ void PerlUpb_DecodeStatus_Die(pTHX_ upb_DecodeStatus status,
 // (the arena) alive.
 SV* PerlUpb_WrapArenaBoundObject(pTHX_ const void* ptr, SV* arena_sv, HV* stash,
                                  uint16_t flags);
+void PerlUpb_SetArenaBoundMeta(pTHX_ SV* sv, const void* meta_def);
+const void* PerlUpb_GetArenaBoundMeta(pTHX_ SV* sv, const char* class_name);
 
 // Extracts the C pointer from a wrapped object, verifying the class name.
 const void* PerlUpb_GetArenaBoundObject(pTHX_ SV* sv, const char* class_name);

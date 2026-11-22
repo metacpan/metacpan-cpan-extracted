@@ -1,6 +1,6 @@
 package Task::BeLike::DCANTRELL;
 
-$VERSION = '1';
+$VERSION = '2';
 
 =head1 NAME
 
@@ -12,7 +12,7 @@ Task::BeLike::DCANTRELL - Install the modules that DCANTRELL thinks you should u
 
 =head1 AUTHOR, COPYRIGHT and LICENCE
 
-Copyright 2025 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
+Copyright 2026 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
 
 This software is free-as-in-speech software, and may be used,
 distributed, and modified under the terms of either the GNU

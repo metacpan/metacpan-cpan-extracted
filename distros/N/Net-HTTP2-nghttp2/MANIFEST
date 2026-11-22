@@ -39,6 +39,7 @@ t/35-closed-stream-response.t
 t/36-rapid-reset-response.t
 t/37-submit-headers.t
 t/38-large-bodies.t
+t/39-mem-send-limit.t
 t/lib/Test/HTTP2/Frame.pm
 t/lib/Test/HTTP2/HPACK.pm
 t/lib/Test/HTTP2/Pair.pm

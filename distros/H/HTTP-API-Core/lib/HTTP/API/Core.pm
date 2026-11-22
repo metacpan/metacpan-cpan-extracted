@@ -12,7 +12,7 @@ use HTTP::API::Core::Response;
 use HTTP::API::Core::Error;
 use HTTP::API::Core::Pagination;
 
-our $VERSION = '1.13';
+our $VERSION = '1.15';
 
 sub new {
     my $class = shift;
@@ -104,7 +104,9 @@ sub request {
     die "path must be a scalar\n" if $path_ref ne '';
     $method = uc($method);
 
-    my $url = $path =~ m{\Ahttps?://} ? $path : $self->_join_url($path);
+    # URI schemes are case-insensitive; align with request URL validation and
+    # the pagination continuation origin guard.
+    my $url = $path =~ m{\Ahttps?://}i ? $path : $self->_join_url($path);
 
     my $query = exists $opts{query} ? delete($opts{query}) : {};
     die "query must be a hash reference\n" if ref($query) ne 'HASH';

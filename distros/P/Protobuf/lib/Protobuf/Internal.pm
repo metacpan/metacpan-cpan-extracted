@@ -173,7 +173,7 @@ require Protobuf;
 use warnings;
 use Exporter qw(import);
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 our @EXPORT_OK = qw(
     class_name_to_full_name

@@ -1,0 +1,58 @@
+% layout 'default';
+% title l('history') . ' — Mogura';
+<h1 class="mb-6 text-2xl font-semibold tracking-tight wrap-anywhere sm:text-3xl"><%= l('history') %></h1>
+
+<form class="my-6 min-w-0 rounded-lg border border-slate-200 bg-white p-4 sm:p-6 flex flex-wrap items-end gap-3 [&>label]:min-w-0 [&>label]:basis-90" method="get" action="/history">
+    <label class="text-sm"><%= l('tags') %>
+        <input class="mt-1 block w-full min-w-0 rounded-md border border-slate-300 bg-white px-3 py-2 disabled:bg-slate-100" name="tag" value="<%= $tag %>" maxlength="120" placeholder="<%= l('filter_tag') %>">
+    </label>
+    <button class="inline-flex min-h-10 items-center justify-center rounded-md border px-4 py-2 font-medium cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 border-slate-300 bg-white text-slate-700 enabled:hover:bg-slate-100" type="submit"><%= l('filter') %></button>
+    % if (length($tag)) {
+    <a class="text-blue-700 underline-offset-4 hover:underline" href="/history"><%= l('clear_filter') %></a>
+    % }
+</form>
+
+<section class="my-6 min-w-0 rounded-lg border border-slate-200 bg-white p-4 sm:p-6">
+    % if (!@$history) {
+    <p class="py-6 text-center text-slate-500"><%= length($tag) ? l('no_history_match') : l('no_history') %></p>
+    % } else {
+    <div data-history-table class="overflow-x-auto">
+        <table class="w-full min-w-[760px] border-collapse text-left text-xs">
+            <thead>
+                <tr>
+                    <th class="whitespace-nowrap border-b border-slate-200 bg-slate-50 px-3 py-3 text-slate-600 font-semibold"><%= l('scan') %></th>
+                    <th class="whitespace-nowrap border-b border-slate-200 bg-slate-50 px-3 py-3 text-slate-600 font-semibold"><%= l('tags') %></th>
+                    <th class="whitespace-nowrap border-b border-slate-200 bg-slate-50 px-3 py-3 text-slate-600 font-semibold"><%= l('submitted_utc') %></th>
+                    <th class="whitespace-nowrap border-b border-slate-200 bg-slate-50 px-3 py-3 text-slate-600 font-semibold"><%= l('status') %></th>
+                    <th class="whitespace-nowrap border-b border-slate-200 bg-slate-50 px-3 py-3 text-slate-600 font-semibold"><%= l('phase') %></th>
+                    <th class="whitespace-nowrap border-b border-slate-200 bg-slate-50 px-3 py-3 text-slate-600 font-semibold"><%= l('mount_status') %></th>
+                </tr>
+            </thead>
+            <tbody>
+            % for my $scan (@$history) {
+                <tr>
+                    <td class="max-w-96 border-b border-slate-200 px-3 py-3 align-top wrap-anywhere"><a class="font-mono text-xs text-blue-700 underline-offset-4 hover:underline" href="/scans/<%= $scan->{id} %>"><%= $scan->{scanner_id} %> / <%= substr($scan->{id}, 0, 8) %></a></td>
+                    <td class="max-w-96 border-b border-slate-200 px-3 py-3 align-top wrap-anywhere"><div class="flex flex-wrap gap-1.5">
+                        % for my $value (@{$scan->{tags} // []}) {
+                        <a class="inline-flex max-w-full items-center rounded-full border border-slate-200 bg-slate-100 px-2.5 py-0.5 text-xs text-slate-700 wrap-anywhere hover:bg-slate-200" href="<%= url_for('/history')->query(tag => $value) %>"><%= $value %></a>
+                        % }
+                    </div></td>
+                    <td class="max-w-96 border-b border-slate-200 px-3 py-3 align-top wrap-anywhere"><%= date_time($scan->{created_at}) %></td>
+                    <td class="max-w-96 border-b border-slate-200 px-3 py-3 align-top wrap-anywhere"><span class="inline-block whitespace-nowrap rounded bg-slate-100 px-2 py-0.5 data-[status=completed]:text-emerald-700 data-[status=partial]:text-amber-700 data-[status=interrupted]:text-amber-700 data-[status=failed]:text-red-700" data-status="<%= $scan->{status} %>"><%= label($scan->{status}) %></span></td>
+                    <td class="max-w-96 border-b border-slate-200 px-3 py-3 align-top wrap-anywhere"><%= label($scan->{phase}) %></td>
+                    <td class="max-w-96 border-b border-slate-200 px-3 py-3 align-top wrap-anywhere"><%= label($scan->{cleanup_status}) %></td>
+                </tr>
+            % }
+            </tbody>
+        </table>
+    </div>
+    % }
+    <nav class="mt-4 flex justify-end gap-6">
+        % if ($page > 1) {
+        <a class="text-blue-700 underline-offset-4 hover:underline" href="<%= url_for('/history')->query(tag => $tag, page => $page - 1) %>"><%= l('previous') %></a>
+        % }
+        % if ($more) {
+        <a class="text-blue-700 underline-offset-4 hover:underline" href="<%= url_for('/history')->query(tag => $tag, page => $page + 1) %>"><%= l('next') %></a>
+        % }
+    </nav>
+</section>

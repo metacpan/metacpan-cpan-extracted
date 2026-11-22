@@ -1,19 +1,27 @@
 ---
-name: Geo-Postcodes-NO
-version: 0.31
+abstract: 'Norwegian postcodes with associated information'
 author:
-abstract: Norwegian postcodes with associated information
+  - 'Arne Sommer <perl@bbop.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
-requires:
-  Geo::Postcodes: 0.31
-  perl: 5.6.1
-generated_by: Module::Build version 0.2805
 meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.2.html
-  version: 1.2
-provides:
-  Geo::Postcodes::NO:
-    file: lib/Geo/Postcodes/NO.pm
-    version: 0.31
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Geo-Postcodes-NO
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.008'
 resources:
-  license: http://dev.perl.org/licenses/
+  homepage: https://www.bring.no/tjenester/adressetjenester/postnummer
+  repository: https://github.com/arnesom/perl-geo-postcodes-no.git
+version: '1.00'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

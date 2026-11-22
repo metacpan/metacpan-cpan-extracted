@@ -97,7 +97,7 @@ if test -f "${PERL}" ; then
     fi
 fi
 
-for thing in prefix siteprefix vendorprefix vendorlib installarchlib installprivlib installbin installman1dir installman3dir installscript installsitearch installsitelib; do
+for thing in prefix siteprefix vendorprefix vendorlib installarchlib installprivlib installbin installman1dir installman3dir installsiteman1dir installsiteman3dir man3ext installscript installsitearch installsitelib; do
     AC_MSG_CHECKING([for Perl installation variable $thing])
     val=`$PERL -V:$thing | sed -e "s/^.*='//" -e "s/';$//"`
     AC_MSG_RESULT($val)
@@ -105,6 +105,30 @@ for thing in prefix siteprefix vendorprefix vendorlib installarchlib installpriv
     up=`echo $thing | tr '[[a-z]]' '[[A-Z]]'`
     eval "PERL$up=$val"
 done
+
+dnl Man page layout, taken from Perl's %Config (site install): the base
+dnl directory from installsiteman1dir (Perl's siteprefix replaced by
+dnl ${prefix}), the section 3 subdirectory and the module page extension
+dnl from installsiteman3dir and man3ext (e.g. share/man, man3, 3pm on
+dnl Linux; man, man3p, 3p on OpenBSD).  An explicit --mandir wins.
+if test "$mandir" = '${datarootdir}/man' && test -n "$PERLINSTALLSITEMAN1DIR" && test -n "$PERLSITEPREFIX" ; then
+    perl_mandir=`dirname "$PERLINSTALLSITEMAN1DIR"`
+    case "$perl_mandir" in
+        "$PERLSITEPREFIX"/*)
+            mandir='${prefix}'`echo "$perl_mandir" | sed -e "s|^$PERLSITEPREFIX||"`
+            ;;
+    esac
+fi
+MAN3SUBDIR=man3
+if test -n "$PERLINSTALLSITEMAN3DIR" ; then
+    MAN3SUBDIR=`basename "$PERLINSTALLSITEMAN3DIR"`
+fi
+MAN3EXT=3
+if test -n "$PERLMAN3EXT" ; then
+    MAN3EXT="$PERLMAN3EXT"
+fi
+AC_MSG_CHECKING([where to install Perl module man pages])
+AC_MSG_RESULT([$mandir/$MAN3SUBDIR/*.$MAN3EXT])
 
 dnl wait3
 dnl We know that wait3 works fine on Solaris 9, but autoconf
@@ -185,6 +209,14 @@ AC_ARG_WITH(ipheader,
    IP_HEADER=$with_ipheader, IP_HEADER=no)
 
 AC_SUBST(IP_HEADER)
+
+ML_SERVERS=no
+AC_ARG_ENABLE(ml-servers,
+[  --enable-ml-servers     Install the Python ML model servers used by
+                          Mail::MIMEDefang::ML (see script/ml-servers)],
+   ML_SERVERS=$enableval, ML_SERVERS=no)
+
+AC_SUBST(ML_SERVERS)
 
 dnl Allow user to tell us where milter includes are
 MILTERINC=
@@ -644,6 +676,7 @@ AC_CHECK_FUNCS(snprintf)
 AC_CHECK_FUNCS(vsnprintf)
 AC_CHECK_FUNCS(readdir_r)
 AC_CHECK_FUNCS(pathconf)
+AC_CHECK_FUNCS(getloadavg)
 AC_CHECK_FUNCS(inet_ntop)
 
 if test "$SPOOLDIR" = "no" -o "$SPOOLDIR" = "" ; then
@@ -886,8 +919,12 @@ fi
 
 AC_SUBST(ENABLE_DEBUGGING)
 AC_SUBST(PTHREAD_FLAG)
-VERSION=`$PERL -I modules/lib -e 'use Mail::MIMEDefang; print Mail::MIMEDefang->md_version'`
+dnl VERSION goes in man pages and packages; FULL_VERSION (with the
+dnl "-dev" suffix on development snapshots) only in the binaries
+VERSION=`$PERL -I modules/lib -e 'use Mail::MIMEDefang; print Mail::MIMEDefang::md_version()'`
+FULL_VERSION=`$PERL -I modules/lib -e 'use Mail::MIMEDefang; print Mail::MIMEDefang::md_version(1)'`
 AC_SUBST(VERSION)
+AC_SUBST(FULL_VERSION)
 
 dnl Jigger for machines without snprintf
 if test "$ac_cv_func_snprintf" != "yes" -o "$ac_cv_func_vsnprintf" != "yes" ; then
@@ -923,6 +960,12 @@ fi
 dnl find libmilter.a and libsm.a
 SMPATH=`echo ../sendmail-*/obj.*/libmilter`
 MDLIBPATH=/usr/local/lib:/usr/local/lib64:/usr/lib:/usr/lib64:/lib:/lib64:/usr/lib/libmilter:/usr/lib64/libmilter
+dnl Debian and Ubuntu install libraries in a multiarch directory,
+dnl e.g. /usr/lib/x86_64-linux-gnu
+MULTIARCH=`$CC -print-multiarch 2>/dev/null`
+if test -n "$MULTIARCH" ; then
+   MDLIBPATH="$MDLIBPATH:/usr/lib/$MULTIARCH:/lib/$MULTIARCH"
+fi
 AC_PATH_PROG(LIBMILTER, libmilter.a, no, $MILTERLIB:$SMPATH:$MDLIBPATH)
 SMPATH=`echo ../sendmail-*/obj.*/libsm`
 AC_PATH_PROG(LIBSM, libsm.a, no, $SMPATH:$MDLIBPATH)
@@ -949,7 +992,8 @@ dnl The directory containing libmilter
 LIBMILTERDIR=`dirname "$LIBMILTERACTUAL"`
 
 dnl Don't include standard directory paths
-if test "$LIBMILTERDIR" = "/usr/lib" -o "$LIBMILTERDIR" = "/lib" -o "$LIBMILTERDIR" = "/usr/lib64" -o "$LIBMILTERDIR" = "/lib64" ; then
+if test "$LIBMILTERDIR" = "/usr/lib" -o "$LIBMILTERDIR" = "/lib" -o "$LIBMILTERDIR" = "/usr/lib64" -o "$LIBMILTERDIR" = "/lib64" -o \
+        \( -n "$MULTIARCH" -a \( "$LIBMILTERDIR" = "/usr/lib/$MULTIARCH" -o "$LIBMILTERDIR" = "/lib/$MULTIARCH" \) \) ; then
    LIBMILTERDIR=""
 else
    LDFLAGS="$LDFLAGS -L$LIBMILTERDIR"
@@ -979,6 +1023,8 @@ AC_SUBST(PERLINSTALLPRIVLIB)
 AC_SUBST(PERLINSTALLBIN)
 AC_SUBST(PERLINSTALLMAN1DIR)
 AC_SUBST(PERLINSTALLMAN3DIR)
+AC_SUBST(MAN3SUBDIR)
+AC_SUBST(MAN3EXT)
 AC_SUBST(PERLINSTALLSCRIPT)
 AC_SUBST(PERLINSTALLSITEARCH)
 AC_SUBST(PERLINSTALLSITELIB)
@@ -989,12 +1035,13 @@ AC_SUBST(PERLINSTALLCONF)
 AC_SUBST(PERLINSTALLSITECONF)
 AC_SUBST(PERLINSTALLVENDORCONF)
 
-AC_CONFIG_FILES([Makefile mimedefang.pl mimedefang-release.pl script/mimedefang-util examples/init-script mimedefang-filter.5 mimedefang-multiplexor.8 mimedefang-protocol.7 mimedefang-notify.7 mimedefang.8 mimedefang.pl.8 md-mx-ctrl.8 watch-mimedefang redhat/mimedefang-init redhat/mimedefang-sysconfig])
+AC_CONFIG_FILES([Makefile mimedefang.pl mimedefang-release.pl script/mimedefang-util script/mimedefang-dashboard examples/init-script mimedefang-filter.5 mimedefang-multiplexor.8 mimedefang-protocol.7 mimedefang-notify.7 mimedefang.8 mimedefang.pl.8 md-mx-ctrl.8 watch-mimedefang redhat/mimedefang-init redhat/mimedefang-sysconfig])
 AC_OUTPUT
 chmod a+x examples/init-script > /dev/null 2>&1
 chmod a+x watch-mimedefang > /dev/null 2>&1
 chmod a+x redhat/mimedefang-init > /dev/null 2>&1
 chmod a+x script/mimedefang-util > /dev/null 2>&1
+chmod a+x script/mimedefang-dashboard > /dev/null 2>&1
 
 dnl Status info
 echo ""

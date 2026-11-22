@@ -100,22 +100,23 @@ sub t_verify_dane_cert_edge : Test(3)
 }
 
 sub _sts_with {
-    my ($domain, $resp) = @_;
+    my ($domain, $resp, @txt) = @_;
+    @txt = ('v=STSv1; id=20260101') unless @txt;
     my $ua = Mail::MIMEDefang::Unit::TLSPolicy::FakeUA->new($resp);
     my $dns = 0;
     no warnings 'redefine';
-    local *Mail::MIMEDefang::TLSPolicy::md_dns_txt = sub { $dns++; return 'v=STSv1; id=20260101' };
+    local *Mail::MIMEDefang::TLSPolicy::md_dns_txt = sub { $dns++; return wantarray ? @txt : $txt[0] };
     local *Mail::MIMEDefang::TLSPolicy::_init_ua = sub { return $ua };
     local *Mail::MIMEDefang::TLSPolicy::md_syslog = sub {};
     my $policy = md_check_mta_sts($domain);
     return ($policy, $dns, $ua->{urls});
 }
 
-sub t_mta_sts_check : Test(9)
+sub t_mta_sts_check : Test(10)
 {
     SKIP: {
         eval { require LWP::UserAgent; require HTTP::Response; 1 }
-            or skip "LWP::UserAgent not available", 9;
+            or skip "LWP::UserAgent not available", 10;
 
         my $ua = Mail::MIMEDefang::TLSPolicy::_init_ua(10);
         is($ua->max_redirect, 0, 'redirects are not followed');
@@ -143,6 +144,9 @@ sub t_mta_sts_check : Test(9)
         my $redir = HTTP::Response->new(301, 'Moved', [Location => 'http://169.254.169.254/']);
         ($policy) = _sts_with('example.com', $redir);
         ok(!defined $policy, 'redirect response refused');
+
+        ($policy, $dns, $urls) = _sts_with('example.com', $ok, 'v=STSv1; id=1', 'v=STSv1; id=2');
+        ok(!defined $policy && !@$urls, 'multiple STSv1 records mean no policy');
     };
 }
 
@@ -156,8 +160,8 @@ sub t_mta_sts_live : Test(3)
         if ( (not defined $ENV{'NET_TEST'}) or ($ENV{'NET_TEST'} ne 'yes' )) {
             skip "Net test disabled", 3;
         }
-        eval { require LWP::UserAgent; 1 }
-            or skip "LWP::UserAgent not available", 3;
+        eval { require LWP::UserAgent; require LWP::Protocol::https; 1 }
+            or skip "LWP::Protocol::https not available", 3;
 
         # gmail.com publishes MTA-STS
         my $res = md_check_mta_sts('gmail.com');

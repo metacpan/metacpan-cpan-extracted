@@ -40,7 +40,7 @@ use SNMP::Info::IEEE802dot3ad ();
 
 our ($VERSION, %FUNCS, %GLOBALS, %MIBS, %MUNGE);
 
-$VERSION = '3.985002';
+$VERSION = '3.985003';
 
 %MIBS = (
     'RAPID-CITY' => 'rapidCity',
@@ -107,6 +107,12 @@ $VERSION = '3.985002';
     'rc_vlan_no_join' => 'rcVlanNotAllowToJoin',
     'rc_vlan_mac'     => 'rcVlanMacAddress',
     'rc_vlan_rstatus' => 'rcVlanRowStatus',
+    'rc_vlan_isid'    => 'rcVlanPlsbIsid',
+
+    # From RAPID-CITY::rcIsidInterfaceTable
+    'rc_isid_if_vlan' => 'rcIsidInterfaceVlan',
+    'rc_isid_if_cvid' => 'rcIsidInterfaceCvid',
+    'rc_isid_if_type' => 'rcIsidInterfaceType',
 
     # From RAPID-CITY::rcIpAddrTable
     'rc_ip_index' => 'rcIpAdEntIfIndex',
@@ -715,20 +721,16 @@ sub agg_ports {
 
     # TODO: implement partial
     my $ports  = $rapidcity->rc_mlt_ports;
-    my $trunks = $rapidcity->rc_mlt_index;
-    my $dps    = $rapidcity->rc_mlt_dp || {};
+    my $trunks = $rapidcity->_rc_mlt_keys();
 
     return {}
-        unless ref {} eq ref $trunks
-            and scalar keys %$trunks
+        unless scalar keys %$trunks
             and ref {} eq ref $ports
             and scalar keys %$ports;
 
     my $ret = {};
     foreach my $m ( sort { $a <=> $b } keys %$trunks ) {
-        my $idx = $trunks->{$m};
-        next unless $idx;
-        $idx = $dps->{$m} ? $dps->{$m} : $idx;
+        my $idx      = $trunks->{$m};
         my $portlist = $ports->{$m};
         next unless $portlist;
         for ( my $i = 0; $i <= scalar(@$portlist); $i++ ) {
@@ -738,6 +740,25 @@ sub agg_ports {
     }
 
     return $ret;
+}
+
+# MLT id => the key agg_ports gives it: rcMltDesignatedPort when that is a
+# configured member, else rcMltIfIndex. The designated port reads 536870912
+# once every member is down.
+sub _rc_mlt_keys {
+    my $rapidcity = shift;
+
+    my $mlts    = $rapidcity->rc_mlt_index() || {};
+    my $dps     = $rapidcity->rc_mlt_dp()    || {};
+    my $members = $rapidcity->rc_mlt_ports() || {};
+    my %keys;
+    foreach my $mlt_id ( keys %$mlts ) {
+        my $ifindex = $mlts->{$mlt_id} or next;
+        my $dp      = $dps->{$mlt_id};
+        my $bits    = $members->{$mlt_id} || [];
+        $keys{$mlt_id} = ( $dp and $bits->[$dp] ) ? $dp : $ifindex;
+    }
+    return \%keys;
 }
 
 sub _agg_ports_walked { return qw/rc_mlt_ports rc_mlt_index rc_mlt_dp/ }
@@ -753,10 +774,9 @@ sub _lag_aggregator_map {
 
     my $map = SNMP::Info::IEEE802dot3ad::_lag_aggregator_map($rapidcity);
     my $channels = $rapidcity->rc_mlt_index() || {};
-    my $dps      = $rapidcity->rc_mlt_dp()    || {};
-    foreach my $mlt_id ( keys %$channels ) {
-        my $ifindex = $channels->{$mlt_id} or next;
-        $map->{$ifindex} = $dps->{$mlt_id} if $dps->{$mlt_id};
+    my $keys     = $rapidcity->_rc_mlt_keys();
+    foreach my $mlt_id ( keys %$keys ) {
+        $map->{ $channels->{$mlt_id} } = $keys->{$mlt_id};
     }
     return $map;
 }
@@ -801,17 +821,13 @@ sub _lag_vendor_domains {
 sub _lag_vendor_groups {
     my ( $rapidcity, $groups ) = @_;
 
-    my $channels = $rapidcity->rc_mlt_index()    || {};
-    my $types    = $rapidcity->rc_mlt_type()     || {};
-    my $running  = $rapidcity->rc_mlt_run_type() || {};
-    my $dps      = $rapidcity->rc_mlt_dp()       || {};
-    my $domain   = $rapidcity->_smlt_domain_key();
-    foreach my $mlt_id ( keys %$channels ) {
-        my $ifindex = $channels->{$mlt_id} or next;
+    my $keys    = $rapidcity->_rc_mlt_keys();
+    my $types   = $rapidcity->rc_mlt_type()     || {};
+    my $running = $rapidcity->rc_mlt_run_type() || {};
+    my $domain  = $rapidcity->_smlt_domain_key();
+    foreach my $mlt_id ( keys %$keys ) {
+        my $ifindex = $keys->{$mlt_id};
         my $type = $types->{$mlt_id} or next;
-
-        # agg_ports keys the channel by its designated port when it has one
-        $ifindex = $dps->{$mlt_id} if $dps->{$mlt_id};
         if ( $type eq 'splitMLT' and defined $domain ) {
             my $record = _mlt_group_record( $groups, $ifindex );
             $record->{mc} = {
@@ -847,6 +863,82 @@ sub _mlt_group_record {
 
     return $groups->{$ifindex}
         ||= SNMP::Info::IEEE802dot3ad::_lag_new_record();
+}
+
+sub _l2sb_vendor_walked {
+    return qw/rc_vlan_isid rc_isid_if_vlan rc_isid_if_cvid rc_isid_if_type
+        rc_mlt_index rc_mlt_ports/;
+}
+
+sub _l2sb_vendor_rows {
+    my $rapidcity = shift;
+    return ( $rapidcity->_rc_vlan_isid_rows(),
+        $rapidcity->_rc_isid_port_rows() );
+}
+
+# An I-SID of 0 means the VLAN has none assigned
+sub _rc_vlan_isid_rows {
+    my $rapidcity = shift;
+
+    my $isids = $rapidcity->rc_vlan_isid() || {};
+    return map { +{ vlan => $_, type => q{isid}, id => $isids->{$_} } }
+        grep { $isids->{$_} } keys %$isids;
+}
+
+# rcIsidInterfaceTable is indexed by ifIndex and I-SID. A VLAN-based
+# binding repeats the VLAN's own rcVlanPlsbIsid row and is left out. A
+# switched UNI has no platform VLAN, only the customer VLAN on the port.
+sub _rc_isid_port_rows {
+    my $rapidcity = shift;
+
+    my $types = $rapidcity->rc_isid_if_type() || {};
+    return unless %$types;
+    my $vlans      = $rapidcity->rc_isid_if_vlan() || {};
+    my $cvids      = $rapidcity->rc_isid_if_cvid() || {};
+    my $vlan_isids = $rapidcity->rc_vlan_isid()    || {};
+    my $mlt_members = $rapidcity->_rc_mlt_member_ports();
+
+    my @rows;
+    foreach my $iid ( keys %$types ) {
+        my ( $ifindex, $isid ) = split /\./, $iid;
+        my $vlan = $vlans->{$iid} || _rc_customer_vlan( $cvids->{$iid} );
+        next if $vlan and ( $vlan_isids->{$vlan} || 0 ) == $isid;
+        my $ports = $mlt_members->{$ifindex} || [$ifindex];
+        push @rows, map {
+            +{  vlan    => $vlan || undef,
+                type    => q{isid},
+                id      => $isid,
+                ifindex => $_,
+            }
+        } @$ports;
+    }
+    return @rows;
+}
+
+# 4096 is the untagged customer VID
+sub _rc_customer_vlan {
+    my $cvid = shift;
+    return unless defined $cvid and $cvid >= 1 and $cvid <= 4094;
+    return $cvid;
+}
+
+# An MLT's own ifIndex is not in ifTable. Bind its services to each
+# configured member: the designated port moves with link state, membership
+# does not. rcMltPortMembers bit N is ifIndex N.
+sub _rc_mlt_member_ports {
+    my $rapidcity = shift;
+
+    my $mlts       = $rapidcity->rc_mlt_index() || {};
+    my $members    = $rapidcity->rc_mlt_ports() || {};
+    my $interfaces = $rapidcity->interfaces()   || {};
+    my %ports;
+    foreach my $mlt_id ( keys %$mlts ) {
+        my $bits = $members->{$mlt_id} or next;
+        my @ports = grep { $bits->[$_] and exists $interfaces->{$_} }
+            0 .. $#$bits;
+        $ports{ $mlts->{$mlt_id} } = \@ports if @ports;
+    }
+    return \%ports;
 }
 
 sub stp_ver {
@@ -1555,8 +1647,10 @@ Returns VLAN IDs
 
 Returns a HASH reference mapping from slave to master port for each member of
 a port bundle (MLT) on the device. Keys are ifIndex of the slave ports,
-Values are ifIndex of the corresponding master ports.  A port listed in
-more than one MLT maps to the MLT with the lowest C<rcMltId>.
+Values are ifIndex of the corresponding master ports: the MLT's
+C<rcMltDesignatedPort> when that is a member, else its C<rcMltIfIndex>.  A
+port listed in more than one MLT maps to the MLT with the lowest
+C<rcMltId>.
 
 =item $rapidcity->rc_mlt_type()
 
@@ -1647,7 +1741,8 @@ As described in L<SNMP::Info::IEEE802dot3ad/"METHODS">, with:
 =item *
 
 An MLT is keyed as C<agg_ports()> keys it: by C<rcMltDesignatedPort> when
-set, else by C<rcMltIfIndex>.
+that is a configured member (C<rcMltPortMembers>), else by
+C<rcMltIfIndex>.
 
 =item *
 
@@ -1725,6 +1820,36 @@ reported in C<mlag_domains()> only and no record has C<peer_link>.
 
 =back
 
+=head2 Layer 2 Service Bindings
+
+=over
+
+=item $rapidcity->l2_service_bindings()
+
+As described in L<SNMP::Info::L2Service/"TABLE METHODS">, with C<type>
+C<isid>:
+
+=over
+
+=item *
+
+One binding per VLAN with an I-SID (C<rcVlanPlsbIsid>), C<ifindex> 0.
+This includes the auto-sense onboarding service, by default VLAN 4048 on
+I-SID 15999999.
+
+=item *
+
+One binding per port service in C<rcIsidInterfaceTable> that the VLAN's
+own binding does not cover, on the port's ifIndex. A switched UNI has the
+customer VLAN on the port as C<vlan> (C<rcIsidInterfaceCvid>); an untagged
+or transparent UNI has C<vlan> undef. A service on an MLT is bound to
+each configured member port (C<rcMltPortMembers>), which does not change
+with link state, or to the MLT's ifIndex when it has no member.
+
+=back
+
+=back
+
 =head2 RAPID-CITY VLAN Table (C<rcVlanTable>)
 
 =over
@@ -1760,6 +1885,30 @@ reported in C<mlag_domains()> only and no record has C<peer_link>.
 =item $rapidcity->rc_vlan_mac()
 
 (C<rcVlanMacAddress>)
+
+=item $rapidcity->rc_vlan_isid()
+
+The SPB I-SID the VLAN is mapped to, 0 for none.
+
+(C<rcVlanPlsbIsid>)
+
+=back
+
+=head2 RAPID-CITY I-SID Interface Table (C<rcIsidInterfaceTable>)
+
+=over
+
+=item $rapidcity->rc_isid_if_vlan()
+
+(C<rcIsidInterfaceVlan>)
+
+=item $rapidcity->rc_isid_if_cvid()
+
+(C<rcIsidInterfaceCvid>)
+
+=item $rapidcity->rc_isid_if_type()
+
+(C<rcIsidInterfaceType>)
 
 =back
 

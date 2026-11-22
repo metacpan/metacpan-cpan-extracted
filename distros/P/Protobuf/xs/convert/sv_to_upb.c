@@ -27,24 +27,63 @@ static void verify_limits(pTHX_ SV* sv, const upb_FieldDef* f, double min, doubl
 }
 
 static void verify_limits_64(pTHX_ SV* sv, const upb_FieldDef* f, bool is_signed) {
-    if (SvROK(sv) && sv_derived_from(sv, "Math::BigInt")) {
-        return;
-    }
-    if (!is_signed) {
-        if (SvUOK(sv)) {
-            // Unsigned integer OK - it's by definition >= 0
+    if (SvROK(sv)) {
+        if (sv_derived_from(sv, "Math::BigInt")) {
+            if (!is_signed) {
+                dSP; ENTER; SAVETMPS;
+                PUSHMARK(SP); XPUSHs(sv); PUTBACK;
+                call_method("is_neg", G_SCALAR);
+                SPAGAIN; SV* neg_sv = POPs;
+                bool is_neg = SvTRUE(neg_sv);
+                PUTBACK; FREETMPS; LEAVE;
+                if (is_neg) {
+                    croak("Negative BigInt out of range for unsigned field '%s'", upb_FieldDef_Name(f));
+                }
+            }
             return;
         }
-        if (SvNOK(sv)) {
-            if (SvNV(sv) < 0) {
-                croak("Value %f out of range for unsigned field '%s'", SvNV(sv), upb_FieldDef_Name(f));
-            }
-        } else if (SvIOK(sv)) {
-            if (SvIV(sv) < 0) {
-                croak("Value %" IVdf " out of range for unsigned field '%s'", SvIV(sv), upb_FieldDef_Name(f));
-            }
-        }
+        CROAK_WRONG_TYPE(sv, is_signed ? "a 64-bit Integer" : "an Unsigned 64-bit Integer", f);
     }
+    if (SvUOK(sv)) {
+        if (is_signed && SvUV(sv) > (UV)INT64_MAX) {
+            croak("Value %" UVuf " out of range for signed 64-bit field '%s'", SvUV(sv), upb_FieldDef_Name(f));
+        }
+        return;
+    }
+    if (SvIOK(sv)) {
+        if (!is_signed && SvIV(sv) < 0) {
+            croak("Value %" IVdf " out of range for unsigned field '%s'", SvIV(sv), upb_FieldDef_Name(f));
+        }
+        return;
+    }
+    if (SvNOK(sv)) {
+        double nv = SvNV(sv);
+        if (!is_signed && nv < 0) {
+            croak("Value %f out of range for unsigned field '%s'", nv, upb_FieldDef_Name(f));
+        }
+        return;
+    }
+    if (SvPOK(sv) && looks_like_number(sv)) {
+        STRLEN len = 0;
+        const char* s = SvPV(sv, len);
+        while (*s && isspace((unsigned char)*s)) s++;
+        if (!is_signed && *s == '-') {
+            croak("Negative string '%s' out of range for unsigned field '%s'", s, upb_FieldDef_Name(f));
+        }
+        errno = 0;
+        char* endptr = NULL;
+        if (is_signed) {
+            (void)strtoll(s, &endptr, 10);
+        } else {
+            (void)strtoull(s, &endptr, 10);
+        }
+        while (endptr && *endptr && isspace((unsigned char)*endptr)) endptr++;
+        if (errno == ERANGE || (endptr && *endptr != '\0' && *endptr != '.' && *endptr != 'e' && *endptr != 'E')) {
+            croak("Value '%s' out of range or invalid for 64-bit field '%s'", s, upb_FieldDef_Name(f));
+        }
+        return;
+    }
+    CROAK_WRONG_TYPE(sv, is_signed ? "a 64-bit Integer" : "an Unsigned 64-bit Integer", f);
 }
 
 static bool convert_singular_sv_to_upb(pTHX_ SV *sv, const upb_FieldDef *f, upb_MessageValue *val, upb_Arena *arena) {
@@ -152,9 +191,8 @@ static bool convert_singular_sv_to_upb(pTHX_ SV *sv, const upb_FieldDef *f, upb_
              if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVHV && !sv_isobject(sv)) {
                  // It's a plain HashRef, recursively create and populate message
                  upb_Message* dst_msg = upb_Message_New(mt, arena);
+                 if (!dst_msg) croak("Arena allocation failed for submessage");
 
-                 // We need to call back into Perl or use C logic to populate
-                 // For now, let's use C logic:
                  HV* hv = (HV*)SvRV(sv);
                  HE* he;
                  hv_iterinit(hv);
@@ -184,10 +222,11 @@ static bool convert_singular_sv_to_upb(pTHX_ SV *sv, const upb_FieldDef *f, upb_
              if (src_mdef != target_mdef) {
                  croak("Message type mismatch for field '%s': expected %s, got %s",
                        upb_FieldDef_Name(f), upb_MessageDef_FullName(target_mdef),
-                       upb_MessageDef_FullName(src_mdef));
+                       src_mdef ? upb_MessageDef_FullName(src_mdef) : "unknown");
              }
 
              upb_Message* dst_msg = upb_Message_New(mt, arena);
+             if (!dst_msg) croak("Arena allocation failed for deep copy");
              if (!upb_Message_DeepCopy(dst_msg, src_msg, mt, arena)) {
                  croak("Deep copy of message failed");
              }
@@ -207,50 +246,107 @@ bool PerlUpb_SvToUpb_Element(pTHX_ SV *sv, const upb_FieldDef *f, upb_MessageVal
     return convert_singular_sv_to_upb(aTHX_ sv, f, val, arena);
 }
 
-// VPP-style Batch Conversion from SVs to raw C types
+// VPP-style Batch Conversion from SVs to raw C types (with full type/range/enum validation)
 void PerlUpb_SvToUpb_BatchRaw(pTHX_ SV **src, upb_FieldType type, void *dst, size_t count, const upb_FieldDef *f, upb_Arena *arena) {
     size_t i = 0;
     switch (type) {
         case kUpb_FieldType_Bool: {
             bool *d = (bool*)dst;
-            for (; i < count; i++) d[i] = SvTRUE(src[i]);
+            for (; i < count; i++) {
+                if (!SvOK(src[i])) croak("Cannot convert undef to non-message type for field '%s'", upb_FieldDef_Name(f));
+                d[i] = SvTRUE(src[i]);
+            }
             break;
         }
         case kUpb_FieldType_Int32:
         case kUpb_FieldType_SInt32:
-        case kUpb_FieldType_SFixed32:
+        case kUpb_FieldType_SFixed32: {
+            int32_t *d = (int32_t*)dst;
+            for (; i < count; i++) {
+                SV* sv = src[i];
+                if (!SvOK(sv)) croak("Cannot convert undef to non-message type for field '%s'", upb_FieldDef_Name(f));
+                if (SvIOK(sv) || SvNOK(sv) || (SvPOK(sv) && looks_like_number(sv))) {
+                    verify_limits(aTHX_ sv, f, INT32_MIN, INT32_MAX);
+                    d[i] = (int32_t)SvIV(sv);
+                } else {
+                    CROAK_WRONG_TYPE(sv, "an Integer", f);
+                }
+            }
+            break;
+        }
         case kUpb_FieldType_Enum: {
             int32_t *d = (int32_t*)dst;
-            for (; i < count; i++) d[i] = (int32_t)SvIV(src[i]);
+            for (; i < count; i++) {
+                upb_MessageValue elem_val;
+                if (!SvOK(src[i])) croak("Cannot convert undef to non-message type for field '%s'", upb_FieldDef_Name(f));
+                convert_singular_sv_to_upb(aTHX_ src[i], f, &elem_val, arena);
+                d[i] = elem_val.int32_val;
+            }
             break;
         }
         case kUpb_FieldType_UInt32:
         case kUpb_FieldType_Fixed32: {
             uint32_t *d = (uint32_t*)dst;
-            for (; i < count; i++) d[i] = (uint32_t)SvUV(src[i]);
+            for (; i < count; i++) {
+                SV* sv = src[i];
+                if (!SvOK(sv)) croak("Cannot convert undef to non-message type for field '%s'", upb_FieldDef_Name(f));
+                if (SvUOK(sv) || SvIOK(sv) || SvNOK(sv) || (SvPOK(sv) && looks_like_number(sv))) {
+                    verify_limits(aTHX_ sv, f, 0, UINT32_MAX);
+                    d[i] = (uint32_t)SvUV(sv);
+                } else {
+                    CROAK_WRONG_TYPE(sv, "an Unsigned Integer", f);
+                }
+            }
             break;
         }
         case kUpb_FieldType_Float: {
             float *d = (float*)dst;
-            for (; i < count; i++) d[i] = (float)SvNV(src[i]);
+            for (; i < count; i++) {
+                SV* sv = src[i];
+                if (!SvOK(sv)) croak("Cannot convert undef to non-message type for field '%s'", upb_FieldDef_Name(f));
+                if (SvNOK(sv) || SvIOK(sv) || (SvPOK(sv) && looks_like_number(sv))) {
+                    verify_limits(aTHX_ sv, f, -3.402823466e+38, 3.402823466e+38);
+                    d[i] = (float)SvNV(sv);
+                } else {
+                    CROAK_WRONG_TYPE(sv, "a Number", f);
+                }
+            }
             break;
         }
         case kUpb_FieldType_Double: {
             double *d = (double*)dst;
-            for (; i < count; i++) d[i] = (double)SvNV(src[i]);
+            for (; i < count; i++) {
+                SV* sv = src[i];
+                if (!SvOK(sv)) croak("Cannot convert undef to non-message type for field '%s'", upb_FieldDef_Name(f));
+                if (SvNOK(sv) || SvIOK(sv) || (SvPOK(sv) && looks_like_number(sv))) {
+                    d[i] = (double)SvNV(sv);
+                } else {
+                    CROAK_WRONG_TYPE(sv, "a Number", f);
+                }
+            }
             break;
         }
         case kUpb_FieldType_Int64:
         case kUpb_FieldType_SInt64:
         case kUpb_FieldType_SFixed64: {
             int64_t *d = (int64_t*)dst;
-            for (; i < count; i++) d[i] = PerlUpb_SVToI64(aTHX_ src[i]);
+            for (; i < count; i++) {
+                SV* sv = src[i];
+                if (!SvOK(sv)) croak("Cannot convert undef to non-message type for field '%s'", upb_FieldDef_Name(f));
+                verify_limits_64(aTHX_ sv, f, true);
+                d[i] = PerlUpb_SVToI64(aTHX_ sv);
+            }
             break;
         }
         case kUpb_FieldType_UInt64:
         case kUpb_FieldType_Fixed64: {
             uint64_t *d = (uint64_t*)dst;
-            for (; i < count; i++) d[i] = PerlUpb_SVToU64(aTHX_ src[i]);
+            for (; i < count; i++) {
+                SV* sv = src[i];
+                if (!SvOK(sv)) croak("Cannot convert undef to non-message type for field '%s'", upb_FieldDef_Name(f));
+                verify_limits_64(aTHX_ sv, f, false);
+                d[i] = PerlUpb_SVToU64(aTHX_ sv);
+            }
             break;
         }
         default:
@@ -303,7 +399,10 @@ bool PerlUpb_SvToUpb(pTHX_ SV *sv, const upb_FieldDef *f, upb_MessageValue *val,
                         while (upb_Map_Next(src_map, &k, &v, &iter)) {
                             if (val_mt) {
                                 upb_Message* dst_v = upb_Message_New(val_mt, arena);
-                                upb_Message_DeepCopy(dst_v, v.msg_val, val_mt, arena);
+                                if (!dst_v) croak("Arena allocation failed for map value message");
+                                if (!upb_Message_DeepCopy(dst_v, v.msg_val, val_mt, arena)) {
+                                    croak("Deep copy of map value message failed");
+                                }
                                 v.msg_val = dst_v;
                             }
                             upb_Map_Set(dst_map, k, v, arena);
@@ -319,26 +418,29 @@ bool PerlUpb_SvToUpb(pTHX_ SV *sv, const upb_FieldDef *f, upb_MessageValue *val,
             const upb_FieldDef* key_f = upb_MessageDef_FindFieldByNumber(entry_def, 1);
             const upb_FieldDef* val_f = upb_MessageDef_FindFieldByNumber(entry_def, 2);
             upb_Map* dst_map = upb_Map_New(arena, upb_FieldDef_CType(key_f), upb_FieldDef_CType(val_f));
+            if (!dst_map) croak("Arena allocation failed for map");
 
             hv_iterinit(hv);
             HE* he;
             while ((he = hv_iternext(hv))) {
                 SV* key_sv = hv_iterkeysv(he);
                 SV* val_sv = hv_iterval(hv, he);
+                bool did_enter = false;
 
                 if (mg && (!val_sv || !SvOK(val_sv))) {
                     dSP; ENTER; SAVETMPS; PUSHMARK(SP);
+                    did_enter = true;
                     XPUSHs(tied_obj); XPUSHs(sv_2mortal(newSVsv(key_sv))); PUTBACK;
                     call_method("FETCH", G_SCALAR);
                     SPAGAIN; val_sv = POPs; PUTBACK;
                 }
 
                 upb_MessageValue k, v;
-                if (!convert_singular_sv_to_upb(aTHX_ key_sv, key_f, &k, arena)) return false;
-                if (!convert_singular_sv_to_upb(aTHX_ val_sv, val_f, &v, arena)) return false;
+                bool ok = convert_singular_sv_to_upb(aTHX_ key_sv, key_f, &k, arena) &&
+                          convert_singular_sv_to_upb(aTHX_ val_sv, val_f, &v, arena);
+                if (did_enter) { FREETMPS; LEAVE; }
+                if (!ok) return false;
                 upb_Map_Set(dst_map, k, v, arena);
-
-                if (mg) { FREETMPS; LEAVE; }
             }
             val->map_val = dst_map;
             return true;
@@ -374,6 +476,7 @@ bool PerlUpb_SvToUpb(pTHX_ SV *sv, const upb_FieldDef *f, upb_MessageValue *val,
                             const upb_MessageDef* mdef = upb_FieldDef_MessageSubDef(f);
                             const upb_MiniTable* mt = upb_MessageDef_MiniTable(mdef);
                             upb_Message* dst_msg = upb_Message_New(mt, arena);
+                            if (!dst_msg) croak("Arena allocation failed for repeated message element %zu", i);
                             if (!upb_Message_DeepCopy(dst_msg, item.msg_val, mt, arena)) {
                                 croak("Failed to deep copy message element %zu", i);
                             }
@@ -419,24 +522,27 @@ bool PerlUpb_SvToUpb(pTHX_ SV *sv, const upb_FieldDef *f, upb_MessageValue *val,
             for (I32 i = 0; i < (I32)num_elements; ++i) {
                 SV **elem_sv_ptr = av_fetch(av, i, 0);
                 SV *elem_sv = (elem_sv_ptr) ? *elem_sv_ptr : NULL;
+                bool did_enter = false;
 
                 if (mg && (!elem_sv || !SvOK(elem_sv))) {
                     dSP; ENTER; SAVETMPS; PUSHMARK(SP);
+                    did_enter = true;
                     XPUSHs(tied_obj); XPUSHs(sv_2mortal(newSViv(i))); PUTBACK;
                     call_method("FETCH", G_SCALAR);
                     SPAGAIN; elem_sv = POPs; PUTBACK;
                 }
 
                 if (!elem_sv) {
+                    if (did_enter) { FREETMPS; LEAVE; }
                     croak("Error fetching element %d from array for field '%s'", (int)i, upb_FieldDef_Name(f));
                     return false;
                 }
 
                 upb_MessageValue item_val;
-                if (!convert_singular_sv_to_upb(aTHX_ elem_sv, f, &item_val, arena)) return false;
+                bool ok = convert_singular_sv_to_upb(aTHX_ elem_sv, f, &item_val, arena);
+                if (did_enter) { FREETMPS; LEAVE; }
+                if (!ok) return false;
                 upb_Array_Set(arr, i, item_val);
-
-                if (mg) { FREETMPS; LEAVE; }
             }
         }
         val->array_val = arr;

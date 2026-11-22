@@ -186,8 +186,8 @@ subtest 'absent and false are different values, natively' => sub {
     is($result->is_vpn // 0, 0, 'and reads an absent field as false too');
     ok(!exists $result->location->{city}, 'a paid member of a shared object is absent too');
     is_deeply([$result->fields], [qw(
-        is_bogon is_tor is_relay is_hosting is_anycast is_carrier is_satellite is_ssh is_smtp is_web
-        is_dns_resolver is_bittorrent tor relay location asn company hostname abuse
+        is_bogon is_tor is_relay is_hosting is_bot is_anycast is_carrier is_satellite is_ssh is_smtp
+        is_web is_dns_resolver is_bittorrent tor relay location asn company hostname abuse
     )], 'fields lists what was served, in wire order');
     is_deeply([sort keys %{ $result->raw }], [sort keys %{ lookup_body(is_hosting => \0) }], 'raw is the wire body');
     # raw keeps the JSON booleans, so it re-encodes to true/false rather than 1/0.
@@ -503,6 +503,10 @@ subtest 'a member of the wrong type or a null is a retried server_error' => sub 
         ['lookup, a flag of 1', 'lookup', { %$lookup, is_tor => 1 }],
         ['lookup, is_bogon of null', 'lookup', { %$lookup, is_bogon => undef }],
         ['lookup, no is_anycast', 'lookup', { %$lookup, is_anycast => undef }],
+        ['lookup, no is_bot', 'lookup', { map { $_ => $lookup->{$_} } grep { $_ ne 'is_bot' } keys %$lookup }],
+        ['lookup, a bot of "x"', 'lookup', { %$lookup, bot => 'x' }],
+        ['lookup, a bot whose agents is a string', 'lookup', { %$lookup, bot => { agents => 'Googlebot' } }],
+        ['lookup, a bot verified of "true"', 'lookup', { %$lookup, bot => { verified => 'true' } }],
         ['lookup, an empty object', 'lookup', {}],
         ['lookup, a detail of "x"', 'lookup', { %$lookup, vpn => 'x' }],
         ['lookup, no tor', 'lookup', { %$lookup, tor => undef }],

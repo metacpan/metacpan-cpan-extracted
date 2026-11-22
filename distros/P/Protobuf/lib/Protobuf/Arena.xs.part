@@ -1,12 +1,18 @@
 MODULE = Protobuf::Arena  PACKAGE = Protobuf::Arena
 
-IV
-_xs_create_raw()
+void
+_xs_alloc_arena(self)
+    SV* self
     CODE:
-        RETVAL = PTR2IV(PerlUpb_Arena_CreateRaw(aTHX));
-
-    OUTPUT:
-        RETVAL
+        if (!sv_isa(self, "Protobuf::Arena") || !SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVHV) {
+            croak("Invalid target for _xs_alloc_arena");
+        }
+        if (!PerlUpb_Arena_GetWrapperRaw(aTHX_ self, NULL)) {
+            void* raw = PerlUpb_Arena_CreateRaw(aTHX);
+            HV* hv = (HV*)SvRV(self);
+            hv_store(hv, "_arena_ptr", 10, newSViv(PTR2IV(raw)), 0);
+            PerlUpb_Arena_AttachMagic(aTHX_ self, raw, false);
+        }
 
 
 SV*
@@ -30,12 +36,6 @@ _xs_attach_tmpfs_raw(path, size)
     OUTPUT:
         RETVAL
 
-
-void
-_xs_destroy_raw(ptr_iv)
-    IV ptr_iv
-    CODE:
-        PerlUpb_Arena_DestroyRaw(aTHX_ INT2PTR(void*, ptr_iv));
 
 void
 _xs_destroy(self)
@@ -114,11 +114,11 @@ void
 _xs_test_block_canary(self)
     SV* self
     CODE:
-        SV* rv = SvRV(self);
-        SV** svp = hv_fetch((HV*)rv, "_arena_ptr", 10, 0);
-        if (!svp || !SvIOK(*svp)) croak("Invalid arena object");
-        void* raw_ptr = INT2PTR(void*, SvIV(*svp));
+        bool is_tmpfs = false;
+        void* raw_ptr = PerlUpb_Arena_GetWrapperRaw(aTHX_ self, &is_tmpfs);
+        if (!raw_ptr || !is_tmpfs) croak("Invalid tmpfs arena object");
         PerlUpb_Arena_Custom* wrapper = (PerlUpb_Arena_Custom*)raw_ptr;
+        if (!wrapper->alloc) croak("Missing block allocator");
         size_t size = 64;
         void* p = wrapper->alloc->base.func(&wrapper->alloc->base, NULL, 0, size, NULL);
         if (p) {
@@ -133,18 +133,13 @@ _xs_set_numa_node(self, node)
     SV* self
     int node
     CODE:
-        if (!sv_derived_from(self, "Protobuf::Arena")) croak("Not a Protobuf::Arena");
-        SV* rv = SvRV(self);
-        if (SvTYPE(rv) != SVt_PVHV) croak("Arena must be a hash ref");
-        SV** svp = hv_fetch((HV*)rv, "_arena_ptr", 10, 0);
-        if (!svp || !SvIOK(*svp)) croak("Invalid arena object");
-        // Only managed arenas (PerlUpb_Arena) support NUMA node setting for now.
-        // Tmpfs arenas are mmapped on a file and policy is different.
-        SV** is_tmpfs = hv_fetch((HV*)rv, "_is_tmpfs", 9, 0);
-        if (is_tmpfs && SvTRUE(*is_tmpfs)) {
+        bool is_tmpfs = false;
+        void* raw_ptr = PerlUpb_Arena_GetWrapperRaw(aTHX_ self, &is_tmpfs);
+        if (!raw_ptr) croak("Invalid arena object");
+        if (is_tmpfs) {
              croak("set_numa_node not supported for tmpfs arenas");
         }
-        PerlUpb_Arena* a = INT2PTR(PerlUpb_Arena*, SvIV(*svp));
+        PerlUpb_Arena* a = (PerlUpb_Arena*)raw_ptr;
         a->stats_alloc.numa_node = node;
 
 void
@@ -152,11 +147,11 @@ _xs_set_chaos_fail_probability(self, p)
     SV* self
     double p
     CODE:
-        if (!sv_derived_from(self, "Protobuf::Arena")) croak("Not a Protobuf::Arena");
-        SV* rv = SvRV(self);
-        SV** svp = hv_fetch((HV*)rv, "_arena_ptr", 10, 0);
-        if (svp && SvIOK(*svp)) {
-            PerlUpb_Arena* a = INT2PTR(PerlUpb_Arena*, SvIV(*svp));
+        bool is_tmpfs = false;
+        void* raw_ptr = PerlUpb_Arena_GetWrapperRaw(aTHX_ self, &is_tmpfs);
+        if (!raw_ptr) croak("Not a valid Protobuf::Arena");
+        if (!is_tmpfs) {
+            PerlUpb_Arena* a = (PerlUpb_Arena*)raw_ptr;
             a->stats_alloc.fail_probability = p;
         }
 
@@ -165,11 +160,11 @@ _xs_set_chaos_delay_probability(self, p)
     SV* self
     double p
     CODE:
-        if (!sv_derived_from(self, "Protobuf::Arena")) croak("Not a Protobuf::Arena");
-        SV* rv = SvRV(self);
-        SV** svp = hv_fetch((HV*)rv, "_arena_ptr", 10, 0);
-        if (svp && SvIOK(*svp)) {
-            PerlUpb_Arena* a = INT2PTR(PerlUpb_Arena*, SvIV(*svp));
+        bool is_tmpfs = false;
+        void* raw_ptr = PerlUpb_Arena_GetWrapperRaw(aTHX_ self, &is_tmpfs);
+        if (!raw_ptr) croak("Not a valid Protobuf::Arena");
+        if (!is_tmpfs) {
+            PerlUpb_Arena* a = (PerlUpb_Arena*)raw_ptr;
             a->stats_alloc.delay_probability = p;
         }
 
@@ -210,6 +205,16 @@ _xs_get_offset(self, ptr_iv)
     IV ptr_iv
     CODE:
         RETVAL = PerlUpb_Arena_GetOffset(aTHX_ self, INT2PTR(void*, ptr_iv));
+
+    OUTPUT:
+        RETVAL
+
+size_t
+_xs_write_shared_message(self, msg_sv)
+    SV* self
+    SV* msg_sv
+    CODE:
+        RETVAL = PerlUpb_Arena_WriteSharedMessage(aTHX_ self, msg_sv);
 
     OUTPUT:
         RETVAL

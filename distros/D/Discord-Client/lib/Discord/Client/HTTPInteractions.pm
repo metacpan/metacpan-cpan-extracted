@@ -14,7 +14,7 @@ use Discord::Client::Commands;
 use Discord::Client::Interactions;
 use Discord::Client::REST;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 sub new {
     my ( $class, %args ) = @_;
@@ -191,11 +191,22 @@ sub handle {
 sub _expire_replay_records {
     my ( $self, $now ) = @_;
 
+    # No retained ID can expire before the earliest recorded deadline.
+    return if defined( $self->{next_seen_expiry} ) && $now < $self->{next_seen_expiry};
+    delete $self->{next_seen_expiry};
+
     # Expire completed IDs only; running work must remain protected from replay.
     for my $id ( keys %{ $self->{seen} } ) {
-        next if $self->{pending}{$id} || $self->{seen}{$id} > $now;
-        delete $self->{seen}{$id};
-        delete $self->{replies}{$id};
+        my $expires = $self->{seen}{$id};
+        if ( !$self->{pending}{$id} && $expires <= $now ) {
+            delete $self->{seen}{$id};
+            delete $self->{replies}{$id};
+            next;
+        }
+
+        # An expired running ID keeps the next request eligible to check again.
+        $self->{next_seen_expiry} = $expires
+            if !defined( $self->{next_seen_expiry} ) || $expires < $self->{next_seen_expiry};
     }
 }
 
@@ -229,6 +240,8 @@ sub _dispatch_payload {
     # Reserve the ID before invoking application code, including reentrant calls.
     $self->{pending}{$id} = $record;
     $self->{seen}{$id} = $now + $self->{replay_ttl};
+    $self->{next_seen_expiry} = $self->{seen}{$id}
+        if !defined( $self->{next_seen_expiry} ) || $self->{seen}{$id} < $self->{next_seen_expiry};
     my $work = $self->{dispatcher}->handle(
         $payload,
         received_at => $received_at,

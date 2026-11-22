@@ -5,16 +5,16 @@ use warnings;
 
 use Carp ();
 
-our $VERSION = '1.17.1';
+our $VERSION = '1.18.0';
 
 our @FLAGS = qw(
     is_vpn is_tor is_relay is_resproxy is_dcproxy is_mobproxy is_pubproxy is_hosting is_cdn
-    is_anycast is_carrier is_satellite is_ssh is_smtp is_web is_dns_resolver is_bittorrent
+    is_bot is_anycast is_carrier is_satellite is_ssh is_smtp is_web is_dns_resolver is_bittorrent
 );
 # Each flag's detail: an object, or for Web IP a list of the web servers found.
 our @DETAILS = qw(
-    vpn tor relay resproxy dcproxy mobproxy pubproxy hosting cdn carrier satellite ssh smtp web
-    dns_resolver bittorrent
+    vpn tor relay resproxy dcproxy mobproxy pubproxy hosting cdn bot carrier satellite ssh smtp
+    web dns_resolver bittorrent
 );
 # Where the address is and who holds it, copied as served: objects, and the
 # reverse-DNS hostname's string.
@@ -150,7 +150,7 @@ the flag above it is false. A populated one always carries every one of its keys
 Always present. C<is_bogon> is set for reserved space, which the client answers
 itself without a request.
 
-=head2 is_tor, is_relay, is_anycast, is_carrier, is_satellite, is_ssh, is_smtp, is_web, is_dns_resolver, is_bittorrent
+=head2 is_tor, is_relay, is_bot, is_anycast, is_carrier, is_satellite, is_ssh, is_smtp, is_web, is_dns_resolver, is_bittorrent
 
 On every answer, with a key or without one: C<1> or C<0>.
 
@@ -158,11 +158,14 @@ On every answer, with a key or without one: C<1> or C<0>.
 
 The paid flags: C<1>, C<0>, or C<undef> when your plan omits the field.
 
-=head2 vpn, tor, relay, resproxy, dcproxy, mobproxy, pubproxy, hosting, cdn, carrier, satellite, ssh, smtp, web, dns_resolver, bittorrent
+=head2 vpn, tor, relay, resproxy, dcproxy, mobproxy, pubproxy, hosting, cdn, bot, carrier, satellite, ssh, smtp, web, dns_resolver, bittorrent
 
 The detail behind each flag, as plain hash references (C<web> an array reference
 of the web servers found), or C<undef> when your plan omits them. Unlimited
-answers C<tor> and C<relay>; every paid plan answers them all.
+answers C<tor> and C<relay>; every paid plan answers them all. C<bot> names whose
+bot uses the address (C<provider>, C<provider_name>), its bots as their user
+agents name them (C<agents>), what they do (C<categories>) and whether the
+operator vouches for the address (C<verified>, C<identity>, C<verified_by>).
 
 =head2 location, asn, company, hostname, abuse
 

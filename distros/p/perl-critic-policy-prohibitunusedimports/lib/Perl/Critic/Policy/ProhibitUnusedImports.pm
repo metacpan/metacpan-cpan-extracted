@@ -1,5 +1,5 @@
 package Perl::Critic::Policy::ProhibitUnusedImports;
-$Perl::Critic::Policy::ProhibitUnusedImports::VERSION = '1.002';
+$Perl::Critic::Policy::ProhibitUnusedImports::VERSION = '1.003';
 # ABSTRACT: An import nobody uses is a dependency nobody knew they had.
 
 use strict;
@@ -74,6 +74,9 @@ sub violates {
       if !@imports && !_module_referenced( $document, $elem, $module );
 
     return if !@imports;
+
+    # perl calls these when another file uses this package, so no call is written.
+    return if grep { $_ eq 'import' || $_ eq 'unimport' } @imports;
 
     my $used = _used_names( $document, $elem );
     foreach my $name (@imports) {
@@ -304,7 +307,7 @@ Perl::Critic::Policy::ProhibitUnusedImports - An import nobody uses is a depende
 
 =head1 VERSION
 
-version 1.002
+version 1.003
 
 =head1 Perl::Critic::Policy::ProhibitUnusedImports
 
@@ -382,6 +385,11 @@ Test::NoWarnings and Test2::Plugin::NoWarnings install a check of the warnings
 of the whole test from their import.  Mojo::Base takes flags, such as C<-base>
 and C<-signatures>, which turn on features and set C<@ISA> rather than name
 symbols.
+
+An import of C<import> or C<unimport>, as in C<use Exporter qw{import}>, is
+never reported, whatever the module.  perl calls those methods when another
+file uses or unuses this package, so the file that imports them never calls
+them.
 
 =back
 

@@ -6,6 +6,23 @@ use warnings;
 use Moo;
 use JSON::MaybeXS;
 use MIME::Base64 qw(decode_base64);
+use Scalar::Util qw(looks_like_number);
+
+my %ALLOWED_JWT_ALGS = (
+  RS256 => 1,
+  ES256 => 1,
+);
+
+my %ALG_TO_KTY = (
+  RS256 => 'RSA',
+  ES256 => 'EC',
+);
+
+sub _is_finite_number {
+  my ($val) = @_;
+  return 0 if !defined $val || ref($val);
+  return $val =~ /\A-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?\z/ ? 1 : 0;
+}
 use Google::Auth;
 use Google::Auth::IDTokens::KeySources;
 
@@ -68,6 +85,11 @@ sub verify {
     die 'VerificationError: Failed to parse JWT payload: ' . $@;
   }
 
+  my $alg = $header->{alg};
+  if (!defined $alg || !$ALLOWED_JWT_ALGS{$alg}) {
+    die 'VerificationError: Unsupported or missing alg claim in JWT header';
+  }
+
   my $kid = $header->{kid};
   die 'VerificationError: Missing kid claim in JWT header' unless defined $kid;
 
@@ -80,6 +102,21 @@ sub verify {
     my ($keys_ref) = @_;
     foreach my $key (@$keys_ref) {
       if ($key->id eq $kid) {
+        if ( defined $key->algorithm
+          && length $key->algorithm
+          && $key->algorithm ne $alg)
+        {
+          next;
+        }
+        if ( $key->can('key_type')
+          && defined $key->key_type
+          && length $key->key_type)
+        {
+          my $expected_kty = $ALG_TO_KTY{$alg};
+          if (defined $expected_kty && $key->key_type ne $expected_kty) {
+            next;
+          }
+        }
         if (Google::Auth::verify_signature($key->key, $message, $signature)) {
           return 1;
         }
@@ -103,14 +140,25 @@ sub verify {
   }
 
   my $now = $options{time_now} // time();
-  if (exists $payload->{exp} && $payload->{exp} < $now - $clock_skew) {
+  if (!_is_finite_number($payload->{exp})) {
+    die 'VerificationError: Missing or invalid exp claim';
+  }
+  if ($payload->{exp} < $now - $clock_skew) {
     die 'ExpiredTokenError: Token signature is expired';
   }
-  if (exists $payload->{nbf} && $payload->{nbf} > $now + $clock_skew) {
-    die 'VerificationError: Token not yet valid';
+  if (exists $payload->{nbf}) {
+    if (!_is_finite_number($payload->{nbf})
+      || $payload->{nbf} > $now + $clock_skew)
+    {
+      die 'VerificationError: Token not yet valid';
+    }
   }
-  if (exists $payload->{iat} && $payload->{iat} > $now + $clock_skew) {
-    die 'VerificationError: Token issued in the future';
+  if (exists $payload->{iat}) {
+    if (!_is_finite_number($payload->{iat})
+      || $payload->{iat} > $now + $clock_skew)
+    {
+      die 'VerificationError: Token issued in the future';
+    }
   }
 
   $payload->{azp} ||= $payload->{cid} if exists $payload->{cid};

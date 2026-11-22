@@ -3,9 +3,12 @@ BEGIN { require 5.010001 }; ## no critic ( RequireUseStrict, RequireUseWarnings 
 use strict;
 use warnings;
 
+#<<<
 package Class::Enumeration;
-
-$Class::Enumeration::VERSION = 'v1.3.1';
+BEGIN {
+our $VERSION = 'v1.3.2';
+}
+#>>>
 
 use overload
   '""'     => 'to_string',

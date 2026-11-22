@@ -547,9 +547,10 @@ sub parse_separator {
 
 2. **Column alignment** — `call_ansicolumn()` invokes `App::ansicolumn::ansicolumn()` via `Command::Run` (same pattern as the tee module's `call()` function):
    - `-rs '\s*\|\s*'` (trim) or `-s '|'` (non-trim): Input separator
-   - `--item-format=' %s '` (trim only): Add padding to each cell
+   - `--item-format=' %s'` (trim only): a space at the left of each cell, where the marks are put, and `table_gap` - 1 spaces at its right (none by default, in every style)
    - `--table-remove=1,-0` (trim only): Remove leading/trailing empty columns
    - `--padding` (trim only): Pad last column to full width
+   - No option is given for the right end: since App::ansicolumn 1.70 (`--table-tight`, the default) the pad at the right end, from `--item-format`, is not counted when the table is fit into `-w`, and is left out when the table does not fit the width with it. The text of the last column can then go up to the right end, where the margin of the page follows, and a line with a character run in (`。`) fits a width less by one. A table which fits with the pad keeps it, so narrow tables do not change. All styles; the left pad stays, because the marks use it. No style has a right pad by default (`table_gap=1`), so this has an effect only with `table_gap` of 2 or more
    - `-o $sep`: Output separator (`│` when rule is enabled, `|` otherwise)
    - `-t`: Table mode (auto-determine column widths)
    - `--cu=1`: Column unit (minimum column width)

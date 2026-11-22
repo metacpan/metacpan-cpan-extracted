@@ -86,6 +86,16 @@ Update relevant documentation with code changes.
 Record published releases in `Changes`; keep development notes out of it.
 Run `prove -lr t` before submitting a pull request.
 
+Use `prove --timer -lr t` to report wall and CPU time per test file. For
+Gateway TLS, Identify, READY and large-frame timings, run
+`DISCORD_CLIENT_TEST_TIMING=1 prove -lv t/13-gateway-websocket.t`.
+The diagnostic reports cumulative wall, user and system CPU time from the start
+of certificate generation; CPU times have the platform's `times` resolution.
+It retains the same payloads, assertions and five-second I/O watchdogs.
+The integration watchdogs measure monotonic time so system clock corrections
+cannot expire relative waits early. `PERL_TEST_TIME_OUT_FACTOR` does not scale
+these five-second budgets.
+
 ## Documentation
 
 Keep public API documentation in each module's POD. Include a minimal example,

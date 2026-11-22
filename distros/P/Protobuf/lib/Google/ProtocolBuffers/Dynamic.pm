@@ -5,8 +5,9 @@ use warnings;
 use Protobuf;
 use Protobuf::DescriptorPool;
 use File::Basename qw(dirname basename);
+use File::Temp qw(tempfile);
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 sub new {
     my ($class, %opts) = @_;
@@ -28,9 +29,9 @@ sub load_file {
     my %seen;
     @inc = grep { !$seen{$_}++ } @inc;
 
-    my @inc_flags = map { "-I$_" } @inc;
-    my $cmd = "protoc @inc_flags -o /dev/stdout \"$file\"";
-    open my $ph, '-|', $cmd or die "Failed to execute protoc: $!";
+    my @inc_flags = map { '-I' . $_ } @inc;
+    open my $ph, '-|', 'protoc', @inc_flags, '-o', '/dev/stdout', $file
+        or die 'Failed to execute protoc: ' . $!;
     binmode $ph;
     local $/;
     my $bytes = <$ph>;
@@ -61,9 +62,8 @@ sub load_file {
 
 sub load_string {
     my ($self, $string, %opts) = @_;
-    my $tmp_file = 'tmp_' . time() . '_' . int(rand(100000)) . '.proto';
-    open my $fh, '>', $tmp_file or die "Cannot write temp proto file: $!";
-    print $fh $string;
+    my ($fh, $tmp_file) = tempfile('proto_XXXXXX', SUFFIX => '.proto', TMPDIR => 1, UNLINK => 1);
+    print {$fh} $string;
     close $fh;
 
     my $ret = eval { $self->load_file($tmp_file) };

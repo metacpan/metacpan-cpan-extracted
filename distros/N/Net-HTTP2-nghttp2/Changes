@@ -1,5 +1,15 @@
 Revision history for Net-HTTP2-nghttp2
 
+0.014   2026-11-21
+        - mem_send takes an optional byte limit: mem_send($max_bytes)
+          returns at most $max_bytes and leaves the rest queued in the
+          session, with want_write true until a later call takes it. A
+          server on a non-blocking socket can now keep libnghttp2's output
+          under its own buffer bound instead of having everything the
+          peer's flow-control window allows serialized into the process at
+          once (CVE-2019-9517, "Internal Data Buffering"). mem_send() with
+          no argument is unchanged.
+
 0.013   2026-11-19
         - CRITICAL FIX, upgrade recommended. Every earlier release truncates
           a body larger than one DATA frame (16384 bytes by default): the

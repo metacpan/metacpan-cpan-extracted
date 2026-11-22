@@ -111,10 +111,10 @@ subtest 'add_user, get_user, check_password, set_password' => sub {
 subtest 'suspend_user' => sub {
     my $user = $moodle->get_user( username => $username );
     ok ! $user->{suspended}, 'get_user shows that the user has not been suspended';
-    $moodle->suspend_user( username => $username );
+    ok $moodle->suspend_user( username => $username )->{ok}, 'suspend_user reports success';
     $user = $moodle->get_user( username => $username );
     ok $user->{suspended}, 'get_user shows that the user has been suspended';
-    $moodle->suspend_user( username => $username, suspend => 0 );
+    ok $moodle->suspend_user( username => $username, suspend => 0 )->{ok}, 'suspend_user reports success when unsuspending';
     $user = $moodle->get_user( username => $username );
     ok ! $user->{suspended}, 'get_user shows that the user has been unsuspended';
 };

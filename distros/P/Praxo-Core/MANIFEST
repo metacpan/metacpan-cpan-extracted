@@ -2,7 +2,7 @@ MANIFEST
 Makefile.PL
 VERSION
 LICENSE
-README.md
+README.pod
 REGISTRY.md
 llms.txt
 llms.md

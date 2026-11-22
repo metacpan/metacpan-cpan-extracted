@@ -1,0 +1,55 @@
+{
+   "abstract" : "Norwegian postcodes with associated information",
+   "author" : [
+      "Arne Sommer <perl@bbop.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Geo-Postcodes-NO",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://www.bring.no/tjenester/adressetjenester/postnummer",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/arnesom/perl-geo-postcodes-no.git",
+         "web" : "https://github.com/arnesom/perl-geo-postcodes-no"
+      }
+   },
+   "version" : "1.00",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

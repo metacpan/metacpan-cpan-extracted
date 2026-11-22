@@ -19,6 +19,7 @@ namespace absl {
 using string_view = std::string_view;
 }  // namespace absl
 #else
+#include "third_party/absl/strings/str_cat.h"
 #include "third_party/absl/strings/string_view.h"
 #endif
 
@@ -55,8 +56,9 @@ std::string ToCamelCase(absl::string_view s) {
   std::string res;
   for (absl::string_view segment : SplitString(s, '_')) {
     if (segment.empty()) continue;
-    res += (char)toupper(segment[0]);
-    res += std::string(segment.substr(1));
+    char upper =
+        static_cast<char>(std::toupper(static_cast<unsigned char>(segment[0])));
+    absl::StrAppend(&res, absl::string_view(&upper, 1), segment.substr(1));
   }
   return res;
 }
@@ -83,7 +85,7 @@ std::string GetDefaultHost(absl::string_view proto_pkg) {
   if (ConsumePrefix(&sub, "google.cloud.") || ConsumePrefix(&sub, "google.")) {
     size_t end = sub.find('.');
     if (end != absl::string_view::npos) {
-      return std::string(sub.substr(0, end)) + ".googleapis.com:443";
+      return absl::StrCat(sub.substr(0, end), ".googleapis.com:443");
     }
   }
   return "localhost:443";
@@ -93,10 +95,14 @@ std::string CapitalizePackage(absl::string_view s) {
   std::string res;
   bool first = true;
   for (absl::string_view segment : SplitString(s, '.')) {
-    if (!first) res += "::";
+    absl::string_view sep = first ? absl::string_view() : "::";
     if (!segment.empty()) {
-      res += (char)toupper(segment[0]);
-      res += std::string(segment.substr(1));
+      char upper = static_cast<char>(
+          std::toupper(static_cast<unsigned char>(segment[0])));
+      absl::StrAppend(&res, sep, absl::string_view(&upper, 1),
+                      segment.substr(1));
+    } else if (!sep.empty()) {
+      absl::StrAppend(&res, sep);
     }
     first = false;
   }

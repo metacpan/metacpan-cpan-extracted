@@ -1,40 +1,33 @@
-use strict;
-use warnings;
+use Test2::V1
+  -pragmas,
+  -target => { CLASS => 'Class::Enumeration::Builder' },
+  qw( dies is isa_ok isnt lives ok plan subtest );
+use Test::Warn qw( warning_like );
 
-use Test::More import => [ qw( BAIL_OUT cmp_ok isa_ok plan require_ok subtest ) ], tests => 6;
-use Test::Fatal qw( dies_ok lives_ok );
-use Test::Warn  qw( warning_like );
+plan 5;
 
-my $class;
+isnt dies { CLASS->import( A => {}, B => { foo => 2 } ) }, undef, 'Different number of custom attributes';
 
-BEGIN {
-  $class = 'Class::Enumeration::Builder';
-  require_ok $class or BAIL_OUT "Cannot load class '$class'!"
-}
+isnt dies { CLASS->import( A => { foo => 1 }, B => { bar => 2 } ) }, undef, 'Different names of custom attributes';
 
-dies_ok { $class->import( A => {}, B => { foo => 2 } ) } 'Different number of custom attributes';
+isnt dies { CLASS->import( { class => 'PowerState', foo => 1, bar => 2 }, qw( OFF ON ) ) }, undef, 'Unknown options';
 
-dies_ok { $class->import( A => { foo => 1 }, B => { bar => 2 } ) } 'Different names of custom attributes';
-
-dies_ok { $class->import( { class => 'PowerState', foo => 1, bar => 2 }, qw( OFF ON ) ) } 'Unknown options';
-
-lives_ok { $class->import( A => { foo => 1 }, B => { foo => 2 } ) } 'Same names of custom attributes';
+ok lives { CLASS->import( A => { foo => 1 }, B => { foo => 2 } ) }, 'Same names of custom attributes';
 
 subtest 'Create enum class at runtime' => sub {
-  plan tests => 7;
+  plan 7;
 
   my $enum_class;
-  lives_ok {
-    $enum_class = $class->import(
+  ok lives {
+    $enum_class = CLASS->import(
       { class => 'CoffeeSize' },
       BIG          => { ounces => 8 },
       HUGE         => { ounces => 10 },
       OVERWHELMING => { ounces => 16 }
     )
-  }
-  'Create enum class and return its name';
+  }, 'Create enum class and return its name';
   warning_like {
-    $class->import(
+    CLASS->import(
       { class => 'CoffeeSize' },
       BIG          => { ounces => 8 },
       HUGE         => { ounces => 10 },
@@ -42,11 +35,11 @@ subtest 'Create enum class at runtime' => sub {
     )
   }
   { carped => qr/already built/ }, 'Carped warning raised';
-  cmp_ok $enum_class, 'eq', 'CoffeeSize', 'Check enum class name';
+  is $enum_class, 'CoffeeSize', 'Check enum class name';
   isa_ok $enum_class, 'Class::Enumeration';
 
   my $self = $enum_class->value_of( 'HUGE' );
-  cmp_ok $self->name,    'eq', 'HUGE', 'Get name';
-  cmp_ok $self->ordinal, '==', 1,      'Get ordinal';
-  cmp_ok $self->ounces,  '==', 10,     'Get ounces'
+  is $self->name,    'HUGE', 'Get name';
+  is $self->ordinal, 1,      'Get ordinal';
+  is $self->ounces,  10,     'Get ounces'
 }

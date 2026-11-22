@@ -18,11 +18,28 @@ typedef struct {
     SV* message_sv;
 } PerlUpb_UnknownFieldSet;
 
+static int unknown_field_set_cleanup(pTHX_ SV* sv, MAGIC* mg) {
+    PerlUpb_UnknownFieldSet* s = (PerlUpb_UnknownFieldSet*)mg->mg_ptr;
+    if (s) {
+        mg->mg_ptr = NULL;
+        if (!PL_dirty && s->message_sv) {
+            SvREFCNT_dec(s->message_sv);
+        }
+        safefree(s);
+    }
+    return 0;
+}
+
+static MGVTBL unknown_field_set_vtbl = {
+    NULL, NULL, NULL, NULL, unknown_field_set_cleanup
+};
+
 SV* PerlUpb_UnknownFieldSet_New(pTHX_ SV* message_sv) {
-    PerlUpb_UnknownFieldSet* s = (PerlUpb_UnknownFieldSet*)malloc(sizeof(PerlUpb_UnknownFieldSet));
+    PerlUpb_UnknownFieldSet* s = (PerlUpb_UnknownFieldSet*)safemalloc(sizeof(PerlUpb_UnknownFieldSet));
     s->message_sv = newSVsv(message_sv);
 
-    SV* sv = newSViv((IV)s);
+    SV* sv = newSViv(PTR2IV(s));
+    sv_magicext(sv, NULL, PERL_MAGIC_ext, &unknown_field_set_vtbl, (const char*)s, 0);
     SV* obj = newRV_noinc(sv);
     sv_bless(obj, gv_stashpv("Protobuf::UnknownFieldSet", GV_ADD));
     return obj;
@@ -32,7 +49,8 @@ static PerlUpb_UnknownFieldSet* GetSet(pTHX_ SV* sv) {
     if (!sv || !SvROK(sv) || !sv_derived_from(sv, "Protobuf::UnknownFieldSet")) {
         return NULL;
     }
-    return (PerlUpb_UnknownFieldSet*)SvIV(SvRV(sv));
+    MAGIC* mg = mg_findext(SvRV(sv), PERL_MAGIC_ext, &unknown_field_set_vtbl);
+    return (mg && mg->mg_ptr) ? (PerlUpb_UnknownFieldSet*)mg->mg_ptr : NULL;
 }
 
 SV* PerlUpb_UnknownFieldSet_GetData(pTHX_ SV* self) {
@@ -189,11 +207,13 @@ void PerlUpb_UnknownFieldSet_DeleteTag(pTHX_ SV* self, uint32_t tag) {
 }
 
 void PerlUpb_UnknownFieldSet_Free(pTHX_ SV* sv) {
-    if (PL_dirty) return;
-    PerlUpb_UnknownFieldSet* s = GetSet(aTHX_ sv);
-    if (s) {
-        SvREFCNT_dec(s->message_sv);
-        free(s);
+    if (PL_dirty || !sv || !SvROK(sv) || !sv_derived_from(sv, "Protobuf::UnknownFieldSet")) return;
+    MAGIC* mg = mg_findext(SvRV(sv), PERL_MAGIC_ext, &unknown_field_set_vtbl);
+    if (mg && mg->mg_ptr) {
+        PerlUpb_UnknownFieldSet* s = (PerlUpb_UnknownFieldSet*)mg->mg_ptr;
+        mg->mg_ptr = NULL;
+        if (s->message_sv) SvREFCNT_dec(s->message_sv);
+        safefree(s);
         sv_setiv(SvRV(sv), 0);
     }
 }

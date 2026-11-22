@@ -138,12 +138,20 @@ use Protobuf::Internal; # Ensure audit logging is available
 require Protobuf;
 use Carp qw(croak);
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 has '_arena_ptr' => (
     is       => 'ro',
-    default  => sub { _xs_create_raw() },
+    init_arg => undef,
 );
+
+sub BUILD {
+    my ($self) = @_;
+    if ($Protobuf::HAS_XS) {
+        _xs_alloc_arena($self);
+    }
+    return;
+}
 
 sub new_tmpfs {
     my ($class, $path, $size) = @_;
@@ -228,8 +236,11 @@ sub verify_selinux {
 }
 
 sub get_offset {
-    my ($self, $ptr_iv) = @_;
-    return $self->_xs_get_offset($ptr_iv);
+    my ($self, $target) = @_;
+    if (ref($target) && eval { $target->isa('Protobuf::Message') }) {
+        return $self->_xs_write_shared_message($target);
+    }
+    return $self->_xs_get_offset($target);
 }
 
 sub attach_message {

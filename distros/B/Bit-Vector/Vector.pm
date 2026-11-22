@@ -23,7 +23,7 @@ require DynaLoader;
 
 @EXPORT_OK = qw();
 
-$VERSION = '7.4';
+$VERSION = '7.5';
 
 bootstrap Bit::Vector $VERSION;
 

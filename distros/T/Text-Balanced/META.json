@@ -4,7 +4,7 @@
       "Damian Conway <damian@conway.org>, Adam Kennedy <adamk@cpan.org>, Steve Hay <shay@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "perl_5"
    ],
@@ -110,6 +110,7 @@
       "test" : {
          "requires" : {
             "Test::More" : "0.88",
+            "Time::HiRes" : "0",
             "vars" : "0"
          }
       }
@@ -121,6 +122,6 @@
          "web" : "https://github.com/steve-m-hay/Text-Balanced"
       }
    },
-   "version" : "2.07",
+   "version" : "2.08",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

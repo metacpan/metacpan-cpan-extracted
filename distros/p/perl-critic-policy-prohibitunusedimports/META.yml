@@ -25,7 +25,7 @@ no_index:
 provides:
   Perl::Critic::Policy::ProhibitUnusedImports:
     file: lib/Perl/Critic/Policy/ProhibitUnusedImports.pm
-    version: '1.002'
+    version: '1.003'
 requires:
   Perl::Critic::Policy: '0'
   Perl::Critic::Utils: '0'
@@ -39,7 +39,7 @@ resources:
   bugtracker: https://github.com/teodesian/perl-critic-policy-prohibitunusedimports/issues
   homepage: https://github.com/teodesian/perl-critic-policy-prohibitunusedimports
   repository: https://github.com/teodesian/perl-critic-policy-prohibitunusedimports.git
-version: '1.002'
+version: '1.003'
 x_contributors:
   - 'troglodyne-robot <trogbot@troglodyne.net>'
 x_generated_by_perl: v5.44.0

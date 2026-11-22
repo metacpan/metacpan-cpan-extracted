@@ -8,7 +8,7 @@ use JSON::PP ();
 use Future;
 use Discord::Client::Error;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 sub new {
     my ( $class, %args ) = @_;

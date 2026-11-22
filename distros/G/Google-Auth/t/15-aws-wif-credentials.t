@@ -589,4 +589,79 @@ subtest
     'Empty AWS_REGION correctly falls back to AWS_DEFAULT_REGION');
   };
 
+subtest 'AWS WIF SSRF and Role Name Traversal Rejections' => sub {
+  local %ENV = %ENV;
+  delete $ENV{'AWS_ACCESS_KEY_ID'};
+  delete $ENV{'AWS_SECRET_ACCESS_KEY'};
+  delete $ENV{'AWS_SESSION_TOKEN'};
+  delete $ENV{'AWS_CONTAINER_CREDENTIALS_RELATIVE_URI'};
+  delete $ENV{'AWS_CONTAINER_CREDENTIALS_FULL_URI'};
+  delete $ENV{'AWS_REGION'};
+  delete $ENV{'AWS_DEFAULT_REGION'};
+
+  my $mock_ua = Test::LWP::UserAgent->new();
+
+  my $bad_url_creds = Google::Auth::ExternalAccountCredentials->make_creds(
+    audience =>
+'//iam.googleapis.com/projects/123456/locations/global/workloadIdentityPools/my-pool/providers/my-provider',
+    subject_token_type => 'urn:ietf:params:aws:token-type:aws4_request',
+    token_url          => 'https://sts.googleapis.com/v1/token',
+    credential_source  => {
+      environment_id => 'aws1',
+      url            =>
+        'http://evil.example.com/latest/meta-data/iam/security-credentials',
+    },
+    ua => $mock_ua,
+  );
+  eval { $bad_url_creds->retrieve_subject_token(); };
+  like(
+    $@,
+    qr/credential_source\.url host .* carries security violation/,
+    'Rejects non-IMDS credential_source.url host'
+  );
+
+  my $bad_imds_creds = Google::Auth::ExternalAccountCredentials->make_creds(
+    audience =>
+'//iam.googleapis.com/projects/123456/locations/global/workloadIdentityPools/my-pool/providers/my-provider',
+    subject_token_type => 'urn:ietf:params:aws:token-type:aws4_request',
+    token_url          => 'https://sts.googleapis.com/v1/token',
+    credential_source  => {
+      environment_id => 'aws1',
+      url => 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
+      imdsv2_session_token_url => 'http://evil.example.com/latest/api/token',
+    },
+    ua => $mock_ua,
+  );
+  eval { $bad_imds_creds->retrieve_subject_token(); };
+  like(
+    $@,
+    qr/imdsv2_session_token_url host .* carries security violation/,
+    'Rejects non-IMDS imdsv2_session_token_url host'
+  );
+
+  $mock_ua->map_response(
+    qr{http://169\.254\.169\.254/latest/api/token},
+    HTTP::Response->new(200, 'OK', [], 'mock-imds-token'));
+  $mock_ua->map_response(
+    qr{http://169\.254\.169\.254/latest/meta-data/iam/security-credentials\z},
+    HTTP::Response->new(200, 'OK', [], '../user-data'));
+  my $bad_role_creds = Google::Auth::ExternalAccountCredentials->make_creds(
+    audience =>
+'//iam.googleapis.com/projects/123456/locations/global/workloadIdentityPools/my-pool/providers/my-provider',
+    subject_token_type => 'urn:ietf:params:aws:token-type:aws4_request',
+    token_url          => 'https://sts.googleapis.com/v1/token',
+    credential_source  => {
+      environment_id => 'aws1',
+      url => 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
+    },
+    ua => $mock_ua,
+  );
+  eval { $bad_role_creds->retrieve_subject_token(); };
+  like(
+    $@,
+    qr/AWS IAM role name carries security violation/,
+    'Rejects path-traversal AWS IAM role name'
+  );
+};
+
 done_testing();

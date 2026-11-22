@@ -115,12 +115,13 @@ $WarningLocation = 0;
 # No limit to complexity of MIME messages
 $MaxMIMEParts = -1;
 
-# Cache the timzone calculation
+# Cache the timezone calculation
 $CachedTimezone = "";
 
 # Syslog facility is "mail"
 $SyslogFacility = "mail";
 undef $GraphDefangSyslogFacility;
+undef $GraphDefangFeedSocket;
 
 $URL = 'https://mimedefang.org/enduser/';
 $CSSHost    = "127.0.0.1:7777:local";
@@ -355,10 +356,10 @@ sub main {
 
     # In case it wasn't done in filter... won't hurt to do it again
     detect_and_load_perl_modules();
-    # Load Antivirus code only if needed
-    if (Mail::MIMEDefang::detect_antivirus_support()) {
-      use Mail::MIMEDefang::Antivirus;
-    }
+    # Always load Mail::MIMEDefang::Antivirus startup code,
+	# the code of each virus scanner is only compiled when that
+    # scanner is actually initialized or used (see Mail::MIMEDefang::Antivirus).
+    use Mail::MIMEDefang::Antivirus;
 
     # Backward-compatibility
     if (defined($Administrator)) {
@@ -401,7 +402,7 @@ sub main {
 	my($ans);
 
 	# Print MIMEDefang version
-	my $ver = md_version();
+	my $ver = md_version(1);
 	print("MIMEDefang version $ver\n\n");
 	# Print the features we have first
 	foreach my $thing (sort keys %Features) {
@@ -851,8 +852,10 @@ sub do_scan {
 	$parser->max_parts($MaxMIMEParts);
     }
     push_status_tag("Parsing Message");
+    Mail::MIMEDefang::MIME::md_mime_prepare();
     $entity = $parser->parse_open($file);
     pop_status_tag();
+    Mail::MIMEDefang::MIME::md_mime_note_parse($parser);
 
     if (!defined($entity) && $MaxMIMEParts > 0) {
 	# Message is too complex; bounce it

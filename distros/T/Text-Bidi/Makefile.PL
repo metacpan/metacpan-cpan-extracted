@@ -12,55 +12,55 @@ check_lib_or_exit(lib => 'fribidi') unless $ENV{TEXT_BIDI_FRIBIDI_LIB};
 
 my %WriteMakefileArgs;
 %WriteMakefileArgs = (
+                       'NAME' => 'Text::Bidi',
+                       'MIN_PERL_VERSION' => '5.010000',
+                       'EXE_FILES' => [
+                                        'bin/fribidi.pl'
+                                      ],
+                       'LICENSE' => 'perl',
+                       'PREREQ_PM' => {
+                                        'Carp' => '0',
+                                        'version' => '0.77',
+                                        'FFI::Platypus' => '2.00',
+                                        'Exporter' => '0',
+                                        'Encode' => '0',
+                                        'overload' => '0',
+                                        'strict' => '0',
+                                        'base' => '0',
+                                        'FFI::Platypus::Buffer' => '0',
+                                        'warnings' => '0',
+                                        'integer' => '0',
+                                        'FFI::CheckLib' => '0.28',
+                                        'open' => '0',
+                                        'Getopt::Long' => '0',
+                                        'Tie::Array' => '0'
+                                      },
+                       'ABSTRACT' => 'Unicode bidi algorithm using libfribidi',
                        'CONFIGURE_REQUIRES' => {
                                                  'FFI::CheckLib' => '0.28',
                                                  'ExtUtils::MakeMaker' => '0'
                                                },
-                       'ABSTRACT' => 'Unicode bidi algorithm using libfribidi',
-                       'VERSION' => '3.02',
                        'DISTNAME' => 'Text-Bidi',
-                       'EXE_FILES' => [
-                                        'bin/fribidi.pl'
-                                      ],
+                       'AUTHOR' => 'Moshe Kamensky <kamensky@cpan.org>',
+                       'VERSION' => '3.03',
                        'TEST_REQUIRES' => {
                                             'Test::More' => '0',
-                                            'File::Spec' => '0',
-                                            'Symbol' => '0',
-                                            'File::Temp' => '0',
-                                            'ExtUtils::MakeMaker' => '0',
-                                            'lib' => '0',
-                                            'Cwd' => '0',
-                                            'utf8' => '0',
-                                            'charnames' => '0',
-                                            'IO::Handle' => '0',
-                                            'Data::Dumper' => '0',
                                             'IPC::Open3' => '0',
-                                            'File::Basename' => '0'
+                                            'File::Spec' => '0',
+                                            'Data::Dumper' => '0',
+                                            'File::Temp' => '0',
+                                            'utf8' => '0',
+                                            'Cwd' => '0',
+                                            'lib' => '0',
+                                            'IO::Handle' => '0',
+                                            'File::Basename' => '0',
+                                            'charnames' => '0',
+                                            'Symbol' => '0',
+                                            'ExtUtils::MakeMaker' => '0'
                                           },
-                       'AUTHOR' => 'Moshe Kamensky <kamensky@cpan.org>',
-                       'MIN_PERL_VERSION' => '5.010000',
                        'test' => {
                                    'TESTS' => 't/*.t'
-                                 },
-                       'PREREQ_PM' => {
-                                        'version' => '0.77',
-                                        'Encode' => '0',
-                                        'warnings' => '0',
-                                        'Getopt::Long' => '0',
-                                        'FFI::Platypus::Buffer' => '0',
-                                        'Carp' => '0',
-                                        'Tie::Array' => '0',
-                                        'integer' => '0',
-                                        'Exporter' => '0',
-                                        'overload' => '0',
-                                        'open' => '0',
-                                        'FFI::Platypus' => '2.00',
-                                        'base' => '0',
-                                        'FFI::CheckLib' => '0.28',
-                                        'strict' => '0'
-                                      },
-                       'LICENSE' => 'perl',
-                       'NAME' => 'Text::Bidi'
+                                 }
                      );
 
 

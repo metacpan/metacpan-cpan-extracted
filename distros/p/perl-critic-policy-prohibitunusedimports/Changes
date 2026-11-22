@@ -1,5 +1,10 @@
 Revision history for perl-critic-policy-prohibitunusedimports
 
+1.003 2026-11-21 TEODESIAN
+    - Never report an import of import or unimport, as in
+      use Exporter qw{import}.  perl calls them when another file uses
+      the package, so no call to them is written.
+
 1.002 2026-11-20 TEODESIAN
     - Add Test::NoWarnings, Test2::Plugin::NoWarnings and Mojo::Base to the
       built-in exempt list.  Each works through its import: the first two

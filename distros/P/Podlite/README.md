@@ -7,11 +7,13 @@ This module is a source filter that allows you to use Podlite markup language in
 ## Installation
 
 ```bash
-perl Makefile.PL
-make
-make test
-make install
+perl Build.PL
+./Build
+./Build test
+./Build install
 ```
+
+Requires Perl 5.10.1 or later. `Filter::Util::Call` and `Carp` come with Perl.
 
 ## Synopsis
 
@@ -48,7 +50,7 @@ print "Sum: ", $x + $y, "\n";
 
 ### Table with Caption
 ```perl
-=begin table :caption<Performance Benchmarks>
+=begin table :caption('Performance Benchmarks')
 Operation      Time (ms)   Memory (MB)
 Parse          45          12
 Render         23          8
@@ -58,7 +60,7 @@ Export         67          15
 
 ### Notification Block
 ```perl
-=begin nested :notify<warning> :caption<Important Note>
+=begin nested :notice<warning> :caption('Important Note')
 This feature is experimental and may change in future releases.
 =end nested
 ```
@@ -106,17 +108,17 @@ For complete documentation, run:
 perldoc Podlite
 ```
 
-Or see the [Podlite Specification Summary](SPECIFICATION_SUMMARY.md) for a comprehensive reference.
+Or see the [Podlite Specification 2.0](https://podlite.org/v2.0/specification) for a comprehensive reference.
 
 ## Podlite Ecosystem
 
 ### Specification
-- [Official Specification (HTML)](https://podlite.org/specification)
-- [Specification Source](https://github.com/podlite/podlite-specs)
+- [Specification 2.0 (HTML)](https://podlite.org/v2.0/specification)
+- [Specification 2.0 Source](https://github.com/podlite/podlite-specs/blob/v2.0.1/Specification.pod6)
 - [Discussions](https://github.com/podlite/podlite-specs/discussions)
 
 ### Implementation
-- [Main Implementation](https://github.com/podlite/podlite)
+- [Main implementation](https://github.com/podlite/podlite)
 - [Changelog](https://github.com/podlite/podlite/releases)
 - [Issues](https://github.com/podlite/podlite/issues)
 

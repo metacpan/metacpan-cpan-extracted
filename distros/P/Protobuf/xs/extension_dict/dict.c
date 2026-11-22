@@ -14,11 +14,28 @@ typedef struct {
     SV* message_sv;
 } PerlUpb_ExtensionDict;
 
+static int extension_dict_cleanup(pTHX_ SV* sv, MAGIC* mg) {
+    PerlUpb_ExtensionDict* dict = (PerlUpb_ExtensionDict*)mg->mg_ptr;
+    if (dict) {
+        mg->mg_ptr = NULL;
+        if (!PL_dirty && dict->message_sv) {
+            SvREFCNT_dec(dict->message_sv);
+        }
+        safefree(dict);
+    }
+    return 0;
+}
+
+static MGVTBL extension_dict_vtbl = {
+    NULL, NULL, NULL, NULL, extension_dict_cleanup
+};
+
 SV* PerlUpb_ExtensionDict_New(pTHX_ SV* message_sv) {
-    PerlUpb_ExtensionDict* dict = (PerlUpb_ExtensionDict*)malloc(sizeof(PerlUpb_ExtensionDict));
+    PerlUpb_ExtensionDict* dict = (PerlUpb_ExtensionDict*)safemalloc(sizeof(PerlUpb_ExtensionDict));
     dict->message_sv = newSVsv(message_sv);
 
-    SV* sv = newSViv((IV)dict);
+    SV* sv = newSViv(PTR2IV(dict));
+    sv_magicext(sv, NULL, PERL_MAGIC_ext, &extension_dict_vtbl, (const char*)dict, 0);
     SV* obj = newRV_noinc(sv);
     sv_bless(obj, gv_stashpv("Protobuf::ExtensionDict", GV_ADD));
     return obj;
@@ -28,7 +45,8 @@ static PerlUpb_ExtensionDict* GetDict(pTHX_ SV* sv) {
     if (!sv || !SvROK(sv) || !sv_derived_from(sv, "Protobuf::ExtensionDict")) {
         return NULL;
     }
-    return (PerlUpb_ExtensionDict*)SvIV(SvRV(sv));
+    MAGIC* mg = mg_findext(SvRV(sv), PERL_MAGIC_ext, &extension_dict_vtbl);
+    return (mg && mg->mg_ptr) ? (PerlUpb_ExtensionDict*)mg->mg_ptr : NULL;
 }
 
 SV* PerlUpb_ExtensionDict_GetItem(pTHX_ SV* self, SV* field_sv) {
@@ -73,10 +91,13 @@ void PerlUpb_ExtensionDict_SetItem(pTHX_ SV* self, SV* field_sv, SV* value_sv) {
 }
 
 void PerlUpb_ExtensionDict_Free(pTHX_ SV* sv) {
-    PerlUpb_ExtensionDict* dict = GetDict(aTHX_ sv);
-    if (dict) {
-        SvREFCNT_dec(dict->message_sv);
-        free(dict);
+    if (PL_dirty || !sv || !SvROK(sv) || !sv_derived_from(sv, "Protobuf::ExtensionDict")) return;
+    MAGIC* mg = mg_findext(SvRV(sv), PERL_MAGIC_ext, &extension_dict_vtbl);
+    if (mg && mg->mg_ptr) {
+        PerlUpb_ExtensionDict* dict = (PerlUpb_ExtensionDict*)mg->mg_ptr;
+        mg->mg_ptr = NULL;
+        if (dict->message_sv) SvREFCNT_dec(dict->message_sv);
+        safefree(dict);
         sv_setiv(SvRV(sv), 0);
     }
 }

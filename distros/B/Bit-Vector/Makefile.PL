@@ -40,7 +40,7 @@ $patchlevel =~ s![^/\\]*$!patchlevel.h!;
 my $PATCHLEVEL = $Config{'PATCHLEVEL'} || $Config{'patchlevel'} || substr($],2,3);
 my $SUBVERSION = $Config{'SUBVERSION'} || $Config{'subversion'} || substr($],5) || 0;
 
-if (open(PATCHLEVEL, ">$patchlevel"))
+if (open(PATCHLEVEL, ">" , $patchlevel))
 {
     print "Writing $patchlevel for $^X ($])\n";
     printf PATCHLEVEL "#define PATCHLEVEL %d\n", $PATCHLEVEL;

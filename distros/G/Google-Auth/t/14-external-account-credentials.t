@@ -311,7 +311,7 @@ subtest 'Initialization and Validation Errors' => sub {
         universe_domain   => 'allowed-custom.com',
         token_url         => 'https://sts.allowed-custom.com/token',
         credential_source => {
-          url => 'http://allowed-custom.com/subject',
+          url => 'https://allowed-custom.com/subject',
         },
       });
     eval { $creds_custom_ok->retrieve_subject_token(); };

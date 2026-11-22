@@ -19,7 +19,7 @@ use VPNDetection::Error;
 use VPNDetection::Oauth;
 use VPNDetection::Result;
 
-our $VERSION = '3.17.0';
+our $VERSION = '3.18.0';
 our @EXPORT_OK = ('is_bogon');
 
 use constant DEFAULT_BASE_URL => 'https://api.vpndetection.io';
@@ -51,6 +51,10 @@ my $CLASS_DETAIL = [fields => [(map { [$_ => ['string']] } qw(provider provider_
 my $PROXY_DETAIL = [fields => [
     [provider => ['string']], [provider_name => ['string']], (map { [$_ => ['date']] } qw(first_seen last_seen)),
     (map { [$_ => ['integer']] } qw(hits hits_days_pct providers_num)),
+]];
+my $BOT_DETAIL = [fields => [
+    (map { [$_ => ['string']] } qw(provider provider_name)), (map { [$_ => [list => ['string']]] } qw(agents categories)),
+    [verified => ['boolean']], (map { [$_ => ['string']] } qw(identity verified_by confidence first_seen last_seen)),
 ]];
 my $PUBPROXY_DETAIL = [fields => [
     [entry => ['boolean']], [exit => ['boolean']], [protocols => [list => ['string']]],
@@ -99,8 +103,7 @@ my $LOCATION = [fields => [
     (map { [$_ => ['number']] } qw(latitude longitude)), [accuracy_radius => ['integer']],
 ]];
 my $ASN = [fields => [
-    [asn => ['integer'], 1], (map { [$_ => ['string'], 1] } qw(name domain type prefix)),
-    (map { [$_ => ['string']] } qw(country rpki_status)),
+    [asn => ['integer'], 1], (map { [$_ => ['string'], 1] } qw(name domain type prefix country rpki_status)),
 ]];
 my $COMPANY = [fields => [(map { [$_ => ['string'], 1] } qw(name domain)), (map { [$_ => ['string']] } qw(type country))]];
 my $ABUSE = [fields => [
@@ -110,12 +113,12 @@ my $ABUSE = [fields => [
 our $LOOKUP = [fields => [
     [ip => ['string'], 1], [is_vpn => ['boolean'], 1], [is_bogon => ['boolean']],
     (map { [$_ => ['boolean']] } qw(
-        is_hosting is_relay is_tor is_cdn is_resproxy is_dcproxy is_mobproxy is_pubproxy
+        is_hosting is_relay is_tor is_cdn is_bot is_resproxy is_dcproxy is_mobproxy is_pubproxy
         is_anycast is_carrier is_satellite is_ssh is_smtp is_web is_dns_resolver is_bittorrent
         trial_expired cap_reached
     )),
     [vpn => $VPN_DETAIL],
-    (map { [$_ => $CLASS_DETAIL] } qw(hosting relay tor cdn)),
+    (map { [$_ => $CLASS_DETAIL] } qw(hosting relay tor cdn)), [bot => $BOT_DETAIL],
     (map { [$_ => $PROXY_DETAIL] } qw(resproxy dcproxy mobproxy)),
     [pubproxy => $PUBPROXY_DETAIL],
     [carrier => $CARRIER_DETAIL], [satellite => $SATELLITE_DETAIL], [ssh => $SSH_DETAIL],

@@ -42,7 +42,7 @@ use Tie::Array;
 use Protobuf::Internal::Proxy;
 our @ISA = qw(Tie::Array Protobuf::Internal::Proxy);
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 
 sub TIEARRAY {

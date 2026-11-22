@@ -10,7 +10,7 @@ use Time::HiRes qw(clock_gettime CLOCK_MONOTONIC);
 use Discord::Client::Error;
 use Discord::Client::Interaction;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 sub new {
     my ( $class, %args ) = @_;
@@ -76,12 +76,8 @@ sub handle {
     return $self->_failed( 'Interaction dispatcher is closed', 'shutdown' ) if $self->{closed};
     my $now = $self->{clock}->();
 
-    # A replay window must not expire an ID while its handler can still act.
-    for my $id ( keys %{ $self->{seen} } ) {
-        delete $self->{seen}{$id}
-            if $self->{seen}{$id}{expires} <= $now
-            && $self->{seen}{$id}{result}->is_ready;
-    }
+    # Reclaim completed replay records only when a retained deadline is due.
+    $self->_expire_seen($now);
     my $id = ref($payload) eq 'HASH' ? $payload->{id} : undef;
     if ( defined($id) && !ref($id) && exists $self->{seen}{$id} ) {
         ++$self->{counters}{duplicates};
@@ -117,6 +113,9 @@ sub handle {
     $self->{jobs}{$key} = $job;
     $self->{seen}{ $context->id } =
         { expires => $now + $self->{seen_ttl}, ack => $context->acknowledgement, result => $result };
+    my $expires = $self->{seen}{ $context->id }{expires};
+    $self->{next_seen_expiry} = $expires
+        if !defined( $self->{next_seen_expiry} ) || $expires < $self->{next_seen_expiry};
     ++$self->{counters}{received};
 
     # Release work capacity on every terminal result; unanswered contexts also close.
@@ -143,6 +142,27 @@ sub handle {
 
     $self->_watch_job($job);
     return $args{acknowledgement_only} ? $context->acknowledgement : $result;
+}
+
+sub _expire_seen {
+    my ( $self, $now ) = @_;
+
+    # Skip full-table scans until at least one retained ID can expire.
+    return if defined( $self->{next_seen_expiry} ) && $now < $self->{next_seen_expiry};
+    delete $self->{next_seen_expiry};
+
+    # A replay window must not expire an ID while its handler can still act.
+    for my $id ( keys %{ $self->{seen} } ) {
+        my $record = $self->{seen}{$id};
+        if ( $record->{expires} <= $now && $record->{result}->is_ready ) {
+            delete $self->{seen}{$id};
+            next;
+        }
+
+        # Recheck expired running work on the next request, even before later deadlines.
+        $self->{next_seen_expiry} = $record->{expires}
+            if !defined( $self->{next_seen_expiry} ) || $record->{expires} < $self->{next_seen_expiry};
+    }
 }
 
 sub _invoke_handler {

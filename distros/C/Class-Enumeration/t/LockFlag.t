@@ -3,7 +3,6 @@
 use strict;
 use warnings;
 
-use Test::Lib;
 use Test::More import => [ qw( BAIL_OUT cmp_ok is_deeply isa_ok note plan subtest use_ok ) ], tests => 4;
 use Test::API import => [ qw( class_api_ok ) ];
 use Test::Fatal qw( dies_ok );

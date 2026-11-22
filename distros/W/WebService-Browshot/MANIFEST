@@ -4,5 +4,7 @@ MANIFEST
 README
 t/WebService-Browshot.t
 lib/WebService/Browshot.pm
+t/API-1.32.t
+t/API-1.32-remote.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

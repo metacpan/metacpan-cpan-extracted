@@ -28,11 +28,11 @@ $n++;
 
 require Bit::Vector;
 
-if ($Bit::Vector::VERSION eq "7.4")
+if ($Bit::Vector::VERSION eq "7.5")
 {print "ok $n\n";} else {print "not ok $n\n";}
 $n++;
 
-if (Bit::Vector::Version() eq "7.4")
+if (Bit::Vector::Version() eq "7.5")
 {print "ok $n\n";} else {print "not ok $n\n";}
 $n++;
 if (Bit::Vector::Word_Bits() >= 32)
@@ -42,7 +42,7 @@ if (Bit::Vector::Long_Bits() >= 32)
 {print "ok $n\n";} else {print "not ok $n\n";}
 $n++;
 
-if (Bit::Vector->Version() eq "7.4")
+if (Bit::Vector->Version() eq "7.5")
 {print "ok $n\n";} else {print "not ok $n\n";}
 $n++;
 if (Bit::Vector->Word_Bits() >= 32)
@@ -71,7 +71,7 @@ $n++;
 
 require Bit::Vector::Overload;
 
-if ($Bit::Vector::Overload::VERSION eq "7.4")
+if ($Bit::Vector::Overload::VERSION eq "7.5")
 {print "ok $n\n";} else {print "not ok $n\n";}
 $n++;
 
@@ -81,7 +81,7 @@ $n++;
 
 require Bit::Vector::String;
 
-if ($Bit::Vector::String::VERSION eq "7.4")
+if ($Bit::Vector::String::VERSION eq "7.5")
 {print "ok $n\n";} else {print "not ok $n\n";}
 $n++;
 

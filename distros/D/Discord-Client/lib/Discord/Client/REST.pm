@@ -17,7 +17,7 @@ use Discord::Client ();
 use Discord::Client::REST::Error;
 use Discord::Client::REST::RateLimiter;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 sub new {
     my ( $class, %args ) = @_;
@@ -573,6 +573,8 @@ Query pairs are optional.
 =head2 get_guild_channels
 
 C<get_guild_channels(guild_id)> returns a Future containing an arrayref of channels.
+Discord's L<Get Guild Channels|https://docs.discord.com/developers/resources/guild#get-guild-channels>
+omits channels the bot cannot view.
 
 =head2 get_guild_member
 

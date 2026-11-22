@@ -1,5 +1,5 @@
                     =====================================
-                      Package "Bit::Vector" Version 7.4
+                      Package "Bit::Vector" Version 7.5
                     =====================================
 
 
@@ -72,34 +72,6 @@ Follow the installation instructions included in
 the "zip" archive.
 
 
-Preliminary steps for use with Perl prior to version 5.002:
------------------------------------------------------------
-
-Edit the file "Makefile.PL" and change the line
-
-    'VERSION_FROM'      => 'Vector.pm',
-to
-    'VERSION'           => '7.4',
-
-Then edit the file "Vector.pm" and change the line
-
-    bootstrap Bit::Vector $VERSION;
-to
-    bootstrap Bit::Vector;
-
-Also edit the file "t/00____version.t" and change the line
-
-    use Bit::Vector 7.4;
-
-to
-
-    use Bit::Vector;
-
-Finally, edit the file "Vector.xs" and delete the line
-
-    PROTOTYPES: DISABLE
-
-
 Preliminary steps for use with ActiveState's port of Perl 5:
 ------------------------------------------------------------
 
@@ -133,7 +105,7 @@ Detailed installation guide:
 ----------------------------
 
  1) Change directory to the directory that has been created by unpacking this
-    package ("cd Bit-Vector-7.4").
+    package ("cd Bit-Vector-7.5").
 
  2) Type "perl Makefile.PL" (or whatever the name and path of your Perl 5
     binary is).

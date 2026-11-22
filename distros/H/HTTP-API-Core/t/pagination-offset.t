@@ -31,7 +31,7 @@ sub fails_like {
     like $error, $pattern, $description;
 }
 
-my $prefix = '/jira/rest/api/2/search?fields=summary%2Cdescription%2Ccomponents&jql=filter%3D415607&maxResults=1000&startAt=';
+my $prefix = '/jira/rest/api/2/search?fields=summary%2Cdescription%2Ccomponents&jql=filter%3D12345&maxResults=1000&startAt=';
 my $client = T::OffsetClient->new({
     $prefix . '0' => { issues => [ { key => 'A' }, { key => 'B' } ], total => 5 },
     $prefix . '2' => { issues => [ { key => 'C' }, { key => 'D' } ], total => 5 },
@@ -47,7 +47,7 @@ my $pager = HTTP::API::Core::Pagination->new(
     page_size_param => 'maxResults',
     page_size       => 1000,
     query           => {
-        jql => 'filter=415607',
+        jql => 'filter=12345',
         fields => 'summary,description,components',
     },
 );

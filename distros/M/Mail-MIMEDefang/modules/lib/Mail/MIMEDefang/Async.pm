@@ -30,12 +30,10 @@ use warnings;
 use Exporter;
 use Carp qw(croak carp);
 
-use Mail::MIMEDefang qw(%Features $CWD $ClamdSock $Sender @Recipients
-                        $AddApparentlyToForSpamAssassin md_syslog);
+use Mail::MIMEDefang qw(%Features $VirusName md_syslog);
 use Mail::MIMEDefang::Antispam qw(spam_assassin_check);
 use Mail::MIMEDefang::Net qw(reverse_ip_address_for_rbl);
 use Mail::MIMEDefang::SPF qw(md_spf_verify);
-use Mail::MIMEDefang::Utils qw(synthesize_received_header);
 use Mail::MIMEDefang::Async::Checks qw(
     md_async_check_dnsbl
     md_async_check_spf_record
@@ -43,6 +41,10 @@ use Mail::MIMEDefang::Async::Checks qw(
     md_async_check_rdns
     md_async_check_dkim_record
     md_async_check_dmarc_record
+    md_async_check_clamd
+    md_async_check_clamdscan
+    md_async_check_spamc
+    md_async_check_rspamd
 );
 use Mail::MIMEDefang::Async::Results qw(
     md_async_interpret_dnsbl
@@ -73,6 +75,10 @@ our @EXPORT = qw(
     md_async_check_rdns
     md_async_check_dkim_record
     md_async_check_dmarc_record
+    md_async_check_clamd
+    md_async_check_clamdscan
+    md_async_check_spamc
+    md_async_check_rspamd
     md_async_interpret_dnsbl
     md_async_interpret_spamassassin
     md_async_interpret_clamav
@@ -135,8 +141,10 @@ sub _ensure_resolver {
     $self->_build_resolver if ($self->{_pid} // 0) != $$;
 }
 
+# Run a batch of checks. Optional \%opts: global_timeout, a minimum deadline
+# for this batch (the engine's global_timeout is used when it is larger).
 sub _run_checks {
-    my ($self, $checks) = @_;
+    my ($self, $checks, $opts) = @_;
 
     croak "_run_checks expects an arrayref" unless ref $checks eq 'ARRAY';
     return {} unless @$checks;
@@ -154,8 +162,14 @@ sub _run_checks {
 
     my $gen = ++$self->{_generation};
 
+    my $global_timeout = $self->{global_timeout};
+    if (defined $opts && defined $opts->{global_timeout}
+        && $opts->{global_timeout} > $global_timeout) {
+        $global_timeout = $opts->{global_timeout};
+    }
+
     my $deadline = AnyEvent->timer(
-        after => $self->{global_timeout},
+        after => $global_timeout,
         cb    => sub {
             return if $gen != $self->{_generation};
             carp "[Mail::MIMEDefang::Async] Global timeout reached – cancelling remaining checks";
@@ -186,6 +200,14 @@ sub _run_checks {
 
     $self->{_cv}->recv;
     undef $deadline;
+
+    # Checks still running (or never started) when the global timeout fired
+    # have neither a result nor an error: report them as errors.
+    foreach my $check (@$checks) {
+        my $name = $check->{name} // 'unnamed';
+        next if exists $self->{_results}{$name} || exists $self->{_errors}{$name};
+        $self->{_errors}{$name} = "Global timeout after ${global_timeout}s";
+    }
 
     return {
         results => $self->{_results},
@@ -330,19 +352,15 @@ sub _socket_check {
 
         $handle->push_write($request) if length $request;
 
-        my $reader;
-        $reader = sub {
-            my (undef, $chunk) = @_;
-            $buf .= $chunk;
+        $handle->on_read(sub {
+            $buf .= $_[0]->rbuf;
+            $_[0]->rbuf = '';
             if ($buf =~ $sentinel || length($buf) >= $max_bytes) {
                 $cleanup->();
                 $self->{_results}{$name} = $buf;
                 $done_cb->();
-            } else {
-                $handle->push_read(chunk => 1024, $reader);
             }
-        };
-        $handle->push_read(chunk => 1024, $reader);
+        });
     });
 }
 
@@ -403,7 +421,11 @@ mimedefang-filter, after C<use Mail::MIMEDefang::Async>).
 Options:
 
   max_concurrency  Max parallel checks in flight (default: 10)
-  global_timeout   Hard wall-clock limit for the whole batch (default: 10s)
+  global_timeout   Hard wall-clock limit for a md_async_run_checks() batch
+                   (default: 10s).  It must cover the slowest check in the
+                   batch: a virus or spam scan usually needs 30s or more.
+                   The single-check md_async_* wrappers extend it to their
+                   own check timeout when that is larger.
   dns_timeout      Per-DNS-query timeout (default: 5s)
   socket_timeout   Per-socket-connection timeout (default: 5s)
 
@@ -420,9 +442,15 @@ sub md_async_init {
 Run a list of check descriptors concurrently. Blocks until all checks complete or
 the global timeout fires. Returns C<{ results =E<gt> \%r, errors =E<gt> \%e }>.
 
+Every check ends up in exactly one of the two hashes: a check that had not
+finished when the global timeout fired is reported in C<errors> with a
+C<Global timeout after Ns> message.
+
 Each check is a hashref with C<name>, C<type> (C<'dns'>, C<'socket'>, or
 C<'process'>), and C<args>.  Use L<Mail::MIMEDefang::Async::Checks> to build
-them.
+them, e.g. C<md_async_check_clamd>, C<md_async_check_clamdscan>,
+C<md_async_check_spamc> and C<md_async_check_rspamd> to run virus and spam
+scans in parallel.  Check names must be unique within a batch.
 
 =cut
 
@@ -598,11 +626,11 @@ sub _async_dmarc_lookup {
 Async replacement for C<message_contains_virus_clamd> from
 L<Mail::MIMEDefang::Antivirus>.
 
-Sends a C<SCAN $CWD/Work> command to the clamd daemon over a socket and
+Sends a C<nSCAN $CWD/Work> command to the clamd daemon over a socket and
 interprets the response. C<$clamd_sock> may be a Unix socket path or a
 C<host:port> string; defaults to C<$ClamdSock>.
 
-B<Note>: the C<SCAN> command instructs clamd to open the path on its own
+B<Note>: the C<nSCAN> command instructs clamd to open the path on its own
 filesystem. This only works when clamd runs on the same host as MIMEDefang.
 For remote clamd, use C<md_async_message_contains_virus_clamdscan> instead.
 
@@ -611,59 +639,40 @@ Returns the standard virus-scanner triplet C<($code, $category, $action)>:
   (0,   'ok',             'ok')          clean
   (1,   'virus',          'quarantine')  virus found
   (999, 'cannot-execute', 'tempfail')    cannot connect
-  (999, 'swerr',          'tempfail')    scan error
+  (999, 'swerr',          'tempfail')    scan error, or empty reply
+
+A reply that is neither a verdict nor an error is logged and treated
+as clean.
 
 =cut
 
 sub md_async_message_contains_virus_clamd {
     my ($clamd_sock) = @_;
-    $clamd_sock //= $ClamdSock;
     croak "Call md_async_init() first" unless defined $_ENGINE;
 
-    unless (defined $clamd_sock) {
-        md_syslog('err', "md_async_message_contains_virus_clamd: no clamd socket configured");
+    my $check = eval {
+        md_async_check_clamd(sock => $clamd_sock, name => '_clamd_scan');
+    };
+    unless ($check) {
+        (my $err = $@) =~ s/ at \S+ line \d+\.?\n?$//;
+        md_syslog('err', "md_async_message_contains_virus_clamd: $err");
         return wantarray ? (999, 'swerr', 'tempfail') : 999;
     }
 
-    my %sock_args = (
-        request    => "SCAN $CWD/Work\n",
-        read_until => qr/\n/,
-        max_bytes  => 4096,
-        timeout    => 30,
-    );
-
-    if ($clamd_sock =~ /:/) {
-        my ($host, $port) = split /:/, $clamd_sock, 2;
-        $sock_args{host} = $host;
-        $sock_args{port} = $port;
-    } else {
-        $sock_args{unix_path} = $clamd_sock;
-    }
-
-    my $out = $_ENGINE->_run_checks([{
-        name => '_clamd_scan',
-        type => 'socket',
-        args => \%sock_args,
-    }]);
+    my $out = $_ENGINE->_run_checks([$check],
+                                    { global_timeout => $check->{args}{timeout} });
 
     if ($out->{errors}{_clamd_scan}) {
         md_syslog('err', "md_async_message_contains_virus_clamd: $out->{errors}{_clamd_scan}");
         return wantarray ? (999, 'cannot-execute', 'tempfail') : 999;
     }
 
-    my $output = $out->{results}{_clamd_scan} // '';
-
-    if ($output =~ /: (.+) FOUND/) {
-        my $virus = $1;
-        md_syslog('info', "md_async_message_contains_virus_clamd: clamd found $virus");
-        return wantarray ? (1, 'virus', 'quarantine') : 1;
-    }
-    if ($output =~ /: (.+) ERROR/) {
-        md_syslog('err', "md_async_message_contains_virus_clamd: clamd error: $1");
-        return wantarray ? (999, 'swerr', 'tempfail') : 999;
-    }
-
-    return wantarray ? (0, 'ok', 'ok') : 0;
+    require Mail::MIMEDefang::Antivirus::ClamAV;
+    my ($code, $category, $action) =
+        Mail::MIMEDefang::Antivirus::ClamAV::clamd_interpret_reply($out->{results}{_clamd_scan});
+    md_syslog('info', "md_async_message_contains_virus_clamd: clamd found $VirusName")
+        if ($category eq 'virus');
+    return wantarray ? ($code, $category, $action) : $code;
 }
 
 =item md_async_message_contains_virus_clamdscan($conf)
@@ -691,7 +700,6 @@ Returns the standard virus-scanner triplet C<($code, $category, $action)>:
 
 sub md_async_message_contains_virus_clamdscan {
     my ($conf) = @_;
-    $conf //= $Features{'Path:CLAMDCONF'};
     croak "Call md_async_init() first" unless defined $_ENGINE;
 
     unless ($Features{'Virus:CLAMDSCAN'}) {
@@ -699,18 +707,9 @@ sub md_async_message_contains_virus_clamdscan {
         return wantarray ? (1, 'not-installed', 'tempfail') : 1;
     }
 
-    my @cmd = (
-        $Features{'Virus:CLAMDSCAN'},
-        '-c', $conf,
-        '--no-summary', '--infected', '--fdpass', '--stream',
-        "$CWD/Work",
-    );
-
-    my $out = $_ENGINE->_run_checks([{
-        name => '_clamdscan',
-        type => 'process',
-        args => { cmd => \@cmd, timeout => 60 },
-    }]);
+    my $check = md_async_check_clamdscan(conf => $conf, name => '_clamdscan');
+    my $out = $_ENGINE->_run_checks([$check],
+                                    { global_timeout => $check->{args}{timeout} });
 
     if ($out->{errors}{_clamdscan}) {
         md_syslog('err', "md_async_message_contains_virus_clamdscan: $out->{errors}{_clamdscan}");
@@ -753,48 +752,20 @@ sub md_async_spamc_check {
     my (%args) = @_;
     croak "Call md_async_init() first" unless defined $_ENGINE;
 
-    my $host    = $args{host}    // '127.0.0.1';
-    my $port    = $args{port}    // 783;
-    my $user    = $args{user}    // getpwuid($<);
-    my $timeout = $args{timeout} // 30;
-
-    open(my $in, '<', './INPUTMSG') or do {
-        md_syslog('err', "md_async_spamc_check: cannot open INPUTMSG: $!");
-        return;
+    my $check = eval {
+        md_async_check_spamc(
+            (map { exists $args{$_} ? ($_ => $args{$_}) : () } qw(host port user timeout)),
+            name => '_spamc_check',
+        );
     };
-    my @msg = <$in>;
-    close($in);
-
-    my @sahdrs;
-    push @sahdrs, "Return-Path: $Sender\n";
-    push @sahdrs, split(/^/m, synthesize_received_header());
-    if ($AddApparentlyToForSpamAssassin && @Recipients) {
-        push @sahdrs, "Apparently-To: " . join(', ', @Recipients) . "\n";
+    unless ($check) {
+        (my $err = $@) =~ s/ at \S+ line \d+\.?\n?$//;
+        md_syslog('err', $err);
+        return;
     }
-    unshift @msg, @sahdrs;
-    my $msg = join('', @msg);
 
-    my $length  = length($msg);
-    my $request = join("\r\n",
-        "CHECK SPAMC/1.5",
-        "Content-length: $length",
-        "User: $user",
-        '',
-        $msg,
-    );
-
-    my $out = $_ENGINE->_run_checks([{
-        name => '_spamc_check',
-        type => 'socket',
-        args => {
-            host       => $host,
-            port       => $port,
-            request    => $request,
-            read_until => qr/\r\n\r\n/,
-            max_bytes  => 65536,
-            timeout    => $timeout,
-        },
-    }]);
+    my $out = $_ENGINE->_run_checks([$check],
+                                    { global_timeout => $check->{args}{timeout} });
 
     if ($out->{errors}{_spamc_check}) {
         md_syslog('err', "md_async_spamc_check: $out->{errors}{_spamc_check}");
@@ -869,45 +840,15 @@ sub md_async_rspamd_check {
         return;
     }
 
-    open(my $fh, '<', './INPUTMSG') or do {
-        md_syslog('err', "md_async_rspamd_check: cannot open INPUTMSG: $!");
+    my $check = eval { md_async_check_rspamd(uri => $uri, name => '_rspamd_check') };
+    unless ($check) {
+        (my $err = $@) =~ s/ at \S+ line \d+\.?\n?$//;
+        md_syslog('err', $err);
         return;
-    };
-    local $/;
-    my $mail = <$fh>;
-    close($fh);
-
-    # Parse host:port from URI
-    my ($host, $port) = ('127.0.0.1', 11333);
-    if ($uri =~ m{https?://([^/:]+)(?::(\d+))?}) {
-        $host = $1;
-        $port = $2 // 11333;
     }
 
-    my $len     = length($mail);
-    my $request = join("\r\n",
-        "POST /checkv2 HTTP/1.0",
-        "Host: $host:$port",
-        "User-Agent: MIMEDefang",
-        "Content-Type: text/plain",
-        "Content-Length: $len",
-        '',
-        $mail,
-    );
-
-    # Use undef sentinel so the reader runs until EOF (HTTP/1.0 closes after response)
-    my $out = $_ENGINE->_run_checks([{
-        name => '_rspamd_check',
-        type => 'socket',
-        args => {
-            host       => $host,
-            port       => $port,
-            request    => $request,
-            read_until => qr/(?!)/,    # never matches - rely on on_eof
-            max_bytes  => 131072,
-            timeout    => 30,
-        },
-    }]);
+    my $out = $_ENGINE->_run_checks([$check],
+                                    { global_timeout => $check->{args}{timeout} });
 
     if ($out->{errors}{_rspamd_check}) {
         md_syslog('warning', "md_async_rspamd_check: $out->{errors}{_rspamd_check}");
@@ -965,10 +906,27 @@ sub md_async_rspamd_check {
       md_async_check_rdns(ip => $client_ip),
   ]);
 
-  # Drop-in replacements
+  # Virus and spam scans in parallel (in filter_end)
+  md_async_init(global_timeout => 60);
+  my $out = md_async_run_checks([
+      md_async_check_clamd(),                          # local clamd, nSCAN
+      md_async_check_clamdscan(name => 'clamd2',       # second clamd, INSTREAM
+                               conf => '/etc/clamd.d/remote.conf'),
+      md_async_check_spamc(host => '127.0.0.1', port => 783),
+  ]);
+  my $av1  = md_async_interpret_clamav(raw   => $out->{results}{clamd},
+                                       error => $out->{errors}{clamd});
+  my $av2  = md_async_interpret_clamav(raw   => $out->{results}{clamd2},
+                                       error => $out->{errors}{clamd2});
+  my $spam = md_async_interpret_spamassassin(raw   => $out->{results}{spamc},
+                                             error => $out->{errors}{spamc});
+  return action_tempfail("Virus scan failed") if $av1->{error} || $av2->{error};
+  if ($av1->{virus} || $av2->{virus}) { ... }
+
+  # Drop-in replacements (one check per call, so they run one after another)
   my $listed                    = md_async_relay_is_blacklisted($client_ip, 'zen.spamhaus.org');
   my $dmarc                     = md_async_dmarc_verify($sender_domain);
-  my ($code, $cat, $act)        = md_async_message_contains_virus();
+  my ($code, $cat, $act)        = md_async_message_contains_virus_clamd();
   my ($score, $thr, $rep, $spam) = md_async_spamc_check();
   my ($hits, $req, $sym, $rpt, $action, $spam) = md_async_rspamd_check();
 

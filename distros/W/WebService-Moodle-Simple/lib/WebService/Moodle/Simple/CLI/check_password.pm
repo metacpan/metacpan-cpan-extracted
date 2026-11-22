@@ -1,5 +1,5 @@
 package WebService::Moodle::Simple::CLI::check_password;
-$WebService::Moodle::Simple::CLI::check_password::VERSION = '0.06';
+$WebService::Moodle::Simple::CLI::check_password::VERSION = '0.07';
 use strict;
 use warnings;
 use Data::Dump 'pp';
@@ -36,15 +36,15 @@ WebService::Moodle::Simple::CLI::check_password - moodle check_password method
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 AUTHOR
 
-Andrew Solomon
+Andrew Solomon <andrew@geekuni.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Copyright 2014- Andrew Solomon.
+This software is copyright (c) 2014 by Andrew Solomon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

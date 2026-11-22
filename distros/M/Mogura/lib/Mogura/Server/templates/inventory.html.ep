@@ -1,0 +1,131 @@
+% if (!@$inventory) {
+<p><%= l('no_scanners') %></p>
+% }
+% my $single = @$inventory == 1 && $page == 1;
+% for my $snapshot (@$inventory) {
+% my $inventory = $snapshot;
+% my $host = $inventory->{host};
+% my $has_host = $host && $host->{selectable};
+% my @disks = @{$inventory->{disks}};
+% my @system_disks = grep { $_->{system_root} } @disks;
+% if ($has_host && !@system_disks) {
+%     unshift @disks, {name => $host->{identity}{disk}{name} // l('system_volume'), system_root => 1, targets => []};
+% }
+% my $host_selected = 0;
+% my $unavailable = $inventory->{stale} || @{$inventory->{errors} // []} || @{$inventory->{blocked} // []};
+<section class="my-6 min-w-0 rounded-lg border border-slate-200 bg-white p-4 sm:p-6">
+    <header class="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4">
+        <div class="min-w-0">
+            <p class="text-xs font-medium text-slate-600"><%= l('scanner') %></p>
+            <h2 class="text-lg font-semibold wrap-anywhere"><%= $inventory->{scanner_id} %></h2>
+        </div>
+        <span class="inline-flex items-center gap-2 text-sm text-slate-700">
+            <span aria-hidden="true" class="size-2 rounded-full <%= $inventory->{stale} ? 'bg-slate-400' : 'bg-emerald-600' %>"></span>
+            <%= l($inventory->{stale} ? 'offline' : 'online') %>
+        </span>
+    </header>
+% if ($inventory->{stale}) {
+<p class="my-5 rounded-md border border-amber-200 bg-amber-50 p-4 text-amber-900 wrap-anywhere"><%= l('inventory_stale') %></p>
+% }
+% if (@{$inventory->{errors} // []}) {
+<details class="my-5 rounded-md border border-amber-200 bg-amber-50 p-4 text-amber-900 wrap-anywhere">
+    <summary class="cursor-pointer font-semibold group-open:mb-5"><%= l('discovery_failed') %></summary>
+    % for my $error (@{$inventory->{errors}}) {
+    <pre class="mt-3 font-mono text-xs whitespace-pre-wrap wrap-anywhere"><%= $error eq 'Cannot retrieve disk information.' ? l('inventory_unavailable') : $error %></pre>
+    % }
+</details>
+% }
+% if (@{$inventory->{blocked} // []}) {
+<aside class="my-5 rounded-md border border-red-200 bg-red-50 p-4 text-red-900 wrap-anywhere">
+    <strong><%= l('mounts_remain') %></strong>
+    <ul class="mt-3 list-disc space-y-1 pl-5">
+    % for my $mount (@{$inventory->{blocked}}) {
+        <li><%= $mount %></li>
+    % }
+    </ul>
+</aside>
+% }
+
+    <h3 class="mb-3 font-semibold"><%= l('select_disk') %></h3>
+
+        <div class="space-y-4" data-disk-list>
+        % for my $disk (@disks) {
+        % my $is_system = $disk->{system_root} && $has_host;
+        % my $checked = $single && $is_system && !$host_selected && !$unavailable;
+        % $host_selected = 1 if $is_system;
+        % my $selectable = grep { $_->{selectable} } @{$disk->{targets}};
+        % my $reasons = exclusion_reasons($disk->{reasons} // []);
+        % my %disk_reasons = map { $_ => 1 } @{$disk->{reasons} // []};
+        <div class="overflow-hidden rounded-md border border-slate-200" role="group" aria-label="<%= $disk->{name} %>">
+            <div class="flex flex-wrap items-baseline gap-x-4 gap-y-2 px-4 py-3 text-xs wrap-anywhere">
+                <strong class="font-mono text-xs wrap-anywhere"><%= $disk->{name} %></strong>
+                % if (defined $disk->{size}) {
+                <span><%= sprintf('%.1f GiB', $disk->{size} / 1073741824) %></span>
+                % }
+                % if (length($disk->{pttype} // '')) {
+                <span><%= l('partition_table') %>: <%= $disk->{pttype} %></span>
+                % }
+                <span class="ml-auto text-slate-600"><%= $is_system ? l('system') : $selectable ? l('selectable') : l('unselectable') %></span>
+            </div>
+            % if ($disk->{serial} || $disk->{wwn}) {
+            <p class="mb-3 px-4 text-xs text-slate-600 wrap-anywhere">
+                % if ($disk->{serial}) {
+                Serial: <%= $disk->{serial} %>
+                % }
+                % if ($disk->{wwn}) {
+                WWN: <%= $disk->{wwn} %>
+                % }
+            </p>
+            % }
+            % if ($is_system) {
+            <label class="flex items-start gap-3 border-t border-slate-200 px-4 py-3 has-checked:bg-blue-50 has-disabled:bg-slate-50 has-disabled:text-slate-500 [&>span]:min-w-0 [&>span]:wrap-anywhere">
+                <input class="mt-1.5 size-4 shrink-0 accent-blue-700" type="radio" name="target" value="<%= $inventory->{scanner_id} %>:<%= $host->{token} %>" data-target-kind="host"
+                       <%= $checked ? 'checked' : '' %> required <%= $unavailable ? 'disabled' : '' %>>
+                <span>
+                    <strong><%= l('system_volume') %></strong>
+                    <%= display($host->{identity}{partition}{fstype}) %>
+                </span>
+            </label>
+            % } else {
+            % if (@$reasons) {
+            <p class="mb-3 px-4 text-xs text-red-700 wrap-anywhere"><%= join(' · ', @$reasons) %></p>
+            % }
+            % for my $target (@{$disk->{targets}}) {
+            % my @mountpoints = grep { defined $_ && length $_ } @{$target->{mountpoints} // []};
+            % my $disabled = !$target->{selectable} || $unavailable;
+            % my $target_reasons = exclusion_reasons([grep { !$disk_reasons{$_} } @{$target->{reasons}}]);
+            <label class="flex items-start gap-3 border-t border-slate-200 px-4 py-3 has-checked:bg-blue-50 has-disabled:bg-slate-50 has-disabled:text-slate-500 [&>span]:min-w-0 [&>span]:wrap-anywhere">
+                <input class="mt-1.5 size-4 shrink-0 accent-blue-700" type="radio" name="target" value="<%= $inventory->{scanner_id} %>:<%= $target->{token} %>" data-target-kind="clone"
+                       required <%= $disabled ? 'disabled' : '' %>>
+                <span>
+                    <strong><%= $target->{name} %></strong>
+                    <%= l('filesystem') %>: <%= length($target->{fstype} // '') ? $target->{fstype} : l('filesystem_none') %>
+                    · <%= sprintf('%.1f GiB', ($target->{size} // 0) / 1073741824) %>
+                    <small class="block text-xs text-slate-500"><%= @mountpoints ? join(', ', @mountpoints) : l('not_mounted') %></small>
+                    % if (@$target_reasons) {
+                    <span class="mt-1 block text-xs text-red-700"><%= join(' · ', @$target_reasons) %></span>
+                    % }
+                </span>
+            </label>
+            % }
+            % if (!@{$disk->{targets}}) {
+            <p class="mb-3 px-4 text-xs text-slate-600 wrap-anywhere"><%= l('no_filesystem') %></p>
+            % }
+            % }
+        </div>
+        % }
+        </div>
+
+</section>
+% }
+
+% if ($page > 1 || $more) {
+<nav class="flex gap-4">
+    % if ($page > 1) {
+    <a href="<%= url_for('/')->query(page=>$page-1) %>"><%= l('previous') %></a>
+    % }
+    % if ($more) {
+    <a href="<%= url_for('/')->query(page=>$page+1) %>"><%= l('next') %></a>
+    % }
+</nav>
+% }

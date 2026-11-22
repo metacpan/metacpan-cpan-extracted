@@ -1,0 +1,6 @@
+Revision history for Mogura
+
+0.01
+    - Initial release.
+    - Check all partitions on an attached disk before showing it is safe to disconnect.
+    - Configure scanner paths, exclusions and per-command and upload timeouts with YAML or CLI options.

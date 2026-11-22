@@ -3148,7 +3148,7 @@ Graph::Kruskal(3).
 
 =head1 VERSION
 
-This man page documents "Bit::Vector" version 7.4.
+This man page documents "Bit::Vector" version 7.5.
 
 =head1 AUTHOR
 

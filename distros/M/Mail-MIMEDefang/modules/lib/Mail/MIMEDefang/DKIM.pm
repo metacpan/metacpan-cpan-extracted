@@ -29,6 +29,7 @@ use Mail::DKIM::Signer;
 use Mail::DKIM::Verifier;
 
 use Mail::MIMEDefang;
+use Mail::MIMEDefang::Net ();
 
 our @ISA = qw(Exporter);
 our @EXPORT;
@@ -187,13 +188,18 @@ If the sub is called in scalar context, the C<$dkim> object is returned.
 
 sub md_dkim_verify {
 
+  # Cache DNS answers in the worker, unless the filter has set its own resolver
+  if ($Features{"Net::DNS"} and not defined(Mail::DKIM::DNS::resolver())) {
+    Mail::DKIM::DNS::resolver(Mail::MIMEDefang::Net::md_caching_resolver());
+  }
+
   my $dkim = Mail::DKIM::Verifier->new();
 
   my $fh;
 
   unless (open($fh, '<', "./INPUTMSG")) {
     md_syslog('err', "Could not open INPUTMSG in md_dkim_verify: $!");
-    return;
+    return wantarray ? ('temperror', undef, 0, undef) : undef;
   }
 
   eval {
@@ -219,15 +225,17 @@ sub md_dkim_verify {
   $key_size = eval {
     my $pk = $dkim->signature->get_public_key;
        $pk && $pk->cork && $pk->cork->size * 8 };
+  my $result = $dkim->result;
+  $result = 'temperror' unless defined $result;
   if(defined $dkim->signature and defined $key_size) {
     if(wantarray) {
-      return ($dkim->result, $dkim->signature->domain, $key_size, $dkim->signature->get_tag('b'));
+      return ($result, $dkim->signature->domain, $key_size, $dkim->signature->get_tag('b'));
     } else {
       return $dkim;
     }
   } else {
     if(wantarray) {
-      return ($dkim->result, undef, 0, undef, undef);
+      return ($result, undef, 0, undef, undef);
     } else {
       return $dkim;
     }

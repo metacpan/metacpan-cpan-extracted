@@ -762,6 +762,7 @@ subtest 'a member of the wrong type or a null is a retried server_error' => sub 
         },
     };
     my $lookup = { ip => '9.9.9.9', is_vpn => \1 };
+    my $as = { asn => 9009, name => 'n', domain => 'd', type => 't', prefix => 'p', country => 'US', rpki_status => 'valid' };
     my @cases = (
         ['lookup, a flag of "yes"', 'lookup', { %$lookup, is_hosting => 'yes' }],
         ['lookup, a flag of 1', 'lookup', { %$lookup, is_tor => 1 }],
@@ -770,9 +771,17 @@ subtest 'a member of the wrong type or a null is a retried server_error' => sub 
         ['lookup, a detail of "x"', 'lookup', { %$lookup, vpn => 'x' }],
         ['lookup, a numeric string in a detail', 'lookup', { %$lookup, dcproxy => { hits => '3' } }],
         ['lookup, a null protocol', 'lookup', { %$lookup, pubproxy => { entry => \1, protocols => [undef] } }],
-        ['lookup, an AS number of "9009"', 'lookup', { %$lookup, asn => { asn => '9009', name => 'n', domain => 'd', type => 't', prefix => 'p' } }],
+        ['lookup, an AS number of "9009"', 'lookup', { %$lookup, asn => { %$as, asn => '9009' } }],
+        (map {
+            my $member = $_;
+            (["lookup, an AS without its $member", 'lookup', { %$lookup, asn => { map { $_ => $as->{$_} } grep { $_ ne $member } keys %$as } }],
+             ["lookup, an AS $member of null", 'lookup', { %$lookup, asn => { %$as, $member => undef } }]);
+        } qw(country rpki_status)),
         ['lookup, a location without its country', 'lookup', { %$lookup, location => { continent => 'EU' } }],
         ['lookup, is_anycast of "yes"', 'lookup', { %$lookup, is_anycast => 'yes' }],
+        ['lookup, is_bot of "yes"', 'lookup', { %$lookup, is_bot => 'yes' }],
+        ['lookup, a null bot agent', 'lookup', { %$lookup, is_bot => \1, bot => { agents => ['Googlebot', undef] } }],
+        ['lookup, a bot verified of "true"', 'lookup', { %$lookup, is_bot => \1, bot => { verified => 'true' } }],
         ['lookup, a web row without its port', 'lookup', { %$lookup, is_web => \1, web => [{ tls_ok => \1 }] }],
         ['lookup, web of {}', 'lookup', { %$lookup, is_web => \0, web => {} }],
         ['lookup, a satellite AS of "14593"', 'lookup', { %$lookup, satellite => { asn => '14593' } }],
@@ -834,6 +843,10 @@ subtest 'a member of the wrong type or a null is a retried server_error' => sub 
     # A member the spec makes nullable still reads as undef.
     $body = { databases => [$family] };
     is($client->database->list->[0]{expires}, undef, 'a nullable member reads');
+
+    # The AS every refused case above was cut from reads as served.
+    $body = { %$lookup, asn => $as };
+    is_deeply(eval { $client->lookup('9.9.9.9')->asn }, $as, 'a whole AS reads');
 };
 
 # Through 3.8.0 a batch entry of the wrong type came back as a Result, and an

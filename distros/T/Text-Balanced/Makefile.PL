@@ -130,8 +130,9 @@ MAIN: {
         },
 
         TEST_REQUIRES => {
-            'Test::More' => '0.88', # done_testing
-            'vars'       => '0'
+            'Test::More'  => '0.88', # done_testing
+            'Time::HiRes' => '0',
+            'vars'        => '0'
         },
 
         PREREQ_PM => {

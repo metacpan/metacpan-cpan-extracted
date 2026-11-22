@@ -1,5 +1,35 @@
 Revision history for Podlite
 
+2.00  2026-11-21
+    - follows the Podlite specification 2.0
+    - a line scanner with its own input reader replaces Filter::Simple;
+      the module needs Perl 5.10.1 and only core modules
+    - broken markup stops compilation with an error naming the file and
+      line: an unclosed =begin, a stray or mismatched =end, a =begin, =for
+      or =end line with no valid block name, or with a name followed by
+      neither whitespace nor the end of the line
+    - a block name must be followed by whitespace or the end of the line;
+      =head1(x) or =Foo::Bar->new stays Perl
+    - block names follow the identifier rules of the specification
+    - indented directives are recognized for words the specification
+      defines; an indented user-defined abbreviated block stays Perl
+    - code after =set, =alias, =include and =boundary lines runs; 1.00
+      dropped it
+    - =data-table rows and =data inside code examples no longer go to
+      *DATA; names that only begin with data are not =data
+    - the last =data block keeps its trailing bytes; wide characters read
+      back through an encoding layer
+    - =begin/=end pairs inside verbatim blocks and Markdown fences are not
+      markup; markers inside code examples do not end the program
+    - a module that uses Podlite no longer replaces the program's
+      main::DATA; data reaches the importing package and the packages
+      declared in the filtered code
+    - a repeated use Podlite keeps data and read position
+    - __DATA__ followed by a comment is a marker
+    - the notification attribute is spelled :notice in the documentation
+    - documentation brought to specification 2.0, links to its
+      versioned page
+
 1.00  2025-11-09
     - initial release
     - source filter for Podlite markup language in Perl programs

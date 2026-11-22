@@ -6,20 +6,22 @@ BEGIN {
     *CORE::GLOBAL::caller = sub { return () };
 }
 
+use File::Temp ();
 use Test2::Aggregate;
 
 plan(3);
 
 my $root   = (grep {/^\.$/i} @INC) ? undef : './';
-my $timest = time();
+my $tmpdir = File::Temp->newdir;
+my $stats  = "$tmpdir/stats";
 
 Test2::Aggregate::run_tests(
     dirs         => ['xt/aggregate'],
     root         => $root,
-    stats_output => "/tmp/tmp2$timest"
+    stats_output => $stats
 );
 
-like(find( "/tmp/tmp2$timest", '.*'), [qr/aggregate.*txt/], "Found stats file");
+like(find( $stats, '.*'), [qr/aggregate.*txt/], "Found stats file");
 
 sub find {
     my $dir     = shift;

@@ -35,8 +35,8 @@ sub lookup {
         ip => '9.9.9.9',
         is_bogon => false,
         (map { ($_ => false) } qw(
-            is_tor is_relay is_anycast is_carrier is_satellite is_ssh is_smtp is_web is_dns_resolver
-            is_bittorrent
+            is_tor is_relay is_bot is_anycast is_carrier is_satellite is_ssh is_smtp is_web
+            is_dns_resolver is_bittorrent
         )),
         tor => {},
         relay => {},

@@ -11,17 +11,10 @@
 #include <cstdint>
 #include <cstring>
 
-#if !defined(GOOGLE3)
-#include <string_view>
-namespace absl {
-using string_view = std::string_view;
-}  // namespace absl
-#else
-#include "third_party/absl/strings/string_view.h"
-#endif
-
 #ifdef GOOGLE3
 #include "net/proto2/proto/descriptor.upb.h"
+#include "third_party/absl/strings/str_cat.h"
+#include "third_party/absl/strings/string_view.h"
 #include "third_party/protobuf/compiler/perl/plugin.upb.h"
 #else
 #include "google/protobuf/compiler/plugin.upb.h"
@@ -53,8 +46,8 @@ void PerlCodeGenerator::RegisterTypesRecursively(
   upb_StringView name_sv = proto2_DescriptorProto_name(msg_proto);
   absl::string_view name(name_sv.data, name_sv.size);
 
-  std::string full_proto = std::string(proto_prefix) + "." + std::string(name);
-  std::string full_perl = std::string(perl_prefix) + "::" + std::string(name);
+  std::string full_proto = absl::StrCat(proto_prefix, ".", name);
+  std::string full_perl = absl::StrCat(perl_prefix, "::", name);
 
   type_to_perl_class_[full_proto] = full_perl;
 
@@ -83,7 +76,7 @@ void PerlCodeGenerator::BuildTypeMap() {
 
     upb_StringView pkg_sv = proto2_FileDescriptorProto_package(files[i]);
     std::string proto_pkg =
-        std::string(".") + std::string(pkg_sv.data, pkg_sv.size);
+        absl::StrCat(".", absl::string_view(pkg_sv.data, pkg_sv.size));
 
     size_t msg_count;
     const proto2_DescriptorProto* const* messages =
@@ -125,7 +118,7 @@ std::string PerlCodeGenerator::GetPerlPackage(
 
   std::string base_package = CapitalizePackage(pkg);
   if (!base_package.empty()) {
-    return base_package + "::" + camel_file_segment;
+    return absl::StrCat(base_package, "::", camel_file_segment);
   } else {
     return camel_file_segment;
   }
@@ -182,7 +175,7 @@ proto2_compiler_CodeGeneratorResponse* PerlCodeGenerator::Generate() {
       p.replace(double_slash, 2, "/");
     }
 
-    std::string final_path = p + ".pm";
+    std::string final_path = absl::StrCat(p, ".pm");
     proto2_compiler_CodeGeneratorResponse_File_set_name(file,
                                                         ArenaCopy(final_path));
     proto2_compiler_CodeGeneratorResponse_File_set_content(
@@ -192,7 +185,7 @@ proto2_compiler_CodeGeneratorResponse* PerlCodeGenerator::Generate() {
     std::string types_content = GenerateTypes(file_proto);
     proto2_compiler_CodeGeneratorResponse_File* types_file =
         proto2_compiler_CodeGeneratorResponse_add_file(response, arena_);
-    std::string types_path = p + "/Types.pm";
+    std::string types_path = absl::StrCat(p, "/Types.pm");
     proto2_compiler_CodeGeneratorResponse_File_set_name(types_file,
                                                         ArenaCopy(types_path));
     proto2_compiler_CodeGeneratorResponse_File_set_content(
@@ -204,25 +197,44 @@ proto2_compiler_CodeGeneratorResponse* PerlCodeGenerator::Generate() {
 
 static std::string FieldTypeToString(int type) {
   switch (type) {
-    case 1: return "Double";
-    case 2: return "Float";
-    case 3: return "Int64";
-    case 4: return "UInt64";
-    case 5: return "Int32";
-    case 6: return "Fixed64";
-    case 7: return "Fixed32";
-    case 8: return "Bool";
-    case 9: return "String";
-    case 10: return "Group";
-    case 11: return "Message";
-    case 12: return "Bytes";
-    case 13: return "UInt32";
-    case 14: return "Enum";
-    case 15: return "SFixed32";
-    case 16: return "SFixed64";
-    case 17: return "SInt32";
-    case 18: return "SInt64";
-    default: return "Unknown";
+    case 1:
+      return "Double";
+    case 2:
+      return "Float";
+    case 3:
+      return "Int64";
+    case 4:
+      return "UInt64";
+    case 5:
+      return "Int32";
+    case 6:
+      return "Fixed64";
+    case 7:
+      return "Fixed32";
+    case 8:
+      return "Bool";
+    case 9:
+      return "String";
+    case 10:
+      return "Group";
+    case 11:
+      return "Message";
+    case 12:
+      return "Bytes";
+    case 13:
+      return "UInt32";
+    case 14:
+      return "Enum";
+    case 15:
+      return "SFixed32";
+    case 16:
+      return "SFixed64";
+    case 17:
+      return "SInt32";
+    case 18:
+      return "SInt64";
+    default:
+      return "Unknown";
   }
 }
 
@@ -316,13 +328,17 @@ std::string PerlCodeGenerator::GenerateModule(
     // Emit formal POD block for the message
     ss << "=pod\n\n";
     ss << "=head1 NAME\n\n";
-    ss << package_name_ << "::" << msg_name << " - Compiled Protocol Buffers message class\n\n";
+    ss << package_name_ << "::" << msg_name
+       << " - Compiled Protocol Buffers message class\n\n";
     ss << "=head1 SYNOPSIS\n\n";
     ss << "    use " << package_name_ << ";\n\n";
     ss << "    my $msg = " << package_name_ << "::" << msg_name << "->new(\n";
     if (field_count > 0) {
-      upb_StringView first_f_name_sv = proto2_FieldDescriptorProto_name(fields[0]);
-      ss << "        " << absl::string_view(first_f_name_sv.data, first_f_name_sv.size) << " => $value,\n";
+      upb_StringView first_f_name_sv =
+          proto2_FieldDescriptorProto_name(fields[0]);
+      ss << "        "
+         << absl::string_view(first_f_name_sv.data, first_f_name_sv.size)
+         << " => $value,\n";
     }
     ss << "    );\n\n";
     ss << "=head1 FIELDS\n\n";
@@ -337,7 +353,9 @@ std::string PerlCodeGenerator::GenerateModule(
       ss << "=item * B<" << f_name << ">\n\n";
       ss << "Type: " << FieldTypeToString(f_type);
       if (f_type_name_sv.size > 0) {
-        ss << " (" << absl::string_view(f_type_name_sv.data, f_type_name_sv.size) << ")";
+        ss << " ("
+           << absl::string_view(f_type_name_sv.data, f_type_name_sv.size)
+           << ")";
       }
       ss << "\n\n";
     }
@@ -478,7 +496,8 @@ std::string PerlCodeGenerator::GenerateModule(
   }
 
   ss << "1;\n\n__END__\n\n=head1 NAME\n\n"
-     << package_name_ << " - Protocol Buffers schema definition\n\n=head1 DESCRIPTION\n\n"
+     << package_name_
+     << " - Protocol Buffers schema definition\n\n=head1 DESCRIPTION\n\n"
      << "Auto-generated Protocol Buffers schema definition class.\n\n"
      << "=head1 LICENSE AND COPYRIGHT\n\nCopyright (C) 2026 Google LLC\n\n"
      << "This program is released under the Apache 2.0 license.\n\n=cut\n";
@@ -510,8 +529,10 @@ std::string PerlCodeGenerator::GenerateTypes(
   }
 
   ss << "1;\n\n__END__\n\n=head1 NAME\n\n"
-     << package_name_ << "::Types - Type definitions and coercions\n\n=head1 DESCRIPTION\n\n"
-     << "Auto-generated Type::Tiny definitions and coercions for Protocol Buffers.\n\n"
+     << package_name_
+     << "::Types - Type definitions and coercions\n\n=head1 DESCRIPTION\n\n"
+     << "Auto-generated Type::Tiny definitions and coercions for Protocol "
+        "Buffers.\n\n"
      << "=head1 LICENSE AND COPYRIGHT\n\nCopyright (C) 2026 Google LLC\n\n"
      << "This program is released under the Apache 2.0 license.\n\n=cut\n";
   return ss.str();
@@ -522,8 +543,7 @@ void PerlCodeGenerator::PrintTypesRecursively(
     std::stringstream& ss) {
   upb_StringView msg_name_sv = proto2_DescriptorProto_name(msg_proto);
   absl::string_view msg_name(msg_name_sv.data, msg_name_sv.size);
-  std::string full_msg_name =
-      std::string(current_package) + "::" + std::string(msg_name);
+  std::string full_msg_name = absl::StrCat(current_package, "::", msg_name);
 
   PrintMessageTypes(msg_proto, current_package, ss);
 
@@ -547,8 +567,7 @@ void PerlCodeGenerator::PrintMessageTypes(
     std::stringstream& ss) {
   upb_StringView msg_name_sv = proto2_DescriptorProto_name(msg_proto);
   absl::string_view msg_name(msg_name_sv.data, msg_name_sv.size);
-  std::string full_perl_class =
-      std::string(current_package) + "::" + std::string(msg_name);
+  std::string full_perl_class = absl::StrCat(current_package, "::", msg_name);
 
   ss << "declare '" << msg_name << "',\n";
   ss << "    as InstanceOf['" << full_perl_class << "'];\n\n";

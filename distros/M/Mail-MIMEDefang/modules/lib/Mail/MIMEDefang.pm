@@ -39,7 +39,8 @@ no warnings qw(once uninitialized);
 require Exporter;
 
 use Carp;
-use Errno qw(ENOENT EACCES);
+use Errno qw(ENOENT EACCES ECONNREFUSED EAGAIN EWOULDBLOCK ENOBUFS);
+use Fcntl qw(F_GETFL F_SETFL O_NONBLOCK);
 use File::Spec;
 use IO::File;
 use MIME::Entity;
@@ -47,10 +48,16 @@ use MIME::WordDecoder;
 use Socket;
 
 our @ISA = qw(Exporter);
+
+# Timestamp of when processing of the current message began; not exported,
+# only accessible via md_get_processing_time().
+my $MessageStartTime;
 our @EXPORT;
 our @EXPORT_OK;
 
-our $VERSION = '3.7.3';
+our $VERSION = '3.8.0';
+# 1 on development snapshots, 0 for release candidates and releases
+our $DEV = 0;
 
 @EXPORT = qw{
       $AddWarningsInline @StatusTags
@@ -73,7 +80,7 @@ our $VERSION = '3.7.3';
       $ValidateIPHeader
       $QuarantineSubject $SALocalTestsOnly $NotifyNoPreamble
       %Actions %Stupidity @FlatParts @Recipients @Warnings %Features
-      $SyslogFacility $GraphDefangSyslogFacility
+      $SyslogFacility $GraphDefangSyslogFacility $GraphDefangFeedSocket
       $MaxMIMEParts $InMessageContext $InFilterContext $PrivateMyHostName
       $EnumerateRecipients $InFilterEnd $FilterEndReplacementEntity
       $AddApparentlyToForSpamAssassin $WarningCounter
@@ -88,10 +95,11 @@ our $VERSION = '3.7.3';
       init_globals print_and_flush detect_and_load_perl_modules
       init_status_tag push_status_tag pop_status_tag
       signal_changed signal_unchanged md_syslog md_graphdefang_log md_graphdefang_log_array
+      md_graphdefang_feed_enable
       write_result_line in_message_context in_filter_context in_filter_wrapup
       in_filter_end percent_decode percent_encode percent_encode_for_graphdefang
       send_mail send_multipart_mail send_quarantine_notifications signal_complete send_admin_mail
-      md_version set_status_tag read_commands_file
+      md_version set_status_tag read_commands_file md_get_processing_time
     };
 
 @EXPORT_OK = qw{
@@ -101,12 +109,25 @@ our $VERSION = '3.7.3';
 #***********************************************************************
 # %PROCEDURE: md_version
 # %ARGUMENTS:
-#  None
+#  full -- (optional) if true, add the "-dev" suffix on development
+#          snapshots
 # %RETURNS:
 #  MIMEDefang version
 #***********************************************************************
 sub md_version {
-    return $VERSION;
+    my ($full) = @_;
+    return ($full && $DEV) ? "$VERSION-dev" : $VERSION;
+}
+
+=item md_get_processing_time
+
+Returns the number of seconds elapsed since processing of the current
+message began (i.e. since the most recent call to init_globals()).
+
+=cut
+
+sub md_get_processing_time {
+    return time() - $MessageStartTime;
 }
 
 =item init_globals
@@ -134,6 +155,7 @@ sub init_globals {
     $MessageID = "NOQUEUE";
     $Helo = "";
     $QueueID = "NOQUEUE";
+    $MessageStartTime = time();
     $QuarantineCount = 0;
     $Rebuild = 0;
     $EntireMessageQuarantined = 0;
@@ -377,6 +399,13 @@ If you need to log UTF-8 strings you can call the sub as:
 
 C<md_graphdefang_log('spam',$hits, undef, 1);>
 
+The optional fifth argument C<$per_message> controls how messages with
+more than one recipient are logged: 0 (default) logs one line per recipient
+when C<$EnumerateRecipients> is set, 1 logs a single line with "rcpts=N"
+and 2 logs a single line with all the recipients separated by ";".
+
+C<md_graphdefang_log('non-spam', $hits, $RelayAddr, 1, 2);>
+
 =cut
 
 #***********************************************************************
@@ -388,6 +417,9 @@ C<md_graphdefang_log('spam',$hits, undef, 1);>
 #  value2 -- (optional) A value associated with the event being logged.
 #  utf8_decode -- (optional) A boolean value that indicates if we want to
 #                 decode UTF-8 encoded strings
+#  per_message -- (optional) 0: one line per recipient (if EnumerateRecipients),
+#                 1: a single line with "rcpts=N",
+#                 2: a single line with all recipients separated by ";"
 # %RETURNS:
 #  Nothing
 # %DESCRIPTION:
@@ -401,7 +433,7 @@ C<md_graphdefang_log('spam',$hits, undef, 1);>
 #***********************************************************************
 sub md_graphdefang_log
 {
-    return unless defined($GraphDefangSyslogFacility);
+    return unless defined($GraphDefangSyslogFacility) || defined($GraphDefangFeedSocket);
     return if (!in_message_context("md_graphdefang_log"));
 
     my $event = shift;
@@ -435,6 +467,9 @@ If you need to log UTF-8 strings you can call the sub as:
 
 C<md_graphdefang_log_array('spam',1,\@info);>
 
+The optional fourth argument C<$per_message> has the same meaning as
+the fifth argument of C<md_graphdefang_log>.
+
 =cut
 
 #***********************************************************************
@@ -445,8 +480,9 @@ C<md_graphdefang_log_array('spam',1,\@info);>
 #  utf8_decode -- (optional) A boolean value that indicates if we want to
 #                 decode UTF-8 encoded strings
 #  values -- (optional) An array of values associated with the event being logged.
-#  per_message -- (optional) A boolean value that indicates if the log should be printed
-#                  once per recipient or just one time.
+#  per_message -- (optional) 0: one line per recipient (if EnumerateRecipients),
+#                 1: a single line with "rcpts=N",
+#                 2: a single line with all recipients separated by ";"
 # %RETURNS:
 #  Nothing
 # %DESCRIPTION:
@@ -458,7 +494,7 @@ C<md_graphdefang_log_array('spam',1,\@info);>
 #***********************************************************************
 sub md_graphdefang_log_array
 {
-    return unless defined($GraphDefangSyslogFacility);
+    return unless defined($GraphDefangSyslogFacility) || defined($GraphDefangFeedSocket);
     return if (!in_message_context("md_graphdefang_log"));
 
     my $event = shift;
@@ -511,17 +547,151 @@ sub md_graphdefang_log_array
     if ($enumerate || scalar(@Recipients) == 1) {
 	    foreach my $recipient (@Recipients) {
 	      my $lcrecipient = percent_encode_for_graphdefang(lc($recipient));
-	      md_syslog("$GraphDefangSyslogFacility|info","MDLOG,$id," .
+	      _graphdefang_emit("MDLOG,$id," .
 	                "$event," . join(",", @info) . ",$lcsender," .
 	                "$lcrecipient,$subj");
 	  }
   } else {
-	  my $lcrecipient = "rcpts=" . scalar(@Recipients);
+	  my $lcrecipient;
+	  if ($per_message == 2) {
+	    $lcrecipient = join(';', map { lc } @Recipients);
+	  } else {
+	    $lcrecipient = "rcpts=" . scalar(@Recipients);
+	  }
 	  $lcrecipient = percent_encode_for_graphdefang($lcrecipient);
-	  md_syslog("$GraphDefangSyslogFacility|info","MDLOG,$id," .
+	  _graphdefang_emit("MDLOG,$id," .
 	          "$event," . join(",", @info) . ",$lcsender," .
 		        "$lcrecipient,$subj");
   }
+}
+
+#***********************************************************************
+# %PROCEDURE: _graphdefang_emit
+# %ARGUMENTS:
+#  line -- a complete MDLOG line
+# %RETURNS:
+#  Nothing
+# %DESCRIPTION:
+#  Sends an MDLOG line to syslog and/or to the dashboard feed socket,
+#  depending on which of them is enabled.
+#***********************************************************************
+sub _graphdefang_emit
+{
+    my $line = shift;
+
+    md_syslog("$GraphDefangSyslogFacility|info", $line)
+      if defined($GraphDefangSyslogFacility);
+    _graphdefang_feed_send($line) if defined($GraphDefangFeedSocket);
+    return;
+}
+
+# Per-process datagram socket used by _graphdefang_feed_send
+my $FeedSock;
+my $FeedWarned = 0;
+
+#***********************************************************************
+# %PROCEDURE: _graphdefang_feed_send
+# %ARGUMENTS:
+#  line -- a complete MDLOG line
+# %RETURNS:
+#  1 if the datagram was sent, 0 otherwise
+# %DESCRIPTION:
+#  Fire-and-forget delivery of an MDLOG line to the UNIX datagram socket
+#  of mimedefang-dashboard.  The socket is non-blocking; if the dashboard
+#  is not running or cannot keep up the line is dropped, so mail flow is
+#  never delayed.
+#***********************************************************************
+sub _graphdefang_feed_send
+{
+    my $line = shift;
+    my $addr = eval { pack_sockaddr_un($GraphDefangFeedSocket) };
+    return 0 unless defined($addr);
+
+    if (!$FeedSock) {
+      return 0 unless -S $GraphDefangFeedSocket;
+      my $sock;
+      if (!socket($sock, PF_UNIX, SOCK_DGRAM, 0)) {
+        _graphdefang_feed_warn("socket: $!");
+        return 0;
+      }
+      my $flags = fcntl($sock, F_GETFL, 0);
+      fcntl($sock, F_SETFL, $flags | O_NONBLOCK) if defined($flags);
+      $FeedSock = $sock;
+    }
+    my $sent = send($FeedSock, $line, 0, $addr);
+    if (!defined($sent)) {
+      # A missing or busy dashboard is normal; anything else is worth a note
+      my $err = $! + 0;
+      _graphdefang_feed_warn("send to $GraphDefangFeedSocket: $!")
+        unless grep { $err == $_ } (ENOENT, ECONNREFUSED, EAGAIN, EWOULDBLOCK, ENOBUFS);
+      return 0;
+    }
+    return 1;
+}
+
+sub _graphdefang_feed_warn
+{
+    my $msg = shift;
+    return if $FeedWarned++;
+    md_syslog('info', "md_graphdefang_log: cannot reach dashboard feed ($msg); further errors are not logged");
+    return;
+}
+
+=item md_graphdefang_feed_enable
+
+Sends every event logged with C<md_graphdefang_log> and
+C<md_graphdefang_log_array> to the UNIX datagram socket of
+C<mimedefang-dashboard>, which shows them live.  It can be used together
+with C<md_graphdefang_log_enable> or on its own, in which case nothing
+is written to syslog.
+
+C<md_graphdefang_feed_enable();>
+
+C<md_graphdefang_feed_enable('/var/spool/MIMEDefang/mimedefang-dashboard.sock', 1);>
+
+The first optional argument is the absolute path of the socket; the
+default is F<mimedefang-dashboard.sock> in the spool directory.  It is
+not a syslog facility: a relative path such as C<'mail'> is ignored, with
+a warning, and the default is used.  The second optional
+argument has the same meaning as the second argument of
+C<md_graphdefang_log_enable>: whether to send one line per recipient.
+
+Delivery never blocks: if the dashboard is not running the events are
+dropped and nothing is logged, so the dashboard can be started and
+stopped at any time.
+
+=cut
+
+#***********************************************************************
+# %PROCEDURE: md_graphdefang_feed_enable
+# %ARGUMENTS:
+#  path -- (optional) path of the dashboard datagram socket
+#  enum_recips -- (optional) one line per recipient (default 1)
+# %RETURNS:
+#  Nothing
+#***********************************************************************
+sub md_graphdefang_feed_enable
+{
+    my ($path, $enum_recips) = @_;
+
+    my $default = File::Spec->catfile($Features{'Path:SPOOLDIR'} // '.',
+                                      'mimedefang-dashboard.sock');
+    # mimedefang.pl works inside per-message directories, so a relative
+    # path never reaches the dashboard.  A common slip is to pass a
+    # syslog facility, as for md_graphdefang_log_enable('mail', 1).
+    if (defined($path) && $path ne '' && !File::Spec->file_name_is_absolute($path)) {
+      md_syslog('warning', "md_graphdefang_feed_enable: '$path' is not an absolute socket path, using $default");
+      $path = undef;
+    }
+    $path = $default unless defined($path) && $path ne '';
+    $GraphDefangFeedSocket = $path;
+    if (defined($enum_recips)) {
+      $EnumerateRecipients = $enum_recips;
+    } elsif (!defined($EnumerateRecipients)) {
+      $EnumerateRecipients = 1;
+    }
+    $FeedWarned = 0;
+    return;
 }
 
 =item detect_and_load_perl_modules
@@ -538,7 +708,9 @@ like SpamAssassin, rbl checks, zip file listing and HTML parsing.
 # $Features{"AutoDetectPerlModules"} = 0;
 
 sub detect_and_load_perl_modules() {
-    my ($use_sa, $use_html, $use_zip, $use_dns);
+    # Start from 0, so that a feature disabled by the filter stays 0
+    # (and is not loaded) when this function is called again
+    my ($use_sa, $use_html, $use_zip, $use_dns) = (0, 0, 0, 0);
     local $@;
     if (!defined($Features{"AutoDetectPerlModules"}) or
       $Features{"AutoDetectPerlModules"}) {
@@ -1428,9 +1600,15 @@ sub read_commands_file {
 	    } elsif ($cmd eq "J") {
 	      $WasResent = 1;
 	      $RelayAddr = $arg;
-	      my($iaddr, $iname);
-	      $iaddr = inet_aton($RelayAddr);
-	      $iname = gethostbyaddr($iaddr, AF_INET);
+	      my($af, $iaddr, $iname);
+	      if ($RelayAddr =~ /:/) {
+		      $af = AF_INET6;
+		      $iaddr = Socket::inet_pton(AF_INET6, $RelayAddr);
+	      } else {
+		      $af = AF_INET;
+		      $iaddr = inet_aton($RelayAddr);
+	      }
+	      $iname = gethostbyaddr($iaddr, $af) if defined($iaddr);
 	      if (defined($iname)) {
 		      $RelayHostname = $iname;
 	      } else {

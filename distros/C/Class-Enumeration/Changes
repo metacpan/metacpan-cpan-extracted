@@ -1,5 +1,14 @@
 Release history for Class-Enumeration
 
+v1.3.2    2026-11-21T13:09:01Z
+          - Add example that uses the "Importer" module (from the outside)
+            instead of any exporter module (from the inside)
+          - Use prefixed name to build the per enum object child class name
+          - Let the test runner provide t/data if it exists
+          - Use Test2::V1 in some test scripts
+          - Remove pre-release logic from Makefile.PL
+          - Update project boilerplate
+
 v1.3.1    2026-02-27T14:22:04Z
           - Use UTC-normalized W3CDTF time stamp in Changes file
           - Update project boilerplate

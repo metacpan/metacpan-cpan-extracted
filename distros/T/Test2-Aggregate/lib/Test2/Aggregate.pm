@@ -6,6 +6,7 @@ use warnings;
 use File::Basename;
 use File::Find;
 use File::Path;
+use File::Spec;
 use Path::Tiny;
 
 use Test2::V0 'subtest';
@@ -31,7 +32,7 @@ See C<$VERSION> in module.
 
 =cut
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 =head1 DESCRIPTION
 
@@ -273,8 +274,9 @@ Matches pre-1.00 behaviour by including C<root> in the output of stats.
 
 =item * C<no_dot> (optional)
 
-Current version will add a C<./> at the start of a test file if the full path does
-not start with C</> or C<.> to avoid the C<'.' is no longer in @INC> error.
+Current version will add a C<./> at the start of a test file if the path is
+not absolute (e.g. C</...>, or C<C:/...> on Windows) and does not start with
+C<.>, to avoid the C<'.' is no longer in @INC> error.
 Setting C<no_dot> to true matches pre-1.00 behaviour that did not do this.
 
 =item * C<bail_on_fail> (optional)
@@ -312,7 +314,7 @@ sub run_tests {
     @dirs = @{$args{dirs}} if $args{dirs};
     $args{root} .= '/' unless !$args{root} || $args{root} =~ m#/$#;
     $args{root} = dirname($0) . "/$args{root}"
-        if $args{relative_root} && $args{root} && $args{root} !~ m#^/#;
+        if $args{relative_root} && $args{root} && !File::Spec->file_name_is_absolute($args{root});
 
     if ($args{root} && ! -e $args{root}) {
         warn "Root '$args{root}' does not exist, no tests are loaded."
@@ -382,7 +384,7 @@ sub _check_abs_path {
     my $root = shift;
     my $path = shift;
     # Can't use path() below as it removes ./ (required by absolute option)
-    $path = "$root$path" unless !$root || substr($path, 0, 1) eq '/';
+    $path = "$root$path" unless !$root || File::Spec->file_name_is_absolute($path);
     return $path;
 }
 
@@ -483,7 +485,7 @@ sub _run_tests {
                 } else {
                     my $t= $test;
                     $t = "./$test"
-                        unless $args->{no_dot} || $test =~ m#^[./]#;
+                        unless $args->{no_dot} || $test =~ m#^\.# || File::Spec->file_name_is_absolute($test);
                     $args->{package}
                         ? eval "package Test::$i" . '::' . "$count; do '$t';"
                         : do $t;
@@ -640,10 +642,10 @@ or to check whether specific tests can run successfully under Test2::Aggregate.
  --absolute,         -a      : Use absolute paths in generated files. Disabled with -r.
  --include_regex <s> -ir <s> : Regex for test paths to include.
  --exclude_regex <s> -er <s> : Regex for test paths to exclude.
- --root <s>          -r <s>  : Define a custom root dir (default is current dir).
- --include <s>,      -I <s>  : Library paths to include.
+ --root <s>          -r <s>  : Define a custom root dir.
+ --include <s>,      -I <s>  : Library path to include (repeatable).
  --test_warnings,    -w      : Fail tests on warnings.
- --test_bundle <s>,  -t      : Test bundle (def: Test2::V0 or Test::More if -p). Can be comma-separated list.
+ --test_bundle <s>,  -t      : Test bundle (def: Test2::V0 or Test::More if -p). Comma-separated list.
  --pass_output <s>,  -po <s> : Output directory for list of 100% passing tests.
  --reverse                   : Reverse the test order.
  --shuffle                   : Shuffle the test order.
@@ -661,6 +663,23 @@ L<Test2::Plugin::BailOnFail>. Startup failures and failures after all test files
 have completed abort the command with a nonzero exit status instead of removing
 tests. This is a coarse way to discover a starting list of tests that can be
 aggregated together, not proof that each removed test is independently broken.
+
+ Options:
+ --out <s>,          -o <s>  : Specify the test file to be created (tmp file by default).
+ --lists,            -l      : Use files specified as lists.
+ --prove,            -p      : Force prove (default is yath/Test2 if installed).
+ --verbose,          -v      : Verbose (passed to yath/prove)
+ --absolute,         -a      : Use absolute paths in generated files. Disabled with -r.
+ --exclude_regex <s> -er <s> : Regex for test paths to exclude.
+ --exclude_list <s>  -el <s> : File with test paths to exclude (one per line).
+ --event_timeout <i> -et <i> : Event timeout for yath (to determine hung tests). Default 10.
+ --root <s>          -r <s>  : Define a custom root dir (default is current dir).
+ --include <s>,      -I <s>  : Library path to include (repeatable).
+ --test_bundle <s>,  -t      : Test bundle (def: Test2::V0 or Test::More if -p). Comma-separated list.
+ --reverse                   : Reverse the test order.
+ --shuffle                   : Shuffle the test order.
+ --sort                      : Run the tests alphabetically.
+ --help              -h      : Show basic help and exit.
 
 C<--sort>, C<--shuffle>, and C<--reverse> are applied once during discovery.
 The resulting order is preserved across retries and in the generated runner.

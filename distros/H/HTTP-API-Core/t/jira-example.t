@@ -26,7 +26,7 @@ my $jira = HTTP::API::Core::Example::Jira->new(
 );
 
 my $pager = $jira->issues_pager(
-    jql => 'filter=415607',
+    jql => 'filter=12345',
     fields => [qw(summary description components)],
     max_results => 1000,
 );
@@ -37,7 +37,7 @@ is scalar(@calls), 2, 'Jira recipe stops at total without extra requests';
 is $calls[0][0], 'GET', 'search uses GET';
 like $calls[0][1], qr{\Ahttps://jira\.example\.test/rest/api/2/search\?},
     'uses Jira Server/Data Center search endpoint under the root context';
-like $calls[0][1], qr/(?:\?|&)jql=filter%3D415607(?:&|$)/,
+like $calls[0][1], qr/(?:\?|&)jql=filter%3D12345(?:&|$)/,
     'escapes JQL query';
 like $calls[0][1], qr/(?:\?|&)fields=summary%2Cdescription%2Ccomponents(?:&|$)/,
     'maps array fields to a comma-separated query value';

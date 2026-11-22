@@ -44,9 +44,12 @@ my $header = <<'HEADER';
 #include "xs/repeated/repeated.h"
 
 #define GET_FIELD_DEF_OR_CROAK(mdef, field_name, fdef_var) \
-    const upb_FieldDef* fdef_var = upb_MessageDef_FindFieldByName(mdef, field_name); \
+    if (!(mdef)) { \
+        croak("Invalid or detached message object (missing MessageDef)"); \
+    } \
+    const upb_FieldDef* fdef_var = upb_MessageDef_FindFieldByName((mdef), (field_name)); \
     if (!fdef_var) { \
-        croak("Field '%s' not found in message '%s'", field_name, upb_MessageDef_FullName(mdef)); \
+        croak("Field '%s' not found in message '%s'", (field_name), upb_MessageDef_FullName((mdef))); \
     }
 
 HEADER

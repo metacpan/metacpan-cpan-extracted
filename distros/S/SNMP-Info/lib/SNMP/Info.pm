@@ -27,7 +27,7 @@ our
      $NOSUCH, $BIGINT, $REPEATERS,
      $BACKOFF_FLOOR, $MAX_FAILED_BULKWALKS, $SLOW_DEVICE_TABLES);
 
-$VERSION = '3.985002';
+$VERSION = '3.985003';
 
 =head1 NAME
 
@@ -35,7 +35,7 @@ SNMP::Info - OO Interface to Network devices and MIBs through SNMP
 
 =head1 VERSION
 
-SNMP::Info - Version 3.985002
+SNMP::Info - Version 3.985003
 
 =head1 AUTHOR
 
@@ -425,6 +425,13 @@ See documentation in L<SNMP::Info::IEEE802dot11> for details.
 SNMP Interface to IEEE Aggregated Links.  F<IEEE8023-LAG-MIB>
 
 See documentation in L<SNMP::Info::IEEE802dot3ad> for details.
+
+=item SNMP::Info::L2Service
+
+Bindings between local VLANs and layer 2 service IDs, such as SPB I-SIDs
+and VXLAN VNIs, from the device class's own sources.
+
+See documentation in L<SNMP::Info::L2Service> for details.
 
 =item SNMP::Info::IPv6
 

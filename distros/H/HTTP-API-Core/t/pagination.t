@@ -136,6 +136,56 @@ is_deeply(
     'client joins paginated URLs against base URL',
 );
 
+# Schemes are case-insensitive in URI syntax. The pagination guard already
+# accepts mixed case; the real client must dispatch that absolute URL intact.
+my @mixed_scheme_urls;
+my $mixed_scheme_api = HTTP::API::Core->new(
+    base_url => 'https://api.example.test',
+    retry => { attempts => 1 },
+    transport => sub {
+        my ($method, $url) = @_;
+        push @mixed_scheme_urls, $url;
+        return {
+            status  => 200,
+            reason  => 'OK',
+            headers => { 'content-type' => 'application/json' },
+            content => $url eq 'https://api.example.test/mixed'
+                ? '{"items":[1],"next":"HTTPS://api.example.test/mixed?page=2"}'
+                : '{"items":[2],"next":null}',
+        };
+    },
+);
+my $mixed_scheme_pager = $mixed_scheme_api->paginate('/mixed');
+is_deeply(scalar($mixed_scheme_pager->all), [1, 2],
+    'real client follows same-origin uppercase HTTPS continuation');
+is_deeply(\@mixed_scheme_urls, [
+    'https://api.example.test/mixed',
+    'HTTPS://api.example.test/mixed?page=2',
+], 'uppercase absolute continuation is not joined to base URL');
+
+my @foreign_scheme_urls;
+my $foreign_scheme_api = HTTP::API::Core->new(
+    base_url => 'https://api.example.test',
+    retry => { attempts => 1 },
+    transport => sub {
+        my ($method, $url) = @_;
+        push @foreign_scheme_urls, $url;
+        return {
+            status  => 200,
+            reason  => 'OK',
+            headers => {},
+            content => '{"items":[1],"next":"HTTPS://other.example.test/private"}',
+        };
+    },
+);
+my $foreign_scheme_pager = $foreign_scheme_api->paginate('/origin');
+my $foreign_scheme_error;
+eval { $foreign_scheme_pager->all; 1 } or $foreign_scheme_error = $@;
+like $foreign_scheme_error, qr/cross-origin pagination continuation rejected/,
+    'uppercase HTTPS continuation to another origin remains blocked';
+is_deeply(\@foreign_scheme_urls, ['https://api.example.test/origin'],
+    'foreign mixed-case URL is rejected before sending a request');
+
 my $query_validation_client = T::Client->new({
     '/users?page=1&tag=admin&tag=staff' => { items => [] },
 });

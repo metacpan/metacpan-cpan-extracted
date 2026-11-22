@@ -1,0 +1,34 @@
+% layout 'default';
+% title l('scan') . ' — Mogura';
+<h1 class="mb-6 text-2xl font-semibold tracking-tight wrap-anywhere sm:text-3xl"><%= l('scan') %></h1>
+
+<p class="text-sm text-slate-600" role="status" data-inventory-status></p>
+<form method="post" action="/scans" data-scan-form>
+    %= csrf_field
+    <input type="hidden" name="scan_id" value="<%= $scan_id %>">
+    <div data-inventory-panel>
+        %= include 'inventory', inventory => $inventory
+    </div>
+
+<section class="my-6 min-w-0 rounded-lg border border-slate-200 bg-white p-4 sm:p-6" data-tag-input>
+    <h2 class="mb-5 text-lg font-semibold"><%= l('tags') %></h2>
+    <div class="flex flex-wrap gap-1.5 not-empty:mb-4" data-initial-tags></div>
+    <div class="flex flex-wrap items-end gap-3 [&>label]:min-w-0 [&>label]:grow">
+        <label class="text-sm" for="new-tag"><span class="sr-only"><%= l('tags') %></span>
+            <input class="mt-1 block w-full min-w-0 rounded-md border border-slate-300 bg-white px-3 py-2 disabled:bg-slate-100" id="new-tag" name="new_tag" maxlength="120" placeholder="<%= l('enter_tag') %>">
+        </label>
+        <button type="button" class="inline-flex min-h-10 items-center justify-center rounded-md border px-4 py-2 font-medium cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 border-slate-300 bg-white text-slate-700 enabled:hover:bg-slate-100" data-add-tag><%= l('add') %></button>
+    </div>
+    <span class="mt-2 block text-xs text-slate-600" role="status" data-tag-input-status></span>
+</section>
+
+<section class="my-6 min-w-0 rounded-lg border border-slate-200 bg-white p-4 sm:p-6">
+    <h2 class="mb-5 text-lg font-semibold"><%= l('notes') %></h2>
+    <label class="sr-only" for="new-note"><%= l('scan_notes') %></label>
+    <textarea class="mt-1 block w-full min-w-0 rounded-md border border-slate-300 bg-white px-3 py-2 disabled:bg-slate-100" id="new-note" name="note" rows="4" maxlength="2000"></textarea>
+</section>
+<div class="my-6">
+        <button class="inline-flex min-h-10 items-center justify-center rounded-md border px-4 py-2 font-medium cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 border-blue-700 bg-blue-700 text-white enabled:hover:bg-blue-800" type="submit"><%= l('start_scan') %></button>
+</div>
+<p class="my-4 text-sm" role="status" data-scan-status></p>
+</form>

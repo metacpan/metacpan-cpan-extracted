@@ -106,6 +106,36 @@ T2->subtest(
 );
 
 T2->subtest(
+    'channel updates across visibility changes',
+    sub {
+        my $cache = Discord::Client::Cache->new;
+        my $identity = { id => '2', guild_id => '1', type => 0, position => 1, parent_id => undef };
+
+        # Ordinary partial updates retain omitted metadata, even for a channel named like the placeholder.
+        my $visible = { %$identity, name => 'general', last_message_id => '3', topic => 'Planning' };
+        $cache->apply( 'CHANNEL_CREATE', $visible );
+        $cache->apply( 'CHANNEL_UPDATE', { id => '2', name => '___hidden___' } );
+        T2->is( $cache->get( channel => '2' ), { %$visible, name => '___hidden___' }, 'visible update merges' );
+
+        # The flagged snapshot omits the old message ID and explicitly clears the topic.
+        my $hidden = {
+            %$identity,
+            name => '___hidden___',
+            flags => 1 << 17,
+            topic => undef,
+            permission_overwrites => [ { id => '1', type => 0, allow => '0', deny => '1024' } ],
+        };
+        $cache->apply( 'CHANNEL_UPDATE', $hidden );
+        T2->is( $cache->get( channel => '2' ), $hidden, 'obfuscated update replaces visible data' );
+
+        # The full update on regaining access can omit flags and the placeholder overwrite.
+        my $restored = { %$identity, name => 'general' };
+        $cache->apply( 'CHANNEL_UPDATE', $restored );
+        T2->is( $cache->get( channel => '2' ), $restored, 'restored snapshot contains only the new fields' );
+    }
+);
+
+T2->subtest(
     'selected types and facade event ordering',
     sub {
 

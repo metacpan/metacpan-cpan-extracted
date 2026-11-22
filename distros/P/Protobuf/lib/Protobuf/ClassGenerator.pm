@@ -111,6 +111,27 @@ sub _capitalize_segment {
     return ucfirst($segment);
 }
 
+sub _validate_ident {
+    my ($ident, $ctx) = @_;
+    croak 'Invalid identifier in descriptor (' . ($ctx // 'ident') . ')'
+        unless defined $ident && $ident =~ /\A[A-Za-z_][A-Za-z0-9_]*\z/;
+    return $ident;
+}
+
+sub _validate_pkg {
+    my ($pkg, $ctx) = @_;
+    croak 'Invalid package name in descriptor (' . ($ctx // 'pkg') . ')'
+        unless defined $pkg && $pkg =~ /\A[A-Za-z_][A-Za-z0-9_]*(?:::[A-Za-z_][A-Za-z0-9_]*)*\z/;
+    return $pkg;
+}
+
+sub _validate_int {
+    my ($num, $ctx) = @_;
+    croak 'Invalid enum integer in descriptor (' . ($ctx // 'number') . ')'
+        unless defined $num && $num =~ /\A-?[0-9]+\z/;
+    return 0 + $num;
+}
+
 sub register_extension_range {
     my ($class, $full_msg_name, $start, $end) = @_;
     push @{$EXTENSION_RANGES{$full_msg_name}}, { start => $start, end => $end };
@@ -159,19 +180,16 @@ sub generate_for_file {
             }
         }
 
-        my $code = "package $perl_class;\n";
-        for my $j (0 .. $vcount - 1) {
-            my $vdef = $edef->get_value($j);
-            my $vname = $vdef->name;
-            my $vnumber = $vdef->number;
-            $code .= "sub $vname { $vnumber }\n";
-        }
-        $code .= "1;\n";
+        _validate_pkg($perl_class, 'top-level enum package');
         {
             no strict 'refs';
-            eval $code;
+            for my $j (0 .. $vcount - 1) {
+                my $vdef = $edef->get_value($j);
+                my $vname = _validate_ident($vdef->name, 'enum value name');
+                my $vnumber = _validate_int($vdef->number, 'enum value number');
+                *{"${perl_class}::${vname}"} = sub () { $vnumber };
+            }
         }
-        die "Failed to generate enum $perl_class: $@" if $@;
     }
     return;
 }
@@ -284,11 +302,9 @@ sub generate_validator_xs {
 
 sub generate_for_message {
     my ($class, $mdef) = @_;
-    my $full_name = $mdef->full_name;
-    my $normalized = $full_name;
-    $normalized =~ s/^\.//;
-    my $perl_class = join('::', map { _capitalize_segment($_) } split(/\./, $normalized));
-    return _generate_for_message($mdef, $perl_class);
+    my $perl_class = _get_perl_class_for_mdef($mdef);
+    (my $parent_ns = $perl_class) =~ s/::[^:]+\z//;
+    return _generate_for_message($mdef, $parent_ns eq $perl_class ? '' : $parent_ns);
 }
 
 sub _generate_for_message {
@@ -298,199 +314,214 @@ sub _generate_for_message {
     my $full_name = $mdef->full_name;
     my $normalized = $full_name;
     $normalized =~ s/^\.//;
+    croak 'Invalid descriptor full_name'
+        unless $normalized =~ /\A[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*\z/;
 
-    my $perl_class = "${current_ns}::" . $mdef->name;
-    # If current_ns already ends with message name, don't append it again
-    if ($current_ns =~ /::$mdef->name$/) {
-        $perl_class = $current_ns;
-    }
+    my $msg_name = _validate_ident($mdef->name, 'message name');
+    my $perl_class = $current_ns ? "${current_ns}::${msg_name}" : $msg_name;
+    _validate_pkg($perl_class, 'message perl_class');
 
     # Special handling for Well-Known Types
     require Protobuf::WKT;
     my $ext_class = Protobuf::WKT->get_extension_class($normalized);
     if ($ext_class) {
-        eval "require $ext_class";
+        _validate_pkg($ext_class, 'WKT extension class');
+        (my $ext_path = "$ext_class.pm") =~ s{::}{/}g;
+        eval { require $ext_path; 1 };
     }
 
     # Guard against double-generation
     return if $GENERATED{$perl_class}++;
 
-    # Special handling for Well-Known Types
-
     $DESCRIPTOR_REGISTRY{$perl_class} = $mdef;
     if ($mdef->isa('Protobuf::Descriptor::MessageDef::PurePerl')) {
         $mdef->{_data}{perl_class} = $perl_class;
     }
-    $log->debugf("GENERATING CLASS: %s", $perl_class);
+    $log->debugf('GENERATING CLASS: %s', $perl_class);
 
-    # Generate the class using string eval
-    my $code = '';
-    $code .= <<"EOC";
-package $perl_class;
-use parent 'Protobuf::Message';
-use Types::Standard qw(Int Str Num Bool ArrayRef HashRef InstanceOf Any);
-use Type::Utils qw(dwim_type);
-use Carp qw(croak);
-
-sub descriptor { return \$Protobuf::ClassGenerator::DESCRIPTOR_REGISTRY{'$perl_class'}; }
-
-sub validate {
-    my \$self = shift;
-    my \$c_func = '_xs_validate_' . '$normalized';
-    \$c_func =~ s/[:\\.]/_/g;
-    if (\$self->can(\$c_func)) {
-        return \$self->\$c_func();
-    }
-    return \$self->SUPER::validate();
-}
-
-EOC
-
-    # Generate enums nested in this message
-    my $enum_count = $mdef->nested_enum_count;
-    for my $i (0 .. $enum_count - 1) {
-        my $edef = $mdef->get_nested_enum($i);
-        my $enum_name = $edef->name;
-        my $enum_pkg = "${perl_class}::$enum_name";
-
-        my $val_count = $edef->value_count;
-        if ($val_count > 0) {
-            my $first_val = $edef->get_value(0)->name;
-            no strict 'refs';
-            if (defined &{"${enum_pkg}::$first_val"}) {
-                $log->debugf("Nested enum %s already generated, skipping", $enum_pkg);
-                next;
-            }
-        }
-
-        $log->debugf("Generating nested enum: %s", $enum_pkg);
-        $code .= "package $enum_pkg;\n";
-        for my $j (0 .. $val_count - 1) {
-            my $vdef = $edef->get_value($j);
-            my $vname = $vdef->name;
-            my $vnumber = $vdef->number;
-            $code .= "sub $vname { $vnumber }\n";
-        }
-    }
-    $code .= "package $perl_class;\n";
-
-    my $field_count = $mdef->field_count;
-    for my $i (0 .. $field_count - 1) {
-        my $fdef = $mdef->get_field($i);
-        my $name = $fdef->name;
-        $FIELD_REGISTRY{$perl_class}{$name} = $fdef;
-
-        my $type_code = _get_type_tiny_code($fdef);
-        my $coercion_code = '';
-        my $extra_where = '';
-        my $type_num = $fdef->type_number;
-        if ($type_num == 11) {
-            my $m_type = eval { $fdef->message_type };
-            my $m_class;
-            if (defined $m_type) {
-                $m_class = _get_perl_class_for_mdef($m_type);
-            } else {
-                my $type_name = eval { $fdef->type_name } || '';
-                $type_name =~ s/^\.//;
-                $m_class = $type_name ? join('::', map { _capitalize_segment($_) } split(/\./, $type_name)) : 'Protobuf::Message';
-            }
-            if ($fdef->is_repeated) {
-                $coercion_code = "->plus_coercions(ArrayRef, sub { my \$arr = \$_; [ map { ref(\$_) eq 'HASH' ? do { my \$m = '$m_class'->new; \$m->from_perl(\$_); \$m } : \$_ } \@\$arr ] })";
-            } elsif (!$fdef->is_map) {
-                $coercion_code = "->plus_coercions(HashRef, sub { my \$m = '$m_class'->new; \$m->from_perl(\$_); \$m })";
-            }
-        } elsif ($type_num == 3 || $type_num == 4 || $type_num == 16 || $type_num == 18) {
-            # INT64, UINT64, SFIXED64, SINT64
-            $coercion_code = "->plus_coercions(Str, sub { Math::BigInt->new(\$_) })";
-        }
-
-        if ($type_num == 5 || $type_num == 15 || $type_num == 17) { # INT32, SFIXED32, SINT32
-            if ($fdef->is_repeated) {
-                $extra_where = '->where(sub { my $arr = $_; !grep { !defined($_) || $_ < -2147483648 || $_ > 2147483647 } @$arr }, message => sub { \'out of range\' })';
-            } else {
-                $extra_where = '->where(sub { defined($_) && $_ >= -2147483648 && $_ <= 2147483647 }, message => sub { Int()->check($_) ? \'out of range\' : \'did not pass type constraint "Int"\' })';
-            }
-        } elsif ($type_num == 13 || $type_num == 7) { # UINT32, FIXED32
-            if ($fdef->is_repeated) {
-                $extra_where = '->where(sub { my $arr = $_; !grep { !defined($_) || $_ < 0 || $_ > 4294967295 } @$arr }, message => sub { \'out of range\' })';
-            } else {
-                $extra_where = '->where(sub { defined($_) && $_ >= 0 && $_ <= 4294967295 }, message => sub { Int()->check($_) ? \'out of range\' : \'did not pass type constraint "Int"\' })';
-            }
-        }
-
-        # Perl-level accessors that delegate to the engine
-        $code .= <<"EOC";
-{
-    my \$type = dwim_type("$type_code")$coercion_code$extra_where;
-    my \$check = \$type->compiled_check;
-    my \$coercion = \$type->coercion;
-
-    sub $name {
-        my \$self = shift;
-        if (\@_) {
-            my \$val = \$_[0];
-            if (\$coercion) {
-                \$val = \$coercion->coerce(\$val);
-            }
-            \$check->(\$val) or croak("Invalid value for field '$name' in message '$perl_class': " . \$type->get_message(\$val));
-            return \$self->set('$name', \$val);
-        }
-        return \$self->get('$name');
-    }
-
-    sub set_$name {
-        my (\$self, \$val) = \@_;
-        if (\$coercion) {
-            \$val = \$coercion->coerce(\$val);
-        }
-        \$check->(\$val) or croak("Invalid value for field '$name' in message '$perl_class': " . \$type->get_message(\$val));
-        return \$self->set('$name', \$val);
-    }
-}
-
-sub has_$name {
-    my \$self = shift;
-    return \$self->has('$name');
-}
-
-sub clear_$name {
-    my \$self = shift;
-    return \$self->clear('$name');
-}
-EOC
-
-        if ($fdef->is_repeated) {
-            $code .= <<"EOC";
-sub add_$name {
-    my \$self = shift;
-    my \$arr = \$self->$name();
-    push \@\$arr, \@_;
-    return \$arr;
-}
-EOC
-        }
-    }
-
-    my $oneof_count = $mdef->oneof_count;
-    for my $i (0 .. $oneof_count - 1) {
-        my $odef = $mdef->get_oneof($i);
-        my $name = $odef->name;
-        $code .= <<"EOC";
-sub $name {
-    my \$self = shift;
-    return \$self->which_oneof('$name');
-}
-EOC
-    }
-
-    $code .= "1;\n";
+    require Protobuf::Message;
+    require Types::Standard;
+    require Type::Utils;
 
     {
-        ## no critic (BuiltinFunctions::ProhibitStringyEval)
+        no strict 'refs';
         no warnings 'redefine';
-        eval $code;
+
+        my $isa_ref = \@{"${perl_class}::ISA"};
+        if (!grep { $_ eq 'Protobuf::Message' } @{$isa_ref}) {
+            push @{$isa_ref}, 'Protobuf::Message';
+        }
+
+        my $captured_class = $perl_class;
+        my $c_func = '_xs_validate_' . $normalized;
+        $c_func =~ s/[:\.]/_/g;
+
+        *{"${perl_class}::descriptor"} = sub {
+            return $Protobuf::ClassGenerator::DESCRIPTOR_REGISTRY{$captured_class};
+        };
+        *{"${perl_class}::validate"} = sub {
+            my $self = shift;
+            if (my $cv = $self->can($c_func)) {
+                return $self->$cv();
+            }
+            return $self->Protobuf::Message::validate();
+        };
+
+        # Generate enums nested in this message
+        my $enum_count = $mdef->nested_enum_count;
+        for my $i (0 .. $enum_count - 1) {
+            my $edef = $mdef->get_nested_enum($i);
+            my $enum_name = _validate_ident($edef->name, 'nested enum name');
+            my $enum_pkg = _validate_pkg("${perl_class}::${enum_name}", 'nested enum pkg');
+
+            my $val_count = $edef->value_count;
+            if ($val_count > 0) {
+                my $first_val = _validate_ident($edef->get_value(0)->name, 'nested enum value');
+                if (defined &{"${enum_pkg}::${first_val}"}) {
+                    $log->debugf('Nested enum %s already generated, skipping', $enum_pkg);
+                    next;
+                }
+            }
+
+            $log->debugf('Generating nested enum: %s', $enum_pkg);
+            for my $j (0 .. $val_count - 1) {
+                my $vdef = $edef->get_value($j);
+                my $vname = _validate_ident($vdef->name, 'nested enum value');
+                my $vnumber = _validate_int($vdef->number, 'nested enum number');
+                *{"${enum_pkg}::${vname}"} = sub () { $vnumber };
+            }
+        }
+
+        my $field_count = $mdef->field_count;
+        for my $i (0 .. $field_count - 1) {
+            my $fdef = $mdef->get_field($i);
+            my $name = _validate_ident($fdef->name, 'field name');
+            $FIELD_REGISTRY{$perl_class}{$name} = $fdef;
+
+            my $type_code = _get_type_tiny_code($fdef);
+            my $type = Type::Utils::dwim_type($type_code, for => $perl_class);
+            my $type_num = $fdef->type_number;
+            if ($type_num == 11) {
+                my $m_type = eval { $fdef->message_type };
+                my $m_class;
+                if (defined $m_type) {
+                    $m_class = _validate_pkg(_get_perl_class_for_mdef($m_type), 'submessage class');
+                } else {
+                    my $type_name = eval { $fdef->type_name } || '';
+                    $type_name =~ s/^\.//;
+                    $m_class = $type_name
+                        ? _validate_pkg(join('::', map { _capitalize_segment($_) } split(/\./, $type_name)), 'submessage fallback class')
+                        : 'Protobuf::Message';
+                }
+                if ($fdef->is_repeated) {
+                    $type = $type->plus_coercions(
+                        Types::Standard::ArrayRef(),
+                        sub {
+                            my $arr = $_;
+                            return [
+                                map {
+                                    ref($_) eq 'HASH'
+                                        ? do { my $m = $m_class->new; $m->from_perl($_); $m }
+                                        : $_
+                                } @{$arr}
+                            ];
+                        }
+                    );
+                } elsif (!$fdef->is_map) {
+                    $type = $type->plus_coercions(
+                        Types::Standard::HashRef(),
+                        sub { my $m = $m_class->new; $m->from_perl($_); $m }
+                    );
+                }
+            } elsif ($type_num == 3 || $type_num == 4 || $type_num == 16 || $type_num == 18) {
+                $type = $type->plus_coercions(
+                    Types::Standard::Str(),
+                    sub { require Math::BigInt; Math::BigInt->new($_) }
+                );
+            }
+
+            if ($type_num == 5 || $type_num == 15 || $type_num == 17) {
+                if ($fdef->is_repeated) {
+                    $type = $type->where(
+                        sub { my $arr = $_; !grep { !defined($_) || $_ < -2147483648 || $_ > 2147483647 } @{$arr} },
+                        message => sub { 'out of range' }
+                    );
+                } else {
+                    $type = $type->where(
+                        sub { defined($_) && $_ >= -2147483648 && $_ <= 2147483647 },
+                        message => sub { Types::Standard::Int()->check($_) ? 'out of range' : 'did not pass type constraint "Int"' }
+                    );
+                }
+            } elsif ($type_num == 13 || $type_num == 7) {
+                if ($fdef->is_repeated) {
+                    $type = $type->where(
+                        sub { my $arr = $_; !grep { !defined($_) || $_ < 0 || $_ > 4294967295 } @{$arr} },
+                        message => sub { 'out of range' }
+                    );
+                } else {
+                    $type = $type->where(
+                        sub { defined($_) && $_ >= 0 && $_ <= 4294967295 },
+                        message => sub { Types::Standard::Int()->check($_) ? 'out of range' : 'did not pass type constraint "Int"' }
+                    );
+                }
+            }
+
+            my $check = $type->compiled_check;
+            my $coercion = $type->coercion;
+            my $field_name = $name;
+
+            *{"${perl_class}::${field_name}"} = sub {
+                my $self = shift;
+                if (@_) {
+                    my $val = $_[0];
+                    if ($coercion) {
+                        $val = $coercion->coerce($val);
+                    }
+                    $check->($val) or croak("Invalid value for field '$field_name' in message '$captured_class': " . $type->get_message($val));
+                    return $self->set($field_name, $val);
+                }
+                return $self->get($field_name);
+            };
+
+            *{"${perl_class}::set_${field_name}"} = sub {
+                my ($self, $val) = @_;
+                if ($coercion) {
+                    $val = $coercion->coerce($val);
+                }
+                $check->($val) or croak("Invalid value for field '$field_name' in message '$captured_class': " . $type->get_message($val));
+                return $self->set($field_name, $val);
+            };
+
+            *{"${perl_class}::has_${field_name}"} = sub {
+                my $self = shift;
+                return $self->has($field_name);
+            };
+
+            *{"${perl_class}::clear_${field_name}"} = sub {
+                my $self = shift;
+                return $self->clear($field_name);
+            };
+
+            if ($fdef->is_repeated) {
+                *{"${perl_class}::add_${field_name}"} = sub {
+                    my $self = shift;
+                    my $arr = $self->$field_name();
+                    push @{$arr}, @_;
+                    return $arr;
+                };
+            }
+        }
+
+        my $oneof_count = $mdef->oneof_count;
+        for my $i (0 .. $oneof_count - 1) {
+            my $odef = $mdef->get_oneof($i);
+            my $oneof_name = _validate_ident($odef->name, 'oneof name');
+            *{"${perl_class}::${oneof_name}"} = sub {
+                my $self = shift;
+                return $self->which_oneof($oneof_name);
+            };
+        }
     }
-    die "Failed to generate class $perl_class: $@" if $@;
 
     # Install Fast Accessors (XSUBs) to overwrite the slow Perl-based ones
     if ($Protobuf::HAS_XS) {

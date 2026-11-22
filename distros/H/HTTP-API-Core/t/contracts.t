@@ -4,6 +4,10 @@ use Test::More;
 
 use HTTP::API::Core;
 
+# These tests make no network requests. Ignore inherited proxy settings so
+# HTTP::Tiny construction is deterministic even when the proxy URL is invalid.
+delete @ENV{qw(http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY)};
+
 sub dies_like {
     my ($code, $pattern, $name) = @_;
     my $error;

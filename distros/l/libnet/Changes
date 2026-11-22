@@ -1,5 +1,12 @@
 Revision history for Perl distribution libnet
 
+3.17 2026-11-21
+
+    - Fix Net::FTP::pasv() to ignore the IP address in the server's 227 reply
+      and always connect the data channel back to the control-connection peer,
+      preventing a malicious server from redirecting the data connection to an
+      arbitrary third-party host.  [CVE-2026-40558]
+
 3.16 2026-10-24
 
     - Fix unbounded response buffering vulnerabilities in Net::Cmd.  [Jitka

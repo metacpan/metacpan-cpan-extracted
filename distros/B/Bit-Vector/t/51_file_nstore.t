@@ -3,10 +3,10 @@
 use strict;
 no strict "vars";
 
-$file = $0;
-#$file =~ s!^.*[/\\:]+!!;
-$file =~ s!\.+[^.]*$!!;
-$file .= '.tmp';
+$filename = $0;
+#$filename =~ s!^.*[/\\:]+!!;
+$filename =~ s!\.+[^.]*$!!;
+$filename .= '.tmp';
 
 eval
 {
@@ -22,9 +22,9 @@ if ($@ or $Storable::VERSION < 2.21)
     exit 0;
 }
 
-unless (open(TMP, ">$file") and print(TMP "$file\n") and close(TMP) and unlink($file))
+unless (open(TMP, ">", $filename) and print(TMP "$filename\n") and close(TMP) and unlink($filename))
 {
-    print "1..0 # skip cannot write temporary file <$file>: $!\n";
+    print "1..0 # skip cannot write temporary file <$filename>: $!\n";
     exit 0;
 }
 
@@ -70,9 +70,9 @@ while (($start < $set->Size()) &&
         $vector = Bit::Vector->new($bits);
         $vector->Primes();
 
-        store($vector,$file);
-        $twin = retrieve($file);
-        unlink($file);
+        store($vector,$filename);
+        $twin = retrieve($filename);
+        unlink($filename);
 
         if (ref($twin) eq 'Bit::Vector')
         {print "ok $n\n";} else {print "not ok $n\n";} # 01
@@ -91,9 +91,9 @@ while (($start < $set->Size()) &&
         {
             $vector->Flip();
 
-            nstore($vector,$file);
-            $clone = retrieve($file);
-            unlink($file);
+            nstore($vector,$filename);
+            $clone = retrieve($filename);
+            unlink($filename);
 
             if (ref($clone) eq 'Bit::Vector')
             {print "ok $n\n";} else {print "not ok $n\n";} # 05
@@ -142,9 +142,9 @@ while (($start >= 0) && ($i < $length) &&
     }
 }
 
-nstore($table,$file);
-$twin = retrieve($file);
-unlink($file);
+nstore($table,$filename);
+$twin = retrieve($filename);
+unlink($filename);
 
 for ( $i = 0; $i < $length; $i++ )
 {

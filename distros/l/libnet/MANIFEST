@@ -38,6 +38,7 @@ t/external/ftp-ssl.t                     Test script
 t/external/pop3-ssl.t                    Test script
 t/external/smtp-ssl.t                    Test script
 t/ftp.t                                  Test script
+t/pasv_address_validation.t              Test Net::FTP PASV address validation
 t/hostname.t                             Test script
 t/netrc.t                                Test script
 t/nntp.t                                 Test script

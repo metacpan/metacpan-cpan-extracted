@@ -1,27 +1,21 @@
-use strict;
-use warnings;
-
-use Test::More import => [ qw( BAIL_OUT require_ok ) ], tests => 8;
+use Test2::V1
+  -pragmas,
+  -target => { CLASS => 'Class::Enumeration' },
+  qw( dies lives ok plan );
 use Test::API import => [ qw( public_ok ) ];
-use Test::Fatal qw( dies_ok lives_ok );
 
-my $class;
+plan 7;
 
-BEGIN {
-  $class = 'Class::Enumeration';
-  require_ok $class or BAIL_OUT "Cannot load class '$class'!"
-}
+public_ok CLASS, qw( name ordinal value_of values names to_string );
 
-public_ok $class, qw( name ordinal value_of values names to_string );
+ok defined( dies { CLASS->values } ), 'Not implemented';
 
-dies_ok { $class->values } 'Not implemented';
+ok defined( dies { CLASS->_new( 0, '' ) } ), 'The name cannot be empty';
 
-dies_ok { $class->_new( 0, '' ) } 'The name cannot be empty';
-
-dies_ok { $class->_new( 0, 'Locked', [] ) } 'Wrong custom attributes data structure (Raises FATAL warning)';
+ok defined( dies { CLASS->_new( 0, 'Locked', [] ) } ), 'Wrong custom attributes data structure (Raises FATAL warning)';
 
 for ( qw( name ordinal ) ) {
-  dies_ok { $class->_new( 0, Locked => { $_ => undef } ) } "Overriding $_ attribute is forbidden"
+  ok defined( dies { CLASS->_new( 0, Locked => { $_ => undef } ) } ), "Overriding $_ attribute is forbidden"
 }
 
-lives_ok { $class->_new( 0, BIG => { ounces => 8 } ) } 'Provide valid custom attributes data structure'
+ok lives { CLASS->_new( 0, BIG => { ounces => 8 } ) }, 'Provide valid custom attributes data structure'

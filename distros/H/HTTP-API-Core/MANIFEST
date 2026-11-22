@@ -63,6 +63,8 @@ t/outbound-header-collisions.t
 t/pagination-atomic-state.t
 t/pagination-contract.t
 t/pagination-initial-loop.t
+t/pagination-max-pages.t
+t/pagination-null-items.t
 t/pagination.t
 t/pagination-offset.t
 t/public-api.t

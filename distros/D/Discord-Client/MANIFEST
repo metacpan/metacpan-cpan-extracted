@@ -68,8 +68,10 @@ t/23-sdk-lifecycle.t
 t/24-distribution.t
 t/25-example-bots.t
 t/26-friendly-api.t
+t/27-test-loop.t
 t/lib/TestDiscordExamples.pm
 t/lib/TestDiscordGateway.pm
+t/lib/TestDiscordLoop.pm
 t/lib/TestDiscordREST.pm
 t/lib/TestDiscordTLS.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)

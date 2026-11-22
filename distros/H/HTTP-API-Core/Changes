@@ -1,5 +1,25 @@
 Revision history for HTTP-API-Core
 
+1.15  2026-11-22
+    - Accept same-origin HTTP(S) next-page URLs with equivalent default
+      ports (including zero-padded forms), and absolute URLs containing only
+      a query or fragment after the authority.
+    - Redact server-controlled continuation URLs and cursors from pagination
+      exceptions when rejecting a cross-origin URL or repeated continuation.
+    - Preserve JSON null items (Perl undef) in Pagination->all across all
+      four pagination modes, without changing the next() exhaustion contract.
+    - Recognize uppercase and mixed-case HTTP(S) URI schemes as absolute
+      request URLs rather than joining them to base_url.
+    - Add opt-in max_pages to bound paginated HTTP requests in all four modes
+      while leaving unlimited pagination as the default. Failed pages can
+      still be retried without consuming the configured page allowance.
+
+1.14  2026-11-22
+    - Make offline tests independent of inherited HTTP proxy environment
+      variables, preventing malformed proxy URLs from breaking test setup.
+    - Verify the complete test suite with deliberately invalid proxy settings
+      in CI without changing production HTTP transport behavior.
+
 1.13  2026-11-21
     - Reject non-ASCII digit characters in client timeout, retry options,
       pagination page sizes/indexes, and URL ports before numeric coercion;

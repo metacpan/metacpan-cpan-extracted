@@ -4,9 +4,12 @@ use strict;
 use warnings;
 use feature 'state';
 
+#<<<
 package Class::Enumeration::Builder;
-
-$Class::Enumeration::Builder::VERSION = 'v1.3.1';
+BEGIN {
+our $VERSION = 'v1.3.2';
+}
+#>>>
 
 use subs qw( _create_enum_object _is_equal );
 
@@ -73,6 +76,8 @@ sub import {
       no strict 'refs'; ## no critic ( ProhibitNoStrict )
       for my $self ( @values ) {
         push @names, my $name = $self->name;
+        # export => 1 extends the API of the enum class itself
+        # Check t/LockFlag.t/class_api_ok test assertion
         *{ "$class\::$name" } = sub () { $self }
       }
       *{ "$class\::EXPORT_OK" }   = \@names;
@@ -103,7 +108,7 @@ sub _create_enum_object ( $$$$;$ ) {
 
   # Put each enum object in its own (dedicated) child class of the parent
   # enum class
-  my $child_class = "$class\::$name";
+  my $child_class = "$class\::" . $prefix . $name;
   {
     no strict 'refs'; ## no critic ( ProhibitNoStrict )
     push @{ "$child_class\::ISA" }, $class

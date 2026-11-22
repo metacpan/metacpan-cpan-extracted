@@ -94,8 +94,8 @@ subtest 'a bogon is answered locally in the widest shape' => sub {
 # Every member a lookup case's `expect` may compare whole. A key the runner reads
 # nowhere fails the case rather than passing it unread.
 my @COMPARED = qw(
-    vpn hosting dcproxy pubproxy carrier satellite ssh smtp web dns_resolver bittorrent location
-    asn company hostname abuse
+    vpn hosting dcproxy pubproxy bot carrier satellite ssh smtp web dns_resolver bittorrent
+    location asn company hostname abuse
 );
 my %READ = map { $_ => 1 } qw(ip isBogon present absent emptyPresent), @COMPARED;
 
