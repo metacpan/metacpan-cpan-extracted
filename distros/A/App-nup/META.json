@@ -62,11 +62,11 @@
    "provides" : {
       "App::nup" : {
          "file" : "lib/App/nup.pm",
-         "version" : "1.22"
+         "version" : "1.23"
       },
       "App::optex::up" : {
          "file" : "lib/App/optex/up.pm",
-         "version" : "1.22"
+         "version" : "1.23"
       }
    },
    "release_status" : "stable",
@@ -81,7 +81,7 @@
          "web" : "https://github.com/tecolicom/App-nup"
       }
    },
-   "version" : "1.22",
+   "version" : "1.23",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"
    ],

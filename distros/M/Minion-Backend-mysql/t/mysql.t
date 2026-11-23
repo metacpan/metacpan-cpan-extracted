@@ -42,6 +42,24 @@ subtest 'Nothing to repair' => sub {
 subtest 'Migrate up and down' => sub {
   is $minion->backend->mysql->migrations->active, 17, 'active version is 17';
   is $minion->backend->mysql->migrations->migrate(0)->active, 0, 'active version is 0';
+
+  my $db = $minion->backend->mysql->db;
+  my $jobs_pk = sub {
+    $db->query(q{SELECT COUNT(*) FROM information_schema.table_constraints
+      WHERE table_schema = DATABASE() AND table_name = 'minion_jobs' AND constraint_type = 'PRIMARY KEY'})->array->[0];
+  };
+  is $minion->backend->mysql->migrations->migrate(13)->active, 13, 'active version is 13';
+  is $jobs_pk->(), 1, 'minion_jobs has a primary key from its first migration';
+  is $minion->backend->mysql->migrations->migrate(14)->active, 14, 'migration 14 runs with the primary key already there';
+  is $jobs_pk->(), 1, 'still one primary key';
+
+  # Migration 14's down step drops the primary key, which leaves the table as
+  # an install made by the earlier migration 13 had it.
+  is $minion->backend->mysql->migrations->migrate(13)->active, 13, 'back to version 13';
+  is $jobs_pk->(), 0, 'no primary key, as the earlier migration 13 left it';
+  is $minion->backend->mysql->migrations->migrate(14)->active, 14, 'active version is 14';
+  is $jobs_pk->(), 1, 'migration 14 added the primary key';
+
   is $minion->backend->mysql->migrations->migrate->active, 17, 'active version is 17';
 };
 

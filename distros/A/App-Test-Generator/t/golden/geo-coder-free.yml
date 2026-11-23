@@ -9,6 +9,12 @@ clear_miss_cache:
     test_security: 0
     test_undef: 0
   function: clear_miss_cache
+  input:
+    scope:
+      _source: input_spec
+      optional: 1
+      position: 0
+      type: string
   module: Geo::Coder::Free
   output:
     _success_indicator: 1
@@ -24,8 +30,29 @@ geocode:
     test_security: 0
     test_undef: 0
   function: geocode
+  input:
+    ignore_words:
+      _source: input_spec
+      optional: 1
+      type: arrayref
+    location:
+      _source: input_spec
+      optional: 1
+      type: string
+    on_error:
+      _source: input_spec
+      optional: 1
+      type: string
+    region:
+      _source: input_spec
+      optional: 1
+      type: string
+    scantext:
+      _source: input_spec
+      optional: 1
+      type: string
   module: Geo::Coder::Free
-  new: {}
+  new: ~
   output:
     _context_aware: 1
     _error_handling:
@@ -51,16 +78,22 @@ geocode_many:
     test_undef: 0
   function: geocode_many
   input:
-    values:
-      _source: code
+    on_error:
+      _source: input_spec
       optional: 1
-      position: 0
+      type: string
+    region:
+      _source: input_spec
+      optional: 1
+      type: string
+    values:
+      _source: input_spec
+      optional: 0
       type: arrayref
   module: Geo::Coder::Free
-  new: {}
+  new: ~
   output:
-    _type_confidence: medium
-    type: number
+    type: hashref
 new:
   config:
     close_stdin: 1
@@ -71,10 +104,28 @@ new:
     test_security: 0
     test_undef: 0
   function: new
+  input:
+    cache:
+      _source: input_spec
+      optional: 1
+      type: object
+    directory:
+      _source: input_spec
+      optional: 1
+      type: string
+    libpostal:
+      _source: input_spec
+      optional: 1
+      type: boolean
+    openaddr:
+      _source: input_spec
+      optional: 1
+      type: string
   module: Geo::Coder::Free
   output:
     isa: Geo::Coder::Free
     type: object
+  skip: constructor needs a live 'cache' object, which a fixture cannot provide
 provenance:
   config:
     close_stdin: 1
@@ -91,19 +142,18 @@ provenance:
       optional: 0
       type: string
     point:
-      _source: code
-      optional: 0
+      _source: input_spec
+      optional: 1
       type: hashref
   module: Geo::Coder::Free
-  new: {}
+  new: ~
   output:
     _context_aware: 1
     _list_context:
       type: scalar
     _scalar_context:
       type: hashref
-    _type_confidence: medium
-    type: number
+    type: string
 reverse_geocode:
   config:
     close_stdin: 1
@@ -114,11 +164,15 @@ reverse_geocode:
     test_security: 0
     test_undef: 0
   function: reverse_geocode
+  input:
+    latlng:
+      _source: input_spec
+      optional: 0
+      type: string
   module: Geo::Coder::Free
-  new: {}
+  new: ~
   output:
-    _type_confidence: medium
-    type: number
+    type: hashref
 run:
   config:
     close_stdin: 1
@@ -129,8 +183,14 @@ run:
     test_security: 0
     test_undef: 0
   function: run
+  input:
+    location:
+      _source: input_spec
+      optional: 0
+      type: arrayref
+  invocant: class
   module: Geo::Coder::Free
-  new: {}
+  new: ~
   output: {}
 ua:
   config:
@@ -154,8 +214,13 @@ valid_location:
     test_security: 0
     test_undef: 0
   function: valid_location
+  input:
+    location:
+      _source: input_spec
+      optional: 1
+      type: string
   module: Geo::Coder::Free
-  new: {}
+  new: ~
   output:
     _success_indicator: 1
     type: boolean

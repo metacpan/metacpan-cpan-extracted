@@ -8,7 +8,6 @@ META.json
 META.yml
 Makefile.PL
 README
-TAGS
 bin/papersway
 bin/papersway-msg
 bin/papersway-ws-cmd

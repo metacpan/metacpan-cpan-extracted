@@ -17,10 +17,14 @@ use Crypt::Age::Simple::Common qw<
    buffer
 >;
 
-use constant MAX_HEADER_SIZE => 64 * 1024; # it's actually the _DEFAULT..._
+use constant {
+   MAX_HEADER_SIZE => 64 * 1024, # it's actually the _DEFAULT..._
 
-# end = "--- " 43base64char LF
-use constant MAC_LINE_SIZE => 4 + 43 + 1;
+   # end = "--- " 43base64char LF
+   MAC_LINE_SIZE => 4 + 43 + 1,
+
+   DEFAULT_MAX_WORK_FACTOR => 32, # this should be... even too high
+};
 
 use namespace::clean;
 
@@ -35,27 +39,34 @@ has _header_bytes => (
 has _payload_key => (is => 'rw', default => undef);
 has _counter => (is => 'rw', default => 0);
 has _last_sent => (is => 'rw', default => 0, reader => 'is_exhausted');
-has _header => (is => 'rw');
 
-has max_header_size => (is => 'ro', default => MAX_HEADER_SIZE);
+has header => (is => 'rwp');
 has identity => (is => 'ro', required => 1); # free-formish
-has is_error => (is => 'rwp', default => 0, init_arg => undef);
 has is_complete => (is => 'rwp', default => 0, init_arg => undef);
+has is_error => (is => 'rwp', default => 0, init_arg => undef);
+has max_header_size => (is => 'ro', default => MAX_HEADER_SIZE);
+
+# FIXME this should be moved somewhere else, e.g. in the Scrypt stanza
+# class when it will be available
+has scrypt_max_work_factor => (
+   is => 'ro',
+   default => DEFAULT_MAX_WORK_FACTOR,
+);
 
 around BUILDARGS => sub ($orig, $class, @args) {
    unshift @args, 'identity' if @args % 2 && ref($args[0]) ne 'HASH';
-   my %input_args = @args == 1 ? $args[0]->%* : @args;
+   my %inargs = @args == 1 ? $args[0]->%* : @args;
 
    my %args;
-   for my $key (qw< identity max_header_size >) {
-      $args{$key} = $input_args{$key} if defined($input_args{$key});
+   for my $key (qw< identity max_header_size scrypt_max_work_factor >) {
+      $args{$key} = $inargs{$key} if defined($inargs{$key});
    }
 
    # we accept taking an input buffer, e.g. if we already have the whole
    # thing in memory and we don't want to be passing it over and over (the
    # offset should help us to this regard)
-   if (defined($input_args{input})) {
-      my $input = ref($args{input}) ? $args{input} : \$args{input};
+   if (defined($inargs{input})) {
+      my $input = ref($inargs{input}) ? $inargs{input} : \$inargs{input};
       $args{_input_buffer} = blessed($input) ? $input
          : Crypt::Age::Simple::Buffer->new(buffers => $input);
    }
@@ -79,9 +90,7 @@ sub get_chunks ($self, $n = undef) {
    return $retval;
 }
 
-sub has_header ($self) { return defined($self->_header) }
-
-sub header ($self) { return $self->_header }
+sub has_header ($self) { return defined($self->header) }
 
 sub pump ($self, $input) {
    ouch 400, 'object is in error state' if $self->is_error;
@@ -93,8 +102,8 @@ sub pump ($self, $input) {
    # use some of the data if possible
    if (! defined($self->_payload_key)) {
       $self->_set_is_error(1);
-      $self->_attempt_parse_header unless defined($self->_header);
-      $self->_attempt_set_payload_key  if defined($self->_header);;
+      $self->_attempt_parse_header unless defined($self->header);
+      $self->_attempt_set_payload_key  if defined($self->header);
       $self->_set_is_error(0);
    }
 
@@ -110,7 +119,7 @@ sub finish ($self) {
 # Accumulate bytes up to no more than $self->max_header_size and look for
 # the MAC line inside it
 sub _attempt_parse_header ($self) {
-   return if defined($self->_header); # parse done!
+   return if defined($self->header); # parse done!
 
    my $bytesref = $self->_header_bytes;
    my $max_header_size = $self->max_header_size;
@@ -149,7 +158,7 @@ sub _attempt_parse_header ($self) {
    # we have enough data for parsing here
    my $offset = 0;
    my $header = Crypt::Age::Header->parse($bytesref, \$offset);
-   $self->_header($header);
+   $self->_set_header($header);
 
    # we might have residual data to give back to the input buffer
    $buffer->give_back($bytesref, $offset) if $offset < $len;
@@ -170,13 +179,13 @@ sub _attempt_set_payload_key ($self) {
    # we need the buffer to have *at least* NONCE_SIZE bytes to operate in
    # this sub, otherwise we have to wait for more data
    my $buffer = $self->_input_buffer;
-   my $available_bytes = $buffer->available_bytes;
-   return unless $available_bytes >= NONCE_SIZE; # not ready yet..
+   return if $buffer->available_bytes < NONCE_SIZE;
 
    # this might be done immediately after parsing the header *but* we
-   # defer it to when it's really needed, i.e. here
+   # deferred it to when it's really needed, i.e. now
    defined(my $file_key = $self->_get_file_key)
       or ouch 400, 'cannot get the file key... wrong identity?';
+
    $header->verify_mac($file_key)
       or ouch 500, 'MAC verification failed...';
 
@@ -196,6 +205,13 @@ sub _get_file_key_scrypt ($self, $password) {
    ouch 400, 'header stanza not of scrypt type'
       if $stanzas[0]->type ne 'scrypt';
 
+   # FIXME this need some reworking because we should allow for a
+   # configurable max limit. The current solution is that the caller
+   # uses a custom $identity with a callback instead.
+   my $Nlog2 = $stanzas[0]{args}[1];
+   ouch 400, 'work factor in stanza is too high'
+      if $Nlog2 > $self->scrypt_max_work_factor;
+
    my $file_key = age_scrypt_unwrap_file_key($stanzas[0], $password)
       or ouch 400, 'undefined file key... wrong password?';
    $header->verify_mac($file_key)
@@ -208,15 +224,21 @@ sub _get_file_key ($self) {
    my $identity = $self->identity;
    my $header = $self->header;
 
-   my $reftype = ref($identity);
-   return $identity->($header) if $reftype eq 'CODE';
-
    my $file_key;
-   my ($type, $args) = $reftype eq 'HASH' ? $identity->%*
+   my $reftype = ref($identity);
+   my ($type, $args) =
+        $reftype eq 'CODE'  ? ()  # ignore here...
+      : $reftype eq 'HASH'  ? $identity->%*
       : $reftype eq 'ARRAY' ? ( X25519 => $identity )
-      : $reftype ? ouch 400, 'cannot handle this kind of reference'
-      : ( scrypt => $identity );
-   if (uc($type) eq 'X25519') {
+      : $reftype            ? ouch 400, 'cannot handle reference'
+      :                       ( scrypt => $identity );
+   if ($reftype eq 'CODE') {
+      # a CODE identity is our last line of flexibility for supporting
+      # other types than scrypt and X25519, or scrypt with very big work
+      # factors
+      $file_key = $identity->($header);
+   }
+   elsif (uc($type) eq 'X25519') {
       my @ids = ref($args) eq 'ARRAY' ? $args->@* : ($args);
       $file_key = $header->unwrap_file_key(\@ids);
    }

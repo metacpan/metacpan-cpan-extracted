@@ -596,6 +596,33 @@ load test_helper.bash
     assert_output "item_vals: v  1 v  2 v  3"
 }
 
+# Test: backslashes in list option values are kept (issue #4)
+@test "getoptlong: array option - backslashes are kept" {
+    run $BASH <<'    END'
+        . ../script/getoptlong.sh
+        declare -A OPTS=([item|i@]=)
+        getoptlong init OPTS
+        getoptlong parse --item 'C:\path\to' --item 'a\nb,c\d'
+        eval "$(getoptlong set)"
+        printf '[%s]' "${item[@]}"; echo
+    END
+    assert_success
+    assert_output '[C:\path\to][a\nb][c\d]'
+}
+
+@test "getoptlong: hash option - backslashes are kept" {
+    run $BASH <<'    END'
+        . ../script/getoptlong.sh
+        declare -A OPTS=([data|D%]=)
+        getoptlong init OPTS
+        getoptlong parse --data 'k1=C:\path,k2=a\nb'
+        eval "$(getoptlong set)"
+        printf '[%s]' "${data[k1]}" "${data[k2]}"; echo
+    END
+    assert_success
+    assert_output '[C:\path][a\nb]'
+}
+
 # Test: Array option reset with --no-item
 @test "getoptlong: array option - --no-item resets array" {
     run $BASH -c '
@@ -787,6 +814,86 @@ END
     '
     assert_success
     assert_output "mode_val:fast"
+}
+
+# Test: the value is not evaluated by the regex validation
+@test "getoptlong: validation - regex - value is not evaluated" {
+    run $BASH <<'    END'
+        . ../script/getoptlong.sh
+        declare -A OPTS=([mode|m:=(^(fast|slow)$)]=)
+        getoptlong init OPTS
+        getoptlong parse --mode '$(echo executed >&2)fast'
+        eval "$(getoptlong set)"
+        echo "mode_val:$mode"
+    END
+    assert_failure
+    assert_output '$(echo executed >&2)fast: invalid argument'
+}
+
+@test "getoptlong: validation - regex - value with quotes and backslash" {
+    run $BASH <<'    END'
+        . ../script/getoptlong.sh
+        declare -A OPTS=([name|n:=(^a.+z$)]=)
+        getoptlong init OPTS
+        getoptlong parse --name 'a"b`c\d$e z'
+        eval "$(getoptlong set)"
+        echo "name_val:$name"
+    END
+    assert_success
+    assert_output 'name_val:a"b`c\d$e z'
+}
+
+@test "getoptlong: validation - regex - invalid pattern" {
+    run $BASH <<'    END'
+        . ../script/getoptlong.sh
+        declare -A OPTS=([mode|m:=(^(a)]=)
+        getoptlong init OPTS
+        getoptlong parse --mode fast
+    END
+    assert_failure
+    assert_line '(^(a): something wrong'
+}
+
+# Test: the return value of a callback is ignored
+@test "getoptlong: callback - return value is ignored" {
+    run $BASH <<'    END'
+        . ../script/getoptlong.sh
+        declare -A OPTS=([action|a:!]=)
+        action() { echo "called:$2" ; return 1 ; }
+        getoptlong init OPTS
+        getoptlong parse --action go
+        eval "$(getoptlong set)"
+        echo "action_val:$action"
+    END
+    assert_success
+    assert_line --index 0 "called:go"
+    assert_line --index 1 "action_val:go"
+}
+
+@test "getoptlong: callback - undefined function" {
+    run $BASH <<'    END'
+        . ../script/getoptlong.sh
+        declare -A OPTS=([action|a:!]=)
+        getoptlong init OPTS
+        getoptlong parse --action go
+        echo "not reached"
+    END
+    assert_failure
+    assert_output "callback function action() is not defined"
+}
+
+# Test: callback arguments are not expanded as file name patterns
+@test "getoptlong: callback - argument is not globbed" {
+    run $BASH <<'    END'
+        . ../script/getoptlong.sh
+        show() { printf '[%s]' "$@" ; echo ; }
+        declare -A OPTS=([action|a:]=)
+        getoptlong init OPTS
+        getoptlong callback action 'show * ?'
+        getoptlong parse --action go
+    END
+    assert_success
+    assert_output '[action][*][?][go]'
 }
 
 # Test: Callback execution

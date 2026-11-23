@@ -680,4 +680,118 @@ subtest 'Calc->new -- hostile expressions produce compile errors, not execution'
 	}
 };
 
+# ---------------------------------------------------------------------------
+# Attack vector 14: The request envelope (Host, cross-site writes, headers)
+#
+# Major Premise G: with no password set, request_refusal runs first and
+# answers 403 to a Host that is not localhost, *.localhost, an IP or listed in
+# allowed_hosts (DNS rebinding), and to a write whose Sec-Fetch-Site or Origin
+# names another site (CSRF).  Every reply carries nosniff.
+# ---------------------------------------------------------------------------
+
+Readonly my $REBIND_HOST   => 'attacker.example.com';
+Readonly my $EVIL_ORIGIN   => 'http://attacker.example.com';
+Readonly my $STATUS_DENIED => 403;
+
+subtest 'DNS rebinding -- a named Host that is not allowed is refused' => sub {
+	# Exploit mechanism: the attacker's name resolves to 127.0.0.1, so the
+	# victim's browser sends our data to a page the attacker scripts.  The Host
+	# header still names the attacker, which is what gives it away.
+	$t->get_ok('/' => { Host => $REBIND_HOST })->status_is($STATUS_DENIED);
+};
+
+subtest 'cross-site write -- Sec-Fetch-Site and Origin are checked' => sub {
+	# Exploit mechanism: a hostile page auto-submits a form to this server
+	# (CSRF).  The browser labels the request cross-site; the server must
+	# refuse before the action runs.
+	$t->post_ok('/uploads/clear' => { 'Sec-Fetch-Site' => 'cross-site' })
+	  ->status_is($STATUS_DENIED, 'Sec-Fetch-Site: cross-site');
+	$t->post_ok('/uploads/clear' => { Origin => $EVIL_ORIGIN })
+	  ->status_is($STATUS_DENIED, 'a foreign Origin');
+};
+
+subtest 'every reply refuses content sniffing' => sub {
+	# Exploit mechanism: a reply served as text/plain that a browser sniffs as
+	# HTML turns reflected text into script.
+	$t->get_ok('/open?path=' . url_escape($PATH_TRAV_ABS))
+	  ->header_is('X-Content-Type-Options' => 'nosniff');
+};
+
+# ---------------------------------------------------------------------------
+# Attack vector 15: back= and the breadcrumb (open redirect, script URLs)
+#
+# Major Premise H: ?back= goes through _safe_back_url, which accepts only
+# /path (not //host) and http(s):// URLs, so javascript:, data: and
+# protocol-relative links never become a href.
+# ---------------------------------------------------------------------------
+
+subtest 'back= -- script and protocol-relative targets are never linked' => sub {
+	SKIP: {
+		skip 'data/sales.csv not found', 4 unless -f $SALES_CSV_PATH;
+		for my $bad ('javascript:alert(1)', 'data:text/html,<script>alert(1)</script>', '//attacker.example.com/x') {
+			$t->get_ok('/bar?l=table:sales&x=region&y=amount&back=' . url_escape($bad))
+			  ->content_unlike(qr/href="\Q$bad\E/i, "back=$bad is not a link");
+		}
+	}
+};
+
+subtest 'back= -- a CRLF cannot split a header' => sub {
+	# Exploit mechanism: back= is echoed where a redirect or header might use it.
+	$t->get_ok('/bar?l=table:sales&x=region&y=amount&back=' . url_escape("/x\r\nX-Injected: evil"))
+	  ->header_is('X-Injected' => undef);
+};
+
+# ---------------------------------------------------------------------------
+# Attack vector 16: Filter, source-column and export-column parameters
+#
+# Major Premise I: an unknown f= operator, or a column the view lacks, is a
+# 400 before any row is read; srccol= must be an identifier of at most 64
+# characters or it is ignored; xcol= names are only matched, never evaluated.
+# ---------------------------------------------------------------------------
+
+SKIP: {
+	skip 'data/sales.csv not found', 5 unless -f $SALES_CSV_PATH;
+	my $l = 'l=' . url_escape('table:sales');
+
+	subtest 'f= -- an operator that is not on the list is refused' => sub {
+		# Exploit mechanism: the operator is the only unquoted part of a filter;
+		# if it reached a dispatch table or eval it would run attacker text.
+		for my $op ('eq;system("id")', '`id`', '$(id)', 'EQ ', "eq\0") {
+			$t->get_ok("/export?$l&format=json&f=" . url_escape("region:$op:x"))
+			  ->status_is(400, "operator refused: $op");
+		}
+	};
+
+	subtest 'f= differ -- the second column name is checked, and reflected encoded' => sub {
+		# Exploit mechanism: differ takes a column name as its value; an unknown
+		# one is echoed in the 400, so it must not come back as markup.
+		my $url = "/export?$l&format=json&f=" . url_escape("region:differ:$XSS_PAYLOAD");
+		# A script client gets text/plain, which nosniff keeps from being markup.
+		$t->get_ok($url)->status_is(400)
+		  ->content_type_like(qr{\Atext/plain}, 'a plain reply is not HTML')
+		  ->header_is('X-Content-Type-Options' => 'nosniff');
+		# A browser gets the error page, where the reason must be escaped.
+		$t->get_ok($url => { Accept => 'text/html' })->status_is(400)
+		  ->content_unlike(qr/<script>alert\(1\)<\/script>/, 'no raw script in the error page');
+	};
+
+	subtest 'srccol= -- a name that is not an identifier is ignored' => sub {
+		# Exploit mechanism: srccol becomes a column name that later reaches
+		# headers, JSON keys and templates.
+		my $tx = $t->ua->get("/export?$l&c=" . url_escape('table:sales') . '&format=json&srccol=' . url_escape($XSS_PAYLOAD));
+		unlike($tx->res->body, qr/<script>/, 'the hostile name is not a column');
+	};
+
+	subtest 'xcol= -- a hostile column name selects nothing and runs nothing' => sub {
+		my $tx = $t->ua->get("/export?$l&format=json&xcol=" . url_escape('`id`') . '&xcol=' . url_escape($XSS_PAYLOAD));
+		is($tx->res->code, 200, 'ignored: the export keeps every column');
+		unlike($tx->res->body, qr/uid=\d+/, 'nothing was executed');
+	};
+
+	subtest 'sort= -- a hostile column is not interpolated into the reply as markup' => sub {
+		$t->get_ok("/view/sales?sort=" . url_escape($XSS_PAYLOAD) . '&dir=desc')
+		  ->content_unlike(qr/<script>alert\(1\)<\/script>/);
+	};
+}
+
 done_testing();

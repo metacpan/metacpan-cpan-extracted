@@ -16,6 +16,12 @@ declare 'BakType',
 declare 'SqlMaintenanceType',
     as (Int | Str);
 
+declare 'CertificateType',
+    as (Int | Str);
+
+declare 'Intent',
+    as (Int | Str);
+
 declare 'SqlBackendType',
     as (Int | Str);
 
@@ -814,6 +820,9 @@ declare 'MapStringSettings',
 declare 'SqlActivationPolicy',
     as (Int | Str);
 
+declare 'MsdtcRpcAuthMode',
+    as (Int | Str);
+
 declare 'Edition',
     as (Int | Str);
 
@@ -961,6 +970,51 @@ coerce 'RepeatedSslCertDetail',
 declare 'MapStringSslCertDetail',
     as HashRef[SslCertDetail()];
 
+declare 'DNSEntry',
+    as InstanceOf['Google::Cloud::Sql::V1::CloudSqlResources::DNSEntry'];
+
+coerce 'DNSEntry',
+    from HashRef, via { 'Google::Cloud::Sql::V1::CloudSqlResources::DNSEntry'->new($_) };
+
+declare 'RepeatedDNSEntry',
+    as ArrayRef[DNSEntry()];
+
+coerce 'RepeatedDNSEntry',
+    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Sql::V1::CloudSqlResources::DNSEntry'->new($_) } @$_ ] };
+
+declare 'MapStringDNSEntry',
+    as HashRef[DNSEntry()];
+
+declare 'CustomerManagedCertificate',
+    as InstanceOf['Google::Cloud::Sql::V1::CloudSqlResources::CustomerManagedCertificate'];
+
+coerce 'CustomerManagedCertificate',
+    from HashRef, via { 'Google::Cloud::Sql::V1::CloudSqlResources::CustomerManagedCertificate'->new($_) };
+
+declare 'RepeatedCustomerManagedCertificate',
+    as ArrayRef[CustomerManagedCertificate()];
+
+coerce 'RepeatedCustomerManagedCertificate',
+    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Sql::V1::CloudSqlResources::CustomerManagedCertificate'->new($_) } @$_ ] };
+
+declare 'MapStringCustomerManagedCertificate',
+    as HashRef[CustomerManagedCertificate()];
+
+declare 'CustomerManagedCertificateConfig',
+    as InstanceOf['Google::Cloud::Sql::V1::CloudSqlResources::CustomerManagedCertificateConfig'];
+
+coerce 'CustomerManagedCertificateConfig',
+    from HashRef, via { 'Google::Cloud::Sql::V1::CloudSqlResources::CustomerManagedCertificateConfig'->new($_) };
+
+declare 'RepeatedCustomerManagedCertificateConfig',
+    as ArrayRef[CustomerManagedCertificateConfig()];
+
+coerce 'RepeatedCustomerManagedCertificateConfig',
+    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Sql::V1::CloudSqlResources::CustomerManagedCertificateConfig'->new($_) } @$_ ] };
+
+declare 'MapStringCustomerManagedCertificateConfig',
+    as HashRef[CustomerManagedCertificateConfig()];
+
 declare 'SqlActiveDirectoryConfig',
     as InstanceOf['Google::Cloud::Sql::V1::CloudSqlResources::SqlActiveDirectoryConfig'];
 
@@ -1009,6 +1063,39 @@ coerce 'RepeatedSqlServerEntraIdConfig',
 declare 'MapStringSqlServerEntraIdConfig',
     as HashRef[SqlServerEntraIdConfig()];
 
+declare 'InitialUsersConfig',
+    as InstanceOf['Google::Cloud::Sql::V1::CloudSqlResources::InitialUsersConfig'];
+
+coerce 'InitialUsersConfig',
+    from HashRef, via { 'Google::Cloud::Sql::V1::CloudSqlResources::InitialUsersConfig'->new($_) };
+
+declare 'RepeatedInitialUsersConfig',
+    as ArrayRef[InitialUsersConfig()];
+
+coerce 'RepeatedInitialUsersConfig',
+    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Sql::V1::CloudSqlResources::InitialUsersConfig'->new($_) } @$_ ] };
+
+declare 'MapStringInitialUsersConfig',
+    as HashRef[InitialUsersConfig()];
+
+declare 'InitialUser',
+    as InstanceOf['Google::Cloud::Sql::V1::CloudSqlResources::InitialUsersConfig::InitialUser'];
+
+coerce 'InitialUser',
+    from HashRef, via { 'Google::Cloud::Sql::V1::CloudSqlResources::InitialUsersConfig::InitialUser'->new($_) };
+
+declare 'RepeatedInitialUser',
+    as ArrayRef[InitialUser()];
+
+coerce 'RepeatedInitialUser',
+    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Sql::V1::CloudSqlResources::InitialUsersConfig::InitialUser'->new($_) } @$_ ] };
+
+declare 'MapStringInitialUser',
+    as HashRef[InitialUser()];
+
+declare 'SqlUserType',
+    as (Int | Str);
+
 declare 'AcquireSsrsLeaseContext',
     as InstanceOf['Google::Cloud::Sql::V1::CloudSqlResources::AcquireSsrsLeaseContext'];
 
@@ -1047,6 +1134,66 @@ declare 'DnsScope',
 
 declare 'RecordManager',
     as (Int | Str);
+
+declare 'StartWorkloadCaptureContext',
+    as InstanceOf['Google::Cloud::Sql::V1::CloudSqlResources::StartWorkloadCaptureContext'];
+
+coerce 'StartWorkloadCaptureContext',
+    from HashRef, via { 'Google::Cloud::Sql::V1::CloudSqlResources::StartWorkloadCaptureContext'->new($_) };
+
+declare 'RepeatedStartWorkloadCaptureContext',
+    as ArrayRef[StartWorkloadCaptureContext()];
+
+coerce 'RepeatedStartWorkloadCaptureContext',
+    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Sql::V1::CloudSqlResources::StartWorkloadCaptureContext'->new($_) } @$_ ] };
+
+declare 'MapStringStartWorkloadCaptureContext',
+    as HashRef[StartWorkloadCaptureContext()];
+
+declare 'StopWorkloadCaptureContext',
+    as InstanceOf['Google::Cloud::Sql::V1::CloudSqlResources::StopWorkloadCaptureContext'];
+
+coerce 'StopWorkloadCaptureContext',
+    from HashRef, via { 'Google::Cloud::Sql::V1::CloudSqlResources::StopWorkloadCaptureContext'->new($_) };
+
+declare 'RepeatedStopWorkloadCaptureContext',
+    as ArrayRef[StopWorkloadCaptureContext()];
+
+coerce 'RepeatedStopWorkloadCaptureContext',
+    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Sql::V1::CloudSqlResources::StopWorkloadCaptureContext'->new($_) } @$_ ] };
+
+declare 'MapStringStopWorkloadCaptureContext',
+    as HashRef[StopWorkloadCaptureContext()];
+
+declare 'StartWorkloadReplayContext',
+    as InstanceOf['Google::Cloud::Sql::V1::CloudSqlResources::StartWorkloadReplayContext'];
+
+coerce 'StartWorkloadReplayContext',
+    from HashRef, via { 'Google::Cloud::Sql::V1::CloudSqlResources::StartWorkloadReplayContext'->new($_) };
+
+declare 'RepeatedStartWorkloadReplayContext',
+    as ArrayRef[StartWorkloadReplayContext()];
+
+coerce 'RepeatedStartWorkloadReplayContext',
+    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Sql::V1::CloudSqlResources::StartWorkloadReplayContext'->new($_) } @$_ ] };
+
+declare 'MapStringStartWorkloadReplayContext',
+    as HashRef[StartWorkloadReplayContext()];
+
+declare 'StopWorkloadReplayContext',
+    as InstanceOf['Google::Cloud::Sql::V1::CloudSqlResources::StopWorkloadReplayContext'];
+
+coerce 'StopWorkloadReplayContext',
+    from HashRef, via { 'Google::Cloud::Sql::V1::CloudSqlResources::StopWorkloadReplayContext'->new($_) };
+
+declare 'RepeatedStopWorkloadReplayContext',
+    as ArrayRef[StopWorkloadReplayContext()];
+
+coerce 'RepeatedStopWorkloadReplayContext',
+    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Sql::V1::CloudSqlResources::StopWorkloadReplayContext'->new($_) } @$_ ] };
+
+declare 'MapStringStopWorkloadReplayContext',
+    as HashRef[StopWorkloadReplayContext()];
 
 1;
 

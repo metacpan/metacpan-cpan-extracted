@@ -46,7 +46,7 @@ BEGIN {
 package main;
 use Google::Cloud::Compute::V1::InterconnectsClient;
 
-my $client = Google::Cloud::Compute::V1::InterconnectsClient->new( credentials => 'dummy' );
+my $client = Google::Cloud::Compute::V1::InterconnectsClient->new();
 ok($client, 'Instantiated generated client');
 isa_ok($client->transport, 'Google::gRPC::Client', 'Client transport');
 
@@ -181,6 +181,23 @@ subtest 'set_labels method' => sub {
     };
     
     my $res = $client->set_labels();
+    ok($res, 'Method returned a response');
+    isa_ok($res, 'Google::Cloud::Compute::V1::Compute::Operation', 'Response object class');
+    done_testing();
+};
+
+subtest 'set_name method' => sub {
+    $client->transport->{mock_call} = sub {
+        my ($args) = @_;
+        is($args->{service}, 'google.cloud.compute.v1.Interconnects', 'Correct service path');
+        is($args->{method}, 'SetName', 'Correct RPC method');
+        isa_ok($args->{request}, 'Google::Cloud::Compute::V1::Compute::SetNameInterconnectRequest', 'Request object');
+        
+        my $response = 'Google::Cloud::Compute::V1::Compute::Operation'->new();
+        return $response;
+    };
+    
+    my $res = $client->set_name();
     ok($res, 'Method returned a response');
     isa_ok($res, 'Google::Cloud::Compute::V1::Compute::Operation', 'Response object class');
     done_testing();

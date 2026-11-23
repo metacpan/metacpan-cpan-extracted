@@ -821,3 +821,40 @@ sub THAW {
 }
 
 1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Protobuf::Engine::PurePerl - Pure-Perl execution engine for Protobuf
+
+=head1 VERSION
+
+version 0.14
+
+=head1 SYNOPSIS
+
+    use Protobuf;
+    my $msg = My::Message->new(profile => 'pure_perl', name => 'Alice');
+
+=head1 DESCRIPTION
+
+C<Protobuf::Engine::PurePerl> implements the L<Protobuf::Engine> interface
+entirely in Perl without requiring compiled C<upb> XS bindings. It supports
+full Protocol Buffers binary wire encoding/decoding (including varints,
+zigzag, packed repeated fields, unknown fields, and 64-bit integers via
+L<Math::BigInt>), Proto3 canonical JSON, and text format serialization.
+
+=head1 METHODS
+
+Implements all L<Protobuf::Engine> methods (C<create_message>, C<get>, C<set>,
+C<has>, C<clear>, C<parse>, C<serialize>, C<merge>, C<copy>, C<to_json>,
+C<from_json>, C<to_perl>, C<to_text>).
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Engine>, L<Protobuf::Engine::XS>
+
+=cut

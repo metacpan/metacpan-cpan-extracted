@@ -125,11 +125,7 @@ entry has focus, then press Enter or Space to toggle it.</p>
     biBrandSvg(clone);
     var src = '<?xml version="1.0" encoding="UTF-8"?>\n'
             + new XMLSerializer().serializeToString(clone);
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([src], { type: 'image/svg+xml;charset=utf-8' }));
-    a.download = 'stacked_bar.svg';
-    a.click();
-    URL.revokeObjectURL(a.href);
+    biSaveFile(new Blob([src], { type: 'image/svg+xml;charset=utf-8' }), 'stacked_bar.svg');
   }
   function drawExportCanvas(scale, done) {
     var svg = document.getElementById('stacked_bar');
@@ -165,10 +161,7 @@ entry has focus, then press Enter or Space to toggle it.</p>
   }
   function biStackedExportPNG() {
     drawExportCanvas(1, function (canvas) {
-      var a = document.createElement('a');
-      a.href = biBrandCanvas(canvas, 1).toDataURL('image/png');
-      a.download = 'stacked_bar.png';
-      a.click();
+      biSavePNG(biBrandCanvas(canvas, 1), 'stacked_bar.png');
     });
   }
   function biStackedExportPDF() {

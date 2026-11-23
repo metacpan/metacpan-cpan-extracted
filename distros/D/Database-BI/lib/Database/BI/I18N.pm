@@ -3,7 +3,7 @@ package Database::BI::I18N;
 use strict;
 use warnings;
 
-our $VERSION = '0.023.1';
+our $VERSION = '0.024.0';
 
 use Carp qw(croak);
 use Readonly;
@@ -73,6 +73,11 @@ sub lingua_choice {
 	return undef unless defined $accept && length $accept;	## no critic (ProhibitExplicitReturnUndef)
 
 	local $ENV{HTTP_ACCEPT_LANGUAGE} = $accept;
+	# Premise 1: a request must never take the server's locale.  Premise 2:
+	# CGI::Lingua falls back to the locale when the header names nothing it can
+	# read, and reads LC_ALL first, where "C" means no language.  Conclusion:
+	# masking LC_ALL makes an unreadable header pick nothing, not the server's.
+	local $ENV{LC_ALL} = 'C';
 	return _lingua($supported);
 }
 
@@ -147,9 +152,15 @@ sub _load {
 	croak "Unsafe language name '$language'" unless $name =~ /\A[a-z]{2,3}(?:_[a-z0-9]{2,8})?\z/;
 	my $module = "Database::BI::I18N::$name";
 
+	# Premise 1: $name matched the pattern above, so it is letters, digits and
+	#            underscores only.
+	# Premise 2: a block eval of require on a file name runs no text as code.
+	# Conclusion: the module loads without a string eval.
 	local ($@, $!);
-	my $table = eval "require $module; \\%${module}::MESSAGES";	## no critic (ProhibitStringyEval): the name is checked above
-	return $table || {};
+	my $loaded = eval { require "Database/BI/I18N/$name.pm"; 1 };
+	return {} unless $loaded;
+	no strict 'refs';
+	return \%{"${module}::MESSAGES"};
 }
 
 1;
@@ -162,7 +173,7 @@ Database::BI::I18N - Choose the language of messages, and give them in it
 
 =head1 VERSION
 
-0.023.1
+0.024.0
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@ AtteanX::Serializer::SPARQLJSON - SPARQL Results JSON Serializer
 
 =head1 VERSION
 
-This document describes AtteanX::Serializer::SPARQLJSON version 0.040
+This document describes AtteanX::Serializer::SPARQLJSON version 0.041
 
 =head1 SYNOPSIS
 
@@ -30,12 +30,16 @@ This document describes AtteanX::Serializer::SPARQLJSON version 0.040
 
 =over 4
 
+=item C<< canonical_iri >>
+
+Returns the canonical IRI of this format.
+
 =cut
 
 use v5.14;
 use warnings;
 
-package AtteanX::Serializer::SPARQLJSON 0.040 {
+package AtteanX::Serializer::SPARQLJSON 0.041 {
 	use Moo;
 	use Types::Standard qw(Str);
 	use Encode qw(encode);
@@ -44,6 +48,7 @@ package AtteanX::Serializer::SPARQLJSON 0.040 {
 	use JSON; 
 	use namespace::clean;
 
+	sub canonical_iri { return 'http://www.w3.org/ns/formats/SPARQL_Results_JSON' }
 	has 'canonical_media_type' => (is => 'ro', isa => Str,  init_arg => undef, default => 'application/sparql-results+json');
 
 =item C<< media_types >>

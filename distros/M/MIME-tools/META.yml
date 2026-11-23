@@ -40,4 +40,4 @@ resources:
   repository:
     type: git
     url: https://salsa.debian.org/dskoll/mime-tools
-version: 5.522
+version: 5.523

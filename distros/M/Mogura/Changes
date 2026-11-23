@@ -1,5 +1,9 @@
 Revision history for Mogura
 
+0.02
+    - Require 64-bit Perl on x86_64 or aarch64 Linux for both the server and scanner.
+    - Report unsupported platforms as NA to CPAN Testers during configuration.
+
 0.01
     - Initial release.
     - Check all partitions on an attached disk before showing it is safe to disconnect.

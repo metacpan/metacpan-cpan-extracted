@@ -46,7 +46,7 @@ BEGIN {
 package main;
 use Google::Cloud::Build::V1::CloudBuildClient;
 
-my $client = Google::Cloud::Build::V1::CloudBuildClient->new( credentials => 'dummy' );
+my $client = Google::Cloud::Build::V1::CloudBuildClient->new();
 ok($client, 'Instantiated generated client');
 isa_ok($client->transport, 'Google::gRPC::Client', 'Client transport');
 

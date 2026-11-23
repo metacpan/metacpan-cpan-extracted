@@ -164,7 +164,7 @@ my @cases = (
         qr/scale: non-numeric value/ ],
     [ 'aov too few complete rows, after the design is built',
         sub { Stats::LikeR::aov( { y => [ 1, undef, undef ], g => [qw(p q r)] }, 'y ~ g' ) },
-        qr/aov: fewer than 2 complete observations/ ],
+        qr/aov: contrasts can be applied only to factors with 2 or more levels/ ],
     [ 'col2col unknown column',
         sub { Stats::LikeR::col2col( \%c2c, 'sum', 'nosuchcolumn' ) },
         qr/col2col: column 'nosuchcolumn' not found/ ],

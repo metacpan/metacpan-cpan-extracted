@@ -690,8 +690,12 @@ subtest 'globals -- success paths leave $_, $@, $! and alarm() alone' => sub {
 		is( $after->{underscore}, $config{sentinel},       "$name: \$_ unchanged" );
 		is( $after->{error},      $config{sentinel_error}, "$name: \$\@ unchanged" );
 		is( $after->{errno},      ENOENT,                  "$name: \$! unchanged" );
-		cmp_ok( $after->{alarm_left}, '>=', $config{alarm_seconds} - $config{alarm_slack},
-			"$name: alarm() timer still running" );
+		SKIP: {
+			# alarm() is a no-op on Windows: it never reports time left
+			skip 'alarm() is not implemented on Windows', 1 if $^O eq 'MSWin32';
+			cmp_ok( $after->{alarm_left}, '>=', $config{alarm_seconds} - $config{alarm_slack},
+				"$name: alarm() timer still running" );
+		}
 	}
 	covered('globals: $_ $@ $! and alarm survive every routine');
 };
@@ -712,8 +716,12 @@ subtest 'globals -- error paths leave $_, $! and alarm() alone' => sub {
 		ok( $died, "$name: the call did croak" );
 		is( $after->{underscore}, $config{sentinel}, "$name: \$_ unchanged" );
 		is( $after->{errno},      ENOENT,            "$name: \$! unchanged" );
-		cmp_ok( $after->{alarm_left}, '>=', $config{alarm_seconds} - $config{alarm_slack},
-			"$name: alarm() timer still running" );
+		SKIP: {
+			# alarm() is a no-op on Windows: it never reports time left
+			skip 'alarm() is not implemented on Windows', 1 if $^O eq 'MSWin32';
+			cmp_ok( $after->{alarm_left}, '>=', $config{alarm_seconds} - $config{alarm_slack},
+				"$name: alarm() timer still running" );
+		}
 	}
 };
 

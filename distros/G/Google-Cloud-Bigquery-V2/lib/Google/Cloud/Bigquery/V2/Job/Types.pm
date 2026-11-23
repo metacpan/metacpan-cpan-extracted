@@ -211,6 +211,9 @@ declare 'MapStringQueryRequest',
 declare 'JobCreationMode',
     as (Int | Str);
 
+declare 'QueryResultsFormat',
+    as (Int | Str);
+
 declare 'LabelsEntry',
     as InstanceOf['Google::Cloud::Bigquery::V2::Job::QueryRequest::LabelsEntry'];
 

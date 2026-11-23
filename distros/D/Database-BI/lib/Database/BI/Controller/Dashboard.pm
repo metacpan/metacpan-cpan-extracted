@@ -3,7 +3,7 @@ package Database::BI::Controller::Dashboard;
 use strict;
 use warnings;
 
-our $VERSION = '0.023.1';
+our $VERSION = '0.024.0';
 
 use Mojo::Base 'Mojolicious::Controller', -strict, -signatures;
 
@@ -20,13 +20,15 @@ use Mojo::File;
 use Mojo::JSON		qw(encode_json decode_json from_json to_json);
 use Mojo::Parameters;
 use Mojo::URL;
-use Mojo::Util		qw(url_escape encode xml_escape hmac_sha1_sum secure_compare);
-use Digest::SHA ();
+use Mojo::Util		qw(url_escape encode xml_escape secure_compare);
+use Digest::SHA		qw(hmac_sha256_hex);
 use Scalar::Util ();
 use Database::BI::Password ();
 use File::Path		qw(remove_tree);
 use File::Spec;
+use Fcntl		qw(:flock);
 use File::Temp		qw(tempfile tempdir);
+use Time::HiRes		();
 use Readonly;
 use Sub::Protected;
 use version ();
@@ -67,7 +69,7 @@ Readonly my %SEQUENTIAL_SCHEMES => map { $_ => 1 } qw(YlOrRd Blues Greens Purple
 Readonly my $DEFAULT_SEQUENTIAL_SCHEME  => 'YlOrRd';
 Readonly my $DEFAULT_CATEGORICAL_SCHEME => 'tableau10';
 
-Readonly my @SUPPORTED_EXT => qw( csv db sql sqlite sqlite3 xml tsv psv xlsx json );
+Readonly my @SUPPORTED_EXT => qw( csv db sql sqlite sqlite3 xml tsv psv xlsx json jsonl ndjson );
 # Use \z (absolute end-of-string) not $ (which permits a trailing \n before \z).
 # A query param decoded from "file.csv%0A" has basename "sales.csv\n"; without \z
 # that passes the extension guard and reaches realpath with an embedded newline.
@@ -77,6 +79,8 @@ Readonly my $EXT_RE        => do { my $p = join '|', @SUPPORTED_EXT; qr/\.(?:$p)
 # exactly: first character must be a letter or underscore (not a digit), so
 # that every table name the controller accepts can also be opened by DataSource
 # without an unhandled croak.
+# srccol=: the name of the column that says which file a stacked row came from.
+Readonly my $SOURCE_COL_RE => qr/\A[A-Za-z_][A-Za-z0-9_]{0,63}\z/;
 Readonly my $TABLE_NAME_RE => qr/\A[A-Za-z_][A-Za-z0-9_]*\z/;
 
 # URL spec pattern shared by _open_spec and _spec_to_url.
@@ -463,7 +467,9 @@ Readonly my %TIME_RANGE => map { $_->{name} => $_ } @TIME_RANGES;
 
 # The operators an f= filter may name (_apply_filter_spec), as written: an
 # operator in capitals is refused with the rest, not read as another one.
-Readonly my @FILTER_OPS => qw(eq ne contains starts lt le gt ge empty notempty between in);
+# differ (the Delta button) is the one whose value is another column's name:
+# f=a:differ:b keeps the rows where a and b do not hold identical text.
+Readonly my @FILTER_OPS => qw(eq ne contains starts lt le gt ge empty notempty between in differ);
 Readonly my %FILTER_OP  => map { $_ => 1 } @FILTER_OPS;
 
 # How many column names a refusal lists before it says how many more there are.
@@ -498,7 +504,7 @@ Readonly my $AI_WINDOW_S           => 3600;
 # digits or '1e400' as infinity, which no LIMIT or OFFSET can use.
 sub _whole_number {
 	my $value = $_[0];
-	return undef unless defined($value) && $value =~ /\A-?\d{1,$MAX_WHOLE_NUMBER_DIGITS}\z/;
+	return undef unless defined($value) && $value =~ /\A-?[0-9]{1,$MAX_WHOLE_NUMBER_DIGITS}\z/;
 	return $value + 0;
 }
 
@@ -595,7 +601,7 @@ sub _pagination {
 sub _page_size_preference {
 	my $self = $_[0];
 	my $value = $self->cookie($PAGE_SIZE_COOKIE);
-	return undef unless defined $value && $value =~ /\A\d{1,4}\z/;
+	return undef unless defined $value && $value =~ /\A[0-9]{1,4}\z/;
 	$value += 0;
 	return $PAGE_SIZE_OK{$value} ? $value : undef;
 }
@@ -912,6 +918,7 @@ Readonly my %CRUMB_OP => (
 	eq => '=', ne => '!=', contains => 'contains', starts => 'starts with',
 	lt => '<', le => '<=', gt => '>', ge => '>=', between => 'between',
 	empty => 'is empty', notempty => 'is not empty', in => 'is one of',
+	differ => 'differs from',
 );
 
 # A trail is never longer than this, whatever the URLs say.
@@ -1060,7 +1067,7 @@ sub _crumb_label :Protected ($self, $url) {
 			($q->param('l') // ''),
 			(map { (split /\|/, $_, 2)[0] // '' } @{ $q->every_param('j') }),
 			@{ $q->every_param('c') };
-		return @names ? join(' + ', @names) . $view : undef;
+		return @names ? _names_summary(\@names) . $view : undef;
 	}
 	if ($path eq '/import') {
 		my $src = Mojo::URL->new($q->param('url') // '');
@@ -1088,6 +1095,17 @@ sub _crumb_label :Protected ($self, $url) {
 		return (ref $a eq 'HASH' && length($a->{name} // '')) ? $a->{name} : 'Canvas';
 	}
 	return undef;
+}
+
+# _names_summary(\@names) -> $text
+#
+# "a + b + c", or for a folder of reports stacked, the first few and a count:
+# "a + b + c + 297 more".  Used for the trail and the page title.
+sub _names_summary {
+	my ($names) = @_;
+	my $keep = 3;
+	return join(' + ', @$names) if @$names <= $keep + 1;
+	return join(' + ', @{$names}[0 .. $keep - 1], (@$names - $keep) . ' more');
 }
 
 # _crumb_spec_name($spec) -> $name
@@ -1605,6 +1623,7 @@ sub accelerate {
 	my $path  = eval { $cache->put($key, $st[9], $st[7], $bytes) };
 	croak $c->_i18n('error_accel_build', $spec, _tidy_error($@)) unless defined $path;
 
+	my $lock   = $c->_models_lock;
 	my $models = $c->_read_models;
 	my $old    = $models->{accelerated}{$key};
 	my $name   = Mojo::File->new($path)->basename;
@@ -1626,6 +1645,7 @@ sub unaccelerate {
 	my ($c, $spec) = @_;
 	croak 'unaccelerate() needs a controller and a spec' unless ref $c && defined $spec;
 	$spec = canonical_spec($spec);	# unaccelerate names no spec in a message
+	my $lock   = $c->_models_lock;
 	my $models = $c->_read_models;
 	my $entry  = delete $models->{accelerated}{$spec};
 	return 0 unless ref $entry eq 'HASH';
@@ -1894,7 +1914,8 @@ sub _get_columns {
 #          timestamp (YYYY-MM-DDTHH:MM:SS) or the same with a space separator,
 #          which is what CSV exports and SQLite text columns usually hold, and
 #          one with a fraction of a second or a zone (Z, +01:00), which is what
-#          JSON APIs write.  The time is taken as written (Util::iso_datetime).
+#          JSON APIs write.  A zone is applied when config time_zone is set
+#          (Util::iso_datetime).
 sub _is_iso_date {
 	return scalar(() = Database::BI::Util::iso_datetime($_[0])) ? 1 : 0;
 }
@@ -1937,7 +1958,8 @@ sub _time_columns {
 			next unless ref($row) eq 'HASH';
 			my $v = $row->{$col};
 			next unless defined $v;
-			$v =~ s/\A\s+|\s+\z//g;
+			$v =~ s/\A\s+//;
+			$v =~ s/\s+\z//;
 			next unless length $v;
 			my $iso = _to_iso_date($v);
 			next COLUMN unless defined $iso;
@@ -2012,6 +2034,8 @@ sub _midday {
 sub _time_range_bounds {
 	my ($preset, $now) = @_;
 	$now = time() unless defined $now;
+	# On the configured zone's clock (Util::frame_epoch), not the server's.
+	$now = Database::BI::Util::frame_epoch($now);
 
 	my @lt = localtime($now);
 	my ($mday, $mon, $year) = @lt[3, 4, 5];	# mon is 0-based
@@ -2225,10 +2249,13 @@ sub _unknown_filter_column {
 			. sprintf(' and %d more', @names - $FILTER_COLUMNS_LISTED);
 	};
 	for my $spec (@{ $self->every_param('f') // [] }) {
-		my ($col, $op) = split /:/, $spec, 3;
+		my ($col, $op, $val) = split /:/, $spec, 3;
 		next unless length($col // '') && defined $op && length $op;
-		next if $known{$col};
-		return sprintf(_message_text('error_filter_column'), $col, $spec, $listed->());
+		# A differ filter names a second column, in its value.
+		my @named = ($op eq 'differ') ? ($col, $val // '') : ($col);
+		my ($missing) = grep { !$known{$_} } @named;
+		next unless defined $missing;
+		return sprintf(_message_text('error_filter_column'), $missing, $spec, $listed->());
 	}
 	my $range = $self->stash('time_range');
 	if (ref $range eq 'HASH' && !$known{ $range->{col} // '' }) {
@@ -2276,12 +2303,47 @@ sub _between_bounds {
 	return ($lo, $hi);
 }
 
+# _filter_date_key($cell, $precision) -> $key
+#
+# The comparable form of a cell in a date filter: what
+# _date_key(_to_iso_date($cell) // $cell, $precision) // $cell gives, read with
+# one pattern match instead of two.
+#
+# Premise 1: _to_iso_date returns an ISO cell unchanged, and _date_key then
+#            reads that same cell again.
+# Premise 2: reading a cell twice gives the same answer both times.
+# Conclusion: an ISO cell is read once and keyed at once.  Only a M/D/YYYY cell
+#             is rewritten first, and a cell that is neither is its own key.
+sub _filter_date_key {
+	my ($cell, $precision) = @_;
+	my @part = Database::BI::Util::iso_datetime($cell);
+	if (!@part && defined $cell && $cell =~ m{\A(\d{1,2})/(\d{1,2})/(\d{4})\z}) {
+		@part = Database::BI::Util::iso_datetime(sprintf '%04d-%02d-%02d', $3, $1, $2);
+	}
+	return $cell unless @part;
+	my ($day, $hour, $min, $sec) = @part;
+	return $day if $precision < 19;
+	return sprintf '%sT%s:%s:%s', $day, $hour // '00', $min // '00', $sec // '00';
+}
+
 sub _apply_filter_spec {
 	my ($records, $spec) = @_;
 	my ($col, $op, $val) = split /:/, $spec, 3;
 	return $records unless length($col // '') && defined $op && length $op;
 	$val //= '';
-	my $lval    = lc $val;	# precompute once; avoids O(N) redundant lc() inside grep
+	# differ: the value is a column name, and a row stays when its two cells do
+	# not hold identical text.  A row that lacks a column counts as empty there,
+	# which also keeps a locked SQL row from croaking on a key it does not have.
+	#
+	# Premise 1: a differ compares two cells as text and nothing else.
+	# Premise 2: the date, number, between and in set-up below is read only by
+	#            the other operators.
+	# Conclusion: a differ returns here, before paying for any of it.
+	if ($op eq 'differ') {
+		my $text = sub { exists $_[0]{ $_[1] } ? ($_[0]{ $_[1] } // '') : '' };
+		return [grep { $text->($_, $col) ne $text->($_, $val) } @{$records}];
+	}
+	my $lval = lc $val;	# precompute once; avoids O(N) redundant lc() inside grep
 	my $between = $op eq 'between';
 	my ($lo, $hi) = $between ? _between_bounds($val) : ();
 	# A between is about times only when both its bounds are.
@@ -2299,7 +2361,7 @@ sub _apply_filter_spec {
 	# An order is a statement about numbers.  A blank or a word has no place in
 	# one, so it matches none of the four, rather than counting as zero.
 	my $by_number = !$is_date && $op =~ /\A(?:lt|le|gt|ge)\z/;
-	my $num_val   = $by_number ? _numeric_cell($val) : undef;
+	my $num_val = $by_number ? _numeric_cell($val) : undef;
 	# A between of two numbers (a range of years, of prices) compares as
 	# numbers, inclusive at both ends and whichever bound is written first;
 	# "9" sorts after "10" as text.  Anything else keeps the text comparison.
@@ -2317,16 +2379,14 @@ sub _apply_filter_spec {
 		($num_lo, $num_hi) = ($num_hi, $num_lo) if defined $num_lo && $num_lo > $num_hi;
 		($lo, $hi) = ($hi, $lo) if $lo gt $hi;
 	}
-	my %in_set    = $op eq 'in' ? (map { lc($_) => 1 } _filter_in_values($val)) : ();
+	my %in_set  = $op eq 'in' ? (map { lc($_) => 1 } _filter_in_values($val)) : ();
 	return [grep {
 		my $cell  = $_->{$col} // '';
 		my $num   = $by_number ? _numeric_cell($cell) : undef;
 		my $both  = defined $num && defined $num_val;
 		# Normalise M/D/YYYY cells to ISO for date comparisons so that the
 		# ISO values produced by <input type="date"> match against either format.
-		my $ncell = $is_date
-			? (_date_key(_to_iso_date($cell) // $cell, $prec) // $cell)
-			: $cell;
+		my $ncell = $is_date ? _filter_date_key($cell, $prec) : $cell;
 		$op eq 'eq'       ? ($is_date ? $ncell eq $nval  : lc($cell) eq $lval) :
 		$op eq 'ne'       ? ($is_date ? $ncell ne $nval  : lc($cell) ne $lval) :
 		$op eq 'contains' ? index(lc($cell), $lval) != -1                      :
@@ -3057,6 +3117,7 @@ sub _dedup_records {
 #                      not a plain number (avoids column-affinity surprises
 #                      with currency or comma-formatted values).
 #   in              -- Always residual (a list of values, matched as eq is).
+#   differ          -- Always residual (compares two columns of one row).
 #   empty / notempty -- Always residual.  Must match both SQL NULL and the
 #                      literal empty string; cannot be expressed as a single
 #                      D::A criterion without an -or grouping.
@@ -3540,7 +3601,8 @@ Readonly my $NO_NUMBER => -9**9**9;
 sub _sort_records ($rows, $column, $dir) {
 	my @text = map {
 		my $v = $_->{$column} // '';
-		$v =~ s/\A\s+|\s+\z//g;
+		$v =~ s/\A\s+//;
+		$v =~ s/\s+\z//;
 		$v;
 	} @$rows;
 	my @filled = grep { length } @text;
@@ -3811,7 +3873,7 @@ sub _fetch_page :Protected ($self, $source, $params) {
 	return (\@page, $has_next);
 }
 
-# _combine_tables(\@sources) -> (\@merged_records, \@merged_columns)
+# _combine_tables(\@sources, $source_col) -> (\@merged_records, \@merged_columns)
 #
 # Purpose: Perform a vertical stack (UNION ALL equivalent) of two or more
 #          record sets.  The merged column list is the union of all source
@@ -3820,13 +3882,16 @@ sub _fetch_page :Protected ($self, $source, $params) {
 #          column names it introduces, in order.  Where a source does not
 #          have a particular column, its rows receive an empty string for
 #          that column.
-# Entry:   $sources is an arrayref of [$records_aref, $columns_aref] pairs.
+# Entry:   $sources is an arrayref of [$records_aref, $columns_aref, $label]
+#          triples.  $source_col, when given, names an added last column that
+#          holds each row's $label (the file or table it came from); a name a
+#          source already uses gets underscores until it is free.
 #          At least one element is required; a single-element call returns
 #          that element's data unchanged (no allocation beyond the column copy).
 # Exit:    Returns (\@merged_records, \@merged_columns).
 # Side Effects: None; allocates new record hashrefs (original rows are not mutated).
 sub _combine_tables {
-	my ($sources) = @_;
+	my ($sources, $source_col) = @_;
 
 	# Build the unified column order: first source's columns first, then any
 	# new columns introduced by each subsequent source in their file order.
@@ -3837,14 +3902,22 @@ sub _combine_tables {
 		}
 	}
 
+	# $source_col names a column that says which source each row came from; it
+	# goes last, and takes a name no source column has.
+	if (defined $source_col) {
+		$source_col .= '_' while $seen{$source_col};
+		push @all_cols, $source_col;
+	}
+
 	my @merged;
 	for my $src (@$sources) {
-		my ($recs, $cols) = @$src;
+		my ($recs, $cols, $label) = @$src;
 		my %has_col = map { $_ => 1 } @$cols;
 		for my $row (@$recs) {
 			my %new_row;
 			$new_row{$_} = $has_col{$_} ? ($row->{$_} // '') : ''
 				for @all_cols;
+			$new_row{$source_col} = $label // '' if defined $source_col;
 			push @merged, \%new_row;
 		}
 	}
@@ -4010,18 +4083,20 @@ sub _run_pipeline_source :Protected ($self) {
 	# with no single aggregatable object.
 	my @cspecs = @{ $self->every_param('c') // [] };
 	if (@cspecs) {
-		my @sources = ([$records, \@columns]);
+		my @sources = ([$records, \@columns, $left_label]);
 		for my $cspec (@cspecs) {
 			my ($csrc, $clabel) = $self->_open_spec($cspec);
 			next unless $csrc;
 			my $crecs = eval { $csrc->fetch_all } // [];
 			next if $@;
 			my @ccols = _get_columns($csrc, $crecs);
-			push @sources,  [$crecs, \@ccols];
+			push @sources,  [$crecs, \@ccols, $clabel];
 			push @combined, { label => $clabel };
 		}
 		if (@sources > 1) {
-			($records, my $new_cols) = _combine_tables(\@sources);
+			my $srccol = $self->param('srccol');
+			$srccol = undef unless defined $srccol && $srccol =~ $SOURCE_COL_RE;
+			($records, my $new_cols) = _combine_tables(\@sources, $srccol);
 			@columns = @$new_cols;
 			$src = undef;	# union: no single aggregatable source
 		}
@@ -4280,7 +4355,8 @@ sub _load_lookup :Protected ($self, $lookup) {
 sub _lookup_key {
 	my ($v) = @_;
 	return undef unless defined $v && !ref $v;
-	(my $k = $v) =~ s/\A\s+|\s+\z//g;
+	(my $k = $v) =~ s/\A\s+//;
+	$k =~ s/\s+\z//;
 	return $k;
 }
 
@@ -5034,9 +5110,105 @@ sub _write_models :Protected ($self, $models) {
 	my $path = $self->_calc_models_path;
 	return 0 unless defined $path;
 	$self->_set_aside_corrupt_store($path);
-	my $ok = eval { Mojo::File->new($path)->spurt(encode_json($models)); 1 };
+	# Premise 1: a reader treats a file that does not parse as empty.  Premise 2:
+	# a write in place that stops half way (disk full, a killed worker) leaves
+	# exactly such a file.  Conclusion: write beside it and rename, so the store
+	# is the old one or the new one, never a torn one (as _write_analyses does).
+	my $ok = eval { _write_file_atomically($path, encode_json($models)); 1 };
 	$self->app->log->warn("Cannot write $path: $@") if !$ok && $@;
 	return $ok ? 1 : 0;
+}
+
+# _write_file_atomically($path, $bytes) -> void
+#
+# Writes $bytes to a temporary file in the same folder and renames it over
+# $path, keeping the mode of the file it replaces.  Croaks, after removing its
+# temporary file, when any step fails.
+sub _write_file_atomically {
+	my ($path, $bytes) = @_;
+	my $dir = Mojo::File->new($path)->dirname->to_string;
+	my ($fh, $temp) = tempfile('.bi-store-XXXXXXXX', DIR => $dir, UNLINK => 0);
+	my $ok = eval {
+		binmode $fh;
+		print {$fh} $bytes or croak "print: $!";
+		close $fh or croak "close: $!";
+		my $mode = -e $path ? (stat $path)[2] & 07777 : (0666 & ~umask);
+		chmod $mode, $temp;
+		rename($temp, $path) or croak "rename: $!";
+		1;
+	};
+	my $why = $@;
+	unless ($ok) {
+		unlink $temp;
+		croak $why;
+	}
+	return;
+}
+
+# _models_lock($self) / _analyses_lock($self) -> a guard, held until it is let go
+#
+# Purpose: Make a save's read, change and write one step among the server's
+#          worker processes.  Without it two workers read the same store, each
+#          adds its own change, and the second to write erases the first's.
+# Method:  An exclusive flock on <store>.lock, kept for as long as the returned
+#          guard lives (a handler writes `my $lock = $self->_models_lock;` and
+#          the lock goes when the handler returns, or dies).  A second call in
+#          the same process, which would wait for itself, gets a guard that
+#          holds nothing.
+# Failure: A lock file that cannot be opened, or a holder that does not let go
+#          within $LOCK_WAIT_TRIES tries, is logged and the save goes ahead
+#          unlocked: a stuck lock must not take the application down.
+Readonly my $LOCK_WAIT_TRIES   => 100;
+Readonly my $LOCK_WAIT_SECONDS => 0.1;
+my %STORE_LOCKS_HELD;	# path => 1 while this process holds that lock
+
+sub _models_lock :Protected ($self) {
+	return _store_lock($self, $self->_calc_models_path);
+}
+
+sub _analyses_lock :Protected ($self) {
+	return _store_lock($self, $self->_analyses_path);
+}
+
+sub _store_lock {
+	my ($self, $path) = @_;
+	return bless({}, 'Database::BI::Controller::Dashboard::StoreLock')
+		if !defined($path) || $STORE_LOCKS_HELD{$path};
+
+	my $lock_path = "$path.lock";
+	my $fh;
+	{
+		local ($@, $!);
+		my $opened = eval { no autodie; open($fh, '>>', $lock_path) };
+		unless ($opened) {
+			$self->app->log->warn("Cannot open $lock_path, so saving without a lock: $!");
+			return bless({}, 'Database::BI::Controller::Dashboard::StoreLock');
+		}
+	}
+	my $locked = 0;
+	for (1 .. $LOCK_WAIT_TRIES) {
+		$locked = flock($fh, LOCK_EX | LOCK_NB) and last;
+		Time::HiRes::sleep($LOCK_WAIT_SECONDS);
+	}
+	unless ($locked) {
+		$self->app->log->warn("Waited for $lock_path and gave up, so saving without it");
+		return bless({}, 'Database::BI::Controller::Dashboard::StoreLock');
+	}
+	$STORE_LOCKS_HELD{$path} = 1;
+	return bless({ fh => $fh, path => $path, held => \%STORE_LOCKS_HELD }, 'Database::BI::Controller::Dashboard::StoreLock');
+}
+
+# The guard: letting go of it unlocks and closes the file.
+{
+	package Database::BI::Controller::Dashboard::StoreLock;
+	sub DESTROY {
+		my $self = shift;
+		return unless $self->{fh};
+		delete $self->{held}{ $self->{path} };
+		flock($self->{fh}, Fcntl::LOCK_UN());
+		close $self->{fh};
+		return;
+	}
 }
 
 # _set_aside_corrupt_store($self, $path) -> void
@@ -5185,13 +5357,24 @@ sub _write_analyses :Protected ($self, $analyses) {
 
 # _gen_analysis_id($self) -> $id_string
 #
-# Returns a 10-character URL-safe alphanumeric random ID.
+# Returns a 10-character URL-safe alphanumeric random ID from the system's
+# random generator.
+Readonly my $ID_LENGTH => 10;
 Readonly my $_ID_CHARS => 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 
 sub _gen_analysis_id :Protected ($self) {
-	my $id = '';
-	$id .= substr($_ID_CHARS, int(rand(62)), 1) for 1..10;
-	return $id;
+	# Premise 1: perl's rand is a seeded linear generator, so its outputs can be
+	#            predicted from a few of them.
+	# Premise 2: an id that names a canvas should not be guessable from another.
+	# Conclusion: draw the bytes from the system's generator (Crypt::URandom, which
+	#             the password salt already needs).
+	require Crypt::URandom;
+	my $bytes = Crypt::URandom::urandom($ID_LENGTH);
+	# A short answer would make a short id, and an empty one a canvas with no name.
+	croak 'The system random generator gave too few bytes for an id'
+		unless defined $bytes && length($bytes) == $ID_LENGTH;
+	my $count = length $_ID_CHARS;
+	return join '', map { substr($_ID_CHARS, ord($_) % $count, 1) } split //, $bytes;
 }
 
 # The canvas is a 12-column CSS grid; a layout entry addresses cells in it.
@@ -5381,6 +5564,7 @@ sub analyses_list ($self) {
 
 # POST /api/analyses
 sub analyses_create ($self) {
+	my $lock = $self->_analyses_lock;	# read, change and write as one step
 	my $body = eval { decode_json($self->req->body) };
 	return $self->render(json => { error => _analysis_json_error($@) }, status => 400)
 		unless ref $body eq 'HASH';
@@ -5429,6 +5613,7 @@ sub analyses_get ($self) {
 
 # PUT /api/analyses/:id  (full replace)
 sub analyses_update ($self) {
+	my $lock = $self->_analyses_lock;	# read, change and write as one step
 	my $id = $self->stash('id') // '';
 	return $self->render(json => { error => _message_text('error_analysis_id_invalid') }, status => 400)
 		unless $id =~ /\A[A-Za-z0-9]+\z/;
@@ -5459,6 +5644,7 @@ sub analyses_update ($self) {
 
 # PATCH /api/analyses/:id  (partial update -- merges supplied keys)
 sub analyses_patch ($self) {
+	my $lock = $self->_analyses_lock;	# read, change and write as one step
 	my $id = $self->stash('id') // '';
 	return $self->render(json => { error => _message_text('error_analysis_id_invalid') }, status => 400)
 		unless $id =~ /\A[A-Za-z0-9]+\z/;
@@ -5494,6 +5680,7 @@ sub analyses_patch ($self) {
 
 # DELETE /api/analyses/:id
 sub analyses_delete ($self) {
+	my $lock = $self->_analyses_lock;	# read, change and write as one step
 	my $id = $self->stash('id') // '';
 	return $self->render(json => { error => _message_text('error_analysis_id_invalid') }, status => 400)
 		unless $id =~ /\A[A-Za-z0-9]+\z/;
@@ -5521,6 +5708,7 @@ sub analyses_delete ($self) {
 # position that the next drag would have to fight; the canvas writes a layout
 # entry once the reader moves or resizes it.
 sub analyses_add_visual ($self) {
+	my $lock = $self->_analyses_lock;	# read, change and write as one step
 	my $id = $self->stash('id') // '';
 	return $self->render(json => { error => _message_text('error_analysis_id_invalid') }, status => 400)
 		unless $id =~ /\A[A-Za-z0-9]+\z/;
@@ -5656,6 +5844,7 @@ sub analyses_add_visual ($self) {
 # empty plan (C<{ cs => [] }>) is the card running no pass even where the page
 # runs one, and leaving the key out is no request to change it at all.
 sub analyses_update_visual ($self) {
+	my $lock = $self->_analyses_lock;	# read, change and write as one step
 	my $id = $self->stash('id') // '';
 	return $self->render(json => { error => _message_text('error_analysis_id_invalid') }, status => 400)
 		unless $id =~ /\A[A-Za-z0-9]+\z/;
@@ -5770,6 +5959,7 @@ sub analyses_update_visual ($self) {
 # everything that names a later card moves down by one with it.  The page reloads
 # afterwards, because the cards on screen carry the old numbers.
 sub analyses_delete_visual ($self) {
+	my $lock = $self->_analyses_lock;	# read, change and write as one step
 	my $id = $self->stash('id') // '';
 	return $self->render(json => { error => _message_text('error_analysis_id_invalid') }, status => 400)
 		unless $id =~ /\A[A-Za-z0-9]+\z/;
@@ -5976,6 +6166,7 @@ sub analyses_export ($self) {
 
 # POST /api/analyses/import  (create from uploaded JSON or raw body)
 sub analyses_import ($self) {
+	my $lock = $self->_analyses_lock;	# read, change and write as one step
 	my $upload    = $self->req->upload('file');
 	my $body_json = $upload ? $upload->slurp : $self->req->body;
 
@@ -7607,6 +7798,57 @@ sub _decode_cell {
 	$s;
 }
 
+# _export_selection($self, $records, \@columns) -> ($records, \@columns)
+#
+# Purpose: Narrow an export to the columns the reader's table still shows, in
+#          the table's order.  Deleting or dragging a column happens only in
+#          the browser, so the Export panel sends what is left as repeated
+#          xcol= and the server applies it here.
+# Entry:   $self is the controller (called as a function: it only reads
+#          params); $records are hashrefs, possibly locked (SQL backends), so
+#          new hashes are built and the originals never written.
+# Exit:    The same two refs when xcol is absent or names no column of the
+#          view; otherwise new refs holding only the known, de-duplicated
+#          names.  Unknown names are ignored, not an error.
+# Side Effects: None.
+sub _export_selection {
+	my ($self, $records, $columns) = @_;
+	my %known = map { $_ => 1 } @$columns;
+	my %seen;
+	my @keep = grep { $known{$_} && !$seen{$_}++ }
+		grep { defined && length } @{ $self->every_param('xcol') };
+	return ($records, $columns) unless @keep;
+	return ([ map { _row_subset($_, \@keep) } @$records ], \@keep);
+}
+
+# _row_subset(\%row, \@columns) -> \%new_row
+#
+# Purpose: Copy the named columns of one row into a plain hash.  A column the
+#          row lacks becomes undef: reading it directly would croak on a
+#          locked (restricted) hash from a SQL backend.
+sub _row_subset {
+	my ($row, $columns) = @_;
+	return +{ map { $_ => (exists $row->{$_} ? $row->{$_} : undef) } @$columns };
+}
+
+# _serialize_json($records, \@columns) -> $utf8_bytes
+#
+# Purpose: A JSON array of row objects whose keys follow @$columns.  A hash
+#          has no order, so encode_json on the rows would list keys in any
+#          order and a column the reader dragged would not stay put.
+# Entry:   $records are hashrefs; $columns the names, in the order wanted.
+# Exit:    UTF-8 bytes.  A column a row lacks is written as null.
+# Side Effects: None.
+sub _serialize_json {
+	my ($records, $columns) = @_;
+	my @names = map { encode_json($_) } @$columns;
+	my @objects = map {
+		my $row = _row_subset($_, $columns);
+		'{' . join(',', map { $names[$_] . ':' . encode_json($row->{ $columns->[$_] }) } 0 .. $#names) . '}';
+	} @$records;
+	return '[' . join(',', @objects) . ']';
+}
+
 # _serialize_csv($records, \@columns) -> $utf8_string
 #
 # Purpose: Build a complete RFC 4180 CSV document (header + data rows) from
@@ -7672,7 +7914,8 @@ sub _render_sqlite :Protected ($self, $records, $columns, $name) {
 sub _render_json :Protected ($self, $records, $columns, $name) {
 	$self->stash(buffer => 0);
 	$self->res->headers->content_disposition(qq{attachment; filename="${name}.json"});
-	$self->render(json => $records);
+	$self->res->headers->content_type('application/json;charset=UTF-8');
+	$self->render(data => _serialize_json($records, $columns));
 }
 
 # ---------------------------------------------------------------------------
@@ -8224,7 +8467,11 @@ Renders C<browse.html.tt> with:
   parent_href    string or undef (undef at filesystem root)
   crumbs         ARRAYREF of { name, href }
   dirs           ARRAYREF of { name, href }   -- subdirectories, sorted
-  files          ARRAYREF of { name, href }   -- supported data files, sorted
+  files          ARRAYREF of { name, path, href } -- supported data files, sorted
+
+With two or more files the page draws a checkbox for each, Select all, and a
+Combine selected button.  Its script (no server round trip) opens
+C</combine?l=path:A&c=path:B&...&srccol=source_file&back2=/browse?path=DIR>.
 
 =head3 MESSAGES
 
@@ -8263,7 +8510,7 @@ sub browse ($self) {
 	} @{ $listing->{dirs} };
 
 	my @files = map {
-		+{ name => $_->{name}, href => '/open?path=' . url_escape($_->{path}) }
+		+{ name => $_->{name}, path => $_->{path}, href => '/open?path=' . url_escape($_->{path}) }
 	} @{ $listing->{files} };
 
 	# Build breadcrumb trail from filesystem root down to $dir.
@@ -8550,7 +8797,7 @@ sub open_file ($self) {
 
 	my $file = eval { Mojo::File->new($file_path)->realpath };
 	return $self->reply->not_found
-		unless defined $file && -f $file && $file->basename =~ $EXT_RE;
+		unless defined $file && CORE::index($file, "\0") < 0 && do { no warnings 'newline'; -f $file } && $file->basename =~ $EXT_RE;
 
 	my $dir      = $file->dirname;
 	(my $table   = $file->basename) =~ s/\.[^.]+\z//;
@@ -9154,6 +9401,10 @@ This is equivalent to a SQL C<UNION ALL> across heterogeneous schemas.
                   current result.  Invalid or non-existent specs are silently
                   skipped.
   ?f=    string   (repeatable) Result filter: "col:op:val".
+  ?srccol= string  Optional.  Adds a last column of this name that holds the
+                  file or table each row came from.  An identifier of up to
+                  64 characters; anything else is ignored.  A name a source
+                  already uses gets underscores added until it is free.
 
 =head4 OUTPUT
 
@@ -9250,10 +9501,15 @@ sub combine_tables ($self) {
 
 	my (undef, $filter_specs, $filters_json) = $self->_apply_filters($records, { chips_only => 1 });
 
-	my $title     = $left_label;
-	$title       .= ' + ' . join(' + ', map { $_->{label} } @summaries) if @summaries;
+	my $title     = _names_summary([ $left_label, map { $_->{label} } @summaries ]);
 	my $table_key = (@join_specs ? 'join+combine:' : 'combine:') . lc($left_label);
 	$table_key   .= ':' . lc($_->{label}) for @summaries;
+	# The key names the layout kept in localStorage: a folder's worth of names
+	# is not a key, so a long one is shortened to its start and a digest.
+	if (length($table_key) > 120) {
+		require Digest::MD5;
+		$table_key = substr($table_key, 0, 80) . ':' . Digest::MD5::md5_hex($table_key);
+	}
 
 	my $page_url = $self->req->url->clone;
 	$page_url->query->remove('page')->remove('per_page');
@@ -9300,6 +9556,32 @@ C<GET /export> -- Stream the current logical view as a browser file download.
   ?j=        string   (repeatable) Join steps.
   ?f=        string   (repeatable) Filter specs.
   ?format=   string   "csv" (default), "sqlite", or "json".
+  ?xcol=     string   (repeatable) Keep only these columns, in this order.
+
+=head4 DOMAIN CONSTRAINTS: ?xcol=
+
+Each C<xcol> is the exact name of one column of the view.  The file holds
+those columns, in the order the C<xcol> values are given.
+
+=over 4
+
+=item Valid partitions
+
+No C<xcol> at all: every column is exported, as before.  One or more names the
+view has: only those columns.  The same name twice: the first one counts.
+
+=item Ignored, not an error
+
+A name the view does not have, or an empty value.  If no name is left after
+this, every column is exported.  A column that a filter or a calculated field
+uses can still be left out of the file: the rows are worked out first, and the
+columns are chosen last.
+
+=back
+
+The Export panel sends one C<xcol> for each column its table still shows, in
+the table's order.  Deleting a column, or dragging it to a new place, changes
+only the page in the browser, so this is how the server learns about it.
 
 =head4 DOMAIN CONSTRAINTS: ?format=
 
@@ -9331,20 +9613,58 @@ Any value not in the valid set (e.g. C<SQLITE>, C<Json>).
 
   error_export_sqlite -- the SQLite file could not be built.
 
+=head3 COMMON PITFALLS
+
+=over 4
+
+=item *
+
+A link without C<xcol> exports every column, even if the page it came from had
+columns deleted.  Only the Export panel adds C<xcol>.
+
+=item *
+
+C<xcol> names are matched exactly, including upper and lower case.  C<Name> and
+C<name> are different columns.
+
+=item *
+
+If every C<xcol> is wrong (a typo, or a column that is not in this view), you
+get all the columns, not an empty file.
+
+=item *
+
+In the JSON file each row is an object whose keys follow the column order.  A
+row that has no value for a column gets C<null> for it, so every row has the
+same keys.
+
+=back
+
+=head3 ENCODING
+
+Column names and cell values may hold any UTF-8 text: accents, Chinese,
+Arabic, emoji.  C<xcol> values must be sent as UTF-8 and percent-encoded in a
+URL (C<caf%C3%A9> for a C<cafe> with an accent on the last letter).  CSV and JSON are written as UTF-8.
+
 =head3 FORMAL SPECIFICATION
 
   export_data == lambda self .
     let (recs, cols, label) = _run_export_pipeline() in
     pre  recs /= undef
-    post if format = 'sqlite' then render_sqlite(recs, cols)
-         else if format = 'json' then render_json(recs, cols)
-         else render_csv(recs, cols)
+    let want = [c in params('xcol') | c /= '' /\ c in cols] in
+    let keep = if want = [] then cols else dedupe(want) in
+    post if format = 'sqlite' then render_sqlite(project(recs, keep), keep)
+         else if format = 'json' then render_json(project(recs, keep), keep)
+         else render_csv(project(recs, keep), keep)
 
 =head3 EXAMPLE
 
   GET /export?l=table:sales&format=csv     -> downloads sales.csv
   GET /export?l=table:sales&format=sqlite  -> downloads sales.db
   GET /export?l=table:sales&format=json    -> downloads sales.json
+
+  # Only two columns, name first:
+  GET /export?l=table:sales&format=csv&xcol=name&xcol=id
 
 =cut
 
@@ -9361,6 +9681,8 @@ sub export_data ($self) {
 		my $hdr = join('; ', map { s/\s+/ /gr =~ s/^\s+|\s+$//gr } @$warnings);
 		$self->res->headers->header('X-BI-Warnings' => $hdr);
 	}
+
+	($records, $columns) = _export_selection($self, $records, $columns);
 
 	my $format = $self->param('format') // 'csv';
 	(my $safe_name = lc $left_label) =~ s/[^a-z0-9_]+/_/g;
@@ -9381,11 +9703,23 @@ C<POST /export> -- Write the current logical view to a chosen filesystem path.
   l=         string   (required) Left table spec.
   j=         string   (repeatable) Join steps.
   f=         string   (repeatable) Filter specs.
+  xcol=      string   (repeatable) Keep only these columns, in this order (the
+                      columns the table still shows).  Unknown names are ignored;
+                      none left means every column.
   dir=       string   Target directory (must exist; resolved via realpath).  Inside
                       config file_roots and export_dirs when they are set.
   filename=  string   Output filename including extension.  Extension determines
                       format: C<.csv> -> RFC 4180 CSV; C<.sql> -> SQLite;
                       C<.json> -> JSON array of row objects.
+
+=head4 DOMAIN CONSTRAINTS: xcol=
+
+Same rule as for C<GET /export>.  Each C<xcol> names one column of the view.
+The file holds those columns, in the order given.  Names the view lacks are
+ignored, and if none are left every column is written.  The Export panel sends
+the columns its table still shows, so a column you deleted in the page is not
+saved, and a column you dragged to a new place is saved in the new place.  A
+JSON file has its keys in that order too.
 
 =head4 DOMAIN CONSTRAINTS: filename=
 
@@ -9450,21 +9784,59 @@ renamed over the name, so a reader never sees half a file and a link made
 after the check is replaced, not followed.  It gets the replaced file's mode,
 or C<0666 & ~umask> for a new one; on failure the temporary file is removed.
 
+=head3 COMMON PITFALLS
+
+=over 4
+
+=item *
+
+C<xcol> is a list, so send it once for each column (C<xcol=name&xcol=id>), not
+as one comma-separated value.
+
+=item *
+
+A script that calls C<POST /export> without C<xcol> gets every column.
+
+=item *
+
+The file name decides the format.  C<report.json> is JSON even if you meant
+CSV.
+
+=item *
+
+A column that is not in the view is skipped quietly.  Check the file if the
+columns look wrong.
+
+=back
+
+=head3 ENCODING
+
+C<filename> and the column names may hold any UTF-8 text.  The body must be
+sent as UTF-8 (C<application/x-www-form-urlencoded>).  The file itself is
+written as UTF-8, with no byte order mark.
+
 =head3 FORMAL SPECIFICATION
 
   export_write == lambda self .
     let dir  = realpath(param('dir'))      in
     let file = dir / strip_path(param('filename')) in
-    pre  is_dir(dir) /\ ext(file) in {csv, sql}
+    pre  is_dir(dir) /\ ext(file) in {csv, sql, json}
     let (recs, cols, _) = _run_export_pipeline() in
     pre  recs /= undef
-    post spurt(file, serialise(recs, cols))
+    let want = [c in params('xcol') | c /= '' /\ c in cols] in
+    let keep = if want = [] then cols else dedupe(want) in
+    post spurt(file, serialise(project(recs, keep), keep))
          /\ render_json({ saved: file.to_string })
 
 =head3 EXAMPLE
 
   POST /export  l=table:sales dir=/home/user/exports filename=report.csv
     -> { "saved": "/home/user/exports/report.csv" }
+
+  # Only two columns, in this order:
+  POST /export  l=table:sales dir=/home/user/exports filename=short.json
+                xcol=name xcol=id
+    -> { "saved": "/home/user/exports/short.json" }
 
 =cut
 
@@ -9519,6 +9891,8 @@ sub export_write ($self) {
 	return $self->render(json => { error => 'Table not found' }, status => 404)
 		unless $records;
 
+	($records, $columns) = _export_selection($self, $records, $columns);
+
 	my $dest = $dest_dir->child($filename);
 	# A link (or a folder, a pipe) already at the name is not replaced: written
 	# through, a link inside the folders would put the export wherever it
@@ -9529,7 +9903,7 @@ sub export_write ($self) {
 	my $tmp;
 	my $ok = eval {
 		my $bytes = $format eq 'csv' ? _serialize_csv($records, $columns)
-		          : $format eq 'json' ? encode_json($records)
+		          : $format eq 'json' ? _serialize_json($records, $columns)
 		          : $self->_write_sqlite_db($records, $columns);
 		# Written beside it and renamed over it: a rename replaces whatever
 		# is at the name, a link made since the check included, and never
@@ -11735,6 +12109,7 @@ sub stats_view ($self) {
 # ---------------------------------------------------------------------------
 
 sub calc_save ($self) {
+	my $lock = $self->_models_lock;	# read, change and write as one step
 	my $spec = canonical_spec($self->param('l') // '');
 	my $name = $self->param('name') // '';
 	my $expr = $self->param('expr') // '';
@@ -11755,6 +12130,7 @@ sub calc_save ($self) {
 }
 
 sub calc_delete ($self) {
+	my $lock = $self->_models_lock;	# read, change and write as one step
 	my $spec = canonical_spec($self->param('l') // '');
 	my $name = $self->param('name') // '';
 
@@ -11781,6 +12157,7 @@ sub calc_list ($self) {
 # ---------------------------------------------------------------------------
 
 sub groups_save ($self) {
+	my $lock = $self->_models_lock;	# read, change and write as one step
 	my $spec       = canonical_spec($self->param('l')     // '');
 	my $col        = $self->param('col')   // '';
 	my $group_name = $self->param('group') // '';
@@ -11803,6 +12180,7 @@ sub groups_save ($self) {
 }
 
 sub groups_delete ($self) {
+	my $lock = $self->_models_lock;	# read, change and write as one step
 	my $spec       = canonical_spec($self->param('l')     // '');
 	my $col        = $self->param('col')   // '';
 	my $group_name = $self->param('group') // '';
@@ -11847,6 +12225,7 @@ sub groups_list ($self) {
 # comparisons already read to the second, so a last_24_hours window filters on
 # a column that has a pattern of this kind.
 sub dates_save ($self) {
+	my $lock = $self->_models_lock;	# read, change and write as one step
 	my $spec    = canonical_spec($self->param('l')       // '');
 	my $col     = $self->param('col')     // '';
 	my $pattern = $self->param('pattern') // '';
@@ -11883,6 +12262,7 @@ sub dates_save ($self) {
 # dates_delete: POST /dates/delete?l=<spec>&col=<col>
 # Removes the pattern for $col (or all patterns for $spec when col is absent).
 sub dates_delete ($self) {
+	my $lock = $self->_models_lock;	# read, change and write as one step
 	my $spec = canonical_spec($self->param('l')   // '');
 	my $col  = $self->param('col') // '';
 
@@ -11923,6 +12303,7 @@ sub dates_list ($self) {
 # have are all 400s here rather than on the next page.  fields= may repeat or
 # hold a comma-separated list; without it every column but the key is added.
 sub lookups_save ($self) {
+	my $lock = $self->_models_lock;	# read, change and write as one step
 	my $spec = canonical_spec($self->param('l')    // '');
 	my $name = $self->param('name') // '';
 	my $key  = $self->param('key')  // '';
@@ -11955,6 +12336,7 @@ sub lookups_save ($self) {
 # lookups_delete: POST /lookups/delete?l=<spec>[&name=<ident>]
 # Removes one lookup, or every lookup of $spec when name= is absent.
 sub lookups_delete ($self) {
+	my $lock = $self->_models_lock;	# read, change and write as one step
 	my $spec = canonical_spec($self->param('l')    // '');
 	my $name = $self->param('name') // '';
 
@@ -11993,6 +12375,7 @@ sub lookups_list ($self) {
 # does not compile or names no group is a 400 here.  fields= picks some of the
 # named groups; without it every named group becomes a column.
 sub extract_save ($self) {
+	my $lock = $self->_models_lock;	# read, change and write as one step
 	my $spec    = canonical_spec($self->param('l')       // '');
 	my $name    = $self->param('name')    // '';
 	my $col     = $self->param('col')     // '';
@@ -12023,6 +12406,7 @@ sub extract_save ($self) {
 # extract_delete: POST /extract/delete?l=<spec>[&name=<ident>]
 # Removes one extraction, or every extraction of $spec when name= is absent.
 sub extract_delete ($self) {
+	my $lock = $self->_models_lock;	# read, change and write as one step
 	my $spec = canonical_spec($self->param('l')    // '');
 	my $name = $self->param('name') // '';
 
@@ -12068,6 +12452,7 @@ sub extract_list ($self) {
 # panel's "Remember" sends it, so a new choice replaces the old one rather than
 # leaving, say, a place-name column beside the latitude chosen after it.
 sub geo_save ($self) {
+	my $lock = $self->_models_lock;	# read, change and write as one step
 	my $spec  = canonical_spec($self->param('l') // '');
 	my @cols  = @{ $self->every_param('col')  // [] };
 	my @kinds = @{ $self->every_param('kind') // [] };
@@ -12097,6 +12482,7 @@ sub geo_save ($self) {
 # geo_delete: POST /geo/delete?l=<spec>&col=<col>
 # Omit col= to clear all column preferences for the spec, and its loc_text.
 sub geo_delete ($self) {
+	my $lock = $self->_models_lock;	# read, change and write as one step
 	my $spec = canonical_spec($self->param('l')   // '');
 	my $col  = $self->param('col') // '';
 
@@ -14788,7 +15174,7 @@ sub map_view ($self) {
 # start unless the config names one, so a list outlives neither a restart nor
 # another installation.
 sub _geo_lookup_sig :Protected ($self, $place) {
-	return hmac_sha1_sum(encode('UTF-8', "geo-lookup\0$place"), $self->app->secrets->[0]);
+	return hmac_sha256_hex(encode('UTF-8', "geo-lookup\0$place"), $self->app->secrets->[0]);
 }
 
 # _geo_boundary_sig($self, $level, $point) -> $hex
@@ -14796,7 +15182,7 @@ sub _geo_lookup_sig :Protected ($self, $place) {
 # The same for a point whose outline the map page lists.  Its own prefix, so a
 # place's signature is never a point's.
 sub _geo_boundary_sig :Protected ($self, $level, $point) {
-	return hmac_sha1_sum(encode('UTF-8', "geo-boundary\0$level\0$point"), $self->app->secrets->[0]);
+	return hmac_sha256_hex(encode('UTF-8', "geo-boundary\0$level\0$point"), $self->app->secrets->[0]);
 }
 
 # ---------------------------------------------------------------------------

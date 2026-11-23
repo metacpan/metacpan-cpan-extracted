@@ -46,7 +46,7 @@ BEGIN {
 package main;
 use Google::Cloud::Compute::V1::InstanceTemplatesClient;
 
-my $client = Google::Cloud::Compute::V1::InstanceTemplatesClient->new( credentials => 'dummy' );
+my $client = Google::Cloud::Compute::V1::InstanceTemplatesClient->new();
 ok($client, 'Instantiated generated client');
 isa_ok($client->transport, 'Google::gRPC::Client', 'Client transport');
 

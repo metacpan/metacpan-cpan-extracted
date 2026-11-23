@@ -44,9 +44,9 @@ BEGIN {
 
 # D. Main test execution
 package main;
-use Google::Cloud::Kms::AutokeyClient;
+use Google::Cloud::Kms::V1::AutokeyClient;
 
-my $client = Google::Cloud::Kms::AutokeyClient->new( credentials => 'dummy' );
+my $client = Google::Cloud::Kms::V1::AutokeyClient->new();
 ok($client, 'Instantiated generated client');
 isa_ok($client->transport, 'Google::gRPC::Client', 'Client transport');
 

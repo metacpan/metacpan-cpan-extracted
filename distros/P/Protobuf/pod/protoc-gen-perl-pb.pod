@@ -1,0 +1,59 @@
+=encoding UTF-8
+
+=head1 NAME
+
+protoc-gen-perl-pb - Protocol Buffers compiler plugin for Perl (upb-backed)
+
+=head1 SYNOPSIS
+
+    protoc \
+      --plugin=protoc-gen-perl-pb=$(which protoc-gen-perl-pb) \
+      --perl-pb_out=lib \
+      --perl-pb_opt=embed_descriptors \
+      -I path/to/protos \
+      path/to/protos/example.proto
+
+=head1 DESCRIPTION
+
+C<protoc-gen-perl-pb> is a C<protoc> code-generator plugin shipped with the
+L<Protobuf> Perl distribution. It reads a C<CodeGeneratorRequest> from standard
+input and emits Perl message, enum, and optional service client classes backed
+by Google's C<upb> C runtime.
+
+You do not normally invoke C<protoc-gen-perl-pb> directly; pass it to
+C<protoc> via C<--plugin=protoc-gen-perl-pb=...> and C<--perl-pb_out=...>.
+
+=head1 OPTIONS
+
+Plugin options are passed via C<--perl-pb_opt=opt1,opt2>:
+
+=over 4
+
+=item * B<embed_descriptors>
+
+Embeds serialized C<FileDescriptorProto> payloads into generated modules so
+descriptors register automatically in L<Protobuf::DescriptorPool/generated_pool>
+when the module is loaded.
+
+=item * B<generate_services>
+
+Generates gRPC/REST service client stubs alongside message classes.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Protobuf::DescriptorPool>,
+L<Module::Starter::Protobuf>
+
+=head1 AUTHOR
+
+C.J. Collier E<lt>cjac@google.comE<gt>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2026 Google LLC and contributors.
+
+Licensed under the Apache License, Version 2.0.
+
+=cut

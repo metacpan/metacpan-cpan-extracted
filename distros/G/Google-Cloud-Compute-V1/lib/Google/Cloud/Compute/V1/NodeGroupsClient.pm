@@ -12,7 +12,7 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Compute::V1::Compute;
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -20,14 +20,15 @@ has transport   => ( is => 'rw' );
 sub BUILD {
     my ($self) = @_;
 
-    # Resolve credentials: use passed credentials object if it implements get_token, or default to ADC
     my $auth = $self->credentials;
-    if (!$auth || !eval { $auth->can('get_token') }) {
+    if (!defined $auth) {
         $auth = Google::Auth->default();
+    } elsif (!eval { $auth->can('get_token') }) {
+        croak 'Invalid credentials object: must implement get_token()';
     }
     my $token = $auth->get_token();
 
-    my $target = 'localhost:50051';
+    my $target = 'compute.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -39,7 +40,6 @@ sub BUILD {
         );
         $self->transport($client);
     } else {
-        # Default high-performance HTTP/2 gRPC client
         my $client = Google::gRPC::Client->new(
             target     => $target,
             auth_token => $token,
@@ -52,9 +52,26 @@ sub add_nodes {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::AddNodesNodeGroupRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.NodeGroups/AddNodes',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.NodeGroups',
         method         => 'AddNodes',
@@ -69,9 +86,26 @@ sub aggregated_list {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::AggregatedListNodeGroupsRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::NodeGroupAggregatedList';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.NodeGroups/AggregatedList',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.NodeGroups',
         method         => 'AggregatedList',
@@ -86,9 +120,26 @@ sub delete {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::DeleteNodeGroupRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.NodeGroups/Delete',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.NodeGroups',
         method         => 'Delete',
@@ -103,9 +154,26 @@ sub delete_nodes {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::DeleteNodesNodeGroupRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.NodeGroups/DeleteNodes',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.NodeGroups',
         method         => 'DeleteNodes',
@@ -120,9 +188,26 @@ sub get {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::GetNodeGroupRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::NodeGroup';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.NodeGroups/Get',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.NodeGroups',
         method         => 'Get',
@@ -137,9 +222,26 @@ sub get_iam_policy {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::GetIamPolicyNodeGroupRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::Policy';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.NodeGroups/GetIamPolicy',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.NodeGroups',
         method         => 'GetIamPolicy',
@@ -154,9 +256,26 @@ sub insert {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::InsertNodeGroupRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.NodeGroups/Insert',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.NodeGroups',
         method         => 'Insert',
@@ -171,9 +290,26 @@ sub list {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::ListNodeGroupsRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::NodeGroupList';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.NodeGroups/List',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.NodeGroups',
         method         => 'List',
@@ -188,9 +324,26 @@ sub list_nodes {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::ListNodesNodeGroupsRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::NodeGroupsListNodes';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.NodeGroups/ListNodes',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.NodeGroups',
         method         => 'ListNodes',
@@ -205,9 +358,26 @@ sub patch {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::PatchNodeGroupRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.NodeGroups/Patch',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.NodeGroups',
         method         => 'Patch',
@@ -222,9 +392,26 @@ sub perform_maintenance {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::PerformMaintenanceNodeGroupRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.NodeGroups/PerformMaintenance',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.NodeGroups',
         method         => 'PerformMaintenance',
@@ -239,9 +426,26 @@ sub set_iam_policy {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::SetIamPolicyNodeGroupRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::Policy';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.NodeGroups/SetIamPolicy',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.NodeGroups',
         method         => 'SetIamPolicy',
@@ -256,9 +460,26 @@ sub set_node_template {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::SetNodeTemplateNodeGroupRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.NodeGroups/SetNodeTemplate',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.NodeGroups',
         method         => 'SetNodeTemplate',
@@ -273,9 +494,26 @@ sub simulate_maintenance_event {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::SimulateMaintenanceEventNodeGroupRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.NodeGroups/SimulateMaintenanceEvent',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.NodeGroups',
         method         => 'SimulateMaintenanceEvent',
@@ -290,9 +528,26 @@ sub test_iam_permissions {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::TestIamPermissionsNodeGroupRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::TestPermissionsResponse';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.NodeGroups/TestIamPermissions',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.NodeGroups',
         method         => 'TestIamPermissions',
@@ -344,7 +599,7 @@ Generated from the following Protocol Buffers schemas:
 
 =over 4
 
-=item * C<google/cloud/compute/v1/compute.proto>
+=item * C<googleapis/google/cloud/compute/v1/compute.proto>
 
 
 

@@ -40,6 +40,7 @@ script/bi-extract
 script/bi-geocode
 script/database-bi
 t/alert.t
+t/all-fuzz.t
 t/ask.t
 t/basic.t
 t/bi-geocode.t
@@ -47,6 +48,7 @@ t/binned.t
 t/bom.t
 t/boundary.t
 t/breadcrumb.t
+t/browse-combine.t
 t/cache-dir.t
 t/calc.t
 t/canvas-cross-row.t
@@ -59,11 +61,14 @@ t/csp.t
 t/csv-quotes.t
 t/data-dir-invariant.t
 t/data-flow.t
+t/delta.t
 t/domain.t
 t/edge_cases.t
 t/en-us.t
+t/export-columns.t
 t/extract-cli.t
 t/extract.t
+t/fast-path.t
 t/field-extract.t
 t/file-roots.t
 t/filter.t
@@ -78,6 +83,7 @@ t/i18n.t
 t/insights.t
 t/integration.t
 t/json.t
+t/jsonl.t
 t/language-fallback.t
 t/launcher.t
 t/lib/BI/Test/Boundary.pm
@@ -87,6 +93,8 @@ t/lib/BI/Test/Marionette.pm
 t/lib/BI/Test/Nominatim.pm
 t/lib/BI/Test/WinRealpath.pm
 t/locales.t
+t/logic-differ.t
+t/logic.t
 t/login.t
 t/lookup.t
 t/manifest.t
@@ -115,7 +123,9 @@ t/table-case.t
 t/theme.t
 t/time-bucket.t
 t/time-range.t
+t/time-zone.t
 t/transaction.t
+t/transition-login.t
 t/transition.t
 t/treemap-combo-colour.t
 t/trend.t
@@ -125,6 +135,7 @@ t/ui-reach.t
 t/unit.t
 t/version.t
 t/wordcloud.t
+t/xml-document.t
 templates/web/en-us/bar.html.tt
 templates/web/en-us/browse.html.tt
 templates/web/en-us/canvas.html.tt

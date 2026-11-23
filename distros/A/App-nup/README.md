@@ -48,7 +48,7 @@ nup - n-up, multi-column paged output for commands and files
 
 # VERSION
 
-Version 1.21
+Version 1.22
 
 # DESCRIPTION
 
@@ -177,8 +177,8 @@ variable works in both modes; see ["Terminal Size"](#terminal-size).
         l . right     right-scroll        one page to the right
         H g < K       no-scroll           the left end of the row
         L G > J       end-scroll          the right end of the row
-        space j down  noaction ESC-) x 3  the panes on the screen to the right
-        d ^D return
+        space f j     noaction ESC-) x 3  the panes on the screen to the right
+        down d ^D return
         b k up u ^U   noaction ESC-( x 3  the panes on the screen to the left
 
     The pages have the height of the screen, and there is nothing to
@@ -504,7 +504,7 @@ by the line as usual.  `e` and `y` are left to move by the line.
 
     `LESSKEY_CONTENT` is read, which `-L` uses to put its keys:
     `h`, `l`, `,`, `.`, the arrow keys, ESC-( and ESC-), `H`, `L`, `g`, `G`,
-    `<`, `>`, space, `b`, `j`, `k`, `d`, `u`, `^D`, `^U`,
+    `<`, `>`, space, `f`, `b`, `j`, `k`, `d`, `u`, `^D`, `^U`,
     the return key, `J` and `K`.
     Without `-L`, the keys are `j`, `k`, the down and up arrows, `d`,
     `u`, `^D`, `^U`, the return key, `J` and `K`.

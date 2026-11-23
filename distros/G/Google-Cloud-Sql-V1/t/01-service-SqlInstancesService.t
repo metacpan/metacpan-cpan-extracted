@@ -33,7 +33,7 @@ sub call {
 
 # C. Fallback Mocks for External Response Classes
 BEGIN {
-    for my $pkg (qw( Google::Cloud::Sql::V1::CloudSqlInstances::DatabaseInstance Google::Cloud::Sql::V1::CloudSqlInstances::InstancesListEntraIdCertificatesResponse Google::Cloud::Sql::V1::CloudSqlInstances::InstancesListResponse Google::Cloud::Sql::V1::CloudSqlInstances::InstancesListServerCasResponse Google::Cloud::Sql::V1::CloudSqlInstances::InstancesListServerCertificatesResponse Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesAcquireSsrsLeaseResponse Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesExecuteSqlResponse Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesGetDiskShrinkConfigResponse Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesGetLatestRecoveryTimeResponse Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesReleaseSsrsLeaseResponse Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesVerifyExternalSyncSettingsResponse Google::Cloud::Sql::V1::CloudSqlResources::Operation Google::Cloud::Sql::V1::CloudSqlResources::SslCert )) {
+    for my $pkg (qw( Google::Cloud::Sql::V1::CloudSqlInstances::DatabaseInstance Google::Cloud::Sql::V1::CloudSqlInstances::InstancesListEntraIdCertificatesResponse Google::Cloud::Sql::V1::CloudSqlInstances::InstancesListResponse Google::Cloud::Sql::V1::CloudSqlInstances::InstancesListServerCasResponse Google::Cloud::Sql::V1::CloudSqlInstances::InstancesListServerCertificatesResponse Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesAcquireSsrsLeaseResponse Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesExecuteSqlReadOnlyResponse Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesExecuteSqlResponse Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesGetDiskShrinkConfigResponse Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesGetLatestRecoveryTimeResponse Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesReleaseSsrsLeaseResponse Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesVerifyExternalSyncSettingsResponse Google::Cloud::Sql::V1::CloudSqlResources::Operation Google::Cloud::Sql::V1::CloudSqlResources::SslCert )) {
         unless ($pkg->can('new')) {
             no strict 'refs';
             *{"${pkg}::new"} = sub { bless {}, $_[0] };
@@ -46,7 +46,7 @@ BEGIN {
 package main;
 use Google::Cloud::Sql::V1::SqlInstancesServiceClient;
 
-my $client = Google::Cloud::Sql::V1::SqlInstancesServiceClient->new( credentials => 'dummy' );
+my $client = Google::Cloud::Sql::V1::SqlInstancesServiceClient->new();
 ok($client, 'Instantiated generated client');
 isa_ok($client->transport, 'Google::gRPC::Client', 'Client transport');
 
@@ -237,7 +237,7 @@ subtest 'get method' => sub {
     done_testing();
 };
 
-subtest 'import_instances method' => sub {
+subtest 'import method' => sub {
     $client->transport->{mock_call} = sub {
         my ($args) = @_;
         is($args->{service}, 'google.cloud.sql.v1.SqlInstancesService', 'Correct service path');
@@ -248,7 +248,7 @@ subtest 'import_instances method' => sub {
         return $response;
     };
     
-    my $res = $client->import_instances();
+    my $res = $client->import();
     ok($res, 'Method returned a response');
     isa_ok($res, 'Google::Cloud::Sql::V1::CloudSqlResources::Operation', 'Response object class');
     done_testing();
@@ -419,6 +419,40 @@ subtest 'restart method' => sub {
     };
     
     my $res = $client->restart();
+    ok($res, 'Method returned a response');
+    isa_ok($res, 'Google::Cloud::Sql::V1::CloudSqlResources::Operation', 'Response object class');
+    done_testing();
+};
+
+subtest 'start method' => sub {
+    $client->transport->{mock_call} = sub {
+        my ($args) = @_;
+        is($args->{service}, 'google.cloud.sql.v1.SqlInstancesService', 'Correct service path');
+        is($args->{method}, 'Start', 'Correct RPC method');
+        isa_ok($args->{request}, 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesStartRequest', 'Request object');
+        
+        my $response = 'Google::Cloud::Sql::V1::CloudSqlResources::Operation'->new();
+        return $response;
+    };
+    
+    my $res = $client->start();
+    ok($res, 'Method returned a response');
+    isa_ok($res, 'Google::Cloud::Sql::V1::CloudSqlResources::Operation', 'Response object class');
+    done_testing();
+};
+
+subtest 'stop method' => sub {
+    $client->transport->{mock_call} = sub {
+        my ($args) = @_;
+        is($args->{service}, 'google.cloud.sql.v1.SqlInstancesService', 'Correct service path');
+        is($args->{method}, 'Stop', 'Correct RPC method');
+        isa_ok($args->{request}, 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesStopRequest', 'Request object');
+        
+        my $response = 'Google::Cloud::Sql::V1::CloudSqlResources::Operation'->new();
+        return $response;
+    };
+    
+    my $res = $client->stop();
     ok($res, 'Method returned a response');
     isa_ok($res, 'Google::Cloud::Sql::V1::CloudSqlResources::Operation', 'Response object class');
     done_testing();
@@ -696,6 +730,23 @@ subtest 'get_latest_recovery_time method' => sub {
     done_testing();
 };
 
+subtest 'execute_sql_read_only method' => sub {
+    $client->transport->{mock_call} = sub {
+        my ($args) = @_;
+        is($args->{service}, 'google.cloud.sql.v1.SqlInstancesService', 'Correct service path');
+        is($args->{method}, 'ExecuteSqlReadOnly', 'Correct RPC method');
+        isa_ok($args->{request}, 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesExecuteSqlReadOnlyRequest', 'Request object');
+        
+        my $response = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesExecuteSqlReadOnlyResponse'->new();
+        return $response;
+    };
+    
+    my $res = $client->execute_sql_read_only();
+    ok($res, 'Method returned a response');
+    isa_ok($res, 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesExecuteSqlReadOnlyResponse', 'Response object class');
+    done_testing();
+};
+
 subtest 'execute_sql method' => sub {
     $client->transport->{mock_call} = sub {
         my ($args) = @_;
@@ -776,6 +827,23 @@ subtest 'point_in_time_restore method' => sub {
     };
     
     my $res = $client->point_in_time_restore();
+    ok($res, 'Method returned a response');
+    isa_ok($res, 'Google::Cloud::Sql::V1::CloudSqlResources::Operation', 'Response object class');
+    done_testing();
+};
+
+subtest 'reconcile_networking method' => sub {
+    $client->transport->{mock_call} = sub {
+        my ($args) = @_;
+        is($args->{service}, 'google.cloud.sql.v1.SqlInstancesService', 'Correct service path');
+        is($args->{method}, 'ReconcileNetworking', 'Correct RPC method');
+        isa_ok($args->{request}, 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesReconcileNetworkingRequest', 'Request object');
+        
+        my $response = 'Google::Cloud::Sql::V1::CloudSqlResources::Operation'->new();
+        return $response;
+    };
+    
+    my $res = $client->reconcile_networking();
     ok($res, 'Method returned a response');
     isa_ok($res, 'Google::Cloud::Sql::V1::CloudSqlResources::Operation', 'Response object class');
     done_testing();

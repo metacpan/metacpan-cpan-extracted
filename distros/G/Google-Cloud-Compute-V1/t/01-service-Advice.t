@@ -33,7 +33,7 @@ sub call {
 
 # C. Fallback Mocks for External Response Classes
 BEGIN {
-    for my $pkg (qw( Google::Cloud::Compute::V1::Compute::CalendarModeAdviceResponse )) {
+    for my $pkg (qw( Google::Cloud::Compute::V1::Compute::CalendarModeAdviceResponse Google::Cloud::Compute::V1::Compute::CapacityAdviceResponse Google::Cloud::Compute::V1::Compute::CapacityHistoryResponse )) {
         unless ($pkg->can('new')) {
             no strict 'refs';
             *{"${pkg}::new"} = sub { bless {}, $_[0] };
@@ -46,7 +46,7 @@ BEGIN {
 package main;
 use Google::Cloud::Compute::V1::AdviceClient;
 
-my $client = Google::Cloud::Compute::V1::AdviceClient->new( credentials => 'dummy' );
+my $client = Google::Cloud::Compute::V1::AdviceClient->new();
 ok($client, 'Instantiated generated client');
 isa_ok($client->transport, 'Google::gRPC::Client', 'Client transport');
 
@@ -64,6 +64,40 @@ subtest 'calendar_mode method' => sub {
     my $res = $client->calendar_mode();
     ok($res, 'Method returned a response');
     isa_ok($res, 'Google::Cloud::Compute::V1::Compute::CalendarModeAdviceResponse', 'Response object class');
+    done_testing();
+};
+
+subtest 'capacity method' => sub {
+    $client->transport->{mock_call} = sub {
+        my ($args) = @_;
+        is($args->{service}, 'google.cloud.compute.v1.Advice', 'Correct service path');
+        is($args->{method}, 'Capacity', 'Correct RPC method');
+        isa_ok($args->{request}, 'Google::Cloud::Compute::V1::Compute::CapacityAdviceRpcRequest', 'Request object');
+        
+        my $response = 'Google::Cloud::Compute::V1::Compute::CapacityAdviceResponse'->new();
+        return $response;
+    };
+    
+    my $res = $client->capacity();
+    ok($res, 'Method returned a response');
+    isa_ok($res, 'Google::Cloud::Compute::V1::Compute::CapacityAdviceResponse', 'Response object class');
+    done_testing();
+};
+
+subtest 'capacity_history method' => sub {
+    $client->transport->{mock_call} = sub {
+        my ($args) = @_;
+        is($args->{service}, 'google.cloud.compute.v1.Advice', 'Correct service path');
+        is($args->{method}, 'CapacityHistory', 'Correct RPC method');
+        isa_ok($args->{request}, 'Google::Cloud::Compute::V1::Compute::CapacityHistoryAdviceRequest', 'Request object');
+        
+        my $response = 'Google::Cloud::Compute::V1::Compute::CapacityHistoryResponse'->new();
+        return $response;
+    };
+    
+    my $res = $client->capacity_history();
+    ok($res, 'Method returned a response');
+    isa_ok($res, 'Google::Cloud::Compute::V1::Compute::CapacityHistoryResponse', 'Response object class');
     done_testing();
 };
 

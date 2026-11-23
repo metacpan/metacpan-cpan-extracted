@@ -1,0 +1,430 @@
+Revision history for Cn-Bioinf
+
+0.031 2026-11-18 CST
+
+ [Bug fixes]
+
+ - admixture's warning that a fit stopped before converging wrote its
+   tolerance as the C runtime writes the number, which under Strawberry
+   Perl 5.24.4 is "1e-010" rather than "1e-10", so t/admixture.t failed
+   there (CPAN Testers report 363318e0-e362-11f1-808f-855b4a25bcf6, the
+   only failure of 32 reports for 0.03-TRIAL). The module was at fault:
+   the tolerance is now written with a two-digit exponent, as pdb_search's
+   E-values have been since 0.02. A new test in t/admixture.t shows the
+   same thing on any perl, and the file no longer prints two of those
+   warnings while it runs.
+
+0.03 2026-11-18 CST
+
+ [Incompatible changes]
+
+ - clustal_view_residues is now view_alignment, and the old name is gone.
+   Its "output_tex_file" is now "output_file", whose ending says what is
+   written: a .tex is the LaTeX tables it wrote before, and a .svg is an
+   image of the alignment. view_alignment also prints the alignment in the
+   terminal, with colored residues in color, and returns that text; give
+   it "return_only => 1" to print nothing. The alignment may be given
+   first, as a hash ref of name => sequence or a FASTA file name, as well
+   as by "msa_file".
+
+ [New functions]
+
+ - pca, fst, hardy_weinberg, ld, ld_prune and gwas: a cohort's principal
+   components, Fst between populations, Hardy-Weinberg tests, linkage
+   disequilibrium and its pruning, and association tests. Each hands the
+   genotypes of the autosomes' biallelic variants to the PLINK 2 that
+   Alien::Bioinf installs, and returns what it computes as perl data.
+   t/popgen.t checks them against PLINK 2's own output, and skips without
+   Alien::Bioinf.
+
+ - admixture: each sample's ancestry as fractions of k populations, and
+   each population's allele frequencies, by ADMIXTURE's model, fitted in
+   XS from the best of 10 random starts. It needs no PLINK 2.
+   t/admixture.t checks it against ADMIXTURE 1.3.0's fit.
+
+ - 0.01-TRIAL and 0.02-TRIAL also shipped functions that their sections
+   here do not list: sex_check, parent, relatedness, concordance,
+   hirisplex_genotypes, trait_predict, blood_type, pdb_search and
+   pgs_score; the sequence functions complement, reverse_complement,
+   transcribe, back_transcribe, translate, translate_six_frames,
+   find_orfs, gc_content, kmer_count, assembly_stats, molecular_weight,
+   isoelectric_point, protein_charge, subseq and motif_search; and
+   fasta_index and fasta_region. README.md describes each.
+
+ [Bug fixes]
+
+ - blood_type called a sample RhD negative ("dd") when it had no usable
+   genotype at any RHD site: every call missing, not diploid, or with a DP
+   below min_depth. Such a call was counted as REF. That sample now has no
+   RhD type, and the reason says why. Two of t/blood.t's samples, BB and
+   OO, changed, and t/data/blood_reference.py, which shares no code with
+   the module, was changed to match and gives the same types.
+
+ - The command line recorded in the Creator of an image from plot_msa,
+   plot_phylo or msa_quality_table could not be pasted back into a shell
+   when an argument held an apostrophe, and left out an argument that was
+   empty. Both are now quoted.
+
+ [Speed and memory]
+
+ - fasta_index, and fasta_region on a FASTA with no .fai, read the file in
+   XS. A 305 MB FASTA was indexed in 0.10 s rather than 2.0 s, with the
+   same index.
+
+ - fasta_region keeps only the index entries its regions can name. For
+   two regions of a FASTA of 1,000,000 contigs it peaked at 13 MB rather
+   than 458 MB with a .fai, and at 194 MB rather than 468 MB without.
+
+ - pca, fst, hardy_weinberg, ld, ld_prune and gwas keep each variant's
+   columns in a temporary file rather than in perl, and pca, and fst
+   without "per_variant", keep none. On 1,000,000 variants of 60 samples,
+   pca peaked at 19 MB rather than 109 MB, and ld at 26 MB rather than
+   109 MB.
+
+ - pgs_score holds each row of the weights in less memory. A score of
+   1,000,000 variants peaked at 325 MB rather than 629 MB.
+
+ [Build]
+
+ - On a long-double perl, Makefile.PL link-tests logl() and sqrtl() for
+   admixture's fit, and uses log() and sqrt() where the libm lacks them.
+
+0.02 2026-11-11 CST
+
+ [Test fixes]
+
+ - On Windows, t/blood.t, t/concordance.t, t/faidx.t, t/parent.t,
+   t/relatedness.t and t/sex.t failed 19 subtests between them, and
+   t/msa.t would have failed one where Alien::Bioinf is installed. Each
+   test sent STDOUT to a file in text mode, so every "\n" the module
+   printed was "\r\n" in the file, and then read that file back with
+   :raw. The module was right; the tests now read the file in text mode.
+   Found by CPAN Testers reports 620bc624-ddea-11f1-b231-87fe50e89311
+   (Strawberry Perl 5.24.4) and 666d71f4-ddea-11f1-b231-87fe50e89311
+   (Strawberry Perl 5.42.3) on 0.01-TRIAL, and reproduced on Linux with
+   PERLIO=:unix:crlf.
+
+ - t/pdb.t compared an E-value from its JSON fixture exactly, and JSON::PP
+   2.97001 under Strawberry Perl 5.24.4 decoded 9.682e-47 as
+   9.6820000000001e-47, which failed one subtest. The test now allows a
+   relative error of 1e-12, a hundred times what that report showed.
+
+ [Bug fixes]
+
+ - pdb_search's report wrote E-values with three exponent digits
+   ("1.6e-089") on Strawberry Perl 5.24.4, whose C runtime prints them
+   that way, and with two ("1.6e-89") everywhere else. It now writes two
+   on every platform, keeping a third only where the exponent needs it.
+   The same report (620bc624) found it in three subtests of t/pdb.t,
+   which now tests the shortening directly.
+
+0.01 2026-09-30 CDT
+
+ [First release]
+
+ - fasta2hash, hash2fasta_file, get_best_alignment_hit, msa_quality_table
+   and clustal_view_residues, taken from the maintainer's bioinf.pm.
+   fasta2hash and hash2fasta_file are now XS: on a 928 MB FASTA, reading
+   went from 3.83 s to under 1 s and writing from 44.44 s to 0.97 s.
+
+ - bioinf.pm's msa_phylo_plot is split in two. plot_msa aligns sequences
+   with Clustal Omega and draws the alignment; plot_phylo draws the guide
+   tree, either aligning the sequences itself or drawing a tree file that
+   plot_msa kept, so the two images need only one alignment.
+
+ - clustalo, BLAST+ and the plotting Python come from Alien::Bioinf, never
+   from PATH. Alien::Bioinf is recommended rather than required, since it
+   installs only where NCBI builds BLAST+; the functions that need it say so
+   when it is missing, and t/msa.t is skipped without it.
+
+ - fasta2hash drops whitespace from sequences and from the end of
+   deflines, as Biopython does, and reads CRLF files; with a key, it stops
+   at the record after that one. hash2fasta_file writes keys and
+   sequences as bytes, and dies on a character above 255.
+
+ - get_best_alignment_hit returns each query's hits as an array, best
+   first, so two hits of one title are both kept, and gives every
+   description of a hit in "descriptions", so a search of nr, which lists
+   one sequence under several accessions, can be read.
+
+ - Sequence names may hold spaces and punctuation. Clustal Omega is given
+   the sequences numbered, and the alignment and the guide tree get their
+   names back, quoted in the tree as newick quotes them.
+
+ - Every image's provenance is one line of Creator metadata, and the only
+   metadata written, as from Matplotlib::Simple: the script, the user, the
+   host, the perl, Python and library versions, and the inputs, each with
+   its SHA-256, with the clustalo or blastp command that made them.
+
+ - pgs_score computes a polygenic score for each sample of a VCF from a
+   PGS Catalog scoring file, matching variants by position or by rsID. The
+   VCF may be a file (VCF, BCF or a PLINK 2 .pgen) or a data frame as
+   Stats::LikeR's read_table returns it, and so may the scoring file.
+   PLINK 2, which Alien::Bioinf now installs, does the scoring, so perl
+   never holds the genotypes: 1.77 million variants against a whole genome
+   took 25 s, perl peaking at 0.8 GB. It says how many variants were
+   scored, missing, or found with alleles that disagree, and warns when the
+   disagreement suggests two genome builds, or when a VCF lists only the
+   sites where its sample carries an ALT allele.
+
+ - sex_check tells each sample of a VCF (.vcf, .vcf.gz or .vcf.bz2) as
+   male or female by peddy's method: its ratio of heterozygous to
+   homozygous-ALT SNVs on X outside the pseudo-autosomal regions, male
+   below 0.6. It prints a table of each sample's sex and the counts it
+   was told from, and returns them as a hash. Perl decompresses the file
+   and XS counts it, keeping seven counters a sample, so a whole genome's
+   .vcf.gz took 4.8 s and 47 MB.
+ - parent returns 1 when two people are parent and child and 0 when not,
+   from two samples of one VCF or each person's own VCF: their IBS0 rate
+   (opposite homozygotes) must be below peddy's 0.012, and their
+   KING-robust kinship, which matches PLINK 2's, from 0.177 to 0.354. It
+   prints the counts it decided from, and returns them too in list
+   context. A site that one person's own VCF lacks is taken as hom-REF, so
+   it warns when one file has far more sites alone than the other, as an
+   exome against a genome does. Two exomes took 1.6 s.
+ - relatedness tells how every two people are related, from every sample
+   of one VCF or the one sample of each of several: each pair's
+   KING-robust kinship and IBS0, IBS1 and IBS2 counts, as parent takes
+   them, a relationship (parent-child, full siblings, duplicate, second-
+   or third-degree, unrelated), and a category named from the sexes it
+   tells from X in the same reading (father-son, mother-daughter,
+   brother-sister, brothers, sisters). Which of a parent and child is the
+   parent is said where a third person shows it. It returns a hash of
+   hashes, $r->{a}{b} being the same hash as $r->{b}{a}, and a pair that
+   parent would die on is left undecided, with the reason, rather than
+   stopping the rest. XS counts every pair 64 sites at a time: the 17
+   people of the CEPH 1463 pedigree took 0.27 s, and agreed with it on
+   every sex and on 134 of 136 pairs, and three exomes took 2.5 s.
+ - concordance compares a test VCF's calls with a truth VCF's, sample by
+   sample, or the one sample of each whatever they are called, and counts
+   the 45 kinds of agreement and disagreement and the metrics of the
+   maintainer's x.low_ram_local_concordance.pl, with each discordant,
+   gained and lost site. Unlike that script it finds a site whatever its
+   ID and with "chr" in both files, compares calls by their alleles, so 1/0
+   and 0|1 are 0/1, and takes ./1 as a no-call, where it died. Its true
+   positives are corrected to the matched calls that carry an ALT, where
+   the script counted matched hom-REF calls and missed matched het-REF
+   ones, and its true negatives to every matched reference call, haploid
+   or diploid; a discordance of two ALT-carrying calls (0/1 against 1/1)
+   is a false positive and a false negative, where the script counted it
+   as neither. XS compares them, holding only the test's sites: two exomes
+   took 1.9 s, and a genome against itself 14 s.
+ - concordance dies, before reading any records, when the two VCFs'
+   ##contig lines give one contig two lengths, as GRCh37 and GRCh38 do,
+   and names the contigs and each header's build. Two such files used to
+   be compared position by position, which matched few sites, and those
+   by chance.
+ - hirisplex_genotypes reads the 41 markers of the HIrisPlex-S eye, hair
+   and skin colour panel out of a VCF and counts, for each sample, how
+   many copies of each marker's model allele it carries, writing them as
+   the CSV the HIrisPlex-S webtool uploads. The panel ships as
+   share/hirisplex_s_panel.tsv, written by share/make_hirisplex_panel.pl
+   from the webtool's own input form and Ensembl; no prediction model
+   ships, because HIrisPlex-S's coefficients are not published and part of
+   the knowledge behind them is covered by European patent EP2195448.
+   Markers are matched by position on GRCh37 or GRCh38, read from the
+   VCF's ##contig lengths unless "build" says, or by rs number. The panel
+   records the forward-strand allele to count, so nothing is guessed: 14
+   of the 41 are the complement of the allele the webtool names, ASIP
+   rs6119471 carries the named allele on the forward strand and still has
+   to be flipped, as the HIrisPlex-S manual says, and MC1R rs312262906 is
+   the 86insA frameshift, merged into rs796296176, which is counted as the
+   allele longer than REF. XS reads the file in one pass, keeping one byte
+   per sample per marker. Each sample is returned with which predictions
+   the manual's rules allow at all: no eye colour without HERC2
+   rs12913832, no hair colour when all 11 MC1R markers are missing.
+ - trait_predict applies a multinomial logistic regression, which is what
+   the IrisPlex, HIrisPlex and HIrisPlex-S models are, to those genotypes
+   and a model table the caller supplies, and returns a probability for
+   each category of each trait. A marker with no genotype drops out of the
+   sum, which counts it as 0 copies, and the markers used and missing are
+   returned with every prediction so that one made from few markers can be
+   reported as such. A trait that hirisplex_genotypes says cannot be
+   predicted is not, unless "force" is 1.
+ - blood_type tells each sample's ABO and RhD blood type from a VCF, and
+   returns a hash of "abo" and "rhesus", each with a genotype and a
+   phenotype (AO and A, dd and negative), and "type" (A-). ABO is read
+   from the O deletion (rs8176719), the B marker (rs8176746) and the O2
+   allele (rs41302905). RhD is read from a record of the RHD gene's
+   deletion where the file has one, and otherwise from 15 sites inside the
+   gene, chosen from 1000 Genomes by share/make_blood_type_panel.pl, at
+   which somebody who has the gene almost always carries an ALT allele: of
+   2,343 such people 5 carried none, and of 150 with no gene none carried
+   any. A marker the file has no record of is read as homozygous REF, as a
+   VCF of one person's variants means it, unless the file could not have
+   held it ("assume_ref" turns that off); a file of SNVs only is given no
+   ABO type, since it cannot show the O deletion. It is not a blood test,
+   and sees no weak or partial D, RHD pseudogene or rare ABO allele. An
+   exome took 0.8 s and a whole genome 6.1 s.
+ - pdb_search searches the RCSB PDB's structures for a sequence, and
+   returns the matching polymer entities best first, each with how well it
+   aligns (E-value, bit score, identity, coverage, gaps and the aligned
+   sequences, under get_best_alignment_hit's names) and what kind of
+   structure it is: method, resolution or a computed model's pLDDT,
+   oligomeric state and symmetry, chains, organism, UniProt, Pfam and
+   InterPro entries, and ligands. It prints a table of them. RCSB aligns
+   with MMseqs2, so the scores are MMseqs2's, not blastp's. It needs the
+   network and HTTPS, so IO::Socket::SSL and Net::SSLeay are recommended,
+   and HTTP::Tiny 0.056 is now required.
+ - The everyday operations on a sequence held as a string: complement,
+   reverse_complement, transcribe and back_transcribe; translate, under
+   any of NCBI's 27 genetic codes by number or name, with "to_stop",
+   "cds", "gap" and "stop_symbol"; translate_six_frames; find_orfs, which
+   finds the frames between stops or from a start codon on both strands;
+   gc_content; kmer_count; assembly_stats, for N50, L50 and the rest;
+   molecular_weight of DNA, RNA or protein; isoelectric_point and
+   protein_charge; subseq; and motif_search, for a motif of IUPAC letters
+   or a pattern on either strand. An ambiguous codon is translated as far
+   as its codons agree (B, Z, J or X otherwise), by Biopython's rules. XS
+   translates and counts k-mers: 10 million bases were translated in 0.09
+   s and their 8-mers counted in 0.5 s. The genetic codes ship as
+   share/genetic_codes.tsv, written by share/make_genetic_codes.pl from
+   NCBI's gc.prt, version 4.6.
+ - fasta_index writes the .fai index that samtools faidx writes, and
+   fasta_region fetches parts of a FASTA by name and range
+   ("chr1:1,000-2,000") without reading the rest of it, using that index
+   when it is there. A range past a sequence's end is cut short, as
+   samtools cuts it.
+ - The tests of those functions take every expected value from another
+   package: the test suites of Biopython 1.87, scikit-bio 0.7.4, BioPerl,
+   htslib 1.25 and assembly-stats 1.0.1, and the output of EMBOSS 6.6.0
+   (getorf, transeq, fuzznuc, wordcount, revseq, extractseq, geecee) and
+   samtools 1.19.2 for the same input. They need none of Alien::Bioinf's
+   programs, so they run wherever the module builds.
+ - plot_msa and plot_phylo take "fh" and "execute", as Matplotlib::Simple's
+   plt does. Each image is drawn by a Python script that stands alone,
+   appended to "fh", a File::Temp, when one is given; "execute => 0"
+   writes the script without running it, so several images, theirs and
+   Matplotlib::Simple's, can be drawn by one run of Python. The script
+   carries the alignment or tree it draws, so it still runs after perl's
+   temporary files are gone. Both functions now return "python_file", the
+   script's name, and print "will write" rather than "wrote" for an image
+   not drawn yet.
+ - plot_msa takes "tooltips => 1", which gives each residue of an SVG
+   alignment a tooltip that a browser shows on hovering over it, naming
+   the sequence, the residue and its number, and the alignment column, as
+   "S.cerevisiae: Lys100, alignment column 105".
+ - hash2fasta_file prints "wrote" and the file's name to STDOUT, as
+   plot_msa and clustal_view_residues do, where it used to say nothing. The
+   FASTA files that plot_msa and plot_phylo write for themselves are not
+   announced.
+ - sex_check, parent, relatedness, concordance and hirisplex_genotypes
+   could lose their results, or corrupt the heap and die with
+   "realloc(): invalid next size", when perl's stack had to grow while the
+   VCF was being read, by the perl that reads and decompresses it. Their
+   XS now takes the stack back from perl after reading, where it used to
+   push the results through a pointer into the stack as it was before.
+   Found by review on 2026-10-26.
+ - The tests failed when TMPDIR held a space, as a Windows user name can:
+   35 subtests of t/sex.t, t/parent.t, t/relatedness.t and t/msa.t matched
+   a temporary file's name with \S+. They now pass with a space in it.
+   Found by review on 2026-11-02.
+ - pgs_score died with PLINK 2's "All N variant(s) in --vcf file excluded
+   by --chr" (exit 7) when the VCF had none of the score's chromosomes. It
+   now scores every variant missing, as it does when only the positions are
+   absent. When PLINK 2 does not start at all, the message gives the reason
+   system gave, where it gave "Inappropriate ioctl for device". Found by
+   review on 2026-11-02.
+ - hirisplex_genotypes counted any ALT longer than REF as MC1R's 86insA
+   (rs312262906), so an MNV such as AC to GTT, or a symbolic <INS>, at that
+   position was counted as two copies of it. It now counts only an ALT that
+   is REF with one A put in, however the VCF anchors the indel. And bases
+   are compared regardless of case, where a lower-case REF or ALT matched
+   nothing and left the marker 0 copies. Found by review on 2026-11-02.
+ - trait_predict multiplied in whatever a dosage held, so "NA" was a called
+   genotype of 0 copies and 7 was taken as it was. A dosage of a marker the
+   model uses must now be a number from 0 to 2, fractional ones included,
+   or undef for no genotype; anything else dies naming the sample, the
+   marker and the value. Found by review on 2026-11-02.
+ - plot_msa and plot_phylo died, once clustalo had run, when a title or
+   label began with "-" (such as "-log10"), or a file name did: argparse
+   read it as an option. Every option now reaches msa_plot.py joined to its
+   value, as --t=-log10. Found by review on 2026-11-02.
+ - sex_check read a GT cut short, such as "1/", as the haploid call "1",
+   and counted it as haploid hom-ALT on X. It is now missing. Found by
+   review on 2026-11-02.
+ - get_best_alignment_hit and msa_quality_table died with JSON::MaybeXS's
+   message or with perl's "Not a HASH reference", naming no function, for a
+   file that was not JSON or not a BLAST report; get_best_alignment_hit
+   returned no queries for {}, and named a query that had no title "" with
+   an "uninitialized" warning. Each now dies naming the function and what
+   is wrong, and a query with no title is named by its query_id. Found by
+   review on 2026-11-02.
+ - pdb_search died of "Illegal division by zero" for a hit RCSB gave an
+   alignment or query length of 0, and with perl's own messages for an
+   answer that was JSON but not a search result. Such a hit's pident or
+   query_cover is now undef, and shown as "-" in the report; such an answer
+   dies naming pdb_search. Found by review on 2026-11-02.
+ - plot_msa, plot_phylo and msa_quality_table passed a sequence that was
+   undef, a reference or empty on to clustalo or blastp, which failed with
+   messages that named none of them. Each is now refused first, naming the
+   function and the sequence. Found by review on 2026-11-02.
+ - fasta2hash read a file ending in .GZ, or any case but .gz, as plain
+   text. Its warning of a repeated defline printed the whitespace dropped
+   from the defline's end, the CR of a CRLF file included. Found by review
+   on 2026-11-02.
+ - clustal_view_residues left |, < and > in a name as they were, which
+   LaTeX's default fonts print as an em dash and an inverted ! and ?, and
+   did not escape the residues at all. A residue number in the last columns
+   of a block was left off the track row, with every number after it in
+   that block; it now ends at the block's end. A tracked protein that
+   "order" leaves out was counted as having a track row, so a table held
+   fewer blocks than "split" said. Found by review on 2026-11-02.
+ - parent and relatedness warned that two people's VCFs were "probably not
+   sequenced over the same regions" whenever one had over twice as many
+   sites alone as the other, however few: two VCFs of 3,000 sites that
+   differed by 3 sites against 1 were told that their IBS0 and kinship were
+   not to be trusted. The difference must now also be 50 sites or more,
+   which chance does not give, and 0.9% or more of the sites compared, below
+   which it cannot change the answer. Found by review on 2026-11-10.
+ - An error raised while a FASTA file or a VCF was being read or written
+   gave the line of Cn/Bioinf.pm that it was raised from. It now gives the
+   caller's line, as every other error does. Found by review on 2026-11-10.
+ - pgs_score's message for a failure of PLINK 2 ended with a second
+   "at ... line", and with PLINK 2's "End time:". It now ends with PLINK
+   2's error and the caller's line, once. Found by review on 2026-11-10.
+ - plot_msa(filename => []) wrote an image named "ARRAY(0x5ea732db32c8)".
+   A file name given to plot_msa, plot_phylo, msa_quality_table or
+   clustal_view_residues that is a reference or empty now dies, naming the
+   function and the option; so does a "threads" that is not a whole number,
+   1 or more, which used to reach clustalo and fail there under "_run".
+   Found by review on 2026-11-10.
+ - sex_check and hirisplex_genotypes warned "Use of uninitialized value"
+   when their first argument was undef, and every function that takes
+   name => value pairs did when a name was undef, before dying of something
+   else. The undef name is now what they die of, with no warning. Found by
+   review on 2026-11-10.
+ - get_best_alignment_hit died with perl's "Not an ARRAY reference" for a
+   report whose "hits" was not an array, and msa_quality_table with "Can't
+   use string as a HASH ref" for one that was not an object, neither naming
+   a function; each now dies naming itself and the part that is wrong.
+   get_best_alignment_hit warned "uninitialized" for an hsp with no
+   bit_score, which now ties, and for a hit with no description, whose
+   title, id and accession are undef and whose "descriptions" is now an
+   empty array, where it held one empty hash. Found by review on
+   2026-11-10.
+ - msa_quality_table drew a name in "order" that the BLAST report does not
+   hold, a misspelt one say, as a row and a column of grey cells. It now
+   dies naming it. A "cb_min", "cb_max", "logscale_add", "default_undefined"
+   or "normalize" that is not a number dies too, where it warned "isn't
+   numeric" and was drawn as 0. Found by review on 2026-11-10.
+ - hirisplex_genotypes, matching by rs number, looked only at the first
+   name of an ID that held several, so "foo;rs12913832" matched nothing. It
+   now matches when any of the names is a marker's. Found by review on
+   2026-11-10.
+ - fasta2hash read a file whose lines end in CR alone (classic Mac OS) as
+   one record, named by the whole file and with no sequence. It now dies,
+   saying so. It ran gzip on a .gz file without "--", so a name that
+   started with "-" was read as gzip's options. Its documentation said that
+   with a key a repeat of that key is looked for; only one that follows
+   the record directly is, since reading stops there, and the
+   documentation now says so. Found by review on 2026-11-10.
+ - hash2fasta_file wrote a sequence that was a reference as
+   "ARRAY(0x...)", a key holding a line feed as a defline and a line of
+   sequence, and an empty key as a defline with no name. Each now dies; an
+   object that overloads its own text is still written as that text. Found
+   by review on 2026-11-10.
+ - sex_check, parent, relatedness, concordance and hirisplex_genotypes read
+   a #CHROM line that ended in a tab as naming one more sample, called "".
+   An empty sample name now dies, giving its column. Found by review on
+   2026-11-10.

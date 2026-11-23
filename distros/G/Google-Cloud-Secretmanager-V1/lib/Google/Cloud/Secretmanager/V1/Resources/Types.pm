@@ -22,6 +22,9 @@ coerce 'RepeatedSecret',
 declare 'MapStringSecret',
     as HashRef[Secret()];
 
+declare 'State',
+    as (Int | Str);
+
 declare 'SecretType',
     as (Int | Str);
 
@@ -315,6 +318,21 @@ coerce 'RepeatedSecretPayload',
 
 declare 'MapStringSecretPayload',
     as HashRef[SecretPayload()];
+
+declare 'CloudSqlSingleUserCredentials',
+    as InstanceOf['Google::Cloud::Secretmanager::V1::Resources::CloudSqlSingleUserCredentials'];
+
+coerce 'CloudSqlSingleUserCredentials',
+    from HashRef, via { 'Google::Cloud::Secretmanager::V1::Resources::CloudSqlSingleUserCredentials'->new($_) };
+
+declare 'RepeatedCloudSqlSingleUserCredentials',
+    as ArrayRef[CloudSqlSingleUserCredentials()];
+
+coerce 'RepeatedCloudSqlSingleUserCredentials',
+    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Secretmanager::V1::Resources::CloudSqlSingleUserCredentials'->new($_) } @$_ ] };
+
+declare 'MapStringCloudSqlSingleUserCredentials',
+    as HashRef[CloudSqlSingleUserCredentials()];
 
 1;
 

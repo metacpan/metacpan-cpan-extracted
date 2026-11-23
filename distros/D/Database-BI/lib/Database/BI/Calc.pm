@@ -10,7 +10,7 @@ use Readonly;
 use Database::BI::Util ();
 use Scalar::Util	qw(looks_like_number);
 
-our $VERSION = '0.023.1';
+our $VERSION = '0.024.0';
 
 Readonly my $MAX_EXPR_LEN => 512;
 Readonly my $MAX_DEPTH    => 20;
@@ -118,7 +118,9 @@ my %FUNCTIONS = (
 	trim     => sub {
 		return undef unless defined $_[0];
 		my $s = $_[0];
-		$s =~ s/\A\s+|\s+\z//g;
+		# s/\A\s+|\s+\z//g is quadratic on a long run of inner spaces; two anchored substitutions are not.
+		$s =~ s/\A\s+//;
+		$s =~ s/\s+\z//;
 		$s;
 	},
 	len      => sub { defined $_[0] ? length($_[0])  : undef },
@@ -209,7 +211,7 @@ my %FUNCTIONS = (
 	},
 	now => sub {
 		# Returns today's date as 'YYYY-MM-DD'.  Takes no arguments.
-		my @t = (localtime)[3, 4, 5];	# mday, mon (0-based), year (since 1900)
+		my @t = (localtime(Database::BI::Util::frame_epoch(time)))[3, 4, 5];	# mday, mon (0-based), year (since 1900)
 		sprintf '%04d-%02d-%02d', $t[2] + 1900, $t[1] + 1, $t[0];
 	},
 
@@ -401,7 +403,8 @@ sub _epoch_of {
 # Purpose: Read one cell as a point in time.  Three shapes are recognised, in
 #          this order: an ISO date, or an ISO timestamp with 'T' or a space
 #          between the date and the time (a fraction of a second and a zone
-#          are accepted and not applied: Database::BI::Util::iso_datetime);
+#          are moved to the configured time_zone, and set aside without one:
+#          Database::BI::Util::iso_datetime);
 #          ten digits, an epoch in seconds; and
 #          thirteen digits, an epoch in milliseconds.  Only the digit count
 #          separates the last two, so it is the rule -- and it is documented,
@@ -409,7 +412,8 @@ sub _epoch_of {
 sub _parse_time {
 	my ($value) = @_;
 	return undef unless defined $value && !ref $value && length $value;
-	(my $s = $value) =~ s/\A\s+|\s+\z//g;
+	(my $s = $value) =~ s/\A\s+//;
+	$s =~ s/\s+\z//;
 	return undef unless length $s;
 
 	my ($ymd, $h, $mi, $sec) = Database::BI::Util::iso_datetime($s);
@@ -421,8 +425,9 @@ sub _parse_time {
 		return { epoch => $epoch, has_time => defined $h ? 1 : 0 };
 	}
 
-	return { epoch => $s + 0, has_time => 1 }       if $s =~ /\A\d{10}\z/;
-	return { epoch => int($s / 1_000), has_time => 1 } if $s =~ /\A\d{13}\z/;
+	# An epoch is one moment; the buckets read it on the configured zone's clock.
+	return { epoch => Database::BI::Util::frame_epoch($s + 0), has_time => 1 } if $s =~ /\A\d{10}\z/;
+	return { epoch => Database::BI::Util::frame_epoch(int($s / 1_000)), has_time => 1 } if $s =~ /\A\d{13}\z/;
 	return undef;
 }
 
@@ -1257,7 +1262,7 @@ Database::BI::Calc - Safe recursive-descent expression evaluator for Database::B
 
 =head1 VERSION
 
-0.023.1
+0.024.0
 
 =head1 SYNOPSIS
 

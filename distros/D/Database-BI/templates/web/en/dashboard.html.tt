@@ -244,6 +244,7 @@
 [%- range_hidden -%]
 [%- cross_row_params -%]
 [%- IF dedup -%]<input type="hidden" name="d" value="1">[%- END -%]
+[%- IF view_srccol.length -%]<input type="hidden" name="srccol" value="[% view_srccol | html %]">[%- END -%]
 [%- FOREACH lkp IN view_lookups -%]<input type="hidden" name="[% lkp.name | html %]" value="[% lkp.value | html %]">[%- END -%]
 [%- END -%]
 
@@ -338,10 +339,11 @@
   </label>
   <button class="btn-add-db" id="btn-add-db" type="button" title="Combine this table with another data file, or narrow down the rows you see by applying conditions">&#x2295; Merge / Filter&hellip;</button>
   <button class="btn-combine" id="btn-combine" type="button" title="Stack rows from another data file beneath these rows, using a unified set of columns and leaving blanks where a column does not exist in a given file">&#x229E; Combine data&hellip;</button>
+  <button class="btn-combine btn-delta" id="btn-delta" type="button" title="Keep only the rows where two columns are not identical, and remove all the other rows">&delta; Delta&hellip;</button>
 </div>
 
 [%- IF left_spec -%]
-<div class="dash-add-filter" id="dash-add-filter" data-spec="[% left_spec | html %]" data-range-qs="[% FOREACH jspec IN current_joins %]&amp;j=[% jspec | uri | html %][% END %][% IF current_joins.size && view_join_type.length %]&amp;jtype=[% view_join_type | uri | html %][% END %][% FOREACH cspec IN combine_specs %]&amp;c=[% cspec | uri | html %][% END %]">
+<div class="dash-add-filter" id="dash-add-filter" data-spec="[% left_spec | html %]" data-range-qs="[% FOREACH jspec IN current_joins %]&amp;j=[% jspec | uri | html %][% END %][% IF current_joins.size && view_join_type.length %]&amp;jtype=[% view_join_type | uri | html %][% END %][% FOREACH cspec IN combine_specs %]&amp;c=[% cspec | uri | html %][% END %][% IF view_srccol.length %]&amp;srccol=[% view_srccol | uri | html %][% END %]">
   <select id="dash-f-col" aria-label="Column to filter">
     <option value="">&#x2014; filter column &#x2014;</option>
     [%- FOREACH col IN columns -%]
@@ -454,6 +456,7 @@
     [%- FOREACH fs IN filter_specs -%]
     <input type="hidden" name="f" value="[% fs | html %]" class="f-preserved">
     [%- END -%]
+    [%- IF page_size_asked -%]<input type="hidden" name="per_page" value="[% page_size | html %]">[%- END -%]
     [%- range_hidden -%]
     [%- cross_row_params -%]
 
@@ -550,6 +553,7 @@
     [%- FOREACH fs IN filter_specs -%]
     <input type="hidden" name="f" value="[% fs | html %]">
     [%- END -%]
+    [%- IF page_size_asked -%]<input type="hidden" name="per_page" value="[% page_size | html %]">[%- END -%]
     [%- range_hidden -%]
     [%- cross_row_params -%]
 
@@ -598,6 +602,40 @@
       <button type="submit" id="btn-do-combine" class="btn-primary" disabled>Combine</button>
     </div>
   </form>
+</div>
+
+<div class="combine-panel" id="delta-panel" hidden>
+  <h3 class="combine-panel-title">Delta</h3>
+
+  <p class="combine-desc-static">Choose two columns. Every row where the two columns are identical is removed, so only the rows where they differ are left.</p>
+
+  <div class="join-fields delta-fields">
+    <div class="join-field">
+      <label for="delta-a-sel">First column</label>
+      <select id="delta-a-sel">
+        <option value="">&#x2014; select column &#x2014;</option>
+        [%- FOREACH col IN columns -%]
+        [%- NEXT IF col.match(':') -%]
+        <option value="[% col | html %]">[% col | html %]</option>
+        [%- END -%]
+      </select>
+    </div>
+    <div class="join-field">
+      <label for="delta-b-sel">Second column</label>
+      <select id="delta-b-sel">
+        <option value="">&#x2014; select column &#x2014;</option>
+        [%- FOREACH col IN columns -%]
+        [%- NEXT IF col.match(':') -%]
+        <option value="[% col | html %]">[% col | html %]</option>
+        [%- END -%]
+      </select>
+    </div>
+  </div>
+
+  <div class="join-actions">
+    <button type="button" id="btn-cancel-delta" class="btn-secondary">Cancel</button>
+    <button type="button" id="btn-do-delta" class="btn-primary" disabled>Apply</button>
+  </div>
 </div>
 
 <div class="graph-panel" id="graph-panel" hidden>
@@ -1932,11 +1970,11 @@ dragging it moves it.</p>
 var BI_PANELS = ['ask-panel', 'join-panel', 'combine-panel', 'export-panel',
   'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel',
   'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel',
-  'cross-row-panel', 'wordcloud-panel', 'folder-panel', 'pivot-panel',
+  'delta-panel', 'cross-row-panel', 'wordcloud-panel', 'folder-panel', 'pivot-panel',
   'calc-panel', 'groups-panel', 'dates-panel', 'lookups-panel',
   'extract-panel', 'save-analysis-panel', 'map-panel'];
 var BI_PANEL_OPENERS = { 'join-panel': 'btn-add-db', 'combine-panel': 'btn-combine',
-  'export-panel': 'btn-export-open' };
+  'delta-panel': 'btn-delta', 'export-panel': 'btn-export-open' };
 function biClosePanels(keep) {
   BI_PANELS.forEach(function (id) {
     var p = document.getElementById(id);
@@ -2030,6 +2068,7 @@ function biViewParams() {
   urlP.getAll('c').forEach(function (v) { params.append('c', v); });
   urlP.getAll('f').forEach(function (v) { params.append('f', v); });
   if (urlP.get('d')) params.set('d', '1');
+  if (urlP.get('srccol')) params.set('srccol', urlP.get('srccol'));
   // A relative range travels as itself, so the rows are the ones this view is
   // showing rather than the ones a frozen date pair would match.
   if (urlP.get('range')) params.set('range', urlP.get('range'));
@@ -2716,6 +2755,8 @@ function biDetectColType(colName) {
       // "is one of" is never offered, but a link (a map's unplotted rows)
       // can bring one; keep it, or reopening the panel would turn it into eq.
       if (keepOp === 'in') ops = ops.concat([['in', 'is one of']]);
+      // Likewise the Delta button's "differs from", whose value is a column.
+      if (keepOp === 'differ') ops = ops.concat([['differ', 'differs from']]);
       ops.forEach(function (pair) {
         var opt = document.createElement('option');
         opt.value = pair[0]; opt.textContent = pair[1];
@@ -3512,6 +3553,65 @@ function biDetectColType(colName) {
     combineSpec         = '';
     checkApply();
     clearDropHooks();
+  });
+}());
+</script>
+
+<script nonce="[% csp_nonce | html %]">
+// ---------------------------------------------------------------------------
+// Delta panel -- keep only the rows where two columns differ.  It adds
+// one filter, f=<first>:differ:<second>, to this view's own link, so the table,
+// charts, export and print all see the same rows.
+// ---------------------------------------------------------------------------
+(function () {
+  var btnOpen = document.getElementById('btn-delta');
+  var panel   = document.getElementById('delta-panel');
+  if (!btnOpen || !panel) return;
+
+  var btnCancel = document.getElementById('btn-cancel-delta');
+  var btnDo     = document.getElementById('btn-do-delta');
+  var selA      = document.getElementById('delta-a-sel');
+  var selB      = document.getElementById('delta-b-sel');
+
+  // Two different columns are needed: a column never differs from itself.
+  function check() {
+    btnDo.disabled = !(selA.value && selB.value && selA.value !== selB.value);
+  }
+  selA.addEventListener('change', check);
+  selB.addEventListener('change', check);
+
+  // Both menus get one width: that of the longest column name.  A select
+  // with width auto is as wide as its longest option, so it is measured once
+  // the panel is showing, and the wider of the two is given to both.
+  function sameWidth() {
+    selA.style.width = selB.style.width = 'auto';
+    var w = Math.max(selA.offsetWidth, selB.offsetWidth);
+    selA.style.width = selB.style.width = w + 'px';
+  }
+
+  btnOpen.addEventListener('click', function () {
+    biClosePanels(panel);
+    panel.hidden    = false;
+    btnOpen.disabled = true;
+    sameWidth();
+    check();
+  });
+
+  btnCancel.addEventListener('click', function () {
+    panel.hidden     = true;
+    btnOpen.disabled = false;
+    selA.value = '';
+    selB.value = '';
+    check();
+  });
+
+  btnDo.addEventListener('click', function () {
+    if (btnDo.disabled) return;
+    var u = new URL(location.href);
+    u.searchParams.append('f', selA.value + ':differ:' + selB.value);
+    // The rows change, so the old page number may not exist any more.
+    u.searchParams.delete('page');
+    location.href = u.toString();
   });
 }());
 </script>
@@ -6249,6 +6349,10 @@ function biModelPost(url, body, errEl, done) {
     var params = biViewParams();
     params.set('dir',      dir);
     params.set('filename', filename);
+    // Only the columns the table still shows, in its order: a column the
+    // reader deleted in the page is not exported.
+    var tstate = window.biTableState ? window.biTableState() : null;
+    if (tstate) tstate.columns.forEach(function (c) { params.append('xcol', c); });
 
     fetch('/export', {
       method: 'POST',

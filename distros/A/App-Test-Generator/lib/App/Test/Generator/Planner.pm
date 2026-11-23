@@ -11,7 +11,7 @@ use App::Test::Generator::Planner::Fixture;
 use App::Test::Generator::Planner::Mock;
 use App::Test::Generator::Planner::Grouping;
 
-our $VERSION = '0.51';
+our $VERSION = '0.52';
 
 # Accessor type strings used in plan_all() strategy mapping
 Readonly my $ACCESSOR_GET      => 'get';
@@ -23,7 +23,7 @@ Readonly my $OUTPUT_BOOLEAN => 'boolean';
 
 =head1 VERSION
 
-Version 0.51
+Version 0.52
 
 =head2 new
 

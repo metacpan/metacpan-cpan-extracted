@@ -57,11 +57,11 @@
    "provides" : {
       "Astro::SIMBAD::Client" : {
          "file" : "lib/Astro/SIMBAD/Client.pm",
-         "version" : "0.050"
+         "version" : "0.051"
       },
       "Astro::SIMBAD::Client::WSQueryInterfaceService" : {
          "file" : "lib/Astro/SIMBAD/Client/WSQueryInterfaceService.pm",
-         "version" : "0.050"
+         "version" : "0.051"
       }
    },
    "release_status" : "stable",
@@ -79,6 +79,6 @@
          "web" : "https://github.com/trwyant/perl-Astro-SIMBAD-Client"
       }
    },
-   "version" : "0.050",
+   "version" : "0.051",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

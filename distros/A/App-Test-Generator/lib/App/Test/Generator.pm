@@ -56,7 +56,7 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw(generate);
 
-our $VERSION = '0.51';
+our $VERSION = '0.52';
 
 Readonly my $DEFAULT_ITERATIONS      => 30;
 Readonly my $DEFAULT_PROPERTY_TRIALS => 1000;
@@ -180,7 +180,7 @@ App::Test::Generator - Fuzz Testing, Mutation Testing, LCSAJ Metrics and Test Da
 
 =head1 VERSION
 
-Version 0.51
+Version 0.52
 
 =head1 SYNOPSIS
 
@@ -592,6 +592,40 @@ For routines with more than one named parameter, use the C<position> keyword.
   output:
     type: number
 
+A routine can take positional arguments followed by named options, as
+C<< sub publish { my ($message, %opts) = @_ } >> does.  Give the leading
+arguments their positions and mark every trailing option C<named: 1>:
+
+  input:
+    message:
+      type: string
+      position: 0
+    priority:
+      type: integer
+      optional: 1
+      named: 1
+
+  # publish($message, priority => $priority)
+
+A parameter in a schema that declares positions must say which it is: a
+missing position on a parameter without C<named: 1> is an error, not a
+second call shape.
+
+A numeric parameter can document a range whose top end this harness cannot
+afford to reach: a count of hashing rounds costs time in proportion to the
+value, so one call at the documented maximum can take minutes.  C<sample_max>
+limits the valid data that is generated while C<max> stays the documented
+bound, so a value above C<max> is still probed (and refused cheaply):
+
+  input:
+    rounds:
+      type: integer
+      named: 1
+      optional: 1
+      min: 10_000
+      max: 100_000_000
+      sample_max: 200_000
+
 The keyword C<undef> is used to indicate that the C<function> takes no arguments.
 
 =head3 C<%output> - output param types for L<Return::Set> checking
@@ -879,6 +913,15 @@ To ensure C<new()> is called with no arguments, you still need to define new, th
 
   new:
 
+=head3 C<$invocant>
+
+The word C<class> when the routine is a class method: the harness calls
+C<Module-E<gt>routine(...)> instead of C<Module::routine(...)>.  With C<new>
+set the routine is called on the object C<new> builds, and without an
+C<invocant> it is called as a plain function.
+
+  invocant: class
+
 =head3 C<%cases>
 
 An optional Perl static corpus, when the output is a simple string (expected => [ args... ]).
@@ -1017,6 +1060,13 @@ other fuzz testing support for C<semantic> entries is being developed.
 =item * C<md5> - MD5 hashes (32 hex chars)
 
 =item * C<sha256> - SHA-256 hashes (64 hex chars)
+
+=item * C<bytes> - Byte strings (arbitrary octets, not text)
+
+The property test draws octets rather than characters.  A byte string holds
+data, not a document, so no text-oriented case applies to it;
+L<App::Test::Generator::SchemaExtractor> sets this for a parameter that is a
+file's contents (`$bytes`, `blob`, "raw bytes").
 
 =item * C<directory> - The path of an existing, writable directory
 
@@ -1829,7 +1879,7 @@ sub generate
 	my $class = (ref($_[0]) ne 'HASH') ? shift : undef;
 	my ($schema_file, $test_file, $schema);
 	# Globals loaded from the user's conf (all optional except function maybe)
-	my ($module, $function, $new, $yaml_cases);
+	my ($module, $function, $new, $yaml_cases, $invocant);
 	my ($seed, $iterations);
 	my $strict_documented = 0;
 
@@ -1896,6 +1946,7 @@ sub generate
 	if(exists($schema->{new})) {
 		$new = defined($schema->{'new'}) ? $schema->{new} : '_UNDEF';
 	}
+	$invocant = $schema->{invocant} if(exists($schema->{invocant}) && defined($schema->{invocant}));
 	$yaml_cases = $schema->{yaml_cases} if(exists($schema->{yaml_cases}));
 	$seed = $schema->{seed} if(exists($schema->{seed}));
 	$iterations = $schema->{iterations} if(exists($schema->{iterations}));
@@ -2266,7 +2317,9 @@ sub generate
 		# `import` is a class method: `use Module` calls Module->import(...).
 		# Some modules (Database::Abstraction) take the class as their first
 		# argument, so a plain Module::import() with no named arguments dies.
-		if(($function eq 'new') || ($function eq 'import')) {
+		# A documented $class invocant (or new/import) is called on the class
+		# itself; without one the routine is a plain function of the module.
+		if(($function eq 'new') || ($function eq 'import') || (defined($invocant) && ($invocant eq 'class') && !defined($new))) {
 			if($has_positions) {
 				$position_code = "\$result = (scalar(\@alist) == 1) ? ${module}\->$function(\$alist[0]) : (scalar(\@alist) == 0) ? ${module}\->$function() : ${module}\->$function(\@alist);";
 			} else {
@@ -2807,7 +2860,9 @@ sub _validate_element_spec {
 		if(($element->{type} eq 'object') && !defined($element->{isa}) && !defined($element->{can}));
 
 	if(($element->{type} eq 'arrayref') || ($element->{type} eq 'array')) {
-		_validate_element_spec($element->{schema}, $param, 0) if defined($element->{schema});
+		# An array's elements can be hashes with fixed keys, just as a
+		# hashref's values can: a type-less schema maps key names to specs.
+		_validate_element_spec($element->{schema}, $param, 1) if defined($element->{schema});
 	} elsif($element->{type} eq 'hashref') {
 		_validate_element_spec($element->{schema}, $param, 1) if defined($element->{schema});
 	}
@@ -2832,6 +2887,17 @@ sub _validate_input_params {
 
 		my $spec = $schema->{input}{$param};
 
+		# A sampling ceiling is not a second maximum: it must sit inside
+		# the documented range, or generated data would not be valid.
+		if(ref($spec) eq 'HASH' && defined($spec->{sample_max})) {
+			croak("sample_max for parameter '$param' must be a non-negative number")
+				unless !ref($spec->{sample_max}) && ($spec->{sample_max} =~ /\A\d+(?:\.\d+)?\z/);
+			croak("sample_max for parameter '$param' is above max")
+				if defined($spec->{max}) && ($spec->{sample_max} > $spec->{max});
+			croak("sample_max for parameter '$param' is below min")
+				if defined($spec->{min}) && ($spec->{sample_max} < $spec->{min});
+		}
+
 		# Validate the type field — required for all parameters
 		if(ref($spec)) {
 			croak("Missing type for parameter '$param'")
@@ -2844,7 +2910,7 @@ sub _validate_input_params {
 				unless _valid_type($spec->{type});
 
 			if(($spec->{type} eq 'arrayref') || ($spec->{type} eq 'array')) {
-				_validate_element_spec($spec->{schema}, $param, 0) if defined($spec->{schema});
+				_validate_element_spec($spec->{schema}, $param, 1) if defined($spec->{schema});
 			} elsif($spec->{type} eq 'hashref') {
 				_validate_element_spec($spec->{schema}, $param, 1) if defined($spec->{schema});
 			}
@@ -2896,14 +2962,17 @@ sub _validate_input_positions {
 		$positions{$pos} = $param;
 	}
 
-	# If any param has a position, all params must have one
+	# If any param has a position, the rest are named options passed after
+	# the positional arguments (sub f { my ($x, %opts) = @_ }), and each must
+	# say so: an omission is otherwise a forgotten position, which would be
+	# called by name and test nothing.
 	if($has_positions) {
 		for my $param (keys %{$schema->{input}}) {
 			my $spec = $schema->{input}{$param};
-			unless(ref($spec) eq 'HASH' && defined($spec->{position})) {
-				croak "Parameter '$param' missing position " .
-					'(all params must have positions if any do)';
-			}
+			next if(ref($spec) eq 'HASH' && defined($spec->{position}));
+			croak "Parameter '$param' missing position " .
+				'(give it one, or named: 1 for a trailing named option)'
+				unless(ref($spec) eq 'HASH' && $spec->{named});
 		}
 
 		# Check for gaps — positions must be a contiguous sequence
@@ -3524,6 +3593,55 @@ The mathematical description is in L</FORMAL SPECIFICATION>.
 
 =cut
 
+# --------------------------------------------------
+# _render_arg_value
+#
+# Purpose:    Render one constructor argument.  A marked path is replaced by a
+#             temporary file or directory the generated test makes at run time,
+#             so a constructor documented to take a directory can be called as
+#             its POD says instead of being left unbuilt.
+#
+# Entry:      $value - the schema value for the argument.
+#
+# Exit:       Perl source for the argument.
+# --------------------------------------------------
+sub _render_arg_value
+{
+	my ($value) = @_;
+
+	if(ref($value) eq 'HASH' && ($value->{'_path'} // '') =~ /^(?:file|directory)$/) {
+		return '(do { require File::Temp; File::Temp::tempdir(CLEANUP => 1) })'
+			if $value->{'_path'} eq 'directory';
+		return '(do { require File::Temp; my ($_fh, $_path) = File::Temp::tempfile(UNLINK => 1); close $_fh; $_path })';
+	}
+
+	# Render element by element: an element may be an object stand-in, which
+	# perl_quote() would emit as the marker hashref rather than build.
+	if(ref($value) eq 'ARRAY') {
+		return '[ ' . join(', ', map { _render_arg_value($_) } @{$value}) . ' ]';
+	}
+
+	if(ref($value) eq 'HASH' && ref($value->{'_stub'}) eq 'HASH') {
+		return '_build_stub_object(' . _render_stub_spec($value->{'_stub'}) . ')';
+	}
+
+	return perl_quote($value);
+}
+
+# A stub description as Perl source, keys sorted so the generated file is
+# deterministic.  Values are scalars, arrayrefs or hashrefs of them.
+sub _render_stub_spec
+{
+	my ($spec) = @_;
+
+	my @methods = map {
+		perl_quote($_) . ' => ' . perl_quote($spec->{methods}{$_})
+	} sort keys %{ $spec->{methods} // {} };
+
+	return '{ isa => ' . perl_quote($spec->{isa})
+		. ', methods => { ' . join(', ', @methods) . ' } }';
+}
+
 sub render_args_hash {
 	my $href = $_[0];
 
@@ -3533,7 +3651,7 @@ sub render_args_hash {
 	# Sort keys for deterministic output across runs — important for
 	# generated test files that are committed to version control
 	my @pairs = map {
-		perl_quote($_) . ' => ' . perl_quote($href->{$_})
+		perl_quote($_) . ' => ' . _render_arg_value($href->{$_})
 	} sort keys %{$href};
 
 	return join(', ', @pairs);
@@ -4006,12 +4124,14 @@ sub _generate_transform_properties {
 		my @args;
 		if(_has_positions($input_spec)) {
 			# Sort fields by declared position so the generated
-			# call passes arguments in the correct order
+			# call passes arguments in the correct order, then pass
+			# the named options as name/value pairs after them
 			my @sorted = sort {
 				$input_spec->{$a}{position} <=>
 				$input_spec->{$b}{position}
-			} keys %{$input_spec};
-			@args = map { "\$$_" } @sorted;
+			} grep { defined $input_spec->{$_}{position} } keys %{$input_spec};
+			my @named = grep { !defined $input_spec->{$_}{position} } @var_names;
+			@args = (map { "\$$_" } @sorted, map { "'$_' => \$$_" } @named);
 		} else {
 			# No positions — use alphabetical order from @var_names
 			@args = map { "\$$_" } @var_names;
@@ -4256,6 +4376,14 @@ sub _get_semantic_generators {
 				}
 			},
 			description => 'SHA-256 hashes (64 hex characters)',
+		}, bytes => {
+			code => q{
+				Gen {
+					my $len = 1 + int(rand(32));
+					join('', map { pack('C', int(rand(256))) } 1..$len);
+				}
+			},
+			description => 'Byte strings (arbitrary octets, not text)',
 		}, directory => {
 			code => q{
 				Gen {
@@ -5106,8 +5234,10 @@ sub _process_custom_properties {
 			my @var_names = sort keys %{$input_spec};
 			my @args;
 			if(_has_positions($input_spec)) {
-				my @sorted = sort { $input_spec->{$a}{'position'} <=> $input_spec->{$b}{'position'} } @var_names;
-				@args = map { "\$$_" } @sorted;
+				my @sorted = sort { $input_spec->{$a}{'position'} <=> $input_spec->{$b}{'position'} }
+					grep { defined $input_spec->{$_}{'position'} } @var_names;
+				my @named = grep { !defined $input_spec->{$_}{'position'} } @var_names;
+				@args = (map { "\$$_" } @sorted, map { "'$_' => \$$_" } @named);
 			} else {
 				@args = map { "\$$_" } @var_names;
 			}

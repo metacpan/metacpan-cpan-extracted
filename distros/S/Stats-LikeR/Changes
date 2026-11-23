@@ -1,5 +1,363 @@
 Revision history for Stats-LikeR
 
+0.3428 2026-11-22 CST (Claude Opus 5.5 helped)
+
+ [Behavior change: rank() of strings]
+
+ - rank() read every value with SvNV(), so rank("b", "a", "b") returned
+   2, 2, 2 (each string was 0) with only "isn't numeric" warnings, "0x10"
+   ranked as 0, and rank("abc", 5, 1) gave 1, 3, 2. It now follows R: when
+   every non-missing value looks like a number (looks_like_number, so
+   "1e1", " 3 " and "Inf" do) the ranking is numeric as before; when one
+   does not, all the values are ranked as strings, so rank("b", "a", "b")
+   is 2.5, 1, 2.5 and rank("abc", 5, 1) is 3, 2, 1, as R's
+   rank(c("abc", 5, 1)). Every ties_method and na_last mode works in both
+   ways. Strings are compared by codepoint, never by locale; R uses the
+   locale's collation, so non-ASCII text may order differently.
+ - A reference that is not an object overloading its numeric value (a
+   hashref, a nested arrayref, a coderef) is now an error, as ranking a
+   list is in R (reg-tests-1a.R:3266). It used to be ranked by address.
+ - NaN stays NA in both modes.
+
+ [Behavior change: numeric options that are not numbers]
+
+ - t_test(x, mu => "abc") warned and ran as mu = 0; conf_level => "abc"
+   ran as a level of 0. R stops. A numeric option or positional argument
+   that is not a number now croaks "<name> is not a number" in t_test,
+   wilcox_test (mu, conf_level, digits_rank, tol_root, edgeworth),
+   var_test (ratio, conf_level), cor_test, prop_test, fisher_test,
+   cmh_test, roc, survfit, epi_2x2, glm, zerotrunc, hurdle, svyglm, ivreg,
+   lmer and coxph (conf_level, theta, epsilon, eps, maxit), binom_test (p,
+   conf_level), density (adjust, n, cut, ext, from, to), bw_sj and bw_ucv
+   (lower, upper, tol), power_t_test (n, delta, power, sd, sig_level,
+   tol), bedroc and auroc (alpha, cutoff, fraction, active_frac),
+   logrank_test (rho), prcomp (tol, rank), write_table (xlsx_freeze_rows,
+   xlsx_freeze_cols), pnorm, dnorm, qnorm, pt, qt, pchisq, qchisq, pf, qf,
+   pbinom (x, every parameter, mean, sd), ptukey and qtukey (every
+   argument, nranges), seq (from, to, by), and, in Perl, age_standardize
+   (conf_level, per) and table_one (digits, pct_digits). pt(1.5, dff =>
+   5), whose misspelled name used to be read as df = 0, now croaks too.
+   Numeric strings with surrounding space, "Inf", "NaN" and objects
+   overloading their numeric value are still numbers, and an undef x is
+   still NaN.
+ - Not changed: scale's center and scale (which take words as well as
+   numbers), and data vectors, where a string that is not a number is a
+   missing value by design.
+
+ [Behavior change: formula parser]
+
+ - lm() now takes offset() terms, as R's lm does. It fits the response less
+   the offset; fitted_values include the offset, residuals are the response
+   less the fitted values, and r_squared and the F statistic are
+   summary.lm()'s, which take the offset out of the fitted values first.
+   The expressions come back in offset_terms, and predict() adds them, as
+   R's predict.lm() and predict.glm() do. Through 0.3427 lm(y ~ x +
+   offset(z)) croaked "cannot evaluate term".
+ - offset() is read wherever a term may stand, as terms() does, not only at
+   the start or after a `+`. It is a variable of the formula's algebra: a
+   term that holds it is dropped (`cnt ~ x + offset(z)*a` is x and a), and
+   `cnt ~ x - offset(z)` still has the offset. Each distinct offset() counts
+   once, where `offset(z) + offset(z)` used to add it twice. An offset
+   expression with a bare operator (`offset(u/2)`, `offset(-z)`,
+   `offset(u+z)`, `offset(u-z)`) is evaluated as arithmetic; it used to be
+   looked up as a column of that name, and every row dropped. glm(), anova(),
+   aov(), zerotrunc(), hurdle(), svyglm() and coxph() read it the same way.
+ - `.` leaves out every variable the response mentions, as R's CheckRHS()
+   does: `log(y) ~ .` omits y, `I(y + x) ~ .` omits y and x, and
+   `log(y) ~ . - x` leaves the rest. It used to omit only a column equal to
+   the whole response text, so `log(y) ~ .` regressed log(y) on y.
+ - The intercept markers act in order and the last wins, as in R: `y ~ x - 1
+   + 1`, `y ~ 0 + x + 1` and `y ~ x + 0 + 1` now have an intercept, where the
+   later `+ 1` used to be dropped silently.
+
+ [Behavior change: a one-level factor is an error]
+
+ - A categorical column with a single level in the model now stops the fit
+   with R's message, "contrasts can be applied only to factors with 2 or
+   more levels" (R 4.6.1 gives it for `y ~ one`, `y ~ one - 1` and
+   `y ~ a:one` alike). lm(), glm(), aov(), anova() and the model-frame
+   fitters used to drop the column silently and fit the model without the
+   variable. aov()'s stacked form, whose one group is the caller's own
+   factor, still fits it.
+ - A factor's levels are now those of the rows the fit keeps, as in R's
+   model.frame(drop.unused.levels = TRUE). A level that occurs only in
+   rows dropped for a missing value in any variable of the model -- the
+   response, an offset() term, offset => or weights => included -- used to
+   stay a level, with a column of zeros whose coefficient came back NaN
+   and an entry in xlevels. `lm('y~a+x')` with a level p held only by a
+   row with an undef x now gives the Intercept, ar and x that R gives,
+   and xlevels q r. Covers lm, glm, aov, anova, svyglm, ivreg, lmer,
+   zerotrunc, hurdle, coxph and vif. Left open: with two formulas over
+   the same rows (hurdle, ivreg, lmer's random parts) a row dropped only
+   by the other formula's variables still counts.
+
+ [Behavior change: read_table() of a damaged .xlsx]
+
+ - A file that is not a zip archive, an archive cut short, and a member
+   that is damaged now die with a message naming the file, as pandas
+   raises zipfile.BadZipFile. A text file named junk.xlsx used to read as
+   [], a truncated archive as no rows, and 8 corrupted bytes in deflate
+   data as 1642 of 2000 rows, silently. The fallback reader no longer
+   takes a non-archive for a member (Transparent => 0) and no longer
+   reads a failed read as end of file.
+ - The CRC-32 of every member is checked, as Python's zipfile checks it.
+   It costs 3.7% of a read of a real 7.8 MB workbook (0.0132 s of 0.359 s)
+   and 6.9% of a 197 MB worksheet of inline strings (0.0725 s of 1.05 s),
+   using the writer's slice-by-8 CRC, which is faster than
+   Compress::Raw::Zlib's.
+ - A member whose size the central directory gives wrongly is an error
+   instead of being inflated a second time by the fallback: a 537 MB
+   member took 2.2 s and 1.07 GB, and now dies after 0.36 s.
+ - Chart sheets, dialog sheets and macro sheets are no longer read as
+   empty tables and counted as sheets, so a workbook of one worksheet and
+   one chart sheet reads as that table, not a hash. A workbook with none
+   but those dies.
+ - Two sheets of one name die instead of the later replacing the earlier.
+
+ [Behavior change: write_table()]
+
+ - A write that dies partway no longer destroys an existing file or leaves
+   a partial one. Output goes to a temporary file in the same directory,
+   renamed over the name when the table is complete and removed on any
+   croak, a tied FETCH's included, for .xlsx, delimited (compressed too)
+   and LaTeX. The permission bits of a replaced file are kept; a hard
+   link to it no longer shares the new contents. A name that is not a
+   regular file (pipe, FIFO, /dev/null, a symlink) is written in place as
+   before, and so is a file in a directory that cannot be written to. A
+   compressed or LaTeX write that croaked used to leave a truncated file;
+   it leaves nothing now.
+ - An .xlsx wider than 16384 columns is refused before the file is opened
+   when the shape fixes the width (a hash of arrays, col_names).
+ - The LaTeX writer now applies the rule the other formats follow: valid
+   UTF-8 as it stands, else read as Latin-1 and encoded. Headers, row
+   names, cells and undef_val were written as the single byte E9 for
+   "caf\xe9" beside C3 A9 for the same text flagged. tex_comment and
+   tex_longtable_head are unchanged.
+
+ [Behavior change: power_t_test()]
+
+ - n below 2 is accepted, as R accepts it: power.t.test() takes the degrees
+   of freedom as pmax(1e-7, n - 1) * tsample, so the t distribution is
+   defined there. power_t_test(n => 1.5, delta => 1) is 0.0608734 as R's,
+   and the power is exactly 0 from n = 1.001 down, where the critical value
+   is infinite (R's qt() is Inf and its pt(Inf) is 0). It used to croak
+   "'n' must be at least 2"; only n <= 0 does now.
+ - Solving for n no longer croaks "no 'n' in [2, 1e+07]" when the target is
+   already exceeded at n = 2: the root is looked for in (1, 2), as R's
+   uniroot(extendInt = "upX") looks below 2. power => 0.2, delta => 5 is
+   1.40673, as R's. For power => 0.01, delta => 0.1 R answers 1.07783,
+   which is not the root: R's pt(ncp =) jumps at df ~ 0.16 (power 0.00163
+   at n = 1.07784, 0.0275 at n = 1.0779) and uniroot stops on the jump.
+   This returns 1.00244, where the continuous power reaches 0.01; the power
+   at n = 1.05, 0.0265484548, agrees with mpmath, and R's is 0.00155.
+
+ [Behavior change: epi_2x2()]
+
+ - An exposure group with no subjects ([[0,0],[5,5]]) has no risk, so the
+   odds ratio, risk ratio, risk difference, their intervals, nnt and that
+   group's risk are NaN. The automatic +0.5 used to make them a risk ratio
+   and odds ratio of exactly 1. epitools' riskratio() and oddsratio() give
+   NaN (0/0). The +0.5 for a zero cell in a non-empty group is unchanged.
+
+ [Bug fixes: formulas and design matrices]
+
+ - A long sum no longer croaks "expands to too many terms" at about 2,900
+   terms. Each `+` rebuilt the whole list and charged it, and the parse was
+   O(k**2); a sum is now built in one accumulator, linear in its terms, and
+   y ~ v1 + ... + v8000 parses in a fraction of a second.
+ - A formula of a hundred thousand unary minus signs no longer overflows the
+   C stack and kills the process; the signs are read in a loop.
+ - A trailing operator (`y ~ x +`, `y ~ x + z +`, `y ~ +`, `y ~ 1 +`) croaks
+   "the formula has an operator with no operand", as the 0.3426 notes say; a
+   cleanup meant for the `+` an intercept marker leaves behind had been
+   deleting it. `y ~ x z` and `y ~ x, z` were read as the one name `xz` after
+   whitespace was stripped, and are now syntax errors.
+ - Comparison and logic characters inside I() (`I(x > 0)`, `I(x == 0)`,
+   `I(a == "a")`, `I(x & z)`, `I(x %% 2)`, `I(!x)`) croak "cannot evaluate
+   term". R makes them logical factors, which this does not code; they used
+   to report "0 degrees of freedom".
+ - A column the data lack, in the response, a term, a function's argument or
+   an offset, croaks "object 'q' not found", as R's does, naming the column,
+   instead of "0 degrees of freedom". An unbalanced offset( reports
+   "unbalanced parentheses in offset()" as before.
+ - Without an intercept the factor coded by indicators for every level
+   is now the one R picks: the first factor of two or more levels in the
+   first term that has one (model.c, modelmatrix()). Before, a factor
+   counted as full only when its margin was empty, so `y ~ x + b:x - 1`,
+   `y ~ x/a - 1`, `y ~ x + z + b:x - 1`, `y ~ x + (x2:z/a) - 1` and
+   `y ~ x + a:b - 1` fitted different columns from R's (x, x:bu and x:bv,
+   the last aliased, for the first). The margin rule is R's TermCode(),
+   whose empty margin is present with or without an intercept.
+ - A factor crossed with itself is the factor, as in R: `a*a`, `a:a`,
+   `c + c*c` and `(a + b)^3` with a repeated factor gave all-NaN product
+   columns; they now give `a`. A term that becomes equal to an earlier
+   one is dropped. A numeric variable's repeat is unchanged (`wt:wt` is
+   `wt` squared, as the README says).
+ - Coefficient, term, level and group_stats names are perl characters
+   when the data are: a column found through its UTF-8 spelling, or a
+   cell with the UTF-8 flag. With `use utf8` and a column "café",
+   $fit->{coefficients}{"café"} now exists, and a level "ж" is no longer
+   named `gÐ¶`. This covers coefficients, terms, xlevels, vcov, summary,
+   confidence intervals, anova and aov row names, vif and the
+   model-frame fitters. A script without `use utf8` gets the same bytes
+   as before.
+ - A design too wide to fit is refused, before anything large is
+   allocated, with "design too wide (more than N columns ...)". X'X
+   and the packed factor were allocated at p*p and p(p-1)/2 before the
+   degrees of freedom were looked at, so `(v1+...+v30)^4` on 50 rows,
+   32 640 columns, was killed for memory. The limit is 2 GiB for the two,
+   about 13 000 columns for a double and 9 400 for a long double or
+   __float128; R fits such models with NA coefficients, so this is a
+   difference, now in the README.
+
+ [Bug fixes: predict()]
+
+ - predict() no longer croaks "newdata is missing column 'log(x)'" for a
+   function of a numeric crossed with a factor (`y ~ g*log(x)`,
+   `exp(x):a`, `sqrt(u):a`): only plain column names are looked up, and a
+   call is evaluated. A factor level holding a ':' (the level "q:r")
+   no longer makes every interaction predict NaN; the coefficient name
+   is split at the ':' that separates components, not at every one.
+
+ [Bug fixes: key encoding]
+
+ - A key perl stored downgraded to Latin-1 (a `use utf8` literal such as "é"
+   is stored as the byte E9, flagged WASUTF8) lost its UTF-8 flag wherever
+   the XS copied it through HePV()/HeUTF8(), so it came back as the lone
+   byte E9 where `keys %h` gives the character. Now fixed in colnames() and
+   everything built on it (melt's `variable` column, the keys fillna() and
+   bfill() add to the rows of a hash of hashes, summary()'s labels, which
+   printed a bare E9, and table_one()'s), the outer keys of select_cols,
+   drop_cols and rename_cols on a hash of hashes, the columns drop_cols and
+   rename_cols keep, both levels of transpose(), p_adjust(), filter() on a
+   hash of hashes, and kruskal_test()'s group_stats.
+
+ [Bug fixes: frames]
+
+ - dropna($hoa, rows => [...]) autovivified an undef column in the caller's
+   frame, and dropna($hoa, cols => []) died "Can't use an undefined value as
+   an ARRAY reference" on one; a non-array column died "Can't use string".
+   Both now behave as cols => ['a'] does: an undef column is all undef, the
+   frame is untouched, and a non-array column dies naming it.
+ - melt() of an AoA with string column ids read them with SvIV() and left an
+   IV on the caller's own SV, so the variable cells came out POK|IOK
+   dualvars where 0.3424 gave plain strings. The id is read from a copy.
+ - interpolate(): 'linear' now spaces the rows equally whatever `x` says, as
+   the README says and pandas' linear ignores the index (index, values and
+   time still use it); barycentric and krogh with a single numeric anchor
+   fill the gap with that constant, as pandas does; quadratic and cubic on a
+   column with no gap are returned as they are instead of dying "needs at
+   least N numeric anchors"; and spline/polynomial with an order outside the
+   IV range (1e30, inf) report the order given, not "got -1".
+ - summary() counted a NaN as a value and returned NaN for every statistic.
+   A NaN is now R's NA: left out of the statistics and counted in a
+   trailing "NA's" column that appears when a variable has one.
+   summary([1,'NaN',3,'Inf']) gives 3 values, Min 1, Median 3, Mean Inf,
+   NA's 1, as R's summary() does.
+
+ [Bug fixes: binom_test()]
+
+ - An integer count is read exactly. A count held as an IV or UV, or a
+   string spelling an integer, no longer goes through an NV, so on a double
+   perl binom_test(4503599627370497, 9007199254740991, alternative =>
+   'less') answers (R does) instead of croaking "x must be a nonnegative
+   integer": v + 0.5 rounds to even from 2**52. binom_test(9007199254740993,
+   9007199254740993) returned a statistic and parameter of
+   9007199254740992 and 499999999999999000 came back as 499999999999998976,
+   against the documented promise that counts are returned exactly up
+   to IV_MAX; both are exact now. A non-integer number is still rounded
+   to within 1e-7, without the +0.5.
+ - binom_test(3, 9223372036854775806) croaked "n is too large (the limit
+   is 9223372036854775806)" on a double perl, because (NV)IV_MAX rounds to
+   2**63. The limit stated and the limit tested are now the same.
+ - dbinom(), pbinom(), qbinom(), rbinom(), fisher_test(), mcnemar_test() and
+   prop_test() were checked for the same flaw. They take their counts as NVs
+   by R's design and return NVs, so there is nothing to lose; fisher_test()
+   refuses cells above R's 2**31 - 1.
+
+ [Bug fixes: density()]
+
+ - n is rounded up, as R's seq.int(length.out = n) rounds it: n => 1.5 gives
+   2 points, 2.5 gives 3, and 0.5 gives 1 where it croaked. It was read with
+   SvIV(), which truncated, and on a perl with 32-bit integers n => 2**31
+   and 2**32 wrapped into "'n' must be at least 1" instead of "'n' is too
+   large".
+
+ [Accuracy]
+
+ - The incomplete beta behind pbinom(), pt(), pf() and qf() formed lambda
+   = (a + b) y - b with a rounded product, which cost sqrt(n) epsilon at
+   shapes of 1e13: pbinom(1765184560411, 17785315992617,
+   7151671909757000 * 2**-56, lower = FALSE) was 0.0111407611194407633 on
+   a long double perl for 0.0111407611194404998 (2.4e-14 relative). It is
+   now a fused multiply-add (nv_fma, fmal in the long-double link probe in
+   dist.ini and Makefile.PL) with the rounding error of a + b taken out,
+   and the result is 5e-18 off. A long-double libm without fmal keeps the
+   old form. Over 8000 mpmath-checked pf/pt/pbinom cases the double and
+   long double results are as good as before or better, except one pbinom
+   tail of 1.6e-15 whose error went from 1.6e-14 to 7e-14 relative; the
+   __float128 results are unchanged. pf near the mean at df ~ 1e12, where x
+   and y are already rounded separately, is not fixed and is the same in R.
+
+ [Speed]
+
+ - csort() on a hash of arrays rebuilt each column with av_fetch(), newSVsv()
+   and av_push() per cell. A column that is not magical is now read through
+   AvARRAY() and written into a pre-extended array; a magical column or cell
+   takes the general path, with the array and cell held across the FETCH.
+   The same cell copy serves the AoA and AoH outputs, and the arrays being
+   built are owned while they are filled, so a croak in a FETCH frees them.
+   1e6 rows x 5 columns, HoA to HoA, fastest of 5 fresh processes: 0.631 s ->
+   0.392 s; peak RSS delta unchanged at 70 MB.
+ - qcut() called a Perl closure per element to find NaN/undef cells; the test
+   is now written out in the three loops. 1e6 values: 0.185 s -> 0.110 s,
+   peak RSS delta 7.6 MB either way.
+ - read_table() reads an archive's central directory once per call and
+   reuses it for every member lookup. A workbook of 5,000 worksheets read
+   in 6.8 s, quadratic in the sheet count, and reads in 0.32 s.
+ - qt() in the far tail grew its bracket by doubling: 16384 steps on a
+   __float128 perl for qt(1e-300, 0.01), which is -Inf, 102 ms against
+   48 us on a double. The bracket now grows by squaring and stops at the
+   first point where the tail is still above the target, so that case is
+   0.4 ms there and qt(-1e5, 1e3, log_p => 1), whose answer is 1e43,
+   went from 1.1 ms to 0.2 ms. qf() and pbinom() on __float128 remain
+   slow: they are 130 bisection steps and one soft-float incomplete beta.
+ - lm_design_build() ordered terms by looping to the formula's total
+   component count, not to its largest degree: `v1*...*v14` took 1.9 s
+   in this step alone and four times as long for each variable added.
+   It loops to the largest degree, and the margin search starts at the
+   first term that can hold the margin. `v1*...*v13` fits in 0.40 s
+   where it took 0.52 s; the rest of that time is the formula algebra.
+
+ [Internal]
+
+ - Removed the unused macros nv_sinh, nv_cosh (and sinhl/coshl from the
+   link probe in dist.ini and Makefile.PL) and DP_INDEX. NVK_PI,
+   NVK_LN_2PI, NVK_LN_SQRT_2PI, NVK_1_SQRT_2PI, NVK_2_SQRT_PI, NVK_EULER,
+   NVK_LN2 and PG_KADD stay: they are used on long double and quadmath
+   builds, so a double build's -Wunused-macros reports them wrongly.
+   AGC_LAST and DENS_K_OPTCOSINE stay as the last members of their lists.
+
+ [Tests]
+
+ - New t/rank.R.scipy.t, with t/rank.R.scipy.py, takes R 4.6.1's and
+   SciPy 1.18.0's rank cases (reg-tests-1a.R, rank.Rd, test_rank.py);
+   t/rank.t was hand-written and never took them.
+ - New t/numeric.options.t calls each function above with each option set
+   to "abc".
+ - New t/formula.parser.R.t (generator t/formula.parser.R.R),
+   t/lm.design.R.t (generator t/lm.design.R.R) and t/predict.offset.R.t
+   (generator t/predict.offset.R.R) pin the formula, design-matrix and
+   predict() changes against R 4.6.1 output frozen as literals.
+   t/lm.R.scipy.t, t/aov.t, t/croak.leaks.t, t/aov.R.t and
+   t/formula.utf8_names.t had pinned the old behavior (a dropped one-level
+   factor, an aliased level M, byte coefficient names) and now pin R's.
+ - New t/wasutf8_keys.t, t/frame.fixes.0_3428.t and t/numeric.fixes.t.
+ - New t/xlsx.files.robustness.t covers the read_table() and write_table()
+   changes; t/unzip_member.t now expects the non-archive cases to die, and
+   t/write_table.compressed.pandas.t and t/write_table.tex.stream.t that a
+   croaking write leaves no file.
+
 0.3427 2026-11-20 CST (Claude Opus 5.5 helped)
 
  [Tests]

@@ -46,7 +46,7 @@ BEGIN {
 package main;
 use Google::Cloud::Sql::V1::SqlBackupRunsServiceClient;
 
-my $client = Google::Cloud::Sql::V1::SqlBackupRunsServiceClient->new( credentials => 'dummy' );
+my $client = Google::Cloud::Sql::V1::SqlBackupRunsServiceClient->new();
 ok($client, 'Instantiated generated client');
 isa_ok($client->transport, 'Google::gRPC::Client', 'Client transport');
 

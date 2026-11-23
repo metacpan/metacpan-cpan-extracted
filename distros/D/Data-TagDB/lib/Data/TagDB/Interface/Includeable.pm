@@ -10,7 +10,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = v0.16;
+our $VERSION = v0.17;
 
 
 
@@ -33,7 +33,7 @@ Data::TagDB::Interface::Includeable - Work with Tag databases, includeable base 
 
 =head1 VERSION
 
-version v0.16
+version v0.17
 
 =head1 SYNOPSIS
 

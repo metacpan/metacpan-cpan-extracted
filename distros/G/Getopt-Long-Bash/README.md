@@ -36,7 +36,7 @@ getoptlong - Option parsing that does what you mean, for Bash
 
 # VERSION
 
-1.3.0
+1.5.0
 
 # DESCRIPTION
 
@@ -423,6 +423,10 @@ Display help message. Optional `SYNOPSIS` overrides `&USAGE`/`USAGE`.
 Display the library version.
 
     getoptlong version
+
+The **getoptlong** command also shows it with `--version`.
+
+    $ getoptlong --version
 
 # CONFIGURATION
 

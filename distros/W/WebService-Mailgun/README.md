@@ -41,9 +41,34 @@ my $res = $mailgun->message($args)
     or die sprintf '%s: %s', $mailgun->error_status, $mailgun->error;
 ```
 
+A response that is not what Mailgun sends fails the same way, even with a `2xx` status (then
+in `error_status`): a body that is not a JSON object, a page without its list of items, a
+`paging.next` that is not an https URL on the API's host, and one that points back to a page
+already fetched. An empty body (`204 No Content`) is
+a success with nothing in it.
+
 The methods that return every page (["Lists of every page"](#lists-of-every-page)) do not return `undef`: they stop
 at the page that failed and return the items fetched so far. Without `RaiseError`, a failure
 there shows only in `error`, which keeps the message of the last failure until the next one.
+
+### Rate limits
+
+Mailgun answers `429 Too Many Requests` when the account sends too many requests. This module
+does not try again by itself. The response
+in `error_response` tells when to: `X-RateLimit-Reset` is the time (in milliseconds since the
+epoch, UTC) the limit is reset.
+
+```perl
+my $res = $mailgun->message($args);
+if (!$res && $mailgun->error_status =~ /^429/) {
+    my $reset = $mailgun->error_response->header('X-RateLimit-Reset');
+    my $wait  = $reset ? int($reset / 1000 - time) + 1 : 1;
+    sleep $wait if $wait > 0;
+    $res = $mailgun->message($args);
+}
+```
+
+[Rate limits](https://documentation.mailgun.com/docs/mailgun/api-reference/api-overview)
 
 ## Lists of every page
 
@@ -51,7 +76,10 @@ there shows only in `error`, which keeps the message of the last failure until t
 return two values: an array reference of all the items, and the `paging.next` URL of that
 empty page as a [URI](https://metacpan.org/pod/URI), where the items that come later will be (for `event`, see
 ["Event Polling"](#event-polling)). When a request fails, the second value is the URL of the page that failed
-instead, so that the rest can be fetched from there. Take the items in list context:
+instead; passed back to `event`, it fetches the rest of the events from there. A page with no
+`paging.next` is the last one, and the second value is that page's own URL. The URL carries no
+API key, so it can be kept or logged; `event` sets the key when it is passed back. Take the
+items in list context:
 
 ```perl
 my ($lists) = $mailgun->lists();
@@ -62,7 +90,7 @@ In scalar context they return the URL, not the items.
 
 # METHODS
 
-## `new(api_key => $api_key, domain => $domain, region => "us"|"eu", RaiseError => 0|1)`
+## `new(api_key => $api_key, domain => $domain, region => "us"|"eu"|"au", RaiseError => 0|1, timeout => $seconds)`
 
 Create a WebService::Mailgun object.
 
@@ -72,7 +100,14 @@ Die when a request fails, instead of returning `undef` (see ["Errors"](#errors))
 
 ### region (default: "us")
 
-The region the domain belongs to: `us` or `eu`. Any other value dies when a request is made.
+The region the domain belongs to: `us`, `eu` or `au`. Any other value dies when a request
+is made. The AU region (`api.au.mailgun.net`) is for Mailgun Send customers who asked for it.
+
+### timeout (default: the one of [Furl](https://metacpan.org/pod/Furl), 10 seconds)
+
+The seconds a request may take, given to [Furl](https://metacpan.org/pod/Furl). Raise it to send large attachments over a
+slow connection. The HTTP client is made on the first request, so set it in `new`, or before
+the first request.
 
 ## error
 
@@ -80,7 +115,14 @@ The error message of the last request that failed.
 
 ## error\_status
 
-The status line (`401 Unauthorized`, say) of the last request that failed.
+The status line (`401 Unauthorized`, say) of the last request that failed (see ["Errors"](#errors)).
+
+## error\_response
+
+The response (a [Furl::Response](https://metacpan.org/pod/Furl%3A%3AResponse)) of the last request that failed, for what `error` and
+`error_status` leave out, such as its headers. See ["Rate limits"](#rate-limits). It does not keep the
+request (whose URL carries the API key). For a response that is not what Mailgun sends (see
+["Errors"](#errors)), it is that response, which can have a `2xx` status.
 
 ## message($args)
 
@@ -96,8 +138,33 @@ my $res = $mailgun->message({
 });
 ```
 
-To pass the same key more than once (several attachments, say), pass an array reference of
-key-value pairs instead of a hash reference:
+A decoded string (one with the UTF-8 flag, such as one from `decode_utf8` or a literal under
+`use utf8`) is sent encoded in UTF-8. Any other string is sent as the bytes it holds.
+
+To give a key several values, pass them in an array reference; the key is sent once for each:
+
+```perl
+my $res = $mailgun->message({
+    from    => 'foo@example.com',
+    to      => ['bar@example.com', 'baz@example.com'],
+    'o:tag' => ['newsletter', 'weekly'],
+    subject => 'test',
+    text    => 'text',
+});
+```
+
+An empty array reference dies, rather than leaving the key out.
+
+`attachment` and `inline` are the exception: there an array reference is a file
+(`[$path]`, or `[$path, $filename]`), as [HTTP::Request::Common](https://metacpan.org/pod/HTTP%3A%3ARequest%3A%3ACommon) takes it, and an array
+reference of those is several files:
+
+```perl
+attachment => [ ['/path/to/a.pdf'], ['/path/to/b.pdf', 'b.pdf'] ],
+```
+
+The same can be passed as an array reference of key-value pairs instead of a hash reference,
+with the key given once for each file:
 
 ```perl
 my $res = $mailgun->message([
@@ -149,20 +216,27 @@ my $res = $mailgun->mime({
 });
 ```
 
-`mime()` changes the hash reference it is given: `message` becomes an array reference holding
-the path of a temporary file (or of `file`, which is removed). Pass a new hash reference for
-each call.
+The MIME message is bytes. A decoded string (one with the UTF-8 flag) is sent encoded in UTF-8,
+as are the values of the other keys, here and in `message`. Give `message` or `file`, not
+both.
+
+The other keys are sent as they are, and like `message`, several values of a key can be given in
+an array reference (`to => ['bar@example.com', 'baz@example.com']`). The hash reference
+given is not changed, so the same one can be passed again.
 
 [Send a message in MIME format](https://documentation.mailgun.com/docs/mailgun/api-reference/send/mailgun/messages/post-v3--domain-name--messages-mime)
 
-## lists()
+## lists($query)
 
-Get list of mailing lists.
+Get list of mailing lists. `$query` is an optional hash reference of the query, such as
+`limit`, the number of lists on a page (fewer requests for many lists).
 
 ```perl
 # get mailing lists (every page; see "Lists of every page")
 my ($lists) = $mailgun->lists();
 # => ArrayRef of mailing list object.
+
+my ($lists) = $mailgun->lists({ limit => 100 });
 ```
 
 [Get mailing lists](https://documentation.mailgun.com/docs/mailgun/api-reference/send/mailgun/mailing-lists/get-v3-lists-pages)
@@ -221,13 +295,17 @@ my $res = $mailgun->delete_list('ml@example.com');
 
 [Delete a mailing list](https://documentation.mailgun.com/docs/mailgun/api-reference/send/mailgun/mailing-lists/delete-v3-lists-address)
 
-## list\_members($address)
+## list\_members($address, $query)
 
-Get members for mailing list.
+Get members for mailing list. `$query` is an optional hash reference of the query, such as
+`subscribed` (`yes` or `no`) and `limit`.
 
 ```perl
 # get members (every page; see "Lists of every page")
 my ($members) = $mailgun->list_members('ml@example.com');
+
+# only the members who unsubscribed
+my ($members) = $mailgun->list_members('ml@example.com', { subscribed => 'no' });
 ```
 
 [Get members of a mailing list](https://documentation.mailgun.com/docs/mailgun/api-reference/send/mailgun/mailing-lists/get-lists-list_address-members-pages)
@@ -327,7 +405,9 @@ my ($events, $next) = $mailgun->event({ event => 'stored', limit => 50 });
 
 ## get\_message\_from\_event($event)
 
-Get stored message. `$event` must be a `stored` event; any other event dies.
+Get stored message. `$event` must be an event with `storage.url`, such as a `stored` event;
+any other event dies. So does a `storage.url` that is not an https URL on `mailgun.net`, a
+host under it, or the API's host, as the API key is sent there.
 
 ```perl
 # get event data
@@ -340,7 +420,8 @@ my $msg = $mailgun->get_message_from_event($events->[0]);
 ## add\_template($args)
 
 Add a template. Like `message`, it takes a hash reference or an array reference of key-value
-pairs.
+pairs. Unlike `message`, an array reference as a value is always a file (`[$path]`), as
+[HTTP::Request::Common](https://metacpan.org/pod/HTTP%3A%3ARequest%3A%3ACommon) takes it, such as the template read from a file.
 
 ```perl
 # add template
@@ -379,8 +460,9 @@ my $res = $mailgun->delete_template($name);
 # Event Polling
 
 The second value `event` returns is the `paging.next` URL of the empty page it stopped at, as a
-[URI](https://metacpan.org/pod/URI) with the API key set. Pass it back to `event` in place of the query, and it returns the
-events stored since the last call, and the URL to use the next time:
+[URI](https://metacpan.org/pod/URI) without the API key (keep it as a string between runs, if you like). Pass it back to
+`event` in place of the query, and it sets the API key, returns the events stored since the
+last call, and the URL to use the next time:
 
 ```perl
 use Time::Piece;

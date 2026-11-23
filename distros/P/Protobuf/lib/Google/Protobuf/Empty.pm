@@ -3,7 +3,7 @@ package Google::Protobuf::Empty;
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -64,38 +64,54 @@ EOF
 # === Message: Google::Protobuf::Empty::Empty ===
     # Fields for Empty
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Protobuf::Empty::Empty - Compiled Protocol Buffers message class
+Google::Protobuf::Empty - Compiled Protocol Buffers messages for google/protobuf/empty.proto
 
 =head1 SYNOPSIS
 
     use Google::Protobuf::Empty;
 
-    my $msg = Google::Protobuf::Empty::Empty->new(
-    );
+    my $msg = Google::Protobuf::Empty::Empty->new({
+    });
 
-=head1 FIELDS
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Protobuf::Empty::Empty->parse($bytes);
 
-=over 4
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Protobuf::Empty - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/protobuf/empty.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Protobuf::Empty::Empty
+
+A generic empty message that you can re-use to avoid defining duplicated
+empty messages in your APIs. A typical example is to use it as the request
+or the response type of an API method. For instance:
+
+    service Foo {
+      rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+    }
+
+
+Inherits from L<Protobuf::Message>.
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Protobuf::Empty::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

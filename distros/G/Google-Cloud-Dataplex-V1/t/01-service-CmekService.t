@@ -46,7 +46,7 @@ BEGIN {
 package main;
 use Google::Cloud::Dataplex::V1::CmekServiceClient;
 
-my $client = Google::Cloud::Dataplex::V1::CmekServiceClient->new( credentials => 'dummy' );
+my $client = Google::Cloud::Dataplex::V1::CmekServiceClient->new();
 ok($client, 'Instantiated generated client');
 isa_ok($client->transport, 'Google::gRPC::Client', 'Client transport');
 

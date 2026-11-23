@@ -1,6 +1,8 @@
 # Mogura
 
-Inspect a Linux host or an attached ext4 or XFS disk with Syft and Grype. With Perl 5.34 or later, install the CPAN release and start the server as your regular user.
+Inspect a Linux host or an attached ext4 or XFS disk with Syft and Grype. Both the server and scanner require Linux on x86_64 or aarch64 and a 64-bit build of Perl 5.34 or later.
+
+Install the CPAN release and start the server as your regular user.
 
 ```sh
 cpanm Mogura

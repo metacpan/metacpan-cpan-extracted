@@ -186,9 +186,10 @@ for my $key (sort keys %CASE) {
 }
 diag(sprintf 'worst relative disagreement with R: %.3g', $worst);
 
-# I() with an exponent that is not a number: every row is NaN and dropped
+# I() with an exponent that is not a number names a column the data lack; R
+# stops with "object 'abc' not found" (through 0.3427 this was "0 degrees of freedom")
 throws_ok { lm(formula => 'y ~ I(x^abc)', data => { y => [1, 2, 3], x => [1, 2, 3] }) }
-	qr/0 degrees of freedom/, 'I(x^abc): a non-numeric exponent is not read as 0';
+	qr/object 'abc' not found/, 'I(x^abc): a non-numeric exponent is not read as 0';
 
 # Non-finite data is refused, as R's lm.fit() refuses it
 throws_ok { lm(formula => 'y ~ x', data => { y => [1, 2, $INF, 4], x => [1, 2, 3, 4] }) }

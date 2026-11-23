@@ -6,7 +6,7 @@ Protobuf::ClassGenerator - Generates Perl classes from Protocol Buffer descripto
 
 =head1 VERSION
 
-version 0.11
+version 0.14
 
 =head1 SYNOPSIS
 

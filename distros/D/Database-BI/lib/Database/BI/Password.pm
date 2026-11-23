@@ -3,10 +3,10 @@ package Database::BI::Password;
 use strict;
 use warnings;
 
-our $VERSION = '0.023.1';
+our $VERSION = '0.024.0';
 
 use Carp qw(croak);
-use Digest::SHA qw(hmac_sha256);
+use Digest::SHA qw(hmac_sha256 sha256);
 use Exporter qw(import);
 use MIME::Base64 qw(encode_base64 decode_base64);
 use Database::BI::I18N ();
@@ -33,8 +33,11 @@ Readonly our %MESSAGES => (
 	error_password_required => 'hash_password: a password is required',
 	error_password_rounds   => 'hash_password: rounds must be a whole number from %d to %d',
 	error_password_salt     => 'hash_password: a salt is %d bytes',
+	error_password_nul      => 'hash_password: a password may not end in a NUL byte',
 	error_password_random   => 'hash_password: Crypt::URandom gave %d random bytes, not %d',
 );
+
+Readonly my $HMAC_BLOCK_BYTES => 64;	# SHA-256's block size, RFC 2104
 
 # _text($key) -> the template for $key in the current language.
 sub _text { return Database::BI::I18N::text(__PACKAGE__, \%MESSAGES, $_[0]) }
@@ -45,7 +48,17 @@ sub _text { return Database::BI::I18N::text(__PACKAGE__, \%MESSAGES, $_[0]) }
 # the function is the RFC's and its test vectors apply.
 sub _pbkdf2 {
 	my ($password, $salt, $rounds, $bytes) = @_;
+	# Premise 1: HMAC (RFC 2104) replaces a key longer than the block (64 bytes)
+	# with its hash, so HMAC(K) = HMAC(H(K)).  Premise 2: the loop below calls
+	# HMAC with the same key every round.  Conclusion: hashing a long key once
+	# gives the same output and costs one hash, not one per round (a megabyte
+	# password was 10,000 megabytes of hashing).
+	$password = sha256($password) if length($password) > $HMAC_BLOCK_BYTES;
 	my $key = '';
+	# TODO: the loop should be removed and just the contents of its body kept
+	# (Path analysis: every caller passes $KEY_BYTES = 32, one SHA-256 block, so the
+	# body runs exactly once.  It is kept on purpose for the RFC 7914 multi-block
+	# vectors t/function.t and t/path.t run through this private function.)
 	for (my $block = 1; length($key) < $bytes; $block++) {
 		my $u = hmac_sha256($salt . pack('N', $block), $password);
 		my $t = $u;
@@ -90,12 +103,16 @@ sub _octets {
 
 sub hash_password {
 	my ($password, %opts) = @_;
-	croak _text('error_password_required') unless defined $password && length $password;
+	croak _text('error_password_required') unless defined $password && !ref($password) && length $password;
+	# HMAC pads a short key with NUL bytes, so "x" and "x\0" would be one password.
+	croak _text('error_password_nul') if $password =~ /\0\z/;
 	my $rounds = $opts{rounds} // $DEFAULT_ROUNDS;
 	croak sprintf(_text('error_password_rounds'), $MIN_ROUNDS, $MAX_ROUNDS)
-		unless $rounds =~ /\A\d+\z/ && $rounds >= $MIN_ROUNDS && $rounds <= $MAX_ROUNDS;
+		unless $rounds =~ /\A[0-9]+\z/ && $rounds >= $MIN_ROUNDS && $rounds <= $MAX_ROUNDS;
 	my $salt = $opts{salt} // _random_bytes($SALT_BYTES);
-	croak sprintf(_text('error_password_salt'), $SALT_BYTES) unless length($salt) == $SALT_BYTES;
+	# A salt is bytes: a reference or a character past U+00FF is not one.
+	croak sprintf(_text('error_password_salt'), $SALT_BYTES)
+		unless !ref($salt) && $salt !~ /[^\x00-\xff]/ && length($salt) == $SALT_BYTES;
 	my $key = _pbkdf2(_octets($password), $salt, $rounds, $KEY_BYTES);
 	return join '$', $SCHEME, $rounds, _b64($salt), _b64($key);
 }
@@ -108,7 +125,7 @@ sub is_password_hash {
 
 sub verify_password {
 	my ($password, $hash) = @_;
-	return 0 unless defined $password && length $password && is_password_hash($hash);
+	return 0 unless defined $password && !ref($password) && length $password && $password !~ /\0\z/ && is_password_hash($hash);
 	my ($rounds, $salt, $want) = $hash =~ $HASH_RE;
 	my $got = _pbkdf2(_octets($password), _unb64($salt), $rounds, $KEY_BYTES);
 	$want = _unb64($want);
@@ -130,7 +147,7 @@ Database::BI::Password - Hash and check the login password
 
 =head1 VERSION
 
-0.023.1
+0.024.0
 
 =head1 SYNOPSIS
 
@@ -160,14 +177,24 @@ without padding.  C<script/database-bi password> makes one.
 
 =head4 INPUT
 
-    $password: string, required, not empty (a character string is hashed as UTF-8)
-    rounds:    integer, optional, 10_000 to 100_000_000 (default 200_000)
-    salt:      16 bytes, optional (default random); for tests
+    $password: string, required, not empty, not a reference, and not ending in a
+               NUL byte (HMAC pads a short key with NULs, so "x" and "x\0" would
+               be one password); a character string is hashed as UTF-8
+    rounds:    integer, optional, 10_000 to 100_000_000 (default 200_000).
+               Domains: 9_999 and below, above 100_000_000, a fractional or
+               signed number, an exponent, spaces, a newline and non-ASCII
+               digits are refused; 10_000, 10_001, 99_999_999 and
+               100_000_000 are accepted.  The password's length is not
+               limited (one over 64 bytes is hashed once first, which HMAC
+               does anyway); a string whose UTF-8 flag is on is hashed as
+               its UTF-8 bytes, so it matches the same text typed as bytes
+    salt:      16 bytes (characters no higher than U+00FF), optional (default
+               random); for tests
 
 =head4 OUTPUT
 
-The hash string.  Croaks on a missing password, rounds out of range, or a salt
-of another length; the messages are in C<%Database::BI::Password::MESSAGES>.
+The hash string.  Croaks on a missing or reference password, one ending in a NUL
+byte, rounds out of range, or a salt of another length or not made of bytes; the messages are in C<%Database::BI::Password::MESSAGES>.
 Crypt::URandom, which makes the salt, croaks when the system has no source of
 random bytes.
 

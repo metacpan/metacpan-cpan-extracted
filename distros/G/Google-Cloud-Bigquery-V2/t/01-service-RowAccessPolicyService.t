@@ -46,7 +46,7 @@ BEGIN {
 package main;
 use Google::Cloud::Bigquery::V2::RowAccessPolicyServiceClient;
 
-my $client = Google::Cloud::Bigquery::V2::RowAccessPolicyServiceClient->new( credentials => 'dummy' );
+my $client = Google::Cloud::Bigquery::V2::RowAccessPolicyServiceClient->new();
 ok($client, 'Instantiated generated client');
 isa_ok($client->transport, 'Google::gRPC::Client', 'Client transport');
 

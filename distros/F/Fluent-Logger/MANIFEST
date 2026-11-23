@@ -20,6 +20,7 @@ t/08_udp.t
 t/09_buffer_overflow_handler.t
 t/10_truncate_buffet_at_overflow.t
 t/11_retry_immediately.t
+t/12_tag.t
 t/Util.pm
 xt/02_perlcritic.t
 xt/04_pod-coverage.t

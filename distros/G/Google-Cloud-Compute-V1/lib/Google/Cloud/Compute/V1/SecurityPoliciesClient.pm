@@ -12,7 +12,7 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Compute::V1::Compute;
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -20,14 +20,15 @@ has transport   => ( is => 'rw' );
 sub BUILD {
     my ($self) = @_;
 
-    # Resolve credentials: use passed credentials object if it implements get_token, or default to ADC
     my $auth = $self->credentials;
-    if (!$auth || !eval { $auth->can('get_token') }) {
+    if (!defined $auth) {
         $auth = Google::Auth->default();
+    } elsif (!eval { $auth->can('get_token') }) {
+        croak 'Invalid credentials object: must implement get_token()';
     }
     my $token = $auth->get_token();
 
-    my $target = 'localhost:50051';
+    my $target = 'compute.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -39,7 +40,6 @@ sub BUILD {
         );
         $self->transport($client);
     } else {
-        # Default high-performance HTTP/2 gRPC client
         my $client = Google::gRPC::Client->new(
             target     => $target,
             auth_token => $token,
@@ -52,9 +52,26 @@ sub add_rule {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::AddRuleSecurityPolicyRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.SecurityPolicies/AddRule',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.SecurityPolicies',
         method         => 'AddRule',
@@ -69,9 +86,26 @@ sub aggregated_list {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::AggregatedListSecurityPoliciesRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::SecurityPoliciesAggregatedList';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.SecurityPolicies/AggregatedList',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.SecurityPolicies',
         method         => 'AggregatedList',
@@ -86,9 +120,26 @@ sub delete {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::DeleteSecurityPolicyRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.SecurityPolicies/Delete',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.SecurityPolicies',
         method         => 'Delete',
@@ -103,9 +154,26 @@ sub get {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::GetSecurityPolicyRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::SecurityPolicy';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.SecurityPolicies/Get',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.SecurityPolicies',
         method         => 'Get',
@@ -120,9 +188,26 @@ sub get_rule {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::GetRuleSecurityPolicyRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::SecurityPolicyRule';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.SecurityPolicies/GetRule',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.SecurityPolicies',
         method         => 'GetRule',
@@ -137,9 +222,26 @@ sub insert {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::InsertSecurityPolicyRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.SecurityPolicies/Insert',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.SecurityPolicies',
         method         => 'Insert',
@@ -154,9 +256,26 @@ sub list {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::ListSecurityPoliciesRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::SecurityPolicyList';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.SecurityPolicies/List',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.SecurityPolicies',
         method         => 'List',
@@ -171,9 +290,26 @@ sub list_preconfigured_expression_sets {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::ListPreconfiguredExpressionSetsSecurityPoliciesRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::SecurityPoliciesListPreconfiguredExpressionSetsResponse';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.SecurityPolicies/ListPreconfiguredExpressionSets',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.SecurityPolicies',
         method         => 'ListPreconfiguredExpressionSets',
@@ -188,9 +324,26 @@ sub patch {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::PatchSecurityPolicyRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.SecurityPolicies/Patch',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.SecurityPolicies',
         method         => 'Patch',
@@ -205,9 +358,26 @@ sub patch_rule {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::PatchRuleSecurityPolicyRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.SecurityPolicies/PatchRule',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.SecurityPolicies',
         method         => 'PatchRule',
@@ -222,9 +392,26 @@ sub remove_rule {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::RemoveRuleSecurityPolicyRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.SecurityPolicies/RemoveRule',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.SecurityPolicies',
         method         => 'RemoveRule',
@@ -239,9 +426,26 @@ sub set_labels {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::SetLabelsSecurityPolicyRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.SecurityPolicies/SetLabels',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.SecurityPolicies',
         method         => 'SetLabels',
@@ -293,7 +497,7 @@ Generated from the following Protocol Buffers schemas:
 
 =over 4
 
-=item * C<google/cloud/compute/v1/compute.proto>
+=item * C<googleapis/google/cloud/compute/v1/compute.proto>
 
 
 

@@ -1,5 +1,9 @@
 Revision history for MIDI-RtController
 
+0.0809 2026-11-22 17:03:37
+    - Improve the eg/filter.pl program.
+    - Fix the eg/echo.pl program.
+
 0.0808 2026-09-07 17:43:18
     - Add the `silent` attribute.
 

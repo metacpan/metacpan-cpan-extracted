@@ -46,7 +46,7 @@ BEGIN {
 package main;
 use Google::Cloud::Dataproc::V1::ClusterControllerClient;
 
-my $client = Google::Cloud::Dataproc::V1::ClusterControllerClient->new( credentials => 'dummy' );
+my $client = Google::Cloud::Dataproc::V1::ClusterControllerClient->new();
 ok($client, 'Instantiated generated client');
 isa_ok($client->transport, 'Google::gRPC::Client', 'Client transport');
 

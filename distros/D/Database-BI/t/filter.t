@@ -275,6 +275,7 @@ subtest 'import_url: non-numeric table_index is sanitized to 0' => sub {
 		no warnings 'redefine';
 		# Proof: table_index=abc fails /\A[0-9]+\z/ and is reset to 0.
 		# Index 0 is valid for this single-table page, so the dashboard renders.
+		no warnings 'once';
 		local *LWP::UserAgent::get = sub {
 			my ($self, $url) = @_;
 			HTTP::Response->new(200, 'OK', [], $html);

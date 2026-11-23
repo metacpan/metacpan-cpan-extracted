@@ -58,7 +58,7 @@ Readonly my @COVER_CRITERIA => qw(branch condition);
 
 Readonly my $SOFT_BUG_WARNING_RE => qr/uninitialized|undefined|blessed|invalid/i;
 
-our $VERSION = '0.51';
+our $VERSION = '0.52';
 
 =encoding utf8
 
@@ -68,7 +68,7 @@ App::Test::Generator::CoverageGuidedFuzzer - AFL-style coverage-guided fuzzing f
 
 =head1 VERSION
 
-Version 0.51
+Version 0.52
 
 =head1 SYNOPSIS
 
@@ -175,9 +175,17 @@ Construct a new coverage-guided fuzzer.
 A hashref representing the parsed YAML schema for the target function.
 Required.  Only two keys are used: C<input>, which describes the single
 argument that will be generated, and C<input_style>.  Inside C<input> the
-keys C<type>, C<min>, C<max>, C<matches>, C<items>, C<properties>,
-C<optional> and C<edge_case_array> are used.  For a string, C<min> and
-C<max> are lengths counted in characters.
+keys C<type>, C<min>, C<max>, C<sample_max>, C<matches>, C<items>,
+C<properties>, C<optional> and C<edge_case_array> are used.  For a string,
+C<min> and C<max> are lengths counted in characters.
+
+C<sample_max> caps the integers and numbers that are generated, while C<max>
+stays the bound a value is validated against: a documented maximum far above
+the documented default (a PBKDF2 round count) costs time in proportion to its
+value, so valid data stops at C<sample_max> while a mutated value between the
+two is still accepted as valid.  Mutations are kept out of the band between
+the two: a mutated value that would land there becomes C<max + 1>, which the
+routine refuses cheaply, so a slow value is never mistaken for a bug.
 
 =item * C<target_sub>
 
@@ -401,7 +409,7 @@ sub run {
 		if(@{ $self->{corpus} } && rand() < $CORPUS_MUTATE_RATIO) {
 			# Mutate a randomly chosen corpus entry
 			my $parent = $self->{corpus}[ int(rand(@{ $self->{corpus} })) ];
-			$input = $self->_mutate($parent->{input});
+			$input = $self->_mutate($parent->{input}, $self->{schema}{input});
 		} else {
 			# Fresh random generation for exploration
 			$input = $self->_generate_random();
@@ -1159,7 +1167,12 @@ sub _rand_int {
 	my ($self, $spec) = @_;
 
 	my $min = $spec->{min} // $INT32_MIN;
-	my $max = $spec->{max} // $INT32_MAX;
+	# sample_max is the ceiling for generated valid data: a documented
+	# maximum far above the default (a PBKDF2 round count) costs time in
+	# proportion to its value, which no fuzzing run can afford.  max stays
+	# the bound _validate_value() checks, so a mutated value between the two
+	# is still valid and one above max is not.
+	my $max = $spec->{sample_max} // $spec->{max} // $INT32_MAX;
 
 	# Bias toward boundary values to probe edge conditions
 	if(rand() < $INT_BOUNDARY_RATIO) {
@@ -1184,7 +1197,9 @@ sub _rand_num {
 	my ($self, $spec) = @_;
 
 	my $min = $spec->{min} // -1e9;
-	my $max = $spec->{max} //  1e9;
+	# As in _rand_int: sample_max caps generated data, max stays the bound
+	# _validate_value() checks.
+	my $max = $spec->{sample_max} // $spec->{max} // 1e9;
 
 	return $min + rand($max - $min);
 }
@@ -1423,15 +1438,20 @@ sub _validate_value {
 #             value, dispatching on its type.
 #
 # Entry:      $input - the value to mutate.
+#             $spec  - the schema spec for that value,
+#                      if known.
 # Exit:       Returns a mutated copy of the input.
 # Side effects: None.
 #
 # Notes:      Blessed references are passed through
 #             unchanged. Undef is replaced with a
 #             freshly generated random value.
+#             A numeric mutation is kept out of the
+#             band between sample_max and max (see
+#             _outside_sampling_band).
 # --------------------------------------------------
 sub _mutate {
-	my ($self, $input) = @_;
+	my ($self, $input, $spec) = @_;
 
 	my $type = ref($input);
 
@@ -1442,22 +1462,62 @@ sub _mutate {
 	elsif(!$type) {
 		# Dispatch scalar mutation based on apparent type
 		if($input =~ /^-?\d+$/) {
-			return $self->_mutate_int($input);
+			return $self->_mutate_int($input, $spec);
 		} elsif($input =~ /^-?[\d.]+$/) {
-			return $self->_mutate_num($input);
+			return $self->_mutate_num($input, $spec);
 		} else {
 			return $self->_mutate_string($input);
 		}
 	}
 	elsif($type eq 'ARRAY') {
-		return $self->_mutate_array($input);
+		return $self->_mutate_array($input, $spec);
 	}
 	elsif($type eq 'HASH') {
-		return $self->_mutate_hash($input);
+		return $self->_mutate_hash($input, $spec);
 	}
 
 	# Blessed refs and other types pass through unchanged
 	return $input;
+}
+
+# --------------------------------------------------
+# _outside_sampling_band
+#
+# Purpose:    Move a mutated numeric value out of the
+#             band between sample_max and max.
+#
+# Entry:      $value - the mutated value.
+#             $spec  - the schema spec it belongs to,
+#                      if known.
+# Exit:       Returns $value unchanged unless it is
+#             above sample_max and at or below max;
+#             such a value is returned as max + 1.
+# Side effects: None.
+#
+# Notes:      Values in that band are valid per the
+#             documented maximum, so a call that
+#             times out there is recorded as a bug
+#             even though the routine is behaving as
+#             documented - the value is merely slow
+#             (a PBKDF2 round count, say).  Above max
+#             the routine refuses it cheaply, and at
+#             or below sample_max it stays affordable,
+#             so a mutation lands in one of those two
+#             places and never creeps upward through
+#             the slow band by doubling.
+# --------------------------------------------------
+sub _outside_sampling_band {
+	my ($self, $value, $spec) = @_;
+
+	return $value unless ref($spec) eq 'HASH';
+
+	my $ceiling = $spec->{sample_max};
+	my $max     = $spec->{max};
+
+	return $value unless defined($ceiling) && defined($max);
+	return $value unless defined($value) && ($value > $ceiling) && ($value <= $max);
+
+	return $max + 1;
 }
 
 # --------------------------------------------------
@@ -1466,21 +1526,26 @@ sub _mutate {
 # Purpose:    Apply a random arithmetic mutation to
 #             an integer value.
 #
-# Entry:      $n - the integer to mutate.
-# Exit:       Returns a mutated integer.
+# Entry:      $n    - the integer to mutate.
+#             $spec - its schema spec, if known.
+# Exit:       Returns a mutated integer, kept out of
+#             the slow band between sample_max and max.
 # Side effects: None.
 # --------------------------------------------------
 sub _mutate_int {
-	my ($self, $n) = @_;
+	my ($self, $n, $spec) = @_;
 	my $op = int(rand(8));
-	return $n + 1                      if $op == 0;
-	return $n - 1                      if $op == 1;
-	return $n * 2                      if $op == 2;
-	return $n == 0 ? 1 : int($n / 2)  if $op == 3;
-	return -$n                         if $op == 4;
-	return 0                           if $op == 5;
-	return $INT32_MAX                  if $op == 6;
-	return $INT32_MIN;
+	my $value
+		= $op == 0 ? $n + 1
+		: $op == 1 ? $n - 1
+		: $op == 2 ? $n * 2
+		: $op == 3 ? ($n == 0 ? 1 : int($n / 2))
+		: $op == 4 ? -$n
+		: $op == 5 ? 0
+		: $op == 6 ? $INT32_MAX
+		: $INT32_MIN;
+
+	return $self->_outside_sampling_band($value, $spec);
 }
 
 # --------------------------------------------------
@@ -1489,18 +1554,23 @@ sub _mutate_int {
 # Purpose:    Apply a random arithmetic mutation to
 #             a floating point value.
 #
-# Entry:      $n - the number to mutate.
-# Exit:       Returns a mutated number.
+# Entry:      $n    - the number to mutate.
+#             $spec - its schema spec, if known.
+# Exit:       Returns a mutated number, kept out of
+#             the slow band between sample_max and max.
 # Side effects: None.
 # --------------------------------------------------
 sub _mutate_num {
-	my ($self, $n) = @_;
+	my ($self, $n, $spec) = @_;
 	my $op = int(rand(5));
-	return $n + rand(10)      if $op == 0;
-	return $n - rand(10)      if $op == 1;
-	return $n * (1 + rand())  if $op == 2;
-	return 0                  if $op == 3;
-	return -$n;
+	my $value
+		= $op == 0 ? $n + rand(10)
+		: $op == 1 ? $n - rand(10)
+		: $op == 2 ? $n * (1 + rand())
+		: $op == 3 ? 0
+		: -$n;
+
+	return $self->_outside_sampling_band($value, $spec);
 }
 
 # --------------------------------------------------
@@ -1565,8 +1635,9 @@ sub _mutate_string {
 # Side effects: None.
 # --------------------------------------------------
 sub _mutate_array {
-	my ($self, $arr) = @_;
+	my ($self, $arr, $spec) = @_;
 
+	my $items = (ref($spec) eq 'HASH') ? $spec->{items} : undef;
 	my @copy = @{$arr};
 
 	my @ops = (
@@ -1574,7 +1645,7 @@ sub _mutate_array {
 		sub {
 			return [] unless @copy;
 			my $i = int(rand(@copy));
-			$copy[$i] = $self->_mutate($copy[$i]);
+			$copy[$i] = $self->_mutate($copy[$i], $items);
 			\@copy
 		},
 		# Duplicate a random element
@@ -1608,8 +1679,10 @@ sub _mutate_array {
 # Side effects: None.
 # --------------------------------------------------
 sub _mutate_hash {
-	my ($self, $h) = @_;
+	my ($self, $h, $spec) = @_;
 
+	my $properties = (ref($spec) eq 'HASH' && ref($spec->{properties}) eq 'HASH')
+		? $spec->{properties} : {};
 	my %copy = %{$h};
 	my @keys = keys %copy;
 
@@ -1617,7 +1690,7 @@ sub _mutate_hash {
 	return \%copy unless @keys;
 
 	my $k = $keys[ int(rand(@keys)) ];
-	$copy{$k} = $self->_mutate($copy{$k});
+	$copy{$k} = $self->_mutate($copy{$k}, $properties->{$k});
 
 	return \%copy;
 }
@@ -1725,6 +1798,12 @@ generated, not a hash.  To pass a hashref, describe it:
         type       => 'hashref',
         properties => { age => { type => 'integer', min => 0 } },
     }
+
+The C<position> and C<named> keys of an extracted schema describe a
+multi-argument call that this fuzzer does not build.  A parameter map without
+a C<type> of its own still yields the single string described above, so a
+routine written as C<my ($first, %opts) = @_> receives it as C<$first> and the
+trailing named options are left at their defaults.
 
 =item How C<undef> and other false values are handled
 

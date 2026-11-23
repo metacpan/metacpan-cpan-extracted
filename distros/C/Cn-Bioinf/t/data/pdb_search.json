@@ -1,0 +1,1220 @@
+[
+   {
+      "answer" : {
+         "query_id" : "c3aaaab3-4f4b-4c50-a198-cc1294ae354a",
+         "result_set" : [
+            {
+               "identifier" : "1BZ1_1",
+               "score" : 1,
+               "services" : [
+                  {
+                     "nodes" : [
+                        {
+                           "match_context" : [
+                              {
+                                 "alignment_length" : 142,
+                                 "bitscore" : 291,
+                                 "evalue" : 1.597e-89,
+                                 "gaps_opened" : 0,
+                                 "mismatches" : 0,
+                                 "query_aligned_seq" : "MVLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLASVSTVLTSKYR",
+                                 "query_beg" : 1,
+                                 "query_end" : 142,
+                                 "query_length" : 142,
+                                 "sequence_identity" : 1,
+                                 "subject_aligned_seq" : "MVLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLASVSTVLTSKYR",
+                                 "subject_beg" : 1,
+                                 "subject_end" : 142,
+                                 "subject_length" : 142
+                              }
+                           ],
+                           "node_id" : 18978,
+                           "norm_score" : 1,
+                           "original_score" : 291
+                        }
+                     ],
+                     "service_type" : "sequence"
+                  }
+               ]
+            },
+            {
+               "identifier" : "1Y01_2",
+               "score" : 1,
+               "services" : [
+                  {
+                     "nodes" : [
+                        {
+                           "match_context" : [
+                              {
+                                 "alignment_length" : 142,
+                                 "bitscore" : 291,
+                                 "evalue" : 1.597e-89,
+                                 "gaps_opened" : 0,
+                                 "mismatches" : 0,
+                                 "query_aligned_seq" : "MVLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLASVSTVLTSKYR",
+                                 "query_beg" : 1,
+                                 "query_end" : 142,
+                                 "query_length" : 142,
+                                 "sequence_identity" : 1,
+                                 "subject_aligned_seq" : "MVLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLASVSTVLTSKYR",
+                                 "subject_beg" : 1,
+                                 "subject_end" : 142,
+                                 "subject_length" : 142
+                              }
+                           ],
+                           "node_id" : 18978,
+                           "norm_score" : 1,
+                           "original_score" : 291
+                        }
+                     ],
+                     "service_type" : "sequence"
+                  }
+               ]
+            },
+            {
+               "identifier" : "AF_AFP69905F1_1",
+               "score" : 1,
+               "services" : [
+                  {
+                     "nodes" : [
+                        {
+                           "match_context" : [
+                              {
+                                 "alignment_length" : 142,
+                                 "bitscore" : 291,
+                                 "evalue" : 1.597e-89,
+                                 "gaps_opened" : 0,
+                                 "mismatches" : 0,
+                                 "query_aligned_seq" : "MVLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLASVSTVLTSKYR",
+                                 "query_beg" : 1,
+                                 "query_end" : 142,
+                                 "query_length" : 142,
+                                 "sequence_identity" : 1,
+                                 "subject_aligned_seq" : "MVLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLASVSTVLTSKYR",
+                                 "subject_beg" : 1,
+                                 "subject_end" : 142,
+                                 "subject_length" : 142
+                              }
+                           ],
+                           "node_id" : 18978,
+                           "norm_score" : 1,
+                           "original_score" : 291
+                        }
+                     ],
+                     "service_type" : "sequence"
+                  }
+               ]
+            },
+            {
+               "identifier" : "6IYI_1",
+               "score" : 0.51417004048583,
+               "services" : [
+                  {
+                     "nodes" : [
+                        {
+                           "match_context" : [
+                              {
+                                 "alignment_length" : 141,
+                                 "bitscore" : 171,
+                                 "evalue" : 1.062e-47,
+                                 "gaps_opened" : 1,
+                                 "mismatches" : 54,
+                                 "query_aligned_seq" : "LSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHF-DLSHGSAQVKGHGKKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLASVSTVLTSKYR",
+                                 "query_beg" : 3,
+                                 "query_end" : 142,
+                                 "query_length" : 142,
+                                 "sequence_identity" : 0.609,
+                                 "subject_aligned_seq" : "LTSADKSHVRSIWSKAGGSAEEIGAEALGRMLESFPNTKTYFDHYADLSVSSAQVHTHGKKIIDALTTAVNHIDDITGALSSLSTLHAQTLRVDPANFKILSHTILVVLALYFPADFTPEVHLACDKFLANVSHALADNYR",
+                                 "subject_beg" : 2,
+                                 "subject_end" : 142,
+                                 "subject_length" : 142
+                              }
+                           ],
+                           "node_id" : 18978,
+                           "norm_score" : 0.51417004048583,
+                           "original_score" : 171
+                        }
+                     ],
+                     "service_type" : "sequence"
+                  }
+               ]
+            },
+            {
+               "identifier" : "1CH4_1",
+               "score" : 0.502024291497976,
+               "services" : [
+                  {
+                     "nodes" : [
+                        {
+                           "match_context" : [
+                              {
+                                 "alignment_length" : 146,
+                                 "bitscore" : 168,
+                                 "evalue" : 9.682e-47,
+                                 "gaps_opened" : 3,
+                                 "mismatches" : 49,
+                                 "query_aligned_seq" : "LSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHF-DLS-----HGSAQVKGHGKKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLASVSTVLTSKYR",
+                                 "query_beg" : 3,
+                                 "query_end" : 142,
+                                 "query_length" : 142,
+                                 "sequence_identity" : 0.609,
+                                 "subject_aligned_seq" : "LTPEEKSAVTALWGKV--NVDEVGGEALGRLLVVYPWTQRFFESFGDLSTPDAVMGNPKVKAHGKKVLGAFSDGLAHLDNLKGTFATLSELHCDKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKVLASVSTVLTSKYR",
+                                 "subject_beg" : 3,
+                                 "subject_end" : 146,
+                                 "subject_length" : 146
+                              }
+                           ],
+                           "node_id" : 18978,
+                           "norm_score" : 0.502024291497976,
+                           "original_score" : 168
+                        }
+                     ],
+                     "service_type" : "sequence"
+                  }
+               ]
+            }
+         ],
+         "result_type" : "polymer_entity",
+         "total_count" : 1952
+      },
+      "url" : "https://search.rcsb.org/rcsbsearch/v2/query"
+   },
+   {
+      "answer" : {
+         "data" : {
+            "polymer_entities" : [
+               {
+                  "entity_poly" : {
+                     "pdbx_strand_id" : "A,C",
+                     "rcsb_entity_polymer_type" : "Protein"
+                  },
+                  "entry" : {
+                     "assemblies" : [
+                        {
+                           "rcsb_struct_symmetry" : [
+                              {
+                                 "kind" : "Global Symmetry",
+                                 "oligomeric_state" : "Hetero 4-mer",
+                                 "stoichiometry" : [
+                                    "A2",
+                                    "B2"
+                                 ],
+                                 "symbol" : "C2"
+                              },
+                              {
+                                 "kind" : "Pseudo Symmetry",
+                                 "oligomeric_state" : "Homo 4-mer",
+                                 "stoichiometry" : [
+                                    "A4"
+                                 ],
+                                 "symbol" : "D2"
+                              }
+                           ]
+                        }
+                     ],
+                     "nonpolymer_entities" : [
+                        {
+                           "nonpolymer_comp" : {
+                              "chem_comp" : {
+                                 "id" : "HEM",
+                                 "name" : "PROTOPORPHYRIN IX CONTAINING FE"
+                              }
+                           }
+                        }
+                     ],
+                     "rcsb_accession_info" : {
+                        "deposit_date" : "1998-11-05T00:00:00Z",
+                        "initial_release_date" : "1998-11-11T00:00:00Z"
+                     },
+                     "rcsb_entry_info" : {
+                        "experimental_method" : "X-ray",
+                        "polymer_composition" : "heteromeric protein",
+                        "resolution_combined" : [
+                           1.59
+                        ],
+                        "structure_determination_methodology" : "experimental"
+                     },
+                     "rcsb_ma_qa_metric_global" : null,
+                     "struct" : {
+                        "title" : "HEMOGLOBIN (ALPHA + MET) VARIANT"
+                     }
+                  },
+                  "rcsb_entity_source_organism" : [
+                     {
+                        "ncbi_taxonomy_id" : 9606,
+                        "scientific_name" : "Homo sapiens"
+                     }
+                  ],
+                  "rcsb_id" : "1BZ1_1",
+                  "rcsb_polymer_entity" : {
+                     "pdbx_description" : "PROTEIN (HEMOGLOBIN ALPHA CHAIN)"
+                  },
+                  "rcsb_polymer_entity_annotation" : [
+                     {
+                        "annotation_id" : "PF00042",
+                        "name" : "Globin (Globin)",
+                        "type" : "Pfam"
+                     },
+                     {
+                        "annotation_id" : "GO:0005833",
+                        "name" : "hemoglobin complex",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0031838",
+                        "name" : "haptoglobin-hemoglobin complex",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0042744",
+                        "name" : "hydrogen peroxide catabolic process",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0016020",
+                        "name" : "membrane",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "IPR002338",
+                        "name" : "Hemoglobin, alpha-type",
+                        "type" : "InterPro"
+                     },
+                     {
+                        "annotation_id" : "IPR002339",
+                        "name" : "Hemoglobin, pi",
+                        "type" : "InterPro"
+                     },
+                     {
+                        "annotation_id" : "GO:0048821",
+                        "name" : "erythrocyte development",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "IPR009050",
+                        "name" : "Globin-like superfamily",
+                        "type" : "InterPro"
+                     },
+                     {
+                        "annotation_id" : "GO:0070062",
+                        "name" : "extracellular exosome",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "IPR012292",
+                        "name" : "Globin/Protoglobin",
+                        "type" : "InterPro"
+                     },
+                     {
+                        "annotation_id" : "GO:0005829",
+                        "name" : "cytosol",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "IPR000971",
+                        "name" : "Globin",
+                        "type" : "InterPro"
+                     },
+                     {
+                        "annotation_id" : "GO:0019825",
+                        "name" : "oxygen binding",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0015671",
+                        "name" : "oxygen transport",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0072562",
+                        "name" : "blood microparticle",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0015670",
+                        "name" : "carbon dioxide transport",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "IPR050056",
+                        "name" : "Hemoglobin and related oxygen transporters",
+                        "type" : "InterPro"
+                     },
+                     {
+                        "annotation_id" : "GO:0030185",
+                        "name" : "nitric oxide transport",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0005576",
+                        "name" : "extracellular region",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0005344",
+                        "name" : "oxygen carrier activity",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0020037",
+                        "name" : "heme binding",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0005506",
+                        "name" : "iron ion binding",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0006954",
+                        "name" : "inflammatory response",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0042542",
+                        "name" : "response to hydrogen peroxide",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0071682",
+                        "name" : "endocytic vesicle lumen",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0098869",
+                        "name" : "cellular oxidant detoxification",
+                        "type" : "GO"
+                     }
+                  ],
+                  "rcsb_polymer_entity_container_identifiers" : {
+                     "reference_sequence_identifiers" : [
+                        {
+                           "database_accession" : "P69905",
+                           "database_name" : "UniProt"
+                        }
+                     ]
+                  }
+               },
+               {
+                  "entity_poly" : {
+                     "pdbx_strand_id" : "A",
+                     "rcsb_entity_polymer_type" : "Protein"
+                  },
+                  "entry" : {
+                     "assemblies" : [
+                        {
+                           "rcsb_struct_symmetry" : [
+                              {
+                                 "kind" : "Global Symmetry",
+                                 "oligomeric_state" : "Hetero 4-mer",
+                                 "stoichiometry" : [
+                                    "A2",
+                                    "B2"
+                                 ],
+                                 "symbol" : "C2"
+                              },
+                              {
+                                 "kind" : "Pseudo Symmetry",
+                                 "oligomeric_state" : "Homo 4-mer",
+                                 "stoichiometry" : [
+                                    "A4"
+                                 ],
+                                 "symbol" : "D2"
+                              }
+                           ]
+                        }
+                     ],
+                     "nonpolymer_entities" : [
+                        {
+                           "nonpolymer_comp" : {
+                              "chem_comp" : {
+                                 "id" : "GOL",
+                                 "name" : "GLYCEROL"
+                              }
+                           }
+                        },
+                        {
+                           "nonpolymer_comp" : {
+                              "chem_comp" : {
+                                 "id" : "HEM",
+                                 "name" : "PROTOPORPHYRIN IX CONTAINING FE"
+                              }
+                           }
+                        }
+                     ],
+                     "rcsb_accession_info" : {
+                        "deposit_date" : "2018-12-16T00:00:00Z",
+                        "initial_release_date" : "2019-04-10T00:00:00Z"
+                     },
+                     "rcsb_entry_info" : {
+                        "experimental_method" : "X-ray",
+                        "polymer_composition" : "heteromeric protein",
+                        "resolution_combined" : [
+                           2.2
+                        ],
+                        "structure_determination_methodology" : "experimental"
+                     },
+                     "rcsb_ma_qa_metric_global" : null,
+                     "struct" : {
+                        "title" : "X-ray sequence and high resolution crystal structure of Starry sturgeon methemoglobin"
+                     }
+                  },
+                  "rcsb_entity_source_organism" : [
+                     {
+                        "ncbi_taxonomy_id" : 7903,
+                        "scientific_name" : "Acipenser stellatus"
+                     }
+                  ],
+                  "rcsb_id" : "6IYI_1",
+                  "rcsb_polymer_entity" : {
+                     "pdbx_description" : "Alpha chain"
+                  },
+                  "rcsb_polymer_entity_annotation" : [
+                     {
+                        "annotation_id" : "GO:0005833",
+                        "name" : "hemoglobin complex",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0031720",
+                        "name" : "haptoglobin binding",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0031838",
+                        "name" : "haptoglobin-hemoglobin complex",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0019825",
+                        "name" : "oxygen binding",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0042744",
+                        "name" : "hydrogen peroxide catabolic process",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0072562",
+                        "name" : "blood microparticle",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "IPR050056",
+                        "name" : "Hemoglobin and related oxygen transporters",
+                        "type" : "InterPro"
+                     },
+                     {
+                        "annotation_id" : "IPR002338",
+                        "name" : "Hemoglobin, alpha-type",
+                        "type" : "InterPro"
+                     },
+                     {
+                        "annotation_id" : "IPR002339",
+                        "name" : "Hemoglobin, pi",
+                        "type" : "InterPro"
+                     },
+                     {
+                        "annotation_id" : "GO:0005344",
+                        "name" : "oxygen carrier activity",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0004601",
+                        "name" : "peroxidase activity",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0020037",
+                        "name" : "heme binding",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "IPR009050",
+                        "name" : "Globin-like superfamily",
+                        "type" : "InterPro"
+                     },
+                     {
+                        "annotation_id" : "GO:0005506",
+                        "name" : "iron ion binding",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "IPR012292",
+                        "name" : "Globin/Protoglobin",
+                        "type" : "InterPro"
+                     },
+                     {
+                        "annotation_id" : "GO:0043177",
+                        "name" : "organic acid binding",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "IPR000971",
+                        "name" : "Globin",
+                        "type" : "InterPro"
+                     }
+                  ],
+                  "rcsb_polymer_entity_container_identifiers" : {
+                     "reference_sequence_identifiers" : [
+                        {
+                           "database_accession" : "A0A1Z0YU11",
+                           "database_name" : "UniProt"
+                        }
+                     ]
+                  }
+               },
+               {
+                  "entity_poly" : {
+                     "pdbx_strand_id" : "B",
+                     "rcsb_entity_polymer_type" : "Protein"
+                  },
+                  "entry" : {
+                     "assemblies" : [
+                        {
+                           "rcsb_struct_symmetry" : [
+                              {
+                                 "kind" : "Global Symmetry",
+                                 "oligomeric_state" : "Hetero 2-mer",
+                                 "stoichiometry" : [
+                                    "A1",
+                                    "B1"
+                                 ],
+                                 "symbol" : "C1"
+                              }
+                           ]
+                        }
+                     ],
+                     "nonpolymer_entities" : [
+                        {
+                           "nonpolymer_comp" : {
+                              "chem_comp" : {
+                                 "id" : "HEM",
+                                 "name" : "PROTOPORPHYRIN IX CONTAINING FE"
+                              }
+                           }
+                        },
+                        {
+                           "nonpolymer_comp" : {
+                              "chem_comp" : {
+                                 "id" : "CHK",
+                                 "name" : "6-[(CYCLOHEXYLACETYL)(2-HYDROXYETHYL)AMINO]-6-DEOXY-D-XYLO-HEXITOL"
+                              }
+                           }
+                        },
+                        {
+                           "nonpolymer_comp" : {
+                              "chem_comp" : {
+                                 "id" : "OXY",
+                                 "name" : "OXYGEN MOLECULE"
+                              }
+                           }
+                        }
+                     ],
+                     "rcsb_accession_info" : {
+                        "deposit_date" : "2004-11-14T00:00:00Z",
+                        "initial_release_date" : "2004-12-21T00:00:00Z"
+                     },
+                     "rcsb_entry_info" : {
+                        "experimental_method" : "X-ray",
+                        "polymer_composition" : "heteromeric protein",
+                        "resolution_combined" : [
+                           2.8
+                        ],
+                        "structure_determination_methodology" : "experimental"
+                     },
+                     "rcsb_ma_qa_metric_global" : null,
+                     "struct" : {
+                        "title" : "Crystal structure of AHSP bound to Fe(II) alpha-hemoglobin"
+                     }
+                  },
+                  "rcsb_entity_source_organism" : [
+                     {
+                        "ncbi_taxonomy_id" : 9606,
+                        "scientific_name" : "Homo sapiens"
+                     }
+                  ],
+                  "rcsb_id" : "1Y01_2",
+                  "rcsb_polymer_entity" : {
+                     "pdbx_description" : "Hemoglobin alpha chain"
+                  },
+                  "rcsb_polymer_entity_annotation" : [
+                     {
+                        "annotation_id" : "PF00042",
+                        "name" : "Globin (Globin)",
+                        "type" : "Pfam"
+                     },
+                     {
+                        "annotation_id" : "GO:0005833",
+                        "name" : "hemoglobin complex",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0031838",
+                        "name" : "haptoglobin-hemoglobin complex",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0042744",
+                        "name" : "hydrogen peroxide catabolic process",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0016020",
+                        "name" : "membrane",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "IPR002338",
+                        "name" : "Hemoglobin, alpha-type",
+                        "type" : "InterPro"
+                     },
+                     {
+                        "annotation_id" : "IPR002339",
+                        "name" : "Hemoglobin, pi",
+                        "type" : "InterPro"
+                     },
+                     {
+                        "annotation_id" : "GO:0048821",
+                        "name" : "erythrocyte development",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "IPR009050",
+                        "name" : "Globin-like superfamily",
+                        "type" : "InterPro"
+                     },
+                     {
+                        "annotation_id" : "GO:0070062",
+                        "name" : "extracellular exosome",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "IPR012292",
+                        "name" : "Globin/Protoglobin",
+                        "type" : "InterPro"
+                     },
+                     {
+                        "annotation_id" : "GO:0005829",
+                        "name" : "cytosol",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "IPR000971",
+                        "name" : "Globin",
+                        "type" : "InterPro"
+                     },
+                     {
+                        "annotation_id" : "GO:0019825",
+                        "name" : "oxygen binding",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0015671",
+                        "name" : "oxygen transport",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0072562",
+                        "name" : "blood microparticle",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0015670",
+                        "name" : "carbon dioxide transport",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "IPR050056",
+                        "name" : "Hemoglobin and related oxygen transporters",
+                        "type" : "InterPro"
+                     },
+                     {
+                        "annotation_id" : "GO:0030185",
+                        "name" : "nitric oxide transport",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0005576",
+                        "name" : "extracellular region",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0005344",
+                        "name" : "oxygen carrier activity",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0020037",
+                        "name" : "heme binding",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0005506",
+                        "name" : "iron ion binding",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0006954",
+                        "name" : "inflammatory response",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0042542",
+                        "name" : "response to hydrogen peroxide",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0071682",
+                        "name" : "endocytic vesicle lumen",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0098869",
+                        "name" : "cellular oxidant detoxification",
+                        "type" : "GO"
+                     }
+                  ],
+                  "rcsb_polymer_entity_container_identifiers" : {
+                     "reference_sequence_identifiers" : [
+                        {
+                           "database_accession" : "P69905",
+                           "database_name" : "UniProt"
+                        }
+                     ]
+                  }
+               },
+               {
+                  "entity_poly" : {
+                     "pdbx_strand_id" : "A,B,C,D",
+                     "rcsb_entity_polymer_type" : "Protein"
+                  },
+                  "entry" : {
+                     "assemblies" : [
+                        {
+                           "rcsb_struct_symmetry" : [
+                              {
+                                 "kind" : "Global Symmetry",
+                                 "oligomeric_state" : "Homo 4-mer",
+                                 "stoichiometry" : [
+                                    "A4"
+                                 ],
+                                 "symbol" : "D2"
+                              }
+                           ]
+                        }
+                     ],
+                     "nonpolymer_entities" : [
+                        {
+                           "nonpolymer_comp" : {
+                              "chem_comp" : {
+                                 "id" : "CMO",
+                                 "name" : "CARBON MONOXIDE"
+                              }
+                           }
+                        },
+                        {
+                           "nonpolymer_comp" : {
+                              "chem_comp" : {
+                                 "id" : "HEM",
+                                 "name" : "PROTOPORPHYRIN IX CONTAINING FE"
+                              }
+                           }
+                        }
+                     ],
+                     "rcsb_accession_info" : {
+                        "deposit_date" : "1998-06-11T00:00:00Z",
+                        "initial_release_date" : "1999-04-27T00:00:00Z"
+                     },
+                     "rcsb_entry_info" : {
+                        "experimental_method" : "X-ray",
+                        "polymer_composition" : "homomeric protein",
+                        "resolution_combined" : [
+                           2.5
+                        ],
+                        "structure_determination_methodology" : "experimental"
+                     },
+                     "rcsb_ma_qa_metric_global" : null,
+                     "struct" : {
+                        "title" : "MODULE-SUBSTITUTED CHIMERA HEMOGLOBIN BETA-ALPHA (F133V)"
+                     }
+                  },
+                  "rcsb_entity_source_organism" : [
+                     {
+                        "ncbi_taxonomy_id" : 9606,
+                        "scientific_name" : "Homo sapiens"
+                     }
+                  ],
+                  "rcsb_id" : "1CH4_1",
+                  "rcsb_polymer_entity" : {
+                     "pdbx_description" : "MODULE-SUBSTITUTED CHIMERA HEMOGLOBIN BETA-ALPHA"
+                  },
+                  "rcsb_polymer_entity_annotation" : [
+                     {
+                        "annotation_id" : "PF00042",
+                        "name" : "Globin (Globin)",
+                        "type" : "Pfam"
+                     },
+                     {
+                        "annotation_id" : "GO:0005833",
+                        "name" : "hemoglobin complex",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0045429",
+                        "name" : "positive regulation of nitric oxide biosynthetic process",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0031838",
+                        "name" : "haptoglobin-hemoglobin complex",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0042744",
+                        "name" : "hydrogen peroxide catabolic process",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0048821",
+                        "name" : "erythrocyte development",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "IPR009050",
+                        "name" : "Globin-like superfamily",
+                        "type" : "InterPro"
+                     },
+                     {
+                        "annotation_id" : "GO:0070062",
+                        "name" : "extracellular exosome",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "IPR012292",
+                        "name" : "Globin/Protoglobin",
+                        "type" : "InterPro"
+                     },
+                     {
+                        "annotation_id" : "GO:0005829",
+                        "name" : "cytosol",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0030492",
+                        "name" : "hemoglobin binding",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0070527",
+                        "name" : "platelet aggregation",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:1904813",
+                        "name" : "ficolin-1-rich granule lumen",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "IPR000971",
+                        "name" : "Globin",
+                        "type" : "InterPro"
+                     },
+                     {
+                        "annotation_id" : "GO:0019825",
+                        "name" : "oxygen binding",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0015671",
+                        "name" : "oxygen transport",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0072562",
+                        "name" : "blood microparticle",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0015670",
+                        "name" : "carbon dioxide transport",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0070293",
+                        "name" : "renal absorption",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:1904724",
+                        "name" : "tertiary granule lumen",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "IPR050056",
+                        "name" : "Hemoglobin and related oxygen transporters",
+                        "type" : "InterPro"
+                     },
+                     {
+                        "annotation_id" : "GO:0031721",
+                        "name" : "hemoglobin alpha binding",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0030185",
+                        "name" : "nitric oxide transport",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0005576",
+                        "name" : "extracellular region",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0005344",
+                        "name" : "oxygen carrier activity",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0020037",
+                        "name" : "heme binding",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0006954",
+                        "name" : "inflammatory response",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0042542",
+                        "name" : "response to hydrogen peroxide",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0071682",
+                        "name" : "endocytic vesicle lumen",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0098869",
+                        "name" : "cellular oxidant detoxification",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "IPR002337",
+                        "name" : "Hemoglobin, beta-type",
+                        "type" : "InterPro"
+                     }
+                  ],
+                  "rcsb_polymer_entity_container_identifiers" : {
+                     "reference_sequence_identifiers" : [
+                        {
+                           "database_accession" : "P68871",
+                           "database_name" : "UniProt"
+                        }
+                     ]
+                  }
+               },
+               {
+                  "entity_poly" : {
+                     "pdbx_strand_id" : "A",
+                     "rcsb_entity_polymer_type" : "Protein"
+                  },
+                  "entry" : {
+                     "assemblies" : [
+                        {
+                           "rcsb_struct_symmetry" : [
+                              {
+                                 "kind" : "Global Symmetry",
+                                 "oligomeric_state" : "Monomer",
+                                 "stoichiometry" : [
+                                    "A1"
+                                 ],
+                                 "symbol" : "C1"
+                              }
+                           ]
+                        }
+                     ],
+                     "nonpolymer_entities" : null,
+                     "rcsb_accession_info" : {
+                        "deposit_date" : "2025-08-01T00:00:00Z",
+                        "initial_release_date" : "2021-07-01T00:00:00Z"
+                     },
+                     "rcsb_entry_info" : {
+                        "experimental_method" : null,
+                        "polymer_composition" : "homomeric protein",
+                        "resolution_combined" : null,
+                        "structure_determination_methodology" : "computational"
+                     },
+                     "rcsb_ma_qa_metric_global" : [
+                        {
+                           "ma_qa_metric_global" : [
+                              {
+                                 "type" : "pLDDT",
+                                 "value" : 98.06
+                              }
+                           ]
+                        }
+                     ],
+                     "struct" : {
+                        "title" : "Computed structure model of Hemoglobin subunit alpha"
+                     }
+                  },
+                  "rcsb_entity_source_organism" : [
+                     {
+                        "ncbi_taxonomy_id" : 9606,
+                        "scientific_name" : "Homo sapiens"
+                     }
+                  ],
+                  "rcsb_id" : "AF_AFP69905F1_1",
+                  "rcsb_polymer_entity" : {
+                     "pdbx_description" : "Hemoglobin subunit alpha"
+                  },
+                  "rcsb_polymer_entity_annotation" : [
+                     {
+                        "annotation_id" : "GO:0005833",
+                        "name" : "hemoglobin complex",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0031838",
+                        "name" : "haptoglobin-hemoglobin complex",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0042744",
+                        "name" : "hydrogen peroxide catabolic process",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0016020",
+                        "name" : "membrane",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "IPR002338",
+                        "name" : "Hemoglobin, alpha-type",
+                        "type" : "InterPro"
+                     },
+                     {
+                        "annotation_id" : "IPR002339",
+                        "name" : "Hemoglobin, pi",
+                        "type" : "InterPro"
+                     },
+                     {
+                        "annotation_id" : "GO:0048821",
+                        "name" : "erythrocyte development",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "IPR009050",
+                        "name" : "Globin-like superfamily",
+                        "type" : "InterPro"
+                     },
+                     {
+                        "annotation_id" : "GO:0070062",
+                        "name" : "extracellular exosome",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "IPR012292",
+                        "name" : "Globin/Protoglobin",
+                        "type" : "InterPro"
+                     },
+                     {
+                        "annotation_id" : "GO:0005829",
+                        "name" : "cytosol",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "IPR000971",
+                        "name" : "Globin",
+                        "type" : "InterPro"
+                     },
+                     {
+                        "annotation_id" : "GO:0019825",
+                        "name" : "oxygen binding",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0015671",
+                        "name" : "oxygen transport",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0072562",
+                        "name" : "blood microparticle",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0015670",
+                        "name" : "carbon dioxide transport",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "IPR050056",
+                        "name" : "Hemoglobin and related oxygen transporters",
+                        "type" : "InterPro"
+                     },
+                     {
+                        "annotation_id" : "GO:0030185",
+                        "name" : "nitric oxide transport",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0005576",
+                        "name" : "extracellular region",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0005344",
+                        "name" : "oxygen carrier activity",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0020037",
+                        "name" : "heme binding",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0005506",
+                        "name" : "iron ion binding",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0006954",
+                        "name" : "inflammatory response",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0042542",
+                        "name" : "response to hydrogen peroxide",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0071682",
+                        "name" : "endocytic vesicle lumen",
+                        "type" : "GO"
+                     },
+                     {
+                        "annotation_id" : "GO:0098869",
+                        "name" : "cellular oxidant detoxification",
+                        "type" : "GO"
+                     }
+                  ],
+                  "rcsb_polymer_entity_container_identifiers" : {
+                     "reference_sequence_identifiers" : [
+                        {
+                           "database_accession" : "P69905",
+                           "database_name" : "UniProt"
+                        }
+                     ]
+                  }
+               }
+            ]
+         }
+      },
+      "url" : "https://data.rcsb.org/graphql"
+   }
+]

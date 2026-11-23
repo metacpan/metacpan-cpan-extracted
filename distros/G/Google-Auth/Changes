@@ -1,5 +1,13 @@
 Revision history for Google-Auth
 
+0.15    2026-11-23
+    - Removed Module::Starter boilerplate from Google::Auth POD, added full POD to all 11 Google::Auth::* credential/verifier/authorizer/store modules, synced stale =head1 VERSION headers, and brought bin/gcloud-auth POD to parity with gcloud auth.
+    - Renamed bin/gcloud-auth.pl to bin/gcloud-auth (Debian Policy 10.4 / lintian script-with-language-extension and manpage fixes).
+    - Added META_MERGE resources in Makefile.PL and shortened ABSTRACT for Debian lintian compliance.
+
+0.14    2026-11-22
+    - [CPAN RT #180794] Declared Test::MockModule in TEST_REQUIRES and Google::Api::Common (0.05) / Google::Cloud::Transport::Adapter::LWP in PREREQ_PM in Makefile.PL (reported by Slaven Rezic / @srezic).
+
 0.13    2026-11-21
     - [Security / CVE-2026-74759] Hardened Google::Auth::ExternalAccountCredentials::Aws against SSRF and path traversal by pinning IMDSv2 URLs (imdsv2_session_token_url, credential_source.url, credential_source.region_url) to link-local hosts (169.254.169.254 / fd00:ec2::254) and validating/URI-escaping EC2 IAM role names.
     - [Security / CVE-2026-74760] Hardened gcloud-auth CLI loopback OAuth login callback to generate PKCE/state tokens using OpenSSL RAND_bytes CSPRNG (Google::Auth::get_secure_random_bytes) and strictly verify the returned OAuth state parameter before accepting authorization codes.

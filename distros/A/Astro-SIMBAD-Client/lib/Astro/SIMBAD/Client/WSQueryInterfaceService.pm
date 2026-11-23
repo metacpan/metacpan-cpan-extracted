@@ -3,18 +3,18 @@ package Astro::SIMBAD::Client::WSQueryInterfaceService;
 # Copyright (C) 2000-2006 Paul Kulchenko, Byrne Reese
 # Portions copyright (C) 2011-2026 by Thomas R. Wyant, III
 # -- generated at [Thu Aug 31 16:25:31 2006]
-# -- generated from http://simweb.u-strasbg.fr/axis/services/WSQuery?wsdl
+# -- generated from http://simweb.unistra.fr/axis/services/WSQuery?wsdl
 
 ## TRW vvvv
 use strict;
 use warnings;
 
-our $VERSION = '0.050';
+our $VERSION = '0.051';
 ## TRW ^^^^
 
 my %methods = (
 queryObjectById => {
-##    endpoint => 'http://simweb.u-strasbg.fr:8080/axis/services/WSQuery',
+##    endpoint => 'http://simweb.unistra.fr:8080/axis/services/WSQuery',
     endpoint => 'axis/services/WSQuery',
     soapaction => '',
     namespace => 'http://uif.simbad.cds',
@@ -25,7 +25,7 @@ queryObjectById => {
     ], # end parameters
   }, # end queryObjectById
 queryObjectByBib => {
-##    endpoint => 'http://simweb.u-strasbg.fr:8080/axis/services/WSQuery',
+##    endpoint => 'http://simweb.unistra.fr:8080/axis/services/WSQuery',
     endpoint => 'axis/services/WSQuery',
     soapaction => '',
     namespace => 'http://uif.simbad.cds',
@@ -36,7 +36,7 @@ queryObjectByBib => {
     ], # end parameters
   }, # end queryObjectByBib
 queryObjectByCoord => {
-##    endpoint => 'http://simweb.u-strasbg.fr:8080/axis/services/WSQuery',
+##    endpoint => 'http://simweb.unistra.fr:8080/axis/services/WSQuery',
     endpoint => 'axis/services/WSQuery',
     soapaction => '',
     namespace => 'http://uif.simbad.cds',

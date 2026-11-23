@@ -4,7 +4,7 @@ AtteanX::Serializer::SPARQL - SPARQL Serializer
 
 =head1 VERSION
 
-This document describes AtteanX::Serializer::SPARQL version 0.040
+This document describes AtteanX::Serializer::SPARQL version 0.041
 
 =head1 SYNOPSIS
 
@@ -39,7 +39,7 @@ This document describes AtteanX::Serializer::SPARQL version 0.040
 use v5.14;
 use warnings;
 
-package AtteanX::Serializer::SPARQL 0.040 {
+package AtteanX::Serializer::SPARQL 0.041 {
 	use Moo;
 	use Data::Dumper;
 	use Encode qw(encode);
@@ -107,7 +107,7 @@ L<IO::Handle> object C<< $fh >>.
 				if ($type == RBRACE) {
 					$io->print("\n");
 					$newline	= 1;
-				} elsif ($type == KEYWORD and $t->value =~ /^(BASE|PREFIX|SELECT|ASK|CONSTRUCT|DESCRIBE|USING|FROM)$/) {
+				} elsif ($type == KEYWORD and $t->value =~ /^(BASE|PREFIX|SELECT|ASK|CONSTRUCT|DESCRIBE|USING|FROM|BIND|FILTER)$/) {
 					$io->print("\n");
 					$newline	= 1;
 				} elsif ($type == KEYWORD and $t->value eq 'WHERE' and blessed($last) and ($last->type == PREFIXNAME or $last->type == IRI)) {
@@ -212,7 +212,7 @@ L<IO::Handle> object C<< $fh >>.
 				$need_space++;
 			} elsif ($type == WS) {
 			} elsif ($type == COMMENT) {
-				$io->print('# ');
+				$io->print('#');
 				$io->print($t->value);
 				$io->print("\n");
 			} elsif ($type == HATHAT) {

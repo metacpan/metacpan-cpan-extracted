@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 3.3.2 are described by their release commits.
 
+## 3.18.1 - 2026-11-23
+
+### Fixes
+
+- Require Mojolicious 9.48, past two advisories in its CSRF helpers ([`ed7027a`](https://github.com/vpndetection-io/sdk-perl/commit/ed7027a7db4924f4f4b1da99ea82906886b1604e))
+
 ## 3.18.0 - 2026-11-22
 
 ### Features

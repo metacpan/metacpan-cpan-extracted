@@ -38,8 +38,8 @@ use File::Temp qw(tempfile);
 use File::Spec;
 use File::Basename;
 use Cwd 'abs_path';
-my $script_path = abs_path(
-  File::Spec->catfile(dirname(__FILE__), '..', 'bin', 'gcloud-auth.pl'));
+my $script_path =
+  abs_path(File::Spec->catfile(dirname(__FILE__), '..', 'bin', 'gcloud-auth'));
 require $script_path;
 
 # Create dummy client id file

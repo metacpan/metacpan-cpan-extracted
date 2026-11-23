@@ -1,0 +1,38 @@
+---
+abstract: 'File::DistDir - locate and copy installed Perl distribution resources'
+author:
+  - 'Rob Lauer <rclauer@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::ShareDir::Install: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::ShareDir::Install: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.7901, CPAN::Meta::Converter version 2.150015'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-DistDir
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  File::DistDir:
+    file: lib/File/DistDir.pm
+    version: 1.0.0
+  File::DistDir::CLI:
+    file: lib/File/DistDir/CLI.pm
+    version: 1.0.0
+requires:
+  CLI::Simple: v2.4.0
+  File::ShareDir: '1.118'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/rlauer6/File-DistDir/issues
+  homepage: https://github.com/rlauer6/File-DistDir
+  repository: https://github.com/rlauer6/File-DistDir
+version: v1.0.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

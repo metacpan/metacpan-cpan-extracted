@@ -156,9 +156,12 @@ t/fisher_test.rxc.R
 t/fisher_test.rxc.exact.py
 t/fisher_test.t
 t/fisher_test.window.R.scipy.t
+t/formula.parser.R.R
+t/formula.parser.R.t
 t/formula.utf8_names.t
 t/formula_groups.R.R
 t/formula_groups.R.t
+t/frame.fixes.0_3428.t
 t/friedman_mcnemar_prop_cmh.R.R
 t/friedman_mcnemar_prop_cmh.R.t
 t/friedman_test.t
@@ -211,6 +214,8 @@ t/lm.R.scipy.t
 t/lm.bugs.t
 t/lm.collinear.R.R
 t/lm.collinear.R.t
+t/lm.design.R.R
+t/lm.design.R.t
 t/lm.edge.R.R
 t/lm.edge.R.t
 t/lm.formula_parens.R.t
@@ -253,6 +258,8 @@ t/morley.tab.bz2
 t/morley.tab.gz
 t/ncol.t
 t/nrow.t
+t/numeric.fixes.t
+t/numeric.options.t
 t/numeric.validation.t
 t/nv_width.t
 t/oneway_test.R.scipy.t
@@ -283,6 +290,8 @@ t/prcomp.R.t
 t/prcomp.small_scale.R.t
 t/prcomp.t
 t/predict.long_names.t
+t/predict.offset.R.R
+t/predict.offset.R.t
 t/predict.svyglm_quasi.R.t
 t/predict.t
 t/predict2.t
@@ -300,6 +309,8 @@ t/qnorm.central.R.t
 t/qnorm.crit.R.scipy.t
 t/quantile.R.R
 t/quantile.R.t
+t/rank.R.scipy.py
+t/rank.R.scipy.t
 t/rank.t
 t/rank.tied_random.t
 t/rbinom.dist.t
@@ -430,6 +441,7 @@ t/view_aoa.t
 t/vif.R.R
 t/vif.R.t
 t/vif_hoslem.t
+t/wasutf8_keys.t
 t/wilcox_test.R.scipy.R
 t/wilcox_test.R.scipy.t
 t/wilcox_test.exact_refusal.t
@@ -452,6 +464,7 @@ t/write_table.xlsx.number.python.py
 t/write_table.xlsx.number.python.t
 t/write_table.xlsx.t
 t/xlsx.entity_scan.t
+t/xlsx.files.robustness.t
 t/xlsx_col_idx.t
 t/zerotrunc.large_counts.R.R
 t/zerotrunc.large_counts.R.t

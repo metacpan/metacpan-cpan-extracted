@@ -1,27 +1,18 @@
-# Copyright (C) 2026 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 package Google::Cloud::Build::V1;
 
 use strict;
 use warnings;
 use Moo;
 use Google::gRPC::Client;
+use Google::Cloud::REST::Client;
 use Google::Auth;
 use Carp qw(croak);
 
-our $VERSION = '0.03';
+use Protobuf;
+use Google::Api::Common;
+use Google::Devtools::Cloudbuild::V1::Cloudbuild;
+
+our $VERSION = '0.05';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -30,31 +21,277 @@ sub BUILD {
     my ($self) = @_;
 
     my $auth = $self->credentials;
-    if (!$auth || !eval { $auth->can('get_token') }) {
+    if (!defined $auth) {
         $auth = Google::Auth->default();
+    } elsif (!eval { $auth->can('get_token') }) {
+        croak 'Invalid credentials object: must implement get_token()';
     }
     my $token = $auth->get_token();
 
-    my $client = Google::gRPC::Client->new(
-        target     => 'cloudbuild.googleapis.com:443',
-        auth_token => $token,
-    );
-    $self->transport($client);
+    my $target = 'cloudbuild.googleapis.com:443';
+    my $t = $self->transport || 'grpc';
+
+    if (ref($t) && eval { $t->can('call') }) {
+        # Already a transport object
+    } elsif (lc($t) eq 'rest') {
+        my $client = Google::Cloud::REST::Client->new(
+            target     => $target,
+            auth_token => $token,
+        );
+        $self->transport($client);
+    } else {
+        my $client = Google::gRPC::Client->new(
+            target     => $target,
+            auth_token => $token,
+        );
+        $self->transport($client);
+    }
 }
 
-sub call_rpc {
-    my ($self, $method, $request_msg, $response_class) = @_;
-    croak 'transport not initialized' unless $self->transport;
-    return $self->transport->call_unary($method, $request_msg, $response_class);
+sub create_build {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Devtools::Cloudbuild::V1::Cloudbuild::CreateBuildRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Longrunning::Operations::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.devtools.cloudbuild.v1.CloudBuild/CreateBuild',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.devtools.cloudbuild.v1.CloudBuild',
+        method         => 'CreateBuild',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
 }
 
-1;
+sub get_build {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Devtools::Cloudbuild::V1::Cloudbuild::GetBuildRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Devtools::Cloudbuild::V1::Cloudbuild::Build';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.devtools.cloudbuild.v1.CloudBuild/GetBuild',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.devtools.cloudbuild.v1.CloudBuild',
+        method         => 'GetBuild',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+
+sub cancel_build {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Devtools::Cloudbuild::V1::Cloudbuild::CancelBuildRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Devtools::Cloudbuild::V1::Cloudbuild::Build';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.devtools.cloudbuild.v1.CloudBuild/CancelBuild',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.devtools.cloudbuild.v1.CloudBuild',
+        method         => 'CancelBuild',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+
+sub get_build_trigger {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Devtools::Cloudbuild::V1::Cloudbuild::GetBuildTriggerRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Devtools::Cloudbuild::V1::Cloudbuild::BuildTrigger';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.devtools.cloudbuild.v1.CloudBuild/GetBuildTrigger',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.devtools.cloudbuild.v1.CloudBuild',
+        method         => 'GetBuildTrigger',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+
+sub delete_build_trigger {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Devtools::Cloudbuild::V1::Cloudbuild::DeleteBuildTriggerRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Protobuf::Empty::Empty';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.devtools.cloudbuild.v1.CloudBuild/DeleteBuildTrigger',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.devtools.cloudbuild.v1.CloudBuild',
+        method         => 'DeleteBuildTrigger',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+
+sub get_worker_pool {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Devtools::Cloudbuild::V1::Cloudbuild::GetWorkerPoolRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Devtools::Cloudbuild::V1::Cloudbuild::WorkerPool';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.devtools.cloudbuild.v1.CloudBuild/GetWorkerPool',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.devtools.cloudbuild.v1.CloudBuild',
+        method         => 'GetWorkerPool',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+
+sub get_default_service_account {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Devtools::Cloudbuild::V1::Cloudbuild::GetDefaultServiceAccountRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Devtools::Cloudbuild::V1::Cloudbuild::DefaultServiceAccount';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.devtools.cloudbuild.v1.CloudBuild/GetDefaultServiceAccount',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.devtools.cloudbuild.v1.CloudBuild',
+        method         => 'GetDefaultServiceAccount',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+1; # End of Google::Cloud::Build::V1
 
 __END__
 
 =head1 NAME
 
-Google::Cloud::Build::V1 - Google Cloud Build V1 API Client
+Google::Cloud::Build::V1 - Client library for Google Cloud Services
 
 =head1 SYNOPSIS
 
@@ -62,14 +299,103 @@ Google::Cloud::Build::V1 - Google Cloud Build V1 API Client
     use Google::Auth;
 
     my $auth = Google::Auth->default();
-    my $client = Google::Cloud::Build::V1->new(credentials => $auth);
+
+    # 1. High-performance gRPC Transport (Default)
+    my $grpc_client = Google::Cloud::Build::V1->new(
+        credentials => $auth,
+        transport   => 'grpc', # Optional: 'grpc' is default
+    );
+
+    # 2. HTTP/REST Transport
+    my $rest_client = Google::Cloud::Build::V1->new(
+        credentials => $auth,
+        transport   => 'rest',
+    );
+
+    # Execute service methods
+    my $res = $grpc_client->some_method( %params );
 
 =head1 DESCRIPTION
 
-Google Cloud Build V1 API Client over high-performance gRPC transport.
+C<Google::Cloud::Build::V1> is an auto-generated client library for Google Cloud Services.
 
-=head1 LICENSE
+It provides a unified client interface supporting both high-performance HTTP/2 gRPC and HTTP/REST transports, with automatic Google Cloud Application Default Credentials (ADC) resolution and typed Protocol Buffers message handling.
 
-Apache 2.0
+=head1 SOURCE
+
+Generated from the following Protocol Buffers schemas:
+
+=over 4
+
+=item * C<googleapis/google/devtools/cloudbuild/v1/cloudbuild.proto>
+
+
+
+=back
+
+=head1 CONSTRUCTOR
+
+=head2 new
+
+    my $client = Google::Cloud::Build::V1->new(
+        credentials => $auth,   # Optional: Google::Auth object (defaults to ADC)
+        transport   => 'grpc', # Optional: 'grpc' (default) or 'rest'
+    );
+
+=head1 ATTRIBUTES
+
+=head2 credentials
+
+Returns or accepts the L<Google::Auth> credentials object.
+
+=head2 transport
+
+Returns or accepts the active transport object (L<Google::gRPC::Client> or L<Google::Cloud::REST::Client>).
+
+=head1 METHODS
+
+=head2 METHODS
+
+The following RPC methods are available in this client:
+
+=over 4
+
+=item * B<create_build>
+
+Calls the RPC method C<CreateBuild> on the service. Takes a hash of parameters representing the request.
+
+=item * B<get_build>
+
+Calls the RPC method C<GetBuild> on the service. Takes a hash of parameters representing the request.
+
+=item * B<cancel_build>
+
+Calls the RPC method C<CancelBuild> on the service. Takes a hash of parameters representing the request.
+
+=item * B<get_build_trigger>
+
+Calls the RPC method C<GetBuildTrigger> on the service. Takes a hash of parameters representing the request.
+
+=item * B<delete_build_trigger>
+
+Calls the RPC method C<DeleteBuildTrigger> on the service. Takes a hash of parameters representing the request.
+
+=item * B<get_worker_pool>
+
+Calls the RPC method C<GetWorkerPool> on the service. Takes a hash of parameters representing the request.
+
+=item * B<get_default_service_account>
+
+Calls the RPC method C<GetDefaultServiceAccount> on the service. Takes a hash of parameters representing the request.
+
+=back
+
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
 
 =cut

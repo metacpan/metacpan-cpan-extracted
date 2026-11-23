@@ -130,7 +130,7 @@ subtest 'every chart, analysis and model button in the toolbar looks the same' =
 	# model panel and shares one look.
 	my %own_style = map { $_ => 1 } qw(
 		btn-copy-link btn-export-open btn-refresh btn-print btn-delete-sel btn-dedup
-		btn-add-db btn-combine dash-f-apply dash-range-apply chip-remove-range
+		btn-add-db btn-combine btn-delta dash-f-apply dash-range-apply chip-remove-range
 	);
 	my @buttons = grep { ($_->{id} // '') =~ /\Abtn-/ && !$own_style{$_->{id}} }
 		$dom->find('div.toolbar button[id]')->each;
@@ -322,7 +322,9 @@ subtest 'every chart page that exports SVG and PNG exports PDF too' => sub {
 		like($b, qr/biChartExportClone\(svg\)/, "$name: saved copies keep the fonts on screen");
 		unlike($b, qr/serializeToString\(svg\)/, "$name: nothing saves the chart without them");
 		like($b, qr/biBrandSvg\((?:clone|root)\)/, "$name: a saved SVG names the program");
-		like($b, qr/biBrandCanvas\(canvas, 1\)\.toDataURL/, "$name: so does a saved PNG");
+		like($b, qr/biSavePNG\(biBrandCanvas\(canvas, 1\), /, "$name: so does a saved PNG");
+		like($b, qr/biSaveFile\(new Blob\(\[src\]/, "$name: a saved SVG goes through the Save As helper");
+		unlike($b, qr/\.download\s*=\s*'/, "$name: no export makes its own download link");
 		like($b, qr/buildPDF\(window\.biBrandCanvas\(canvas, PDF_SCALE\)\)/, "$name: so does a saved PDF");
 		like($b, qr{/URI \(' \+ BRAND_URL}, "$name: the PDF links to the distribution");
 		like($b, qr{BRAND_URL\s+= 'https://metacpan\.org/dist/Database-BI'}, "$name: on MetaCPAN");
@@ -346,7 +348,10 @@ subtest 'a canvas card saves its chart as SVG, PNG and PDF' => sub {
 	like($b, qr/\['svg', 'png', 'pdf'\]/, 'a card added without a reload gets the same buttons');
 	unlike($b, qr/Save image/, 'the old button has gone');
 	like($b, qr/biBrandSvg\(cardExportClone\(svg\)\)/, 'a saved SVG names the program');
-	like($b, qr/biBrandCanvas\(canv, 1\)\.toDataURL/, 'so does a saved PNG');
+	like($b, qr/biSavePNG\(biBrandCanvas\(canv, 1\), /, 'so does a saved PNG');
+	like($b, qr/biSaveFile\(new Blob/, 'a saved SVG goes through the Save As helper');
+	like($b, qr/window\.showSaveFilePicker/, 'which asks where to save when the browser can');
+	like($b, qr/window\.biSaveFile = /, 'and is on the page');
 	like($b, qr/addCardLegend\(svg\.closest\('\.visual-card'\), clone, box\)/,
 		'every saved format carries a pie card its legend');
 };

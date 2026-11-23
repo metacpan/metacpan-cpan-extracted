@@ -12,7 +12,7 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Compute::V1::Compute;
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -20,14 +20,15 @@ has transport   => ( is => 'rw' );
 sub BUILD {
     my ($self) = @_;
 
-    # Resolve credentials: use passed credentials object if it implements get_token, or default to ADC
     my $auth = $self->credentials;
-    if (!$auth || !eval { $auth->can('get_token') }) {
+    if (!defined $auth) {
         $auth = Google::Auth->default();
+    } elsif (!eval { $auth->can('get_token') }) {
+        croak 'Invalid credentials object: must implement get_token()';
     }
     my $token = $auth->get_token();
 
-    my $target = 'localhost:50051';
+    my $target = 'compute.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -39,7 +40,6 @@ sub BUILD {
         );
         $self->transport($client);
     } else {
-        # Default high-performance HTTP/2 gRPC client
         my $client = Google::gRPC::Client->new(
             target     => $target,
             auth_token => $token,
@@ -52,9 +52,26 @@ sub aggregated_list {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::AggregatedListSubnetworksRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::SubnetworkAggregatedList';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.Subnetworks/AggregatedList',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.Subnetworks',
         method         => 'AggregatedList',
@@ -69,9 +86,26 @@ sub delete {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::DeleteSubnetworkRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.Subnetworks/Delete',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.Subnetworks',
         method         => 'Delete',
@@ -86,9 +120,26 @@ sub expand_ip_cidr_range {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::ExpandIpCidrRangeSubnetworkRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.Subnetworks/ExpandIpCidrRange',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.Subnetworks',
         method         => 'ExpandIpCidrRange',
@@ -103,9 +154,26 @@ sub get {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::GetSubnetworkRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::Subnetwork';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.Subnetworks/Get',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.Subnetworks',
         method         => 'Get',
@@ -120,9 +188,26 @@ sub get_iam_policy {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::GetIamPolicySubnetworkRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::Policy';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.Subnetworks/GetIamPolicy',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.Subnetworks',
         method         => 'GetIamPolicy',
@@ -137,9 +222,26 @@ sub insert {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::InsertSubnetworkRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.Subnetworks/Insert',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.Subnetworks',
         method         => 'Insert',
@@ -154,9 +256,26 @@ sub list {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::ListSubnetworksRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::SubnetworkList';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.Subnetworks/List',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.Subnetworks',
         method         => 'List',
@@ -171,9 +290,26 @@ sub list_usable {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::ListUsableSubnetworksRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::UsableSubnetworksAggregatedList';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.Subnetworks/ListUsable',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.Subnetworks',
         method         => 'ListUsable',
@@ -188,9 +324,26 @@ sub patch {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::PatchSubnetworkRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.Subnetworks/Patch',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.Subnetworks',
         method         => 'Patch',
@@ -205,9 +358,26 @@ sub set_iam_policy {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::SetIamPolicySubnetworkRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::Policy';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.Subnetworks/SetIamPolicy',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.Subnetworks',
         method         => 'SetIamPolicy',
@@ -222,9 +392,26 @@ sub set_private_ip_google_access {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::SetPrivateIpGoogleAccessSubnetworkRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.Subnetworks/SetPrivateIpGoogleAccess',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.Subnetworks',
         method         => 'SetPrivateIpGoogleAccess',
@@ -239,9 +426,26 @@ sub test_iam_permissions {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::TestIamPermissionsSubnetworkRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::TestPermissionsResponse';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.Subnetworks/TestIamPermissions',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.Subnetworks',
         method         => 'TestIamPermissions',
@@ -293,7 +497,7 @@ Generated from the following Protocol Buffers schemas:
 
 =over 4
 
-=item * C<google/cloud/compute/v1/compute.proto>
+=item * C<googleapis/google/cloud/compute/v1/compute.proto>
 
 
 

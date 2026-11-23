@@ -1,5 +1,4 @@
 Changes
-ignore.txt
 lib/Google/Cloud/Compute/V1.pm
 lib/Google/Cloud/Compute/V1/AcceleratorTypesClient.pm
 lib/Google/Cloud/Compute/V1/AddressesClient.pm
@@ -19,14 +18,17 @@ lib/Google/Cloud/Compute/V1/ForwardingRulesClient.pm
 lib/Google/Cloud/Compute/V1/FutureReservationsClient.pm
 lib/Google/Cloud/Compute/V1/GlobalAddressesClient.pm
 lib/Google/Cloud/Compute/V1/GlobalForwardingRulesClient.pm
+lib/Google/Cloud/Compute/V1/GlobalFrontendSettingsServiceClient.pm
 lib/Google/Cloud/Compute/V1/GlobalNetworkEndpointGroupsClient.pm
 lib/Google/Cloud/Compute/V1/GlobalOperationsClient.pm
 lib/Google/Cloud/Compute/V1/GlobalOrganizationOperationsClient.pm
 lib/Google/Cloud/Compute/V1/GlobalPublicDelegatedPrefixesClient.pm
 lib/Google/Cloud/Compute/V1/GlobalVmExtensionPoliciesClient.pm
 lib/Google/Cloud/Compute/V1/HealthChecksClient.pm
+lib/Google/Cloud/Compute/V1/HostsClient.pm
 lib/Google/Cloud/Compute/V1/ImageFamilyViewsClient.pm
 lib/Google/Cloud/Compute/V1/ImagesClient.pm
+lib/Google/Cloud/Compute/V1/ImageViewsClient.pm
 lib/Google/Cloud/Compute/V1/InstanceGroupManagerResizeRequestsClient.pm
 lib/Google/Cloud/Compute/V1/InstanceGroupManagersClient.pm
 lib/Google/Cloud/Compute/V1/InstanceGroupsClient.pm
@@ -45,6 +47,7 @@ lib/Google/Cloud/Compute/V1/LicenseCodesClient.pm
 lib/Google/Cloud/Compute/V1/LicensesClient.pm
 lib/Google/Cloud/Compute/V1/MachineImagesClient.pm
 lib/Google/Cloud/Compute/V1/MachineTypesClient.pm
+lib/Google/Cloud/Compute/V1/ManagedRulesetsClient.pm
 lib/Google/Cloud/Compute/V1/NetworkAttachmentsClient.pm
 lib/Google/Cloud/Compute/V1/NetworkEdgeSecurityServicesClient.pm
 lib/Google/Cloud/Compute/V1/NetworkEndpointGroupsClient.pm
@@ -58,6 +61,7 @@ lib/Google/Cloud/Compute/V1/OrganizationSecurityPoliciesClient.pm
 lib/Google/Cloud/Compute/V1/PacketMirroringsClient.pm
 lib/Google/Cloud/Compute/V1/PreviewFeaturesClient.pm
 lib/Google/Cloud/Compute/V1/ProjectsClient.pm
+lib/Google/Cloud/Compute/V1/ProjectViewsClient.pm
 lib/Google/Cloud/Compute/V1/PublicAdvertisedPrefixesClient.pm
 lib/Google/Cloud/Compute/V1/PublicDelegatedPrefixesClient.pm
 lib/Google/Cloud/Compute/V1/RegionAutoscalersClient.pm
@@ -93,6 +97,7 @@ lib/Google/Cloud/Compute/V1/RegionTargetHttpsProxiesClient.pm
 lib/Google/Cloud/Compute/V1/RegionTargetTcpProxiesClient.pm
 lib/Google/Cloud/Compute/V1/RegionUrlMapsClient.pm
 lib/Google/Cloud/Compute/V1/RegionZonesClient.pm
+lib/Google/Cloud/Compute/V1/ReliabilityRisksClient.pm
 lib/Google/Cloud/Compute/V1/ReservationBlocksClient.pm
 lib/Google/Cloud/Compute/V1/ReservationsClient.pm
 lib/Google/Cloud/Compute/V1/ReservationSlotsClient.pm
@@ -129,6 +134,7 @@ lib/Google/Cloud/Compute/V1/ZoneVmExtensionPoliciesClient.pm
 Makefile.PL
 MANIFEST			This list of files
 README
+SECURITY.md
 t/00-load.t
 t/01-service-AcceleratorTypes.t
 t/01-service-Addresses.t
@@ -137,6 +143,7 @@ t/01-service-Autoscalers.t
 t/01-service-BackendBuckets.t
 t/01-service-BackendServices.t
 t/01-service-CrossSiteNetworks.t
+t/01-service-Default.t
 t/01-service-Disks.t
 t/01-service-DiskTypes.t
 t/01-service-ExternalVpnGateways.t
@@ -146,14 +153,17 @@ t/01-service-ForwardingRules.t
 t/01-service-FutureReservations.t
 t/01-service-GlobalAddresses.t
 t/01-service-GlobalForwardingRules.t
+t/01-service-GlobalFrontendSettingsService.t
 t/01-service-GlobalNetworkEndpointGroups.t
 t/01-service-GlobalOperations.t
 t/01-service-GlobalOrganizationOperations.t
 t/01-service-GlobalPublicDelegatedPrefixes.t
 t/01-service-GlobalVmExtensionPolicies.t
 t/01-service-HealthChecks.t
+t/01-service-Hosts.t
 t/01-service-ImageFamilyViews.t
 t/01-service-Images.t
+t/01-service-ImageViews.t
 t/01-service-InstanceGroupManagerResizeRequests.t
 t/01-service-InstanceGroupManagers.t
 t/01-service-InstanceGroups.t
@@ -172,6 +182,7 @@ t/01-service-LicenseCodes.t
 t/01-service-Licenses.t
 t/01-service-MachineImages.t
 t/01-service-MachineTypes.t
+t/01-service-ManagedRulesets.t
 t/01-service-NetworkAttachments.t
 t/01-service-NetworkEdgeSecurityServices.t
 t/01-service-NetworkEndpointGroups.t
@@ -185,6 +196,7 @@ t/01-service-OrganizationSecurityPolicies.t
 t/01-service-PacketMirrorings.t
 t/01-service-PreviewFeatures.t
 t/01-service-Projects.t
+t/01-service-ProjectViews.t
 t/01-service-PublicAdvertisedPrefixes.t
 t/01-service-PublicDelegatedPrefixes.t
 t/01-service-RegionAutoscalers.t
@@ -220,6 +232,7 @@ t/01-service-RegionTargetHttpsProxies.t
 t/01-service-RegionTargetTcpProxies.t
 t/01-service-RegionUrlMaps.t
 t/01-service-RegionZones.t
+t/01-service-ReliabilityRisks.t
 t/01-service-ReservationBlocks.t
 t/01-service-Reservations.t
 t/01-service-ReservationSlots.t
@@ -259,6 +272,7 @@ t/02-rest-transport-Autoscalers.t
 t/02-rest-transport-BackendBuckets.t
 t/02-rest-transport-BackendServices.t
 t/02-rest-transport-CrossSiteNetworks.t
+t/02-rest-transport-Default.t
 t/02-rest-transport-Disks.t
 t/02-rest-transport-DiskTypes.t
 t/02-rest-transport-ExternalVpnGateways.t
@@ -268,14 +282,17 @@ t/02-rest-transport-ForwardingRules.t
 t/02-rest-transport-FutureReservations.t
 t/02-rest-transport-GlobalAddresses.t
 t/02-rest-transport-GlobalForwardingRules.t
+t/02-rest-transport-GlobalFrontendSettingsService.t
 t/02-rest-transport-GlobalNetworkEndpointGroups.t
 t/02-rest-transport-GlobalOperations.t
 t/02-rest-transport-GlobalOrganizationOperations.t
 t/02-rest-transport-GlobalPublicDelegatedPrefixes.t
 t/02-rest-transport-GlobalVmExtensionPolicies.t
 t/02-rest-transport-HealthChecks.t
+t/02-rest-transport-Hosts.t
 t/02-rest-transport-ImageFamilyViews.t
 t/02-rest-transport-Images.t
+t/02-rest-transport-ImageViews.t
 t/02-rest-transport-InstanceGroupManagerResizeRequests.t
 t/02-rest-transport-InstanceGroupManagers.t
 t/02-rest-transport-InstanceGroups.t
@@ -294,6 +311,7 @@ t/02-rest-transport-LicenseCodes.t
 t/02-rest-transport-Licenses.t
 t/02-rest-transport-MachineImages.t
 t/02-rest-transport-MachineTypes.t
+t/02-rest-transport-ManagedRulesets.t
 t/02-rest-transport-NetworkAttachments.t
 t/02-rest-transport-NetworkEdgeSecurityServices.t
 t/02-rest-transport-NetworkEndpointGroups.t
@@ -307,6 +325,7 @@ t/02-rest-transport-OrganizationSecurityPolicies.t
 t/02-rest-transport-PacketMirrorings.t
 t/02-rest-transport-PreviewFeatures.t
 t/02-rest-transport-Projects.t
+t/02-rest-transport-ProjectViews.t
 t/02-rest-transport-PublicAdvertisedPrefixes.t
 t/02-rest-transport-PublicDelegatedPrefixes.t
 t/02-rest-transport-RegionAutoscalers.t
@@ -342,6 +361,7 @@ t/02-rest-transport-RegionTargetHttpsProxies.t
 t/02-rest-transport-RegionTargetTcpProxies.t
 t/02-rest-transport-RegionUrlMaps.t
 t/02-rest-transport-RegionZones.t
+t/02-rest-transport-ReliabilityRisks.t
 t/02-rest-transport-ReservationBlocks.t
 t/02-rest-transport-Reservations.t
 t/02-rest-transport-ReservationSlots.t
@@ -378,6 +398,5 @@ t/manifest.t
 t/pod-coverage.t
 t/pod.t
 xt/00_perl-critic.t
-xt/boilerplate.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -10,14 +10,14 @@ use Carp qw(croak);
 
 use Protobuf;
 use Google::Api::Common;
-use Google::Cloud::Kms::V1::AutokeyAdmin;
-use Google::Cloud::Kms::V1::EkmService;
 use Google::Cloud::Kms::V1::Resources;
+use Google::Cloud::Kms::V1::EkmService;
+use Google::Cloud::Kms::V1::AutokeyAdmin;
 use Google::Cloud::Kms::V1::Autokey;
 use Google::Cloud::Kms::V1::HsmManagement;
 use Google::Cloud::Kms::V1::Service;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -25,14 +25,15 @@ has transport   => ( is => 'rw' );
 sub BUILD {
     my ($self) = @_;
 
-    # Resolve credentials: use passed credentials object if it implements get_token, or default to ADC
     my $auth = $self->credentials;
-    if (!$auth || !eval { $auth->can('get_token') }) {
+    if (!defined $auth) {
         $auth = Google::Auth->default();
+    } elsif (!eval { $auth->can('get_token') }) {
+        croak 'Invalid credentials object: must implement get_token()';
     }
     my $token = $auth->get_token();
 
-    my $target = 'cloudkms.googleapis.com';
+    my $target = 'cloudkms.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -44,7 +45,6 @@ sub BUILD {
         );
         $self->transport($client);
     } else {
-        # Default high-performance HTTP/2 gRPC client
         my $client = Google::gRPC::Client->new(
             target     => $target,
             auth_token => $token,
@@ -53,64 +53,30 @@ sub BUILD {
     }
 }
 
-sub list_key_rings {
-    my ($self, %params) = @_;
-
-    my $request_class = 'Google::Cloud::Kms::V1::Service::ListKeyRingsRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
-
-    my $response_class = 'Google::Cloud::Kms::V1::Service::ListKeyRingsResponse';
-    my $response = $self->transport->call({
-        service        => 'google.cloud.kms.v1.KeyManagementService',
-        method         => 'ListKeyRings',
-        request        => $request,
-        response_class => $response_class,
-    });
-
-    return $response;
-}
-
-sub create_key_handle {
-    my ($self, %params) = @_;
-
-    my $request_class = 'Google::Cloud::Kms::V1::Autokey::CreateKeyHandleRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
-
-    my $response_class = 'Google::Longrunning::Operations::Operation';
-    my $response = $self->transport->call({
-        service        => 'google.cloud.kms.v1.Autokey',
-        method         => 'CreateKeyHandle',
-        request        => $request,
-        response_class => $response_class,
-    });
-
-    return $response;
-}
-
-sub list_ekm_connections {
-    my ($self, %params) = @_;
-
-    my $request_class = 'Google::Cloud::Kms::V1::EkmService::ListEkmConnectionsRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
-
-    my $response_class = 'Google::Cloud::Kms::V1::EkmService::ListEkmConnectionsResponse';
-    my $response = $self->transport->call({
-        service        => 'google.cloud.kms.v1.EkmService',
-        method         => 'ListEkmConnections',
-        request        => $request,
-        response_class => $response_class,
-    });
-
-    return $response;
-}
-
 sub update_autokey_config {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Kms::V1::AutokeyAdmin::UpdateAutokeyConfigRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Kms::V1::AutokeyAdmin::AutokeyConfig';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.kms.v1.AutokeyAdmin/UpdateAutokeyConfig',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.kms.v1.AutokeyAdmin',
         method         => 'UpdateAutokeyConfig',
@@ -125,9 +91,26 @@ sub get_autokey_config {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Kms::V1::AutokeyAdmin::GetAutokeyConfigRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Kms::V1::AutokeyAdmin::AutokeyConfig';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.kms.v1.AutokeyAdmin/GetAutokeyConfig',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.kms.v1.AutokeyAdmin',
         method         => 'GetAutokeyConfig',
@@ -142,12 +125,97 @@ sub show_effective_autokey_config {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Kms::V1::AutokeyAdmin::ShowEffectiveAutokeyConfigRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Kms::V1::AutokeyAdmin::ShowEffectiveAutokeyConfigResponse';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.kms.v1.AutokeyAdmin/ShowEffectiveAutokeyConfig',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.kms.v1.AutokeyAdmin',
         method         => 'ShowEffectiveAutokeyConfig',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+
+sub create_key_handle {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Cloud::Kms::V1::Autokey::CreateKeyHandleRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Longrunning::Operations::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.kms.v1.Autokey/CreateKeyHandle',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.cloud.kms.v1.Autokey',
+        method         => 'CreateKeyHandle',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+
+sub list_ekm_connections {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Cloud::Kms::V1::EkmService::ListEkmConnectionsRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Cloud::Kms::V1::EkmService::ListEkmConnectionsResponse';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.kms.v1.EkmService/ListEkmConnections',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.cloud.kms.v1.EkmService',
+        method         => 'ListEkmConnections',
         request        => $request,
         response_class => $response_class,
     });
@@ -159,12 +227,63 @@ sub list_single_tenant_hsm_instances {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Kms::V1::HsmManagement::ListSingleTenantHsmInstancesRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Kms::V1::HsmManagement::ListSingleTenantHsmInstancesResponse';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.kms.v1.HsmManagement/ListSingleTenantHsmInstances',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.kms.v1.HsmManagement',
         method         => 'ListSingleTenantHsmInstances',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+
+sub list_key_rings {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Cloud::Kms::V1::Service::ListKeyRingsRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Cloud::Kms::V1::Service::ListKeyRingsResponse';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.kms.v1.KeyManagementService/ListKeyRings',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.cloud.kms.v1.KeyManagementService',
+        method         => 'ListKeyRings',
         request        => $request,
         response_class => $response_class,
     });
@@ -213,17 +332,17 @@ Generated from the following Protocol Buffers schemas:
 
 =over 4
 
-=item * C<google/cloud/kms/v1/service.proto>
+=item * C<googleapis/google/cloud/kms/v1/autokey_admin.proto>
 
-=item * C<google/cloud/kms/v1/autokey.proto>
+=item * C<googleapis/google/cloud/kms/v1/autokey.proto>
 
-=item * C<google/cloud/kms/v1/ekm_service.proto>
+=item * C<googleapis/google/cloud/kms/v1/ekm_service.proto>
 
-=item * C<google/cloud/kms/v1/autokey_admin.proto>
+=item * C<googleapis/google/cloud/kms/v1/hsm_management.proto>
 
-=item * C<google/cloud/kms/v1/hsm_management.proto>
+=item * C<googleapis/google/cloud/kms/v1/resources.proto>
 
-=item * C<google/cloud/kms/v1/resources.proto>
+=item * C<googleapis/google/cloud/kms/v1/service.proto>
 
 
 
@@ -256,18 +375,6 @@ The following RPC methods are available in this client:
 
 =over 4
 
-=item * B<list_key_rings>
-
-Calls the RPC method C<ListKeyRings> on the service. Takes a hash of parameters representing the request.
-
-=item * B<create_key_handle>
-
-Calls the RPC method C<CreateKeyHandle> on the service. Takes a hash of parameters representing the request.
-
-=item * B<list_ekm_connections>
-
-Calls the RPC method C<ListEkmConnections> on the service. Takes a hash of parameters representing the request.
-
 =item * B<update_autokey_config>
 
 Calls the RPC method C<UpdateAutokeyConfig> on the service. Takes a hash of parameters representing the request.
@@ -280,9 +387,21 @@ Calls the RPC method C<GetAutokeyConfig> on the service. Takes a hash of paramet
 
 Calls the RPC method C<ShowEffectiveAutokeyConfig> on the service. Takes a hash of parameters representing the request.
 
+=item * B<create_key_handle>
+
+Calls the RPC method C<CreateKeyHandle> on the service. Takes a hash of parameters representing the request.
+
+=item * B<list_ekm_connections>
+
+Calls the RPC method C<ListEkmConnections> on the service. Takes a hash of parameters representing the request.
+
 =item * B<list_single_tenant_hsm_instances>
 
 Calls the RPC method C<ListSingleTenantHsmInstances> on the service. Takes a hash of parameters representing the request.
+
+=item * B<list_key_rings>
+
+Calls the RPC method C<ListKeyRings> on the service. Takes a hash of parameters representing the request.
 
 =back
 

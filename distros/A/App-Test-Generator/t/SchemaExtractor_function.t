@@ -897,6 +897,25 @@ subtest '_detect_datetime_type() detects DateTime from isa check' => sub {
 	is($p{semantic}, 'datetime_object', 'datetime_object semantic');
 };
 
+subtest '_detect_datetime_type() leaves a timezone regex alone' => sub {
+	my $e = _extractor();
+	my %p;
+	$e->_detect_datetime_type(\%p, 'spec',
+		'croak unless $spec =~ /\A(?:utc|gmt|z)\z/i;');
+	ok(!exists $p{semantic}, 'no semantic type invented from the t and z');
+	ok(!exists $p{matches}, 'no ISO 8601 matches constraint invented');
+};
+
+subtest '_detect_datetime_type() detects ISO 8601 from a date-shaped regex' => sub {
+	my $e = _extractor();
+	my %p;
+	$e->_detect_datetime_type(\%p, 'stamp',
+		'croak unless $stamp =~ /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z/;');
+	is($p{semantic}, 'iso8601_string', 'iso8601_string semantic');
+	is($p{type}, 'string', 'string type');
+	ok($p{matches}, 'has matches pattern');
+};
+
 subtest '_detect_datetime_type() detects UNIX timestamp from numeric range' => sub {
 	my $e = _extractor();
 	my %p;

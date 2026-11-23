@@ -212,3 +212,55 @@ sub _read_file {
 
 1;
 
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Auth::DefaultCredentials - Application Default Credentials (ADC) loader for Google Cloud
+
+=head1 SYNOPSIS
+
+    use Google::Auth::DefaultCredentials;
+
+    my $dc    = Google::Auth::DefaultCredentials->new();
+    my $creds = $dc->from_env($scopes)
+             || $dc->from_well_known_path($scopes)
+             || $dc->from_system_default_path($scopes);
+
+=head1 DESCRIPTION
+
+Discovers and instantiates credentials from GOOGLE_APPLICATION_CREDENTIALS, the well-known gcloud ADC path, or the system default path.
+
+=head1 METHODS AND ATTRIBUTES
+
+=over 4
+
+=item * B<environment>
+
+=item * B<make_creds>
+
+=item * B<from_env>
+
+=item * B<from_well_known_path>
+
+=item * B<from_system_default_path>
+
+=back
+
+=head1 SEE ALSO
+
+L<Google::Auth>, L<Google::Auth::Credentials>
+
+=head1 AUTHOR
+
+C.J. Collier E<lt>cjac@google.comE<gt>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2026 Google LLC and contributors.
+
+Licensed under the Apache License, Version 2.0.
+
+=cut

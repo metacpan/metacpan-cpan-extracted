@@ -13,11 +13,11 @@ sub get_token { 'mock-token-abc' }
 
 package main;
 use Google::Api::Common;
-use Google::Cloud::Kms::KeyManagementServiceClient;
+use Google::Cloud::Kms::V1::KeyManagementServiceClient;
 use Google::Cloud::REST::Client;
 
 subtest 'Client REST Transport Initialization' => sub {
-    my $client = Google::Cloud::Kms::KeyManagementServiceClient->new(
+    my $client = Google::Cloud::Kms::V1::KeyManagementServiceClient->new(
         credentials => bless({}, 'Google::Auth::Mock'),
         transport   => 'rest',
     );

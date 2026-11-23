@@ -20,7 +20,7 @@ use parent 'Data::TagDB::WeakBaseObject';
 use constant NS_DATE => 'fc43fbba-b959-4882-b4c8-90a288b7d416';
 use constant RE_UUID => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/;
 
-our $VERSION = v0.16;
+our $VERSION = v0.17;
 
 
 
@@ -259,6 +259,8 @@ sub create_colour {
             $colour = $colour->css;
         } elsif ($colour->isa('Graphics::Color::RGB')) {
             $colour = $colour->as_css_hex;
+        } elsif ($colour->isa('Data::Identifier::Interface::Simple')) {
+            $colour = $colour->as('Data::URIID::Colour')->rgb;
         } else {
             croak 'Unsupported type';
         }
@@ -365,6 +367,23 @@ sub create_date {
             for_type    => $self->db->create_tag([$self->wk->uuid => 'a414c87d-efe0-4376-8eae-66aefa78cf92'], [$self->wk->tagname => 'gregorian-date']),
         ),
     );
+}
+
+
+sub create_language {
+    my ($self, $lang, @opts) = @_;
+    my Data::TagDB $db = $self->db;
+    my Data::TagDB::WellKnown $wk = $self->wk;
+    my $di;
+    my $tag;
+
+    croak 'Stray options passed' if scalar @opts;
+
+    $di = Data::Identifier::Generate->language($lang);
+    $tag = $self->db->create_tag($di, [$wk->language_tag_identifier(1), lc($lang)]);
+    $db->create_relation(tag => $tag, relation => $wk->has_type(1), related => $wk->ietf_language(1));
+
+    return $tag;
 }
 
 
@@ -509,7 +528,7 @@ Data::TagDB::Factory - Work with Tag databases
 
 =head1 VERSION
 
-version v0.16
+version v0.17
 
 =head1 SYNOPSIS
 
@@ -641,7 +660,11 @@ Creates a tag for a colour.
 The passed colour must be in hash-and-hex format or a valid colour object
 from one of the supported modules.
 
-Currently L<Data::URIID::Colour>, L<Color::Library::Color>, and L<Graphics::Color::RGB> are supported.
+Currently L<Data::URIID::Colour>,
+L<Color::Library::Color>,
+L<Graphics::Color::RGB>,
+and any L<Data::Identifier::Interface::Simple> that can convert into a L<Data::URIID::Colour>
+are supported.
 
 =head2 create_date
 
@@ -677,6 +700,18 @@ a specific precision.
 =back
 
 Valid precision values are: C<year>, C<month>, C<day>.
+
+=head2 create_language
+
+    my Data::TagDB::Tag $tag = $factory->create_language($ietf_language_tag);
+    # e.g.:
+    my Data::TagDB::Tag $tag = $factory->create_language('de');
+
+(experimental since v0.17)
+
+Creates a tag for the given language.
+The language is passed as a IETF language tag.
+Takes no options.
 
 =head2 generate
 

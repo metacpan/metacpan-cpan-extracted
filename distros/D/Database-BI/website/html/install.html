@@ -489,6 +489,26 @@ BI_OPEN=/full/path/store.db hypnotoad script/database-bi</code></pre>
 			</td>
 		</tr>
 		<tr>
+			<td><code>time_zone</code></td>
+			<td>unset</td>
+			<td>
+				<code>UTC</code>, <code>local</code> or an offset such as
+				<code>+05:30</code>. A timestamp ending <code>Z</code> or an offset is
+				moved to that zone's clock before filters, time ranges and buckets read
+				it. Unset, the zone is ignored. Zone names such as <code>Europe/London</code>
+				are not read. It applies to the whole server. See <a href="data.html#time-zones">Time zones</a>.
+			</td>
+		</tr>
+		<tr>
+			<td><code>json_flatten</code></td>
+			<td><code>0</code></td>
+			<td>
+				<code>1</code> shows a nested JSON object as a column for each value,
+				named by its path (<code>address.city</code>), instead of JSON text.
+				It applies to every file, not one. See <a href="data.html#json-flatten">JSON files</a>.
+			</td>
+		</tr>
+		<tr>
 			<td><code>url_private_hosts</code></td>
 			<td>unset</td>
 			<td>

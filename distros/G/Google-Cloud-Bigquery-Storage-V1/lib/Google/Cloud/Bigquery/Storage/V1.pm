@@ -1,27 +1,25 @@
-# Copyright (C) 2026 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 package Google::Cloud::Bigquery::Storage::V1;
 
 use strict;
 use warnings;
-
-our $VERSION = '0.03';
 use Moo;
 use Google::gRPC::Client;
+use Google::Cloud::REST::Client;
 use Google::Auth;
 use Carp qw(croak);
+
+use Protobuf;
+use Google::Api::Common;
+use Google::Cloud::Bigquery::Storage::V1::Avro;
+use Google::Cloud::Bigquery::Storage::V1::Arrow;
+use Google::Cloud::Bigquery::Storage::V1::Annotations;
+use Google::Cloud::Bigquery::Storage::V1::Protobuf;
+use Google::Cloud::Bigquery::Storage::V1::Table;
+use Google::Cloud::Bigquery::Storage::V1::Stream;
+use Google::Cloud::Bigquery::Storage::V1::Storage;
+
+our $VERSION = '0.05';
+
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
 
@@ -29,31 +27,73 @@ sub BUILD {
     my ($self) = @_;
 
     my $auth = $self->credentials;
-    if (!$auth || !eval { $auth->can('get_token') }) {
+    if (!defined $auth) {
         $auth = Google::Auth->default();
+    } elsif (!eval { $auth->can('get_token') }) {
+        croak 'Invalid credentials object: must implement get_token()';
     }
     my $token = $auth->get_token();
 
-    my $client = Google::gRPC::Client->new(
-        target     => 'bigquerystorage.googleapis.com:443',
-        auth_token => $token,
-    );
-    $self->transport($client);
+    my $target = 'bigquerystorage.googleapis.com:443';
+    my $t = $self->transport || 'grpc';
+
+    if (ref($t) && eval { $t->can('call') }) {
+        # Already a transport object
+    } elsif (lc($t) eq 'rest') {
+        my $client = Google::Cloud::REST::Client->new(
+            target     => $target,
+            auth_token => $token,
+        );
+        $self->transport($client);
+    } else {
+        my $client = Google::gRPC::Client->new(
+            target     => $target,
+            auth_token => $token,
+        );
+        $self->transport($client);
+    }
 }
 
-sub call_rpc {
-    my ($self, $method, $request_msg, $response_class) = @_;
-    croak 'transport not initialized' unless $self->transport;
-    return $self->transport->call_unary($method, $request_msg, $response_class);
-}
+sub create_read_session {
+    my ($self, %params) = @_;
 
-1;
+    my $request_class = 'Google::Cloud::Bigquery::Storage::V1::Storage::CreateReadSessionRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Cloud::Bigquery::Storage::V1::Stream::ReadSession';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.bigquery.storage.v1.BigQueryRead/CreateReadSession',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.cloud.bigquery.storage.v1.BigQueryRead',
+        method         => 'CreateReadSession',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+1; # End of Google::Cloud::Bigquery::Storage::V1
 
 __END__
 
 =head1 NAME
 
-Google::Cloud::Bigquery::Storage::V1 - Google Cloud BigQuery Storage V1 API Client
+Google::Cloud::Bigquery::Storage::V1 - Client library for Google Cloud Services
 
 =head1 SYNOPSIS
 
@@ -61,14 +101,91 @@ Google::Cloud::Bigquery::Storage::V1 - Google Cloud BigQuery Storage V1 API Clie
     use Google::Auth;
 
     my $auth = Google::Auth->default();
-    my $client = Google::Cloud::Bigquery::Storage::V1->new(credentials => $auth);
+
+    # 1. High-performance gRPC Transport (Default)
+    my $grpc_client = Google::Cloud::Bigquery::Storage::V1->new(
+        credentials => $auth,
+        transport   => 'grpc', # Optional: 'grpc' is default
+    );
+
+    # 2. HTTP/REST Transport
+    my $rest_client = Google::Cloud::Bigquery::Storage::V1->new(
+        credentials => $auth,
+        transport   => 'rest',
+    );
+
+    # Execute service methods
+    my $res = $grpc_client->some_method( %params );
 
 =head1 DESCRIPTION
 
-Google Cloud BigQuery Storage V1 API Client over high-performance gRPC transport.
+C<Google::Cloud::Bigquery::Storage::V1> is an auto-generated client library for Google Cloud Services.
 
-=head1 LICENSE
+It provides a unified client interface supporting both high-performance HTTP/2 gRPC and HTTP/REST transports, with automatic Google Cloud Application Default Credentials (ADC) resolution and typed Protocol Buffers message handling.
 
-Apache 2.0
+=head1 SOURCE
+
+Generated from the following Protocol Buffers schemas:
+
+=over 4
+
+=item * C<googleapis/google/cloud/bigquery/storage/v1/annotations.proto>
+
+=item * C<googleapis/google/cloud/bigquery/storage/v1/arrow.proto>
+
+=item * C<googleapis/google/cloud/bigquery/storage/v1/avro.proto>
+
+=item * C<googleapis/google/cloud/bigquery/storage/v1/protobuf.proto>
+
+=item * C<googleapis/google/cloud/bigquery/storage/v1/storage.proto>
+
+=item * C<googleapis/google/cloud/bigquery/storage/v1/stream.proto>
+
+=item * C<googleapis/google/cloud/bigquery/storage/v1/table.proto>
+
+
+
+=back
+
+=head1 CONSTRUCTOR
+
+=head2 new
+
+    my $client = Google::Cloud::Bigquery::Storage::V1->new(
+        credentials => $auth,   # Optional: Google::Auth object (defaults to ADC)
+        transport   => 'grpc', # Optional: 'grpc' (default) or 'rest'
+    );
+
+=head1 ATTRIBUTES
+
+=head2 credentials
+
+Returns or accepts the L<Google::Auth> credentials object.
+
+=head2 transport
+
+Returns or accepts the active transport object (L<Google::gRPC::Client> or L<Google::Cloud::REST::Client>).
+
+=head1 METHODS
+
+=head2 METHODS
+
+The following RPC methods are available in this client:
+
+=over 4
+
+=item * B<create_read_session>
+
+Calls the RPC method C<CreateReadSession> on the service. Takes a hash of parameters representing the request.
+
+=back
+
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
 
 =cut

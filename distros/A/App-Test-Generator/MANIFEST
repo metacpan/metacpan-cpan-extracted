@@ -5,6 +5,7 @@ bin/fuzz-harness-generator
 bin/generate-test-dashboard
 bin/instrument-modules
 bin/pod-example-tester
+bin/run-all-fuzz
 bin/test-generator-index
 bin/test-generator-mutate
 Changes
@@ -109,6 +110,7 @@ t/golden/geo-coder-free.yml
 t/golden/ham-dxcc-lookup.yml
 t/golden/lingua-en-namecase.yml
 t/golden_schemas.t
+t/harness_tolerances.t
 t/instantiation.t
 t/integration.t
 t/LCSAJ-Coverage.t

@@ -82,21 +82,6 @@ coerce 'RepeatedEnableManagedRotationRequest',
 declare 'MapStringEnableManagedRotationRequest',
     as HashRef[EnableManagedRotationRequest()];
 
-declare 'CloudSQLSingleUserCredentials',
-    as InstanceOf['Google::Cloud::Secretmanager::V1::Service::EnableManagedRotationRequest::CloudSQLSingleUserCredentials'];
-
-coerce 'CloudSQLSingleUserCredentials',
-    from HashRef, via { 'Google::Cloud::Secretmanager::V1::Service::EnableManagedRotationRequest::CloudSQLSingleUserCredentials'->new($_) };
-
-declare 'RepeatedCloudSQLSingleUserCredentials',
-    as ArrayRef[CloudSQLSingleUserCredentials()];
-
-coerce 'RepeatedCloudSQLSingleUserCredentials',
-    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Secretmanager::V1::Service::EnableManagedRotationRequest::CloudSQLSingleUserCredentials'->new($_) } @$_ ] };
-
-declare 'MapStringCloudSQLSingleUserCredentials',
-    as HashRef[CloudSQLSingleUserCredentials()];
-
 declare 'RotateSecretRequest',
     as InstanceOf['Google::Cloud::Secretmanager::V1::Service::RotateSecretRequest'];
 

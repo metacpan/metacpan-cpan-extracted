@@ -16,7 +16,7 @@ if ($target =~ /\.ps1$/) {
   print $fh <<'EOF';
 # Proxy to the Perl implementation
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-& perl "$scriptDir\gcloud-auth.pl" @Args
+& perl "$scriptDir\gcloud-auth" @Args
 EOF
 } else {
   # Shell Proxy

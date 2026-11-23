@@ -13,7 +13,7 @@ use warnings;
 use Carp;
 use File::ValueFile::Simple::Writer;
 
-our $VERSION = v0.16;
+our $VERSION = v0.17;
 
 use parent 'Data::TagDB::WeakBaseObject';
 
@@ -131,7 +131,7 @@ Data::TagDB::Exporter - Work with Tag databases
 
 =head1 VERSION
 
-version v0.16
+version v0.17
 
 =head1 SYNOPSIS
 

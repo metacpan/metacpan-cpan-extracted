@@ -3,7 +3,7 @@ package Google::Protobuf::Duration;
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -113,47 +113,136 @@ EOF
     # Field: seconds Type: 3 ()
     # Field: nanos Type: 5 ()
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Protobuf::Duration::Duration - Compiled Protocol Buffers message class
+Google::Protobuf::Duration - Compiled Protocol Buffers messages for google/protobuf/duration.proto
 
 =head1 SYNOPSIS
 
     use Google::Protobuf::Duration;
 
-    my $msg = Google::Protobuf::Duration::Duration->new(
-        seconds => $value,
-    );
+    my $msg = Google::Protobuf::Duration::Duration->new({
+        seconds => $seconds,
+        nanos => $nanos,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->seconds();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Protobuf::Duration::Duration->parse($bytes);
 
-=item * B<seconds>
-
-Type: Int64
-
-=item * B<nanos>
-
-Type: Int32
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Protobuf::Duration - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/protobuf/duration.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Protobuf::Duration::Duration
+
+A Duration represents a signed, fixed-length span of time represented
+as a count of seconds and fractions of seconds at nanosecond
+resolution. It is independent of any calendar and concepts like "day"
+or "month". It is related to Timestamp in that the difference between
+two Timestamp values is a Duration and it can be added or subtracted
+from a Timestamp. Range is approximately +-10,000 years.
+
+# Examples
+
+Example 1: Compute Duration from two Timestamps in pseudo code.
+
+    Timestamp start = ...;
+    Timestamp end = ...;
+    Duration duration = ...;
+
+    duration.seconds = end.seconds - start.seconds;
+    duration.nanos = end.nanos - start.nanos;
+
+    if (duration.seconds < 0 && duration.nanos > 0) {
+      duration.seconds += 1;
+      duration.nanos -= 1000000000;
+    } else if (duration.seconds > 0 && duration.nanos < 0) {
+      duration.seconds -= 1;
+      duration.nanos += 1000000000;
+    }
+
+Example 2: Compute Timestamp from Timestamp + Duration in pseudo code.
+
+    Timestamp start = ...;
+    Duration duration = ...;
+    Timestamp end = ...;
+
+    end.seconds = start.seconds + duration.seconds;
+    end.nanos = start.nanos + duration.nanos;
+
+    if (end.nanos < 0) {
+      end.seconds -= 1;
+      end.nanos += 1000000000;
+    } else if (end.nanos >= 1000000000) {
+      end.seconds += 1;
+      end.nanos -= 1000000000;
+    }
+
+Example 3: Compute Duration from datetime.timedelta in Python.
+
+    td = datetime.timedelta(days=3, minutes=10)
+    duration = Duration()
+    duration.FromTimedelta(td)
+
+# JSON Mapping
+
+In JSON format, the Duration type is encoded as a string rather than an
+object, where the string ends in the suffix "s" (indicating seconds) and
+is preceded by the number of seconds, with nanoseconds expressed as
+fractional seconds. For example, 3 seconds with 0 nanoseconds should be
+encoded in JSON format as "3s", while 3 seconds and 1 nanosecond should
+be expressed in JSON format as "3.000000001s", and 3 seconds and 1
+microsecond should be expressed in JSON format as "3.000001s".
+
+
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->seconds() >> / C<< $msg->seconds($value) >>
+
+Type: C<Int64>
+
+Signed seconds of the span of time. Must be from -315,576,000,000
+to +315,576,000,000 inclusive. Note: these bounds are computed from:
+60 sec/min * 60 min/hr * 24 hr/day * 365.25 days/year * 10000 years
+
+=item * C<< $msg->nanos() >> / C<< $msg->nanos($value) >>
+
+Type: C<Int32>
+
+Signed fractions of a second at nanosecond resolution of the span
+of time. Durations less than one second are represented with a 0
+`seconds` field and a positive or negative `nanos` field. For durations
+of one second or more, a non-zero value for the `nanos` field must be
+of the same sign as the `seconds` field. Must be from -999,999,999
+to +999,999,999 inclusive.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Protobuf::Duration::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

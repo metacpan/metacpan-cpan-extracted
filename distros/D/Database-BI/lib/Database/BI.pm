@@ -9,6 +9,7 @@ use Carp qw(croak);
 use Mojo::File ();
 use Mojo::URL;
 use Database::BI::I18N ();
+use Database::BI::Util ();
 use Database::BI::Sessions;
 use CHI	();
 use File::Spec ();
@@ -18,15 +19,12 @@ use Database::BI::Model::DataSource;
 use Database::BI::Tutorial;
 
 # version->declare here alone: this is VERSION_FROM, and with it MakeMaker
-# writes 0.023.1 into META; a plain dotted string becomes v0.023.1 there.
-use version; our $VERSION = version->declare('0.023.1');
+# writes 0.024.0 into META; a plain dotted string becomes v0.024.0 there.
+use version; our $VERSION = version->declare('0.024.0');
 
 # The roadmap after 0.021.0, from its gap analysis (2026-11-06).
 #
 # Features:
-# TODO: Time zones.  A timestamp's Z or offset is accepted and ignored (times
-#	are compared as written).  Normalise to UTC or a configured zone, with
-#	Time range and span= buckets aware of it.
 # TODO: More JSON: JSON Lines (.jsonl, .ndjson); optional dot-path flattening
 #	of nested objects (address.city) instead of JSON text; reading a large
 #	file as a stream rather than all at once.
@@ -150,7 +148,7 @@ Database::BI - Web-based Business Intelligence viewer for data files
 
 =head1 VERSION
 
-0.023.1
+0.024.0
 
 =head1 DESCRIPTION
 
@@ -184,6 +182,11 @@ every supported file.  Recently opened filesystem files appear in a
 
 B<Filesystem browser> -- C</browse> lets the user navigate the entire
 filesystem and open any supported data file, not just files in C<data_dir>.
+A folder with two or more data files has a checkbox beside each (and Select
+all; shift-click ticks a range), and Combine selected opens the ticked files
+as one table, as the Combine data panel does.  A folder of reports of one
+format, such as a DMARC archive, is one click, and the table has a
+C<source_file> column that names the file each row came from.
 
 =item *
 
@@ -212,7 +215,8 @@ applies the filter.  Each active filter chip has an individual remove (x)
 button so conditions can be dropped one at a time.  Operators: C<eq>,
 C<ne>, C<contains>, C<starts>, C<lt>, C<le>, C<gt>, C<ge>, C<between>, C<empty>,
 C<notempty>; and C<in>, which a link can carry but the bar does not offer: any
-value of a JSON list, as in C<f=place:in:["Paris","Rome"]>.  Filters are
+value of a JSON list, as in C<f=place:in:["Paris","Rome"]>, and C<differ>,
+which the Delta button adds (see below).  Filters are
 applied server-side after all joins.  C<lt>, C<le>,
 C<gt> and C<ge> compare numbers, reading C<$1,234.56> and C<(1,234.56)> as
 numbers too; a blank or a word in the cell matches none of them.
@@ -230,6 +234,17 @@ set and leaving blanks where a source file lacks a column.
 
 =item *
 
+B<Delta> -- the "Delta" button, to the right of Combine data, asks for two
+columns and removes every row where they are identical, so only the rows
+where they differ are left.  It adds the filter C<f=first:differ:second> to the
+view, so the table, charts, pivot, export and print all show the same rows,
+and the chip can be removed like any other filter.  "Identical" means the same
+text: C<Ann> and C<ann>, or C<10> and C<10.0>, differ.  An empty cell
+is identical to another empty cell, so a row where both are empty is removed.  Both columns must be in the view, or the request
+is a C<400>.  The names of the two columns must not contain a colon.
+
+=item *
+
 B<Charts> -- nine L<HTML::D3> D3.js v7 chart types are accessible from
 the toolbar: line chart (brush-to-zoom, reference lines for min/avg/max and a trend line,
 multi-series interactive legend), pie chart (click-a-slice to filter,
@@ -242,6 +257,12 @@ by dragging the bottom-right corner grip, or from the keyboard: the grip
 takes focus, the arrow keys resize the chart (Shift takes bigger steps,
 Home and End go to the narrowest and widest it can be) and the size is announced
 as it changes.  All chart pages include Copy-link and Export SVG/PNG/PDF buttons.
+In a browser with the File System Access API (Chrome, Edge and other Chromium
+browsers, on this machine or over https) each export opens the Save As box, so
+the reader chooses the folder and the file name; the chart's own name is
+suggested, and cancelling saves nothing.  Other browsers download the file under
+that name into their usual downloads folder.  (The Export panel on a table is
+different: it saves on the server, in C<export_dirs>.)
 
 =item *
 
@@ -335,7 +356,10 @@ data" panel is open the dropped file populates the right-table path field.
 
 B<Export> -- the toolbar export panel writes the current logical view
 (after joins, filters, and dedup) to a chosen filesystem path as CSV
-(C<.csv>), SQLite (C<.sql>), or JSON (C<.json>).
+(C<.csv>), SQLite (C<.sql>), or JSON (C<.json>).  Only the columns the table
+still shows are saved, in the table's order: a column you deleted is left out,
+and a column you dragged to a new place is written there (JSON keys follow the
+same order).
 
 =item *
 
@@ -501,7 +525,9 @@ only a relative window of rows (see L</Relative time ranges>).
 
 A long table is shown a page at a time: C<?page=> is the page, and
 C<?per_page=> its size (else the reader's preference, else 200; up to 2000;
-C<0> is every row on one page, and then C<page=> is ignored).  The page says
+C<0> is every row on one page, and then C<page=> is ignored; a number below 1
+is 1, and anything that is not a whole number written with the digits 0-9 is
+taken as if it were not given).  The page says
 "Page 2 of 7", and its Rows per page list (25, 50, 100, 200, All) changes the
 size, keeping the first row on screen.  A pivot pages its row groups the same
 way.
@@ -521,7 +547,11 @@ show the data directory.
 =item C<GET /browse>
 
 Filesystem navigator.  Accepts C<?path=> to set the starting directory
-(defaults to C<$HOME>).
+(defaults to C<$HOME>).  When the folder holds two or more data files the
+page can tick several and send them to C</combine> (the first as C<l=>, the
+others as C<c=>, with C<srccol=source_file>).  A very long list makes a long
+URL, so the request line may be up to 256 KiB (C<MOJO_MAX_LINE_SIZE>, which
+is set to that at startup unless it is already set).
 
 =item C<GET /open>
 
@@ -537,6 +567,7 @@ Performs one or more left joins and renders the merged table.  Parameters:
   l=<spec>               left table spec (see below)
   j=<spec>|<lk>|<rk>    join step (repeatable): right-spec, left key, right key
   c=<spec>               table to stack after the joins (repeatable; see /combine)
+  srccol=<name>          with c=, a column naming each row's source file (see /combine)
   f=<col>:<op>:<val>     result filter (repeatable)
   range=<name>           relative time range, with rcol=<column> (see below)
 
@@ -567,6 +598,10 @@ C</join>) as a file download.  Additional parameter:
 
   format=csv      (default) - RFC 4180 CSV; UTF-8; CRLF line endings
   format=sqlite   - SQLite 3 database with a single table named "data"
+  format=json     - JSON array of row objects; keys follow the column order
+  xcol=<name>     - (repeatable) keep only these columns, in this order;
+                    names the view lacks are ignored, and none left means
+                    every column
 
 The download filename is derived from the left table label with
 non-alphanumeric characters replaced by underscores.
@@ -574,9 +609,10 @@ non-alphanumeric characters replaced by underscores.
 =item C<POST /export>
 
 Writes the current logical view to a chosen filesystem path.
-Body params: C<l=>, C<j=>, C<f=> (same as GET), plus
+Body params: C<l=>, C<j=>, C<f=>, C<xcol=> (same as GET), plus
 C<dir=> (target directory) and C<filename=> (name including extension;
-extension determines format: C<.csv> or C<.sql>).
+extension determines format: C<.csv>, C<.sql> or C<.json>).  The Export panel
+sends one C<xcol=> for each column its table still shows.
 Returns JSON C<{ saved: "/abs/path" }> or C<{ error: "..." }>.
 
 =item C<GET /api/dirs>
@@ -627,6 +663,12 @@ where a source file lacks a column.  Parameters:
   j=<spec>|<lk>|<rk>    join step applied to the left table first (repeatable)
   c=<spec>               additional table to stack (repeatable)
   f=<col>:<op>:<val>     result filter applied after combining (repeatable)
+  srccol=<name>          add a last column, <name>, holding the file or table
+                         each row came from (a letter or underscore, then
+                         letters, digits or underscores, at most 64; a name a
+                         source already uses gets an underscore added).  The
+                         file browser's Combine selected passes source_file.
+                         The panels, Export and Print carry it on.
 
 =item C<GET /graph>
 
@@ -1845,6 +1887,24 @@ server other machines reach should be behind https.  Ten wrong passwords from
 one address within 15 minutes lock that address out for the rest of the 15
 minutes (C<429>); each server process counts its own.
 
+=head2 Time zones
+
+A timestamp that names its zone (C<2026-11-06T23:30:00Z>, C<...+01:00>) is read
+as written unless C<time_zone> is set.  With it, such a value is moved to that
+zone's clock first, so the day and hour a filter, the Time range, a formula
+(C<hour>, C<minute>) and the C<span=> buckets see are the ones on that clock,
+and "today", "this month" and the other Time range presets are that zone's too.
+A value with no zone written is taken to be on that clock already, and a table
+still shows each cell as it was written.
+
+    {
+        time_zone => 'UTC',        # or '-05:00', '+05:30', or 'local'
+    }
+
+C<local> is the server's own zone, daylight saving included (set C<TZ> to
+change it).  Named zones such as C<America/New_York> are not read: use C<local>
+with C<TZ>, or an offset.  Anything else stops the start.
+
 =head2 MariaDB and MySQL servers
 
 A server is opened by name.  Each entry of C<mariadb_servers> is one database:
@@ -2360,10 +2420,10 @@ that read differently; C<t/i18n.t> fails when a British message needs an
 American spelling it does not list.  The tutorial's text is still in British
 English.
 
-=item B<Supported data file extensions are: csv, db, sql, sqlite, sqlite3, xml, psv, tsv, xlsx, json>
+=item B<Supported data file extensions are: csv, db, sql, sqlite, sqlite3, xml, psv, tsv, xlsx, json, jsonl, ndjson>
 
 The application recognises C<.csv>, C<.db>, C<.sql>, C<.sqlite>, C<.sqlite3>,
-C<.xml>, C<.psv>, C<.tsv>, C<.xlsx> and C<.json> files.  All three SQLite extensions
+C<.xml>, C<.psv>, C<.tsv>, C<.xlsx>, C<.json>, C<.jsonl> and C<.ndjson> files.  All three SQLite extensions
 (C<.sql>, C<.sqlite>, C<.sqlite3>) are treated identically -- C<inventory.sqlite>
 and C<inventory.sqlite3> are both opened as SQLite databases without renaming.
 Excel C<.xlsx> files are read by L<Database::Abstraction>, using
@@ -2379,6 +2439,15 @@ opens on C</tables>, with a card for each, and other values beside the lists
 or a list shows as its JSON text, C<true> and C<false> as words and C<null> as
 an empty cell, and the columns are in the order the file first names them.  A
 file of another format with the same name in the same folder is the one read.
+
+A C<.jsonl> or C<.ndjson> file (JSON Lines, one object a line, as logs and API
+exports write it) is a table with a row for each line.  It is read as a stream,
+and so is a C<.json> list of objects over 16 MiB, so a large file does not
+need memory for its text and its parse as well.  Set C<json_flatten> to 1 in
+C<database_bi.conf> and a nested object becomes a column for each of its
+values, named by its path (C<address.city>), instead of one cell of JSON text;
+lists stay text.  It is off by default, and applies to C<.json> and JSON Lines
+alike.
 
 URLs will work.
 For example enter
@@ -2642,8 +2711,10 @@ sub startup ($self) {
 	_check_share_secret($self->config('share_secret'));
 	_check_export_dirs($self, $self->config('export_dirs'));
 	croak 'ai_calls_per_hour: give a whole number of provider calls an hour, or 0 for no limit'
-		if defined $self->config('ai_calls_per_hour') && $self->config('ai_calls_per_hour') !~ /\A\d+\z/;
+		if defined $self->config('ai_calls_per_hour') && $self->config('ai_calls_per_hour') !~ /\A[0-9]+\z/;
 	_check_login($self->config('password_hash'), $self->config('login_expiration'));
+	# Read once: a bad time_zone stops the start, as the other settings do.
+	my $time_zone = Database::BI::Util::parse_zone($self->config('time_zone'));
 	_require_export_dirs_with_password($self->config('password_hash'), $self->config('export_dirs'));
 
 	# Only this machine can reach a server unless the configuration says
@@ -2652,6 +2723,8 @@ sub startup ($self) {
 	# win: the daemon and prefork commands read MOJO_LISTEN only when started,
 	# after this, and -l replaces it.
 	my @listen = _listen_locations($self->config('listen'));
+	# Stacking a folder of files puts every path in the URL; Mojo's 8 KiB line limit is too small.
+	$ENV{MOJO_MAX_LINE_SIZE} ||= 262_144;
 	$ENV{MOJO_LISTEN} = join(',', @listen) unless length($ENV{MOJO_LISTEN} // '');
 	_default_hypnotoad_listen($self->config);
 	_require_password_if_open($self, $ENV{MOJO_LISTEN}, $self->config->{hypnotoad});
@@ -2774,6 +2847,7 @@ sub startup ($self) {
 	# would need to set it again there.
 	$self->hook(around_dispatch => sub {
 		my ($next, $c) = @_;
+		local $Database::BI::Util::ZONE = $time_zone;
 		local $Database::BI::I18N::LANGUAGE = Database::BI::I18N::choose(
 			accept  => scalar $c->req->headers->accept_language,
 			default => $c->app->config->{language},
@@ -2937,6 +3011,8 @@ sub startup ($self) {
 			view_filters   => [ grep { length } @{ $c->every_param('f') } ],
 			view_combines  => [ grep { /\A(?:path|table|url|redis|mariadb):/i } @{ $c->every_param('c') } ],
 			view_dedup     => ($c->param('d') ? 1 : 0),
+			# srccol= names the column that says which file a stacked row came from.
+			view_srccol    => (($c->param('srccol') // '') =~ /\A[A-Za-z_][A-Za-z0-9_]{0,63}\z/ ? $c->param('srccol') : ''),
 			# lk=/nolk= turn a stored lookup on or off for this view, as name=value
 			# pairs so the macro can write them back in the order they came.
 			view_lookups   => [ map { my $k = $_; map { { name => $k, value => $_ } } grep { length } @{ $c->every_param($k) } } qw(lk nolk) ],
@@ -3133,6 +3209,7 @@ sub startup ($self) {
 			exists $opts{file_ext}       ? (file_ext       => $opts{file_ext})       : (),
 			exists $opts{internal_table} ? (internal_table => $opts{internal_table}) : (),
 			exists $opts{column_order}   ? (column_order   => $opts{column_order})   : (),
+			json_flatten   => $c->app->config('json_flatten') ? 1 : 0,
 		);
 	});
 
@@ -3412,7 +3489,7 @@ sub _check_login {
 			unless Database::BI::Password::is_password_hash($hash);
 	}
 	croak sprintf("login_expiration: '%s' is not a number of seconds from 60", ref($expiration) || $expiration)
-		if defined $expiration && (ref $expiration || $expiration !~ /\A\d+\z/ || $expiration < 60);
+		if defined $expiration && (ref $expiration || $expiration !~ /\A[0-9]+\z/ || $expiration < 60);
 	return;
 }
 

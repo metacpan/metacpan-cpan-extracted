@@ -44,9 +44,9 @@ BEGIN {
 
 # D. Main test execution
 package main;
-use Google::Cloud::Kms::EkmServiceClient;
+use Google::Cloud::Kms::V1::EkmServiceClient;
 
-my $client = Google::Cloud::Kms::EkmServiceClient->new( credentials => 'dummy' );
+my $client = Google::Cloud::Kms::V1::EkmServiceClient->new();
 ok($client, 'Instantiated generated client');
 isa_ok($client->transport, 'Google::gRPC::Client', 'Client transport');
 

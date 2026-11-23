@@ -46,60 +46,9 @@ BEGIN {
 package main;
 use Google::Cloud::Kms::V1;
 
-my $client = Google::Cloud::Kms::V1->new( credentials => 'dummy' );
+my $client = Google::Cloud::Kms::V1->new();
 ok($client, 'Instantiated generated client');
 isa_ok($client->transport, 'Google::gRPC::Client', 'Client transport');
-
-subtest 'list_key_rings method' => sub {
-    $client->transport->{mock_call} = sub {
-        my ($args) = @_;
-        is($args->{service}, 'google.cloud.kms.v1.KeyManagementService', 'Correct service path');
-        is($args->{method}, 'ListKeyRings', 'Correct RPC method');
-        isa_ok($args->{request}, 'Google::Cloud::Kms::V1::Service::ListKeyRingsRequest', 'Request object');
-        
-        my $response = 'Google::Cloud::Kms::V1::Service::ListKeyRingsResponse'->new();
-        return $response;
-    };
-    
-    my $res = $client->list_key_rings();
-    ok($res, 'Method returned a response');
-    isa_ok($res, 'Google::Cloud::Kms::V1::Service::ListKeyRingsResponse', 'Response object class');
-    done_testing();
-};
-
-subtest 'create_key_handle method' => sub {
-    $client->transport->{mock_call} = sub {
-        my ($args) = @_;
-        is($args->{service}, 'google.cloud.kms.v1.Autokey', 'Correct service path');
-        is($args->{method}, 'CreateKeyHandle', 'Correct RPC method');
-        isa_ok($args->{request}, 'Google::Cloud::Kms::V1::Autokey::CreateKeyHandleRequest', 'Request object');
-        
-        my $response = 'Google::Longrunning::Operations::Operation'->new();
-        return $response;
-    };
-    
-    my $res = $client->create_key_handle();
-    ok($res, 'Method returned a response');
-    isa_ok($res, 'Google::Longrunning::Operations::Operation', 'Response object class');
-    done_testing();
-};
-
-subtest 'list_ekm_connections method' => sub {
-    $client->transport->{mock_call} = sub {
-        my ($args) = @_;
-        is($args->{service}, 'google.cloud.kms.v1.EkmService', 'Correct service path');
-        is($args->{method}, 'ListEkmConnections', 'Correct RPC method');
-        isa_ok($args->{request}, 'Google::Cloud::Kms::V1::EkmService::ListEkmConnectionsRequest', 'Request object');
-        
-        my $response = 'Google::Cloud::Kms::V1::EkmService::ListEkmConnectionsResponse'->new();
-        return $response;
-    };
-    
-    my $res = $client->list_ekm_connections();
-    ok($res, 'Method returned a response');
-    isa_ok($res, 'Google::Cloud::Kms::V1::EkmService::ListEkmConnectionsResponse', 'Response object class');
-    done_testing();
-};
 
 subtest 'update_autokey_config method' => sub {
     $client->transport->{mock_call} = sub {
@@ -152,6 +101,40 @@ subtest 'show_effective_autokey_config method' => sub {
     done_testing();
 };
 
+subtest 'create_key_handle method' => sub {
+    $client->transport->{mock_call} = sub {
+        my ($args) = @_;
+        is($args->{service}, 'google.cloud.kms.v1.Autokey', 'Correct service path');
+        is($args->{method}, 'CreateKeyHandle', 'Correct RPC method');
+        isa_ok($args->{request}, 'Google::Cloud::Kms::V1::Autokey::CreateKeyHandleRequest', 'Request object');
+        
+        my $response = 'Google::Longrunning::Operations::Operation'->new();
+        return $response;
+    };
+    
+    my $res = $client->create_key_handle();
+    ok($res, 'Method returned a response');
+    isa_ok($res, 'Google::Longrunning::Operations::Operation', 'Response object class');
+    done_testing();
+};
+
+subtest 'list_ekm_connections method' => sub {
+    $client->transport->{mock_call} = sub {
+        my ($args) = @_;
+        is($args->{service}, 'google.cloud.kms.v1.EkmService', 'Correct service path');
+        is($args->{method}, 'ListEkmConnections', 'Correct RPC method');
+        isa_ok($args->{request}, 'Google::Cloud::Kms::V1::EkmService::ListEkmConnectionsRequest', 'Request object');
+        
+        my $response = 'Google::Cloud::Kms::V1::EkmService::ListEkmConnectionsResponse'->new();
+        return $response;
+    };
+    
+    my $res = $client->list_ekm_connections();
+    ok($res, 'Method returned a response');
+    isa_ok($res, 'Google::Cloud::Kms::V1::EkmService::ListEkmConnectionsResponse', 'Response object class');
+    done_testing();
+};
+
 subtest 'list_single_tenant_hsm_instances method' => sub {
     $client->transport->{mock_call} = sub {
         my ($args) = @_;
@@ -166,6 +149,23 @@ subtest 'list_single_tenant_hsm_instances method' => sub {
     my $res = $client->list_single_tenant_hsm_instances();
     ok($res, 'Method returned a response');
     isa_ok($res, 'Google::Cloud::Kms::V1::HsmManagement::ListSingleTenantHsmInstancesResponse', 'Response object class');
+    done_testing();
+};
+
+subtest 'list_key_rings method' => sub {
+    $client->transport->{mock_call} = sub {
+        my ($args) = @_;
+        is($args->{service}, 'google.cloud.kms.v1.KeyManagementService', 'Correct service path');
+        is($args->{method}, 'ListKeyRings', 'Correct RPC method');
+        isa_ok($args->{request}, 'Google::Cloud::Kms::V1::Service::ListKeyRingsRequest', 'Request object');
+        
+        my $response = 'Google::Cloud::Kms::V1::Service::ListKeyRingsResponse'->new();
+        return $response;
+    };
+    
+    my $res = $client->list_key_rings();
+    ok($res, 'Method returned a response');
+    isa_ok($res, 'Google::Cloud::Kms::V1::Service::ListKeyRingsResponse', 'Response object class');
     done_testing();
 };
 

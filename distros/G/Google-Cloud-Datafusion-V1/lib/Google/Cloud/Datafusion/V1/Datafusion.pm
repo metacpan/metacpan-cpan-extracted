@@ -3,7 +3,7 @@ package Google::Cloud::Datafusion::V1::Datafusion;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -1404,14 +1404,14 @@ Type: Message (.google.cloud.datafusion.v1.OperationMetadata.AdditionalStatusEnt
 
 =cut
 
-# === Service Client: Google::Cloud::Datafusion::V1::Datafusion::DatafusionClient ===
-package Google::Cloud::Datafusion::V1::Datafusion::DatafusionClient;
+# === Service Client: Google::Cloud::Datafusion::V1::Datafusion::DataFusionClient ===
+package Google::Cloud::Datafusion::V1::Datafusion::DataFusionClient;
 
 =pod
 
 =head1 NAME
 
-Google::Cloud::Datafusion::V1::Datafusion::DatafusionClient - Client stub representing the remote DataFusion service
+Google::Cloud::Datafusion::V1::Datafusion::DataFusionClient - Client stub representing the remote DataFusion service
 
 =head1 DESCRIPTION
 

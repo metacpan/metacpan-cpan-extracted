@@ -2612,23 +2612,14 @@ for my $c (@CASES) {
 		'constant predictor: the estimable slope is still exact');
 }
 
-# A factor with a single level contributes no columns, so `y ~ x + g` fits the
-# same model as `y ~ x`.  R refuses this outright:
+# A factor with a single level is refused, as in R (0.3428; through 0.3427 it
+# was dropped and the model fitted as `y ~ x`):
 #   Error in `contrasts<-`(...): contrasts can be applied only to factors with
 #   2 or more levels
-# lm() dropping the term instead is a deliberate difference, so it is pinned
-# here: whatever it does must at least be a coherent fit of `y ~ x`.
 {
-	my $with    = lm(formula => 'y ~ x + g', data => $DATA{onelevel});
-	my $without = lm(formula => 'y ~ x',     data => $DATA{onelevel});
-	is($with->{rank}, $without->{rank},
-		'single-level factor: contributes no column, so rank matches y ~ x');
-	is($with->{'df_residual'}, $without->{'df_residual'},
-		'single-level factor: df_residual matches y ~ x');
-	is_close($with->{rss}, $without->{rss}, 1e-12,
-		'single-level factor: rss matches y ~ x');
-	is_close($with->{coefficients}{x}, $without->{coefficients}{x}, 1e-12,
-		'single-level factor: slope matches y ~ x');
+	ok(!eval { lm(formula => 'y ~ x + g', data => $DATA{onelevel}); 1 }
+	   && $@ =~ /contrasts can be applied only to factors with 2 or more levels/,
+		'single-level factor: refused, as R does');
 }
 
 # Level ordering.  lm() sorts levels with strcmp(), i.e. in byte order, which is

@@ -12,7 +12,7 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Compute::V1::Compute;
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -20,14 +20,15 @@ has transport   => ( is => 'rw' );
 sub BUILD {
     my ($self) = @_;
 
-    # Resolve credentials: use passed credentials object if it implements get_token, or default to ADC
     my $auth = $self->credentials;
-    if (!$auth || !eval { $auth->can('get_token') }) {
+    if (!defined $auth) {
         $auth = Google::Auth->default();
+    } elsif (!eval { $auth->can('get_token') }) {
+        croak 'Invalid credentials object: must implement get_token()';
     }
     my $token = $auth->get_token();
 
-    my $target = 'localhost:50051';
+    my $target = 'compute.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -39,7 +40,6 @@ sub BUILD {
         );
         $self->transport($client);
     } else {
-        # Default high-performance HTTP/2 gRPC client
         my $client = Google::gRPC::Client->new(
             target     => $target,
             auth_token => $token,
@@ -52,9 +52,26 @@ sub delete {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::DeleteRegionSslPolicyRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.RegionSslPolicies/Delete',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.RegionSslPolicies',
         method         => 'Delete',
@@ -69,12 +86,63 @@ sub get {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::GetRegionSslPolicyRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::SslPolicy';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.RegionSslPolicies/Get',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.RegionSslPolicies',
         method         => 'Get',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+
+sub get_iam_policy {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Cloud::Compute::V1::Compute::GetIamPolicyRegionSslPolicyRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Cloud::Compute::V1::Compute::Policy';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.RegionSslPolicies/GetIamPolicy',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.cloud.compute.v1.RegionSslPolicies',
+        method         => 'GetIamPolicy',
         request        => $request,
         response_class => $response_class,
     });
@@ -86,9 +154,26 @@ sub insert {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::InsertRegionSslPolicyRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.RegionSslPolicies/Insert',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.RegionSslPolicies',
         method         => 'Insert',
@@ -103,9 +188,26 @@ sub list {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::ListRegionSslPoliciesRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::SslPoliciesList';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.RegionSslPolicies/List',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.RegionSslPolicies',
         method         => 'List',
@@ -120,9 +222,26 @@ sub list_available_features {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::ListAvailableFeaturesRegionSslPoliciesRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::SslPoliciesListAvailableFeaturesResponse';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.RegionSslPolicies/ListAvailableFeatures',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.RegionSslPolicies',
         method         => 'ListAvailableFeatures',
@@ -137,12 +256,97 @@ sub patch {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Compute::V1::Compute::PatchRegionSslPolicyRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Compute::V1::Compute::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.RegionSslPolicies/Patch',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.compute.v1.RegionSslPolicies',
         method         => 'Patch',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+
+sub set_iam_policy {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Cloud::Compute::V1::Compute::SetIamPolicyRegionSslPolicyRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Cloud::Compute::V1::Compute::Policy';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.RegionSslPolicies/SetIamPolicy',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.cloud.compute.v1.RegionSslPolicies',
+        method         => 'SetIamPolicy',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+
+sub test_iam_permissions {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Cloud::Compute::V1::Compute::TestIamPermissionsRegionSslPolicyRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Cloud::Compute::V1::Compute::TestPermissionsResponse';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.compute.v1.RegionSslPolicies/TestIamPermissions',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.cloud.compute.v1.RegionSslPolicies',
+        method         => 'TestIamPermissions',
         request        => $request,
         response_class => $response_class,
     });
@@ -191,7 +395,7 @@ Generated from the following Protocol Buffers schemas:
 
 =over 4
 
-=item * C<google/cloud/compute/v1/compute.proto>
+=item * C<googleapis/google/cloud/compute/v1/compute.proto>
 
 
 
@@ -232,6 +436,10 @@ Calls the RPC method C<Delete> on the service. Takes a hash of parameters repres
 
 Calls the RPC method C<Get> on the service. Takes a hash of parameters representing the request.
 
+=item * B<get_iam_policy>
+
+Calls the RPC method C<GetIamPolicy> on the service. Takes a hash of parameters representing the request.
+
 =item * B<insert>
 
 Calls the RPC method C<Insert> on the service. Takes a hash of parameters representing the request.
@@ -247,6 +455,14 @@ Calls the RPC method C<ListAvailableFeatures> on the service. Takes a hash of pa
 =item * B<patch>
 
 Calls the RPC method C<Patch> on the service. Takes a hash of parameters representing the request.
+
+=item * B<set_iam_policy>
+
+Calls the RPC method C<SetIamPolicy> on the service. Takes a hash of parameters representing the request.
+
+=item * B<test_iam_permissions>
+
+Calls the RPC method C<TestIamPermissions> on the service. Takes a hash of parameters representing the request.
 
 =back
 

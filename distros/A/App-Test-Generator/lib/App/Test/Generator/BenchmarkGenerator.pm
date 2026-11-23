@@ -7,7 +7,7 @@ use Params::Get qw(get_params);
 use Readonly;
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '0.51';
+our $VERSION = '0.52';
 
 Readonly my %TYPE_DEFAULTS => (
 	number  => 42,
@@ -33,7 +33,7 @@ App::Test::Generator::BenchmarkGenerator - Generate Benchmark harnesses from ATG
 
 =head1 VERSION
 
-Version 0.51
+Version 0.52
 
 =head1 SYNOPSIS
 
@@ -105,6 +105,14 @@ Each transform defined in the schema becomes one variant in the C<cmpthese> call
 with representative input values derived from the transform's type and range
 constraints.  When no transforms are defined, a single C<'default'> variant is
 emitted using the base input specification.
+
+A parameter with a C<position> is passed positionally, in position order; a
+parameter without one follows as a C<name =E<gt> value> pair, so a routine
+written as C<my ($first, %opts) = @_> is timed as C<first(5, option =E<gt> 42)>
+rather than with the option left out.  C<sample_max>, when present, caps the
+numeric value chosen for that parameter while C<max> stays the documented
+range: a work factor such as a PBKDF2 round count is timed at its default
+rather than at a maximum that takes minutes per call.
 
 The generated script is a plain C<.pl> file suitable for running directly with
 C<perl>.  It is not a test file and has no dependency on any test framework.
@@ -384,7 +392,14 @@ sub _build_call {
 		my @positional = sort { $a->{position} <=> $b->{position} }
 		                 grep { ref($_) eq 'HASH' && defined $_->{position} }
 		                 values %$input;
-		my $args = join(', ', map { _representative_value($_) } @positional);
+		# A parameter after the positional ones is a named option
+		# (`sub f { my ($first, %opts) = @_ }`), passed after them as a
+		# key/value pair.  Dropping it would benchmark a different call,
+		# and a required option would make every iteration die.
+		my @named = map { _quote_key($_) . ' => ' . _representative_value($input->{$_}) }
+		            sort grep { !(ref($input->{$_}) eq 'HASH' && defined $input->{$_}{position}) }
+		            keys %$input;
+		my $args = join(', ', (map { _representative_value($_) } @positional), @named);
 		$call = $has_new ? "\$obj->$function($args)"
 		                 : ($module eq 'builtin' ? "$function($args)"
 		                                         : "${module}::$function($args)");
@@ -419,7 +434,10 @@ sub _representative_value {
 
 	if($type eq 'number' || $type eq 'integer' || $type eq 'float') {
 		my $min = $spec->{min};
-		my $max = $spec->{max};
+		# sample_max caps the value chosen for a work factor (a PBKDF2 round
+		# count at the documented maximum takes minutes per call); max stays
+		# the bound when the parameter documents no sample_max.
+		my $max = defined($spec->{sample_max}) ? $spec->{sample_max} : $spec->{max};
 		my $default = $TYPE_DEFAULTS{$type} // 42;
 		if(defined $min && looks_like_number($min) && defined $max && looks_like_number($max)) {
 			return int(($min + $max) / 2);

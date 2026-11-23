@@ -15,7 +15,7 @@ as_string:
       optional: 1
       type: boolean
   module: CGI::Info
-  new: {}
+  new: ~
   output:
     type: string
 browser_type:
@@ -29,7 +29,7 @@ browser_type:
     test_undef: 0
   function: browser_type
   module: CGI::Info
-  new: {}
+  new: ~
   output:
     type: string
 cache:
@@ -51,7 +51,7 @@ cache:
       position: 0
       type: object
   module: CGI::Info
-  new: {}
+  new: ~
   output:
     type: object
 cgi_host_url:
@@ -68,7 +68,7 @@ cgi_host_url:
     test_undef: 0
   function: cgi_host_url
   module: CGI::Info
-  new: {}
+  new: ~
   output:
     type: string
 cookie:
@@ -83,12 +83,15 @@ cookie:
   function: cookie
   input:
     cookie_name:
+      _constraint_source:
+        min: input_spec
       _source: validator
       matches: ^[!#-'*+\-.\^_`|~0-9A-Za-z]+$
       min: 1
+      optional: 0
       type: string
   module: CGI::Info
-  new: {}
+  new: ~
   output:
     _type_confidence: medium
     type: number
@@ -103,7 +106,7 @@ documentroot:
     test_undef: 0
   function: documentroot
   module: CGI::Info
-  new: {}
+  new: ~
   output:
     type: string
 domain_name:
@@ -117,7 +120,7 @@ domain_name:
     test_undef: 0
   function: domain_name
   module: CGI::Info
-  new: {}
+  new: ~
   output:
     type: string
 get_cookie:
@@ -132,14 +135,18 @@ get_cookie:
   function: get_cookie
   input:
     cookie_name:
+      _constraint_source:
+        min: input_spec
       _source: validator
       matches: ^[!#-'*+\-.\^_`|~0-9A-Za-z]+$
       min: 1
+      optional: 0
       type: string
   module: CGI::Info
-  new: {}
+  new: ~
   output:
-    type: string
+    _type_confidence: medium
+    type: number
 host_name:
   accessor:
     property: site
@@ -154,7 +161,7 @@ host_name:
     test_undef: 0
   function: host_name
   module: CGI::Info
-  new: {}
+  new: ~
   output:
     type: string
 is_ai:
@@ -168,7 +175,7 @@ is_ai:
     test_undef: 0
   function: is_ai
   module: CGI::Info
-  new: {}
+  new: ~
   output:
     type: boolean
 is_mobile:
@@ -182,7 +189,7 @@ is_mobile:
     test_undef: 0
   function: is_mobile
   module: CGI::Info
-  new: {}
+  new: ~
   output:
     _error_handling:
       type: string
@@ -200,7 +207,7 @@ is_robot:
     test_undef: 0
   function: is_robot
   module: CGI::Info
-  new: {}
+  new: ~
   output:
     _error_handling:
       type: string
@@ -218,7 +225,7 @@ is_search_engine:
     test_undef: 0
   function: is_search_engine
   module: CGI::Info
-  new: {}
+  new: ~
   output:
     _error_handling:
       type: string
@@ -239,7 +246,7 @@ is_tablet:
     test_undef: 0
   function: is_tablet
   module: CGI::Info
-  new: {}
+  new: ~
   output:
     type: boolean
 logdir:
@@ -264,7 +271,7 @@ logdir:
       semantic: directory
       type: string
   module: CGI::Info
-  new: {}
+  new: ~
   output:
     type: string
 messages:
@@ -281,7 +288,7 @@ messages:
     test_undef: 0
   function: messages
   module: CGI::Info
-  new: {}
+  new: ~
   output:
     type: string
 messages_as_string:
@@ -295,7 +302,7 @@ messages_as_string:
     test_undef: 0
   function: messages_as_string
   module: CGI::Info
-  new: {}
+  new: ~
   output:
     type: string
 new:
@@ -382,6 +389,7 @@ new:
   output:
     isa: CGI::Info
     type: object
+  skip: constructor needs a live 'cache' object, which a fixture cannot provide
 param:
   config:
     close_stdin: 1
@@ -399,7 +407,7 @@ param:
       position: 0
       type: string
   module: CGI::Info
-  new: {}
+  new: ~
   output:
     _list_return: 2
 params:
@@ -412,8 +420,60 @@ params:
     test_security: 0
     test_undef: 0
   function: params
+  input:
+    allow:
+      _source: input_spec
+      optional: 1
+      type: hashref
+    limits:
+      _source: input_spec
+      optional: 1
+      type: hashref
+    logger:
+      _source: input_spec
+      optional: 1
+      type: object
+    max_body_size:
+      _constraint_source:
+        min: input_spec
+      _source: input_spec
+      min: 0
+      optional: 1
+      type: integer
+    max_nesting_depth:
+      _constraint_source:
+        min: input_spec
+      _source: input_spec
+      min: 0
+      optional: 1
+      type: integer
+    max_params:
+      _constraint_source:
+        min: input_spec
+      _source: input_spec
+      min: 0
+      optional: 1
+      type: integer
+    max_part_headers:
+      _constraint_source:
+        min: input_spec
+      _source: input_spec
+      min: 0
+      optional: 1
+      type: integer
+    max_parts:
+      _constraint_source:
+        min: input_spec
+      _source: input_spec
+      min: 0
+      optional: 1
+      type: integer
+    upload_dir:
+      _source: input_spec
+      optional: 1
+      type: string
   module: CGI::Info
-  new: {}
+  new: ~
   output:
     _error_handling:
       exception_handling: 1
@@ -430,7 +490,7 @@ protocol:
     test_undef: 0
   function: protocol
   module: CGI::Info
-  new: {}
+  new: ~
   output:
     type: string
 reset:
@@ -458,7 +518,7 @@ root_dir:
     test_undef: 0
   function: root_dir
   module: CGI::Info
-  new: {}
+  new: ~
   output:
     type: string
 rootdir:
@@ -485,7 +545,7 @@ script_dir:
     test_undef: 0
   function: script_dir
   module: CGI::Info
-  new: {}
+  new: ~
   output:
     type: string
 script_name:
@@ -502,7 +562,7 @@ script_name:
     test_undef: 0
   function: script_name
   module: CGI::Info
-  new: {}
+  new: ~
   output:
     type: string
 script_path:
@@ -519,7 +579,7 @@ script_path:
     test_undef: 0
   function: script_path
   module: CGI::Info
-  new: {}
+  new: ~
   output:
     type: string
 set_logger:
@@ -540,7 +600,7 @@ set_logger:
     logger:
       type: any
   module: CGI::Info
-  new: {}
+  new: ~
   output:
     _returns_self: 1
     _void_context_hint: setter
@@ -566,7 +626,7 @@ status:
       position: 0
       type: integer
   module: CGI::Info
-  new: {}
+  new: ~
   output:
     _type_confidence: low
     type: integer
@@ -586,6 +646,6 @@ tmpdir:
       optional: 1
       type: string
   module: CGI::Info
-  new: {}
+  new: ~
   output:
     type: string

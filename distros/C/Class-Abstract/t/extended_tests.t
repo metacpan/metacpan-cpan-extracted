@@ -536,4 +536,25 @@ subtest 'new() -- return value is a blessed empty hashref' => sub {
 		'new() returns an empty hashref (no keys pre-populated)';
 };
 
+# ===========================================================================
+# SECTION: import() reached through a subclass
+#
+# "use Animal;" calls the inherited Animal->import.  That must not make the
+# package that wrote the "use" line abstract.
+# ===========================================================================
+
+# Purpose: inherited import() leaves the caller's @ISA alone
+subtest 'import() -- through an abstract or concrete subclass does nothing' => sub {
+	{
+		package ET::InhAbstract; our @ISA = ('Class::Abstract');
+		package ET::InhConcrete; our @ISA = ('ET::InhAbstract');
+		package ET::InhUserA;    our @ISA = ();
+		package ET::InhUserB;    our @ISA = ();
+		package ET::InhUserA;    ET::InhAbstract->import();
+		package ET::InhUserB;    ET::InhConcrete->import();
+	}
+	is_deeply( \@ET::InhUserA::ISA, [], 'use of an abstract class does not change the caller @ISA' );
+	is_deeply( \@ET::InhUserB::ISA, [], 'use of a concrete subclass does not change the caller @ISA' );
+};
+
 done_testing;

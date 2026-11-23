@@ -6,7 +6,7 @@ Protobuf::Arena - Memory arena for Protocol Buffer messages
 
 =head1 VERSION
 
-version 0.11
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -33,19 +33,19 @@ Key architectural features related to arenas in this implementation:
 
 =over 4
 
-=item * **Ownership:** Top-level L<Protobuf::Message> objects usually create and own their C<Protobuf::Arena> instance.
+=item * B<Ownership:> Top-level L<Protobuf::Message> objects usually create and own their C<Protobuf::Arena> instance.
 
-=item * **Shared Memory (tmpfs):** Supports creating arenas backed by C<tmpfs> for high-performance, zero-copy Inter-Process Communication (IPC), as detailed in C<perl/doc/architecture/advanced/01-tmpfs-ipc-design.md>.
+=item * B<Shared Memory (tmpfs):> Supports creating arenas backed by C<tmpfs> for high-performance, zero-copy Inter-Process Communication (IPC).
 
-=item * **Memory Canaries:** Arenas use canary bytes (C<0xDEADBEEFCAFEBABEULL>) to detect memory corruption (buffer overflows/underflows) within arena-allocated blocks.
+=item * B<Memory Canaries:> Arenas use canary bytes (C<0xDEADBEEFCAFEBABEULL>) to detect memory corruption (buffer overflows/underflows) within arena-allocated blocks.
 
-=item * **NUMA Awareness:** (Planned) Optimizations for memory placement on multi-socket systems.
+=item * B<NUMA Awareness:> (Planned) Optimizations for memory placement on multi-socket systems.
 
 =back
 
 =head1 METHODS
 
-== Class Methods
+=head2 Class Methods
 
 =head2 new()
 
@@ -65,7 +65,7 @@ Creates a new arena backed by a file in C<tmpfs> at the given C<$path> with a sp
 
 Attaches to an existing C<tmpfs>-backed arena at C<$path> with the given C<$size>.
 
-== Instance Methods
+=head2 Instance Methods
 
 =head2 space_allocated()
 
@@ -138,7 +138,7 @@ use Protobuf::Internal; # Ensure audit logging is available
 require Protobuf;
 use Carp qw(croak);
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 has '_arena_ptr' => (
     is       => 'ro',

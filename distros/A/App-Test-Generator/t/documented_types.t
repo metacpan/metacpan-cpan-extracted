@@ -119,6 +119,16 @@ foreach my $source (qw(input_spec pod)) {
 	};
 }
 
+subtest 'a type inferred from the code is not expected to be enforced' => sub {
+	my $run = _run('from_code', _schema('code'));
+
+	is($run->{exit}, 0, 'the harness passes against a routine that validates nothing')
+		or diag(join("\n", grep { !/^ok / } split(/\n/, $run->{out})));
+	unlike($run->{out}, qr/^not ok/m, 'no case failed');
+	unlike($run->{out}, qr/=> '?(?:xyzzy|0x10|1_000)'?\) dies/,
+		'no wrong-type value was required to die');
+};
+
 subtest 'a hand-written schema still expects the wrong type to die' => sub {
 	my $run = _run('handwritten', _schema(undef));
 

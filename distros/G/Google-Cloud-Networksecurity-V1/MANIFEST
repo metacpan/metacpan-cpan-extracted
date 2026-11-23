@@ -1,5 +1,4 @@
 Changes
-ignore.txt
 lib/Google/Cloud/Networksecurity/V1.pm
 lib/Google/Cloud/Networksecurity/V1/AddressGroup.pm
 lib/Google/Cloud/Networksecurity/V1/AddressGroup/Types.pm
@@ -30,9 +29,9 @@ lib/Google/Cloud/Networksecurity/V1/InterceptClient.pm
 lib/Google/Cloud/Networksecurity/V1/Mirroring.pm
 lib/Google/Cloud/Networksecurity/V1/Mirroring/Types.pm
 lib/Google/Cloud/Networksecurity/V1/MirroringClient.pm
-lib/Google/Cloud/Networksecurity/V1/Networksecurity.pm
-lib/Google/Cloud/Networksecurity/V1/Networksecurity/Types.pm
-lib/Google/Cloud/Networksecurity/V1/NetworksecurityClient.pm
+lib/Google/Cloud/Networksecurity/V1/NetworkSecurity.pm
+lib/Google/Cloud/Networksecurity/V1/NetworkSecurity/Types.pm
+lib/Google/Cloud/Networksecurity/V1/NetworkSecurityClient.pm
 lib/Google/Cloud/Networksecurity/V1/OrganizationAddressGroupServiceClient.pm
 lib/Google/Cloud/Networksecurity/V1/OrganizationSecurityProfileGroupServiceClient.pm
 lib/Google/Cloud/Networksecurity/V1/SecurityProfileGroup.pm
@@ -62,27 +61,29 @@ lib/Google/Cloud/Networksecurity/V1/UrlList/Types.pm
 Makefile.PL
 MANIFEST			This list of files
 README
+SECURITY.md
 t/00-load.t
 t/01-service-AddressGroupService.t
+t/01-service-Default.t
 t/01-service-DnsThreatDetectorService.t
 t/01-service-FirewallActivation.t
 t/01-service-Intercept.t
 t/01-service-Mirroring.t
-t/01-service-Networksecurity.t
+t/01-service-NetworkSecurity.t
 t/01-service-SecurityProfileGroupService.t
 t/01-service-SSERealmService.t
 t/02-rest-transport-AddressGroupService.t
+t/02-rest-transport-Default.t
 t/02-rest-transport-DnsThreatDetectorService.t
 t/02-rest-transport-FirewallActivation.t
 t/02-rest-transport-Intercept.t
 t/02-rest-transport-Mirroring.t
-t/02-rest-transport-Networksecurity.t
+t/02-rest-transport-NetworkSecurity.t
 t/02-rest-transport-SecurityProfileGroupService.t
 t/02-rest-transport-SSERealmService.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
 xt/00_perl-critic.t
-xt/boilerplate.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

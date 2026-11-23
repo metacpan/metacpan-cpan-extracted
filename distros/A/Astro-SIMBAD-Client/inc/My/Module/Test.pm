@@ -59,27 +59,11 @@ my $skip;	# True to skip tests.
 my $silent;	# True to silence exceptions if $skip is true.
 
 sub access {
-    eval {
-	require LWP::UserAgent;
-	1;
-    } or plan skip_all => 'Can not load LWP::UserAgent';
-    my $ua = LWP::UserAgent->new(
-	timeout	=> 10,
-    );
-    my $smb = Astro::SIMBAD::Client->new();
-    my $resp;
-    foreach my $server ( qw{
-	simbad.u-strasbg.fr
-	simbad.cfa.harvard.edu
-    } ) {
-	$smb->set( server => $server );
-	$resp = $ua->head( $smb->__build_url( 'simbad/' ) );
-	$resp->is_success()
-	    or next;
-	return $server;
-    }
-    plan skip_all => "@{[$resp->status_line]}";
-    return;
+    my $server;
+    my $resp = Astro::SIMBAD::Client::__random_server( $server );
+    $resp->is_success()
+	or plan skip_all => 'No responsive server found';
+    return $server;
 }
 
 sub call {

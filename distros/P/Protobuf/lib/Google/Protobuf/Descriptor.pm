@@ -3,7 +3,7 @@ package Google::Protobuf::Descriptor;
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -956,32 +956,6 @@ EOF
     # Fields for FileDescriptorSet
     # Field: file Type: 11 (.google.protobuf.FileDescriptorProto)
 
-=pod
-
-=head1 NAME
-
-Google::Protobuf::Descriptor::FileDescriptorSet - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Protobuf::Descriptor;
-
-    my $msg = Google::Protobuf::Descriptor::FileDescriptorSet->new(
-        file => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<file>
-
-Type: Message (.google.protobuf.FileDescriptorProto)
-
-=back
-
-=cut
-
 # === Message: Google::Protobuf::Descriptor::FileDescriptorProto ===
     # Fields for FileDescriptorProto
     # Field: name Type: 9 ()
@@ -997,76 +971,6 @@ Type: Message (.google.protobuf.FileDescriptorProto)
     # Field: source_code_info Type: 11 (.google.protobuf.SourceCodeInfo)
     # Field: syntax Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Protobuf::Descriptor::FileDescriptorProto - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Protobuf::Descriptor;
-
-    my $msg = Google::Protobuf::Descriptor::FileDescriptorProto->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<package>
-
-Type: String
-
-=item * B<dependency>
-
-Type: String
-
-=item * B<public_dependency>
-
-Type: Int32
-
-=item * B<weak_dependency>
-
-Type: Int32
-
-=item * B<message_type>
-
-Type: Message (.google.protobuf.DescriptorProto)
-
-=item * B<enum_type>
-
-Type: Message (.google.protobuf.EnumDescriptorProto)
-
-=item * B<service>
-
-Type: Message (.google.protobuf.ServiceDescriptorProto)
-
-=item * B<extension>
-
-Type: Message (.google.protobuf.FieldDescriptorProto)
-
-=item * B<options>
-
-Type: Message (.google.protobuf.FileOptions)
-
-=item * B<source_code_info>
-
-Type: Message (.google.protobuf.SourceCodeInfo)
-
-=item * B<syntax>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Protobuf::Descriptor::DescriptorProto ===
     # Fields for DescriptorProto
     # Field: name Type: 9 ()
@@ -1080,97 +984,9 @@ Type: String
     # Field: reserved_range Type: 11 (.google.protobuf.DescriptorProto.ReservedRange)
     # Field: reserved_name Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Protobuf::Descriptor::DescriptorProto - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Protobuf::Descriptor;
-
-    my $msg = Google::Protobuf::Descriptor::DescriptorProto->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<field>
-
-Type: Message (.google.protobuf.FieldDescriptorProto)
-
-=item * B<extension>
-
-Type: Message (.google.protobuf.FieldDescriptorProto)
-
-=item * B<nested_type>
-
-Type: Message (.google.protobuf.DescriptorProto)
-
-=item * B<enum_type>
-
-Type: Message (.google.protobuf.EnumDescriptorProto)
-
-=item * B<extension_range>
-
-Type: Message (.google.protobuf.DescriptorProto.ExtensionRange)
-
-=item * B<oneof_decl>
-
-Type: Message (.google.protobuf.OneofDescriptorProto)
-
-=item * B<options>
-
-Type: Message (.google.protobuf.MessageOptions)
-
-=item * B<reserved_range>
-
-Type: Message (.google.protobuf.DescriptorProto.ReservedRange)
-
-=item * B<reserved_name>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Protobuf::Descriptor::ExtensionRangeOptions ===
     # Fields for ExtensionRangeOptions
     # Field: uninterpreted_option Type: 11 (.google.protobuf.UninterpretedOption)
-
-=pod
-
-=head1 NAME
-
-Google::Protobuf::Descriptor::ExtensionRangeOptions - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Protobuf::Descriptor;
-
-    my $msg = Google::Protobuf::Descriptor::ExtensionRangeOptions->new(
-        uninterpreted_option => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<uninterpreted_option>
-
-Type: Message (.google.protobuf.UninterpretedOption)
-
-=back
-
-=cut
 
 # === Message: Google::Protobuf::Descriptor::FieldDescriptorProto ===
     # Fields for FieldDescriptorProto
@@ -1185,72 +1001,6 @@ Type: Message (.google.protobuf.UninterpretedOption)
     # Field: json_name Type: 9 ()
     # Field: options Type: 11 (.google.protobuf.FieldOptions)
     # Field: proto3_optional Type: 8 ()
-
-=pod
-
-=head1 NAME
-
-Google::Protobuf::Descriptor::FieldDescriptorProto - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Protobuf::Descriptor;
-
-    my $msg = Google::Protobuf::Descriptor::FieldDescriptorProto->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<number>
-
-Type: Int32
-
-=item * B<label>
-
-Type: Enum (.google.protobuf.FieldDescriptorProto.Label)
-
-=item * B<type>
-
-Type: Enum (.google.protobuf.FieldDescriptorProto.Type)
-
-=item * B<type_name>
-
-Type: String
-
-=item * B<extendee>
-
-Type: String
-
-=item * B<default_value>
-
-Type: String
-
-=item * B<oneof_index>
-
-Type: Int32
-
-=item * B<json_name>
-
-Type: String
-
-=item * B<options>
-
-Type: Message (.google.protobuf.FieldOptions)
-
-=item * B<proto3_optional>
-
-Type: Bool
-
-=back
-
-=cut
 
 # Enum: FieldDescriptorProto::Type
 our $FieldDescriptorProto_TYPE_DOUBLE = 1;
@@ -1272,111 +1022,15 @@ our $FieldDescriptorProto_TYPE_SFIXED64 = 16;
 our $FieldDescriptorProto_TYPE_SINT32 = 17;
 our $FieldDescriptorProto_TYPE_SINT64 = 18;
 
-=pod
-
-=head2 Enum: FieldDescriptorProto::Type
-
-Values:
-
-=over 4
-
-=item * C<TYPE_DOUBLE> => 1
-
-=item * C<TYPE_FLOAT> => 2
-
-=item * C<TYPE_INT64> => 3
-
-=item * C<TYPE_UINT64> => 4
-
-=item * C<TYPE_INT32> => 5
-
-=item * C<TYPE_FIXED64> => 6
-
-=item * C<TYPE_FIXED32> => 7
-
-=item * C<TYPE_BOOL> => 8
-
-=item * C<TYPE_STRING> => 9
-
-=item * C<TYPE_GROUP> => 10
-
-=item * C<TYPE_MESSAGE> => 11
-
-=item * C<TYPE_BYTES> => 12
-
-=item * C<TYPE_UINT32> => 13
-
-=item * C<TYPE_ENUM> => 14
-
-=item * C<TYPE_SFIXED32> => 15
-
-=item * C<TYPE_SFIXED64> => 16
-
-=item * C<TYPE_SINT32> => 17
-
-=item * C<TYPE_SINT64> => 18
-
-=back
-
-=cut
-
 # Enum: FieldDescriptorProto::Label
 our $FieldDescriptorProto_LABEL_OPTIONAL = 1;
 our $FieldDescriptorProto_LABEL_REQUIRED = 2;
 our $FieldDescriptorProto_LABEL_REPEATED = 3;
 
-=pod
-
-=head2 Enum: FieldDescriptorProto::Label
-
-Values:
-
-=over 4
-
-=item * C<LABEL_OPTIONAL> => 1
-
-=item * C<LABEL_REQUIRED> => 2
-
-=item * C<LABEL_REPEATED> => 3
-
-=back
-
-=cut
-
 # === Message: Google::Protobuf::Descriptor::OneofDescriptorProto ===
     # Fields for OneofDescriptorProto
     # Field: name Type: 9 ()
     # Field: options Type: 11 (.google.protobuf.OneofOptions)
-
-=pod
-
-=head1 NAME
-
-Google::Protobuf::Descriptor::OneofDescriptorProto - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Protobuf::Descriptor;
-
-    my $msg = Google::Protobuf::Descriptor::OneofDescriptorProto->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<options>
-
-Type: Message (.google.protobuf.OneofOptions)
-
-=back
-
-=cut
 
 # === Message: Google::Protobuf::Descriptor::EnumDescriptorProto ===
     # Fields for EnumDescriptorProto
@@ -1386,127 +1040,17 @@ Type: Message (.google.protobuf.OneofOptions)
     # Field: reserved_range Type: 11 (.google.protobuf.EnumDescriptorProto.EnumReservedRange)
     # Field: reserved_name Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Protobuf::Descriptor::EnumDescriptorProto - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Protobuf::Descriptor;
-
-    my $msg = Google::Protobuf::Descriptor::EnumDescriptorProto->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<value>
-
-Type: Message (.google.protobuf.EnumValueDescriptorProto)
-
-=item * B<options>
-
-Type: Message (.google.protobuf.EnumOptions)
-
-=item * B<reserved_range>
-
-Type: Message (.google.protobuf.EnumDescriptorProto.EnumReservedRange)
-
-=item * B<reserved_name>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Protobuf::Descriptor::EnumValueDescriptorProto ===
     # Fields for EnumValueDescriptorProto
     # Field: name Type: 9 ()
     # Field: number Type: 5 ()
     # Field: options Type: 11 (.google.protobuf.EnumValueOptions)
 
-=pod
-
-=head1 NAME
-
-Google::Protobuf::Descriptor::EnumValueDescriptorProto - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Protobuf::Descriptor;
-
-    my $msg = Google::Protobuf::Descriptor::EnumValueDescriptorProto->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<number>
-
-Type: Int32
-
-=item * B<options>
-
-Type: Message (.google.protobuf.EnumValueOptions)
-
-=back
-
-=cut
-
 # === Message: Google::Protobuf::Descriptor::ServiceDescriptorProto ===
     # Fields for ServiceDescriptorProto
     # Field: name Type: 9 ()
     # Field: method Type: 11 (.google.protobuf.MethodDescriptorProto)
     # Field: options Type: 11 (.google.protobuf.ServiceOptions)
-
-=pod
-
-=head1 NAME
-
-Google::Protobuf::Descriptor::ServiceDescriptorProto - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Protobuf::Descriptor;
-
-    my $msg = Google::Protobuf::Descriptor::ServiceDescriptorProto->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<method>
-
-Type: Message (.google.protobuf.MethodDescriptorProto)
-
-=item * B<options>
-
-Type: Message (.google.protobuf.ServiceOptions)
-
-=back
-
-=cut
 
 # === Message: Google::Protobuf::Descriptor::MethodDescriptorProto ===
     # Fields for MethodDescriptorProto
@@ -1516,52 +1060,6 @@ Type: Message (.google.protobuf.ServiceOptions)
     # Field: options Type: 11 (.google.protobuf.MethodOptions)
     # Field: client_streaming Type: 8 ()
     # Field: server_streaming Type: 8 ()
-
-=pod
-
-=head1 NAME
-
-Google::Protobuf::Descriptor::MethodDescriptorProto - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Protobuf::Descriptor;
-
-    my $msg = Google::Protobuf::Descriptor::MethodDescriptorProto->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<input_type>
-
-Type: String
-
-=item * B<output_type>
-
-Type: String
-
-=item * B<options>
-
-Type: Message (.google.protobuf.MethodOptions)
-
-=item * B<client_streaming>
-
-Type: Bool
-
-=item * B<server_streaming>
-
-Type: Bool
-
-=back
-
-=cut
 
 # === Message: Google::Protobuf::Descriptor::FileOptions ===
     # Fields for FileOptions
@@ -1587,134 +1085,10 @@ Type: Bool
     # Field: ruby_package Type: 9 ()
     # Field: uninterpreted_option Type: 11 (.google.protobuf.UninterpretedOption)
 
-=pod
-
-=head1 NAME
-
-Google::Protobuf::Descriptor::FileOptions - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Protobuf::Descriptor;
-
-    my $msg = Google::Protobuf::Descriptor::FileOptions->new(
-        java_package => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<java_package>
-
-Type: String
-
-=item * B<java_outer_classname>
-
-Type: String
-
-=item * B<java_multiple_files>
-
-Type: Bool
-
-=item * B<java_generate_equals_and_hash>
-
-Type: Bool
-
-=item * B<java_string_check_utf8>
-
-Type: Bool
-
-=item * B<optimize_for>
-
-Type: Enum (.google.protobuf.FileOptions.OptimizeMode)
-
-=item * B<go_package>
-
-Type: String
-
-=item * B<cc_generic_services>
-
-Type: Bool
-
-=item * B<java_generic_services>
-
-Type: Bool
-
-=item * B<py_generic_services>
-
-Type: Bool
-
-=item * B<php_generic_services>
-
-Type: Bool
-
-=item * B<deprecated>
-
-Type: Bool
-
-=item * B<cc_enable_arenas>
-
-Type: Bool
-
-=item * B<objc_class_prefix>
-
-Type: String
-
-=item * B<csharp_namespace>
-
-Type: String
-
-=item * B<swift_prefix>
-
-Type: String
-
-=item * B<php_class_prefix>
-
-Type: String
-
-=item * B<php_namespace>
-
-Type: String
-
-=item * B<php_metadata_namespace>
-
-Type: String
-
-=item * B<ruby_package>
-
-Type: String
-
-=item * B<uninterpreted_option>
-
-Type: Message (.google.protobuf.UninterpretedOption)
-
-=back
-
-=cut
-
 # Enum: FileOptions::OptimizeMode
 our $FileOptions_SPEED = 1;
 our $FileOptions_CODE_SIZE = 2;
 our $FileOptions_LITE_RUNTIME = 3;
-
-=pod
-
-=head2 Enum: FileOptions::OptimizeMode
-
-Values:
-
-=over 4
-
-=item * C<SPEED> => 1
-
-=item * C<CODE_SIZE> => 2
-
-=item * C<LITE_RUNTIME> => 3
-
-=back
-
-=cut
 
 # === Message: Google::Protobuf::Descriptor::MessageOptions ===
     # Fields for MessageOptions
@@ -1723,48 +1097,6 @@ Values:
     # Field: deprecated Type: 8 ()
     # Field: map_entry Type: 8 ()
     # Field: uninterpreted_option Type: 11 (.google.protobuf.UninterpretedOption)
-
-=pod
-
-=head1 NAME
-
-Google::Protobuf::Descriptor::MessageOptions - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Protobuf::Descriptor;
-
-    my $msg = Google::Protobuf::Descriptor::MessageOptions->new(
-        message_set_wire_format => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<message_set_wire_format>
-
-Type: Bool
-
-=item * B<no_standard_descriptor_accessor>
-
-Type: Bool
-
-=item * B<deprecated>
-
-Type: Bool
-
-=item * B<map_entry>
-
-Type: Bool
-
-=item * B<uninterpreted_option>
-
-Type: Message (.google.protobuf.UninterpretedOption)
-
-=back
-
-=cut
 
 # === Message: Google::Protobuf::Descriptor::FieldOptions ===
     # Fields for FieldOptions
@@ -1777,135 +1109,19 @@ Type: Message (.google.protobuf.UninterpretedOption)
     # Field: weak Type: 8 ()
     # Field: uninterpreted_option Type: 11 (.google.protobuf.UninterpretedOption)
 
-=pod
-
-=head1 NAME
-
-Google::Protobuf::Descriptor::FieldOptions - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Protobuf::Descriptor;
-
-    my $msg = Google::Protobuf::Descriptor::FieldOptions->new(
-        ctype => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<ctype>
-
-Type: Enum (.google.protobuf.FieldOptions.CType)
-
-=item * B<packed>
-
-Type: Bool
-
-=item * B<jstype>
-
-Type: Enum (.google.protobuf.FieldOptions.JSType)
-
-=item * B<lazy>
-
-Type: Bool
-
-=item * B<unverified_lazy>
-
-Type: Bool
-
-=item * B<deprecated>
-
-Type: Bool
-
-=item * B<weak>
-
-Type: Bool
-
-=item * B<uninterpreted_option>
-
-Type: Message (.google.protobuf.UninterpretedOption)
-
-=back
-
-=cut
-
 # Enum: FieldOptions::CType
 our $FieldOptions_STRING = 0;
 our $FieldOptions_CORD = 1;
 our $FieldOptions_STRING_PIECE = 2;
-
-=pod
-
-=head2 Enum: FieldOptions::CType
-
-Values:
-
-=over 4
-
-=item * C<STRING> => 0
-
-=item * C<CORD> => 1
-
-=item * C<STRING_PIECE> => 2
-
-=back
-
-=cut
 
 # Enum: FieldOptions::JSType
 our $FieldOptions_JS_NORMAL = 0;
 our $FieldOptions_JS_STRING = 1;
 our $FieldOptions_JS_NUMBER = 2;
 
-=pod
-
-=head2 Enum: FieldOptions::JSType
-
-Values:
-
-=over 4
-
-=item * C<JS_NORMAL> => 0
-
-=item * C<JS_STRING> => 1
-
-=item * C<JS_NUMBER> => 2
-
-=back
-
-=cut
-
 # === Message: Google::Protobuf::Descriptor::OneofOptions ===
     # Fields for OneofOptions
     # Field: uninterpreted_option Type: 11 (.google.protobuf.UninterpretedOption)
-
-=pod
-
-=head1 NAME
-
-Google::Protobuf::Descriptor::OneofOptions - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Protobuf::Descriptor;
-
-    my $msg = Google::Protobuf::Descriptor::OneofOptions->new(
-        uninterpreted_option => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<uninterpreted_option>
-
-Type: Message (.google.protobuf.UninterpretedOption)
-
-=back
-
-=cut
 
 # === Message: Google::Protobuf::Descriptor::EnumOptions ===
     # Fields for EnumOptions
@@ -1913,109 +1129,15 @@ Type: Message (.google.protobuf.UninterpretedOption)
     # Field: deprecated Type: 8 ()
     # Field: uninterpreted_option Type: 11 (.google.protobuf.UninterpretedOption)
 
-=pod
-
-=head1 NAME
-
-Google::Protobuf::Descriptor::EnumOptions - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Protobuf::Descriptor;
-
-    my $msg = Google::Protobuf::Descriptor::EnumOptions->new(
-        allow_alias => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<allow_alias>
-
-Type: Bool
-
-=item * B<deprecated>
-
-Type: Bool
-
-=item * B<uninterpreted_option>
-
-Type: Message (.google.protobuf.UninterpretedOption)
-
-=back
-
-=cut
-
 # === Message: Google::Protobuf::Descriptor::EnumValueOptions ===
     # Fields for EnumValueOptions
     # Field: deprecated Type: 8 ()
     # Field: uninterpreted_option Type: 11 (.google.protobuf.UninterpretedOption)
 
-=pod
-
-=head1 NAME
-
-Google::Protobuf::Descriptor::EnumValueOptions - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Protobuf::Descriptor;
-
-    my $msg = Google::Protobuf::Descriptor::EnumValueOptions->new(
-        deprecated => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<deprecated>
-
-Type: Bool
-
-=item * B<uninterpreted_option>
-
-Type: Message (.google.protobuf.UninterpretedOption)
-
-=back
-
-=cut
-
 # === Message: Google::Protobuf::Descriptor::ServiceOptions ===
     # Fields for ServiceOptions
     # Field: deprecated Type: 8 ()
     # Field: uninterpreted_option Type: 11 (.google.protobuf.UninterpretedOption)
-
-=pod
-
-=head1 NAME
-
-Google::Protobuf::Descriptor::ServiceOptions - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Protobuf::Descriptor;
-
-    my $msg = Google::Protobuf::Descriptor::ServiceOptions->new(
-        deprecated => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<deprecated>
-
-Type: Bool
-
-=item * B<uninterpreted_option>
-
-Type: Message (.google.protobuf.UninterpretedOption)
-
-=back
-
-=cut
 
 # === Message: Google::Protobuf::Descriptor::MethodOptions ===
     # Fields for MethodOptions
@@ -2023,62 +1145,10 @@ Type: Message (.google.protobuf.UninterpretedOption)
     # Field: idempotency_level Type: 14 (.google.protobuf.MethodOptions.IdempotencyLevel)
     # Field: uninterpreted_option Type: 11 (.google.protobuf.UninterpretedOption)
 
-=pod
-
-=head1 NAME
-
-Google::Protobuf::Descriptor::MethodOptions - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Protobuf::Descriptor;
-
-    my $msg = Google::Protobuf::Descriptor::MethodOptions->new(
-        deprecated => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<deprecated>
-
-Type: Bool
-
-=item * B<idempotency_level>
-
-Type: Enum (.google.protobuf.MethodOptions.IdempotencyLevel)
-
-=item * B<uninterpreted_option>
-
-Type: Message (.google.protobuf.UninterpretedOption)
-
-=back
-
-=cut
-
 # Enum: MethodOptions::IdempotencyLevel
 our $MethodOptions_IDEMPOTENCY_UNKNOWN = 0;
 our $MethodOptions_NO_SIDE_EFFECTS = 1;
 our $MethodOptions_IDEMPOTENT = 2;
-
-=pod
-
-=head2 Enum: MethodOptions::IdempotencyLevel
-
-Values:
-
-=over 4
-
-=item * C<IDEMPOTENCY_UNKNOWN> => 0
-
-=item * C<NO_SIDE_EFFECTS> => 1
-
-=item * C<IDEMPOTENT> => 2
-
-=back
-
-=cut
 
 # === Message: Google::Protobuf::Descriptor::UninterpretedOption ===
     # Fields for UninterpretedOption
@@ -2090,127 +1160,1203 @@ Values:
     # Field: string_value Type: 12 ()
     # Field: aggregate_value Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Protobuf::Descriptor::UninterpretedOption - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Protobuf::Descriptor;
-
-    my $msg = Google::Protobuf::Descriptor::UninterpretedOption->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: Message (.google.protobuf.UninterpretedOption.NamePart)
-
-=item * B<identifier_value>
-
-Type: String
-
-=item * B<positive_int_value>
-
-Type: UInt64
-
-=item * B<negative_int_value>
-
-Type: Int64
-
-=item * B<double_value>
-
-Type: Double
-
-=item * B<string_value>
-
-Type: Bytes
-
-=item * B<aggregate_value>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Protobuf::Descriptor::SourceCodeInfo ===
     # Fields for SourceCodeInfo
     # Field: location Type: 11 (.google.protobuf.SourceCodeInfo.Location)
-
-=pod
-
-=head1 NAME
-
-Google::Protobuf::Descriptor::SourceCodeInfo - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Protobuf::Descriptor;
-
-    my $msg = Google::Protobuf::Descriptor::SourceCodeInfo->new(
-        location => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<location>
-
-Type: Message (.google.protobuf.SourceCodeInfo.Location)
-
-=back
-
-=cut
 
 # === Message: Google::Protobuf::Descriptor::GeneratedCodeInfo ===
     # Fields for GeneratedCodeInfo
     # Field: annotation Type: 11 (.google.protobuf.GeneratedCodeInfo.Annotation)
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Protobuf::Descriptor::GeneratedCodeInfo - Compiled Protocol Buffers message class
+Google::Protobuf::Descriptor - Compiled Protocol Buffers messages for google/protobuf/descriptor.proto
 
 =head1 SYNOPSIS
 
     use Google::Protobuf::Descriptor;
 
-    my $msg = Google::Protobuf::Descriptor::GeneratedCodeInfo->new(
-        annotation => $value,
-    );
+    my $msg = Google::Protobuf::Descriptor::FileDescriptorSet->new({
+        file => $file,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->file();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Protobuf::Descriptor::FileDescriptorSet->parse($bytes);
 
-=item * B<annotation>
-
-Type: Message (.google.protobuf.GeneratedCodeInfo.Annotation)
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Protobuf::Descriptor - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/protobuf/descriptor.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Protobuf::Descriptor::FileDescriptorSet
+
+The protocol compiler can output a FileDescriptorSet containing the .proto
+files it parses.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->file() >> / C<< $msg->file($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Descriptor::FileDescriptorProto>)
+
+=back
+
+=head2 Google::Protobuf::Descriptor::FileDescriptorProto
+
+Describes a complete .proto file.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+file name, relative to root of source tree
+
+=item * C<< $msg->package() >> / C<< $msg->package($value) >>
+
+Type: C<String>
+
+e.g. "foo", "foo.bar", etc.
+
+=item * C<< $msg->dependency() >> / C<< $msg->dependency($value) >>
+
+Type: C<String>
+
+Names of files imported by this file.
+
+=item * C<< $msg->public_dependency() >> / C<< $msg->public_dependency($value) >>
+
+Type: C<Int32>
+
+Indexes of the public imported files in the dependency list above.
+
+=item * C<< $msg->weak_dependency() >> / C<< $msg->weak_dependency($value) >>
+
+Type: C<Int32>
+
+Indexes of the weak imported files in the dependency list.
+For Google-internal migration only. Do not use.
+
+=item * C<< $msg->message_type() >> / C<< $msg->message_type($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Descriptor::DescriptorProto>)
+
+All top-level definitions in this file.
+
+=item * C<< $msg->enum_type() >> / C<< $msg->enum_type($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Descriptor::EnumDescriptorProto>)
+
+=item * C<< $msg->service() >> / C<< $msg->service($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Descriptor::ServiceDescriptorProto>)
+
+=item * C<< $msg->extension() >> / C<< $msg->extension($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Descriptor::FieldDescriptorProto>)
+
+=item * C<< $msg->options() >> / C<< $msg->options($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Descriptor::FileOptions>)
+
+=item * C<< $msg->source_code_info() >> / C<< $msg->source_code_info($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Descriptor::SourceCodeInfo>)
+
+This field contains optional information about the original source code.
+You may safely remove this entire field without harming runtime
+functionality of the descriptors -- the information is needed only by
+development tools.
+
+=item * C<< $msg->syntax() >> / C<< $msg->syntax($value) >>
+
+Type: C<String>
+
+The syntax of the proto file.
+The supported values are "proto2" and "proto3".
+
+=back
+
+=head2 Google::Protobuf::Descriptor::DescriptorProto
+
+Describes a message type.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+=item * C<< $msg->field() >> / C<< $msg->field($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Descriptor::FieldDescriptorProto>)
+
+=item * C<< $msg->extension() >> / C<< $msg->extension($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Descriptor::FieldDescriptorProto>)
+
+=item * C<< $msg->nested_type() >> / C<< $msg->nested_type($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Descriptor::DescriptorProto>)
+
+=item * C<< $msg->enum_type() >> / C<< $msg->enum_type($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Descriptor::EnumDescriptorProto>)
+
+=item * C<< $msg->extension_range() >> / C<< $msg->extension_range($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Descriptor::DescriptorProto::ExtensionRange>)
+
+=item * C<< $msg->oneof_decl() >> / C<< $msg->oneof_decl($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Descriptor::OneofDescriptorProto>)
+
+=item * C<< $msg->options() >> / C<< $msg->options($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Descriptor::MessageOptions>)
+
+=item * C<< $msg->reserved_range() >> / C<< $msg->reserved_range($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Descriptor::DescriptorProto::ReservedRange>)
+
+=item * C<< $msg->reserved_name() >> / C<< $msg->reserved_name($value) >>
+
+Type: C<String>
+
+Reserved field names, which may not be used by fields in the same message.
+A given name may only be reserved once.
+
+=back
+
+=head2 Google::Protobuf::Descriptor::ExtensionRangeOptions
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->uninterpreted_option() >> / C<< $msg->uninterpreted_option($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Descriptor::UninterpretedOption>)
+
+The parser stores options it doesn't recognize here. See above.
+
+=back
+
+=head2 Google::Protobuf::Descriptor::FieldDescriptorProto
+
+Describes a field within a message.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+=item * C<< $msg->number() >> / C<< $msg->number($value) >>
+
+Type: C<Int32>
+
+=item * C<< $msg->label() >> / C<< $msg->label($value) >>
+
+Type: C<Enum> (L<Google::Protobuf::FieldDescriptorProto::Label>)
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<Enum> (L<Google::Protobuf::FieldDescriptorProto::Type>)
+
+If type_name is set, this need not be set.  If both this and type_name
+are set, this must be one of TYPE_ENUM, TYPE_MESSAGE or TYPE_GROUP.
+
+=item * C<< $msg->type_name() >> / C<< $msg->type_name($value) >>
+
+Type: C<String>
+
+For message and enum types, this is the name of the type.  If the name
+starts with a '.', it is fully-qualified.  Otherwise, C++-like scoping
+rules are used to find the type (i.e. first the nested types within this
+message are searched, then within the parent, on up to the root
+namespace).
+
+=item * C<< $msg->extendee() >> / C<< $msg->extendee($value) >>
+
+Type: C<String>
+
+For extensions, this is the name of the type being extended.  It is
+resolved in the same manner as type_name.
+
+=item * C<< $msg->default_value() >> / C<< $msg->default_value($value) >>
+
+Type: C<String>
+
+For numeric types, contains the original text representation of the value.
+For booleans, "true" or "false".
+For strings, contains the default text contents (not escaped in any way).
+For bytes, contains the C escaped value.  All bytes >= 128 are escaped.
+
+=item * C<< $msg->oneof_index() >> / C<< $msg->oneof_index($value) >>
+
+Type: C<Int32>
+
+If set, gives the index of a oneof in the containing type's oneof_decl
+list.  This field is a member of that oneof.
+
+=item * C<< $msg->json_name() >> / C<< $msg->json_name($value) >>
+
+Type: C<String>
+
+JSON name of this field. The value is set by protocol compiler. If the
+user has set a "json_name" option on this field, that option's value
+will be used. Otherwise, it's deduced from the field's name by converting
+it to camelCase.
+
+=item * C<< $msg->options() >> / C<< $msg->options($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Descriptor::FieldOptions>)
+
+=item * C<< $msg->proto3_optional() >> / C<< $msg->proto3_optional($value) >>
+
+Type: C<Bool>
+
+If true, this is a proto3 "optional". When a proto3 field is optional, it
+tracks presence regardless of field type.
+
+When proto3_optional is true, this field must be belong to a oneof to
+signal to old proto3 clients that presence is tracked for this field. This
+oneof is known as a "synthetic" oneof, and this field must be its sole
+member (each proto3 optional field gets its own synthetic oneof). Synthetic
+oneofs exist in the descriptor only, and do not generate any API. Synthetic
+oneofs must be ordered after all "real" oneofs.
+
+For message fields, proto3_optional doesn't create any semantic change,
+since non-repeated message fields always track presence. However it still
+indicates the semantic detail of whether the user wrote "optional" or not.
+This can be useful for round-tripping the .proto file. For consistency we
+give message fields a synthetic oneof also, even though it is not required
+to track presence. This is especially important because the parser can't
+tell if a field is a message or an enum, so it must always create a
+synthetic oneof.
+
+Proto2 optional fields do not set this flag, because they already indicate
+optional with `LABEL_OPTIONAL`.
+
+=back
+
+=head3 Enum: FieldDescriptorProto::Type
+
+=over 4
+
+=item * C<TYPE_DOUBLE> => C<1>
+
+=item * C<TYPE_FLOAT> => C<2>
+
+=item * C<TYPE_INT64> => C<3>
+
+=item * C<TYPE_UINT64> => C<4>
+
+=item * C<TYPE_INT32> => C<5>
+
+=item * C<TYPE_FIXED64> => C<6>
+
+=item * C<TYPE_FIXED32> => C<7>
+
+=item * C<TYPE_BOOL> => C<8>
+
+=item * C<TYPE_STRING> => C<9>
+
+=item * C<TYPE_GROUP> => C<10>
+
+=item * C<TYPE_MESSAGE> => C<11>
+
+=item * C<TYPE_BYTES> => C<12>
+
+=item * C<TYPE_UINT32> => C<13>
+
+=item * C<TYPE_ENUM> => C<14>
+
+=item * C<TYPE_SFIXED32> => C<15>
+
+=item * C<TYPE_SFIXED64> => C<16>
+
+=item * C<TYPE_SINT32> => C<17>
+
+=item * C<TYPE_SINT64> => C<18>
+
+=back
+
+=head3 Enum: FieldDescriptorProto::Label
+
+=over 4
+
+=item * C<LABEL_OPTIONAL> => C<1>
+
+=item * C<LABEL_REQUIRED> => C<2>
+
+=item * C<LABEL_REPEATED> => C<3>
+
+=back
+
+=head2 Google::Protobuf::Descriptor::OneofDescriptorProto
+
+Describes a oneof.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+=item * C<< $msg->options() >> / C<< $msg->options($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Descriptor::OneofOptions>)
+
+=back
+
+=head2 Google::Protobuf::Descriptor::EnumDescriptorProto
+
+Describes an enum type.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+=item * C<< $msg->value() >> / C<< $msg->value($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Descriptor::EnumValueDescriptorProto>)
+
+=item * C<< $msg->options() >> / C<< $msg->options($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Descriptor::EnumOptions>)
+
+=item * C<< $msg->reserved_range() >> / C<< $msg->reserved_range($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Descriptor::EnumDescriptorProto::EnumReservedRange>)
+
+Range of reserved numeric values. Reserved numeric values may not be used
+by enum values in the same enum declaration. Reserved ranges may not
+overlap.
+
+=item * C<< $msg->reserved_name() >> / C<< $msg->reserved_name($value) >>
+
+Type: C<String>
+
+Reserved enum value names, which may not be reused. A given name may only
+be reserved once.
+
+=back
+
+=head2 Google::Protobuf::Descriptor::EnumValueDescriptorProto
+
+Describes a value within an enum.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+=item * C<< $msg->number() >> / C<< $msg->number($value) >>
+
+Type: C<Int32>
+
+=item * C<< $msg->options() >> / C<< $msg->options($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Descriptor::EnumValueOptions>)
+
+=back
+
+=head2 Google::Protobuf::Descriptor::ServiceDescriptorProto
+
+Describes a service.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+=item * C<< $msg->method() >> / C<< $msg->method($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Descriptor::MethodDescriptorProto>)
+
+=item * C<< $msg->options() >> / C<< $msg->options($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Descriptor::ServiceOptions>)
+
+=back
+
+=head2 Google::Protobuf::Descriptor::MethodDescriptorProto
+
+Describes a method of a service.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+=item * C<< $msg->input_type() >> / C<< $msg->input_type($value) >>
+
+Type: C<String>
+
+Input and output type names.  These are resolved in the same way as
+FieldDescriptorProto.type_name, but must refer to a message type.
+
+=item * C<< $msg->output_type() >> / C<< $msg->output_type($value) >>
+
+Type: C<String>
+
+=item * C<< $msg->options() >> / C<< $msg->options($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Descriptor::MethodOptions>)
+
+=item * C<< $msg->client_streaming() >> / C<< $msg->client_streaming($value) >>
+
+Type: C<Bool>
+
+Identifies if client streams multiple client messages
+
+=item * C<< $msg->server_streaming() >> / C<< $msg->server_streaming($value) >>
+
+Type: C<Bool>
+
+Identifies if server streams multiple server messages
+
+=back
+
+=head2 Google::Protobuf::Descriptor::FileOptions
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->java_package() >> / C<< $msg->java_package($value) >>
+
+Type: C<String>
+
+Sets the Java package where classes generated from this .proto will be
+placed.  By default, the proto package is used, but this is often
+inappropriate because proto packages do not normally start with backwards
+domain names.
+
+=item * C<< $msg->java_outer_classname() >> / C<< $msg->java_outer_classname($value) >>
+
+Type: C<String>
+
+Controls the name of the wrapper Java class generated for the .proto file.
+That class will always contain the .proto file's getDescriptor() method as
+well as any top-level extensions defined in the .proto file.
+If java_multiple_files is disabled, then all the other classes from the
+.proto file will be nested inside the single wrapper outer class.
+
+=item * C<< $msg->java_multiple_files() >> / C<< $msg->java_multiple_files($value) >>
+
+Type: C<Bool>
+
+If enabled, then the Java code generator will generate a separate .java
+file for each top-level message, enum, and service defined in the .proto
+file.  Thus, these types will *not* be nested inside the wrapper class
+named by java_outer_classname.  However, the wrapper class will still be
+generated to contain the file's getDescriptor() method as well as any
+top-level extensions defined in the file.
+
+=item * C<< $msg->java_generate_equals_and_hash() >> / C<< $msg->java_generate_equals_and_hash($value) >>
+
+Type: C<Bool>
+
+This option does nothing.
+
+=item * C<< $msg->java_string_check_utf8() >> / C<< $msg->java_string_check_utf8($value) >>
+
+Type: C<Bool>
+
+If set true, then the Java2 code generator will generate code that
+throws an exception whenever an attempt is made to assign a non-UTF-8
+byte sequence to a string field.
+Message reflection will do the same.
+However, an extension field still accepts non-UTF-8 byte sequences.
+This option has no effect on when used with the lite runtime.
+
+=item * C<< $msg->optimize_for() >> / C<< $msg->optimize_for($value) >>
+
+Type: C<Enum> (L<Google::Protobuf::FileOptions::OptimizeMode>)
+
+=item * C<< $msg->go_package() >> / C<< $msg->go_package($value) >>
+
+Type: C<String>
+
+Sets the Go package where structs generated from this .proto will be
+placed. If omitted, the Go package will be derived from the following:
+  - The basename of the package import path, if provided.
+  - Otherwise, the package statement in the .proto file, if present.
+  - Otherwise, the basename of the .proto file, without extension.
+
+=item * C<< $msg->cc_generic_services() >> / C<< $msg->cc_generic_services($value) >>
+
+Type: C<Bool>
+
+Should generic services be generated in each language?  "Generic" services
+are not specific to any particular RPC system.  They are generated by the
+main code generators in each language (without additional plugins).
+Generic services were the only kind of service generation supported by
+early versions of google.protobuf.
+
+Generic services are now considered deprecated in favor of using plugins
+that generate code specific to your particular RPC system.  Therefore,
+these default to false.  Old code which depends on generic services should
+explicitly set them to true.
+
+=item * C<< $msg->java_generic_services() >> / C<< $msg->java_generic_services($value) >>
+
+Type: C<Bool>
+
+=item * C<< $msg->py_generic_services() >> / C<< $msg->py_generic_services($value) >>
+
+Type: C<Bool>
+
+=item * C<< $msg->php_generic_services() >> / C<< $msg->php_generic_services($value) >>
+
+Type: C<Bool>
+
+=item * C<< $msg->deprecated() >> / C<< $msg->deprecated($value) >>
+
+Type: C<Bool>
+
+Is this file deprecated?
+Depending on the target platform, this can emit Deprecated annotations
+for everything in the file, or it will be completely ignored; in the very
+least, this is a formalization for deprecating files.
+
+=item * C<< $msg->cc_enable_arenas() >> / C<< $msg->cc_enable_arenas($value) >>
+
+Type: C<Bool>
+
+Enables the use of arenas for the proto messages in this file. This applies
+only to generated classes for C++.
+
+=item * C<< $msg->objc_class_prefix() >> / C<< $msg->objc_class_prefix($value) >>
+
+Type: C<String>
+
+Sets the objective c class prefix which is prepended to all objective c
+generated classes from this .proto. There is no default.
+
+=item * C<< $msg->csharp_namespace() >> / C<< $msg->csharp_namespace($value) >>
+
+Type: C<String>
+
+Namespace for generated classes; defaults to the package.
+
+=item * C<< $msg->swift_prefix() >> / C<< $msg->swift_prefix($value) >>
+
+Type: C<String>
+
+By default Swift generators will take the proto package and CamelCase it
+replacing '.' with underscore and use that to prefix the types/symbols
+defined. When this options is provided, they will use this value instead
+to prefix the types/symbols defined.
+
+=item * C<< $msg->php_class_prefix() >> / C<< $msg->php_class_prefix($value) >>
+
+Type: C<String>
+
+Sets the php class prefix which is prepended to all php generated classes
+from this .proto. Default is empty.
+
+=item * C<< $msg->php_namespace() >> / C<< $msg->php_namespace($value) >>
+
+Type: C<String>
+
+Use this option to change the namespace of php generated classes. Default
+is empty. When this option is empty, the package name will be used for
+determining the namespace.
+
+=item * C<< $msg->php_metadata_namespace() >> / C<< $msg->php_metadata_namespace($value) >>
+
+Type: C<String>
+
+Use this option to change the namespace of php generated metadata classes.
+Default is empty. When this option is empty, the proto file name will be
+used for determining the namespace.
+
+=item * C<< $msg->ruby_package() >> / C<< $msg->ruby_package($value) >>
+
+Type: C<String>
+
+Use this option to change the package of ruby generated classes. Default
+is empty. When this option is not set, the package name will be used for
+determining the ruby package.
+
+=item * C<< $msg->uninterpreted_option() >> / C<< $msg->uninterpreted_option($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Descriptor::UninterpretedOption>)
+
+The parser stores options it doesn't recognize here.
+See the documentation for the "Options" section above.
+
+=back
+
+=head3 Enum: FileOptions::OptimizeMode
+
+=over 4
+
+=item * C<SPEED> => C<1>
+
+=item * C<CODE_SIZE> => C<2>
+
+=item * C<LITE_RUNTIME> => C<3>
+
+=back
+
+=head2 Google::Protobuf::Descriptor::MessageOptions
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->message_set_wire_format() >> / C<< $msg->message_set_wire_format($value) >>
+
+Type: C<Bool>
+
+Set true to use the old proto1 MessageSet wire format for extensions.
+This is provided for backwards-compatibility with the MessageSet wire
+format.  You should not use this for any other reason:  It's less
+efficient, has fewer features, and is more complicated.
+
+The message must be defined exactly as follows:
+  message Foo {
+    option message_set_wire_format = true;
+    extensions 4 to max;
+  }
+Note that the message cannot have any defined fields; MessageSets only
+have extensions.
+
+All extensions of your type must be singular messages; e.g. they cannot
+be int32s, enums, or repeated messages.
+
+Because this is an option, the above two restrictions are not enforced by
+the protocol compiler.
+
+=item * C<< $msg->no_standard_descriptor_accessor() >> / C<< $msg->no_standard_descriptor_accessor($value) >>
+
+Type: C<Bool>
+
+Disables the generation of the standard "descriptor()" accessor, which can
+conflict with a field of the same name.  This is meant to make migration
+from proto1 easier; new code should avoid fields named "descriptor".
+
+=item * C<< $msg->deprecated() >> / C<< $msg->deprecated($value) >>
+
+Type: C<Bool>
+
+Is this message deprecated?
+Depending on the target platform, this can emit Deprecated annotations
+for the message, or it will be completely ignored; in the very least,
+this is a formalization for deprecating messages.
+
+=item * C<< $msg->map_entry() >> / C<< $msg->map_entry($value) >>
+
+Type: C<Bool>
+
+Whether the message is an automatically generated map entry type for the
+maps field.
+
+For maps fields:
+    map<KeyType, ValueType> map_field = 1;
+The parsed descriptor looks like:
+    message MapFieldEntry {
+        option map_entry = true;
+        optional KeyType key = 1;
+        optional ValueType value = 2;
+    }
+    repeated MapFieldEntry map_field = 1;
+
+Implementations may choose not to generate the map_entry=true message, but
+use a native map in the target language to hold the keys and values.
+The reflection APIs in such implementations still need to work as
+if the field is a repeated message field.
+
+NOTE: Do not set the option in .proto files. Always use the maps syntax
+instead. The option should only be implicitly set by the proto compiler
+parser.
+
+=item * C<< $msg->uninterpreted_option() >> / C<< $msg->uninterpreted_option($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Descriptor::UninterpretedOption>)
+
+The parser stores options it doesn't recognize here. See above.
+
+=back
+
+=head2 Google::Protobuf::Descriptor::FieldOptions
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->ctype() >> / C<< $msg->ctype($value) >>
+
+Type: C<Enum> (L<Google::Protobuf::FieldOptions::CType>)
+
+The ctype option instructs the C++ code generator to use a different
+representation of the field than it normally would.  See the specific
+options below.  This option is not yet implemented in the open source
+release -- sorry, we'll try to include it in a future version!
+
+=item * C<< $msg->packed() >> / C<< $msg->packed($value) >>
+
+Type: C<Bool>
+
+The packed option can be enabled for repeated primitive fields to enable
+a more efficient representation on the wire. Rather than repeatedly
+writing the tag and type for each element, the entire array is encoded as
+a single length-delimited blob. In proto3, only explicit setting it to
+false will avoid using packed encoding.
+
+=item * C<< $msg->jstype() >> / C<< $msg->jstype($value) >>
+
+Type: C<Enum> (L<Google::Protobuf::FieldOptions::JSType>)
+
+The jstype option determines the JavaScript type used for values of the
+field.  The option is permitted only for 64 bit integral and fixed types
+(int64, uint64, sint64, fixed64, sfixed64).  A field with jstype JS_STRING
+is represented as JavaScript string, which avoids loss of precision that
+can happen when a large value is converted to a floating point JavaScript.
+Specifying JS_NUMBER for the jstype causes the generated JavaScript code to
+use the JavaScript "number" type.  The behavior of the default option
+JS_NORMAL is implementation dependent.
+
+This option is an enum to permit additional types to be added, e.g.
+goog.math.Integer.
+
+=item * C<< $msg->lazy() >> / C<< $msg->lazy($value) >>
+
+Type: C<Bool>
+
+Should this field be parsed lazily?  Lazy applies only to message-type
+fields.  It means that when the outer message is initially parsed, the
+inner message's contents will not be parsed but instead stored in encoded
+form.  The inner message will actually be parsed when it is first accessed.
+
+This is only a hint.  Implementations are free to choose whether to use
+eager or lazy parsing regardless of the value of this option.  However,
+setting this option true suggests that the protocol author believes that
+using lazy parsing on this field is worth the additional bookkeeping
+overhead typically needed to implement it.
+
+This option does not affect the public interface of any generated code;
+all method signatures remain the same.  Furthermore, thread-safety of the
+interface is not affected by this option; const methods remain safe to
+call from multiple threads concurrently, while non-const methods continue
+to require exclusive access.
+
+
+Note that implementations may choose not to check required fields within
+a lazy sub-message.  That is, calling IsInitialized() on the outer message
+may return true even if the inner message has missing required fields.
+This is necessary because otherwise the inner message would have to be
+parsed in order to perform the check, defeating the purpose of lazy
+parsing.  An implementation which chooses not to check required fields
+must be consistent about it.  That is, for any particular sub-message, the
+implementation must either *always* check its required fields, or *never*
+check its required fields, regardless of whether or not the message has
+been parsed.
+
+As of 2021, lazy does no correctness checks on the byte stream during
+parsing.  This may lead to crashes if and when an invalid byte stream is
+finally parsed upon access.
+
+TODO(b/211906113):  Enable validation on lazy fields.
+
+=item * C<< $msg->unverified_lazy() >> / C<< $msg->unverified_lazy($value) >>
+
+Type: C<Bool>
+
+unverified_lazy does no correctness checks on the byte stream. This should
+only be used where lazy with verification is prohibitive for performance
+reasons.
+
+=item * C<< $msg->deprecated() >> / C<< $msg->deprecated($value) >>
+
+Type: C<Bool>
+
+Is this field deprecated?
+Depending on the target platform, this can emit Deprecated annotations
+for accessors, or it will be completely ignored; in the very least, this
+is a formalization for deprecating fields.
+
+=item * C<< $msg->weak() >> / C<< $msg->weak($value) >>
+
+Type: C<Bool>
+
+For Google-internal migration only. Do not use.
+
+=item * C<< $msg->uninterpreted_option() >> / C<< $msg->uninterpreted_option($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Descriptor::UninterpretedOption>)
+
+The parser stores options it doesn't recognize here. See above.
+
+=back
+
+=head3 Enum: FieldOptions::CType
+
+=over 4
+
+=item * C<STRING> => C<0>
+
+=item * C<CORD> => C<1>
+
+=item * C<STRING_PIECE> => C<2>
+
+=back
+
+=head3 Enum: FieldOptions::JSType
+
+=over 4
+
+=item * C<JS_NORMAL> => C<0>
+
+=item * C<JS_STRING> => C<1>
+
+=item * C<JS_NUMBER> => C<2>
+
+=back
+
+=head2 Google::Protobuf::Descriptor::OneofOptions
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->uninterpreted_option() >> / C<< $msg->uninterpreted_option($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Descriptor::UninterpretedOption>)
+
+The parser stores options it doesn't recognize here. See above.
+
+=back
+
+=head2 Google::Protobuf::Descriptor::EnumOptions
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->allow_alias() >> / C<< $msg->allow_alias($value) >>
+
+Type: C<Bool>
+
+Set this option to true to allow mapping different tag names to the same
+value.
+
+=item * C<< $msg->deprecated() >> / C<< $msg->deprecated($value) >>
+
+Type: C<Bool>
+
+Is this enum deprecated?
+Depending on the target platform, this can emit Deprecated annotations
+for the enum, or it will be completely ignored; in the very least, this
+is a formalization for deprecating enums.
+
+=item * C<< $msg->uninterpreted_option() >> / C<< $msg->uninterpreted_option($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Descriptor::UninterpretedOption>)
+
+The parser stores options it doesn't recognize here. See above.
+
+=back
+
+=head2 Google::Protobuf::Descriptor::EnumValueOptions
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->deprecated() >> / C<< $msg->deprecated($value) >>
+
+Type: C<Bool>
+
+Is this enum value deprecated?
+Depending on the target platform, this can emit Deprecated annotations
+for the enum value, or it will be completely ignored; in the very least,
+this is a formalization for deprecating enum values.
+
+=item * C<< $msg->uninterpreted_option() >> / C<< $msg->uninterpreted_option($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Descriptor::UninterpretedOption>)
+
+The parser stores options it doesn't recognize here. See above.
+
+=back
+
+=head2 Google::Protobuf::Descriptor::ServiceOptions
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->deprecated() >> / C<< $msg->deprecated($value) >>
+
+Type: C<Bool>
+
+Is this service deprecated?
+Depending on the target platform, this can emit Deprecated annotations
+for the service, or it will be completely ignored; in the very least,
+this is a formalization for deprecating services.
+
+=item * C<< $msg->uninterpreted_option() >> / C<< $msg->uninterpreted_option($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Descriptor::UninterpretedOption>)
+
+The parser stores options it doesn't recognize here. See above.
+
+=back
+
+=head2 Google::Protobuf::Descriptor::MethodOptions
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->deprecated() >> / C<< $msg->deprecated($value) >>
+
+Type: C<Bool>
+
+Is this method deprecated?
+Depending on the target platform, this can emit Deprecated annotations
+for the method, or it will be completely ignored; in the very least,
+this is a formalization for deprecating methods.
+
+=item * C<< $msg->idempotency_level() >> / C<< $msg->idempotency_level($value) >>
+
+Type: C<Enum> (L<Google::Protobuf::MethodOptions::IdempotencyLevel>)
+
+=item * C<< $msg->uninterpreted_option() >> / C<< $msg->uninterpreted_option($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Descriptor::UninterpretedOption>)
+
+The parser stores options it doesn't recognize here. See above.
+
+=back
+
+=head3 Enum: MethodOptions::IdempotencyLevel
+
+=over 4
+
+=item * C<IDEMPOTENCY_UNKNOWN> => C<0>
+
+=item * C<NO_SIDE_EFFECTS> => C<1>
+
+=item * C<IDEMPOTENT> => C<2>
+
+=back
+
+=head2 Google::Protobuf::Descriptor::UninterpretedOption
+
+A message representing a option the parser does not recognize. This only
+appears in options protos created by the compiler::Parser class.
+DescriptorPool resolves these when building Descriptor objects. Therefore,
+options protos in descriptor objects (e.g. returned by Descriptor::options(),
+or produced by Descriptor::CopyTo()) will never have UninterpretedOptions
+in them.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Descriptor::UninterpretedOption::NamePart>)
+
+=item * C<< $msg->identifier_value() >> / C<< $msg->identifier_value($value) >>
+
+Type: C<String>
+
+The value of the uninterpreted option, in whatever type the tokenizer
+identified it as during parsing. Exactly one of these should be set.
+
+=item * C<< $msg->positive_int_value() >> / C<< $msg->positive_int_value($value) >>
+
+Type: C<UInt64>
+
+=item * C<< $msg->negative_int_value() >> / C<< $msg->negative_int_value($value) >>
+
+Type: C<Int64>
+
+=item * C<< $msg->double_value() >> / C<< $msg->double_value($value) >>
+
+Type: C<Double>
+
+=item * C<< $msg->string_value() >> / C<< $msg->string_value($value) >>
+
+Type: C<Bytes>
+
+=item * C<< $msg->aggregate_value() >> / C<< $msg->aggregate_value($value) >>
+
+Type: C<String>
+
+=back
+
+=head2 Google::Protobuf::Descriptor::SourceCodeInfo
+
+Encapsulates information about the original source file from which a
+FileDescriptorProto was generated.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Descriptor::SourceCodeInfo::Location>)
+
+A Location identifies a piece of source code in a .proto file which
+corresponds to a particular definition.  This information is intended
+to be useful to IDEs, code indexers, documentation generators, and similar
+tools.
+
+For example, say we have a file like:
+  message Foo {
+    optional string foo = 1;
+  }
+Let's look at just the field definition:
+  optional string foo = 1;
+  ^       ^^     ^^  ^  ^^^
+  a       bc     de  f  ghi
+We have the following locations:
+  span   path               represents
+  [a,i)  [ 4, 0, 2, 0 ]     The whole field definition.
+  [a,b)  [ 4, 0, 2, 0, 4 ]  The label (optional).
+  [c,d)  [ 4, 0, 2, 0, 5 ]  The type (string).
+  [e,f)  [ 4, 0, 2, 0, 1 ]  The name (foo).
+  [g,h)  [ 4, 0, 2, 0, 3 ]  The number (1).
+
+Notes:
+- A location may refer to a repeated field itself (i.e. not to any
+  particular index within it).  This is used whenever a set of elements are
+  logically enclosed in a single code segment.  For example, an entire
+  extend block (possibly containing multiple extension definitions) will
+  have an outer location whose path refers to the "extensions" repeated
+  field without an index.
+- Multiple locations may have the same path.  This happens when a single
+  logical declaration is spread out across multiple places.  The most
+  obvious example is the "extend" block again -- there may be multiple
+  extend blocks in the same scope, each of which will have the same path.
+- A location's span is not always a subset of its parent's span.  For
+  example, the "extendee" of an extension declaration appears at the
+  beginning of the "extend" block and is shared by all extensions within
+  the block.
+- Just because a location's span is a subset of some other location's span
+  does not mean that it is a descendant.  For example, a "group" defines
+  both a type and a field in a single declaration.  Thus, the locations
+  corresponding to the type and field and their components will overlap.
+- Code which tries to interpret locations should probably be designed to
+  ignore those that it doesn't understand, as more types of locations could
+  be recorded in the future.
+
+=back
+
+=head2 Google::Protobuf::Descriptor::GeneratedCodeInfo
+
+Describes the relationship between generated code and its original source
+file. A GeneratedCodeInfo message is associated with only one generated
+source file, but may contain references to different source .proto files.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->annotation() >> / C<< $msg->annotation($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Descriptor::GeneratedCodeInfo::Annotation>)
+
+An Annotation connects some span of text in generated code to an element
+of its generating .proto file.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Protobuf::Descriptor::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

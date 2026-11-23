@@ -46,7 +46,7 @@ BEGIN {
 package main;
 use Google::Cloud::Networksecurity::V1::SSERealmServiceClient;
 
-my $client = Google::Cloud::Networksecurity::V1::SSERealmServiceClient->new( credentials => 'dummy' );
+my $client = Google::Cloud::Networksecurity::V1::SSERealmServiceClient->new();
 ok($client, 'Instantiated generated client');
 isa_ok($client->transport, 'Google::gRPC::Client', 'Client transport');
 

@@ -13,6 +13,7 @@ typedef struct upb_FieldDef upb_FieldDef;
 // String utils
 const char* PerlUpb_GetStrData(pTHX_ SV* sv);
 const char* PerlUpb_VerifyStrData(pTHX_ SV* sv);
+SV* PerlUpb_NewUtf8SV(pTHX_ const char* buf, size_t len);
 
 // Converts a Perl class name (A::B) to a Protobuf full name (A.B).
 // Caller is responsible for Safefree()ing the returned string.

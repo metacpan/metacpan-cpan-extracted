@@ -4,12 +4,13 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 3;
+plan tests => 4;
 
 BEGIN {
+    use_ok( 'Google::Cloud::Pubsub::V1' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Pubsub::V1::PublisherClient' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Pubsub::V1::SchemaServiceClient' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Pubsub::V1::SubscriberClient' ) || print "Bail out!\n";
 }
 
-diag( "Testing Google::Cloud::Pubsub::V1::PublisherClient $Google::Cloud::Pubsub::V1::PublisherClient::VERSION, Perl $], $^X" );
+diag( "Testing Google::Cloud::Pubsub::V1 $Google::Cloud::Pubsub::V1::VERSION, Perl $], $^X" );

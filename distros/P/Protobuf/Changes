@@ -1,5 +1,13 @@
 Revision history for Protobuf
 
+0.14    2026-11-23
+    - Overhauled Protobuf.pm POD (removed duplicate NAME/SYNOPSIS/DESCRIPTION/LICENSE blocks; added protobuf.dev-style generated code reference, WKTs, arenas, and engine API docs) and added POD to Protobuf::Engine, Protobuf::Engine::XS, Protobuf::Engine::PurePerl, Protobuf::Internal::Map, Protobuf::Internal::Proxy, and Google::ProtocolBuffers::Dynamic.
+    - Overhauled protoc-gen-perl-pb (protoc/generator.cc) POD output to extract SourceCodeInfo .proto comments, convert Markdown **bold** to POD B<>, emit a single unified NAME, working SYNOPSIS, and clickable L<> type links.
+    - Updated ToCamelCase (protoc/helpers.cc) to sanitize dots and hyphens in .proto basenames (e.g., k8s.min.proto -> K8sMin.pm).
+    - Excluded prebuilt bin/protoc-gen-perl-pb from distribution tarballs via MANIFEST.SKIP (Debian lintian source-contains-prebuilt-binary).
+    - Added pod/protoc-gen-perl-pb.pod and MAN1PODS entry in Makefile.PL (Debian lintian no-manual-page).
+    - Honored $ENV{LDFLAGS} in LDDLFLAGS and LDFLAGS when linking libprotobufperl.so and protoc-gen-perl-pb (Debian lintian hardening-no-bindnow).
+
 0.13    2026-11-21
     - Hardened XS/C++ arena, tmpfs arena, descriptor pool, object cache, and SV-to-upb conversion memory safety.
     - Improved ClassGenerator and protoc plugin codegen helpers.

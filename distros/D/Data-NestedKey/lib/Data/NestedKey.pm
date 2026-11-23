@@ -15,7 +15,7 @@ use Scalar::Util qw(reftype);
 use Storable qw(nfreeze);
 use YAML::XS ();
 
-our $VERSION = '1.2.2';
+our $VERSION = '1.3.0';
 
 # Package variables for serialization options
 our $JSON_PRETTY = 1;  # Controls whether JSON output is pretty or compact
@@ -100,52 +100,6 @@ sub _parse_path {
   }
 
   return @segments;
-}
-
-# Walk a parsed path down into $data, stopping one segment before the
-# end.  Returns ($node, $final_segment) where $node is the innermost
-# container the final segment lives in, or (undef, undef) if any
-# intermediate step is missing or of the wrong type.
-#
-# If $create is true, missing intermediate hash keys are auto-vivified
-# (mirrors the old behaviour in set()).  Array slots are never
-# auto-vivified here — callers that need that must handle it themselves.
-
-########################################################################
-sub _walk {
-########################################################################
-  my ( $data, $segments, $create ) = @_;
-
-  my $current = $data;
-
-  for my $seg ( @{$segments}[ 0 .. $#{$segments} - 1 ] ) {
-    my ( $key, $idx ) = @{$seg}{qw(key index)};
-
-    # Step into the hash key only if this segment has one.
-    if ( exists $seg->{key} ) {
-      if ( _is_hash($current) ) {
-        $current->{$key} //= {} if $create && !exists $current->{$key};
-
-        return ( undef, undef ) if !exists $current->{$key};
-
-        $current = $current->{$key};
-      }
-      else {
-        return ( undef, undef );
-      }
-    }
-
-    # If this segment carries an array subscript, step into it.
-    if ( defined $idx ) {
-      return ( undef, undef ) if !_is_array($current);
-
-      $current = $current->[$idx];
-
-      return ( undef, undef ) if !defined $current;
-    }
-  }
-
-  return ( $current, $segments->[-1] );
 }
 
 ########################################################################
@@ -279,56 +233,70 @@ sub delete { ## no critic
 
   for my $key_path (@key_paths) {
     my @segments = _parse_path($key_path);
-    my @parents;  # Track parent containers for empty-hash cleanup
+    next if !@segments;
+
     my $current = $self->{data};
-    my $abort   = 0;
+    my @parents;
+    my $valid = 1;
 
     for my $seg ( @segments[ 0 .. $#segments - 1 ] ) {
-      my ( $key, $idx ) = @{$seg}{qw(key index)};
-
-      last if !_is_hash($current) || !exists $current->{$key};
-
-      push @parents, [ $current, $key ];
-      $current = $current->{$key};
-
-      if ( defined $idx ) {
-        if ( _is_array($current) ) {
-          $current = $current->[$idx];
-
-          if ( !defined $current ) {
-            $abort = 1;
-            last;
-          }
-          # Array slots are not tracked for empty-cleanup
-          @parents = ();
-        }
-        else {
-          $abort = 1;
+      if ( exists $seg->{key} ) {
+        if ( !_is_hash($current) || !exists $current->{ $seg->{key} } ) {
+          $valid = 0;
           last;
         }
+
+        push @parents, [ $current, $seg->{key} ];
+        $current = $current->{ $seg->{key} };
+      }
+
+      if ( defined $seg->{index} ) {
+        my $idx = $seg->{index};
+        if ( !_is_array($current)
+          || $idx >= @{$current}
+          || $idx < -@{$current}
+          || !defined $current->[$idx] ) {
+          $valid = 0;
+          last;
+        }
+
+        $current = $current->[$idx];
+        @parents = ();
       }
     }
 
-    next if $abort;
+    next if !$valid;
 
-    my $final = $segments[-1];
-    my ( $final_key, $final_idx ) = @{$final}{qw(key index)};
+    my $final   = $segments[-1];
+    my $changed = 0;
 
-    if ( defined $final_idx ) {
-      # Deleting a specific array slot: splice it out
-      if ( _is_hash($current)
-        && exists $current->{$final_key}
-        && _is_array( $current->{$final_key} ) ) {
-        splice @{ $current->{$final_key} }, $final_idx, 1;
+    if ( exists $final->{key} ) {
+      next if !_is_hash($current) || !exists $current->{ $final->{key} };
+
+      if ( defined $final->{index} ) {
+        my $array = $current->{ $final->{key} };
+        my $idx   = $final->{index};
+        next if !_is_array($array) || $idx >= @{$array} || $idx < -@{$array};
+
+        splice @{$array}, $idx, 1;
+        @parents = ();  # Do not prune through an indexed array.
       }
-    }
-    else {
-      if ( _is_hash($current) && exists $current->{$final_key} ) {
-        delete $current->{$final_key};
+      else {
+        delete $current->{ $final->{key} };
       }
+      $changed = 1;
+    }
+    elsif ( defined $final->{index} ) {
+      my $idx = $final->{index};
+      next if !_is_array($current) || $idx >= @{$current} || $idx < -@{$current};
+
+      splice @{$current}, $idx, 1;
+      @parents = ();
+      $changed = 1;
     }
 
-    # Cleanup empty parent hashes (only meaningful when no array was traversed)
+    next if !$changed;
+
     while (@parents) {
       my ( $parent, $key ) = @{ pop @parents };
       last if !_is_hash( $parent->{$key} ) || %{ $parent->{$key} };
@@ -348,31 +316,31 @@ sub exists_key {
   for my $key_path (@key_paths) {
     my @segments = _parse_path($key_path);
     my $current  = $self->{data};
-    my $exists   = 1;
+    my $found    = @segments ? 1 : 0;
 
     for my $seg (@segments) {
-      my ( $key, $idx ) = @{$seg}{qw(key index)};
-
-      if ( _is_hash($current) && exists $current->{$key} ) {
-        $current = $current->{$key};
-      }
-      else {
-        $exists = 0;
-        last;
-      }
-
-      if ( defined $idx ) {
-        if ( _is_array($current) && defined $current->[$idx] ) {
-          $current = $current->[$idx];
-        }
-        else {
-          $exists = 0;
+      if ( exists $seg->{key} ) {
+        if ( !_is_hash($current) || !exists $current->{ $seg->{key} } ) {
+          $found = 0;
           last;
         }
+        $current = $current->{ $seg->{key} };
+      }
+
+      if ( defined $seg->{index} ) {
+        my $idx = $seg->{index};
+        if ( !_is_array($current)
+          || $idx >= @{$current}
+          || $idx < -@{$current}
+          || !defined $current->[$idx] ) {
+          $found = 0;
+          last;
+        }
+        $current = $current->[$idx];
       }
     }
 
-    push @results, $exists;
+    push @results, $found;
   }
 
   return wantarray ? @results : $results[0];
@@ -412,12 +380,12 @@ Data::NestedKey - Object-oriented handling of deeply nested hash structures.
   print $nk->as_string();
 
   # use the CLI version
-  cat ecr-response.json | dnk 'repositories[0].repositoryUri'
+  cat ecr-response.json | dnk get 'repositories[0].repositoryUri'
 
 =head1 DESCRIPTION
 
 C<Data::NestedKey> (and the CLI script C<dnk>) provide a lightweight
-way to manipulate deeply nested data structures use dot-separated
+way to manipulate deeply nested data structures using dot-separated
 keys.
 
 C<Data::NestedKey> provides an object-oriented approach to this
@@ -452,15 +420,17 @@ values are nested several levels deep. This module enables reading and modifying
 specific elements using intuitive dot-separated keys, making access more
 straightforward.
 
-For example, given a JSON configuration file, a utility could allow:
+For example, the C<dnk> command can update a value in a JSON configuration:
 
-   init-config foo.json session_files.dir /some/path
+   dnk -i foo.json --replace set session_files.dir /some/path
 
-Where the command takes the configuration file name followed by key-value pairs
-representing the specific elements to update.
+Without C<--replace>, C<dnk set> prints the modified document to standard
+output instead of changing the input file.
 
 The class also supports serialization in multiple formats, controlled by
-package variables:
+package variables. These variables are shared by all C<Data::NestedKey>
+instances in the process; changing one affects subsequent serialization
+by every instance:
 
 =over 4
 
@@ -550,28 +520,36 @@ returns the first.
 
 =head2 delete(@key_paths)
 
-Removes the specified keys from the nested structure. If the final segment
-carries an array subscript, the element is removed with C<splice> (the array
-shrinks; no undef hole is left). Empty parent hashes are pruned automatically
-when no array is traversed on the way down.
+Removes the specified keys from the nested structure. Array subscripts may
+be used within a path or as a leading segment for an array-rooted structure.
+Negative subscripts count from the end. If the final segment carries an
+array subscript, the element is removed with C<splice> (the array shrinks;
+no undef hole is left).
+
+Nonexistent paths, including out-of-range array indices, are ignored
+without modifying the structure. Empty parent hashes are pruned
+automatically when no array is traversed on the way down.
 
 Returns the object itself.
 
 =head2 exists_key(@key_paths)
 
-Checks whether the given keys exist in the nested structure. Array subscripts
-are honoured: a subscript pointing past the end of an array, or to an undef
-slot, is treated as non-existent.
+Checks whether the given keys exist in the nested structure. Array
+subscripts, including leading subscripts for an array-rooted structure,
+are supported. A subscript pointing past the end of an array, or to an
+undef slot, is treated as non-existent.
 
-Returns a list of boolean values (1 for exists, 0 for does not exist).
+Returns one boolean per requested path in list context (1 for exists,
+0 for does not exist). In scalar context returns the first result.
 
 =head2 as_string()
 
 Serializes the nested structure into a string using the specified format.
 
 The C<""> operator is overloaded to call this method, so the object may be
-interpolated directly into strings.  Set C<$Data::NestedKey::FORMAT> to change
-the default format from JSON.
+interpolated directly into strings. Set C<$Data::NestedKey::FORMAT> to change
+the default format from JSON. This is a package variable, not an
+instance-specific setting.
 
 Returns a string representation of the data.
 

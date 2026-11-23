@@ -68,18 +68,24 @@ sub give_back ($self, $input, $input_offset = 0) {
       : ref($input) eq 'SCALAR' ? [ $input ]
       : ref($input) ? ouch 400, 'cannot handle inputs as ' . ref($input)
       : length($input // '') == 0 ? [] : [ \$input ];
-   my @parts = $aref->@* or return $self;
+   my @parts = $aref->@*;
    $input_offset = trim(\@parts, $input_offset);
+   return $self unless @parts;
 
    my $bo = $self->_buffers;
+
+   # if we are at an offset right now there's some work to do...
    my $offset = $self->_offset;
    if ($offset > 0) {
+      # calculate how many bytes from the current offset to the end of the
+      # first chunk (after trimming, the offset always refers to the first
+      # chunk).
       my $n_copy_existing = length($bo->[0]->$*) - $offset;
 
-      my @popped;
-      my $n = 0;
+      my @popped; # holds stuff popped away from @parts
+      my $n = 0;  # how many bytes we rewind as we go
       while ($offset > 0 && @parts > 0) {
-         my $len = length($parts[-1]);
+         my $len = length($parts[-1]->$*); # move backwards in input parts
          $len -= $input_offset if @parts == 1;
          if ($len <= $offset) { # just rewind the offset
             $offset -= $len;
@@ -96,7 +102,7 @@ sub give_back ($self, $input, $input_offset = 0) {
                   $input_offset = 0;
                }
                else {
-                  my $part = substr($$pref, 0, $n_copy_incoming);
+                  $part = substr($$pref, 0, $n_copy_incoming);
                }
                push @parts, \$part;
             }
@@ -109,9 +115,13 @@ sub give_back ($self, $input, $input_offset = 0) {
             $offset = 0;
          }
       }
+
+      # whatever happened, we might have a new offset so let's save it
+      $self->_offset($offset);
    }
 
-   return $self if @parts == 0;
+   return $self if @parts == 0; # exhausted the input
+
    ouch 500, 'offset > 0 is unacceptable at this point' if $offset > 0;
    unshift($bo->@*, @parts);
    $self->_offset($input_offset);

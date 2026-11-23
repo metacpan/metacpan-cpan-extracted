@@ -7,7 +7,7 @@ Attean::SPARQLClient - RDF blank nodes
 
 =head1 VERSION
 
-This document describes Attean::SPARQLClient version 0.040
+This document describes Attean::SPARQLClient version 0.041
 
 =head1 SYNOPSIS
 
@@ -49,7 +49,7 @@ is a L<Attean::API::IRI>, but can be coerced from a string.
 
 =cut
 
-package Attean::SPARQLClient 0.040 {
+package Attean::SPARQLClient 0.041 {
 	use Moo;
 	use Types::Standard qw(ConsumerOf Bool Str InstanceOf);
 	use Encode qw(encode);
@@ -129,7 +129,8 @@ iterator. Otherwise raises an error via C<< die >>.
 			my $b	= Attean::Result->new( bindings => {} );
 			return Attean::ListIterator->new(variables => [], values => [$b], item_type => 'Attean::API::Result');
 		} else {
-			die "SPARQL Protocol error: " . $response->status_line;
+			my $endpoint	= $self->endpoint->value;
+			die "SPARQL Protocol error on endpoint <${endpoint}>: " . $response->status_line;
 		}
 	}
 }

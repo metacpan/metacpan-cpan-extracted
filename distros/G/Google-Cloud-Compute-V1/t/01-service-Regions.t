@@ -46,7 +46,7 @@ BEGIN {
 package main;
 use Google::Cloud::Compute::V1::RegionsClient;
 
-my $client = Google::Cloud::Compute::V1::RegionsClient->new( credentials => 'dummy' );
+my $client = Google::Cloud::Compute::V1::RegionsClient->new();
 ok($client, 'Instantiated generated client');
 isa_ok($client->transport, 'Google::gRPC::Client', 'Client transport');
 

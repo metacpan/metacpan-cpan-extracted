@@ -46,7 +46,7 @@ BEGIN {
 package main;
 use Google::Cloud::Dataflow::V1beta3::FlexTemplatesServiceClient;
 
-my $client = Google::Cloud::Dataflow::V1beta3::FlexTemplatesServiceClient->new( credentials => 'dummy' );
+my $client = Google::Cloud::Dataflow::V1beta3::FlexTemplatesServiceClient->new();
 ok($client, 'Instantiated generated client');
 isa_ok($client->transport, 'Google::gRPC::Client', 'Client transport');
 

@@ -4,9 +4,11 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 16;
+plan tests => 19;
 
 BEGIN {
+    use_ok( 'Google::Cloud::Sql::V1' ) || print "Bail out!\n";
+    use_ok( 'Google::Cloud::Sql::V1::BlueGreenDeploymentsServiceClient' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Sql::V1::SqlAvailableDatabaseVersionsServiceClient' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Sql::V1::SqlBackupRunsServiceClient' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Sql::V1::SqlBackupsServiceClient' ) || print "Bail out!\n";
@@ -23,6 +25,7 @@ BEGIN {
     use_ok( 'Google::Cloud::Sql::V1::SqlSslCertsServiceClient' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Sql::V1::SqlTiersServiceClient' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Sql::V1::SqlUsersServiceClient' ) || print "Bail out!\n";
+    use_ok( 'Google::Cloud::Sql::V1::SqlWorkloadCapturesServiceClient' ) || print "Bail out!\n";
 }
 
-diag( "Testing Google::Cloud::Sql::V1::SqlAvailableDatabaseVersionsServiceClient $Google::Cloud::Sql::V1::SqlAvailableDatabaseVersionsServiceClient::VERSION, Perl $], $^X" );
+diag( "Testing Google::Cloud::Sql::V1 $Google::Cloud::Sql::V1::VERSION, Perl $], $^X" );

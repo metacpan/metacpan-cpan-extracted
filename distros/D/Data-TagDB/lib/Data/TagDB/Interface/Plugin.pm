@@ -12,7 +12,7 @@ use warnings;
 
 use parent ();
 
-our $VERSION = v0.16;
+our $VERSION = v0.17;
 
 our %_known_plugins;
 
@@ -48,7 +48,7 @@ Data::TagDB::Interface::Plugin - Work with Tag databases, plugin base package
 
 =head1 VERSION
 
-version v0.16
+version v0.17
 
 =head1 SYNOPSIS
 

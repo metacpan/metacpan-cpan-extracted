@@ -177,3 +177,53 @@ sub fetch_access_token {
 
 1;
 
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Auth::ComputeEngine - Credentials provider for Google Compute Engine, GKE, and Cloud Run metadata server
+
+=head1 SYNOPSIS
+
+    use Google::Auth::ComputeEngine;
+
+    if (Google::Auth::ComputeEngine->on_gce()) {
+        my $creds = Google::Auth::ComputeEngine->new();
+        my $token = $creds->get_token();
+    }
+
+=head1 DESCRIPTION
+
+Detects GCP runtime environments and fetches OAuth 2.0 access tokens from the Compute Engine metadata server (169.254.169.254).
+
+=head1 METHODS AND ATTRIBUTES
+
+=over 4
+
+=item * B<ua>
+
+=item * B<scope>
+
+=item * B<on_gce>
+
+=item * B<fetch_access_token>
+
+=back
+
+=head1 SEE ALSO
+
+L<Google::Auth>, L<Google::Auth::Credentials>
+
+=head1 AUTHOR
+
+C.J. Collier E<lt>cjac@google.comE<gt>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2026 Google LLC and contributors.
+
+Licensed under the Apache License, Version 2.0.
+
+=cut

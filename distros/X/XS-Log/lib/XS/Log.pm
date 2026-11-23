@@ -1,6 +1,6 @@
 package XS::Log;
-our $VERSION = 1.16;
-our $BUILDDATE = "2026-09-14";  #Build Time: 02:14:11
+our $VERSION = 1.18;
+our $BUILDDATE = "2026-11-23";  #Build Time: 10:27:15
 use strict;
 use warnings;
 use constant { 
@@ -72,88 +72,42 @@ sub Colored
 	else{}
 	return $txt;
 }
+# 统一日志处理
+sub _printLog {
+    my ($level, $fmt, @args) = @_;
 
-sub printNote {
-	my ($fmt, @args) = @_;
-	my $msg = sprintf($fmt, @args);
-	my ($pkg,$file,$line);
-	$file = ""; $line = 0;
-	#判断是否调用caller会提速？
-	if(get_show_file_info())
-	{
-		($pkg, $file, $line) = caller;
-	}
-	xs_log_write(LOG_LEVEL_TRACE,$file,$line,$msg);
+    # 格式化消息
+    my $msg = @args ? sprintf($fmt, @args) : ($fmt // '');
+
+    # 获取调用位置
+    my ($file, $line) = ('', 0);
+
+    if (get_show_file_info()) {
+        (undef, $file, $line) = caller(1);
+    }
+
+    xs_log_write($level, $file, $line, $msg);
 }
-sub printBug {
-	my ($fmt, @args) = @_;
-	my $msg = sprintf($fmt, @args);
-	my ($pkg,$file,$line);
-	$file = ""; $line = 0;
-	#判断是否调用caller会提速？
-	if(get_show_file_info())
-	{
-		($pkg, $file, $line) = caller;
-	}
-	xs_log_write(LOG_LEVEL_DEBUG,$file,$line,$msg);
-}
-sub printInf {
-	my ($fmt, @args) = @_;
-	my $msg = sprintf($fmt, @args);
-	my ($pkg,$file,$line);
-	$file = ""; $line = 0;
-	#判断是否调用caller会提速？
-	if(get_show_file_info())
-	{
-		($pkg, $file, $line) = caller;
-	}
-	xs_log_write(LOG_LEVEL_INFO,$file,$line,$msg);
-}
-sub printWarn {
-	my ($fmt, @args) = @_;
-	my $msg = sprintf($fmt, @args);
-	my ($pkg,$file,$line);
-	$file = ""; $line = 0;
-	#判断是否调用caller会提速？
-	if(get_show_file_info())
-	{
-		($pkg, $file, $line) = caller;
-	}
-	xs_log_write(LOG_LEVEL_WARN,$file,$line,$msg);
-}
-sub printErr {
-	my ($fmt, @args) = @_;
-	my $msg = sprintf($fmt, @args);
-	my ($pkg,$file,$line);
-	$file = ""; $line = 0;
-	#判断是否调用caller会提速？
-	if(get_show_file_info())
-	{
-		($pkg, $file, $line) = caller;
-	}
-	xs_log_write(LOG_LEVEL_ERROR,$file,$line,$msg);
-}
-sub printFail {
-	my ($fmt, @args) = @_;
-	my $msg = sprintf($fmt, @args);
-	my ($pkg,$file,$line);
-	$file = ""; $line = 0;
-	#判断是否调用caller会提速？
-	if(get_show_file_info())
-	{
-		($pkg, $file, $line) = caller;
-	}
-	xs_log_write(LOG_LEVEL_FATAL,$file,$line,$msg);
-}
+
+# 日志接口
+sub printNote { _printLog(LOG_LEVEL_TRACE, @_); }
+sub printBug  { _printLog(LOG_LEVEL_DEBUG, @_); }
+sub printInf  { _printLog(LOG_LEVEL_INFO,  @_); }
+sub printWarn { _printLog(LOG_LEVEL_WARN,  @_); }
+sub printErr  { _printLog(LOG_LEVEL_ERROR, @_); }
+sub printFail { _printLog(LOG_LEVEL_FATAL, @_); }
+
+# 普通文本日志，不获取调用位置
 sub printLog {
-	my ($fmt, @args) = @_;
-	my $msg = sprintf($fmt, @args);
-	xs_log_write(LOG_LEVEL_TEXT,"",0,$msg);
+    my ($fmt, @args) = @_;
+    my $msg = @args ? sprintf($fmt, @args) : ($fmt // '');
+
+    xs_log_write(LOG_LEVEL_TEXT, '', 0, $msg);
 }
 
 sub printRep {
 	my ($fmt, @args) = @_;
-	my $msg = sprintf($fmt, @args);
+	my $msg = @args ? sprintf($fmt, @args) : ($fmt // '');
 	xs_rep_write($msg);
 }
 1;

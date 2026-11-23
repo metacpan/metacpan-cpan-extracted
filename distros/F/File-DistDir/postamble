@@ -1,0 +1,3 @@
+install ::
+	-$(NOECHO) ln -sf $(INSTALLMAN3DIR)/File::DistDir::CLI.3pm $(DESTINSTALLMAN3DIR)/dist-dir.3pm; 
+	$(NOECHO) echo $(INSTALLMAN3DIR)/dist-dir.3pm >> $(DESTINSTALLSITEARCH)/auto/$(FULLEXT)/.packlist

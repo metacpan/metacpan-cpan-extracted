@@ -1,6 +1,6 @@
-# Google::Cloud::Storage::V2::StorageClient
+# Google::Cloud::Storage::V2
 
-Auto-generated Protocol Buffers client library for Google Cloud Services.
+Auto-generated Protocol Buffers client library.
 
 ## Installation
 
@@ -15,7 +15,7 @@ To install this module, run the following commands:
 
 After installing, you can find documentation for this module with the `perldoc` command:
 
-    perldoc Google::Cloud::Storage::V2::StorageClient
+    perldoc Google::Cloud::Storage::V2
 
 ## License and Copyright
 

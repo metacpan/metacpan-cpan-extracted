@@ -33,7 +33,7 @@ sub call {
 
 # C. Fallback Mocks for External Response Classes
 BEGIN {
-    for my $pkg (qw( Google::Cloud::Dataplex::V1::Logs::Entity )) {
+    for my $pkg (qw( Google::Cloud::Dataplex::V1::Metadata::Entity )) {
         unless ($pkg->can('new')) {
             no strict 'refs';
             *{"${pkg}::new"} = sub { bless {}, $_[0] };
@@ -46,7 +46,7 @@ BEGIN {
 package main;
 use Google::Cloud::Dataplex::V1::MetadataServiceClient;
 
-my $client = Google::Cloud::Dataplex::V1::MetadataServiceClient->new( credentials => 'dummy' );
+my $client = Google::Cloud::Dataplex::V1::MetadataServiceClient->new();
 ok($client, 'Instantiated generated client');
 isa_ok($client->transport, 'Google::gRPC::Client', 'Client transport');
 
@@ -57,13 +57,13 @@ subtest 'create_entity method' => sub {
         is($args->{method}, 'CreateEntity', 'Correct RPC method');
         isa_ok($args->{request}, 'Google::Cloud::Dataplex::V1::Metadata::CreateEntityRequest', 'Request object');
         
-        my $response = 'Google::Cloud::Dataplex::V1::Logs::Entity'->new();
+        my $response = 'Google::Cloud::Dataplex::V1::Metadata::Entity'->new();
         return $response;
     };
     
     my $res = $client->create_entity();
     ok($res, 'Method returned a response');
-    isa_ok($res, 'Google::Cloud::Dataplex::V1::Logs::Entity', 'Response object class');
+    isa_ok($res, 'Google::Cloud::Dataplex::V1::Metadata::Entity', 'Response object class');
     done_testing();
 };
 

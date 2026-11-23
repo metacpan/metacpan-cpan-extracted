@@ -46,7 +46,7 @@ BEGIN {
 package main;
 use Google::Cloud::Compute::V1::RegionNetworkFirewallPoliciesClient;
 
-my $client = Google::Cloud::Compute::V1::RegionNetworkFirewallPoliciesClient->new( credentials => 'dummy' );
+my $client = Google::Cloud::Compute::V1::RegionNetworkFirewallPoliciesClient->new();
 ok($client, 'Instantiated generated client');
 isa_ok($client->transport, 'Google::gRPC::Client', 'Client transport');
 
@@ -249,6 +249,23 @@ subtest 'patch method' => sub {
     };
     
     my $res = $client->patch();
+    ok($res, 'Method returned a response');
+    isa_ok($res, 'Google::Cloud::Compute::V1::Compute::Operation', 'Response object class');
+    done_testing();
+};
+
+subtest 'patch_association method' => sub {
+    $client->transport->{mock_call} = sub {
+        my ($args) = @_;
+        is($args->{service}, 'google.cloud.compute.v1.RegionNetworkFirewallPolicies', 'Correct service path');
+        is($args->{method}, 'PatchAssociation', 'Correct RPC method');
+        isa_ok($args->{request}, 'Google::Cloud::Compute::V1::Compute::PatchAssociationRegionNetworkFirewallPolicyRequest', 'Request object');
+        
+        my $response = 'Google::Cloud::Compute::V1::Compute::Operation'->new();
+        return $response;
+    };
+    
+    my $res = $client->patch_association();
     ok($res, 'Method returned a response');
     isa_ok($res, 'Google::Cloud::Compute::V1::Compute::Operation', 'Response object class');
     done_testing();

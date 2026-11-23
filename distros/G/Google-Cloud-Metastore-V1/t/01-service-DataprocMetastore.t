@@ -46,7 +46,7 @@ BEGIN {
 package main;
 use Google::Cloud::Metastore::V1::DataprocMetastoreClient;
 
-my $client = Google::Cloud::Metastore::V1::DataprocMetastoreClient->new( credentials => 'dummy' );
+my $client = Google::Cloud::Metastore::V1::DataprocMetastoreClient->new();
 ok($client, 'Instantiated generated client');
 isa_ok($client->transport, 'Google::gRPC::Client', 'Client transport');
 

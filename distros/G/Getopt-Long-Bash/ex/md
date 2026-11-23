@@ -31,7 +31,7 @@ done
 PAT='\h*([*-]|\d+\.)\h+' 
 
 while (( $# > 0 )) ; do
-    greple -G --all --need=0 "${grepleopt[@]}" $1 \
+    greple -G --all --need=0 "${grepleopt[@]}" "$1" \
 	| greple \
 	    -Mtee ansifold --separate='\r' --autoindent "^$PAT|" -sw80 -- \
 	    -E "^$PAT.*\n" --crmode --all --no-color \

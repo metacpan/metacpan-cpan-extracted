@@ -1,3 +1,10 @@
+2026-11-23  Breno G. de Oliveira <garu@cpan.org>
+
+   Release 1.27
+
+   Skip some regexp tests in older perls.
+
+
 2026-11-20  Breno G. de Oliveira <garu@cpan.org>
 
    Release 1.26

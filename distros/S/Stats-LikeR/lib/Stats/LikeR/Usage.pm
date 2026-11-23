@@ -3074,7 +3074,7 @@ Stats::LikeR::Usage
 
 =head1 VERSION
 
-version 0.3427
+version 0.3428
 
 =head1 AUTHOR
 

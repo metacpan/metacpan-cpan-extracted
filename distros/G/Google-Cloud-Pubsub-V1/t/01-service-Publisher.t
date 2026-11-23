@@ -46,7 +46,7 @@ BEGIN {
 package main;
 use Google::Cloud::Pubsub::V1::PublisherClient;
 
-my $client = Google::Cloud::Pubsub::V1::PublisherClient->new( credentials => 'dummy' );
+my $client = Google::Cloud::Pubsub::V1::PublisherClient->new();
 ok($client, 'Instantiated generated client');
 isa_ok($client->transport, 'Google::gRPC::Client', 'Client transport');
 

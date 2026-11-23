@@ -37,6 +37,75 @@ const char* PerlUpb_VerifyStrData(pTHX_ SV *sv) {
     return SvPVutf8(sv, len);
 }
 
+static size_t valid_utf8_char_len(const unsigned char* s, size_t rem) {
+    unsigned char b0 = s[0];
+    if (b0 < 0x80) {
+        return 1;
+    }
+    if (b0 >= 0xC2 && b0 <= 0xDF) {
+        if (rem >= 2 && (s[1] & 0xC0) == 0x80) {
+            return 2;
+        }
+        return 0;
+    }
+    if (b0 >= 0xE0 && b0 <= 0xEF) {
+        if (rem >= 3 && (s[1] & 0xC0) == 0x80 && (s[2] & 0xC0) == 0x80) {
+            if (b0 == 0xE0 && s[1] < 0xA0) return 0; // overlong
+            if (b0 == 0xED && s[1] >= 0xA0) return 0; // UTF-16 surrogate
+            return 3;
+        }
+        return 0;
+    }
+    if (b0 >= 0xF0 && b0 <= 0xF4) {
+        if (rem >= 4 && (s[1] & 0xC0) == 0x80 && (s[2] & 0xC0) == 0x80 && (s[3] & 0xC0) == 0x80) {
+            if (b0 == 0xF0 && s[1] < 0x90) return 0; // overlong
+            if (b0 == 0xF4 && s[1] >= 0x90) return 0; // > U+10FFFF
+            return 4;
+        }
+        return 0;
+    }
+    return 0;
+}
+
+SV* PerlUpb_NewUtf8SV(pTHX_ const char* buf, size_t len) {
+    if (!buf || len == 0) {
+        SV* sv = newSVpvn("", 0);
+        SvUTF8_on(sv);
+        return sv;
+    }
+    if (is_utf8_string((const U8*)buf, (STRLEN)len)) {
+        SV* sv = newSVpvn(buf, (STRLEN)len);
+        SvUTF8_on(sv);
+        return sv;
+    }
+
+    // Sanitize malformed UTF-8 byte sequences (e.g. legacy proto2 strings) to U+FFFD
+    SV* sv = newSV((STRLEN)(len + 16));
+    sv_setpvn(sv, "", 0);
+    const unsigned char* p = (const unsigned char*)buf;
+    const unsigned char* end = p + len;
+    const unsigned char* chunk_start = p;
+
+    while (p < end) {
+        size_t clen = valid_utf8_char_len(p, (size_t)(end - p));
+        if (clen > 0) {
+            p += clen;
+        } else {
+            if (p > chunk_start) {
+                sv_catpvn(sv, (const char*)chunk_start, (STRLEN)(p - chunk_start));
+            }
+            sv_catpvn(sv, "\xEF\xBF\xBD", 3);
+            p++;
+            chunk_start = p;
+        }
+    }
+    if (p > chunk_start) {
+        sv_catpvn(sv, (const char*)chunk_start, (STRLEN)(p - chunk_start));
+    }
+    SvUTF8_on(sv);
+    return sv;
+}
+
 #ifdef HAS_X86_INTRINSICS
 // Helper to check for dots or colons in 32-byte chunks
 __attribute__((target("avx2")))

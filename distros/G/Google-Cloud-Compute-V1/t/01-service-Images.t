@@ -46,7 +46,7 @@ BEGIN {
 package main;
 use Google::Cloud::Compute::V1::ImagesClient;
 
-my $client = Google::Cloud::Compute::V1::ImagesClient->new( credentials => 'dummy' );
+my $client = Google::Cloud::Compute::V1::ImagesClient->new();
 ok($client, 'Instantiated generated client');
 isa_ok($client->transport, 'Google::gRPC::Client', 'Client transport');
 

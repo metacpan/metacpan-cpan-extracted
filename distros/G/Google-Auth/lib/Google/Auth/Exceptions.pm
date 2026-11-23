@@ -20,11 +20,58 @@ use warnings;
 
 =head1 NAME
 
-Google::Auth::Exceptions - Exceptions used in the Google::Auth package
+Google::Auth::Exceptions - Exception classes used by Google::Auth
 
 =head1 VERSION
 
-Version 0.09
+Version 0.15
+
+=head1 SYNOPSIS
+
+    use Google::Auth::Exceptions;
+
+    eval {
+        Google::Auth::DefaultCredentialsError->throw('No credentials found');
+    };
+    if (my $err = $@) {
+        if (ref($err) && $err->isa('Google::Auth::DefaultCredentialsError')) {
+            warn "ADC lookup failed: $err\n";
+        }
+    }
+
+=head1 DESCRIPTION
+
+C<Google::Auth::Exceptions> defines the structured exception hierarchy thrown
+by L<Google::Auth> and its credential providers. All exception classes inherit
+from C<Google::Auth::Error> and overload stringification (C<"">) to return
+their C<message> attribute.
+
+=head1 EXCEPTION CLASSES
+
+=over 4
+
+=item C<Google::Auth::Error>
+
+Base exception class. Provides C<message> (read-only string), C<to_string()>,
+and C<throw($message)>.
+
+=item C<Google::Auth::TransportError>
+
+Subclasses C<Google::Auth::Error>. Thrown when an underlying HTTP transport
+request fails.
+
+=item C<Google::Auth::RefreshError>
+
+Subclasses C<Google::Auth::Error>. Thrown when refreshing an OAuth 2.0 access
+token or ID token fails.
+
+=item C<Google::Auth::DefaultCredentialsError>
+
+Subclasses C<Google::Auth::Error>. Thrown by
+L<Google::Auth::DefaultCredentials> when Application Default Credentials
+cannot be located in the environment.
+
+=back
 
 =cut
 

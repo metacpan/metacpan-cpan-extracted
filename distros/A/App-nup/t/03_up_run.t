@@ -148,7 +148,7 @@ SH
         my $end = $align ? "noaction ${n}L" : 'end-scroll';
         "h left-scroll;l $right;, left-scroll;. $right;\\kl left-scroll;\\kr $right;\\e( left-scroll;\\e) $right;H no-scroll;L end-scroll;"
         . "g no-scroll;G $end;< no-scroll;> $end;"
-        . "\\  noaction $fwd;b noaction $back;"
+        . "\\  noaction $fwd;f noaction $fwd;b noaction $back;"
         . "j noaction $fwd;k noaction $back;\\kd noaction $fwd;\\ku noaction $back;"
         . "d noaction $fwd;u noaction $back;^D noaction $fwd;^U noaction $back;"
         . "\\r noaction $fwd;\\n noaction $fwd;"

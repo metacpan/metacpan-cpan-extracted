@@ -31,5 +31,5 @@ requires:
 resources:
   bugtracker: https://github.com/viasnake/mogura/issues
   repository: https://github.com/viasnake/mogura.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

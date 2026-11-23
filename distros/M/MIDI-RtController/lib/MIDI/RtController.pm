@@ -5,7 +5,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 use v5.36;
 
-our $VERSION = '0.0808';
+our $VERSION = '0.0809';
 
 use Moo;
 use strictures 2;
@@ -225,7 +225,7 @@ MIDI::RtController - Control your MIDI controller
 
 =head1 VERSION
 
-version 0.0808
+version 0.0809
 
 =head1 SYNOPSIS
 

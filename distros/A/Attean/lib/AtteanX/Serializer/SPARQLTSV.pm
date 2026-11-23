@@ -4,7 +4,7 @@ AtteanX::Serializer::SPARQLTSV - SPARQL Results TSV Serializer
 
 =head1 VERSION
 
-This document describes AtteanX::Serializer::SPARQLTSV version 0.040
+This document describes AtteanX::Serializer::SPARQLTSV version 0.041
 
 =head1 SYNOPSIS
 
@@ -30,12 +30,16 @@ This document describes AtteanX::Serializer::SPARQLTSV version 0.040
 
 =over 4
 
+=item C<< canonical_iri >>
+
+Returns the canonical IRI of this format.
+
 =cut
 
 use v5.14;
 use warnings;
 
-package AtteanX::Serializer::SPARQLTSV 0.040 {
+package AtteanX::Serializer::SPARQLTSV 0.041 {
 	use Moo;
 	use Types::Standard qw(Str ArrayRef);
 	use Encode qw(encode);
@@ -44,6 +48,7 @@ package AtteanX::Serializer::SPARQLTSV 0.040 {
 	use List::Util qw(any);
 	use namespace::clean;
 
+	sub canonical_iri { return 'http://www.w3.org/ns/formats/SPARQL_Results_TSV' }
 	has 'canonical_media_type' => (is => 'ro', isa => Str, init_arg => undef, default => 'text/tab-separated-values');
 
 =item C<< media_types >>

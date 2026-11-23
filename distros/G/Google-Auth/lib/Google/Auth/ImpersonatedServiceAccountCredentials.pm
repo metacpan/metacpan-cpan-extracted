@@ -199,3 +199,60 @@ sub _parse_rfc3339_epoch {
 }
 
 1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Auth::ImpersonatedServiceAccountCredentials - Short-lived credentials via IAM Credentials service account impersonation
+
+=head1 SYNOPSIS
+
+    use Google::Auth::ImpersonatedServiceAccountCredentials;
+
+    my $creds = Google::Auth::ImpersonatedServiceAccountCredentials->new(
+        source_credentials => $source_creds,
+        impersonation_url  => $impersonation_url,
+        scope              => ['https://www.googleapis.com/auth/cloud-platform'],
+    );
+    my $token = $creds->get_token();
+
+=head1 DESCRIPTION
+
+Uses source credentials to mint short-lived OAuth 2.0 access tokens for a target service account via the IAM Credentials API, with RFC 3339 expireTime parsing.
+
+=head1 METHODS AND ATTRIBUTES
+
+=over 4
+
+=item * B<base_credentials>
+
+=item * B<source_credentials>
+
+=item * B<impersonation_url>
+
+=item * B<scope>
+
+=item * B<ua>
+
+=item * B<fetch_access_token>
+
+=back
+
+=head1 SEE ALSO
+
+L<Google::Auth>, L<Google::Auth::Credentials>
+
+=head1 AUTHOR
+
+C.J. Collier E<lt>cjac@google.comE<gt>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2026 Google LLC and contributors.
+
+Licensed under the Apache License, Version 2.0.
+
+=cut

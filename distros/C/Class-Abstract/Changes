@@ -1,5 +1,18 @@
 Revision history for Class-Abstract
 
+0.04	Sun Nov 22 10:35:57 AM EST 2026
+	[ Bug Fixes ]
+	- "use Animal;" (or "use Dog;") no longer makes the using package
+	  abstract: subclasses inherit import(), which now registers a caller
+	  only when called as Class::Abstract->import
+	[ Tests ]
+	- Fix GitHub#3
+	- Skip the alarm() checks in t/unit.t on Windows, where alarm() is a
+	  no-op
+	- Run child perls in t/integration.t without PERL5OPT so Devel::Cover
+	  does not break the permission tests
+	- Test that an inherited import() leaves the caller's @ISA alone
+
 0.03	Thu Nov  5 09:51:37 AM EST 2026
 	[ Incompatible Changes ]
 	- $config{harness_bypass} now defaults to 0: enforcement is no longer

@@ -54,11 +54,20 @@ std::vector<absl::string_view> SplitString(absl::string_view s, char delim) {
 
 std::string ToCamelCase(absl::string_view s) {
   std::string res;
-  for (absl::string_view segment : SplitString(s, '_')) {
-    if (segment.empty()) continue;
-    char upper =
-        static_cast<char>(std::toupper(static_cast<unsigned char>(segment[0])));
-    absl::StrAppend(&res, absl::string_view(&upper, 1), segment.substr(1));
+  bool cap_next = true;
+  for (size_t i = 0; i < s.size(); ++i) {
+    char c = s[i];
+    if (c == '_' || c == '.' || c == '-') {
+      cap_next = true;
+      continue;
+    }
+    if (cap_next) {
+      res.push_back(
+          static_cast<char>(std::toupper(static_cast<unsigned char>(c))));
+      cap_next = false;
+    } else {
+      res.push_back(c);
+    }
   }
   return res;
 }

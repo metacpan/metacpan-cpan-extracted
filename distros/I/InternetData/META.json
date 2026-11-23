@@ -44,7 +44,7 @@
       "runtime" : {
          "requires" : {
             "IO::Socket::SSL" : "2.009",
-            "Mojolicious" : "9.47",
+            "Mojolicious" : "9.48",
             "Net::SSLeay" : "1.46",
             "perl" : "5.022"
          }
@@ -67,6 +67,6 @@
          "web" : "https://github.com/internetdata/sdk-perl"
       }
    },
-   "version" : "v1.18.0",
+   "version" : "v1.18.2",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

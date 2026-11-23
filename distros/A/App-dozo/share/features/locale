@@ -1,0 +1,34 @@
+# Generate UTF-8 locales on Debian and Ubuntu based images
+#
+#   dozo --with locale ...                  # ja_JP.UTF-8
+#   dozo --with locale/ja_JP+en_US ...      # ja_JP.UTF-8 and en_US.UTF-8
+#
+# - Nothing is done when the image has the locales already, or has
+#   neither locale-gen nor apt-get (alpine uses musl, which does not
+#   need them), so it can be given always in ~/.dozorc.
+# - The locales package is installed only when locale-gen is missing:
+#   upgrading it rebuilds the locale archive from its configuration,
+#   and loses locales an image has made otherwise (homebrew/brew loses
+#   en_US.UTF-8).
+# - apt-get update is not checked: an image may have a third party
+#   repository that fails.
+# - Debian's locale-gen ignores its arguments and makes what is listed
+#   in /etc/locale.gen, so the locales are written there as well.
+USER root
+ARG DOZO_ARG
+RUN IFS=+; for l in ${DOZO_ARG:-ja_JP}; do \
+        locale -a 2>/dev/null | grep -qi "^$l\.utf-\{0,1\}8\$" || set -- "$@" "$l"; \
+    done; \
+    unset IFS; \
+    if [ $# -eq 0 ]; then \
+        echo "locale: the image has them already"; \
+    elif ! command -v locale-gen > /dev/null && ! command -v apt-get > /dev/null; then \
+        echo "locale: neither locale-gen nor apt-get, nothing is done"; \
+    else \
+        { command -v locale-gen > /dev/null \
+              || { apt-get update; apt-get install -yq locales; }; } \
+        && for l; do \
+               echo "$l.UTF-8 UTF-8" >> /etc/locale.gen; set -- "$@" "$l.UTF-8"; shift; \
+           done \
+        && locale-gen --keep-existing "$@"; \
+    fi

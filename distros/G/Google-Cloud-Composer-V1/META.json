@@ -1,5 +1,5 @@
 {
-   "abstract" : "Google Cloud Composer V1 API Client",
+   "abstract" : "Client library for Google Cloud Services",
    "author" : [
       "C.J. Collier <cjac@google.com>"
    ],
@@ -33,11 +33,11 @@
       "runtime" : {
          "requires" : {
             "Google::Api::Common" : "0.01",
-            "Google::Auth" : "0.02",
-            "Google::gRPC::Client" : "0.02",
+            "Google::Auth" : "0.01",
+            "Google::gRPC::Client" : "0.01",
             "Log::Any" : "0",
             "Moo" : "0",
-            "Protobuf" : "0.05",
+            "Protobuf" : "0.01",
             "perl" : "5.008003"
          }
       },
@@ -48,6 +48,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.03",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

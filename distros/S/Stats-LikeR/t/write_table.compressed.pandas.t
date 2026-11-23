@@ -191,12 +191,12 @@ for my $ext (qw(gz bz2)) {
 }
 is substr(slurp(path('one.gz')), 4, 4), "\0\0\0\0", 'the gzip header mtime is 0';
 
-# A croak partway -- here a nested reference in the last row -- leaves a file
-# whose stream never ends, which read_table refuses; it does not leave a
-# complete file holding the rows before it.
-# That holds for a croak on the first row as well as on the 20,001st: bzip2
-# would otherwise not yet have written a byte, and an empty file is an empty
-# table to read_table, not a broken one (see _Bzip2::DEFLATE).
+# A croak partway -- here a nested reference in the last row -- leaves no file:
+# up to 0.3427 it left one whose stream never ended, which read_table refused;
+# since 0.3428 the output goes to a temporary file that is renamed only on
+# success, so there is neither a complete file holding the rows before the
+# croak nor a broken one (the first-row case matters to bzip2, which would not
+# yet have written a byte; see _Bzip2::DEFLATE).
 for my $ext (qw(gz bz2)) {
 	for my $n (20000, 0) {
 		my $f = path("partial$n.csv.$ext");
@@ -204,11 +204,9 @@ for my $ext (qw(gz bz2)) {
 		eval { write_table(\@d, $f, quiet => 1) };
 		is $@, "write_table: Cannot write nested reference types to table\n",
 			".$ext, after $n rows: the nested reference croaks";
-		cmp_ok -s $f, '>', 0, ".$ext, after $n rows: the partial file is not empty";
-		eval { read_table($f) };
-		my $codec = $ext eq 'gz' ? 'gzip' : 'bzip2';
-		is $@, "read_table: \"$f\" ends in the middle of its $codec data; it is truncated\n",
-			".$ext, after $n rows: and read_table refuses it as truncated";
+		ok !-e $f, ".$ext, after $n rows: no file is left";
+		is_deeply [ grep { /\.tmp\z/ } glob(path('*')) ], [],
+			".$ext, after $n rows: and no temporary file is left";
 	}
 }
 

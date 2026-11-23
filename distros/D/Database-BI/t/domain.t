@@ -1177,4 +1177,345 @@ subtest 'GET /view/sales dashboard JS defines __biDropCallback and __biDropLabel
 	  ->content_like(qr/clearDropHooks/,    'clearDropHooks function defined');
 };
 
+
+# ======================================================================
+# DOMAINS 11-18: numeric, length, format and character domains
+#
+# Each parameter has its own subtest.  For each: the valid partition(s), the
+# invalid ones, the exact edges (minimum, maximum, one either side), and the
+# character classes a user can type (umlauts, emoji, Zalgo, a right-to-left
+# override).  Limits are named in %LIMIT and %TEXT so a test reads as a
+# statement of the domain, not a list of numbers.
+# ======================================================================
+{
+	use Encode ();
+	require Database::BI::Password;
+	require Database::BI::Model::Boundary;
+	require Database::BI::Model::Geocode;
+	require Database::BI::Util;
+
+	Readonly my %LIMIT => (
+		rounds_min   => 10_000,
+		rounds_max   => 100_000_000,
+		salt_bytes   => 16,
+		hmac_block   => 64,		# a key longer than this is hashed first
+		lat_max      => 90,
+		lon_max      => 180,
+		online_max   => 20,		# Boundary's default
+		plain_digits => 300,		# parse_number's fast-path length
+		per_page_max => 2_000,
+		srccol_max   => 64,
+		login_min    => 60,
+		secret_min   => 16,
+		ask_max      => 500,
+		place_max    => 200,
+	);
+	# Text a user can type, as characters (not bytes), for every free-text domain.
+	Readonly my %TEXT => (
+		ascii  => 'plain',
+		umlaut => "M\x{FC}ller Stra\x{DF}e",
+		emoji  => "\x{1F600}\x{1F468}\x{200D}\x{1F469}\x{200D}\x{1F467}",	# a smile and a family joined with ZWJ
+		zalgo  => "z\x{0351}\x{0315}\x{0346}a\x{0300}\x{0301}\x{0302}l\x{0303}\x{0304}g\x{0305}o",
+		rtl    => "abc\x{202E}def\x{202C}",
+		cjk    => "\x{6771}\x{4EAC}\x{90FD}",
+	);
+	my @TEXT_KINDS = sort keys %TEXT;
+	my $shown = sub { my ($v) = @_; return defined $v ? ($v =~ s/([^\x20-\x7e])/sprintf('\\x{%X}', ord $1)/gre) : 'undef' };
+	my $why = sub { my ($code) = @_; local $@; return eval { $code->(); 1 } ? undef : ($@ =~ s/ at \S+ line \d+\.?\n?\z//r) };
+
+	# -- DOMAIN 11 ------------------------------------------------------
+	# hash_password rounds: valid is a whole number from 10_000 to 100_000_000.
+	# Partitions: below, inside, above, and not a whole number at all.  The
+	# real PBKDF2 is replaced by a stub so the top edge costs nothing.
+	subtest 'DOMAIN 11 rounds: 9_999 | 10_000 | 10_001 ... 99_999_999 | 100_000_000 | 100_000_001' => sub {
+		mock 'Database::BI::Password::_pbkdf2' => sub { 'k' x 32 };
+		my $refusal = sprintf('hash_password: rounds must be a whole number from %d to %d', $LIMIT{rounds_min}, $LIMIT{rounds_max});
+		for my $rounds ($LIMIT{rounds_min}, $LIMIT{rounds_min} + 1, 200_000, $LIMIT{rounds_max} - 1, $LIMIT{rounds_max}) {
+			my $made = eval { Database::BI::Password::hash_password('pw', rounds => $rounds) };
+			like $made // 'refused', qr/\Apbkdf2-sha256\$$rounds\$/, "$rounds is accepted";
+		}
+		for my $rounds ($LIMIT{rounds_min} - 1, 0, 1, $LIMIT{rounds_max} + 1, 10 * $LIMIT{rounds_max}, -10_000, '10000.5', '1e4', '', ' 10000', "10000\n", 'many', '9' x 40) {
+			is $why->(sub { Database::BI::Password::hash_password('pw', rounds => $rounds) }), $refusal, 'refused: rounds ' . $shown->($rounds);
+		}
+		restore_all();
+		# Combinatorial: the largest rounds with the shortest password and an edge salt.
+		mock 'Database::BI::Password::_pbkdf2' => sub { 'k' x 32 };
+		like Database::BI::Password::hash_password('x', rounds => $LIMIT{rounds_max}, salt => 'S' x $LIMIT{salt_bytes}), qr/\$$LIMIT{rounds_max}\$/, 'the highest rounds, a one-character password and the exact salt together';
+		restore_all();
+	};
+
+	# -- DOMAIN 12 ------------------------------------------------------
+	# hash_password salt: exactly 16 bytes (characters up to U+00FF).
+	subtest 'DOMAIN 12 salt: 15 | 16 | 17 bytes; bytes against characters' => sub {
+		my $refusal = sprintf('hash_password: a salt is %d bytes', $LIMIT{salt_bytes});
+		mock 'Database::BI::Password::_pbkdf2' => sub { 'k' x 32 };
+		for my $salt ('S' x $LIMIT{salt_bytes}, "\x{E9}" x $LIMIT{salt_bytes}, "\0" x $LIMIT{salt_bytes}, "\xFF" x $LIMIT{salt_bytes}) {
+			ok eval { Database::BI::Password::hash_password('pw', salt => $salt); 1 }, 'accepted: ' . $shown->($salt);
+		}
+		for my $salt ('', 'S', 'S' x ($LIMIT{salt_bytes} - 1), 'S' x ($LIMIT{salt_bytes} + 1), "\x{263A}" x $LIMIT{salt_bytes}, "\x{1F600}" x $LIMIT{salt_bytes},
+			"S" x ($LIMIT{salt_bytes} - 1) . "\x{100}", [ 1 .. $LIMIT{salt_bytes} ]) {
+			is $why->(sub { Database::BI::Password::hash_password('pw', salt => $salt) }), $refusal, 'refused: ' . (ref $salt || $shown->($salt));
+		}
+		restore_all();
+	};
+
+	# -- DOMAIN 13 ------------------------------------------------------
+	# The password: any text but empty, a reference, or ending in NUL.  The
+	# edge at 64 bytes is where HMAC starts hashing the key first: both sides
+	# must verify, and a changed last character must not.
+	subtest 'DOMAIN 13 password: lengths 1, 63, 64, 65, 66 bytes and every kind of text' => sub {
+		my $salt = 'S' x $LIMIT{salt_bytes};
+		for my $length (1, $LIMIT{hmac_block} - 1, $LIMIT{hmac_block}, $LIMIT{hmac_block} + 1, $LIMIT{hmac_block} + 2) {
+			my $password = 'a' x ($length - 1) . 'b';
+			my $hash = Database::BI::Password::hash_password($password, rounds => $LIMIT{rounds_min}, salt => $salt);
+			ok Database::BI::Password::verify_password($password, $hash), "$length bytes verifies";
+			ok !Database::BI::Password::verify_password('a' x $length, $hash), "$length bytes: the last character matters";
+			ok !Database::BI::Password::verify_password('a' x ($length - 1), $hash) || $length == 1, "$length bytes: one fewer does not verify" if $length > 1;
+		}
+		my %hash_of;
+		for my $kind (@TEXT_KINDS) {
+			# A character string (UTF-8 flag on, as a decoded form field is).
+			my $password = $TEXT{$kind};
+			utf8::upgrade($password);
+			my $hash = Database::BI::Password::hash_password($password, rounds => $LIMIT{rounds_min}, salt => $salt);
+			ok Database::BI::Password::verify_password($password, $hash), "$kind text: made and verified";
+			ok Database::BI::Password::verify_password(Encode::encode('UTF-8', $password), $hash), "$kind text: as characters or as its UTF-8 bytes, the same password";
+			$hash_of{$hash}++;
+		}
+		is scalar(keys %hash_of), scalar(@TEXT_KINDS), 'different texts give different hashes';
+		is $why->(sub { Database::BI::Password::hash_password('') }), 'hash_password: a password is required', 'empty: refused';
+		is $why->(sub { Database::BI::Password::hash_password("x\0") }), 'hash_password: a password may not end in a NUL byte', 'a trailing NUL: refused';
+		ok eval { Database::BI::Password::hash_password("x\0y", rounds => $LIMIT{rounds_min}); 1 }, 'a NUL inside is a password';
+		ok eval { Database::BI::Password::hash_password('0', rounds => $LIMIT{rounds_min}); 1 }, '"0" is a password, not an empty one';
+		ok eval { Database::BI::Password::hash_password(' ', rounds => $LIMIT{rounds_min}); 1 }, 'a space is a password';
+	};
+
+	# -- DOMAIN 14 ------------------------------------------------------
+	# point_key: lat in -90..90 and lon in -180..180, written as a plain decimal.
+	subtest 'DOMAIN 14 point_key range: the edges and one either side' => sub {
+		my $key = sub { Database::BI::Model::Boundary->point_key(@_) };
+		my %valid = (
+			'-90,-180' => '-90.000,-180.000', '90,180' => '90.000,180.000', '0,0' => '0.000,0.000',
+			'89.9999,179.9999' => '90.000,180.000', '-89.9999,-179.9999' => '-90.000,-180.000',
+			'90,-180' => '90.000,-180.000', '-90,180' => '-90.000,180.000',
+		);
+		is $key->(split /,/), $valid{$_}, "$_ -> $valid{$_}" for sort keys %valid;
+		for my $point ('90.0001,0', '-90.0001,0', '0,180.0001', '0,-180.0001', '91,0', '0,181', '90.0001,180.0001', '90,180.0001', '90.0001,180',
+			'1000,0', '0,1000') {
+			is $key->(split /,/, $point), undef, "out of range: $point";
+		}
+		# Combinatorial: each coordinate at its limit, the other at both edges of its own.
+		is $key->(90, -180), '90.000,-180.000', 'latitude at its maximum, longitude at its minimum';
+		is $key->(-90, 180), '-90.000,180.000', 'latitude at its minimum, longitude at its maximum';
+		is $key->(90, 180.001), undef, 'latitude at its maximum, longitude just above';
+		is $key->(-90.001, -180), undef, 'longitude at its minimum, latitude just below';
+		# Rounding is to three places.
+		is $key->(0.0004, 0.0004), '0.000,0.000', '0.0004 rounds down';
+		is $key->(0.0006, 0.0006), '0.001,0.001', '0.0006 rounds up';
+	};
+
+	subtest 'DOMAIN 15 point_key format: plain decimals against everything else' => sub {
+		my $key = sub { Database::BI::Model::Boundary->point_key(@_) };
+		for my $good ('1', '1.5', '-1.5', '0', '-0', '0.0', '12.345678', '007') {
+			ok defined $key->($good, $good), 'a plain decimal: ' . $good;
+		}
+		for my $bad ('+1', '.5', '5.', '1e2', '1E2', ' 1', '1 ', "1\n", '1,5', '0x1', 'NaN', 'Inf', '', '--1', '1-', "\x{661}", "1\x{FF11}", "\x{1F600}", "1\x{202E}", "\x{0301}1", "\x{FC}") {
+			is $key->($bad, 0), undef, 'not a plain decimal: ' . $shown->($bad);
+		}
+		is $key->(undef, 0), undef, 'undef latitude';
+		is $key->(0, undef), undef, 'undef longitude';
+	};
+
+	# -- DOMAIN 16 ------------------------------------------------------
+	# Boundary settings: ranks 8, 10 or 12; country codes of two letters;
+	# online_max a whole number from 0.
+	subtest 'DOMAIN 16 ranks, codes and online_max' => sub {
+		my $class = 'Database::BI::Model::Boundary';
+		for my $rank (8, 10, 12) {
+			is_deeply $class->check_ranks({ lk => $rank }), { lk => $rank }, "rank $rank accepted";
+		}
+		for my $rank (7, 9, 11, 13, 0, -8, 80, 100, '08', '8 ') {
+			throws_ok { $class->check_ranks({ lk => $rank }) } qr/\Athe rank for 'lk' must be one of 8, 10, 12/, "rank refused: '$rank'";
+		}
+		is_deeply $class->check_ranks({ aa => 8, ZZ => 12 }), { aa => 8, zz => 12 }, 'the first and last two-letter codes, in either case';
+		for my $code ('', 'a', 'abc', 'a1', '1a', 'a-', "\x{FC}\x{FC}", "\x{1F600}\x{1F600}", "a\x{301}", "a\n") {
+			throws_ok { $class->check_ranks({ $code => 10 }) } qr/\A'.*' is not a two-letter country code/s, 'code refused: ' . $shown->($code);
+		}
+		for my $max (0, 1, $LIMIT{online_max}, 1_000_000) {
+			ok eval { $class->new(online_max => $max); 1 }, "online_max $max accepted";
+		}
+		for my $max (-1, 1.5, 'x', '') {
+			ok !eval { $class->new(online_max => $max); 1 }, 'online_max refused: ' . $shown->($max);
+		}
+	};
+
+	# -- DOMAIN 17 ------------------------------------------------------
+	# parse_number: a plain ASCII decimal of up to 300 integer digits takes
+	# the fast path; longer ones the full path; anything past DBL_MAX is no
+	# number.  Non-ASCII symbols are removed, so currency signs do not matter.
+	subtest 'DOMAIN 17 parse_number: digit count, magnitude and symbols' => sub {
+		my $num = \&Database::BI::Util::parse_number;
+		is $num->('1' x $LIMIT{plain_digits}), '1' x $LIMIT{plain_digits} + 0, 'the longest fast-path integer';
+		is $num->('1' . '0' x ($LIMIT{plain_digits})), 1e300, 'one digit longer takes the full path to the same kind of answer';
+		is $num->('1' . '0' x 307), 1e307, '308 digits';
+		ok defined $num->('1' . '0' x 308), '309 digits starting 1 (1e308) is under the largest double';
+		is $num->('9' . '0' x 308), undef, '309 digits starting 9 is past the largest double: no number';
+		is $num->('-' . '9' . '0' x 308), undef, '... and so is its negative';
+		ok defined $num->('-1' . '0' x 308), 'the negative edge, inside';
+		ok defined $num->('1.7976931348623157e308'), 'the largest double, spelt out';
+		is $num->('1.7976931348623159e308'), undef, 'one step past it';
+		is $num->('1e309'), undef, '1e309';
+		is $num->('0'), 0, 'zero';
+		is $num->('-0.0'), 0, 'minus zero';
+		is $num->('1e-400'), 0, 'underflow is zero, not an error';
+
+		is $num->("\x{20AC}1,234.50"), 1234.5, 'a euro sign is removed';
+		is $num->("1,234.50\x{20AC}"), 1234.5, '... after the number too';
+		is $num->("\x{A3}5"), 5, 'a pound sign';
+		is $num->("\x{202E}5"), 5, 'a right-to-left override is not a letter';
+		is $num->('5%'), 5, 'a percent sign';
+		for my $text ($TEXT{umlaut}, 'Gr' . "\x{F6}" . "\x{DF}e", $TEXT{zalgo}, $TEXT{cjk}, "\x{661}\x{662}\x{663}", "\x{FF11}\x{FF12}", 'abc', '1a', 'a1', '1.2.3', '--1') {
+			is $num->($text), undef, 'not a number: ' . $shown->($text);
+		}
+		is $num->("\x{1F600}"), undef, 'an emoji alone is not a number';
+		is $num->("(1,234.50)"), -1234.5, 'accounting brackets mean negative';
+		is $num->('USD 7'), 7, 'a currency code';
+	};
+
+	# -- DOMAIN 18 ------------------------------------------------------
+	# The text added to each place: one short line, at most 200 characters
+	# once tidied.  Length is in characters, not bytes.
+	subtest 'DOMAIN 18 place_text: 199 | 200 | 201 characters, and what counts as a line' => sub {
+		my $text = sub { Database::BI::Model::Geocode->place_text(@_) };
+		for my $length ($LIMIT{place_max} - 1, $LIMIT{place_max}) {
+			is_deeply [ $text->('a' x $length) ], [ 'a' x $length ], "$length characters accepted";
+		}
+		is_deeply [ $text->('a' x ($LIMIT{place_max} + 1)) ], [], '201 characters refused';
+		is_deeply [ $text->('a' x $LIMIT{place_max} . '   ') ], [ 'a' x $LIMIT{place_max} ], 'tidied first: trailing spaces do not count';
+		is_deeply [ $text->(', ' . 'a' x $LIMIT{place_max}) ], [ 'a' x $LIMIT{place_max} ], '... nor a leading comma';
+		is_deeply [ $text->('a ' x 150) ], [ join ' ', ('a') x 150 ], 'runs of spaces collapse before the count' if 0;
+		# Characters, not bytes: 200 of a wide character is still 200.
+		for my $kind (qw(umlaut emoji cjk)) {
+			my $ch = substr($TEXT{$kind}, 0, 1);
+			is_deeply [ $text->($ch x $LIMIT{place_max}) ], [ $ch x $LIMIT{place_max} ], "200 characters of $kind (more than 200 bytes) accepted";
+			is_deeply [ $text->($ch x ($LIMIT{place_max} + 1)) ], [], "201 characters of $kind refused";
+		}
+		for my $kind (@TEXT_KINDS) {
+			my @got = $text->($TEXT{$kind});
+			is_deeply \@got, [ $TEXT{$kind} ], "$kind text passes through unchanged";
+		}
+		is_deeply [ $text->(undef) ], [ '' ], 'undef is an empty text';
+		is_deeply [ $text->('') ], [ '' ], 'empty is an empty text';
+		is_deeply [ $text->('   ') ], [ '' ], 'blank is an empty text';
+		for my $bad ("a\nb", "a\tb", "a\x00b", "a\x1Fb", "a\x7Fb", [], {}, \'x') {
+			is_deeply [ $text->($bad) ], [], 'not one line: ' . (ref $bad || $shown->($bad));
+		}
+		is_deeply [ $text->("a\x{20}b") ], [ 'a b' ], 'U+0020 is the first character allowed';
+		is_deeply [ $text->("a\x{80}b") ], [ "a\x{80}b" ], 'a C1 character is not an ASCII control';
+	};
+
+	# -- DOMAIN 19 ------------------------------------------------------
+	# Config values checked at startup, called as the app does.
+	subtest 'DOMAIN 19 login_expiration and share_secret: the edges' => sub {
+		my $login  = \&Database::BI::_check_login;
+		my $secret = \&Database::BI::_check_share_secret;
+		for my $seconds ($LIMIT{login_min}, $LIMIT{login_min} + 1, 28_800, 10_000_000) {
+			ok eval { $login->(undef, $seconds); 1 }, "login_expiration $seconds accepted";
+		}
+		ok eval { $login->(undef, undef); 1 }, 'unset is accepted';
+		for my $seconds ($LIMIT{login_min} - 1, 0, -60, '60.0', '6e1', '', ' 60', "60\n", 'a minute', [ 60 ]) {
+			my $m = $why->(sub { $login->(undef, $seconds) });
+			like $m // 'accepted', qr/\Alogin_expiration: '.*' is not a number of seconds from 60\z/s, 'refused: ' . (ref $seconds || $shown->($seconds));
+		}
+
+		for my $value ('x' x $LIMIT{secret_min}, 'x' x ($LIMIT{secret_min} + 1), (map { $TEXT{$_} x 16 } qw(umlaut emoji cjk)), "\x{FC}" x $LIMIT{secret_min}) {
+			ok eval { $secret->($value); 1 }, 'share_secret accepted: ' . length($value) . ' characters';
+		}
+		ok eval { $secret->(undef); $secret->(''); 1 }, 'unset or empty means derive one';
+		for my $value ('x', 'x' x ($LIMIT{secret_min} - 1), "\x{FC}" x ($LIMIT{secret_min} - 1), "\x{1F600}" x ($LIMIT{secret_min} - 1)) {
+			is $why->(sub { $secret->($value) }), 'share_secret: give at least 16 characters, so a share link cannot be forged by guessing it', 'too short: ' . length($value) . ' characters';
+		}
+		is $why->(sub { $secret->('BI_DEFAULT_INSECURE_SECRET') }), 'share_secret: that is the default from the source, which anyone can read; choose another', 'the old default is refused';
+		is $why->(sub { $secret->([ 'x' x 16 ]) }), 'share_secret: give a string of at least 16 characters, or leave it out', 'a reference is refused';
+	};
+
+	# -- DOMAIN 20 ------------------------------------------------------
+	# GET /api/ask q=: 1 to 500 characters.  Length is in characters.
+	subtest 'DOMAIN 20 question length: 0 | 1 | 500 | 501 characters, as ASCII and as multibyte text' => sub {
+		my $app = Test::Mojo->new('Database::BI');
+		$app->app->config->{model_dir} = tempdir(CLEANUP => 1);
+		$app->app->config->{ai_api_key} = 'test-key-not-used';
+		$app->app->config->{ai_calls_per_hour} = 0;	# 0 = no provider call is allowed, so no network
+		my $ask = sub {
+			my ($q) = @_;
+			$app->post_ok('/api/ask' => form => { l => "path:$SALES_ABS", q => $q });
+			return ($app->tx->res->code, $app->tx->res->json // {});
+		};
+		my ($code, $json) = $ask->('');
+		is $code, 400, 'no question: 400';
+		like $json->{error}, qr/\S/, '... with a message';
+
+		my $too_long = sprintf('The question is longer than %d characters; please shorten it', $LIMIT{ask_max});
+		for my $kind (qw(ascii umlaut emoji cjk)) {
+			my $unit = substr($TEXT{$kind}, 0, 1);
+			($code, $json) = $ask->($unit);
+			isnt $code, 400, "$kind: one character is past the length check";
+			($code, $json) = $ask->($unit x $LIMIT{ask_max});
+			isnt $code, 400, "$kind: $LIMIT{ask_max} characters is past the length check (" . length(Encode::encode('UTF-8', $unit x $LIMIT{ask_max})) . ' bytes)';
+			($code, $json) = $ask->($unit x ($LIMIT{ask_max} + 1));
+			is $code, 400, "$kind: 501 characters is refused";
+			is $json->{error}, $too_long, '... with the documented message';
+		}
+		($code, $json) = $ask->($TEXT{zalgo} x 100);
+		is $code, 400, 'Zalgo text counts its combining marks as characters: refused';
+		($code, $json) = $ask->($TEXT{rtl});
+		isnt $code, 400, 'a right-to-left override is just text';
+	};
+
+	# -- DOMAIN 21 ------------------------------------------------------
+	# per_page=: 1 to 2,000 rows; 0 is every row; below 1 is 1; above 2,000 is
+	# 2,000; anything but a whole number is the default.
+	subtest 'DOMAIN 21 per_page: -1 | 0 | 1 | 2 | 2000 | 2001, and not numbers' => sub {
+		my $dir = tempdir(CLEANUP => 1);
+		my $rows = $LIMIT{per_page_max} + 5;
+		Mojo::File->new($dir, 'many.csv')->spew(join("\n", 'sku,qty', map { "r$_,$_" } 1 .. $rows) . "\n");
+		my $app = Test::Mojo->new('Database::BI', { data_dir => $dir, model_dir => tempdir(CLEANUP => 1) });
+		my $shown_rows = sub {
+			my ($qs) = @_;
+			$app->get_ok('/open?path=' . url_escape("$dir/many.csv") . $qs)->status_is(200);
+			return scalar(() = $app->tx->res->body =~ m{<td[^>]*>r\d+</td>}g);
+		};
+		my %expect = (
+			'1' => 1, '2' => 2, '25' => 25, $LIMIT{per_page_max} => $LIMIT{per_page_max},
+			$LIMIT{per_page_max} + 1 => $LIMIT{per_page_max}, '99999' => $LIMIT{per_page_max},
+			'0' => $rows, '-1' => 1, '-100' => 1,
+		);
+		is $shown_rows->("&per_page=$_"), $expect{$_}, "per_page=$_ shows $expect{$_} rows" for sort { $a <=> $b } keys %expect;
+		for my $junk ('', 'abc', '2.5', '1e3', '+5', ' 5', "\x{FC}", "5\x{FF11}") {
+			is $shown_rows->('&per_page=' . url_escape(Encode::encode('UTF-8', $junk))), 200, 'not a whole number (' . $shown->($junk) . '): the default 200';
+		}
+	};
+
+	# -- DOMAIN 22 ------------------------------------------------------
+	# srccol=: an identifier of 1 to 64 characters, else ignored.
+	subtest 'DOMAIN 22 srccol: 1 | 64 | 65 characters and which characters' => sub {
+		my $dir = tempdir(CLEANUP => 1);
+		Mojo::File->new($dir, 'a.csv')->spew("k,v\n1,x\n2,y\n");
+		Mojo::File->new($dir, 'b.csv')->spew("k,v\n3,z\n4,w\n");
+		my $app = Test::Mojo->new('Database::BI', { data_dir => $dir, model_dir => tempdir(CLEANUP => 1) });
+		my $columns_with = sub {
+			my ($name) = @_;
+			$app->get_ok('/export?format=json&l=' . url_escape("path:$dir/a.csv") . '&c=' . url_escape("path:$dir/b.csv") . '&srccol=' . url_escape(Encode::encode('UTF-8', $name)))->status_is(200);
+			return $app->tx->res->json->[0] // {};
+		};
+		for my $name ('a', '_', 'A9', 'x' x $LIMIT{srccol_max}) {
+			ok exists $columns_with->($name)->{$name}, 'a column is added: ' . length($name) . ' characters';
+		}
+		for my $name ('x' x ($LIMIT{srccol_max} + 1), '1a', '9', 'a b', 'a-b', "\x{FC}ber", "caf\x{E9}", "\x{1F600}", "a\x{301}", "a\x{202E}b", "a\n") {
+			my $row = $columns_with->($name);
+			ok !exists $row->{$name} && scalar(keys %{$row}) == 2, 'ignored, no column added: ' . $shown->($name);
+		}
+	};
+}
+
 done_testing;

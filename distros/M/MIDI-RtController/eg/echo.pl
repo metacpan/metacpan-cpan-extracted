@@ -6,8 +6,7 @@ use strict;
 use warnings;
 use MIDI::RtController;
 
-my $in  = $ARGV[0] || die "Usage: perl $0 midi-in-port [midi-out-port]";
-my $out = $ARGV[1] || $in;
+my ($in, $out) = @ARGV >= 2 ? @ARGV : die "Usage: perl $0 midi-in-port midi-out-port";
 
 my $rtc = MIDI::RtController->new( input => $in, output => $out );
 

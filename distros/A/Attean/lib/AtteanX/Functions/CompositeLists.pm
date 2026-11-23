@@ -8,7 +8,7 @@ AtteanX::Functions::CompositeLists - Functions and aggregates to work with compo
 
 =head1 VERSION
 
-This document describes AtteanX::Functions::CompositeLists version 0.040
+This document describes AtteanX::Functions::CompositeLists version 0.041
 
 =head1 SYNOPSIS
 
@@ -61,7 +61,7 @@ package AtteanX::Functions::CompositeLists::TurtleLexerWithNull {
 	}
 }
 
-package AtteanX::Functions::CompositeLists 0.040 {
+package AtteanX::Functions::CompositeLists 0.041 {
 
 	use Attean;
 	use Attean::RDF;
@@ -81,7 +81,7 @@ package AtteanX::Functions::CompositeLists 0.040 {
 =cut
 	sub lex_to_list {
 		my $l	= shift;
-		die 'TypeError: Cannot parse non-literal to cdt:List' unless ($l->does('Attean::API::Literal'));
+		die 'TypeError: Cannot parse non-literal to cdt:List: ' . $l->as_string unless ($l->does('Attean::API::Literal'));
 		my $dt	= $l->datatype;
 		die 'TypeError: not a datatype literal' unless ($dt);
 		die 'TypeError: Expecting a List but found '  . $dt->value unless ($dt->value eq $LIST_TYPE_IRI);
@@ -101,7 +101,7 @@ package AtteanX::Functions::CompositeLists 0.040 {
 		my @nodes;
 		eval {
 			my $t = $p->_next_nonws($lexer);
-			if ($t->type == LBRACKET) {
+			if ($t->type == LBRACKET or $t->type == ANON) {
 				push(@nodes, @{AtteanX::Functions::CompositeMaps::_recursive_lexer_parse_cdt($p, $lexer)});
 			}
 # 			while (my $t = $p->_next_nonws($lexer)) {
@@ -201,6 +201,27 @@ package AtteanX::Functions::CompositeLists 0.040 {
 		} else {
 			die 'TypeError: Unexpected non-CDT type: ' . $dt->value;
 		}
+	}
+
+=item C<< map_terms ( $map ) >>
+
+Map the terms contained in this CDT value using the supplied L<Attean::TermMap>
+map, returning a new CDT value.
+
+=cut
+
+	sub map_terms {
+		my $self			= shift;
+		my $map				= shift;
+		my $l				= shift;
+		return $l unless ($l->does('Attean::API::Literal'));
+		my $dt	= $l->datatype;
+		return $l unless ($dt->value eq $LIST_TYPE_IRI);
+		my @nodes	= lex_to_list($l);
+		my @mapped	= map { ($map->map($_) || $_) } @nodes;
+		my $literal			= eval { list_to_lex(@mapped) };
+		warn "cdt:List term-mapping error: $@" if $@;
+		return $literal;
 	}
 
 =item C<< listGet($list, $pos) >>

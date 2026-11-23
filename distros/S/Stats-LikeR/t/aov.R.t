@@ -42,13 +42,9 @@
 # TRUE): coef.aov() leaves an aliased one out, where lm() and this module keep
 # it (as NA and NaN).
 #
-# DIVERGENCE (%DIVERGE).  A factor's levels are read from every row, not only
-# from the rows the model keeps.  R's lm() builds its model frame with
-# drop.unused.levels = TRUE, so in br, where every "M" row loses its response,
-# R has no level M, and here M is an aliased column (coefficient NaN), is in
-# xlevels, and is in group_stats with size 0 and a NaN mean.  The table is the
-# same.  This is lm_design_build()'s, shared with lm(), glm() and anova(), and
-# is pinned so that changing it is a deliberate act.
+# In br, where every "M" row loses its response, R's lm() has no level M
+# (model.frame drop.unused.levels = TRUE).  Through 0.3427 this module kept M as
+# an aliased column; since 0.3428 it matches R, and %DIVERGE is empty.
 #
 # group_stats is tapply(y, f, mean) and table(f) for each factor of the model,
 # over the rows fitted: keyed by level when the model has one factor, by factor
@@ -291,8 +287,7 @@ my %EXPECT = (
 );
 
 my %ALIASED = (npk_full => ['N:P:K']);
-# Levels R drops with their rows and this module keeps: see DIVERGENCE above.
-my %DIVERGE = (br => { coef => ['tensionM'], level => { tension => ['M'] } });
+my %DIVERGE; # none: since 0.3428 a level seen only in dropped rows is no level, as in R
 
 my ($worst, $worst_at) = (0, '');
 sub near {

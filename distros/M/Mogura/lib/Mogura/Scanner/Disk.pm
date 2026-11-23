@@ -8,7 +8,7 @@ use Cwd qw(abs_path);
 use Fcntl qw(O_RDONLY O_NONBLOCK);
 use Mogura::Scanner::Command;
 
-# Linux amd64: _IOR(0x12, 128, __u64), available since Linux 5.15.
+# _IOR(0x12, 128, __u64) on x86_64 and aarch64, available since Linux 5.15.
 use constant BLKGETDISKSEQ => 0x80081280;
 use constant BIOS_BOOT_PARTITION_TYPE => '21686148-6449-6e6f-744e-656564454649';
 

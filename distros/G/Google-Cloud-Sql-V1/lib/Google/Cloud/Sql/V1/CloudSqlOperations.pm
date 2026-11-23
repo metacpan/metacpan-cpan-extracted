@@ -3,7 +3,7 @@ package Google::Cloud::Sql::V1::CloudSqlOperations;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;

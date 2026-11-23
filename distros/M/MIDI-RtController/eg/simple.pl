@@ -13,6 +13,6 @@ my $controller = MIDI::RtController->new(
 );
 
 for my $val (0 .. 127) {
-    $controller->send_it(['control_change', 1, 78, $val]);
+    $controller->send_it(['control_change', 1, 74, $val]);
     sleep(1);
 }

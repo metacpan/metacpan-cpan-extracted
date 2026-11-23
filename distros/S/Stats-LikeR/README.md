@@ -1262,7 +1262,10 @@ You can also pass the counts as `binom_test([6, 4])` — 6 right, 4 wrong — wh
 you have wins and losses instead of wins and a total.
 
 Every count must be a whole number (to within 1e-7, as in R) that is not
-negative. `NaN`, an infinity, `undef` or a string croaks, as R's `binom.test`
+negative. A count held as an integer, or spelled as one in a string, is read
+exactly at any size, so odd counts in [2**52, 2**53) and counts past 2**53 are
+neither refused nor rounded on a double perl; only a non-integer number takes
+the floating-point route. `NaN`, an infinity, `undef` or a string that is not a number croaks, as R's `binom.test`
 stops on them. So does a count, or a successes + failures sum, of perl's `IV_MAX`
 or more: 9223372036854775807 on a 64-bit perl, 2147483647 on a perl with 32-bit
 integers. The width of C's `long` does not matter, so Windows has the same limit
@@ -2475,7 +2478,10 @@ arguments. R's `warnWbw` is accepted as well as `warn_wbw`.
 - **`n`** — the number of equally spaced points at which to estimate. Defaults
   to 512. Values above 512 are rounded up to a power of two internally (that
   is what makes the FFT cheap) and the result is interpolated back to exactly
-  the `n` you asked for, so a power of two is the efficient choice.
+  the `n` you asked for, so a power of two is the efficient choice. A
+  fractional `n` is rounded up, as R's `seq.int(length.out = n)` does: 1.5 is
+  two points and 0.5 is one. An `n` of 0 or less is an error, and so is one
+  above 2**26.
 - **`from`, `to`** — the ends of the output grid. The defaults are `cut`
   bandwidths outside the range of the data.
 - **`cut`** — how many bandwidths past the extremes of the data the default
@@ -3293,7 +3299,11 @@ Pass the four counts (or a `[a,b,c,d]` / `[[a,b],[c,d]]` array ref):
     print "@{ $r->{'odds_ratio_ci'} }"; # 0.895 3.285
 
 Options: `conf_level` (default `0.95`) and `correct` (add 0.5 to every cell,
-done automatically when a cell is 0). Every cell must be a finite,
+done automatically when a cell is 0). An exposure group with no subjects
+(`a + b` or `c + d` is 0) has no risk, so the odds ratio, risk ratio, risk
+difference and their intervals, `nnt` and that group's risk are `NaN`, as
+epitools' `riskratio()` and `oddsratio()` give; the +0.5 would otherwise report
+a ratio of exactly 1 for `[[0,0],[5,5]]`. Every cell must be a finite,
 non-negative number in either call form; anything else is a fatal error that
 names the cell. Result keys: `odds_ratio`, `risk_ratio`,
 `risk_diff` (each with a matching `*_ci`), `risk_exposed`, `risk_unexposed`, and
@@ -4371,6 +4381,11 @@ row axis is positional for AoA/AoH/HoA and string-sorted key order for HoH — t
 same shape and ordering rules as `ffill`/`bfill`. Returns a NEW frame; the input
 is never modified.
 
+A column with nothing to fill is returned as it is, whatever the method, as in
+pandas: `quadratic` or `cubic` on two complete values is not an error. A
+`barycentric` or `krogh` column with a single numeric anchor is filled with that
+constant, as pandas does.
+
 ### Methods
 
 | `method` | What it does |
@@ -4422,8 +4437,9 @@ By default rows are equally spaced (`0, 1, 2, …`). Pass `x` to interpolate
 against real abscissae — either an arrayref (one coordinate per row) or a column
 name/index whose numeric values are the coordinates. `x` must be strictly
 increasing, must not contain NaN (pandas refuses a NaN index too, so
-`interpolate` croaks), and is used by every method except plain `linear` semantics (use
-`index`/`values` for a line on unequal spacing).
+`interpolate` croaks), and is used by every method except plain `linear`, which spaces the rows equally
+whatever `x` says, as pandas' `linear` ignores the index (use `index`/`values`
+for a line on unequal spacing).
 
     # linear fit on unequal spacing
     interpolate({ v => [ 0, undef, undef, 10 ] }, method => 'index', x => [ 0, 1, 3, 4 ]);
@@ -4940,7 +4956,43 @@ changes nothing. Only a `-` outside parentheses removes, and a term that is
 itself the name of a column is that column, so a column named `a-b` can still be
 written `y ~ a-b`.
 
-Three details differ from R deliberately:
+`offset()` may stand wherever a term may, as in R: `y ~ x + offset(z)`,
+`y ~ x + offset(u/2)`, `y ~ x + offset(-z)`, `y ~ x*offset(z)`. A term that
+holds an offset (`offset(z):x`) is dropped from the model, and each distinct
+`offset()` counts once. `lm` fits the response less the offset, as
+`lm.fit(x, y - offset)` does; `fitted_values` include the offset, `residuals`
+are the response less the fitted values, and `r_squared` and the F statistic are
+`summary.lm`'s, which take the offset out of the fitted values first. The
+expressions are returned in `offset_terms`.
+
+The intercept markers act in order and the last one wins, as in R: `y ~ x - 1 + 1`
+and `y ~ 0 + x + 1` have an intercept, `y ~ x + 1 - 1` has none. With a
+transformed response `.` leaves out every variable the response mentions:
+`log(y) ~ .` omits `y`, and `I(y + x) ~ .` omits both `y` and `x`.
+
+A formula that R refuses is refused here: an operator with no operand
+(`y ~ x +`), two operands with no operator between them (`y ~ x z`), a column
+name that is not in the data (`object 'q' not found`), and a comparison or logic
+operator inside `I()` (`I(x > 0)`, `I(x == 0)`, `I(x & z)`, `I(!x)`), which R
+turns into a logical factor and `lm` does not evaluate. A sum of any number of
+terms is read in time linear in their number, and a long run of unary signs is
+not a problem.
+
+A categorical column with only one level makes the model an error, as in R
+("contrasts can be applied only to factors with 2 or more levels"); through
+0.3427 it contributed no column. A factor's levels are those of the rows the
+fit keeps, as in R's `model.frame()`: a level that occurs only in rows dropped
+for a missing value in any variable of the model, the response, `offset` or
+`weights` included, is no level. Without an intercept the first factor of two or
+more levels in the first term that has one is coded by indicators for every
+level, as R's `model.matrix()` does (`y ~ x + b:x - 1` has columns `x`, `x:bu`
+and `x:bv`, the last aliased). Coefficient, term and level names are perl
+characters when the column or levels were (a column found only through its
+UTF-8 spelling, or a cell with the UTF-8 flag), so with `use utf8`
+`$fit->{coefficients}{"café"}` exists; a script without `use utf8` keeps
+getting its bytes back.
+
+A few details differ from R deliberately:
 
 - Levels are sorted with `strcmp`, i.e. by byte value, which is what
   `patsy`/`pandas` does. R sorts with the collation of the running locale, so a
@@ -4948,18 +5000,20 @@ Three details differ from R deliberately:
   the two: on `c("b", "A", "a")` R takes `a` and `lm` takes `A`. Both
   parameterise the same fit — residual sum of squares, rank and fitted values
   agree — but the coefficient names and values differ.
-- A lone term crossed with itself keeps the product, so `wt:wt` is `wt` squared
-  and `y ~ wt*wt` fits `y ~ wt + I(wt^2)`. R's formula algebra collapses `a:a`
-  to `a`, making the same formula mean `y ~ wt` there. Any other product, such
-  as `(a + b)*(a + b)` or `(a + b)*a`, is R's: the union of the two terms'
-  variables.
-- A categorical column with only one level contributes no column, so
-  `y ~ x + g` fits `y ~ x`. R refuses the model outright ("contrasts can be
-  applied only to factors with 2 or more levels").
+- A lone *numeric* term crossed with itself keeps the product, so `wt:wt` is
+  `wt` squared and `y ~ wt*wt` fits `y ~ wt + I(wt^2)`. R's formula algebra
+  collapses `a:a` to `a`, making the same formula mean `y ~ wt` there. A
+  *factor* crossed with itself is R's: `a*a` and `a:a` are `a`. Any other
+  product, such as `(a + b)*(a + b)` or `(a + b)*a`, is R's: the union of the
+  two terms' variables.
+- A design of more than about 13,000 columns (9,400 where `NV` is a long double
+  or `__float128`) is refused with "design too wide", before anything is
+  allocated, because `X'X` and the packed factor of the fit need 1.5 p**2
+  numbers; the limit is 2 GiB of them. R fits such a model, with `NA` for the
+  coefficients past the rank.
 - The intercept markers `- 1`, `+ 0`, `0 +` are read only at the top level of
-  the formula. R reads one inside a group, as in `y ~ (a + 1)*b`, and lets the
-  last one win; here it is an error, because the intercept has been decided
-  before the groups are expanded.
+  the formula. R reads one inside a group, as in `y ~ (a + 1)*b`; here it is an
+  error, because the intercept has been decided before the groups are expanded.
 
 the dot operator also works:
 
@@ -5775,7 +5829,7 @@ omitting it entirely is how you ask for the power.
 
 | Parameter | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
-| `n` | Float | `undef` | Number of observations (per group for two-sample, pairs for paired). Must be at least 2. |
+| `n` | Float | `undef` | Number of observations (per group for two-sample, pairs for paired). Any positive number, as in R, which floors the degrees of freedom `(n - 1) * tsample` at 1e-7: below `n = 1.001` the critical value is infinite and the power is exactly 0. |
 | `delta` | Float | `undef` | True difference in means. Used as `abs(delta)` when the test is two-sided. |
 | `sd` | Float | 1.0 | Standard deviation. |
 | `sig_level` | Float | 0.05 | Significance level (Type I error probability), in `[0, 1]`. R's dotted `sig.level` is refused as an unknown argument. |
@@ -6367,6 +6421,17 @@ Rank values like R's `rank()`. Takes flat scalars and/or array refs (like `min`)
     my @r = rank([3, 1, 4, 1, 5], 'ties_method' => 'min'); # 3, 1, 4, 1, 5
 
 Ranks are 1-based; `average` may return half-ranks. `undef` and NaN are treated as NA.
+
+As in R, the values decide what is ranked. When every non-missing value looks
+like a number (Perl's `looks_like_number`, so `"1e1"`, `" 3 "` and `"Inf"`
+do), they are ranked numerically. When any one does not (`"b"`, `""`, `"0x10"`),
+all the values are ranked as strings, so `rank("b", "a", "b")` is
+`2.5, 1, 2.5` and `rank("abc", 5, 1)` is `3, 2, 1` (the strings `"1"`, `"5"`,
+`"abc"`), as R's `rank(c("abc", 5, 1))` is. Strings are compared by codepoint,
+never by locale; R uses the locale's collation, so for non-ASCII text, or mixed
+case outside the C locale, the order can differ from R's. A reference that is
+not an object overloading its numeric value (a hashref, a nested arrayref, a
+coderef) is an error, as ranking a list is in R.
 
 ### ties_method
 
@@ -7019,6 +7084,14 @@ Rows are taken in the order the XML gives them, and a row's `r=` number only
 says how many blank rows lie before it. Up to 0.3425 every row with no value
 was dropped. Tested in `t/read_table.xlsx.blank_rows.pandas.t`.
 
+**Damaged files.** A file that is not a zip archive, an archive cut short, and a
+member whose deflate data is damaged, whose size is not the one the archive's
+directory gives, or whose CRC-32 is wrong, are errors that name the file; up to
+0.3427 they read as an empty or partial table. This is what pandas does
+(`zipfile.BadZipFile`). Chart sheets, dialog sheets and macro sheets are not
+worksheets and are not read, as in pandas and openpyxl. Two sheets with one name
+are an error when the workbook is read whole, since they cannot both be keys.
+
 **Multiple worksheets.** If the workbook has more than one worksheet and no
 `sheet` is given, `read_table` returns a **hashref keyed by worksheet name**,
 each value being that sheet parsed just as a single table would be (honouring
@@ -7667,7 +7740,7 @@ The AoH/HoH case is the per-column summary R gives for a data frame — so the a
     summary(\@x, color => 1);               # force colour (default: auto on a TTY)
     my $txt = summary(\%hoa, return_only => 1);   # capture instead of printing
 
-Non-numeric and undefined cells are ignored: they never count toward `# values`, and a variable with no numeric values shows `0` and `na`. For example, `summary` of an AoH:
+Non-numeric and undefined cells are ignored: they never count toward `# values`, and a variable with no numeric values shows `0` and `na`. A NaN is R's `NA`: it is left out of every statistic and counted in a trailing `NA's` column, which appears only when some variable has one (`summary([1, 'NaN', 3, 'Inf'])` gives 3 values, Min 1, Median 3, Mean `Inf`, `NA's` 1, as R does). `Inf` is a value. For example, `summary` of an AoH:
 
     # summary: 2 rows x 7 cols	(showing 2 rows)
     Column  # values  Min.  1st Qu.  Median  Mean  3rd Qu.  Max.
@@ -8662,6 +8735,15 @@ and `"café"`, which are the same string to perl, are both written `café`. This
 is the reading the `.xlsx` and LaTeX writers give text too. Up to 0.3425 a
 string held as bytes was written as those bytes, and `"caf\xe9"` came out as a
 single byte E9, which Python's `csv`, pandas and R read as `caf\x{FFFD}`.
+
+A file is written to a temporary file beside it and renamed over the name once the
+table is complete, in every format, so a write that dies partway -- a cell over
+Excel's 32,767 characters, a code point above U+10FFFF, a tied cell whose
+`FETCH` dies -- leaves an existing file as it was and makes none where there was
+none, and the new file keeps the old one's permissions. A name that is not a
+regular file (a pipe, `/dev/null`, a symlink) is written in place, as is a file
+in a directory the process cannot write to. An `.xlsx` table too wide for Excel
+is refused before the file is opened wherever the shape says how wide it is.
 
 Every cell of delimited output is written whole, including one holding a NUL byte, and a cell of a tied hash or array (such as `Tie::IxHash`) is read through its `FETCH`. A number is formatted the way perl formats it, but in a copy, so writing a table does not add a string buffer to every numeric scalar in it. Nor does finding an AoH's or a HoH's columns leave an iterator on every row hash, as walking them with `keys` would. A row that is a restricted hash (`Hash::Util::lock_keys`) may lack some of the columns; those cells are written empty, where they used to die with *Attempt to access disallowed key*.
 

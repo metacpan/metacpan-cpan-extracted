@@ -1,5 +1,55 @@
 Revision history for Database-BI
 
+0.024.0	Sun Nov 22 09:10:13 PM EST 2026
+	[ Enhancements ]
+	- JSON Lines (.jsonl, .ndjson) files open as a table, a row to a
+	  line, and are read as a stream.  A .json list of objects over 16 MiB
+	  is streamed too.
+	- json_flatten in database_bi.conf shows a nested JSON object as a
+	  column for each value (address.city) instead of JSON text.  It and
+	  time_zone apply to the whole server, not to one request or file.
+	- time_zone in database_bi.conf (UTC, local, or an offset such as
+	  +05:30): a timestamp ending Z or +01:00 is moved to that zone before
+	  the filters, Time range, hour/minute and span= buckets read it, and
+	  the Time range presets use that zone's today.  Unset, a zone is
+	  ignored as before.
+	- Delta, a new button right of Combine data: choose two columns and
+	  every row where they are identical is removed, leaving the rows
+	  that differ.  It is the filter f=a:differ:b, so charts, export and
+	  print follow it.
+	- Browse your files: tick two or more files (or Select all, or
+	  shift-click a range) and Combine selected opens them as one table,
+	  as Combine data does.  A folder of reports, such as a DMARC
+	  archive, is one click.  The table has a source_file column that
+	  names the file each row came from (srccol= on /combine, for any
+	  stack of files).
+	- Export SVG, PNG and PDF, on the chart pages and canvas cards, now
+	  open the Save As box in Chrome, Edge and other browsers that support
+	  it, so you choose the folder and file name.  Other browsers download
+	  as before.
+	- A table made by stacking many files is titled with the first few
+	  names and a count, not all of them.
+	- Requests may now have a start line of up to 256 KiB
+	  (MOJO_MAX_LINE_SIZE), for the long link a stack of many files makes.
+
+	[ Bug fixes ]
+	- SafeUA::resolve_host returns an empty list for a host the resolver will
+	  not take as text (a wide character), as the POD says it does when a
+	  host does not resolve, instead of dying inside getaddrinfo
+	- Export saves only the columns the table still shows, in its order:
+	  columns deleted in the page (for example from a merged table) were
+	  still written to the file.
+	- The rows per page you chose now stay when you Merge or Combine more
+	  data, instead of going back to 200.
+	- JSON exports write each row's keys in the table's column order.
+
+	[ Other ]
+	- Tests: the time zone tests that need another server zone skip on
+	  Windows, which has no tzset; a fixed-offset check runs there.  A slow
+	  edge-case test has a longer time limit, and the SafeUA test skips
+	  where the DNS resolver answers names that cannot exist.
+	- No more "used only once" warnings when Database::BI is compiled.
+
 0.023.1	Wed Nov 11 08:33:35 PM EST 2026
 	[ Enhancements ]
 	- Map boundaries are no longer only counties.  The map panel's Show

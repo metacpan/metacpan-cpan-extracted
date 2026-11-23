@@ -27,7 +27,7 @@ requires:
   CryptX: '0.091'
   Ouch: '0.0501'
   perl: '5.024000'
-version: '0.001'
+version: '0.002'
 x_contributors:
   - 'Flavio Poletti <flavio@polettix.it>'
 x_generated_by_perl: v5.40.1

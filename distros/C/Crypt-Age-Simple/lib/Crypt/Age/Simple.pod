@@ -12,7 +12,7 @@ Crypt::Age::Simple - DWIM interface to age files from Perl
 
 =head1 VERSION
 
-This document describes Crypt::Age::Simple version 0.001.
+This document describes Crypt::Age::Simple version 0.002.
 
 =begin html
 

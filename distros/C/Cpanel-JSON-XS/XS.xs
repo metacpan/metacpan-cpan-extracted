@@ -289,11 +289,13 @@ mingw_modfl(long double x, long double *ip)
 #define SvREFCNT_dec_NN(sv) SvREFCNT_dec(sv)
 #endif
 /* from cperl */
-#ifndef strEQc
-/* the buffer ends with \0, includes comparison of the \0.
-   better than strEQ as it uses memcmp, word-wise comparison. */
-# define strEQc(s, c) memEQ(s, ("" c ""), sizeof(c))
-#endif
+/* s is a \0-terminated string: compares the \0 too, but never reads past it
+   (a formatted number is shorter than the constant, the buffer after its \0
+   is uninitialized). */
+#undef strEQc
+#define strEQc(s, c) (strncmp((s), ("" c ""), sizeof(c)) == 0)
+/* s is a \0-terminated string starting with c, the string s may continue */
+#define strPrefixc(s, c) (strncmp((s), ("" c ""), sizeof(c)-1) == 0)
 #ifndef memEQc
 /* excluding the final \0, so the string s may continue */
 # define memEQc(s, c) memEQ(s, ("" c ""), sizeof(c)-1)
@@ -1855,7 +1857,7 @@ encode_hv (pTHX_ enc_t *enc, HV *hv, SV *typesv)
 
 /* implement convert_blessed, sv is already unref'ed here */
 static void
-encode_stringify(pTHX_ enc_t *enc, SV *sv, int isref)
+encode_stringify_(pTHX_ enc_t *enc, SV *sv, int isref)
 {
   char *str = NULL;
   STRLEN len;
@@ -1901,7 +1903,7 @@ encode_stringify(pTHX_ enc_t *enc, SV *sv, int isref)
   if (type != SVt_PVAV && type != SVt_PVHV && type != SVt_PVFM) {
     /* the essential of pp_stringify */
 #if PERL_VERSION > 7
-    pv = newSVpvs("");
+    pv = sv_2mortal (newSVpvs(""));
     if (!isref && !(enc->json.flags & F_ALLOW_STRINGIFY)) {
       sv_copypv(pv, sv_2mortal (newRV_inc (sv)));
     } else {
@@ -1915,10 +1917,10 @@ encode_stringify(pTHX_ enc_t *enc, SV *sv, int isref)
       pv = AMG_CALLun(sv,string);
       len = SvCUR(pv);
       str = SvPVX(pv);
-      SvREFCNT_inc(pv);
+      sv_2mortal (SvREFCNT_inc(pv));
     }
     else {
-      pv = newSVpvs("");
+      pv = sv_2mortal (newSVpvs(""));
       s = SvPV(sv,len);
       sv_setpvn(pv,s,len);
       if (SvUTF8(sv))
@@ -1931,7 +1933,7 @@ encode_stringify(pTHX_ enc_t *enc, SV *sv, int isref)
 #endif
     if (!len && !SvOBJECT (sv)) {
       encode_const_str (aTHX_ enc, "null", 4, 0);
-      SvREFCNT_dec(pv);
+      /* pv is mortal */
       return;
     }
   } else {
@@ -1939,7 +1941,7 @@ encode_stringify(pTHX_ enc_t *enc, SV *sv, int isref)
     if (SvGMAGICAL(sv))
       mg_get(sv);
     if (MyAMG(sv)) { /* force a RV here */
-      SV* rv = newRV_inc(sv);
+      SV* rv = sv_2mortal (newRV_inc(sv));
 #if PERL_VERSION <= 8
       HV *stash = SvSTASH(sv);
       if (!SvSTASH(rv) || !(SvFLAGS(sv) & SVf_AMAGIC)) {
@@ -1967,10 +1969,9 @@ encode_stringify(pTHX_ enc_t *enc, SV *sv, int isref)
         encode_ch (aTHX_ enc, '"');
         encode_str (aTHX_ enc, str, len, 1);
         encode_ch (aTHX_ enc, '"');
-        SvREFCNT_dec(rv);
+        /* rv is mortal */
         return;
       }
-      SvREFCNT_dec(rv);
       pv = NULL; /* owned by the overload call */
     }
   }
@@ -1984,23 +1985,23 @@ encode_stringify(pTHX_ enc_t *enc, SV *sv, int isref)
         (enc->json.flags & F_ALLOW_BIGNUM)
         && str
         && SvROK(sv)
-        && (memEQc(str, "NaN") || memEQc(str, "nan") ||
-            memEQc(str, "inf") || memEQc(str, "-inf"))))
+        && (strPrefixc(str, "NaN") || strPrefixc(str, "nan") ||
+            strPrefixc(str, "inf") || strPrefixc(str, "-inf"))))
   {
     if (is_bignum_obj (aTHX_ SvRV (sv)))
     {
       if (enc->json.infnan_mode == 0) {
         encode_const_str (aTHX_ enc, "null", 4, 0);
-        if (pv) SvREFCNT_dec(pv);
+        /* pv is mortal */
         return;
       } else if (enc->json.infnan_mode == 3) {
-        if (memEQc(str, "NaN") || memEQc(str, "nan"))
+        if (strPrefixc(str, "NaN") || strPrefixc(str, "nan"))
           encode_const_str (aTHX_ enc, "nan", 3, 0);
-        else if (memEQc(str, "inf"))
+        else if (strPrefixc(str, "inf"))
           encode_const_str (aTHX_ enc, "inf", 3, 0);
         else
           encode_const_str (aTHX_ enc, "-inf", 4, 0);
-        if (pv) SvREFCNT_dec(pv);
+        /* pv is mortal */
         return;
       }
     }
@@ -2014,8 +2015,18 @@ encode_stringify(pTHX_ enc_t *enc, SV *sv, int isref)
     if (isref != 1)
       encode_ch (aTHX_ enc, '"');
   }
-  if (pv) SvREFCNT_dec(pv);
+  /* pv and rv are mortal: freed by encode_stringify's scope, also when encode_str croaks */
 #undef MyAMG
+}
+
+/* The temporaries of encode_stringify_ (string copy, overload object) are
+   freed on return and when encode_str croaks (malformed UTF-8). */
+static void
+encode_stringify(pTHX_ enc_t *enc, SV *sv, int isref)
+{
+  ENTER; SAVETMPS;
+  encode_stringify_(aTHX_ enc, sv, isref);
+  FREETMPS; LEAVE;
 }
 
 INLINE int
@@ -2517,17 +2528,17 @@ encode_sv (pTHX_ enc_t *enc, SV *sv, SV *typesv)
               str++;
               len--;
             }
-          if (UNLIKELY (memEQc (str, "NaN") || memEQc (str, "nan")))
+          if (UNLIKELY (strPrefixc (str, "NaN") || strPrefixc (str, "nan")))
             {
               nv = NV_NAN;
               is_bigobj = 0;
             }
-          else if (UNLIKELY (memEQc (str, "inf")))
+          else if (UNLIKELY (strPrefixc (str, "inf")))
             {
               nv = NV_INF;
               is_bigobj = 0;
             }
-          else if (UNLIKELY (memEQc (str, "-inf")))
+          else if (UNLIKELY (strPrefixc (str, "-inf")))
             {
               nv = -NV_INF;
               is_bigobj = 0;
@@ -2982,7 +2993,7 @@ encode_sv (pTHX_ enc_t *enc, SV *sv, SV *typesv)
                 {
                   is_neg = 1;
                   if (LIKELY(uv <= (UV)(IV_MAX) + 1))
-                    iv = -(IV)uv;
+                    iv = (IV)(0 - uv); /* unsigned negate: uv may be IV_MAX + 1 */
                   else
                     {
                       iv = IV_MIN; /* underflow, but F_ALLOW_BIGNUM can handle this */
@@ -4369,7 +4380,7 @@ decode_av (pTHX_ dec_t *dec, SV *typesv)
   AV *av = newAV ();
   AV *typeav = NULL;
   SV *typerv;
-  int hooked = (dec->json.flags & F_HOOK) != 0;
+  int hooked = (dec->json.flags & (F_HOOK | F_ALLOW_TAGS)) != 0;
   /* a croaking filter callback would leak this container, which is only
      referenced from the C stack; hold a mortal reference while hooks can run */
   if (UNLIKELY (hooked))
@@ -4480,7 +4491,7 @@ decode_hv (pTHX_ dec_t *dec, SV *typesv)
   int dupkeys_as_arrayref = dec->json.flags & F_DUPKEYS_AS_AREF;
   HV *dupkeys_seen = NULL;
   char endstr = '"';
-  int hooked = (dec->json.flags & F_HOOK) != 0;
+  int hooked = (dec->json.flags & (F_HOOK | F_ALLOW_TAGS)) != 0;
 
   if (UNLIKELY (hooked))
     sv_2mortal ((SV *)hv);
@@ -4589,10 +4600,15 @@ decode_hv (pTHX_ dec_t *dec, SV *typesv)
                       (void)hv_store_ent (typehv, keysv, value_typesv, 0);
                     }
 
+                  /* a croaking filter or THAW would leak keysv: the mortal owns it */
+                  if (UNLIKELY (hooked))
+                    sv_2mortal (keysv);
+
                   value = decode_sv (aTHX_ dec, value_typesv);
                   if (!value)
                     {
-                      SvREFCNT_dec (keysv);
+                      if (!hooked)
+                        SvREFCNT_dec (keysv);
                       goto fail;
                     }
 
@@ -4602,7 +4618,8 @@ decode_hv (pTHX_ dec_t *dec, SV *typesv)
                                     || SvTYPE (SvRV (old_value)) != SVt_PVAV))
                         {
                           SvREFCNT_dec (value);
-                          SvREFCNT_dec (keysv);
+                          if (!hooked)
+                            SvREFCNT_dec (keysv);
                           ERR ("Invalid dupkeys_as_arrayref hash key");
                         }
                       av_push ((AV*)SvRV (old_value), value);
@@ -4612,7 +4629,8 @@ decode_hv (pTHX_ dec_t *dec, SV *typesv)
                     {
                       (void)hv_store_ent (hv, keysv, value, 0);
                     }
-                  SvREFCNT_dec (keysv);
+                  if (!hooked)
+                    SvREFCNT_dec (keysv);
 
                   break;
                 }
@@ -5037,7 +5055,7 @@ decode_bom(pTHX_ const char* encoding, SV* string, STRLEN offset)
   LEAVE;
   ENTER;
   PUSHMARK(SP);
-  XPUSHs(newSVpvn(encoding, strlen(encoding)));
+  XPUSHs(sv_2mortal (newSVpvn(encoding, strlen(encoding))));
   XPUSHs(string);
   PUTBACK;
   /* Calling Encode::Unicode::decode_xs would be faster, but we'd need the blessed

@@ -8,7 +8,7 @@ Attean::Plan - Representation of SPARQL query plan operators
 
 =head1 VERSION
 
-This document describes Attean::Plan version 0.040
+This document describes Attean::Plan version 0.041
 
 =head1 SYNOPSIS
 
@@ -32,7 +32,7 @@ Evaluates a quad pattern against the model.
 
 =cut
 
-package Attean::Plan::Quad 0.040 {
+package Attean::Plan::Quad 0.041 {
 	use Moo;
 	use Scalar::Util qw(blessed reftype);
 	use Types::Standard qw(ConsumerOf ArrayRef);
@@ -141,7 +141,7 @@ Evaluates a join (natural-, anti-, or left-) using a nested loop.
 
 =cut
 
-package Attean::Plan::NestedLoopJoin 0.040 {
+package Attean::Plan::NestedLoopJoin 0.041 {
 	use Moo;
 	use List::Util qw(all);
 	use namespace::clean;
@@ -230,7 +230,7 @@ Evaluates a join (natural-, anti-, or left-) using a hash join.
 
 =cut
 
-package Attean::Plan::HashJoin 0.040 {
+package Attean::Plan::HashJoin 0.041 {
 	use Moo;
 	use List::Util qw(all);
 	use namespace::clean;
@@ -371,7 +371,7 @@ package Attean::Plan::HashJoin 0.040 {
 
 =cut
 
-package Attean::Plan::Construct 0.040 {
+package Attean::Plan::Construct 0.041 {
 	use Moo;
 	use List::Util qw(all);
 	use Types::Standard qw(Str ArrayRef ConsumerOf InstanceOf);
@@ -482,7 +482,7 @@ package Attean::Plan::Construct 0.040 {
 
 =cut
 
-package Attean::Plan::Describe 0.040 {
+package Attean::Plan::Describe 0.041 {
 	use Moo;
 	use Attean::RDF;
 	use List::Util qw(all);
@@ -568,7 +568,7 @@ named variable binding.
 
 =cut
 
-package Attean::Plan::EBVFilter 0.040 {
+package Attean::Plan::EBVFilter 0.041 {
 	use Moo;
 	use Scalar::Util qw(blessed);
 	use Types::Standard qw(Str ConsumerOf);
@@ -628,7 +628,7 @@ ordering.
 
 =cut
 
-package Attean::Plan::Merge 0.040 {
+package Attean::Plan::Merge 0.041 {
 	use Moo;
 	use Scalar::Util qw(blessed);
 	use Types::Standard qw(Str ArrayRef ConsumerOf);
@@ -657,7 +657,7 @@ Evaluates a set of sub-plans, returning the union of results.
 
 =cut
 
-package Attean::Plan::Union 0.040 {
+package Attean::Plan::Union 0.041 {
 	use Moo;
 	use Scalar::Util qw(blessed);
 	use namespace::clean;
@@ -728,7 +728,7 @@ expressions, binding the produced values to new variables.
 
 =cut
 
-package Attean::Plan::Extend 0.040 {
+package Attean::Plan::Extend 0.041 {
 	use Moo;
 	use Encode;
 	use UUID::Tiny ':std';
@@ -754,6 +754,21 @@ package Attean::Plan::Extend 0.040 {
 		return sprintf('Extend { %s }', join(', ', @strings));
 	}
 	sub tree_attributes { return qw(variable expression) };
+	
+# 	around 'evaluate_expression' => sub {
+# 		my $orig	= shift;
+# 		my $self	= shift;
+# 		my $model	= shift;
+# 		my $expr	= shift;
+# 		my $r		= shift;
+# 
+# 		my $debug	= 1;
+# 		my $value	= $orig->($self, $model, $expr, $r, @_);
+# 		if ($debug) {
+# 			print STDERR sprintf("[TRACE] %-60s <- %s\n", $value->as_string, $expr->as_string);
+# 		}
+# 		return $value;
+# 	};
 	
 	sub BUILDARGS {
 		my $class		= shift;
@@ -989,7 +1004,7 @@ package Attean::Plan::Extend 0.040 {
 					my @operands	= map { $self->evaluate_expression($model, $_, $r) } @children;
 					my $rr	= eval { $func->($model, $self->active_graphs, @operands) };
 					if ($@) {
-						warn "INVOKE error: $@" if $@;
+# 						warn "INVOKE error <$furi>: $@" if $@;
 						return;
 					}
 					return $rr;
@@ -997,7 +1012,7 @@ package Attean::Plan::Extend 0.040 {
 					my @operands	= map { eval { $self->evaluate_expression($model, $_, $r) } || undef } @children;
 					my $rr	= eval { $fform->($model, $self->active_graphs, @operands) };
 					if ($@) {
-						warn "INVOKE error: $@" if $@;
+# 						warn "INVOKE error <$furi>: $@" if $@;
 						return $r;
 					}
 					return $rr;
@@ -1179,15 +1194,44 @@ package Attean::Plan::Extend 0.040 {
 					my $flags	= blessed($flags_term) ? $flags_term->value : '';
 					die 'REPLACE() called with unsafe ?{} match pattern' if (index($pattern, '(?{') != -1 or index($pattern, '(??{') != -1);
 					die 'REPLACE() called with unsafe ?{} replace pattern' if (index($replace, '(?{') != -1 or index($replace, '(??{') != -1);
+					die "REPLACE() called with unescaped \$ character at the start of replacement string without trailing digits" if ($replace =~ m<^\$(?!\d)>x); # starting with a '$' without following digits
+					die "REPLACE() called with unescaped \$ character in replacement string without trailing digits" if ($replace =~ m<[^\\]\$(?!\d) >x); # a '$' not at the start, without a preceding escape backslash, and without following digits
 
-					$replace	=~ s/\\/\\\\/g;
-					$replace	=~ s/\$(\d+)/\$$1/g;
+					''				=~ /(?:$pattern)|/; # match against an empty string to determine how many capture groups there are
+					my $capture_groups	= $#+;
+					
 					$replace	=~ s/"/\\"/g;
 					$replace	= qq["$replace"];
 					no warnings 'uninitialized';
-
+					
 					if ($flags eq 'i') {
 						$pattern	= '(?i)' . $pattern;
+					}
+
+					# TODO: This only does one round of stripping off trailing digits to find a valid capture group,
+					#       but the F&O semantics say to continue doing that until it works.
+					my $EMPTY	= '';
+					my @group_vars	= ($replace =~ /(?<!\\)\$(\d+)/);
+					foreach my $v (@group_vars) {
+						if ($v == 0) {
+							# $0 as the whole-match variable
+							$replace	=~ s/(?<!\\)\$${v}/\$&/;
+						} elsif ($v > $capture_groups and length($v) > 1) {
+							# If the var is too big to reference a capture group,
+							# strip off the last digit as a literal and try again.
+# 								warn "variable \$${v} does not reference any of the $capture_groups capture groups\n";
+							my ($head, $tail)	= ($v =~ /^(.+)(.)$/);
+							
+							# Insert the $EMPTY variable (to be interpolated during replacement) between
+							# the length-1 prefix and the 1-digit suffix of the variable number, so it may
+							# reference an actual capture group (e.g. replacing "a(b)c" with "$12" in "abc"
+							# should yield "ab2c" since $12 is not a valid capture group var, but $1 is,
+							# and so the trailing 2 becomes a literal '2' in the replacement string).
+							$replace	=~ s/(?<!\\)\$${head}${tail}/\$${head}\${EMPTY}${tail}/;
+						} elsif ($v > $capture_groups) {
+							# for single-digit vars that are larger than the number of capture groups, replace with the empty string
+							$replace	=~ s/(?<!\\)\$${v}//;
+						}
 					}
 
 					$value	=~ s/$pattern/"$replace"/eeg;
@@ -1198,13 +1242,27 @@ package Attean::Plan::Extend 0.040 {
 					my $value	= $term->value;
 					my @nums;
 					foreach my $i (0 .. $#args) {
-						my $argnum	= $i + 2;
 						my $arg		= $args[ $i ];
 						push(@nums, $arg->numeric_value);
 					}
-					$nums[0]--;
-					my $substring	= (scalar(@nums) > 1) ? substr($value, $nums[0], $nums[1]) : substr($value, $nums[0]);
-					return Attean::Literal->new(value => $substring, $term->construct_args);
+					my $start	= $nums[0]-1; # adjust from 1-based API
+					my @len		= scalar(@nums > 1) ? ($nums[1]) : ();
+					if ($start < 0) {
+						if (scalar(@len)) {
+							my $diff	= abs($start);
+							$len[0]		-= $diff;
+						}
+						$start		= 0;
+						
+					}
+					if (scalar(@len) and $len[0] < 0) {
+						# negative length, just produce the empty string
+						$len[0]	= 0;
+					}
+					my $lex		= $term->value;
+					no warnings 'substr';
+					my $v		= scalar(@len) ? substr($lex, $start, $len[0]) : substr($lex, $start);
+					return Attean::Literal->new(value => ($v // ''), $term->construct_args);
 				} elsif ($func eq 'CONTAINS') {
 					my ($term, $pattern)	= map { $self->evaluate_expression($model, $_, $r) } @{ $expr->children };
 					my $t_key	= $term->lang_dir();
@@ -1217,10 +1275,16 @@ package Attean::Plan::Extend 0.040 {
 					return ($pos >= 0) ? $true : $false;
 				} elsif ($func eq 'STRSTARTS') {
 					my (@terms)	= map { $self->evaluate_expression($model, $_, $r) } @{ $expr->children };
+					unless ($terms[0]->argument_compatible($terms[1])) {
+						die "TypeError: ${func} operands are not argument compatible";
+					}
 					my ($string, $pat)	= map { $_->value } @terms;
 					return (substr($string, 0, length($pat)) eq $pat) ? $true : $false;
 				} elsif ($func eq 'STRENDS') {
 					my (@terms)	= map { $self->evaluate_expression($model, $_, $r) } @{ $expr->children };
+					unless ($terms[0]->argument_compatible($terms[1])) {
+						die "TypeError: ${func} operands are not argument compatible";
+					}
 					my ($string, $pat)	= map { $_->value } @terms;
 					return (substr($string, length($string) - length($pat)) eq $pat) ? $true : $false;
 				} elsif ($func eq 'STRAFTER') {
@@ -1482,7 +1546,7 @@ hash of already-seen results.
 
 =cut
 
-package Attean::Plan::HashDistinct 0.040 {
+package Attean::Plan::HashDistinct 0.041 {
 	use Moo;
 	use namespace::clean;
 	
@@ -1510,7 +1574,7 @@ filtering out sequential duplicates.
 
 =cut
 
-package Attean::Plan::Unique 0.040 {
+package Attean::Plan::Unique 0.041 {
 	use Moo;
 	use namespace::clean;
 	
@@ -1545,7 +1609,7 @@ number of results ("offset") and limiting the total number of returned results
 
 =cut
 
-package Attean::Plan::Slice 0.040 {
+package Attean::Plan::Slice 0.041 {
 	use Moo;
 	use Types::Standard qw(Int);
 	use namespace::clean;
@@ -1586,7 +1650,7 @@ of variable bindings in each result.
 
 =cut
 
-package Attean::Plan::Project 0.040 {
+package Attean::Plan::Project 0.041 {
 	use Moo;
 	with 'Attean::API::BindingSubstitutionPlan', 'Attean::API::UnaryQueryTree';
 	use Types::Standard qw(ArrayRef ConsumerOf);
@@ -1663,7 +1727,7 @@ sorting is applied.
 
 =cut
 
-package Attean::Plan::OrderBy 0.040 {
+package Attean::Plan::OrderBy 0.041 {
 	use Moo;
 	use Types::Standard qw(HashRef ArrayRef InstanceOf Bool Str);
 	use Scalar::Util qw(blessed);
@@ -1746,7 +1810,7 @@ Evaluates a SPARQL query against a remote endpoint.
 
 =cut
 
-package Attean::Plan::Service 0.040 {
+package Attean::Plan::Service 0.041 {
 	use Moo;
 	use Types::Standard qw(ConsumerOf Bool Str InstanceOf);
 	use Encode qw(encode);
@@ -1798,7 +1862,7 @@ Returns a constant set of results.
 
 =cut
 
-package Attean::Plan::Table 0.040 {
+package Attean::Plan::Table 0.041 {
 	use Moo;
 	use Types::Standard qw(ArrayRef ConsumerOf);
 	use namespace::clean;
@@ -1863,7 +1927,7 @@ L<Attean::ListIterator>, the size of that iterator will be used.
 
 =cut
 
-package Attean::Plan::Iterator 0.040 {
+package Attean::Plan::Iterator 0.041 {
 	use Moo;
 	use Types::Standard qw(ArrayRef ConsumerOf Int);
 	use namespace::clean;
@@ -1927,7 +1991,7 @@ package Attean::Plan::Iterator 0.040 {
 
 =cut
 
-package Attean::Plan::ALPPath 0.040 {
+package Attean::Plan::ALPPath 0.041 {
 	use Moo;
 	use Attean::TreeRewriter;
 	use Types::Standard qw(ArrayRef ConsumerOf);
@@ -2079,7 +2143,7 @@ package Attean::Plan::ALPPath 0.040 {
 	}
 }
 
-package Attean::Plan::ZeroOrOnePath 0.040 {
+package Attean::Plan::ZeroOrOnePath 0.041 {
 	use Moo;
 	use Attean::TreeRewriter;
 	use Types::Standard qw(ArrayRef ConsumerOf);
@@ -2178,7 +2242,7 @@ results were produced by evaluating the sub-plan.
 
 =cut
 
-package Attean::Plan::Exists 0.040 {
+package Attean::Plan::Exists 0.041 {
 	use Moo;
 	use Types::Standard qw(ArrayRef ConsumerOf);
 	use namespace::clean;
@@ -2212,7 +2276,7 @@ package Attean::Plan::Exists 0.040 {
 
 =cut
 
-package Attean::Plan::Aggregate 0.040 {
+package Attean::Plan::Aggregate 0.041 {
 	use Moo;
 	use Encode;
 	use UUID::Tiny ':std';
@@ -2548,7 +2612,7 @@ package Attean::Plan::Aggregate 0.040 {
 	}
 }
 
-package Attean::Plan::Sequence 0.040 {
+package Attean::Plan::Sequence 0.041 {
 	use Moo;
 	use Scalar::Util qw(blessed);
 	use Types::Standard qw(ConsumerOf ArrayRef);
@@ -2573,7 +2637,7 @@ package Attean::Plan::Sequence 0.040 {
 	}
 }
 
-package Attean::Plan::Clear 0.040 {
+package Attean::Plan::Clear 0.041 {
 	use Moo;
 	use Scalar::Util qw(blessed);
 	use Types::Standard qw(ConsumerOf ArrayRef);
@@ -2610,7 +2674,7 @@ package Attean::Plan::Clear 0.040 {
 	}
 }
 
-package Attean::Plan::Drop 0.040 {
+package Attean::Plan::Drop 0.041 {
 	use Moo;
 	use Scalar::Util qw(blessed);
 	use Types::Standard qw(ConsumerOf ArrayRef);
@@ -2645,7 +2709,7 @@ package Attean::Plan::Drop 0.040 {
 	}
 }
 
-package Attean::Plan::TripleTemplateToModelQuadMethod 0.040 {
+package Attean::Plan::TripleTemplateToModelQuadMethod 0.041 {
 	use Moo;
 	use Scalar::Util qw(blessed);
 	use Types::Standard qw(ConsumerOf Str ArrayRef HashRef);
@@ -2723,7 +2787,7 @@ package Attean::Plan::TripleTemplateToModelQuadMethod 0.040 {
 	}
 }
 
-package Attean::Plan::Load 0.040 {
+package Attean::Plan::Load 0.041 {
 	use Moo;
 	use Encode;
 	use LWP::UserAgent;
@@ -2753,13 +2817,14 @@ package Attean::Plan::Load 0.040 {
 			my $resp	= $ua->get( $url );
 			if ($resp->is_success) {
 				my $ct		= $resp->header('Content-Type');
-				if (my $pclass = Attean->get_parser( media_type => $ct )) {
-					my $p		= $pclass->new();
-					my $str		= $resp->decoded_content;
-					my $bytes	= encode('UTF-8', $str, Encode::FB_CROAK);
-					my $iter	= $p->parse_iter_from_bytes( $bytes );
-					return $iter;
-				}
+				my $pclass	= Attean->get_parser( media_type => $ct );
+				$pclass		= Attean->get_parser( filename => $url ) unless ($pclass);
+				$pclass	= Attean->get_parser( 'Turtle' ) unless ($pclass); # default to Turtle if no media type is provided
+				my $p		= $pclass->new();
+				my $str		= $resp->decoded_content;
+				my $bytes	= encode('UTF-8', $str, Encode::FB_CROAK);
+				my $iter	= $p->parse_iter_from_bytes( $bytes );
+				return $iter;
 			}
 			
 			if ($silent) {

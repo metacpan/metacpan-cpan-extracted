@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::Storage::V1::Avro;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -27,7 +27,7 @@ GVRJTUVTVEFNUF9QUkVDSVNJT05fUElDT1MQA0K5AQokY29tLmdvb2dsZS5jbG91ZC5iaWdx
 dWVyeS5zdG9yYWdlLnYxQglBdnJvUHJvdG9QAVo+Y2xvdWQuZ29vZ2xlLmNvbS9nby9iaWdx
 dWVyeS9zdG9yYWdlL2FwaXYxL3N0b3JhZ2VwYjtzdG9yYWdlcGKqAiBHb29nbGUuQ2xvdWQu
 QmlnUXVlcnkuU3RvcmFnZS5WMcoCIEdvb2dsZVxDbG91ZFxCaWdRdWVyeVxTdG9yYWdlXFYx
-SvAWCgYSBA4AUAEKvAQKAQwSAw4AEjKxBCBDb3B5cmlnaHQgMjAyNSBHb29nbGUgTExDCgog
+SvAWCgYSBA4AUAEKvAQKAQwSAw4AEjKxBCBDb3B5cmlnaHQgMjAyNiBHb29nbGUgTExDCgog
 TGljZW5zZWQgdW5kZXIgdGhlIEFwYWNoZSBMaWNlbnNlLCBWZXJzaW9uIDIuMCAodGhlICJM
 aWNlbnNlIik7CiB5b3UgbWF5IG5vdCB1c2UgdGhpcyBmaWxlIGV4Y2VwdCBpbiBjb21wbGlh
 bmNlIHdpdGggdGhlIExpY2Vuc2UuCiBZb3UgbWF5IG9idGFpbiBhIGNvcHkgb2YgdGhlIExp

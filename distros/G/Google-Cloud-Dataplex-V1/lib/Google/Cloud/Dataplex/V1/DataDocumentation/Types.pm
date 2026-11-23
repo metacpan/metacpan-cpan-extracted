@@ -70,6 +70,36 @@ coerce 'RepeatedTableResult',
 declare 'MapStringTableResult',
     as HashRef[TableResult()];
 
+declare 'DataProductResult',
+    as InstanceOf['Google::Cloud::Dataplex::V1::DataDocumentation::DataDocumentationResult::DataProductResult'];
+
+coerce 'DataProductResult',
+    from HashRef, via { 'Google::Cloud::Dataplex::V1::DataDocumentation::DataDocumentationResult::DataProductResult'->new($_) };
+
+declare 'RepeatedDataProductResult',
+    as ArrayRef[DataProductResult()];
+
+coerce 'RepeatedDataProductResult',
+    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Dataplex::V1::DataDocumentation::DataDocumentationResult::DataProductResult'->new($_) } @$_ ] };
+
+declare 'MapStringDataProductResult',
+    as HashRef[DataProductResult()];
+
+declare 'AssetDescription',
+    as InstanceOf['Google::Cloud::Dataplex::V1::DataDocumentation::DataDocumentationResult::DataProductResult::AssetDescription'];
+
+coerce 'AssetDescription',
+    from HashRef, via { 'Google::Cloud::Dataplex::V1::DataDocumentation::DataDocumentationResult::DataProductResult::AssetDescription'->new($_) };
+
+declare 'RepeatedAssetDescription',
+    as ArrayRef[AssetDescription()];
+
+coerce 'RepeatedAssetDescription',
+    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Dataplex::V1::DataDocumentation::DataDocumentationResult::DataProductResult::AssetDescription'->new($_) } @$_ ] };
+
+declare 'MapStringAssetDescription',
+    as HashRef[AssetDescription()];
+
 declare 'SchemaRelationship',
     as InstanceOf['Google::Cloud::Dataplex::V1::DataDocumentation::DataDocumentationResult::SchemaRelationship'];
 

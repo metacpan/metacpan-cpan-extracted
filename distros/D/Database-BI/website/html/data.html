@@ -60,7 +60,7 @@
 		</tr>
 		<tr>
 			<td>Any file on disc</td>
-			<td><code>/browse</code> to walk the filesystem, <code>/open?path=/abs/path</code> to open one by path, or <a href="install.html#run"><code>script/database-bi FILE</code></a> to show one at the home address.</td>
+			<td><code>/browse</code> to walk the filesystem (tick several files and Combine selected opens them as one table, with a <code>source_file</code> column), <code>/open?path=/abs/path</code> to open one by path, or <a href="install.html#run"><code>script/database-bi FILE</code></a> to show one at the home address.</td>
 		</tr>
 		<tr>
 			<td>A file on another host</td>
@@ -92,7 +92,8 @@
 <p>
 	Recognised extensions are <code>csv</code>, <code>psv</code>, <code>tsv</code>,
 	<code>sql</code>, <code>sqlite</code>, <code>sqlite3</code>, <code>db</code>,
-	<code>xml</code>, <code>xlsx</code> and <code>json</code>. A file whose columns cannot be
+	<code>xml</code>, <code>xlsx</code>, <code>json</code>, <code>jsonl</code> and
+	<code>ndjson</code>. A file whose columns cannot be
 	identified is read as header-less and given synthetic column names rather
 	than silently losing its first row. Nor are rows lost when a column is
 	mostly empty: a bank export whose cheque-number column is filled in only
@@ -110,6 +111,20 @@
 	for each, as a SQLite file with several tables does. Values beside the lists,
 	such as a date or a count, are left out. A cell holding an object or a list
 	shows as its JSON text, and the columns keep the order the file gives them.
+</p>
+<p id="jsonl">
+	A <strong>JSON Lines</strong> file (<code>.jsonl</code> or <code>.ndjson</code>,
+	one object a line, as logs and API exports write it) is a table with a row for
+	each line. It is read as a stream, and so is a <code>.json</code> list of
+	objects over 16&nbsp;MiB, so a large file does not need memory for its text and
+	its parse as well. A line that is not JSON is refused with its number.
+</p>
+<p id="json-flatten">
+	Set <code>json_flatten =&gt; 1</code> in <code>database_bi.conf</code> and a
+	nested object becomes a column for each of its values, named by its path
+	(<code>address.city</code>, <code>address.geo.lat</code>), instead of one cell of
+	JSON text. A list stays text. It is off by default and applies to
+	<code>.json</code> and JSON Lines alike.
 </p>
 <p id="mariadb">
 	A <strong>MariaDB or MySQL server</strong> is opened by name. Add it to
@@ -146,6 +161,9 @@
 		<code>j=&lt;spec&gt;|&lt;leftkey&gt;|&lt;rightkey&gt;</code> appends
 		columns from another table, keeping every left row. <code>c=&lt;spec&gt;</code>
 		stacks further files under the result on a unified column set.
+		<code>srccol=&lt;name&gt;</code> adds a last column that names the file each
+		row came from; the file browser's Combine selected sets it to
+		<code>source_file</code>.
 	</li>
 	<li>
 		<strong>Normalise dates, look up and compute fields.</strong> A stored date pattern
@@ -183,7 +201,10 @@
 		<code>eq</code>, <code>ne</code>, <code>contains</code>,
 		<code>starts</code>, <code>lt</code>, <code>le</code>, <code>gt</code>,
 		<code>ge</code>, <code>between</code>, <code>empty</code>,
-		<code>notempty</code>, and
+		<code>notempty</code>,
+		<code>differ</code>, whose value is another column
+		(<code>f=billed:differ:paid</code>, the Delta button) and keeps the rows
+		where the two cells are not identical text, and
 		<code>in</code>, any value of a JSON list
 		(<code>f=place:in:["Paris","Rome"]</code>), which a map uses to link to
 		the rows it could not plot. String
@@ -236,12 +257,30 @@ this_year, last_year</code></pre>
 	and a saved canvas all show the same rows. Filters you wrote are untouched.
 	Entries whose window falls entirely outside the data are disabled in the
 	filter bar, with the column's earliest and latest value in the tooltip.
+	With <code>time_zone</code> set in <code>database_bi.conf</code>, today and
+	the other windows are that zone's, and a timestamp ending <code>Z</code> or an
+	offset is read on that clock (see <a href="#time-zones">Time zones</a>).
 	The filter bar offers Time range only when the table has a column of dates
 	or dates and times, and its column menu lists only those columns.
 </p>
 <p>
 	An unknown <code>range=</code> is a 400 rather than a silently unfiltered
 	view, and so is a range with no <code>rcol=</code>.
+</p>
+
+<h2 id="time-zones">Time zones</h2>
+<p>
+	A timestamp that names its zone (<code>2026-11-06T23:30:00Z</code>,
+	<code>...+01:00</code>) is read as written unless <code>time_zone</code> is
+	set in <code>database_bi.conf</code>: <code>UTC</code>, <code>local</code> (the
+	server's own zone, daylight saving included) or an offset such as
+	<code>-05:00</code> or <code>+05:30</code>. The time is then moved to that
+	zone's clock, and the day moves with it, before the filters, the time range,
+	<code>hour()</code>, <code>minute()</code>, <code>span()</code> and the time
+	buckets read it. A value with no zone written is taken to be on that clock
+	already, and the table still shows each cell as it was written. Named zones
+	such as <code>America/New_York</code> are not read: use <code>local</code> with
+	<code>TZ</code>, or an offset.
 </p>
 
 <h2 id="calc">Calculated fields</h2>
@@ -449,9 +488,10 @@ POST /export  l=...&amp;dir=/tmp&amp;filename=out.csv</code></pre>
 		this is built for.
 	</li>
 	<li>
-		An ISO timestamp is read as written: a fraction of a second, a trailing
-		<code>Z</code> or an offset such as <code>+01:00</code> is accepted, and the
-		zone is not applied. A non-ISO timestamp is read as far as its
+		An ISO timestamp is accepted with a fraction of a second and a trailing
+		<code>Z</code> or an offset such as <code>+01:00</code>. The zone is applied
+		only when <code>time_zone</code> is set (<a href="#time-zones">Time zones</a>);
+		otherwise the time is read as written. A non-ISO timestamp is read as far as its
 		<code>YYYY-MM-DD</code> prefix, so <code>last_24_hours</code> is exact on ISO
 		timestamps in the server's zone.
 	</li>

@@ -6,6 +6,7 @@
 #include "xs/message/serialize.h"
 #include "xs/protobuf/message.h"
 #include "xs/protobuf/arena.h"
+#include "xs/protobuf/utils.h"
 #include "xs/descriptor/message.h"
 #include "xs/descriptor_pool/pool.h"
 #include "upb/wire/decode.h"
@@ -142,8 +143,7 @@ SV* PerlUpb_Message_ToText(pTHX_ SV* message_sv) {
 
     size_t encoded = upb_TextEncode(msg, mdef, NULL, 0, buf, size + 1);
 
-    SV* result = newSVpvn(buf, encoded);
-    SvUTF8_on(result);
+    SV* result = PerlUpb_NewUtf8SV(aTHX_ buf, encoded);
     free(buf);
     return result;
 }
@@ -171,8 +171,7 @@ SV* PerlUpb_Message_ToJson(pTHX_ SV* message_sv) {
         croak("JSON Encode error: %s", upb_Status_ErrorMessage(&status));
     }
 
-    SV* result = newSVpvn(buf, encoded);
-    SvUTF8_on(result);
+    SV* result = PerlUpb_NewUtf8SV(aTHX_ buf, encoded);
     free(buf);
     return result;
 }

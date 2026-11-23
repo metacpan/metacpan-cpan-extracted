@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+#
+# Run every <distribution>/t/all-fuzz.t in this workspace against the
+# App-Test-Generator working tree.
+#
+# Usage:
+#   run-all-fuzz
+#
+# When run from a checkout of this distribution the workspace is its parent
+# directory; when run from an installed copy the current directory is
+# searched instead.  Exits 0 only when every suite passes.  On failure, the
+# failing suites' output is printed and the full logs are kept.
+
+set -u
+
+script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+
+# Prefer the checkout this script lives in; fall back to an installed copy.
+if [[ -f "$script_dir/../lib/App/Test/Generator.pm" ]]; then
+	atg=$(cd -- "$script_dir/.." && pwd)
+	root=$(dirname -- "$atg")
+else
+	root=$(pwd)
+	atg=''
+	if [[ -f "$root/App-Test-Generator/lib/App/Test/Generator.pm" ]]; then
+		atg="$root/App-Test-Generator"
+	fi
+fi
+
+# Use the working tree, not whatever App::Test::Generator is installed.
+export EXTENDED_TESTING=1
+if [[ -n "$atg" ]]; then
+	export PERL5LIB="$atg/lib${PERL5LIB:+:$PERL5LIB}"
+	export PATH="$atg/bin:$PATH"
+fi
+
+mapfile -t tests < <(
+	find "$root" -maxdepth 3 -type f -path '*/t/all-fuzz.t' -print \
+		| sort
+)
+
+if ((${#tests[@]} == 0)); then
+	printf 'error: no */t/all-fuzz.t found under %s\n' "$root" >&2
+	exit 2
+fi
+
+logs=$(mktemp -d "${TMPDIR:-/tmp}/all-fuzz.XXXXXX") || exit 2
+
+pids=()
+names=()
+n=0
+for test in "${tests[@]}"; do
+	dir=${test%/t/all-fuzz.t}
+	name=$(basename -- "$(cd -- "$dir" && pwd)")
+	n=$((n + 1))
+	names[n]=$name
+
+	(
+		cd "$dir" || exit 2
+		prove -Ilib t/all-fuzz.t >"$logs/$n.log" 2>&1
+		rc=$?
+		printf '%s\n' "$rc" >"$logs/$n.status"
+		exit "$rc"
+	) &
+	pids+=("$!")
+done
+
+for pid in "${pids[@]}"; do
+	wait "$pid" || true
+done
+
+printf '\nall-fuzz results (workspace: %s)\n' "$root"
+if [[ -n "$atg" ]]; then
+	printf 'App-Test-Generator: %s\n' "$atg"
+fi
+printf '%s\n' '----------------------------------------'
+
+failures=()
+for i in $(seq 1 "$n"); do
+	name=${names[i]}
+	rc=$(cat "$logs/$i.status" 2>/dev/null || printf '2')
+	if [[ "$rc" == 0 ]]; then
+		printf 'PASS  %s\n' "$name"
+	else
+		printf 'FAIL  %s (exit %s)\n' "$name" "$rc"
+		failures+=("$i:$name")
+	fi
+done
+
+if ((${#failures[@]})); then
+	for entry in "${failures[@]}"; do
+		i=${entry%%:*}
+		name=${entry#*:}
+		printf '\n===== %s =====\n' "$name"
+		tail -n 40 "$logs/$i.log"
+	done
+	printf '\nFull logs kept in %s\n' "$logs"
+	exit 1
+fi
+
+rm -rf "$logs"
+printf '\nAll all-fuzz suites passed.\n'

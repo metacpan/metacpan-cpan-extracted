@@ -7,7 +7,7 @@ Attean::API::Model - RDF Model
 
 =head1 VERSION
 
-This document describes Attean::API::Model version 0.040
+This document describes Attean::API::Model version 0.041
 
 =head1 DESCRIPTION
 
@@ -166,7 +166,7 @@ in the model.
 
 use Attean::API::Binding;
 
-package Attean::API::Model 0.040 {
+package Attean::API::Model 0.041 {
 	use Sub::Install;
 	use Sub::Util qw(set_subname);
 	use URI::Namespace;
@@ -174,6 +174,7 @@ package Attean::API::Model 0.040 {
 	use List::Util qw(uniq);
 	use Math::Cartesian::Product;
 	use Data::Dumper;
+	use Attean::RDF qw(iri);
 
 	use Moo::Role;
 	
@@ -314,6 +315,41 @@ package Attean::API::Model 0.040 {
 			});
 		}
 	}
+	
+=item C<< type_hierarchy ( $node ) >>
+
+Returns a list of Attean::API::IRI objects for the type hierarchy of $node.
+
+This is equivalent to what a query would return for:
+
+  <$node> rdf:type/rdfs:subClassOf* ?types
+
+=cut
+	sub type_hierarchy {
+		my $self	= shift;
+		my $n		= shift;
+		
+		my @types	= $self->objects( $n, iri("http://www.w3.org/1999/02/22-rdf-syntax-ns#type") )->elements;
+		my @iris	= @types;
+		my $current	= \@types;
+		
+		my %seen	= map { $_->value => 1 } @types;
+		while (1) {
+			my @new	= $self->objects( $current, iri("http://www.w3.org/2000/01/rdf-schema#subClassOf") )->elements;
+			my $new	= 0;
+			my @next;
+			foreach my $t (@new) {
+				unless ($seen{ $t->value }++) {
+					$new++;
+					push(@iris, $t);
+					push(@next, $t);
+				}
+			}
+			last unless ($new);
+			$current	= \@next;
+		}
+		return @iris;
+	}
 
 	sub graph_nodes {
 		my $self	= shift;
@@ -379,7 +415,7 @@ package Attean::API::Model 0.040 {
 }
 
 
-package Attean::API::MutableModel 0.040 {
+package Attean::API::MutableModel 0.041 {
 	use Attean::RDF;
 	use LWP::UserAgent;
 	use Encode qw(encode);
@@ -500,21 +536,21 @@ package Attean::API::MutableModel 0.040 {
 }
 
 
-package Attean::API::ETagCacheableModel 0.040 {
+package Attean::API::ETagCacheableModel 0.041 {
 	use Moo::Role;
 	
 	requires 'etag_value_for_quads';
 }
 
 
-package Attean::API::TimeCacheableModel 0.040 {
+package Attean::API::TimeCacheableModel 0.041 {
 	use Moo::Role;
 	
 	requires 'mtime_for_quads';
 }
 
 
-package Attean::API::BulkUpdatableModel 0.040 {
+package Attean::API::BulkUpdatableModel 0.041 {
 	use Moo::Role;
 	
 	with 'Attean::API::MutableModel';
@@ -537,7 +573,7 @@ package Attean::API::BulkUpdatableModel 0.040 {
 	};
 }
 
-package Attean::API::RDFStarModel 0.040 {
+package Attean::API::RDFStarModel 0.041 {
 	use Moo::Role;
 
 	with 'Attean::API::Model';

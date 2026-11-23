@@ -232,11 +232,7 @@ legend entry has focus, then press Enter or Space to open the matching rows in t
     biBrandSvg(root);
     var src = '<?xml version="1.0" encoding="UTF-8"?>\n'
             + new XMLSerializer().serializeToString(root);
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([src], { type: 'image/svg+xml;charset=utf-8' }));
-    a.download = 'pie.svg';
-    a.click();
-    URL.revokeObjectURL(a.href);
+    biSaveFile(new Blob([src], { type: 'image/svg+xml;charset=utf-8' }), 'pie.svg');
   }
 
   // Render the SVG to a canvas, then draw the legend items using 2D canvas ops.
@@ -291,10 +287,7 @@ legend entry has focus, then press Enter or Space to open the matching rows in t
   }
   function biPieExportPNG() {
     drawExportCanvas(1, function (canvas) {
-      var a = document.createElement('a');
-      a.href = biBrandCanvas(canvas, 1).toDataURL('image/png');
-      a.download = 'pie.png';
-      a.click();
+      biSavePNG(biBrandCanvas(canvas, 1), 'pie.png');
     });
   }
   function biPieExportPDF() {

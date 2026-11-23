@@ -11,9 +11,9 @@ use Carp qw(croak);
 use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Dataproc::V1::Shared;
+use Google::Cloud::Dataproc::V1::AutoscalingPolicies;
 use Google::Cloud::Dataproc::V1::Operations;
 use Google::Cloud::Dataproc::V1::Jobs;
-use Google::Cloud::Dataproc::V1::AutoscalingPolicies;
 use Google::Cloud::Dataproc::V1::Sessions;
 use Google::Cloud::Dataproc::V1::Batches;
 use Google::Cloud::Dataproc::V1::Clusters;
@@ -21,7 +21,7 @@ use Google::Cloud::Dataproc::V1::SessionTemplates;
 use Google::Cloud::Dataproc::V1::NodeGroups;
 use Google::Cloud::Dataproc::V1::WorkflowTemplates;
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -29,14 +29,15 @@ has transport   => ( is => 'rw' );
 sub BUILD {
     my ($self) = @_;
 
-    # Resolve credentials: use passed credentials object if it implements get_token, or default to ADC
     my $auth = $self->credentials;
-    if (!$auth || !eval { $auth->can('get_token') }) {
+    if (!defined $auth) {
         $auth = Google::Auth->default();
+    } elsif (!eval { $auth->can('get_token') }) {
+        croak 'Invalid credentials object: must implement get_token()';
     }
     my $token = $auth->get_token();
 
-    my $target = 'localhost:50051';
+    my $target = 'dataproc.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -48,7 +49,6 @@ sub BUILD {
         );
         $self->transport($client);
     } else {
-        # Default high-performance HTTP/2 gRPC client
         my $client = Google::gRPC::Client->new(
             target     => $target,
             auth_token => $token,
@@ -61,9 +61,26 @@ sub create_cluster {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Dataproc::V1::Clusters::CreateClusterRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Longrunning::Operations::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.dataproc.v1.ClusterController/CreateCluster',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.dataproc.v1.ClusterController',
         method         => 'CreateCluster',
@@ -78,9 +95,26 @@ sub update_cluster {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Dataproc::V1::Clusters::UpdateClusterRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Longrunning::Operations::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.dataproc.v1.ClusterController/UpdateCluster',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.dataproc.v1.ClusterController',
         method         => 'UpdateCluster',
@@ -95,9 +129,26 @@ sub stop_cluster {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Dataproc::V1::Clusters::StopClusterRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Longrunning::Operations::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.dataproc.v1.ClusterController/StopCluster',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.dataproc.v1.ClusterController',
         method         => 'StopCluster',
@@ -112,9 +163,26 @@ sub start_cluster {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Dataproc::V1::Clusters::StartClusterRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Longrunning::Operations::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.dataproc.v1.ClusterController/StartCluster',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.dataproc.v1.ClusterController',
         method         => 'StartCluster',
@@ -129,9 +197,26 @@ sub delete_cluster {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Dataproc::V1::Clusters::DeleteClusterRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Longrunning::Operations::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.dataproc.v1.ClusterController/DeleteCluster',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.dataproc.v1.ClusterController',
         method         => 'DeleteCluster',
@@ -146,9 +231,26 @@ sub get_cluster {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Dataproc::V1::Clusters::GetClusterRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Dataproc::V1::Clusters::Cluster';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.dataproc.v1.ClusterController/GetCluster',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.dataproc.v1.ClusterController',
         method         => 'GetCluster',
@@ -163,9 +265,26 @@ sub list_clusters {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Dataproc::V1::Clusters::ListClustersRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Dataproc::V1::Clusters::ListClustersResponse';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.dataproc.v1.ClusterController/ListClusters',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.dataproc.v1.ClusterController',
         method         => 'ListClusters',
@@ -180,9 +299,26 @@ sub diagnose_cluster {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Dataproc::V1::Clusters::DiagnoseClusterRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Longrunning::Operations::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.dataproc.v1.ClusterController/DiagnoseCluster',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.dataproc.v1.ClusterController',
         method         => 'DiagnoseCluster',
@@ -234,25 +370,25 @@ Generated from the following Protocol Buffers schemas:
 
 =over 4
 
-=item * C<google/cloud/dataproc/v1/node_groups.proto>
+=item * C<googleapis/google/cloud/dataproc/v1/autoscaling_policies.proto>
 
-=item * C<google/cloud/dataproc/v1/autoscaling_policies.proto>
+=item * C<googleapis/google/cloud/dataproc/v1/batches.proto>
 
-=item * C<google/cloud/dataproc/v1/batches.proto>
+=item * C<googleapis/google/cloud/dataproc/v1/clusters.proto>
 
-=item * C<google/cloud/dataproc/v1/session_templates.proto>
+=item * C<googleapis/google/cloud/dataproc/v1/jobs.proto>
 
-=item * C<google/cloud/dataproc/v1/operations.proto>
+=item * C<googleapis/google/cloud/dataproc/v1/node_groups.proto>
 
-=item * C<google/cloud/dataproc/v1/shared.proto>
+=item * C<googleapis/google/cloud/dataproc/v1/operations.proto>
 
-=item * C<google/cloud/dataproc/v1/workflow_templates.proto>
+=item * C<googleapis/google/cloud/dataproc/v1/sessions.proto>
 
-=item * C<google/cloud/dataproc/v1/sessions.proto>
+=item * C<googleapis/google/cloud/dataproc/v1/session_templates.proto>
 
-=item * C<google/cloud/dataproc/v1/jobs.proto>
+=item * C<googleapis/google/cloud/dataproc/v1/shared.proto>
 
-=item * C<google/cloud/dataproc/v1/clusters.proto>
+=item * C<googleapis/google/cloud/dataproc/v1/workflow_templates.proto>
 
 
 

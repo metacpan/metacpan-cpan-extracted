@@ -1,0 +1,12 @@
+###PGS CATALOG SCORING FILE - made up for t/pgs.t, in the layout of PGS000138
+#format_version=2.0
+#pgs_id=PGS_TEST
+#genome_build=GRCh37
+rsID	chr_name	chr_position	effect_allele	other_allele	effect_weight
+rs1	1	100	G	A	0.5
+rs2	1	200	C	T	-0.25
+rs3	1	300	T	G	0.1
+rs4	2	400	A	G	1
+rs5	2	500	C	G	2
+rs6	3	600	A	C	3
+rs8	1	800	G	A	0.75

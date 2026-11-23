@@ -46,7 +46,7 @@ BEGIN {
 package main;
 use Google::Cloud::Networkservices::V1::DepServiceClient;
 
-my $client = Google::Cloud::Networkservices::V1::DepServiceClient->new( credentials => 'dummy' );
+my $client = Google::Cloud::Networkservices::V1::DepServiceClient->new();
 ok($client, 'Instantiated generated client');
 isa_ok($client->transport, 'Google::gRPC::Client', 'Client transport');
 

@@ -202,3 +202,60 @@ package Google::Auth::WebUserAuthorizer::CallbackApp;
 # For now, WebUserAuthorizer provides the helpers to build one easily.
 
 1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Auth::WebUserAuthorizer - OAuth 2.0 web application authorization flow with XSRF state validation
+
+=head1 SYNOPSIS
+
+    use Google::Auth::WebUserAuthorizer;
+
+    my $authorizer = Google::Auth::WebUserAuthorizer->new(
+        client_id    => $client_id,
+        scope        => ['openid', 'email'],
+        token_store  => $token_store,
+        callback_uri => 'https://app.example.com/oauth2callback',
+    );
+
+=head1 DESCRIPTION
+
+Manages 3-legged OAuth 2.0 web authorization flows, including immediate and deferred callback handling with XSRF state validation prior to session storage.
+
+=head1 METHODS AND ATTRIBUTES
+
+=over 4
+
+=item * B<handle_auth_callback_deferred>
+
+=item * B<handle_auth_callback>
+
+=item * B<get_authorization_url>
+
+=item * B<get_credentials>
+
+=item * B<extract_callback_state>
+
+=item * B<validate_callback_state>
+
+=back
+
+=head1 SEE ALSO
+
+L<Google::Auth>, L<Google::Auth::Credentials>
+
+=head1 AUTHOR
+
+C.J. Collier E<lt>cjac@google.comE<gt>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2026 Google LLC and contributors.
+
+Licensed under the Apache License, Version 2.0.
+
+=cut

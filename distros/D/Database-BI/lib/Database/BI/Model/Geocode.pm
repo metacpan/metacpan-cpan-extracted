@@ -40,7 +40,7 @@ use Time::HiRes			();
 use Params::Get			();
 use Params::Validate::Strict	qw(validate_strict);
 
-our $VERSION = '0.023.1';
+our $VERSION = '0.024.0';
 
 # The version of Geo::Coder::Free this module asks for: 0.46 added valid_location()
 # and on_error => 'undef', 0.47 added geocode_many(), and 0.48 added the
@@ -184,7 +184,7 @@ Database::BI::Model::Geocode - Resolve a location column to coordinates, once pe
 
 =head1 VERSION
 
-0.023.1
+0.024.0
 
 =head1 SYNOPSIS
 
@@ -1705,7 +1705,7 @@ sub place_rows {
 	croak(_fmt('error_column_required')) unless @columns;
 
 	my $name = join(', ', @columns);
-	$text = (defined($text) && !ref($text)) ? ($text =~ s/\A\s+|\s+\z//gr) : '';
+	$text = (defined($text) && !ref($text)) ? ($text =~ s/\A\s+//r =~ s/\s+\z//r) : '';
 	return ($rows, $name) if @columns == 1 && !length($text);
 
 	my @places = map {
@@ -1713,7 +1713,7 @@ sub place_rows {
 		my $place = (ref($row) eq 'HASH')
 			? join(', ', grep { length } map {
 				my $cell = $row->{$_};
-				(defined($cell) && !ref($cell)) ? ($cell =~ s/\A\s+|\s+\z//gr) : '';
+				(defined($cell) && !ref($cell)) ? ($cell =~ s/\A\s+//r =~ s/\s+\z//r) : '';
 			} @columns)
 			: undef;
 		$place .= ", $text" if defined($place) && length($place) && length($text);

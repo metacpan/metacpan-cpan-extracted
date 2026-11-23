@@ -10,30 +10,30 @@ use Carp qw(croak);
 
 use Protobuf;
 use Google::Api::Common;
-use Google::Cloud::Dataplex::V1::Metadata;
-use Google::Cloud::Dataplex::V1::Resources;
-use Google::Cloud::Dataplex::V1::DataDiscovery;
-use Google::Cloud::Dataplex::V1::Security;
 use Google::Cloud::Dataplex::V1::DataQualityRuleTemplate;
 use Google::Cloud::Dataplex::V1::DatascansCommon;
-use Google::Cloud::Dataplex::V1::Content;
+use Google::Cloud::Dataplex::V1::Security;
+use Google::Cloud::Dataplex::V1::DataDiscovery;
 use Google::Cloud::Dataplex::V1::DataDocumentation;
 use Google::Cloud::Dataplex::V1::Processing;
-use Google::Cloud::Dataplex::V1::Analyze;
-use Google::Cloud::Dataplex::V1::Tasks;
+use Google::Cloud::Dataplex::V1::Content;
+use Google::Cloud::Dataplex::V1::Resources;
+use Google::Cloud::Dataplex::V1::Metadata;
 use Google::Cloud::Dataplex::V1::Logs;
 use Google::Cloud::Dataplex::V1::DataProfile;
 use Google::Cloud::Dataplex::V1::DataQuality;
+use Google::Cloud::Dataplex::V1::Tasks;
+use Google::Cloud::Dataplex::V1::Analyze;
 use Google::Cloud::Dataplex::V1::Service;
-use Google::Cloud::Dataplex::V1::Datascans;
-use Google::Cloud::Dataplex::V1::DataTaxonomy;
-use Google::Cloud::Dataplex::V1::Cmek;
-use Google::Cloud::Dataplex::V1::BusinessGlossary;
 use Google::Cloud::Dataplex::V1::Catalog;
+use Google::Cloud::Dataplex::V1::DataTaxonomy;
+use Google::Cloud::Dataplex::V1::Datascans;
+use Google::Cloud::Dataplex::V1::BusinessGlossary;
+use Google::Cloud::Dataplex::V1::Cmek;
 use Google::Cloud::Dataplex::V1::ApprovalWorkflow;
 use Google::Cloud::Dataplex::V1::DataProducts;
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -41,14 +41,15 @@ has transport   => ( is => 'rw' );
 sub BUILD {
     my ($self) = @_;
 
-    # Resolve credentials: use passed credentials object if it implements get_token, or default to ADC
     my $auth = $self->credentials;
-    if (!$auth || !eval { $auth->can('get_token') }) {
+    if (!defined $auth) {
         $auth = Google::Auth->default();
+    } elsif (!eval { $auth->can('get_token') }) {
+        croak 'Invalid credentials object: must implement get_token()';
     }
     my $token = $auth->get_token();
 
-    my $target = 'localhost:50051';
+    my $target = 'dataplex.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -60,7 +61,6 @@ sub BUILD {
         );
         $self->transport($client);
     } else {
-        # Default high-performance HTTP/2 gRPC client
         my $client = Google::gRPC::Client->new(
             target     => $target,
             auth_token => $token,
@@ -73,9 +73,26 @@ sub create_data_product {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Dataplex::V1::DataProducts::CreateDataProductRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Longrunning::Operations::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.dataplex.v1.DataProductService/CreateDataProduct',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.dataplex.v1.DataProductService',
         method         => 'CreateDataProduct',
@@ -127,49 +144,49 @@ Generated from the following Protocol Buffers schemas:
 
 =over 4
 
-=item * C<google/cloud/dataplex/v1/data_quality.proto>
+=item * C<googleapis/google/cloud/dataplex/v1/analyze.proto>
 
-=item * C<google/cloud/dataplex/v1/metadata.proto>
+=item * C<googleapis/google/cloud/dataplex/v1/approval_workflow.proto>
 
-=item * C<google/cloud/dataplex/v1/analyze.proto>
+=item * C<googleapis/google/cloud/dataplex/v1/business_glossary.proto>
 
-=item * C<google/cloud/dataplex/v1/data_taxonomy.proto>
+=item * C<googleapis/google/cloud/dataplex/v1/catalog.proto>
 
-=item * C<google/cloud/dataplex/v1/catalog.proto>
+=item * C<googleapis/google/cloud/dataplex/v1/cmek.proto>
 
-=item * C<google/cloud/dataplex/v1/resources.proto>
+=item * C<googleapis/google/cloud/dataplex/v1/content.proto>
 
-=item * C<google/cloud/dataplex/v1/data_products.proto>
+=item * C<googleapis/google/cloud/dataplex/v1/data_discovery.proto>
 
-=item * C<google/cloud/dataplex/v1/data_discovery.proto>
+=item * C<googleapis/google/cloud/dataplex/v1/data_documentation.proto>
 
-=item * C<google/cloud/dataplex/v1/tasks.proto>
+=item * C<googleapis/google/cloud/dataplex/v1/data_products.proto>
 
-=item * C<google/cloud/dataplex/v1/content.proto>
+=item * C<googleapis/google/cloud/dataplex/v1/data_profile.proto>
 
-=item * C<google/cloud/dataplex/v1/datascans_common.proto>
+=item * C<googleapis/google/cloud/dataplex/v1/data_quality.proto>
 
-=item * C<google/cloud/dataplex/v1/service.proto>
+=item * C<googleapis/google/cloud/dataplex/v1/data_quality_rule_template.proto>
 
-=item * C<google/cloud/dataplex/v1/business_glossary.proto>
+=item * C<googleapis/google/cloud/dataplex/v1/datascans_common.proto>
 
-=item * C<google/cloud/dataplex/v1/data_documentation.proto>
+=item * C<googleapis/google/cloud/dataplex/v1/datascans.proto>
 
-=item * C<google/cloud/dataplex/v1/datascans.proto>
+=item * C<googleapis/google/cloud/dataplex/v1/data_taxonomy.proto>
 
-=item * C<google/cloud/dataplex/v1/cmek.proto>
+=item * C<googleapis/google/cloud/dataplex/v1/logs.proto>
 
-=item * C<google/cloud/dataplex/v1/approval_workflow.proto>
+=item * C<googleapis/google/cloud/dataplex/v1/metadata.proto>
 
-=item * C<google/cloud/dataplex/v1/processing.proto>
+=item * C<googleapis/google/cloud/dataplex/v1/processing.proto>
 
-=item * C<google/cloud/dataplex/v1/security.proto>
+=item * C<googleapis/google/cloud/dataplex/v1/resources.proto>
 
-=item * C<google/cloud/dataplex/v1/data_profile.proto>
+=item * C<googleapis/google/cloud/dataplex/v1/security.proto>
 
-=item * C<google/cloud/dataplex/v1/data_quality_rule_template.proto>
+=item * C<googleapis/google/cloud/dataplex/v1/service.proto>
 
-=item * C<google/cloud/dataplex/v1/logs.proto>
+=item * C<googleapis/google/cloud/dataplex/v1/tasks.proto>
 
 
 

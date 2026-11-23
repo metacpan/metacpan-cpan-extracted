@@ -329,6 +329,14 @@ $ledger{"api.$_"} = "documented behaviour: $_" for qw(
 	route.range route.tables route.wordcloud route.catalog route.tutorial route.index route.stats_percentile
 );
 
+# The public functions of the smaller modules, each tested from its POD alone.
+$ledger{"api.$_"} = "documented behaviour: $_" for qw(
+	Password.is_password_hash
+	Boundary.check_ranks Boundary.rank_for Boundary.name_for Boundary.level_name Boundary.levels Boundary.point_key
+	SafeUA.new SafeUA.send_request SafeUA.private_host_allowed SafeUA.blocked_address SafeUA.numeric_host
+	I18N.languages I18N.choose I18N.lingua_choice I18N.language I18N.from_locale
+);
+
 # ---------------------------------------------------------------------------
 # Bootstrap the Mojolicious app first so that Test::Mojo dynamically
 # requires all app modules at runtime (after the CHECK phase).
@@ -2350,7 +2358,7 @@ subtest 'Geocode.models_with_cache -- does not mutate the caller hashref' => sub
 		my $f = sub { 'f=' . url_escape($_[0]) };
 		$t->get_ok('/view/sales?' . $f->('region:gtx:North'))->status_is(400);
 		message_ok('Dashboard', 'error_filter_op', $t->tx->res->body,
-			['gtx', 'region:gtx:North', 'eq, ne, contains, starts, lt, le, gt, ge, empty, notempty, between, in']);
+			['gtx', 'region:gtx:North', 'eq, ne, contains, starts, lt, le, gt, ge, empty, notempty, between, in, differ']);
 		$t->get_ok('/view/sales?' . $f->('regoin:eq:North'))->status_is(400);
 		message_ok('Dashboard', 'error_filter_column', $t->tx->res->body, ['regoin', 'regoin:eq:North', undef]);
 		like $t->tx->res->body, qr/the columns are: .*\bregion\b/, '... naming the columns there are';
@@ -2369,6 +2377,7 @@ subtest 'Geocode.models_with_cache -- does not mutate the caller hashref' => sub
 		my $err = sub { my ($code) = @_; local $@; eval { $code->(); 1 } and return; return without_location($@) };
 
 		message_ok('Password', 'error_password_required', $err->(sub { $hash->('') }));
+		message_ok('Password', 'error_password_nul', $err->(sub { $hash->("x\0") }));
 		message_ok('Password', 'error_password_rounds', $err->(sub { $hash->('x', rounds => 5) }), [10_000, 100_000_000]);
 		message_ok('Password', 'error_password_salt', $err->(sub { $hash->('x', salt => 'short') }), [16]);
 		require Crypt::URandom;	# before the mock, or loading it puts urandom back
@@ -2651,6 +2660,9 @@ subtest 'Geocode.models_with_cache -- does not mutate the caller hashref' => sub
 
 		my $two = unit_sqlite('two.sqlite', 'CREATE TABLE alpha (id INTEGER)', 'CREATE TABLE beta (id INTEGER)');
 		message_ok(DataSource => 'error_table_not_found', $err->(directory => $dir_of->($two), table => 'two', internal_table => 'gamma'), [undef, 'gamma']);
+
+		my $entity_xml = unit_csv('ents.xml', qq{<?xml version="1.0"?>\n<!DOCTYPE r [<!ENTITY y "lol">]>\n<rows><row><sku>&y;</sku></row></rows>\n});
+		message_ok(DataSource => 'error_xml_entities', $err->(directory => $dir_of->($entity_xml), table => 'ents'), [$entity_xml]);
 
 		my $bad_json = unit_csv('broken.json', '{"rows": [');
 		message_ok(DataSource => 'error_json_invalid', $err->(directory => $dir_of->($bad_json), table => 'broken'), [$bad_json, undef]);
@@ -3824,6 +3836,289 @@ subtest 'Geocode.models_with_cache -- does not mutate the caller hashref' => sub
 		$tm->get_ok('/export?l=' . $e->("path:$left") . '&j=' . $e->("path:$right|id|id"))->status_is(200);
 		my $hdr = $tm->tx->res->headers->header('X-BI-Warnings') // '';
 		message_ok(Dashboard => 'warn_join_schema_mismatch', $hdr, ['v', 'INTEGER', undef, 'TEXT', undef]);
+	};
+}
+
+# ---------------------------------------------------------------------------
+# Black-box tests of the smaller modules' public functions, from their POD:
+# Password, Boundary (the pure functions), SafeUA and I18N.  Each case is
+# either a documented return value or a documented refusal; the hostile ones
+# (near-miss hashes, bad codes, address spellings meant to slip past a block
+# list) are most of them.
+# ---------------------------------------------------------------------------
+{
+	Readonly my $MIN_ROUNDS     => 10_000;	# Password's documented minimum
+	Readonly my $KEPT_ERROR     => 'kept $@';
+	Readonly my $KEPT_ERRNO     => 2;	# ENOENT, an arbitrary errno to look for afterwards
+	Readonly my $ALARM_SECONDS  => 100;
+	Readonly my $LOOPBACK       => '127.0.0.1';
+
+	# A call must leave the caller's $@, $! and any pending alarm alone.
+	my $leaves_state = sub {
+		my ($name, $code) = @_;
+		local $@ = $KEPT_ERROR;
+		local $! = $KEPT_ERRNO;
+		my $can_alarm = $^O ne 'MSWin32';	# Windows has no alarm()
+		alarm $ALARM_SECONDS if $can_alarm;
+		$code->();
+		my $left = $can_alarm ? alarm 0 : 0;
+		is $@, $KEPT_ERROR, "$name keeps \$\@";
+		is $! + 0, $KEPT_ERRNO, "$name keeps \$!";
+		ok $left > 0, "$name leaves the caller's alarm running" if $can_alarm;
+	};
+
+	subtest 'Password::is_password_hash accepts only what verify_password can check' => sub {
+		require Database::BI::Password;
+		my $good = Database::BI::Password::hash_password('pw', rounds => $MIN_ROUNDS);
+		returns_is(Database::BI::Password::is_password_hash($good), { type => 'integer', min => 1, max => 1 }, 'a made hash is 1');
+		my @bad = (undef, '', 'pw', [], {}, \$good, "$good\n", " $good", uc($good),
+			join('$', 'pbkdf2-sha256', 'ten', 'AAAA', 'BBBB'),
+			join('$', 'pbkdf2-sha1', $MIN_ROUNDS, 'AAAA', 'BBBB'),
+			'pbkdf2-sha256$' . $MIN_ROUNDS . '$only-three-fields');
+		for my $value (@bad) {
+			is Database::BI::Password::is_password_hash($value), 0,
+				'not a hash: ' . (defined $value ? (ref $value || "'" . ($value =~ s/\n/\\n/gr) . "'") : 'undef');
+		}
+		$leaves_state->('is_password_hash', sub { Database::BI::Password::is_password_hash($good) });
+		diag("hash form: $good") if $ENV{TEST_VERBOSE};
+		delete $ledger{'api.Password.is_password_hash'};
+	};
+
+	subtest 'Boundary::check_ranks lower-cases codes and refuses what is not a rank table' => sub {
+		require Database::BI::Model::Boundary;
+		my $class = 'Database::BI::Model::Boundary';
+		is_deeply $class->check_ranks({ LK => 10 }), { lk => 10 }, 'a code is lower-cased';
+		is_deeply $class->check_ranks({ in => '8', Es => 12 }), { in => 8, es => 12 }, 'a rank given as text becomes a number';
+		is_deeply $class->check_ranks({}), {}, 'no ranks is no ranks';
+		my $given = { LK => 10 };
+		$class->check_ranks($given);
+		is_deeply $given, { LK => 10 }, 'the argument is not changed';
+
+		my $croaks = sub { my ($v) = @_; local $@; eval { $class->check_ranks($v); 1 } ? 'no error' : without_location($@) };
+		my $table = 'Boundary ranks must be a hash of country codes to place ranks';
+		is $croaks->($_), $table, 'refused as a table: ' . (defined $_ ? (ref $_ || $_) : 'undef') for (undef, 'LK', [ 'lk', 10 ], \'x');
+		is $croaks->({ abc => 10 }), "'abc' is not a two-letter country code", 'a three-letter code';
+		is $croaks->({ 1 => 10 }), "'1' is not a two-letter country code", 'a digit';
+		is $croaks->({ 'l' => 10 }), "'l' is not a two-letter country code", 'one letter';
+		is $croaks->({ "lk\n" => 10 }), "'lk\n' is not a two-letter country code", 'a code with a newline after it';
+		for my $rank (9, 11, 0, -8, '8.0', '', 'ten', undef, [ 10 ]) {
+			is $croaks->({ lk => $rank }), "the rank for 'lk' must be one of 8, 10, 12",
+				'rank refused: ' . (defined $rank ? (ref $rank || "'$rank'") : 'undef');
+		}
+		is $croaks->({ LK => 10, lk => 12 }), "'lk' is given twice", 'one country spelt two ways';
+		$leaves_state->('check_ranks', sub { $class->check_ranks({ lk => 10 }) });
+		delete $ledger{'api.Boundary.check_ranks'};
+	};
+
+	subtest 'Boundary naming, ranks and points' => sub {
+		my $class = 'Database::BI::Model::Boundary';
+		is_deeply [ $class->levels ], [ qw(country state county city town neighbourhood) ], 'levels, largest first';
+
+		is $class->level_name('state'), 'state', 'a level has a name';
+		is $class->level_name('neighbourhood'), 'neighbourhood', 'the last level too';
+		is $class->level_name($_), undef, 'not a level: ' . (defined $_ ? (ref $_ || "'$_'") : 'undef')
+			for (undef, '', 'planet', 'COUNTY', [ 'county' ]);
+
+		is $class->name_for('in'), 'district', 'India has districts';
+		is $class->name_for('IN'), 'district', 'in any case';
+		is $class->name_for('es'), 'province', 'Spain has provinces';
+		is $class->name_for('cn'), 'prefecture', 'China has prefectures';
+		is $class->name_for('fr'), 'department', 'France has departments';
+		is $class->name_for('us'), 'county', 'the United States has counties';
+		is $class->name_for($_), 'county', 'no country, the level name: ' . (defined $_ ? (ref $_ || "'$_'") : 'undef')
+			for (undef, '', [ 'in' ], 'zz');
+		my $state = $class->new(level => 'state');
+		is $state->name_for('de'), 'state', 'an object answers for its own level';
+
+		my $county = $class->new;
+		is $county->rank_for('in'), 10, 'India: 10';
+		is $county->rank_for('KE'), 8, 'Kenya: 8';
+		is $county->rank_for('us'), 12, 'a country not listed: 12';
+		is $county->rank_for($_), 12, 'no country: 12' for (undef, '', [ 'in' ]);
+		is $class->new(ranks => { us => 10 })->rank_for('US'), 10, 'a given rank beats the built-in one';
+		is $class->new(ranks => { in => 8 })->rank_for('in'), 8, '... over a country that has its own';
+		ok $state->rank_for('us') =~ /\A\d+\z/, 'another level: still a number';
+
+		is $class->point_key(39.0901, -77.6402), '39.090,-77.640', 'the documented example';
+		is $class->point_key(0, 0), '0.000,0.000', 'zero';
+		is $class->point_key(-0.0001, 0.0004), '0.000,0.000', 'a point just under zero has the one key';
+		is $class->point_key(90, 180), '90.000,180.000', 'the largest point';
+		is $class->point_key(-90, -180), '-90.000,-180.000', 'the smallest point';
+		is $class->point_key(1.0004, 1.0006), $class->point_key(1.0004, 1.0006), 'the same point, the same key';
+		for my $point ([ 90.001, 0 ], [ 0, 180.001 ], [ -91, 0 ], [ undef, 1 ], [ 1, undef ], [ 'x', 1 ], [ 1, '1e2' ], [ '', '' ], [ '1,5', 1 ], [ "5\n", 1 ]) {
+			is $class->point_key(@{$point}), undef, 'no key for ' . join(', ', map { defined $_ ? "'" . ($_ =~ s/\n/\\n/gr) . "'" : 'undef' } @{$point});
+		}
+		$leaves_state->('point_key', sub { $class->point_key(1, 2) });
+
+		throws_ok { $class->new(level => 'planet') } qr/\AUnknown boundary level 'planet'/, 'an unknown level is refused';
+		throws_ok { $class->new(cache => bless {}, 'Unit::NoCache') } qr/\AThe boundary cache needs get\(\) and set\(\)/, 'a cache without get and set';
+		throws_ok { $class->new(ranks => { lk => 9 }) } qr/the rank for 'lk' must be one of 8, 10, 12/, 'a bad rank table';
+		delete @ledger{map { "api.Boundary.$_" } qw(rank_for name_for level_name levels point_key)};
+	};
+
+	subtest 'SafeUA::blocked_address refuses every address a request must not reach' => sub {
+		require Database::BI::SafeUA;
+		my $blocked = \&Database::BI::SafeUA::blocked_address;
+		my %why = (
+			'10.1.2.3'            => 'a private network',
+			'192.168.0.1'         => 'a private network',
+			'172.16.0.1'          => 'a private network',
+			'172.31.255.255'      => 'a private network',
+			'::1'                 => 'this machine',
+			'[::1]'               => 'this machine',
+			'fe80::1'             => 'link-local',
+			'[fe80::1%eth0]'      => 'link-local',
+			'fc00::1'             => 'a private network',
+			'ff02::1'             => 'multicast',
+			'224.0.0.1'           => 'multicast',
+			'2001:db8::1'         => 'reserved for documentation',
+			'203.0.113.9'         => 'reserved for documentation',
+		);
+		is $blocked->($_), $why{$_}, "$_ is $why{$_}" for sort keys %why;
+		ok defined $blocked->($_), "refused: $_" for ($LOOPBACK, '127.255.255.254', '0.0.0.0', '169.254.169.254',
+			'::ffff:10.0.0.1', '::ffff:127.0.0.1', '64:ff9b::7f00:1', '255.255.255.255');
+		is $blocked->($_), 'not an address', 'not an address: ' . (defined $_ ? "'$_'" : 'undef')
+			for (undef, '', 'localhost', 'example.com', '300.1.1.1', '1.2.3', ':::', '1.2.3.4.5');
+		is $blocked->($_), undef, "public: $_" for ('8.8.8.8', '1.1.1.1', '172.15.255.255', '172.32.0.1', '2606:4700:4700::1111', '::ffff:8.8.8.8');
+		$leaves_state->('blocked_address', sub { $blocked->('10.0.0.1') });
+		delete $ledger{'api.SafeUA.blocked_address'};
+	};
+
+	subtest 'SafeUA::numeric_host reads every spelling of an address the resolver would' => sub {
+		my $numeric = \&Database::BI::SafeUA::numeric_host;
+		my %reads = (
+			'2130706433'   => $LOOPBACK,
+			'127.1'        => $LOOPBACK,
+			'0x7f000001'   => $LOOPBACK,
+			'0177.0.0.1'   => $LOOPBACK,
+			'127.0.0.1'    => $LOOPBACK,
+			'127.0.0.1.'   => $LOOPBACK,
+			'[::1]'        => '::1',
+			'::1'          => '::1',
+			'8.8.8.8'      => '8.8.8.8',
+		);
+		is $numeric->($_), $reads{$_}, "$_ is $reads{$_}" for sort keys %reads;
+		is $numeric->($_), undef, 'a name, not an address: ' . (defined $_ ? "'$_'" : 'undef')
+			for (undef, '', 'example.com', 'localhost', '127.0.0.1.example.com', '1.2.3.4.5', '256.1.1.1', '08.1.1.1', '0x', '[example]', '1e3');
+		$leaves_state->('numeric_host', sub { $numeric->('127.1') });
+		delete $ledger{'api.SafeUA.numeric_host'};
+	};
+
+	subtest 'SafeUA new, private_host_allowed and send_request refuse without sending' => sub {
+		my @resolved;
+		my $ua = Database::BI::SafeUA->new(private_hosts => [ '*.Corp.Example', 'Intranet', undef, [ 'x' ] ], resolve => sub { push @resolved, $_[0]; return @{ $Unit::Resolve::answer } });
+		isa_ok $ua, 'LWP::UserAgent', 'the user agent';
+		like $ua->agent, qr{\ADatabase-BI/}, 'it names itself';
+
+		is $ua->private_host_allowed('a.corp.example'), 1, '*.suffix matches a subdomain';
+		is $ua->private_host_allowed('A.CORP.EXAMPLE'), 1, 'in any case';
+		is $ua->private_host_allowed('intranet'), 1, 'an exact name';
+		is $ua->private_host_allowed($_), 0, 'not allowed: ' . (defined $_ ? "'$_'" : 'undef')
+			for (undef, '', 'corp.example', 'evilcorp.example', 'a.corp.example.evil.com', 'x', 'intranet2');
+		is +(Database::BI::SafeUA->new->private_host_allowed('intranet')), 0, 'no list, nothing allowed';
+
+		# Nothing may be sent for any of these: replace the real send so a leak is seen.
+		my @sent;
+		mock 'LWP::UserAgent::send_request' => sub { push @sent, $_[1]; return HTTP::Response->new(200) };
+		my $refused = sub {
+			my ($url, @addresses) = @_;
+			local $Unit::Resolve::answer = [ @addresses ];
+			my $request = HTTP::Request->new(GET => $url);
+			my $res = $ua->send_request($request);
+			is $res->code, 403, "refused: $url" . (@addresses ? " (@addresses)" : '');
+			is $res->header('Client-Warning'), 'Internal response', '... marked as ours';
+			like $res->message, qr/\ARefused: ./, '... with a reason';
+			is $res->request, $request, '... and the request is the one given';
+			diag($res->message) if $ENV{TEST_VERBOSE};
+		};
+		$refused->('ftp://example.com/x', '8.8.8.8');
+		$refused->('file:///etc/passwd');
+		$refused->("http://$LOOPBACK/", $LOOPBACK);
+		$refused->('http://2130706433/', $LOOPBACK);
+		$refused->('http://[::1]/');
+		$refused->('http://internal.example/', '10.0.0.5');
+		$refused->('http://rebind.example/', '8.8.8.8', '10.0.0.5');
+		$refused->('http://gone.example/');
+		is_deeply \@sent, [], 'none of them was sent';
+
+		# A public name is sent, to the checked address, with the Host kept.
+		{
+			local $Unit::Resolve::answer = [ '8.8.8.8' ];
+			my $res = $ua->send_request(HTTP::Request->new(GET => 'http://public.example/path'));
+			is $res->code, 200, 'a public address is let through';
+			is scalar(@sent), 1, '... and sent once';
+			like $sent[0]->uri, qr{\Ahttp://8\.8\.8\.8/path\z}, '... to the address that was checked';
+			is $sent[0]->header('Host'), 'public.example', '... with the name as Host';
+		}
+		# A listed intranet name may resolve privately; an address spelt out never may.
+		{
+			local $Unit::Resolve::answer = [ '10.0.0.5' ];
+			@sent = ();
+			is $ua->send_request(HTTP::Request->new(GET => 'http://intranet/'))->code, 200, 'a listed name may be private';
+			is $ua->send_request(HTTP::Request->new(GET => 'http://10.0.0.5/'))->code, 403, 'an address written out may not';
+		}
+		restore_all();
+		$leaves_state->('private_host_allowed', sub { $ua->private_host_allowed('intranet') });
+		delete @ledger{map { "api.SafeUA.$_" } qw(new send_request private_host_allowed)};
+	};
+
+	subtest 'I18N picks a language from Accept-Language and the locale' => sub {
+		require Database::BI::I18N;
+		is_deeply [ Database::BI::I18N::languages() ], [ 'en', 'en-us' ], 'two languages, British first';
+
+		is Database::BI::I18N::choose(accept => 'en-US,en;q=0.8'), 'en-us', 'American English';
+		is Database::BI::I18N::choose(accept => 'en-GB'), 'en', 'other English is en';
+		is Database::BI::I18N::choose(accept => 'en'), 'en', 'plain English';
+		is Database::BI::I18N::choose(accept => 'fr-FR'), 'en', 'nothing supported: the base language';
+		is Database::BI::I18N::choose(accept => 'fr-FR', default => 'en-us'), 'en-us', 'nothing supported: the default';
+		is Database::BI::I18N::choose(default => 'en-us'), 'en-us', 'no header: the default';
+		is Database::BI::I18N::choose(accept => $_), 'en', 'no usable header: en: ' . (defined $_ ? "'$_'" : 'undef') for (undef, '');
+		is Database::BI::I18N::choose(accept => 'fr', default => 'xx'), 'en', 'an unsupported default is en';
+		{
+			# An unreadable header must not fall back to the server's own locale.
+			local $ENV{LANG} = 'en_US.UTF-8';
+			local $ENV{LC_ALL};
+			delete $ENV{LC_ALL};
+			is Database::BI::I18N::choose(accept => '*;;;<script>', default => ['en-us']), 'en', 'garbage is en, not the locale';
+			is Database::BI::I18N::lingua_choice('*;;;<script>', [ 'en', 'en-us' ]), undef, 'garbage picks nothing';
+		}
+		is Database::BI::I18N::choose(), 'en', 'no arguments';
+
+		is Database::BI::I18N::lingua_choice($_, [ 'en', 'en-us' ]), undef, 'nothing picked: ' . (defined $_ ? "'$_'" : 'undef') for (undef, '');
+		is Database::BI::I18N::lingua_choice('en-US', [ 'en', 'en-us' ]), 'en-us', 'the region, when offered';
+		is Database::BI::I18N::lingua_choice('en-US', [ 'en' ]), 'en', 'the language alone, when the region is not';
+		is Database::BI::I18N::lingua_choice('fr', [ 'en' ]), undef, 'a language not offered';
+		{
+			local $ENV{HTTP_ACCEPT_LANGUAGE} = 'de';
+			Database::BI::I18N::lingua_choice('en-US', [ 'en', 'en-us' ]);
+			is $ENV{HTTP_ACCEPT_LANGUAGE}, 'de', 'the caller\'s own header is put back';
+		}
+
+		{
+			local $Database::BI::I18N::LANGUAGE;
+			is Database::BI::I18N::language(), 'en', 'unset: en, whatever the locale';
+			local $ENV{LC_ALL} = 'fr_FR.UTF-8';
+			is Database::BI::I18N::language(), 'en', 'the environment is not read';
+			local $Database::BI::I18N::LANGUAGE = 'en-us';
+			is Database::BI::I18N::language(), 'en-us', 'set: what was set';
+		}
+
+		my $locale = sub {
+			my (%env) = @_;
+			local @ENV{qw(LC_ALL LC_MESSAGES LANG LANGUAGE HTTP_ACCEPT_LANGUAGE)};
+			delete @ENV{qw(LC_ALL LC_MESSAGES LANG LANGUAGE HTTP_ACCEPT_LANGUAGE)};
+			@ENV{ keys %env } = values %env;
+			return Database::BI::I18N::from_locale();
+		};
+		is $locale->(LC_ALL => 'en_US.UTF-8'), 'en-us', 'en_US.UTF-8 is en-us';
+		is $locale->(LANG => 'en_US.UTF-8'), 'en-us', '... from LANG too';
+		is $locale->(LC_ALL => 'en_GB.UTF-8'), 'en', 'en_GB.UTF-8 is en';
+		is $locale->(LC_ALL => 'C', LANG => 'en_US.UTF-8'), 'en', 'LC_ALL=C names no language, whatever LANG says';
+		is $locale->(), 'en', 'an unset locale is en';
+		is $locale->(LC_ALL => 'fr_FR.UTF-8'), 'en', 'an unsupported locale is en';
+		is $locale->(LC_ALL => 'C', HTTP_ACCEPT_LANGUAGE => 'en-US'), 'en', 'a request header is ignored';
+		$leaves_state->('from_locale', sub { $locale->(LANG => 'en_US.UTF-8') });
+		delete @ledger{map { "api.I18N.$_" } qw(languages choose lingua_choice language from_locale)};
 	};
 }
 

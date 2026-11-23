@@ -53,17 +53,41 @@ sub format_grpc_timeout {
 }
 
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::gRPC::Deadline - gRPC Deadline Support
+Google::gRPC::Deadline - Parsing and formatting for gRPC C<grpc-timeout> headers
 
 =head1 SYNOPSIS
 
     use Google::gRPC::Deadline;
 
+    my $seconds = Google::gRPC::Deadline::parse_timeout('500m');   # 0.5
+    my $header  = Google::gRPC::Deadline::format_grpc_timeout(30); # '30S'
+
 =head1 DESCRIPTION
 
-This module provides grpc deadline support functionality for the Google gRPC Perl client SDK.
+C<Google::gRPC::Deadline> converts between numeric seconds and the gRPC HTTP/2
+C<grpc-timeout> wire format (C<n> nanoseconds, C<u> microseconds, C<m>
+milliseconds, C<S> seconds, C<M> minutes, C<H> hours).
+
+=head1 FUNCTIONS
+
+=head2 parse_timeout( $value )
+
+Parses a numeric timeout in seconds or a gRPC timeout string (e.g., C<'500m'>,
+C<'30S'>, C<'2M'>, C<'1H'>) and returns fractional seconds. Croaks on invalid
+format.
+
+=head2 format_grpc_timeout( $seconds )
+
+Formats a timeout value into a canonical gRPC C<grpc-timeout> header string
+(e.g., C<'250m'>, C<'30S'>, C<'5M'>).
+
+=head1 SEE ALSO
+
+L<Google::gRPC>, L<Google::gRPC::Client>, L<Google::gRPC::Channel>
 
 =head1 AUTHOR
 

@@ -1,0 +1,29 @@
+## NCBI genetic codes: gc.prt version 4.6, written by share/make_genetic_codes.pl
+#id	names	aas	starts
+1	Standard; SGC0	FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG	---M------**--*----M---------------M----------------------------
+2	Vertebrate Mitochondrial; SGC1	FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIMMTTTTNNKKSS**VVVVAAAADDEEGGGG	----------**--------------------MMMM----------**---M------------
+3	Yeast Mitochondrial; SGC2	FFLLSSSSYY**CCWWTTTTPPPPHHQQRRRRIIMMTTTTNNKKSSRRVVVVAAAADDEEGGGG	----------**----------------------MM---------------M------------
+4	Mold Mitochondrial; Protozoan Mitochondrial; Coelenterate Mitochondrial; Mycoplasma; Spiroplasma; SGC3	FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG	--MM------**-------M------------MMMM---------------M------------
+5	Invertebrate Mitochondrial; SGC4	FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIMMTTTTNNKKSSSSVVVVAAAADDEEGGGG	---M------**--------------------MMMM---------------M------------
+6	Ciliate Nuclear; Dasycladacean Nuclear; Hexamita Nuclear; SGC5	FFLLSSSSYYQQCC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG	--------------*--------------------M----------------------------
+9	Echinoderm Mitochondrial; Flatworm Mitochondrial; SGC8	FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIIMTTTTNNNKSSSSVVVVAAAADDEEGGGG	----------**-----------------------M---------------M------------
+10	Euplotid Nuclear; SGC9	FFLLSSSSYY**CCCWLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG	----------**-----------------------M----------------------------
+11	Bacterial, Archaeal and Plant Plastid	FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG	---M------**--*----M------------MMMM---------------M------------
+12	Alternative Yeast Nuclear	FFLLSSSSYY**CC*WLLLSPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG	----------**--*----M---------------M----------------------------
+13	Ascidian Mitochondrial	FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIMMTTTTNNKKSSGGVVVVAAAADDEEGGGG	---M------**----------------------MM---------------M------------
+14	Alternative Flatworm Mitochondrial	FFLLSSSSYYY*CCWWLLLLPPPPHHQQRRRRIIIMTTTTNNNKSSSSVVVVAAAADDEEGGGG	-----------*-----------------------M----------------------------
+15	Blepharisma Macronuclear	FFLLSSSSYY*QCC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG	----------*---*--------------------M----------------------------
+16	Chlorophycean Mitochondrial	FFLLSSSSYY*LCC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG	----------*---*--------------------M----------------------------
+21	Trematode Mitochondrial	FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIMMTTTTNNNKSSSSVVVVAAAADDEEGGGG	----------**-----------------------M---------------M------------
+22	Scenedesmus obliquus Mitochondrial	FFLLSS*SYY*LCC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG	------*---*---*--------------------M----------------------------
+23	Thraustochytrium Mitochondrial	FF*LSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG	--*-------**--*-----------------M--M---------------M------------
+24	Rhabdopleuridae Mitochondrial	FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSSKVVVVAAAADDEEGGGG	---M------**-------M---------------M---------------M------------
+25	Candidate Division SR1 and Gracilibacteria	FFLLSSSSYY**CCGWLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG	---M------**-----------------------M---------------M------------
+26	Pachysolen tannophilus Nuclear	FFLLSSSSYY**CC*WLLLAPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG	----------**--*----M---------------M----------------------------
+27	Karyorelict Nuclear	FFLLSSSSYYQQCCWWLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG	--------------*--------------------M----------------------------
+28	Condylostoma Nuclear	FFLLSSSSYYQQCCWWLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG	----------**--*--------------------M----------------------------
+29	Mesodinium Nuclear	FFLLSSSSYYYYCC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG	--------------*--------------------M----------------------------
+30	Peritrich Nuclear	FFLLSSSSYYEECC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG	--------------*--------------------M----------------------------
+31	Blastocrithidia Nuclear	FFLLSSSSYYEECCWWLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG	----------**-----------------------M----------------------------
+32	Balanophoraceae Plastid	FFLLSSSSYY*WCC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG	---M------*---*----M------------MMMM---------------M------------
+33	Cephalodiscidae Mitochondrial	FFLLSSSSYYY*CCWWLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSSKVVVVAAAADDEEGGGG	---M-------*-------M---------------M---------------M------------

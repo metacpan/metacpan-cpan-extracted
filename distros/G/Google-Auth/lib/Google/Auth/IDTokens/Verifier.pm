@@ -246,3 +246,60 @@ sub verify_iap {
 }
 
 1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Auth::IDTokens::Verifier - Cryptographic verifier for Google OIDC and IAP ID tokens (RS256/ES256)
+
+=head1 SYNOPSIS
+
+    use Google::Auth::IDTokens::Verifier;
+
+    my $verifier = Google::Auth::IDTokens::Verifier->new(
+        key_source => $key_source,
+    );
+    my $claims = $verifier->verify($jwt, aud => $expected_audience);
+
+=head1 DESCRIPTION
+
+Verifies Google-signed JWT ID tokens with strict algorithm allowlisting (RS256, ES256), key-algorithm binding, OpenSSL XS signature verification, and numeric exp/nbf/iat claim checks.
+
+=head1 METHODS AND ATTRIBUTES
+
+=over 4
+
+=item * B<key_source>
+
+=item * B<aud>
+
+=item * B<azp>
+
+=item * B<iss>
+
+=item * B<verify>
+
+=item * B<verify_oidc>
+
+=item * B<verify_iap>
+
+=back
+
+=head1 SEE ALSO
+
+L<Google::Auth>, L<Google::Auth::Credentials>
+
+=head1 AUTHOR
+
+C.J. Collier E<lt>cjac@google.comE<gt>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2026 Google LLC and contributors.
+
+Licensed under the Apache License, Version 2.0.
+
+=cut

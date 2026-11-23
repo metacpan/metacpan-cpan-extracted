@@ -4,10 +4,12 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 1;
+plan tests => 3;
 
 BEGIN {
-    use_ok( 'Google::Cloud::Secretmanager::V1::SecretmanagerServiceClient' ) || print "Bail out!\n";
+    use_ok( 'Google::Cloud::Secretmanager::V1' ) || print "Bail out!\n";
+    use_ok( 'Google::Cloud::Secretmanager::V1::SecretManagerServiceClient' ) || print "Bail out!\n";
+    use_ok( 'Google::Cloud::Secretmanager::V1::SecretOperationsServiceClient' ) || print "Bail out!\n";
 }
 
-diag( "Testing Google::Cloud::Secretmanager::V1::SecretmanagerServiceClient $Google::Cloud::Secretmanager::V1::SecretmanagerServiceClient::VERSION, Perl $], $^X" );
+diag( "Testing Google::Cloud::Secretmanager::V1 $Google::Cloud::Secretmanager::V1::VERSION, Perl $], $^X" );

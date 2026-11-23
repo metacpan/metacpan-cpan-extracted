@@ -152,15 +152,163 @@ sub abort_stream {
 
 =head1 NAME
 
-Google::gRPC::Stream - gRPC Stream Interface
+Google::gRPC::Stream - Active HTTP/2 gRPC RPC stream state machine
 
 =head1 SYNOPSIS
 
     use Google::gRPC::Stream;
 
+    # Typically created via Google::gRPC::Channel->create_stream(...)
+    my $stream = $channel->create_stream(
+        method         => '/google.pubsub.v1.Publisher/Publish',
+        response_class => 'Google::Pubsub::V1::PublishResponse',
+        deadline       => time() + 30,
+        on_message     => sub {
+            my ($stream, $msg) = @_;
+            ...
+        },
+        on_trailers    => sub {
+            my ($stream, $info) = @_;
+            warn "Status: $info->{status} ($info->{message})\n";
+        },
+        on_close       => sub {
+            my ($stream, $status, $message) = @_;
+            ...
+        },
+    );
+
+    # Send a message (pass 1 as second arg to half-close the send side)
+    $stream->write_message($req_msg, 1);
+
+    # Or pull buffered responses synchronously
+    while (my $msg = $stream->recv_message()) {
+        ...
+    }
+
 =head1 DESCRIPTION
 
-This module provides grpc stream interface functionality for the Google gRPC Perl client SDK.
+C<Google::gRPC::Stream> represents a single active gRPC RPC stream multiplexed
+over an HTTP/2 connection managed by L<Google::gRPC::Channel>. It handles
+length-prefixed gRPC message framing via L<Google::gRPC::Framing>, optional
+automatic Protobuf deserialization into C<response_class>, deadline
+enforcement, and lifecycle callbacks (C<on_message>, C<on_trailers>,
+C<on_close>).
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item C<stream_id> (required, read-only)
+
+HTTP/2 stream identifier assigned by the underlying transport engine.
+
+=item C<channel> (required, read-only)
+
+Parent L<Google::gRPC::Channel> instance.
+
+=item C<type> (read-only, default C<'unary'>)
+
+RPC streaming mode (e.g. C<unary>, C<client_streaming>, C<server_streaming>,
+C<bidi_streaming>).
+
+=item C<response_class> (optional, read-only)
+
+Protobuf Perl class name (supporting C<parse($bytes)>) used to deserialize
+incoming message payloads automatically.
+
+=item C<on_message> / C<on_trailers> / C<on_close> (read-write)
+
+Optional coderef callbacks invoked as messages arrive, trailers are parsed,
+or the stream closes.
+
+=item C<deadline> (read-write)
+
+Optional absolute epoch timestamp (from L<Time::HiRes/time>). When exceeded,
+L</check_deadline> aborts the stream with status C<4> (C<DEADLINE_EXCEEDED>).
+
+=item C<state> (read-write, default C<'open'>)
+
+Current stream state: C<open>, C<half_closed_local>, C<half_closed_remote>,
+or C<closed>.
+
+=item C<status> / C<status_message> / C<status_details> (read-write)
+
+Final gRPC status code (default C<0>), status message, and optional decoded
+C<grpc-status-details-bin> payload.
+
+=item C<pool> / C<ip_key> (read-write)
+
+Optional L<Google::gRPC::ChannelPool> reference and endpoint IP key for byte
+accounting.
+
+=back
+
+=head1 METHODS
+
+=head2 write_message($msg, $end_stream)
+
+    $stream->write_message($protobuf_msg, 0);
+    $stream->write_message($protobuf_msg, 1); # half-close write side
+
+Serializes C<$msg> (calling C<< $msg->serialize() >> if it is an object),
+wraps it in a 5-byte gRPC frame, records pool metrics if attached, and sends
+it via the parent channel. If C<$end_stream> is true, transitions C<state> to
+C<half_closed_local> (or C<closed> if already C<half_closed_remote>).
+
+=head2 close_write()
+
+    $stream->close_write();
+
+Convenience wrapper for C<< $stream->write_message(undef, 1) >> to signal
+end-of-stream on the client send side.
+
+=head2 push_incoming_data($chunk)
+
+    $stream->push_incoming_data($bytes);
+
+Appends raw HTTP/2 DATA bytes to C<read_buffer>, unpacks any complete gRPC
+frames, deserializes them via C<response_class> when configured, enqueues them
+into C<response_queue>, and invokes C<on_message>.
+
+=head2 recv_message()
+
+    my $msg = $stream->recv_message();
+
+Checks the stream deadline and shifts the next buffered response message off
+C<response_queue>, or returns C<undef> if none is available.
+
+=head2 handle_trailers($trailers)
+
+    $stream->handle_trailers(\%trailers);
+
+Parses gRPC trailing headers via L<Google::gRPC::Framing/parse_trailers>,
+populates C<status>, C<status_message>, and C<status_details>, and invokes
+C<on_trailers>.
+
+=head2 handle_close($code)
+
+    $stream->handle_close($code);
+
+Transitions the stream to C<closed> and invokes C<on_close>.
+
+=head2 check_deadline()
+
+    $stream->check_deadline();
+
+Checks whether C<time() E<gt> $self-E<gt>deadline> and, if so, calls
+L</abort_stream> with status C<4> (C<Deadline Exceeded>).
+
+=head2 abort_stream($status_code, $status_msg)
+
+    $stream->abort_stream(4, 'Deadline Exceeded');
+
+Terminates the stream with the given gRPC status code and message, firing
+C<on_trailers> and L</handle_close>.
+
+=head1 SEE ALSO
+
+L<Google::gRPC>, L<Google::gRPC::Channel>, L<Google::gRPC::ChannelPool>,
+L<Google::gRPC::Framing>, L<Google::gRPC::Deadline>
 
 =head1 AUTHOR
 

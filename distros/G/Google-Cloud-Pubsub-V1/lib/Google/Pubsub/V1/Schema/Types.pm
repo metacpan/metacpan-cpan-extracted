@@ -241,6 +241,21 @@ coerce 'RepeatedValidateMessageResponse',
 declare 'MapStringValidateMessageResponse',
     as HashRef[ValidateMessageResponse()];
 
+declare 'CompiledProtoSchema',
+    as InstanceOf['Google::Pubsub::V1::Schema::CompiledProtoSchema'];
+
+coerce 'CompiledProtoSchema',
+    from HashRef, via { 'Google::Pubsub::V1::Schema::CompiledProtoSchema'->new($_) };
+
+declare 'RepeatedCompiledProtoSchema',
+    as ArrayRef[CompiledProtoSchema()];
+
+coerce 'RepeatedCompiledProtoSchema',
+    from ArrayRef[HashRef], via { [ map { 'Google::Pubsub::V1::Schema::CompiledProtoSchema'->new($_) } @$_ ] };
+
+declare 'MapStringCompiledProtoSchema',
+    as HashRef[CompiledProtoSchema()];
+
 1;
 
 __END__

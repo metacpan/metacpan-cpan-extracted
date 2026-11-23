@@ -3,7 +3,7 @@ package Google::Protobuf::Wrappers;
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -107,283 +107,257 @@ EOF
     # Fields for DoubleValue
     # Field: value Type: 1 ()
 
-=pod
-
-=head1 NAME
-
-Google::Protobuf::Wrappers::DoubleValue - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Protobuf::Wrappers;
-
-    my $msg = Google::Protobuf::Wrappers::DoubleValue->new(
-        value => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<value>
-
-Type: Double
-
-=back
-
-=cut
-
 # === Message: Google::Protobuf::Wrappers::FloatValue ===
     # Fields for FloatValue
     # Field: value Type: 2 ()
-
-=pod
-
-=head1 NAME
-
-Google::Protobuf::Wrappers::FloatValue - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Protobuf::Wrappers;
-
-    my $msg = Google::Protobuf::Wrappers::FloatValue->new(
-        value => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<value>
-
-Type: Float
-
-=back
-
-=cut
 
 # === Message: Google::Protobuf::Wrappers::Int64Value ===
     # Fields for Int64Value
     # Field: value Type: 3 ()
 
-=pod
-
-=head1 NAME
-
-Google::Protobuf::Wrappers::Int64Value - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Protobuf::Wrappers;
-
-    my $msg = Google::Protobuf::Wrappers::Int64Value->new(
-        value => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<value>
-
-Type: Int64
-
-=back
-
-=cut
-
 # === Message: Google::Protobuf::Wrappers::UInt64Value ===
     # Fields for UInt64Value
     # Field: value Type: 4 ()
-
-=pod
-
-=head1 NAME
-
-Google::Protobuf::Wrappers::UInt64Value - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Protobuf::Wrappers;
-
-    my $msg = Google::Protobuf::Wrappers::UInt64Value->new(
-        value => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<value>
-
-Type: UInt64
-
-=back
-
-=cut
 
 # === Message: Google::Protobuf::Wrappers::Int32Value ===
     # Fields for Int32Value
     # Field: value Type: 5 ()
 
-=pod
-
-=head1 NAME
-
-Google::Protobuf::Wrappers::Int32Value - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Protobuf::Wrappers;
-
-    my $msg = Google::Protobuf::Wrappers::Int32Value->new(
-        value => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<value>
-
-Type: Int32
-
-=back
-
-=cut
-
 # === Message: Google::Protobuf::Wrappers::UInt32Value ===
     # Fields for UInt32Value
     # Field: value Type: 13 ()
-
-=pod
-
-=head1 NAME
-
-Google::Protobuf::Wrappers::UInt32Value - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Protobuf::Wrappers;
-
-    my $msg = Google::Protobuf::Wrappers::UInt32Value->new(
-        value => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<value>
-
-Type: UInt32
-
-=back
-
-=cut
 
 # === Message: Google::Protobuf::Wrappers::BoolValue ===
     # Fields for BoolValue
     # Field: value Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Protobuf::Wrappers::BoolValue - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Protobuf::Wrappers;
-
-    my $msg = Google::Protobuf::Wrappers::BoolValue->new(
-        value => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<value>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Protobuf::Wrappers::StringValue ===
     # Fields for StringValue
     # Field: value Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Protobuf::Wrappers::StringValue - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Protobuf::Wrappers;
-
-    my $msg = Google::Protobuf::Wrappers::StringValue->new(
-        value => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<value>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Protobuf::Wrappers::BytesValue ===
     # Fields for BytesValue
     # Field: value Type: 12 ()
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Protobuf::Wrappers::BytesValue - Compiled Protocol Buffers message class
+Google::Protobuf::Wrappers - Compiled Protocol Buffers messages for google/protobuf/wrappers.proto
 
 =head1 SYNOPSIS
 
     use Google::Protobuf::Wrappers;
 
-    my $msg = Google::Protobuf::Wrappers::BytesValue->new(
+    my $msg = Google::Protobuf::Wrappers::DoubleValue->new({
         value => $value,
-    );
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->value();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Protobuf::Wrappers::DoubleValue->parse($bytes);
 
-=item * B<value>
-
-Type: Bytes
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Protobuf::Wrappers - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/protobuf/wrappers.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Protobuf::Wrappers::DoubleValue
+
+Wrapper message for `double`.
+
+The JSON representation for `DoubleValue` is JSON number.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->value() >> / C<< $msg->value($value) >>
+
+Type: C<Double>
+
+The double value.
+
+=back
+
+=head2 Google::Protobuf::Wrappers::FloatValue
+
+Wrapper message for `float`.
+
+The JSON representation for `FloatValue` is JSON number.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->value() >> / C<< $msg->value($value) >>
+
+Type: C<Float>
+
+The float value.
+
+=back
+
+=head2 Google::Protobuf::Wrappers::Int64Value
+
+Wrapper message for `int64`.
+
+The JSON representation for `Int64Value` is JSON string.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->value() >> / C<< $msg->value($value) >>
+
+Type: C<Int64>
+
+The int64 value.
+
+=back
+
+=head2 Google::Protobuf::Wrappers::UInt64Value
+
+Wrapper message for `uint64`.
+
+The JSON representation for `UInt64Value` is JSON string.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->value() >> / C<< $msg->value($value) >>
+
+Type: C<UInt64>
+
+The uint64 value.
+
+=back
+
+=head2 Google::Protobuf::Wrappers::Int32Value
+
+Wrapper message for `int32`.
+
+The JSON representation for `Int32Value` is JSON number.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->value() >> / C<< $msg->value($value) >>
+
+Type: C<Int32>
+
+The int32 value.
+
+=back
+
+=head2 Google::Protobuf::Wrappers::UInt32Value
+
+Wrapper message for `uint32`.
+
+The JSON representation for `UInt32Value` is JSON number.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->value() >> / C<< $msg->value($value) >>
+
+Type: C<UInt32>
+
+The uint32 value.
+
+=back
+
+=head2 Google::Protobuf::Wrappers::BoolValue
+
+Wrapper message for `bool`.
+
+The JSON representation for `BoolValue` is JSON `true` and `false`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->value() >> / C<< $msg->value($value) >>
+
+Type: C<Bool>
+
+The bool value.
+
+=back
+
+=head2 Google::Protobuf::Wrappers::StringValue
+
+Wrapper message for `string`.
+
+The JSON representation for `StringValue` is JSON string.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->value() >> / C<< $msg->value($value) >>
+
+Type: C<String>
+
+The string value.
+
+=back
+
+=head2 Google::Protobuf::Wrappers::BytesValue
+
+Wrapper message for `bytes`.
+
+The JSON representation for `BytesValue` is JSON string.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->value() >> / C<< $msg->value($value) >>
+
+Type: C<Bytes>
+
+The bytes value.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Protobuf::Wrappers::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -215,15 +215,138 @@ sub reset_metrics {
 
 =head1 NAME
 
-Google::gRPC::ChannelPool - gRPC Channel Pool Management
+Google::gRPC::ChannelPool - Round-robin gRPC subchannel pool with per-endpoint metrics
 
 =head1 SYNOPSIS
 
     use Google::gRPC::ChannelPool;
 
+    my $pool = Google::gRPC::ChannelPool->new(
+        target     => 'pubsub.googleapis.com:443',
+        auth_token => $bearer_token,
+    );
+
+    # Round-robin subchannel selection
+    my $channel = $pool->get_channel();
+
+    # Or create a stream directly with automatic request/response byte accounting
+    my $stream = $pool->create_stream(
+        method         => '/google.pubsub.v1.Publisher/Publish',
+        request        => $req_msg,
+        response_class => 'Google::Pubsub::V1::PublishResponse',
+        on_message     => sub {
+            my ($stream, $resp) = @_;
+            ...
+        },
+    );
+
+    # Inspect per-endpoint traffic metrics
+    my $all_metrics = $pool->get_metrics();
+    $pool->reset_metrics();
+
 =head1 DESCRIPTION
 
-This module provides grpc channel pool management functionality for the Google gRPC Perl client SDK.
+C<Google::gRPC::ChannelPool> resolves a gRPC target hostname into one or more
+IP addresses (using C<Socket::getaddrinfo>, or a caller-supplied
+C<resolved_ips> list), creates a dedicated L<Google::gRPC::Channel> subchannel
+for each endpoint, and distributes RPCs across them in round-robin order.
+
+It also tracks per-endpoint request counts and framed byte totals
+(C<requests>, C<bytes_sent>, C<bytes_received>, C<total_bytes>) whenever
+streams are created via L</create_stream>.
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item C<target> (required, read-only)
+
+Target host and optional port (e.g. C<pubsub.googleapis.com:443>,
+C<[::1]:50051>, or C<localhost>). Defaults to port C<443> when omitted.
+
+=item C<auth_token> (optional, read-only)
+
+Bearer token forwarded to each underlying L<Google::gRPC::Channel>.
+
+=item C<engine_type> (optional, read-only)
+
+Transport engine type (e.g. C<xs>, C<pureperl>, C<mock>) forwarded to each
+underlying L<Google::gRPC::Channel>.
+
+=item C<resolved_ips> (optional, read-only)
+
+Optional arrayref of pre-resolved IP addresses (or C<host:port> targets) to
+use instead of performing DNS resolution via C<getaddrinfo>.
+
+=item C<subchannels> (read-write)
+
+Arrayref of L<Google::gRPC::Channel> objects managed by the pool.
+
+=item C<rr_index> (read-write)
+
+Current round-robin cursor index.
+
+=item C<metrics> (read-write)
+
+Hashref keyed by endpoint IP address containing per-endpoint counters
+(C<requests>, C<bytes_sent>, C<bytes_received>, C<total_bytes>, C<target>).
+
+=back
+
+=head1 METHODS
+
+=head2 get_channel()
+
+    my $channel = $pool->get_channel();
+
+Returns the next L<Google::gRPC::Channel> in round-robin order, or C<undef>
+if the pool has no subchannels.
+
+=head2 create_stream(%opts)
+
+    my $stream = $pool->create_stream(
+        method         => '/pkg.Service/Method',
+        request        => $req,
+        response_class => 'My::Response',
+        on_message     => sub { my ($stream, $msg) = @_; ... },
+    );
+
+Selects the next subchannel via L</get_channel>, records outgoing request
+metrics, wraps C<on_message> to record incoming response byte metrics, and
+delegates to C<< $channel->create_stream(%opts) >>. Returns the resulting
+L<Google::gRPC::Stream> with its C<pool> and C<ip_key> attributes populated.
+
+=head2 record_request($ip_key, $bytes)
+
+    $pool->record_request('127.0.0.1', 128);
+
+Increments C<requests>, C<bytes_sent>, and C<total_bytes> for C<$ip_key>.
+
+=head2 record_response($ip_key, $bytes)
+
+    $pool->record_response('127.0.0.1', 256);
+
+Increments C<bytes_received> and C<total_bytes> for C<$ip_key>.
+
+=head2 get_metrics($key)
+
+    my $all = $pool->get_metrics();
+    my $one = $pool->get_metrics('127.0.0.1');
+
+Returns the metrics hashref for C<$key> (accepting either an IP key or a
+C<host:port> target string), or the full metrics hashref when C<$key> is
+omitted.
+
+=head2 reset_metrics()
+
+    $pool->reset_metrics();
+
+Resets C<requests>, C<bytes_sent>, C<bytes_received>, and C<total_bytes> to
+C<0> for all tracked endpoints.
+
+=head1 SEE ALSO
+
+L<Google::gRPC>, L<Google::gRPC::Channel>, L<Google::gRPC::Stream>
 
 =head1 AUTHOR
 

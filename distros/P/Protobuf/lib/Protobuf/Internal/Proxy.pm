@@ -6,7 +6,7 @@ Protobuf::Internal::Proxy - Base class for tied XS objects
 
 =head1 VERSION
 
-version 0.11
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -17,7 +17,20 @@ version 0.11
 
 =head1 DESCRIPTION
 
-This module provides common helper functions for classes that tie Perl variables to internal XS objects, for example, delegating method calls to the underlying XS object.
+C<Protobuf::Internal::Proxy> is a lightweight base class providing shared
+delegation helpers for Perl classes that wrap or tie Perl containers (arrays
+and hashes) to underlying C<upb> XS objects.
+
+=head1 METHODS
+
+=head2 _xs_delegate($method, @args)
+
+Resolves the underlying XS handle (either C<< $self->{_xs} >> for hash-based
+proxies or C<$self> directly) and invokes C<$method> with C<@args>.
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Internal::Map>, L<Protobuf::Internal::Repeated>
 
 =cut
 

@@ -46,7 +46,7 @@ BEGIN {
 package main;
 use Google::Cloud::Networksecurity::V1::FirewallActivationClient;
 
-my $client = Google::Cloud::Networksecurity::V1::FirewallActivationClient->new( credentials => 'dummy' );
+my $client = Google::Cloud::Networksecurity::V1::FirewallActivationClient->new();
 ok($client, 'Instantiated generated client');
 isa_ok($client->transport, 'Google::gRPC::Client', 'Client transport');
 

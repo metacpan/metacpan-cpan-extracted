@@ -231,6 +231,38 @@ for my $style ('', ',table_style=3line', ',table_style=simple') {
     };
 }
 
+# The line of a table and the number of its lines are taken from the
+# match of the table, not from a match made inside it: spaces after
+# the last pipe are removed, and a <br> in a cell is colored.
+my %inner = (
+    'spaces after the last pipe' => [ "| one  | short |  ", 'colorize=0,' ],
+    'a <br> in a cell'           => [ "| one  | first<br>second |", '' ],
+);
+for my $name (sort keys %inner) {
+    my($row, $colorize) = @{$inner{$name}};
+    my $md = md_file(<<"EOF");
+$sentence
+$sentence
+
+| Name | Description |
+|------|-------------|
+$row
+| two  | short |
+
+$sentence
+$sentence
+EOF
+    for my $intact ('', ',intact=table') {
+        subtest "paragraph below a table with $name$intact" => sub {
+            my $out = plain(run("'-Mmd::config($colorize$config,fold=1,fold_width=40,table_width=40$intact)' $md")->stdout);
+            $out =~ s/^.*\x1F.*\n//mg;  # the table kept intact is one line
+            cmp_ok(max_width($out), '<=', 40, 'paragraph below the table is folded');
+            my @quick = $out =~ /\bquick\b/g;
+            is(scalar @quick, 4, 'paragraph lines appear once');
+        };
+    }
+}
+
 }
 
 done_testing;

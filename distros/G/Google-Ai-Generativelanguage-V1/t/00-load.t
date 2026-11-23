@@ -1,5 +1,5 @@
 #!perl
-use 5.006;
+use 5.008003;
 use strict;
 use warnings;
 use Test::More;
@@ -11,3 +11,5 @@ BEGIN {
     use_ok( 'Google::Ai::Generativelanguage::V1::GenerativeServiceClient' ) || print "Bail out!\n";
     use_ok( 'Google::Ai::Generativelanguage::V1::ModelServiceClient' ) || print "Bail out!\n";
 }
+
+diag( "Testing Google::Ai::Generativelanguage::V1 $Google::Ai::Generativelanguage::V1::VERSION, Perl $], $^X" );

@@ -33,7 +33,7 @@ sub call {
 
 # C. Fallback Mocks for External Response Classes
 BEGIN {
-    for my $pkg (qw( Google::Cloud::Sql::V1::CloudSqlResources::Operation Google::Cloud::Sql::V1::CloudSqlResources::SslCert Google::Cloud::Sql::V1::CloudSqlSslCerts::SslCertsInsertResponse Google::Cloud::Sql::V1::CloudSqlSslCerts::SslCertsListResponse )) {
+    for my $pkg (qw( Google::Cloud::Sql::V1::CloudSqlResources::Operation Google::Cloud::Sql::V1::CloudSqlResources::SslCert Google::Cloud::Sql::V1::CloudSqlSslCerts::ListCustomerManagedCertificatesResponse Google::Cloud::Sql::V1::CloudSqlSslCerts::SslCertsInsertResponse Google::Cloud::Sql::V1::CloudSqlSslCerts::SslCertsListResponse )) {
         unless ($pkg->can('new')) {
             no strict 'refs';
             *{"${pkg}::new"} = sub { bless {}, $_[0] };
@@ -46,7 +46,7 @@ BEGIN {
 package main;
 use Google::Cloud::Sql::V1::SqlSslCertsServiceClient;
 
-my $client = Google::Cloud::Sql::V1::SqlSslCertsServiceClient->new( credentials => 'dummy' );
+my $client = Google::Cloud::Sql::V1::SqlSslCertsServiceClient->new();
 ok($client, 'Instantiated generated client');
 isa_ok($client->transport, 'Google::gRPC::Client', 'Client transport');
 
@@ -115,6 +115,57 @@ subtest 'list method' => sub {
     my $res = $client->list();
     ok($res, 'Method returned a response');
     isa_ok($res, 'Google::Cloud::Sql::V1::CloudSqlSslCerts::SslCertsListResponse', 'Response object class');
+    done_testing();
+};
+
+subtest 'update_customer_managed_certificate method' => sub {
+    $client->transport->{mock_call} = sub {
+        my ($args) = @_;
+        is($args->{service}, 'google.cloud.sql.v1.SqlSslCertsService', 'Correct service path');
+        is($args->{method}, 'UpdateCustomerManagedCertificate', 'Correct RPC method');
+        isa_ok($args->{request}, 'Google::Cloud::Sql::V1::CloudSqlSslCerts::UpdateCustomerManagedCertificateRequest', 'Request object');
+        
+        my $response = 'Google::Cloud::Sql::V1::CloudSqlResources::Operation'->new();
+        return $response;
+    };
+    
+    my $res = $client->update_customer_managed_certificate();
+    ok($res, 'Method returned a response');
+    isa_ok($res, 'Google::Cloud::Sql::V1::CloudSqlResources::Operation', 'Response object class');
+    done_testing();
+};
+
+subtest 'delete_customer_managed_certificate method' => sub {
+    $client->transport->{mock_call} = sub {
+        my ($args) = @_;
+        is($args->{service}, 'google.cloud.sql.v1.SqlSslCertsService', 'Correct service path');
+        is($args->{method}, 'DeleteCustomerManagedCertificate', 'Correct RPC method');
+        isa_ok($args->{request}, 'Google::Cloud::Sql::V1::CloudSqlSslCerts::DeleteCustomerManagedCertificateRequest', 'Request object');
+        
+        my $response = 'Google::Cloud::Sql::V1::CloudSqlResources::Operation'->new();
+        return $response;
+    };
+    
+    my $res = $client->delete_customer_managed_certificate();
+    ok($res, 'Method returned a response');
+    isa_ok($res, 'Google::Cloud::Sql::V1::CloudSqlResources::Operation', 'Response object class');
+    done_testing();
+};
+
+subtest 'list_customer_managed_certificates method' => sub {
+    $client->transport->{mock_call} = sub {
+        my ($args) = @_;
+        is($args->{service}, 'google.cloud.sql.v1.SqlSslCertsService', 'Correct service path');
+        is($args->{method}, 'ListCustomerManagedCertificates', 'Correct RPC method');
+        isa_ok($args->{request}, 'Google::Cloud::Sql::V1::CloudSqlSslCerts::ListCustomerManagedCertificatesRequest', 'Request object');
+        
+        my $response = 'Google::Cloud::Sql::V1::CloudSqlSslCerts::ListCustomerManagedCertificatesResponse'->new();
+        return $response;
+    };
+    
+    my $res = $client->list_customer_managed_certificates();
+    ok($res, 'Method returned a response');
+    isa_ok($res, 'Google::Cloud::Sql::V1::CloudSqlSslCerts::ListCustomerManagedCertificatesResponse', 'Response object class');
     done_testing();
 };
 

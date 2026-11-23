@@ -4,9 +4,10 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 9;
+plan tests => 10;
 
 BEGIN {
+    use_ok( 'Google::Cloud::Dataplex::V1' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Dataplex::V1::BusinessGlossaryServiceClient' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Dataplex::V1::CatalogServiceClient' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Dataplex::V1::CmekServiceClient' ) || print "Bail out!\n";
@@ -18,4 +19,4 @@ BEGIN {
     use_ok( 'Google::Cloud::Dataplex::V1::MetadataServiceClient' ) || print "Bail out!\n";
 }
 
-diag( "Testing Google::Cloud::Dataplex::V1::BusinessGlossaryServiceClient $Google::Cloud::Dataplex::V1::BusinessGlossaryServiceClient::VERSION, Perl $], $^X" );
+diag( "Testing Google::Cloud::Dataplex::V1 $Google::Cloud::Dataplex::V1::VERSION, Perl $], $^X" );

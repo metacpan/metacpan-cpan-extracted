@@ -3,7 +3,7 @@ package Google::Protobuf::Type;
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -197,52 +197,6 @@ EOF
     # Field: source_context Type: 11 (.google.protobuf.SourceContext)
     # Field: syntax Type: 14 (.google.protobuf.Syntax)
 
-=pod
-
-=head1 NAME
-
-Google::Protobuf::Type::Type - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Protobuf::Type;
-
-    my $msg = Google::Protobuf::Type::Type->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<fields>
-
-Type: Message (.google.protobuf.Field)
-
-=item * B<oneofs>
-
-Type: String
-
-=item * B<options>
-
-Type: Message (.google.protobuf.Option)
-
-=item * B<source_context>
-
-Type: Message (.google.protobuf.SourceContext)
-
-=item * B<syntax>
-
-Type: Enum (.google.protobuf.Syntax)
-
-=back
-
-=cut
-
 # === Message: Google::Protobuf::Type::Field ===
     # Fields for Field
     # Field: kind Type: 14 (.google.protobuf.Field.Kind)
@@ -255,68 +209,6 @@ Type: Enum (.google.protobuf.Syntax)
     # Field: options Type: 11 (.google.protobuf.Option)
     # Field: json_name Type: 9 ()
     # Field: default_value Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Protobuf::Type::Field - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Protobuf::Type;
-
-    my $msg = Google::Protobuf::Type::Field->new(
-        kind => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kind>
-
-Type: Enum (.google.protobuf.Field.Kind)
-
-=item * B<cardinality>
-
-Type: Enum (.google.protobuf.Field.Cardinality)
-
-=item * B<number>
-
-Type: Int32
-
-=item * B<name>
-
-Type: String
-
-=item * B<type_url>
-
-Type: String
-
-=item * B<oneof_index>
-
-Type: Int32
-
-=item * B<packed>
-
-Type: Bool
-
-=item * B<options>
-
-Type: Message (.google.protobuf.Option)
-
-=item * B<json_name>
-
-Type: String
-
-=item * B<default_value>
-
-Type: String
-
-=back
-
-=cut
 
 # Enum: Field::Kind
 our $Field_TYPE_UNKNOWN = 0;
@@ -339,81 +231,11 @@ our $Field_TYPE_SFIXED64 = 16;
 our $Field_TYPE_SINT32 = 17;
 our $Field_TYPE_SINT64 = 18;
 
-=pod
-
-=head2 Enum: Field::Kind
-
-Values:
-
-=over 4
-
-=item * C<TYPE_UNKNOWN> => 0
-
-=item * C<TYPE_DOUBLE> => 1
-
-=item * C<TYPE_FLOAT> => 2
-
-=item * C<TYPE_INT64> => 3
-
-=item * C<TYPE_UINT64> => 4
-
-=item * C<TYPE_INT32> => 5
-
-=item * C<TYPE_FIXED64> => 6
-
-=item * C<TYPE_FIXED32> => 7
-
-=item * C<TYPE_BOOL> => 8
-
-=item * C<TYPE_STRING> => 9
-
-=item * C<TYPE_GROUP> => 10
-
-=item * C<TYPE_MESSAGE> => 11
-
-=item * C<TYPE_BYTES> => 12
-
-=item * C<TYPE_UINT32> => 13
-
-=item * C<TYPE_ENUM> => 14
-
-=item * C<TYPE_SFIXED32> => 15
-
-=item * C<TYPE_SFIXED64> => 16
-
-=item * C<TYPE_SINT32> => 17
-
-=item * C<TYPE_SINT64> => 18
-
-=back
-
-=cut
-
 # Enum: Field::Cardinality
 our $Field_CARDINALITY_UNKNOWN = 0;
 our $Field_CARDINALITY_OPTIONAL = 1;
 our $Field_CARDINALITY_REQUIRED = 2;
 our $Field_CARDINALITY_REPEATED = 3;
-
-=pod
-
-=head2 Enum: Field::Cardinality
-
-Values:
-
-=over 4
-
-=item * C<CARDINALITY_UNKNOWN> => 0
-
-=item * C<CARDINALITY_OPTIONAL> => 1
-
-=item * C<CARDINALITY_REQUIRED> => 2
-
-=item * C<CARDINALITY_REPEATED> => 3
-
-=back
-
-=cut
 
 # === Message: Google::Protobuf::Type::Enum ===
     # Fields for Enum
@@ -423,134 +245,342 @@ Values:
     # Field: source_context Type: 11 (.google.protobuf.SourceContext)
     # Field: syntax Type: 14 (.google.protobuf.Syntax)
 
-=pod
-
-=head1 NAME
-
-Google::Protobuf::Type::Enum - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Protobuf::Type;
-
-    my $msg = Google::Protobuf::Type::Enum->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<enumvalue>
-
-Type: Message (.google.protobuf.EnumValue)
-
-=item * B<options>
-
-Type: Message (.google.protobuf.Option)
-
-=item * B<source_context>
-
-Type: Message (.google.protobuf.SourceContext)
-
-=item * B<syntax>
-
-Type: Enum (.google.protobuf.Syntax)
-
-=back
-
-=cut
-
 # === Message: Google::Protobuf::Type::EnumValue ===
     # Fields for EnumValue
     # Field: name Type: 9 ()
     # Field: number Type: 5 ()
     # Field: options Type: 11 (.google.protobuf.Option)
 
-=pod
-
-=head1 NAME
-
-Google::Protobuf::Type::EnumValue - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Protobuf::Type;
-
-    my $msg = Google::Protobuf::Type::EnumValue->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<number>
-
-Type: Int32
-
-=item * B<options>
-
-Type: Message (.google.protobuf.Option)
-
-=back
-
-=cut
-
 # === Message: Google::Protobuf::Type::Option ===
     # Fields for Option
     # Field: name Type: 9 ()
     # Field: value Type: 11 (.google.protobuf.Any)
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Protobuf::Type::Option - Compiled Protocol Buffers message class
+Google::Protobuf::Type - Compiled Protocol Buffers messages for google/protobuf/type.proto
 
 =head1 SYNOPSIS
 
     use Google::Protobuf::Type;
 
-    my $msg = Google::Protobuf::Type::Option->new(
-        name => $value,
-    );
+    my $msg = Google::Protobuf::Type::Type->new({
+        name => $name,
+        fields => $fields,
+        oneofs => $oneofs,
+        options => $options,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->name();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Protobuf::Type::Type->parse($bytes);
 
-=item * B<name>
-
-Type: String
-
-=item * B<value>
-
-Type: Message (.google.protobuf.Any)
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Protobuf::Type - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/protobuf/type.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Protobuf::Type::Type
+
+A protocol buffer message type.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+The fully qualified message name.
+
+=item * C<< $msg->fields() >> / C<< $msg->fields($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Type::Field>)
+
+The list of fields.
+
+=item * C<< $msg->oneofs() >> / C<< $msg->oneofs($value) >>
+
+Type: C<String>
+
+The list of types appearing in `oneof` definitions in this type.
+
+=item * C<< $msg->options() >> / C<< $msg->options($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Type::Option>)
+
+The protocol buffer options.
+
+=item * C<< $msg->source_context() >> / C<< $msg->source_context($value) >>
+
+Type: C<Message> (L<Google::Protobuf::SourceContext::SourceContext>)
+
+The source context.
+
+=item * C<< $msg->syntax() >> / C<< $msg->syntax($value) >>
+
+Type: C<Enum> (L<Google::Protobuf::Syntax>)
+
+The source syntax.
+
+=back
+
+=head2 Google::Protobuf::Type::Field
+
+A single field of a message type.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<Enum> (L<Google::Protobuf::Field::Kind>)
+
+The field type.
+
+=item * C<< $msg->cardinality() >> / C<< $msg->cardinality($value) >>
+
+Type: C<Enum> (L<Google::Protobuf::Field::Cardinality>)
+
+The field cardinality.
+
+=item * C<< $msg->number() >> / C<< $msg->number($value) >>
+
+Type: C<Int32>
+
+The field number.
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+The field name.
+
+=item * C<< $msg->type_url() >> / C<< $msg->type_url($value) >>
+
+Type: C<String>
+
+The field type URL, without the scheme, for message or enumeration
+types. Example: `"type.googleapis.com/google.protobuf.Timestamp"`.
+
+=item * C<< $msg->oneof_index() >> / C<< $msg->oneof_index($value) >>
+
+Type: C<Int32>
+
+The index of the field type in `Type.oneofs`, for message or enumeration
+types. The first type has index 1; zero means the type is not in the list.
+
+=item * C<< $msg->packed() >> / C<< $msg->packed($value) >>
+
+Type: C<Bool>
+
+Whether to use alternative packed wire representation.
+
+=item * C<< $msg->options() >> / C<< $msg->options($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Type::Option>)
+
+The protocol buffer options.
+
+=item * C<< $msg->json_name() >> / C<< $msg->json_name($value) >>
+
+Type: C<String>
+
+The field JSON name.
+
+=item * C<< $msg->default_value() >> / C<< $msg->default_value($value) >>
+
+Type: C<String>
+
+The string value of the default value of this field. Proto2 syntax only.
+
+=back
+
+=head3 Enum: Field::Kind
+
+=over 4
+
+=item * C<TYPE_UNKNOWN> => C<0>
+
+=item * C<TYPE_DOUBLE> => C<1>
+
+=item * C<TYPE_FLOAT> => C<2>
+
+=item * C<TYPE_INT64> => C<3>
+
+=item * C<TYPE_UINT64> => C<4>
+
+=item * C<TYPE_INT32> => C<5>
+
+=item * C<TYPE_FIXED64> => C<6>
+
+=item * C<TYPE_FIXED32> => C<7>
+
+=item * C<TYPE_BOOL> => C<8>
+
+=item * C<TYPE_STRING> => C<9>
+
+=item * C<TYPE_GROUP> => C<10>
+
+=item * C<TYPE_MESSAGE> => C<11>
+
+=item * C<TYPE_BYTES> => C<12>
+
+=item * C<TYPE_UINT32> => C<13>
+
+=item * C<TYPE_ENUM> => C<14>
+
+=item * C<TYPE_SFIXED32> => C<15>
+
+=item * C<TYPE_SFIXED64> => C<16>
+
+=item * C<TYPE_SINT32> => C<17>
+
+=item * C<TYPE_SINT64> => C<18>
+
+=back
+
+=head3 Enum: Field::Cardinality
+
+=over 4
+
+=item * C<CARDINALITY_UNKNOWN> => C<0>
+
+=item * C<CARDINALITY_OPTIONAL> => C<1>
+
+=item * C<CARDINALITY_REQUIRED> => C<2>
+
+=item * C<CARDINALITY_REPEATED> => C<3>
+
+=back
+
+=head2 Google::Protobuf::Type::Enum
+
+Enum type definition.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Enum type name.
+
+=item * C<< $msg->enumvalue() >> / C<< $msg->enumvalue($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Type::EnumValue>)
+
+Enum value definitions.
+
+=item * C<< $msg->options() >> / C<< $msg->options($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Type::Option>)
+
+Protocol buffer options.
+
+=item * C<< $msg->source_context() >> / C<< $msg->source_context($value) >>
+
+Type: C<Message> (L<Google::Protobuf::SourceContext::SourceContext>)
+
+The source context.
+
+=item * C<< $msg->syntax() >> / C<< $msg->syntax($value) >>
+
+Type: C<Enum> (L<Google::Protobuf::Syntax>)
+
+The source syntax.
+
+=back
+
+=head2 Google::Protobuf::Type::EnumValue
+
+Enum value definition.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Enum value name.
+
+=item * C<< $msg->number() >> / C<< $msg->number($value) >>
+
+Type: C<Int32>
+
+Enum value number.
+
+=item * C<< $msg->options() >> / C<< $msg->options($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Type::Option>)
+
+Protocol buffer options.
+
+=back
+
+=head2 Google::Protobuf::Type::Option
+
+A protocol buffer option, which can be attached to a message, field,
+enumeration, etc.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+The option's name. For protobuf built-in options (options defined in
+descriptor.proto), this is the short name. For example, `"map_entry"`.
+For custom options, it should be the fully-qualified name. For example,
+`"google.api.http"`.
+
+=item * C<< $msg->value() >> / C<< $msg->value($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Any::Any>)
+
+The option's value packed in an Any message. If the value is a primitive,
+the corresponding wrapper type defined in google/protobuf/wrappers.proto
+should be used. If the value is an enum, it should be stored as an int32
+value using the google.protobuf.Int32Value type.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Protobuf::Type::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

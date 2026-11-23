@@ -557,12 +557,12 @@ SKIP: {
 	};
 
 	subtest 'Database::Join -- column name collision prefixed with right table label' => sub {
-		# Right table also has an "emp" column — collides with left "emp".
+		# Right table also has an "emp" column - collides with left "emp".
 		Mojo::File->new("$DIR/dflow_right2.csv")->spew("dept_id,dept_name,emp\n10,Engineering,Mgr-E\n");
 		my $right_ds2 = Database::BI::Model::DataSource->new(directory => $DIR, table => 'dflow_right2');
 		my $join = Database::Join->new(
-			databases        => [$left_ds, $right_ds2],
-			join_column      => 'dept_id',
+			databases      => [$left_ds, $right_ds2],
+			join_column    => 'dept_id',
 			collision_prefix => { 1 => 'dept' },
 		);
 		my $merged = $join->selectall_arrayref;
@@ -574,7 +574,7 @@ SKIP: {
 	subtest 'Database::Join -- duplicate right keys: last match wins' => sub {
 		Mojo::File->new("$DIR/dflow_dup.csv")->spew("dept_id,dept_name\n10,First\n10,Second\n");
 		my $dup_ds = Database::BI::Model::DataSource->new(directory => $DIR, table => 'dflow_dup');
-		my $join   = Database::Join->new(databases => [$left_ds, $dup_ds], join_column => 'dept_id');
+		my $join = Database::Join->new(databases => [$left_ds, $dup_ds], join_column => 'dept_id');
 		my $merged = $join->selectall_arrayref;
 		# Database::Join uses last-wins semantics for duplicate right keys (unlike the
 		# former _left_join helper which used first-wins via //=).
@@ -731,8 +731,8 @@ subtest '_apply_filter_spec -- malformed spec (no colon) returns input unchanged
 
 subtest '_apply_filter_spec -- original arrayref not mutated' => sub {
 	my @orig = ({ name => 'Alice' }, { name => 'Bob' });
-	my $in   = \@orig;
-	my $out  = $FILTER->($in, 'name:eq:alice');
+	my $in = \@orig;
+	my $out = $FILTER->($in, 'name:eq:alice');
 	is scalar(@orig), 2, 'original @orig still has 2 elements';
 	isnt $out, $in,       'returned a new arrayref (not the same reference)';
 };
@@ -845,7 +845,7 @@ subtest '_dedup_records -- input arrayref not mutated' => sub {
 # ======================================================================
 
 subtest '_combine_tables -- left columns appear first in union order' => sub {
-	my @left_recs  = ({ a => '1', b => '2' });
+	my @left_recs = ({ a => '1', b => '2' });
 	my @right_recs = ({ b => '3', c => '4' });
 	my ($merged, $cols) = $COMBINE->([
 		[\@left_recs,  [qw(a b)]],
@@ -911,7 +911,7 @@ subtest '_get_columns -- ordered source: columns() takes priority (D->U on first
 	# When source->columns returns an arrayref, the fallback is bypassed entirely.
 	my $source = bless {
 		_columns => [qw(z a m)],   # non-alphabetical: verifies no sorting applied
-		_id_col  => 'z',
+		_id_col => 'z',
 	}, 'Database::BI::Model::DataSource';
 	my @records = ({ z => '1', a => '2', m => '3' });
 	my @cols = $GET_COLS->($source, \@records);
@@ -2032,5 +2032,240 @@ subtest 'Geocode TOCTOU -- two resolve calls with same input cache each get thei
 	ok  $HAS_POSITION->($r2->{'cache'}{'Margate'}),   'r2 cache has Margate';
 	ok !exists($r2->{'cache'}{'Ramsgate'}),            'r2 cache has no Ramsgate';
 };
+
+
+# ======================================================================
+# Sections 35-38: lifecycles of files, handles and cached data
+#
+# DU chains traced here:
+#   Extract::put   $temp D(open) -> U(write) -> U(rename to $p) | K(unlink on failure)
+#                  $p    D(rename)  -> U(get(): -f $p) -- a $p that is only
+#                  part written is a use of half-defined data, so the write
+#                  goes to $temp and only a whole file is ever renamed to $p.
+#   _refuse_xml_entities  $fh D(open) -> U(read, in blocks) -> K(close), on every
+#                  path including the croak; $tail D(each block) -> U(next block)
+#   Boundary cache  $outline D(_set) -> U(_get) -> U(returned feature geometry):
+#                  a caller changing the feature must not change what the
+#                  cache will give the next caller.
+# ======================================================================
+{
+	use lib 't/lib';
+	use Test::Permissions qw(can_revoke_create with_revoked);
+	require Database::BI::Extract;
+	require Database::BI::Model::Boundary;
+
+	Readonly my %FLOW => (
+		rounds       => 200,	# repeats that would show a leaked handle
+		fd_slack     => 3,
+		block        => 65_536,	# DataSource's scan block
+		marker       => '<!ENTITY',
+		deadline     => 10,
+	);
+	Readonly my $KEPT_ERROR => 'kept $@';
+	Readonly my $KEPT_ERRNO => 2;
+
+	my $open_handles = sub { return scalar(() = glob('/proc/self/fd/*')) };
+	my $has_proc     = -d '/proc/self/fd';
+	my @spec         = ('table:sales', 1_700_000_000, 4096);
+
+	subtest 'Extract::put: the extract is whole or it is what it was, and a failure leaves no temporary file' => sub {
+		my $dir = tempdir(CLEANUP => 1);
+		my $extract = Database::BI::Extract->new(dir => $dir);
+		my $path = $extract->put(@spec, 'first version of the extract');
+		is $extract->get(@spec), $path, 'put then get: the same path (define then use)';
+		is(Mojo::File->new($path)->slurp, 'first version of the extract', '... holding what was put');
+
+		# Mid-flight failure: the write dies after part of the data is down.
+		mock 'Mojo::File::spurt' => sub {
+			my ($file, $bytes) = @_;
+			open my $out, '>:raw', "$file" or die "cannot open: $!\n";
+			print {$out} substr($bytes, 0, 5);
+			close $out;
+			die "No space left on device\n";
+		};
+		mock 'Mojo::File::spew' => sub {
+			my ($file, $bytes) = @_;
+			open my $out, '>:raw', "$file" or die "cannot open: $!\n";
+			print {$out} substr($bytes, 0, 5);
+			close $out;
+			die "No space left on device\n";
+		};
+		throws_ok { $extract->put(@spec, 'second version, much longer than the first') }
+			qr/\ACannot write extract '\Q$path\E': No space left on device/, 'a failed write croaks, naming the extract and the reason';
+		restore_all();
+		is(Mojo::File->new($path)->slurp, 'first version of the extract', 'the extract that was there is untouched, not truncated');
+		is_deeply [ grep { /\.tmp\z/ } map { $_->basename } @{ Mojo::File->new($dir)->list->to_array } ], [], 'no temporary file is left behind';
+
+		# A first write that fails leaves nothing for get() to trust.
+		my @other = ('table:other', 1, 2);
+		mock 'Mojo::File::spurt' => sub { open my $o, '>:raw', "$_[0]"; print {$o} 'par'; close $o; die "disk full\n" };
+		mock 'Mojo::File::spew'  => sub { open my $o, '>:raw', "$_[0]"; print {$o} 'par'; close $o; die "disk full\n" };
+		throws_ok { $extract->put(@other, 'whole') } qr/\ACannot write extract/, 'a first write can fail too';
+		restore_all();
+		is $extract->get(@other), undef, 'and then get() finds no extract, rather than a short one';
+
+		# $@ and $! are the caller's through all of it.
+		{
+			local ($@, $!) = ($KEPT_ERROR, $KEPT_ERRNO);
+			$extract->put(@other, 'whole');
+			is $@, $KEPT_ERROR, 'put keeps $@';
+			is $! + 0, $KEPT_ERRNO, 'put keeps $!';
+		}
+		ok defined $extract->get(@other), 'and the retry works';
+
+		# Evicting also clears a temporary file a killed process left.
+		my $stale = File::Spec->catfile($dir, "abc.12345.tmp");
+		Mojo::File->new($stale)->spew('half');
+		$extract->evict('table:sales');
+		ok !-e $stale, 'evict clears a stale temporary file';
+	};
+
+	subtest 'Extract::put: permissions taken away mid-flight' => sub {
+		my $dir = tempdir(CLEANUP => 1);
+		plan skip_all => 'cannot revoke create here' unless can_revoke_create($dir);
+		my $extract = Database::BI::Extract->new(dir => $dir);
+		my $path = $extract->put(@spec, 'kept');
+		my $before = $has_proc ? $open_handles->() : 0;
+		with_revoked('create', $dir, sub {
+			my $refused = 0;
+			for (1 .. $FLOW{rounds}) {
+				$refused++ unless eval { $extract->put(@spec, 'replacement'); 1 };
+			}
+			is $refused, $FLOW{rounds}, 'every write is refused';
+			throws_ok { $extract->put(@spec, 'replacement') } qr/\ACannot write extract/, 'put refuses when the folder cannot be written';
+			is(Mojo::File->new($path)->slurp, 'kept', '... and the old extract survives');
+		});
+		SKIP: {
+			skip 'no /proc/self/fd', 1 unless $has_proc;
+			cmp_ok $open_handles->(), '<=', $before + $FLOW{fd_slack}, 'no handle is left open after ' . $FLOW{rounds} . ' refused writes';
+		}
+		is $extract->put(@spec, 'again'), $path, 'with write access back, put works on the same object';
+	};
+
+	subtest '_refuse_xml_entities: handle lifecycle on every path' => sub {
+		my $refuse = \&Database::BI::Model::DataSource::_refuse_xml_entities;
+		my $dir = tempdir(CLEANUP => 1);
+		my $clean   = File::Spec->catfile($dir, 'clean.xml');
+		my $entity  = File::Spec->catfile($dir, 'entity.xml');
+		my $missing = File::Spec->catfile($dir, 'missing.xml');
+		Mojo::File->new($clean)->spew('<rows><row><a>1</a></row></rows>');
+		Mojo::File->new($entity)->spew('<!DOCTYPE x [<!ENTITY e "v">]><x>&e;</x>');
+
+		SKIP: {
+			skip 'no /proc/self/fd', 1 unless $has_proc;
+			my $before = $open_handles->();
+			for (1 .. $FLOW{rounds}) {
+				$refuse->($clean);
+				eval { $refuse->($entity) };
+				$refuse->($missing);
+				$refuse->($dir);
+			}
+			cmp_ok $open_handles->(), '<=', $before + $FLOW{fd_slack}, 'no handle is left open: clean, refused, missing and a folder, ' . $FLOW{rounds} . ' times each';
+		}
+
+		# The marker may fall across the boundary between two blocks.
+		for my $cut (1 .. length($FLOW{marker}) - 1, 0, length($FLOW{marker})) {
+			my $file = File::Spec->catfile($dir, "cut$cut.xml");
+			my $lead = '<r>' . ('x' x ($FLOW{block} - 3 - $cut));
+			Mojo::File->new($file)->spew($lead . $FLOW{marker} . ' e "v">' . '</r>');
+			throws_ok { $refuse->($file) } qr/entit/i, "a marker cut $cut bytes into the first block is found";
+		}
+		my $big = File::Spec->catfile($dir, 'big.xml');
+		Mojo::File->new($big)->spew('<r>' . ('<a>1</a>' x 100_000) . '</r>');
+		lives_ok { $refuse->($big) } 'a clean file of several blocks passes';
+		my $late = File::Spec->catfile($dir, 'late.xml');
+		Mojo::File->new($late)->spew('<r>' . ('<a>1</a>' x 100_000) . '<!ENTITY e "v"></r>');
+		throws_ok { $refuse->($late) } qr/entit/i, 'a marker in the last block is found';
+
+		# The state a caller holds is put back.
+		{
+			local ($@, $!) = ($KEPT_ERROR, $KEPT_ERRNO);
+			local $/ = 'sep';
+			$refuse->($clean);
+			is $@, $KEPT_ERROR, 'keeps $@';
+			is $! + 0, $KEPT_ERRNO, 'keeps $!';
+			is $/, 'sep', 'keeps $/';
+		}
+		local $_ = 'kept';
+		$refuse->($clean);
+		is $_, 'kept', 'keeps $_';
+	};
+
+	subtest '_refuse_xml_entities: the file changes or goes between the check and the read' => sub {
+		my $refuse = \&Database::BI::Model::DataSource::_refuse_xml_entities;
+		my $dir  = tempdir(CLEANUP => 1);
+		my $file = File::Spec->catfile($dir, 'swap.xml');
+		Mojo::File->new($file)->spew('<r><a>1</a></r>');
+
+		# The result describes the file as it is when it is read: a check is not remembered.
+		lives_ok { $refuse->($file) } 'clean now';
+		Mojo::File->new($file)->spew('<!ENTITY e SYSTEM "file:///etc/passwd">');
+		throws_ok { $refuse->($file) } qr/entit/i, 'refused once it holds an entity: nothing was cached from the clean read';
+		unlink $file;
+		lives_ok { $refuse->($file) } 'gone: left to the reader, which reports it';
+
+		# A link swapped to point at something else is read as what it points at now.
+		my $target_ok  = File::Spec->catfile($dir, 'ok.xml');
+		my $target_bad = File::Spec->catfile($dir, 'bad.xml');
+		Mojo::File->new($target_ok)->spew('<r/>');
+		Mojo::File->new($target_bad)->spew('<!ENTITY e "v">');
+		my $link = File::Spec->catfile($dir, 'link.xml');
+		SKIP: {
+			skip 'cannot make symlinks here', 3 unless eval { symlink($target_ok, $link) };
+			lives_ok { $refuse->($link) } 'a link to a clean file passes';
+			unlink $link; symlink($target_bad, $link);
+			throws_ok { $refuse->($link) } qr/entit/i, 'swapped to point at an entity file, it is refused';
+			unlink $link; symlink(File::Spec->catfile($dir, 'nowhere.xml'), $link);
+			lives_ok { $refuse->($link) } 'a dangling link is left to the reader';
+		}
+
+		# A named pipe would block an open until something wrote to it.
+		my $fifo = File::Spec->catfile($dir, 'pipe.xml');
+		SKIP: {
+			require POSIX;
+			skip 'no mkfifo here', 1 unless eval { POSIX::mkfifo($fifo, 0600) };
+			local $SIG{ALRM} = sub { die "blocked\n" };
+			alarm $FLOW{deadline};
+			my $ok = eval { $refuse->($fifo); 1 };
+			alarm 0;
+			ok $ok, 'a named pipe is not opened (it would wait for a writer forever)' or diag($@);
+		}
+	};
+
+	subtest 'Boundary: what the cache holds is not changed through a result the caller was given' => sub {
+		require BI::Test::Boundary;
+		my $dir = tempdir(CLEANUP => 1);
+		my $ua = BI::Test::Boundary->new(areas => [ { name => 'Ten', id => 1, box => [ 9, 19, 11, 21 ] } ]);
+		my @points = ([ 10.5, 20.5 ]);
+		my @points_before = map { [ @{$_} ] } @points;
+		BI::Test::Boundary::with_ua($ua, sub {
+			my $boundary = Database::BI::Model::Boundary->new(online => 1, cache => Database::BI::Model::Boundary->file_cache($dir));
+			my $first = $boundary->outlines(\@points);
+			is_deeply \@points, \@points_before, 'the caller\'s points are not changed';
+			is scalar(@{ $first->{features} }), 1, 'an outline is drawn';
+			my $shape = [ map { [ @{$_} ] } @{ $first->{features}[0]{geometry}{coordinates}[0] } ];
+
+			# The caller scribbles over everything it was given.
+			$first->{features}[0]{geometry}{coordinates}[0][0] = [ 999, 999 ];
+			$first->{features}[0]{properties}{name} = 'Scribbled';
+			$first->{inside}{'10.500,20.500'} = 'x';
+			push @{ $first->{pending} }, 'junk';
+
+			my $second = $boundary->outlines(\@points, lookup => 0);
+			is $second->{features}[0]{properties}{name}, 'Ten', 'the next result has the name the cache holds, not the one scribbled';
+			is_deeply $second->{features}[0]{geometry}{coordinates}[0], $shape, '... and the shape';
+			is_deeply $second->{pending}, [], '... and no pending point was added';
+			my $third = Database::BI::Model::Boundary->new(cache => Database::BI::Model::Boundary->file_cache($dir))->outlines(\@points, lookup => 0);
+			is $third->{features}[0]{properties}{name}, 'Ten', 'and so does a new object on the same folder';
+		});
+		my $plain = Database::BI::Model::Boundary->new;
+		local ($@, $!) = ($KEPT_ERROR, $KEPT_ERRNO);
+		local $_ = 'kept';
+		$plain->outlines([ [ 10.5, 20.5 ] ], lookup => 0);
+		is $@, $KEPT_ERROR, 'outlines keeps $@';
+		is $! + 0, $KEPT_ERRNO, 'and $!';
+		is $_, 'kept', 'and $_';
+	};
+}
 
 done_testing;

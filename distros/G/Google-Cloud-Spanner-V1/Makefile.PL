@@ -8,7 +8,7 @@ my %WriteMakefileArgs = (
     AUTHOR           => ['C.J. Collier <cjac@google.com>'],
     VERSION_FROM     => 'lib/Google/Cloud/Spanner/V1.pm',
     ABSTRACT_FROM    => 'lib/Google/Cloud/Spanner/V1.pm',
-    LICENSE          => 'artistic_2',
+    LICENSE          => 'apache_2_0',
     MIN_PERL_VERSION => '5.008003',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
@@ -23,6 +23,9 @@ my %WriteMakefileArgs = (
         'Google::gRPC::Client'    => '0.01',
         'Google::Api::Common'     => '0.01',
         'Protobuf'                => '0.01',
+
+        #'ABC'              => '1.6',
+        #'Foo::Bar::Module' => '5.0401',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Google-Cloud-Spanner-V1-*' },

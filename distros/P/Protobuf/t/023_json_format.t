@@ -41,6 +41,23 @@ subtest 'json streaming' => sub {
     ok($json, 'Got JSON from streaming bridge');
 };
 
+subtest 'proto2 non-utf8 bytes in string field produce valid utf8 scalars' => sub {
+    # Field 19 in proto2 TestMessage is `optional string name = 19;` (wire tag (19 << 3) | 2 = 0x9a, 0x01)
+    my $raw_payload = 'Bad ' . "\x92" . ' quote';
+    my $wire = "\x9a\x01" . chr(length($raw_payload)) . $raw_payload;
+    my $msg = Protobuf_perl_test::Test::TestMessage->parse($wire);
+
+    my $name = $msg->name();
+    ok(utf8::is_utf8($name), 'Getter returns UTF-8 flagged scalar');
+    ok(utf8::valid($name), 'Getter scalar has valid internal UTF-8 representation');
+    is($name, "Bad \x{fffd} quote", 'Malformed byte replaced with U+FFFD in getter');
+
+    my $json = $msg->to_json();
+    ok(utf8::is_utf8($json), 'to_json returns UTF-8 flagged scalar');
+    ok(utf8::valid($json), 'to_json scalar has valid internal UTF-8 representation');
+    like($json, qr/"name":"Bad \x{fffd} quote"/, 'Malformed byte replaced with U+FFFD in JSON output');
+};
+
 TODO: {
     local $TODO = 'Implement Direct JSON-to-Wire Conversion';
     ok(0, 'Parsing JSON directly to wire format bypasses intermediate Perl objects');

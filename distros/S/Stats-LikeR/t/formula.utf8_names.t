@@ -10,10 +10,11 @@
 # 1.17142857142857149), and e = c(2,1,4,3,6,5) (0.33333333333333348, 1).
 # R's column names do not matter to the fit; only the data do.
 #
-# Output names: the coefficient names are the formula's own bytes, unflagged,
-# so for a flagged formula they are the UTF-8 encoding of the name (what
-# Encode::encode_utf8() of the name gives), not the characters; the names are
-# looked up again by predict() through the same two-way lookup.
+# Output names: since 0.3428 a name is perl characters when its column was
+# found as characters (a flagged formula against `use utf8` keys), so the
+# coefficient is under $nm itself; a byte-string formula and byte keys still
+# give byte names, which is what such a script looks up.  The names are looked
+# up again by predict() through the same two-way lookup.
 require 5.010; use strict; use warnings FATAL => 'all';
 use utf8;
 use Test::More;
@@ -38,7 +39,7 @@ for my $nm (sort keys %want) {
 			ok($r, "$glmfn->[0] $shape->[0] $lab: fits") or diag($@);
 			next unless $r;
 			near($r->{coefficients}{Intercept}, $want{$nm}[0], "$glmfn->[0] $shape->[0] $lab: intercept");
-			near($r->{coefficients}{$bytes}, $want{$nm}[1], "$glmfn->[0] $shape->[0] $lab: slope under the formula's bytes");
+			near($r->{coefficients}{$nm}, $want{$nm}[1], "$glmfn->[0] $shape->[0] $lab: slope under the characters");
 		}
 	}
 	# a byte-string formula and byte-string keys keep working as before

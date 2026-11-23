@@ -4,7 +4,7 @@ use parent 'Protobuf::Descriptor::Base::PurePerl', 'Protobuf::Descriptor::File';
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 sub name {
     my ($self) = @_;

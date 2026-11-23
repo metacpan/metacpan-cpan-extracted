@@ -1,5 +1,10 @@
 Revision history for Perl extension App-nup
 
+1.23 2026-11-22T16:17:21Z
+
+    - -L: f moves to the right by the panes on the screen, as space
+      does
+
 1.22 2026-11-22T06:07:18Z
 
     - -L: +Gg of the default pager is left out.  With the less of

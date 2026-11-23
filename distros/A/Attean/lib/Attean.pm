@@ -4,7 +4,7 @@ Attean - A Semantic Web Framework
 
 =head1 VERSION
 
-This document describes Attean version 0.040
+This document describes Attean version 0.041
 
 =head1 SYNOPSIS
 
@@ -51,7 +51,7 @@ Semantic Web (RDF and SPARQL) data.
 package Attean {
 	use v5.14;
 	use warnings;
-	our $VERSION	= '0.040';
+	our $VERSION	= '0.041';
 	use Attean::API;
 	
 	use Attean::Blank;
@@ -119,6 +119,39 @@ returns undef.
 	sub get_store {
 		my $self	= shift;
 		return $self->_get_plugin('stores', shift);
+	}
+
+=item C<< parse_store_args ( $string ) >>
+
+Parses the configure C<$string> and returns a list C<($type, \%args, \@files)>
+containing the store type (suitable for passing to C<get_store>) and constructor
+arguments for creating an L<Attean::API::Store> object. This string configuration
+format is suitable for use when only a single scalar value can be used to indicate
+what store is to be used.
+
+The format is comprised of between one and three components joined by ';':
+
+* The name of the store type
+* A list of key=value pairs (joined by ',')
+* A list of filenames joined by ',' (this can be used by callers to load
+  initial data into the store, but the specific format and use is unspecified)
+
+Examples:
+
+* Memory;foo=bar,baz=quux;file1,file2
+* DBI;type=mysql,database=db,user=test,password=pw,host=127.0.0.1,port=3306
+* DBI;type=sqlite,database=test.sqlite
+
+=cut
+
+	sub parse_store_args {
+		my $class	= shift;
+		my $conf	= shift;
+		my ($name, $args, $files)	= split(';', $conf, 3);
+		my @files	= defined($files) ? split(',', $files) : ();
+		my @args	= defined($args) ? split(',', $args) : ();
+		my %args	= map { split(/=/, $_, 2) } @args;
+		return ($name, \%args, \@files);
 	}
 
 =item C<< temporary_model >> 
@@ -469,6 +502,18 @@ currently undefined.
 			}
 		}
 
+=item C<< get_functions () >>
+
+Returns a list of IRI strings for all functions having been registered
+with L<register_global_function>.
+
+=cut
+
+		sub get_functions {
+			my $class	= shift;
+			return keys %global_functions;
+		}
+
 =item C<< get_global_function( $uri ) >>
 
 =cut
@@ -497,6 +542,18 @@ currently undefined.
 			}
 		}
 
+=item C<< get_functional_forms () >>
+
+Returns a list of IRI strings for all functional forms having been registered
+with L<register_global_functional_form>.
+
+=cut
+
+		sub get_functional_forms {
+			my $class	= shift;
+			return keys %global_functional_forms;
+		}
+
 =item C<< get_global_functional_form( $uri ) >>
 
 =cut
@@ -521,6 +578,19 @@ currently undefined.
 				my $funcs	= $args{ $uri };
 				$global_aggregates{ $uri }	= $funcs;
 			}
+		}
+
+
+=item C<< get_aggregates () >>
+
+Returns a list of IRI strings for all aggregate functions having been registered
+with L<register_global_aggregate>.
+
+=cut
+
+		sub get_aggregates {
+			my $class	= shift;
+			return keys %global_aggregates;
 		}
 
 =item C<< get_global_aggregate( $uri ) >>

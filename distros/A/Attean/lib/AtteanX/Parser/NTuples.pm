@@ -7,7 +7,7 @@ AtteanX::Parser::NTuples - Shared functionality for N-Triples and N-Quads parser
 
 =head1 VERSION
 
-This document describes AtteanX::Parser::NTuples version 0.040
+This document describes AtteanX::Parser::NTuples version 0.041
 
 =head1 SYNOPSIS
 
@@ -33,7 +33,7 @@ This module provides a base class for RDF formats N-Triples and N-Quads.
 
 =cut
 
-package AtteanX::Parser::NTuples 0.040 {
+package AtteanX::Parser::NTuples 0.041 {
 	use utf8;
 	use Moo;
 	use Attean;
@@ -176,12 +176,14 @@ LINE:			($line, my @extra)	= split(/\r\n|\r|\n/, $line, 2);
 			} else {
 				my ($uri)	= $_[0] =~ m/^<([^>]*)>/;
 				substr($_[0], 0, length($uri)+2)	= '';
+				state $count;
 				state %cache;
 				if (my $i = $cache{$uri}) {
 					return $i;
 				} else {
-					if (rand() < 0.02) {
-						# clear out the cache roughly every 50 IRIs
+					if ($count++ > 50) {
+						# clear out the cache every 50 IRIs
+						$count	= 0;
 						%cache	= ();
 					}
 					my $iri	= $self->new_abs_iri( value => _unescape($uri, $lineno) );
@@ -200,7 +202,8 @@ LINE:			($line, my @extra)	= split(/\r\n|\r|\n/, $line, 2);
 			return $b;
 		} elsif ($char eq '"') {
 			substr($_[0], 0, 1)	= '';
-			my $value	= decode('utf8', '');
+			my $value	= '';
+			utf8::decode($value);
 			while (length($_[0]) and substr($_[0], 0, 1) ne '"') {
 				while ($_[0] =~ m/^([^"\\]+)/) {
 					$value	.= $1;
@@ -234,11 +237,11 @@ LINE:			($line, my @extra)	= split(/\r\n|\r|\n/, $line, 2);
 							substr($_[0],0,2)	= '';
 						} elsif ($1 eq 'u') {
 							$_[0] =~ m/^\\u([0-9A-Fa-f]{4})/ or die qq[Bad N-Triples \\u escape at line $lineno, near "$_[0]"];
-							$value	.= $self->unescape_hex($1);
+							$value	.= $self->_unescape_hex($1);
 							substr($_[0],0,6)	= '';
 						} elsif ($1 eq 'U') {
 							$_[0] =~ m/^\\U([0-9A-Fa-f]{8})/ or die qq[Bad N-Triples \\U escape at line $lineno, near "$_[0]"];
-							$value	.= $self->unescape_hex($1);
+							$value	.= $self->_unescape_hex($1);
 							substr($_[0],0,10)	= '';
 						} else {
 							die qq[Not valid N-Triples escape character '\\$1' at line $lineno, near "$_[0]"];
@@ -275,7 +278,7 @@ LINE:			($line, my @extra)	= split(/\r\n|\r|\n/, $line, 2);
 		}
 	}
 
-	sub unescape_hex {
+	sub _unescape_hex {
 		my $self		= shift;
 		my $codepoint	= shift;
 		my $cp			= hex($codepoint);

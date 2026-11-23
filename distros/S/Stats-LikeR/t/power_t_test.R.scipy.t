@@ -399,12 +399,11 @@ for my $bad (2, -1, 1.0000001) {
 		qr/'power' must be numeric in \[0, 1\]/, "power => $bad croaks";
 }
 
-# nu = (n - 1) * tsample, so below n = 2 there is no variance to estimate. R
-# masks the degeneracy with pmax(1e-07, n - 1) and returns a power of 0; this
-# used to return a power of 0.99998.
-for my $bad (1.9999, 1, 0, -5) {
+# n <= 0 has no sample; any positive n is accepted, as in R (see the n < 2
+# block at the end of this file).
+for my $bad (0, -5) {
 	throws_ok { power_t_test(n => $bad, delta => 0.5, power => undef) }
-		qr/'n' must be at least 2/, "n => $bad croaks";
+		qr/'n' must be positive/, "n => $bad croaks";
 }
 throws_ok { power_t_test(n => 30, delta => 0.5, sd => -1, power => undef) }
 	qr/'sd' must not be negative/, 'a negative sd croaks';
@@ -438,14 +437,6 @@ throws_ok { power_t_test(n => 30, delta => 0, power => 0.8, sd => undef) }
 throws_ok { power_t_test(n => 30, sd => 0, power => 0.8, delta => undef) }
 	qr/cannot solve for 'delta' unless 'sd' is positive/,
 	'solving for delta with sd == 0 croaks';
-# power => 0.2 is already exceeded at n = 2 when delta is 5. R extends the
-# bracket below its own lower end and answers n = 1.406729, which is not a
-# sample size. Used to return n = 2.00004 with power => 0.2 attached.
-# The upper end of the bracket is formatted by perl's %g, which on an MSVCRT
-# perl (Strawberry 5.24) writes 1e7 as 1e+007, so take it from perl too.
-my $n_hi = quotemeta sprintf('%g', 1e7);
-throws_ok { power_t_test(power => 0.2, delta => 5, sd => 1, n => undef) }
-	qr/no 'n' in \[2, $n_hi\] gives a power of 0\.2/, 'an unreachable n croaks';
 # a sig_level is a probability, so its bracket cannot be widened. R widens it
 # anyway (extendInt = "yes") and returns sig.level = 1.071987. Used to return
 # 0.99994 with power => 0.99 attached.
@@ -545,5 +536,52 @@ for my $c (grep { $_->{alternative} eq 'one.sided' && !$_->{strict}
 # 1.0041181143634293e-06, 3.7e-11 from it.
 is_rel(power_t_test(n => 20, delta => 1, alternative => 'less')->{power},
 	1.004118114325838652e-06, 1e-12, "'less' at n = 20, delta = 1: about 1e-6, not 0.9279");
+
+
+# n < 2.  Up to 0.3427 n < 2 croaked and a power target already exceeded at
+# n = 2 croaked "no 'n' in [2, 1e+07]"; R answers both, because
+# nu = pmax(1e-7, n - 1) * tsample keeps the t distribution defined.
+#
+# Provenance: R 4.6.1 stats::power.t.test() (src/library/stats/R/power.R),
+# options(digits = 17).  Powers at n >= 1.2 agree with a noncentral-t
+# integral to 1e-12; the solved n is R's uniroot() at tol = .Machine$double.eps^0.25
+# (1.2e-4 on the bracket), so it is held to 1e-4.
+{
+	my @pw = (
+		# [args, R's power]
+		[ { n => 1.5, delta => 1 },                                  0.060873433554392786 ],
+		[ { n => 1.5, delta => 1, sig_level => 1e-3, alternative => 'one.sided' }, 0.0024386051252059948 ],
+		[ { n => 1.5, delta => 1, strict => 1 },                     0.067574237903835432 ],
+		[ { n => 1.9999, delta => 1, type => 'one.sample' },         0.090572816770560172 ],
+		[ { n => 2, delta => 1 },                                    0.091317784361726217 ],
+		[ { n => 1.5, delta => 5 },                                  0.265946143819 ],
+		# below n = 1.001 the critical value is infinite and R's power is exactly 0
+		[ { n => 1, delta => 1 },                                    0 ],
+		[ { n => 1, delta => 1, type => 'one.sample' },              0 ],
+		[ { n => 0.5, delta => 1 },                                  0 ],
+		[ { n => 1.0001, delta => 1 },                               0 ],
+	);
+	for my $c (@pw) {
+		my ($args, $want) = @$c;
+		my $r = power_t_test(%$args, power => undef);
+		my $name = join ',', map { "$_=$args->{$_}" } sort keys %$args;
+		# 1e-9 relative: the worst disagreement with R is 3e-12 (n = 1.5, double); the rest is headroom for the quadrature on wider NVs
+		cmp_ok(abs($r->{power} - $want), '<=', 1e-9 * ($want || 1), "power at n < 2: $name");
+	}
+	# solving for n: R's 1.40672931575 for power 0.2 at delta 5
+	my $r = power_t_test(power => 0.2, delta => 5, sd => 1, n => undef);
+	cmp_ok(abs($r->{n} - 1.40672931575), '<=', 1e-4, 'power already exceeded at n = 2: n in (1, 2), as R');
+	cmp_ok(abs(power_t_test(n => $r->{n}, delta => 5)->{power} - 0.2), '<=', 1e-9, '... and it round-trips to the power');
+	# R answers 1.0778300889 for power 0.01, delta 0.1, but its pt(ncp =) is
+	# discontinuous at df ~ 0.16 (power 0.00163 at n = 1.07784, 0.0275 at
+	# n = 1.0779), so uniroot lands on the jump.  The root here is the
+	# continuous one, checked through the smooth power: power(1.05) =
+	# 0.0265484548144408 by mpmath (mp.dps = 30, E[Phi(ncp - qu sqrt(X/nu))]).
+	my $s = power_t_test(power => 0.01, delta => 0.1, n => undef);
+	ok($s->{n} > 1 && $s->{n} < 2, 'power 0.01 at delta 0.1: n is in (1, 2)');
+	cmp_ok(abs(power_t_test(n => $s->{n}, delta => 0.1)->{power} - 0.01), '<=', 1e-9, '... and round-trips');
+	cmp_ok(abs(power_t_test(n => 1.05, delta => 0.1)->{power} - 0.0265484548144408), '<=', 1e-7 * 0.0265,
+		'power at n = 1.05 against mpmath');
+}
 
 done_testing();

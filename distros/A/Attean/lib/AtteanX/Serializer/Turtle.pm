@@ -4,7 +4,7 @@ AtteanX::Serializer::Turtle - Turtle Serializer
 
 =head1 VERSION
 
-This document describes AtteanX::Serializer::Turtle version 0.040
+This document describes AtteanX::Serializer::Turtle version 0.041
 
 =head1 SYNOPSIS
 
@@ -34,12 +34,16 @@ This document describes AtteanX::Serializer::Turtle version 0.040
 
 =over 4
 
+=item C<< canonical_iri >>
+
+Returns the canonical IRI of this format.
+
 =cut
 
 use v5.14;
 use warnings;
 
-package AtteanX::Serializer::Turtle 0.040 {
+package AtteanX::Serializer::Turtle 0.041 {
 	use Moo;
 	use Data::Dumper;
 	use Encode qw(encode);
@@ -54,6 +58,7 @@ package AtteanX::Serializer::Turtle 0.040 {
 	with 'Attean::API::AppendableSerializer';
 	with 'Attean::API::TripleSerializer';
 	
+	sub canonical_iri { return 'http://www.w3.org/ns/formats/Turtle' }
 	sub canonical_media_type { return "text/turtle" }
 
 	sub media_types {

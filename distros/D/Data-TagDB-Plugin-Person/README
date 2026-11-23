@@ -1,0 +1,4 @@
+Data::TagDB::Plugin::Person
+---------------------------
+
+Thos module provides a plugin to Data::TagDB that can be used to interact with person data more easily.

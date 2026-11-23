@@ -48,8 +48,8 @@
             "Crypt::URandom" : "0",
             "Cwd" : "0",
             "DB_File" : "0",
-            "Database::Abstraction" : "0.56",
-            "Database::Join" : "v0.11.1",
+            "Database::Abstraction" : "0.57",
+            "Database::Join" : "v0.11.4",
             "Digest::MD5" : "0",
             "Digest::SHA" : "0",
             "Encode" : "0",
@@ -91,6 +91,7 @@
             "Time::HiRes" : "0",
             "URI" : "0",
             "Unicode::Normalize" : "0",
+            "XML::Simple" : "0",
             "perl" : "5.028000",
             "version" : "0.77"
          }
@@ -114,8 +115,7 @@
             "Test::Permissions" : "v0.1.2",
             "Test::Returns" : "0.005",
             "Test::Without::Module" : "0",
-            "Text::xSV::Slurp" : "0",
-            "XML::Simple" : "0"
+            "Text::xSV::Slurp" : "0"
          }
       }
    },
@@ -132,6 +132,6 @@
          "web" : "https://github.com/nigelhorne/Database-BI"
       }
    },
-   "version" : "0.023.1",
+   "version" : "0.024.0",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

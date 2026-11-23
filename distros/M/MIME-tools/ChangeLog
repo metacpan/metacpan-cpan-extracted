@@ -1,3 +1,11 @@
+5.523	  2026-11-22  Dianne Skoll <dianne@skoll.ca>
+
+	* VERSION 5.523 RELEASED
+
+	* Fix quadratic-time-complexity operation in MIME parameter
+	  parsing that could result in a DoS.  Bug found and fixed by EZO
+  	  Labs Security.
+
 5.522	  2026-10-27  Dianne Skoll <dianne@skoll.ca>
 
 	* VERSION 5.522 RELEASED

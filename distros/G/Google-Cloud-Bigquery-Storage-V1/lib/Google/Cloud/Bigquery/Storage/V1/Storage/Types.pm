@@ -376,6 +376,51 @@ declare 'MapStringRowError',
 declare 'RowErrorCode',
     as (Int | Str);
 
+declare 'ClientStats',
+    as InstanceOf['Google::Cloud::Bigquery::Storage::V1::Storage::ClientStats'];
+
+coerce 'ClientStats',
+    from HashRef, via { 'Google::Cloud::Bigquery::Storage::V1::Storage::ClientStats'->new($_) };
+
+declare 'RepeatedClientStats',
+    as ArrayRef[ClientStats()];
+
+coerce 'RepeatedClientStats',
+    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Bigquery::Storage::V1::Storage::ClientStats'->new($_) } @$_ ] };
+
+declare 'MapStringClientStats',
+    as HashRef[ClientStats()];
+
+declare 'RequestStats',
+    as InstanceOf['Google::Cloud::Bigquery::Storage::V1::Storage::ClientStats::RequestStats'];
+
+coerce 'RequestStats',
+    from HashRef, via { 'Google::Cloud::Bigquery::Storage::V1::Storage::ClientStats::RequestStats'->new($_) };
+
+declare 'RepeatedRequestStats',
+    as ArrayRef[RequestStats()];
+
+coerce 'RepeatedRequestStats',
+    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Bigquery::Storage::V1::Storage::ClientStats::RequestStats'->new($_) } @$_ ] };
+
+declare 'MapStringRequestStats',
+    as HashRef[RequestStats()];
+
+declare 'WindowStats',
+    as InstanceOf['Google::Cloud::Bigquery::Storage::V1::Storage::ClientStats::WindowStats'];
+
+coerce 'WindowStats',
+    from HashRef, via { 'Google::Cloud::Bigquery::Storage::V1::Storage::ClientStats::WindowStats'->new($_) };
+
+declare 'RepeatedWindowStats',
+    as ArrayRef[WindowStats()];
+
+coerce 'RepeatedWindowStats',
+    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Bigquery::Storage::V1::Storage::ClientStats::WindowStats'->new($_) } @$_ ] };
+
+declare 'MapStringWindowStats',
+    as HashRef[WindowStats()];
+
 1;
 
 __END__

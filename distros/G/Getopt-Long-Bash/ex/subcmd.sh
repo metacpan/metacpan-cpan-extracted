@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-. $(dirname $0)/getoptlong.sh
+set -eu
+
+. "$(dirname "$0")"/getoptlong.sh -
 
 help_main() {
     cat <<-END
@@ -21,7 +23,7 @@ getoptlong parse "$@" && eval "$(getoptlong set)"
 
 declare -p message
 
-[[ ${subcmd:=$1} ]] && shift || { echo "subcommand is required"; exit 1; }
+[[ ${subcmd:=${1:-}} ]] && shift || { echo "subcommand is required"; exit 1; }
 
 case $subcmd in
     flag) declare -A SUB_OPTS=([ flag | F   ]=) ;;
@@ -43,4 +45,4 @@ case $subcmd in
     hash) declare -p hash ;;
 esac
 
-(( $# > 0 )) && echo "$@"
+(( $# > 0 )) && echo "$@" || :

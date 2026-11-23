@@ -28,16 +28,77 @@
   </a>
   [%- END %]
 
+  [%- IF files.size > 1 %]
+  <div class="browser-pick-bar" id="browse-pick-bar">
+    <label class="browser-pick-all"><input type="checkbox" id="browse-pick-all"> Select all [% files.size %] files</label>
+    <span class="browser-pick-count" id="browse-pick-count" aria-live="polite">None selected</span>
+    <button type="button" class="btn-primary" id="browse-combine" data-dir="[% current_path | html %]" disabled title="Open the ticked files as one table, with the rows of each stacked beneath the last">&#x229E; Combine selected</button>
+  </div>
+  [%- END %]
+
   [%- FOREACH f IN files %]
-  <a class="browser-entry browser-file" href="[% f.href | html %]">
-    <span class="browser-icon">&#x1F4CA;</span>
-    <span class="browser-name">[% f.name | html %]</span>
-  </a>
+  <div class="browser-file-row">
+    [%- IF files.size > 1 %]
+    <input type="checkbox" class="browser-pick" value="[% f.path | html %]" aria-label="Select [% f.name | html %]">
+    [%- END %]
+    <a class="browser-entry browser-file" href="[% f.href | html %]">
+      <span class="browser-icon">&#x1F4CA;</span>
+      <span class="browser-name">[% f.name | html %]</span>
+    </a>
+  </div>
   [%- END %]
 
   [%- UNLESS dirs.size || files.size %]
   <p class="empty-state">No folders or supported data files here.</p>
   [%- END %]
 </div>
+
+[%- IF files.size > 1 %]
+<script nonce="[% csp_nonce | html %]">
+(function () {
+  var picks = Array.prototype.slice.call(document.querySelectorAll('.browser-pick'));
+  var all   = document.getElementById('browse-pick-all');
+  var count = document.getElementById('browse-pick-count');
+  var go    = document.getElementById('browse-combine');
+  if (!go || !all) return;
+  var last = -1;
+
+  function chosen() { return picks.filter(function (p) { return p.checked; }); }
+  function refresh() {
+    var n = chosen().length;
+    count.textContent = n ? n + (n === 1 ? ' file selected' : ' files selected') : 'None selected';
+    go.disabled = n < 2;
+    all.checked = n === picks.length;
+    all.indeterminate = n > 0 && n < picks.length;
+  }
+
+  picks.forEach(function (p, i) {
+    p.addEventListener('click', function (ev) {
+      // Shift-click ticks (or clears) everything from the last click to this one.
+      if (ev.shiftKey && last >= 0) {
+        var lo = Math.min(last, i), hi = Math.max(last, i);
+        for (var k = lo; k <= hi; k++) picks[k].checked = p.checked;
+      }
+      last = i;
+      refresh();
+    });
+  });
+  all.addEventListener('change', function () {
+    picks.forEach(function (p) { p.checked = all.checked; });
+    refresh();
+  });
+  go.addEventListener('click', function () {
+    var sel = chosen();
+    if (sel.length < 2) return;
+    var q = ['l=' + encodeURIComponent('path:' + sel[0].value)];
+    for (var i = 1; i < sel.length; i++) q.push('c=' + encodeURIComponent('path:' + sel[i].value));
+    q.push('srccol=source_file');
+    q.push('back2=' + encodeURIComponent('/browse?path=' + encodeURIComponent(go.getAttribute('data-dir'))));
+    location.href = '/combine?' + q.join('&');
+  });
+  refresh();
+})();
+</script>
+[%- END %]
 
 [%- END -%]

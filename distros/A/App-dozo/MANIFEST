@@ -8,8 +8,10 @@ cpanfile
 lib/App/dozo.pm
 minil.toml
 script/dozo
+share/features/locale
 t/00_compile.t
 t/03_dozo.t
+t/04_status.t
 xt/author/docker_dozo.t
 META.yml
 MANIFEST

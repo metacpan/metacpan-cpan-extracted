@@ -1,6 +1,6 @@
 package App::optex::up;
 
-our $VERSION = "1.22";
+our $VERSION = "1.23";
 
 =encoding utf-8
 
@@ -121,7 +121,7 @@ C<LESSKEY_CONTENT> (less 661 or later), after the keys of the user,
 or those of C<NUP_LESSKEY> in their place, none when it is empty:
 C<h> and C<l>, C<,> and C<.>, and ESC-( and ESC-), move by one page
 as the arrow keys, C<H> and C<L> go to the left and the right end,
-and so do C<g> and C<G>, C<E<lt>> and C<E<gt>>, and space and C<b>
+and so do C<g> and C<G>, C<E<lt>> and C<E<gt>>, and space, C<f> and C<b>
 move to the right and to the left by the panes on the screen, as do
 C<j> and C<k>, the down and up arrows, C<d> and C<u>, C<^D> and
 C<^U>, and the return key, and C<J> and C<K> go to the right and the
@@ -586,10 +586,10 @@ sub finalize {
                 # with pages: g G < > go to the ends as H and L
                 "g no-scroll;G $end;< no-scroll;> $end",
 
-                # the panes on the screen: space and b, and the keys
+                # the panes on the screen: space, f and b, and the keys
                 # to go down and up, since a page has the height of
                 # the screen and there is nothing below it
-                "\\  noaction $fwd;b noaction $back",
+                "\\  noaction $fwd;f noaction $fwd;b noaction $back",
                 "j noaction $fwd;k noaction $back",
                 "\\kd noaction $fwd;\\ku noaction $back",
                 "d noaction $fwd;u noaction $back",

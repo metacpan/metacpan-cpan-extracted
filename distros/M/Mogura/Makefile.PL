@@ -1,5 +1,16 @@
 use strict;
 use warnings;
+use Config;
+
+BEGIN {
+    # CPAN::Reporter uses this diagnostic to grade unsupported platforms as NA.
+    die "OS unsupported: Mogura requires Linux (found $^O)\n" unless $^O eq 'linux';
+    die "OS unsupported: Mogura requires Linux x86_64 or aarch64 (found $Config{archname})\n"
+        unless $Config{archname} =~ /\A(?:x86_64|aarch64)(?:-|\z)/;
+    die "OS unsupported: Mogura requires a 64-bit Perl build\n"
+        unless $Config{ptrsize} == 8 && $Config{ivsize} == 8;
+}
+
 use ExtUtils::MakeMaker;
 use File::Find qw(find);
 

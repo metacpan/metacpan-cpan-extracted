@@ -26,7 +26,7 @@ use Data::URIID::Colour;
 
 use parent 'Data::TagDB::Base';
 
-our $VERSION = v0.16;
+our $VERSION = v0.17;
 
 my %_queries = (
     _default => {
@@ -505,6 +505,8 @@ sub load_plugin {
     foreach my $plugin_name (@{$plugins}) {
         my $info = $plugin_infos->{$plugin_name};
 
+        croak 'Trying to load blacklisted plugin' if $self->_match_plugin_list(plugin_blacklist => $plugin_name);
+
         unless (defined $info) {
             unless (exists $Data::TagDB::Interface::Plugin::_known_plugins{$plugin_name}) {
                 my $fn = $plugin_name =~ s{::|'}{/}gr; # from parent.pm!
@@ -521,6 +523,22 @@ sub load_plugin {
             $plugin_infos->{$plugin_name} = $info = $plugin_name->plugin_attach($self, undef);
         }
     }
+}
+
+
+sub whitelist_plugin {
+    my ($self, @list) = @_;
+    my $whitelist = $self->{plugin_whitelist} //= [];
+    push(@{$whitelist}, @list);
+    return $self;
+}
+
+
+sub blacklist_plugin {
+    my ($self, @list) = @_;
+    my $blacklist = $self->{plugin_blacklist} //= [];
+    push(@{$blacklist}, @list);
+    return $self;
 }
 
 # ---- Virtual methods ----
@@ -568,6 +586,22 @@ sub _get_plugin_info {
     my ($self, $plugin) = @_;
     my $plugin_infos = $self->{plugin_infos} //= {};
     return $plugin_infos->{$plugin};
+}
+
+sub _match_plugin_list {
+    my ($self, $list, $plugin) = @_;
+    $list = $self->{$list};
+    return undef unless defined $list;
+
+    foreach my $ent (@{$list}) {
+        if (ref $ent) {
+            return 1 if $plugin =~ $ent;
+        } else {
+            return 1 if $plugin eq $ent;
+        }
+    }
+
+    return undef;
 }
 
 sub _tag_by_ise_cached {
@@ -811,43 +845,65 @@ sub _link_iterator {
 
 sub _load_cloudlet {
     my ($self, %opts) = @_;
+    my $tag = $opts{tag};
     my $direct = $opts{direct};
     my $indirect = $opts{indirect};
+    my $direct_inverse = $opts{direct_inverse};
+    my $indirect_inverse = $opts{indirect_inverse};
+    my $sql = 'WITH ';
+    my @selects;
+    my @bind;
+    my $sth;
+    my @root;
+    my @entry;
 
-    $direct   = [$direct]   unless ref($direct) eq 'ARRAY';
-    $indirect = [$indirect] unless ref($indirect) eq 'ARRAY' || !defined($indirect);
-
-    return Data::TagDB::Cloudlet->new(db => $self, root => []) unless scalar(@{$direct});
-
-    if (defined($indirect) && !scalar(@{$indirect})) {
-        $indirect = undef;
-    }
-
-    if (defined $opts{indirect}) {
-        my $query = 'WITH RECURSIVE X(related,root) AS (SELECT related,true FROM relation WHERE tag = ? AND relation IN ('.join(',', map{'?'} @{$direct}).') UNION SELECT relation.related,false FROM relation, X WHERE relation.relation IN ('.join(',', map{'?'} @{$indirect}).') AND relation.tag = X.related) SELECT related,root FROM X';
-        my @bind = ($opts{tag}->dbid, map {$_->dbid} @{$direct}, @{$indirect});
-        my $sth = $self->dbh->prepare($query);
-        my @root;
-        my @entry;
-
-        $sth->execute(@bind);
-        while (my $row = $sth->fetchrow_arrayref) {
-            my $ent = $self->tag_by_dbid($row->[0]);
-            if ($row->[1]) {
-                push(@root, $ent);
-            } else {
-                push(@entry, $ent);
-            }
+    foreach my $set ($direct, $indirect, $direct_inverse, $indirect_inverse) {
+        if (defined $set) {
+            $set = [$set] unless ref($set) eq 'ARRAY';
+            $set = undef unless scalar(@{$set});
         }
-        $sth->finish;
-        return Data::TagDB::Cloudlet->new(db => $self, root => \@root, entry => \@entry);
-    } else {
-        return Data::TagDB::Cloudlet->new(db => $self, root => [
-                $self->relation(tag => $opts{tag}, relation => $opts{direct})->collect('related')
-            ]);
     }
 
-    # WITH RECURSIVE X(related,root) AS (SELECT related,true FROM relation WHERE tag = 597 AND relation IN (7, 201) UNION SELECT relation.related,false FROM relation, X WHERE relation.relation = 140 AND relation.tag = X.related) SELECT *,(SELECT data FROM metadata WHERE tag = X.related AND relation = 1 AND type = 5 LIMIT 1) FROM X
+    return Data::TagDB::Cloudlet->new(db => $self, root => []) unless defined($direct) || defined($direct_inverse);
+
+    if (defined($indirect) || defined($indirect_inverse)) {
+        $sql .= 'RECURSIVE ';
+    }
+
+    $sql .= 'X(related,root) AS (';
+
+    if (defined $direct) {
+        push(@selects, 'SELECT related,true FROM relation WHERE tag = ? AND relation IN ('.join(',', map{'?'} @{$direct}).')');
+        push(@bind, map {$_->dbid} $tag, @{$direct});
+    }
+    if (defined $direct_inverse) {
+        push(@selects, 'SELECT tag AS "related",true FROM relation WHERE related = ? AND relation IN ('.join(',', map{'?'} @{$direct_inverse}).')');
+        push(@bind, map {$_->dbid} $tag, @{$direct_inverse});
+    }
+    if (defined $indirect) {
+        push(@selects, 'SELECT relation.related,false FROM relation, X WHERE relation.relation IN ('.join(',', map{'?'} @{$indirect}).') AND relation.tag = X.related');
+        push(@bind, map {$_->dbid} @{$indirect});
+    }
+    if (defined $indirect_inverse) {
+        push(@selects, 'SELECT relation.tag AS "related",false FROM relation, X WHERE relation.relation IN ('.join(',', map{'?'} @{$indirect_inverse}).') AND relation.related = X.related');
+        push(@bind, map {$_->dbid} @{$indirect_inverse});
+    }
+
+    $sql .= join(' UNION ', @selects);
+    $sql .= ') SELECT related,root FROM X';
+    $sth = $self->dbh->prepare($sql) // die $sql.' -> '.$self->dbh->errstr;
+    $sth->execute(@bind);
+    while (my $row = $sth->fetchrow_arrayref) {
+        my $ent = $self->tag_by_dbid($row->[0]);
+        if ($row->[1]) {
+            push(@root, $ent);
+        } else {
+            push(@entry, $ent);
+        }
+    }
+    $sth->finish;
+
+    return Data::TagDB::Cloudlet->new(db => $self, root => \@root, entry => \@entry);
 }
 
 # Highly experimental!
@@ -906,7 +962,7 @@ Data::TagDB - Work with Tag databases
 
 =head1 VERSION
 
-version v0.16
+version v0.17
 
 =head1 SYNOPSIS
 
@@ -1311,6 +1367,30 @@ The plugin is loaded (as per L<perlfunc/require>) if needed.
 
 The plugin may run startup code.
 So this method might take some time and/or die depending on the nature of the plugin.
+
+=head2 whitelist_plugin
+
+    $db->whitelist_plugin($pkg, ...);
+
+(experimental since v0.17)
+
+This method is for future compatibility. It doesn't do anything yet.
+
+See also:
+L</blacklist_plugin>.
+
+=head2 blacklist_plugin
+
+    $db->blacklist_plugin($pkg, ...);
+
+(experimental since v0.17)
+
+Marks the given plugins as blacklisted. That is they will never be loaded.
+Plugins must be given as package name or as a regex reference (C<qr//>).
+
+B<Note:>
+This should not be used as only security feature to prevent loading code.
+If you don't want to load a plugin for security reasons, make sure to never try to load it.
 
 =head2 tag_by_hint
 

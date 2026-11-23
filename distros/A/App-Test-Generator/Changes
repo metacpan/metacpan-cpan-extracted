@@ -1,5 +1,248 @@
 Revision history for App-Test-Generator
 
+0.52	Sun Nov 22 09:01:22 PM EST 2026
+	[Bug fixes]
+	- A signature-like example in a comment is no longer read as code.
+	  SchemaExtractor took `# my ($password, %opts) = @_;` in extract_all's
+	  own comment for that routine's parameters, so t/app.t's strict-POD
+	  self-test failed on an undocumented $password
+	- The harness's "no file descriptors leaked" check is turned off only for
+	  a call that holds a database handle on purpose, and the documentation
+	  has to say which: a handle returned to the caller that the POD
+	  documents as C<dbh>, a query against the documented SQLite cache
+	  (whose first call builds the cache and keeps the handle on the
+	  object), or the cache builder that stores it.  A routine that merely
+	  mentions the cache no longer qualifies, so Database::Join::add_database
+	  - which disconnects the cache and holds nothing - keeps the check
+	- A routine that takes positional arguments followed by named options
+	  (`my ($password, %opts) = @_`) is now fuzzed with that call shape: the
+	  schema gives the leading arguments their `position` and marks the rest
+	  `named: 1`, and the harness passes them after the positional ones.
+	  Passing every argument by name made
+	  Database::BI::Password::hash_password read the literal key 'password'
+	  as the password, so no empty or NUL-terminated password was ever tried
+	- SchemaExtractor reads a documented numeric range written with words
+	  (`10_000 to 100_000_000 (default 200_000)`) as min/max, and records
+	  the documented default as the new C<sample_max> when the maximum is at
+	  least ten times it: valid data is generated only up to the default
+	  while C<max> stays the documented bound.  A PBKDF2 round count is
+	  fuzzed at its default rather than at a maximum that takes minutes per
+	  call, while an ordinary bounded option (a port, 1 to 65535 with
+	  default 8080) is still generated across its whole range, and the
+	  harness no longer expects out-of-range values such as 66 to be
+	  accepted
+	- App::Test::Generator::CoverageGuidedFuzzer honours the new C<sample_max>
+	  schema key: generated integers and numbers stop at it while C<max>
+	  stays the bound a value is validated against, so a work factor such as
+	  a PBKDF2 round count is fuzzed at its documented default rather than at
+	  a maximum that takes minutes per call.  A mutated number is kept out of
+	  the band between C<sample_max> and C<max>: a value that would land there
+	  becomes C<max + 1> and is refused cheaply, so repeated doubling cannot
+	  creep up into the slow band and record a timeout as a bug.  A mixed-call
+	  schema is called with its single positional argument; the trailing named
+	  options are not built and stay at their defaults
+	- App::Test::Generator::BenchmarkGenerator passes a parameter without a
+	  position after the positional arguments as a `name => value` pair, so a
+	  mixed-call routine is timed as `first(5, option => 42)` instead of with
+	  the option dropped (a required option used to kill every iteration),
+	  and it caps the numeric value it chooses at C<sample_max>, so a work
+	  factor is timed at its default rather than at a maximum that takes
+	  minutes per call
+	- SchemaExtractor reads a =head4 Input section written as a table, one
+	  `name : type` or `$name SCALAR` line per parameter (Database::BI
+	  documents every routine that way): each type is recorded as
+	  documented, a range such as `-90 .. 90` as a bound, "optional"/
+	  "default" as optionality, and "a readable file" as an existing file
+	  the harness supplies.  The missing types made the generated harnesses
+	  expect wrong-typed arguments to die, so most Database::BI routines
+	  failed
+	- SchemaExtractor no longer takes a call to a routine whose name ends in
+	  a filehandle builtin (C<_json_read($path)>) for a filehandle operation
+	  on its argument, which typed the path as IO::Handle
+	- A POD Input section documenting a `$class` invocant marks the routine
+	  as a class method (new schema key C<invocant: class>), so its harness
+	  calls Module->routine(...) rather than Module::routine(...) and does
+	  not shift every argument by one
+	- The generated harness accepts a blessed exception object from a
+	  routine that should die (autodie throws one) as an error with a
+	  message, instead of requiring a plain string
+	- An argument the body only ever calls a method on ($c->req) is an
+	  object the caller supplies, and a method call on undef is an error,
+	  so it is typed object and required: the harness skips the routine
+	  as untestable instead of passing it a string or undef
+	- SchemaExtractor finds a routine's POD when it sits in its own later
+	  block (`=head2 Date normalisation`, then `date_normalise($value,
+	  $pattern)`) rather than above its sub.  An Input table row whose
+	  description names no type still declares the argument as a string,
+	  the table's order gives the call positions, and a code variable
+	  holding a documented positional slot is folded onto the documented
+	  name rather than becoming a second argument
+	- A regex held in a variable ($path =~ $EXT_RE) is no longer recorded
+	  as the matches constraint: the harness emitted the variable name as
+	  a pattern and its test file did not compile
+	- A POD block that documents several helpers at once, with rows such as
+	  `compile_pattern: $pattern   # string`, is read one row per routine;
+	  other routines' rows are not turned into arguments
+	- A POD Input section written as the Perl hash it documents
+	  (`{ name => { type => 'string', optional => 1 } }`) is read as that
+	  hash: its outer keys are the parameters, in call order, and their
+	  inner type, optional and isa fields describe them.  It was read as
+	  table rows, so type, optional and max became parameters of
+	  Lingua::EN::NameCase::nc, and Planner::Isolation::plan lost the
+	  documented `optional => 0` on its strategy
+	- A documented type is no longer replaced by one the code only implied
+	  from an operator in the body, so qr/$pattern/ does not make a string
+	  argument a number, and `//` and `->` are not read as arithmetic
+	  operators when typing a return value
+	- An argument the body refuses when empty ("die ... unless defined $x
+	  && length $x") is required and its empty-string case expects the
+	  error instead of a clean return, in the fuzzer's own cases as well as
+	  the per-parameter ones.  The value the harness passes for it while
+	  another argument is under test is non-empty, so the routine does not
+	  die for a reason the case does not name
+	- A routine whose contract reports invalid input by returning undef
+	  satisfies a generated must-die case by doing so; it was failed for
+	  not also croaking
+	- The harness's environment check treats a variable set to undef as
+	  unset, as perl does, instead of reporting a change it did not make
+	- A constructor is no longer read as an accessor just because it stores
+	  one field, so its arguments keep the types the validator gives them
+	  instead of collapsing to one string (Model::Geocode::new took a
+	  geocoder object, not 'test')
+	- A constructor whose input includes an object it calls methods on with
+	  no can/isa to stand one in (a cache, user agent, geocoder,
+	  translations), or an existing directory of data, is reported as
+	  skipped; its instance methods get new: ~, so the routines that need
+	  the missing object are skipped as a family rather than each failing
+	  at object construction
+	- A POD Input table row written with a \@arrayref or \%hashref sigil,
+	  or with `=>` rather than `:`, now gives its parameter a type,
+	  optionality and position; "one or more" on an arrayref is a minimum
+	  length.  Before, those rows were ignored and the parameters took
+	  whatever the code implied
+	- A string parameter the POD calls an existing directory is marked for
+	  the harness to supply a temporary directory, as an existing file
+	  already was, instead of being fuzzed with a path that cannot satisfy
+	  its -d test
+	- A member list the harness injects itself (its temporary file or
+	  directory) is a fixture, not the routine's documented domain: no
+	  value outside it is expected to die, which the split_path and
+	  file_cache harnesses were failing on
+	- `return \%hash` is typed as a hashref, and the % in \% is no longer
+	  read as a modulo operator: routines that return a hash of results had
+	  no usable output type, or a numeric one
+	- A / or % inside a regex literal is no longer read as arithmetic, so a
+	  routine returning `$text =~ /[0-9%]/ ? $text : undef` is no longer
+	  typed as returning a number (SafeUA::numeric_host, which returns a
+	  dotted-quad string, failed its own output validation).  The same for a
+	  hyphen in a string literal ('Period-over-period' made a hash key a
+	  number), a % in a sprintf format, a `//` read as division, and a `-e`
+	  file test read as subtraction
+	- A return of sprintf, join or a case function is typed as a string,
+	  whatever arithmetic its arguments contain: Util::iso8601_utc and
+	  minute_stamp return timestamps, not numbers
+	- A POD block that follows the code, headed with the routine's name
+	  (`=head2 put`), now documents that routine.  Database::BI::Extract keeps
+	  every method's POD in one block after the subs, so none of its input
+	  types were read and its methods were fuzzed with the code's guesses
+	- A POD input row naming several parameters on one line
+	  (`$spec, $mtime, $size   # as for path`) documents each of them, in call
+	  order.  In a `#` comment the first word is prose, not a type: `# any
+	  spec string` documents a string, not an "any"
+	- A parameter the POD calls the SQLite file's contents is a byte string
+	  (semantic C<bytes>): the harness passes octets instead of text and makes
+	  no byte-order-marker probe, which a byte-oriented write rejects.  The
+	  generator registers C<bytes> among its semantic types, so a schema
+	  carrying it no longer carps "Unknown semantic type 'bytes'" and its
+	  property test draws octets rather than falling back to a text string.
+	  The fuzzer's own case generator draws octets for it too, instead of
+	  warning that the semantic type is unhandled and keeping the text
+	  filler it had built for every other case
+	- Semantic test cases were generated for every semantic type as though it
+	  were a Unix timestamp (the comparison against 'unix_timestamp' was
+	  missing), so a string parameter was expected to die on 2147483648 and
+	  on 0
+	- A routine documented to return a boolean is checked for a truth value,
+	  not for the literal 0 or 1: Perl's false is `''` (defined() returns
+	  it), and Calc::has_error's documented boolean was rejected as invalid
+	- A constructor taking a directory now gets a temporary one made by the
+	  generated test instead of being left unbuilt, so the instance methods
+	  documented to take their data directory are fuzzed rather than skipped
+	  with the class.  A constructor taking a file is still reported as not
+	  auto-buildable: the file usually has to be a module or live under a
+	  particular directory (Mutator, SchemaExtractor), and a random one
+	  would make every instance method of those classes fail
+	- A routine whose POD documents a settings hashref naming a database
+	  and a password needs a live server, so it is reported as skipped; so
+	  is a hashref whose POD states the shape of the whole value ("hashref
+	  of { country code => place rank }", "the existing model store"),
+	  which a generated hash of arbitrary keys cannot satisfy
+	- SchemaExtractor builds a stand-in for a constructor's documented
+	  object list, so the class's instance methods are fuzzed instead of
+	  skipped: the base class comes from the POD ("subclass of
+	  C<Database::Abstraction>") and the canned answers from the join
+	  column's documented default.  The stand-in publishes only that
+	  column, so the constructor's join_column check has a valid fixture
+	  and a documented predicate's column names one
+	- Documented argument shapes are read from the Input spec: "Arrayref
+	  of {col, op, val} predicate hashrefs" fixes the element keys and the
+	  "op -- one of: ..." list their domain, while a hashref documented as
+	  "index => criteria hashref" holds hashrefs rather than strings
+	- A routine taking a variadic list or an argument hash keeps its
+	  documented parameter names instead of turning table row order into
+	  call positions, and a deprecated forwarding alias takes its target's
+	  documented return type
+	- A routine that materialises the object's SQLite cache keeps that
+	  handle open for the next query by design, so the generated harness no
+	  longer reports it as a leaked file descriptor
+	- A type written quoted in an Input hash dump (`insights => 'arrayref'`,
+	  as Database::BI::Summary documents its arguments) types that argument;
+	  the quote was stripped only to recognise the row, so every such
+	  parameter fell back to a string and Summary::generate was fuzzed with
+	  a string where it reads an arrayref
+	- A guarded undef return (`return undef unless ...`) is the routine's
+	  error return, not the type of a successful value: a routine whose
+	  success value is a hashref now reports hashref, so
+	  Database::BI::Calc::span_interval is checked against the record its
+	  POD documents instead of a string
+	- An arrayref documented as holding hashrefs ("insight hashrefs" on
+	  Database::BI::Summary's insights) is fuzzed with hashes rather than
+	  the strings an unshaped arrayref gets, so the routine that reads
+	  `$_->{kind}` from each insight is not handed a string
+	- A documented output shape led by an adverb and an article ("Always an
+	  arrayref of hashrefs", Database::Join::aggregate) is read as the
+	  container: the article after "Always" stopped the shape matching, so
+	  the aggregate's arrayref was checked as a string
+	- SchemaExtractor reads a return of C<localtime> or C<gmtime> as the
+	  nine-element time list it is in list context, with
+	  C<element_type: number>, rather than as a number because of the
+	  arithmetic in its argument.  Database::BI::Util::zone_wall returns a
+	  clock reading that the harness checked as a number
+	- SchemaExtractor reads a regex as an ISO 8601 datetime only when it
+	  spells out a date before the time separator.  Any regex that merely
+	  contained a t and a z qualified, so Database::BI::Util::parse_zone's
+	  C</\A(?:utc|gmt|z)\z/i> (the t of utc, the z of gmt|z) was given an
+	  ISO 8601 C<matches> constraint and every zone it refuses was fuzzed
+	  as valid input
+	- SchemaExtractor joins every pattern a routine accepts a parameter by
+	  into one C<matches> domain.  Only the first was kept, so
+	  Database::BI::Util::parse_zone's C<local> and offset forms were
+	  missing and the fuzzer expected the values it croaks on to survive
+	- The harness expects a wrong-typed number to die only when the
+	  routine's own validator checks the type.  A type inferred from the
+	  code is not a check, so Database::BI::Util::zone_wall's C<$epoch> -
+	  only ever passed to C<localtime> - failed 720 cases for the wrong
+	  types it never promised to reject
+	- A pattern built from the routine's own variables is not a constraint on
+	  the parameter.  q_wrap's delimiter loop matches C</\Q$l\E|\Q$r\E/>,
+	  whose C<\Q>/C<\E> quote nothing once compiled from a string and whose
+	  C<$l>/C<$r> are loop lexicals the schema does not carry, so the
+	  generated harness failed to compile.  A C<return> guarded by
+	  C<unless> also no longer counts as accepting the value it matches
+
+	[ Enhancements ]
+	- Added bin/run-all-fuzz
+
 0.51	Wed Nov 18 09:42:50 PM EST 2026
 	[Bug fixes]
 	- test-generator-mutate compiles each mutant against the project's own lib/

@@ -1,0 +1,25 @@
+#A made-up multinomial logistic model for t/hirisplex.t, in the form
+#trait_predict reads. Its betas are invented round numbers, NOT HIrisPlex-S's:
+#those are not published, and Cn::Bioinf ships no model. What the test checks
+#with it is the arithmetic and the bookkeeping, not anybody's prediction.
+#
+#A category with nothing but an intercept of 0 is the reference category,
+#which is how a multinomial logistic model with k categories is written with
+#k - 1 sets of betas. "(intercept)" stands in for a marker name. Markers are
+#named as the webtool's CSV heads its columns, "<rs number>_<input allele>",
+#which is how hirisplex_genotypes keys the genotypes it returns.
+#
+#eye uses two markers and hair_shade one, so that a trait whose markers are
+#all present and one whose marker is missing are both covered; rs1805005_T is
+#in no category, so the file also covers a marker the model names and the
+#panel has, with a beta that only one trait uses.
+trait	category	marker	beta
+eye	blue	(intercept)	1.5
+eye	blue	rs12913832_T	-2.0
+eye	blue	rs16891982_C	-0.5
+eye	intermediate	(intercept)	0.5
+eye	intermediate	rs12913832_T	-1.0
+eye	brown	(intercept)	0
+hair_shade	light	(intercept)	-0.25
+hair_shade	light	rs1805007_T	1.25
+hair_shade	dark	(intercept)	0

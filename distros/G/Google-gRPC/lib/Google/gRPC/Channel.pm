@@ -217,15 +217,79 @@ sub _on_engine_close {
 
 =head1 NAME
 
-Google::gRPC::Channel - gRPC Channel Abstraction
+Google::gRPC::Channel - Multiplexed HTTP/2 gRPC channel managing streams and keepalive
 
 =head1 SYNOPSIS
 
     use Google::gRPC::Channel;
 
+    my $channel = Google::gRPC::Channel->new(
+        target                => 'spanner.googleapis.com:443',
+        auth_token            => $access_token,
+        engine_type           => 'nghttp2', # or 'pp'
+        timeout               => 30,
+        keepalive_time_sec    => 60,
+        keepalive_timeout_sec => 20,
+    );
+
+    my $stream = $channel->create_stream(
+        service        => 'google.spanner.v1.Spanner',
+        method         => 'CreateSession',
+        request        => $request_msg,
+        response_class => 'Google::Cloud::Spanner::V1::Session',
+        type           => 'unary',
+    );
+
 =head1 DESCRIPTION
 
-This module provides grpc channel abstraction functionality for the Google gRPC Perl client SDK.
+C<Google::gRPC::Channel> represents a single HTTP/2 gRPC channel to a remote
+C<target>. It wraps an underlying HTTP/2 engine (L<Google::gRPC::Engine::NGHTTP2>
+or L<Google::gRPC::Engine::PP>), multiplexes concurrent L<Google::gRPC::Stream>
+instances, injects gRPC pseudo-headers, Bearer authorization, and
+C<grpc-timeout> deadlines, and tracks channel activity for keepalive.
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item * B<target> (required) - Remote C<host:port> authority.
+
+=item * B<auth_token> - Optional OAuth 2.0 Bearer token.
+
+=item * B<engine_type> - Optional engine override (C<'nghttp2'> or C<'pp'>).
+
+=item * B<timeout> - Optional default per-stream deadline.
+
+=item * B<keepalive_time_sec> / B<keepalive_timeout_sec> - Optional HTTP/2 keepalive intervals.
+
+=item * B<engine> - Underlying L<Google::gRPC::Engine> instance.
+
+=item * B<streams> - HashRef of active stream IDs to L<Google::gRPC::Stream> objects.
+
+=item * B<last_activity_time> - High-resolution timestamp of the last stream event.
+
+=back
+
+=head1 METHODS
+
+=head2 create_stream
+
+    my $stream = $channel->create_stream(
+        service        => $service_name,
+        method         => $method_name,
+        request        => $request_msg_or_bytes,
+        response_class => $response_class,
+        type           => 'unary', # 'unary', 'server_stream', 'client_stream', 'bidi'
+        timeout        => 15,      # optional override
+    );
+
+Submits a new HTTP/2 stream on the channel and returns a L<Google::gRPC::Stream>
+handle.
+
+=head1 SEE ALSO
+
+L<Google::gRPC>, L<Google::gRPC::Client>, L<Google::gRPC::ChannelPool>,
+L<Google::gRPC::Stream>, L<Google::gRPC::Engine>
 
 =head1 AUTHOR
 

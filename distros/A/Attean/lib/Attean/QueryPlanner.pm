@@ -7,7 +7,7 @@ Attean::QueryPlanner - Query planner
 
 =head1 VERSION
 
-This document describes Attean::QueryPlanner version 0.040
+This document describes Attean::QueryPlanner version 0.041
 
 =head1 SYNOPSIS
 
@@ -41,14 +41,14 @@ use Attean::Algebra;
 use Attean::Plan;
 use Attean::Expression;
 
-package Attean::QueryPlanner 0.040 {
+package Attean::QueryPlanner 0.041 {
 	use Moo;
 	use Encode qw(encode);
 	use Attean::RDF;
 	use Scalar::Util qw(blessed reftype);
 	use List::Util qw(reduce);
 	use List::Util qw(all any);
-	use Types::Standard qw(Int ConsumerOf InstanceOf);
+	use Types::Standard qw(Int Bool ConsumerOf InstanceOf);
 	use URI::Escape;
 	use Algorithm::Combinatorics qw(subsets);
 	use List::Util qw(min);
@@ -58,6 +58,9 @@ package Attean::QueryPlanner 0.040 {
 	with 'Attean::API::QueryPlanner', 'MooX::Log::Any';
 	has 'counter' => (is => 'rw', isa => Int, default => 0);
 	has 'table_threshold'	=> (is => 'rw', isa => Int, default => 10);
+	
+	# use this to suppress the use of the query-defined dataset (e.g. in cases where the dataset is defined via protocol and implemented via a Model-layer wrapper)
+	has 'suppress_dataset'	=> (is => 'rw', isa => Bool, default => 0);
 
 =back
 
@@ -130,7 +133,7 @@ the supplied C<< $active_graph >>.
 			my @active_graphs	= @$active_graphs;
 			my @default_graphs	= @$default_graphs;
 			
-			if ($algebra->can('dataset')) {
+			if ($algebra->can('dataset') and not $self->suppress_dataset) {
 				my $dataset	= $algebra->dataset;
 				my @default	= @{ $dataset->{'default'} || [] };
 				my $named	= $dataset->{'named'};
@@ -653,6 +656,14 @@ the supplied C<< $active_graph >>.
 		die "Unimplemented algebra evaluation for: " . $algebra->as_string;
 	}
 	
+=item C<< replace_blanks_with_variables ( \%blanks, \@triples ) >>
+
+For each of the triples in the supplied arrayref, replace (in-place) any
+blank nodes with fresh variables, using C<%blanks> as a cache of blank node
+label to variable mappings.
+
+=cut
+
 	sub replace_blanks_with_variables {
 		my $self	= shift;
 		my $blanks	= shift;

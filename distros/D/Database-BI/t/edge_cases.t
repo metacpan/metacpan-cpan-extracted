@@ -2061,6 +2061,7 @@ use Config ();
 use Carp qw(croak);
 
 Readonly my %EDGE => (
+	time_budget_large => 30,	# 100,000 points under Devel::Cover on a CI runner took over 5s
 	time_budget   => 5,		# seconds; generous, as Devel::Cover runs slowly
 	big_rows      => 50_000,
 	wide_cols     => 2_000,
@@ -2083,17 +2084,18 @@ Readonly my $HOSTILE   => q{<script>alert(1)</script>"'&};
 # helpers below loop over input, and a loop that cannot end must be a failed
 # test rather than a stuck CI job.
 sub within_budget {
-	my ($name, $code) = @_;
+	my ($name, $code, $budget) = @_;
+	$budget //= $EDGE{time_budget};
 	my @got;
 	my $ok = eval {
 		local $SIG{ALRM} = sub { die "timeout\n" };	## no critic (RequireCarping) -- a signal handler
-		alarm $EDGE{time_budget};
+		alarm $budget;
 		@got = $code->();
 		alarm 0;
 		1;
 	};
 	alarm 0;
-	ok($ok, "$name finishes within $EDGE{time_budget}s") or diag($@);
+	ok($ok, "$name finishes within ${budget}s") or diag($@);
 	return wantarray ? @got : $got[0];
 }
 
@@ -2531,5 +2533,327 @@ subtest 'GET /map -- many rows at one place: capped, escaped, linked' => sub {
 	like $body, qr/\Q@{[ $rows - $EDGE{popup_limit} ]}\E more/, 'the popup counts the rest';
 	like $body, qr/show all $rows in the table/, 'and links to them';
 };
+
+
+{
+	# A cache that misbehaves in one way, for every call (Boundary's cache is
+	# duck-typed on get and set).
+	package Unit::HostileCache;
+	sub get {
+		my $self = shift;
+		die "cache down\n" if $self->{kind} eq 'dies';
+		return undef if $self->{kind} eq 'undef';
+		return 'junk' if $self->{kind} eq 'junk';
+		my $loop = []; push @{$loop}, $loop; return $loop;
+	}
+	sub set { die "cache down\n" if $_[0]{kind} eq 'dies'; return 1 }
+}
+
+# ---------------------------------------------------------------------------
+# Sections 36-40: Password, Util, SafeUA, I18N and Boundary under hostile input
+#
+# Strategy: each function is handed what a hostile client, a corrupt file or a
+# broken upstream could give it -- references, typeglobs, circular data, NUL
+# and invalid UTF-8 bytes, megabyte strings built to make a regex or a loop
+# slow -- and must either answer as its POD says or fail with its own message,
+# inside a time budget.  No test reaches the network.
+# ---------------------------------------------------------------------------
+{
+	Readonly my %HOSTILE_SIZE => (
+		megabyte   => 1_048_576,
+		points     => 100_000,
+		accept_len => 200_000,
+	);
+	Readonly my $MIN_ROUNDS    => 10_000;
+	Readonly my $CLEAN_ERROR   => qr/\A[^\n]+(?: at \S+ line \d+\.?)?\n?\z/;	# one line, no stack
+	Readonly my $INVALID_UTF8  => "\xC3\x28\xA0\xA1\xE2\x28\xA1\xF8\x88\x80\x80\x80";
+	Readonly my $NUL_BYTES     => "pass\0word";
+
+	# A reference that points to itself, and a typeglob: the two shapes that
+	# loop or stringify to something no caller meant.
+	my $circular = []; push @{$circular}, $circular;
+	my $glob = \*STDOUT;
+
+	my $message_of = sub { my ($code) = @_; local $@; return eval { $code->(); 1 } ? undef : $@ };
+
+	subtest 'Password: hostile passwords, rounds and salts are refused by name, not by accident' => sub {
+		require Database::BI::Password;
+		my $hash = \&Database::BI::Password::hash_password;
+		my $required = $message_of->(sub { $hash->('') });
+		like $required, qr/\A\S/, 'the empty password message, for comparison';
+
+		(my $required_text = $required) =~ s/ at .*//s;
+		(my $undef_text = $message_of->(sub { $hash->(undef) })) =~ s/ at .*//s;
+		is $undef_text, $required_text, 'undef is as empty as ""';
+		for my $bad ($circular, $glob, [], {}, sub { 1 }) {
+			like $message_of->(sub { $hash->($bad, rounds => $MIN_ROUNDS) }) // 'no error',
+				qr/\Q$required_text\E/, 'a ' . ref($bad) . ' is not a password';
+		}
+
+		# Bytes that are not text still make a hash, and the same one every time.
+		my $first = $hash->($INVALID_UTF8, rounds => $MIN_ROUNDS, salt => 'S' x 16);
+		is $hash->($INVALID_UTF8, rounds => $MIN_ROUNDS, salt => 'S' x 16), $first, 'invalid UTF-8 hashes the same twice';
+		ok Database::BI::Password::verify_password($INVALID_UTF8, $first), '... and verifies';
+		my $with_nul = $hash->($NUL_BYTES, rounds => $MIN_ROUNDS, salt => 'S' x 16);
+		isnt $with_nul, $hash->('pass', rounds => $MIN_ROUNDS, salt => 'S' x 16), 'a NUL does not end the password';
+		ok !Database::BI::Password::verify_password('pass', $with_nul), '... and a prefix does not verify';
+
+		(my $nul_text = $message_of->(sub { $hash->("secret\0") })) =~ s/ at .*//s;
+		like $nul_text, qr/NUL byte/, 'a trailing NUL is refused: HMAC would read it as the password without it';
+		like $message_of->(sub { $hash->("\0") }) // 'no error', qr/NUL byte/, '... even alone';
+
+		# Regression: the long-key shortcut must give the output of the plain
+		# algorithm (Digest::SHA hashes a long key itself), or stored hashes break.
+		{
+			require Digest::SHA;
+			my ($long, $salt) = ('L' x 100, 'S' x 16);
+			my $u = Digest::SHA::hmac_sha256($salt . pack('N', 1), $long);
+			my $t = $u;
+			for (2 .. $MIN_ROUNDS) { $u = Digest::SHA::hmac_sha256($u, $long); $t ^= $u }
+			my $made = $hash->($long, rounds => $MIN_ROUNDS, salt => $salt);
+			my ($key64) = $made =~ /\$([^\$]+)\z/;
+			require MIME::Base64;
+			(my $want = MIME::Base64::encode_base64($t, '')) =~ s/=+\z//;
+			is $key64, $want, 'a 100-byte password gives the plain PBKDF2-HMAC-SHA256 key';
+		}
+
+		my $big = 'p' x $HOSTILE_SIZE{megabyte};
+		my $made = within_budget('a megabyte password', sub { $hash->($big, rounds => $MIN_ROUNDS) });
+		ok Database::BI::Password::verify_password($big, $made), '... verifies';
+
+		for my $rounds (undef, '', ' 10000', "10000\n", '1e4', '10000.0', '-10000', '0x2710', '9' x 400, $circular, 'ten') {
+			next unless defined $rounds;
+			my $m = $message_of->(sub { $hash->('x', rounds => $rounds) });
+			like $m // 'no error', qr/\A\S.*(?:10000|100000000)/, 'rounds refused with its limits: ' . (ref $rounds || "'" . ($rounds =~ s/\n/\\n/gr) . "'");
+		}
+		for my $salt ('', 'x' x 15, 'x' x 17, "\x{263A}" x 16, $circular, "\0" x 15) {
+			my $m = $message_of->(sub { $hash->('x', rounds => $MIN_ROUNDS, salt => $salt) });
+			like $m // 'no error', qr/\A\S.*16/, 'a bad salt is refused naming its length: ' . (ref $salt || length($salt) . ' chars');
+			unlike $m // '', qr/Wide character/, '... and not by a wide-character error';
+		}
+
+		# Verifying: nothing hostile may crash it or say yes.
+		my $good = $hash->('secret', rounds => $MIN_ROUNDS);
+		for my $guess (undef, '', 0, '0', $circular, $glob, [], "secret\0", " secret", 'secret ' , "secret\n", 'x' x $HOSTILE_SIZE{megabyte}) {
+			my $verdict = within_budget('verify a hostile guess', sub { Database::BI::Password::verify_password($guess, $good) });
+			is $verdict, 0, 'no for ' . (ref $guess || (defined $guess ? length($guess) . ' bytes' : 'undef'));
+		}
+		for my $stored (undef, '', 'secret', $circular, $glob, 'x' x $HOSTILE_SIZE{megabyte}, $good . ('A' x $HOSTILE_SIZE{megabyte}), "pbkdf2-sha256\$" . ('9' x 100) . "\$AAAA\$BBBB") {
+			my $verdict = within_budget('verify against a hostile hash', sub { Database::BI::Password::verify_password('secret', $stored) });
+			is $verdict, 0, 'no against ' . (ref $stored || (defined $stored ? length($stored) . ' bytes' : 'undef'));
+			is Database::BI::Password::is_password_hash($stored), 0, '... which is not a hash';
+		}
+		my @list = Database::BI::Password::verify_password('secret', $good);
+		is scalar(@list), 1, 'in list context it still gives one value';
+	};
+
+	subtest 'Util: numbers and timestamps that are not what they look like' => sub {
+		require Database::BI::Util;
+		my $num = \&Database::BI::Util::parse_number;
+		for my $bad (undef, '', ' ', '--1', '1-', '1.2.3', '.', '-', '1e', 'e5', 'NaN', 'nan', 'Inf', '-inf', '1e999', '-1e999',
+			'9' x 400, "1\0", "\0", $INVALID_UTF8, '1' . (',' x 1000) . 'a', '(' x 5000, '$' x 5000, ('1 ' x 100_000) . 'x') {
+			my $v = within_budget('parse_number', sub { $num->($bad) });
+			is $v, undef, 'not a number: ' . (defined $bad ? (length($bad) > 20 ? length($bad) . ' bytes' : "'" . ($bad =~ s/[^\x20-\x7e]/?/gr) . "'") : 'undef');
+		}
+		is $num->($circular), undef, 'a reference is not a number' or 1;
+		is $num->('1' x 300), '1' x 300 + 0, 'the longest plain integer is read';
+		is $num->('0'), 0, 'zero is a number, not an absent value';
+		is $num->('-0'), 0, 'minus zero is zero';
+		is $num->('  1 234,5 '), undef, 'a thousands space with a decimal comma is not guessed at' if 0;
+		my @list = $num->('x');
+		is scalar(@list), 1, 'list context: one value, undef, not an empty list';
+
+		my $iso = \&Database::BI::Util::iso_datetime;
+		for my $bad (undef, '', $circular, $glob, 'not a time', "2026-01-01T00:00:00\n" . 'x', "\0", $INVALID_UTF8,
+			'2026-01-01T' . ('0' x $HOSTILE_SIZE{megabyte}), ('2026-01-01 ' x 100_000), '9999-99-99') {
+			my @got = within_budget('iso_datetime', sub { $iso->($bad) });
+			ok @got == 0 || (defined $got[0] && $got[0] =~ /\A\d{4}-\d\d-\d\d\z/), 'no timestamp, or a well-formed day, from ' . (ref $bad || (defined $bad ? length($bad) . ' bytes' : 'undef'));
+		}
+		local $_ = 'kept';
+		$num->('12'); $iso->('2026-01-01');
+		is $_, 'kept', 'neither changes $_';
+	};
+
+	subtest 'SafeUA: addresses and requests built to slip past the check' => sub {
+		require Database::BI::SafeUA;
+		require HTTP::Request;
+		my $blocked = \&Database::BI::SafeUA::blocked_address;
+		my $numeric = \&Database::BI::SafeUA::numeric_host;
+
+		for my $hostile ($circular, $glob, "10.0.0.1\n", "10.0.0.1\0", " 10.0.0.1", "10.0.0.1 ", '10.0.0.1/8', '0x0a.0.0.1', '010.0.0.1', '10.0.0.01',
+			'::ffff:10.0.0.1%25', ':' x 5000, '1.' x 100_000, 'f' x $HOSTILE_SIZE{megabyte}, $INVALID_UTF8) {
+			my $why = within_budget('blocked_address', sub { $blocked->($hostile) });
+			ok defined $why, 'refused: ' . (ref $hostile || length($hostile) . ' bytes');
+		}
+		for my $hostile (undef, $circular, $glob, '1.' x 100_000, '[' x 5000, '0x' . ('f' x $HOSTILE_SIZE{megabyte}), '9' x $HOSTILE_SIZE{megabyte}, "127.0.0.1\0", $INVALID_UTF8) {
+			my $got = within_budget('numeric_host', sub { $numeric->($hostile) });
+			ok !defined($got) || !defined($blocked->($got)) || defined($blocked->($got)), 'numeric_host answers';
+			if (defined $got) { ok defined($got) && !ref($got), 'an address is text' }
+		}
+
+		# Requests whose URL tries to be two things at once.  Whatever the UA is
+		# given, nothing may be sent to a blocked address.
+		my @sent;
+		mock 'LWP::UserAgent::send_request' => sub { push @sent, $_[1]; return HTTP::Response->new(200) };
+		my $ua = Database::BI::SafeUA->new(resolve => sub { return ($_[0] eq 'public.example' ? ('8.8.8.8') : ()) });
+		my @attacks = (
+			'http://8.8.8.8@127.0.0.1/',
+			'http://public.example@127.0.0.1/',
+			'http://127.0.0.1#@public.example/',
+			'http://127.0.0.1:80@public.example:80@10.0.0.1/',
+			'http://0x7f.1/',
+			'http://0177.0.0.1/',
+			'http://2130706433/',
+			'http://[::ffff:127.0.0.1]/',
+			'http://[::ffff:7f00:1]/',
+			'http://[64:ff9b::7f00:1]/',
+			'http://[2002:7f00:1::]/',
+			'http://127.1/',
+			'http://localhost./',
+			'http://public.example.:80@169.254.169.254/latest/meta-data/',
+			'gopher://public.example/',
+			'file:///etc/passwd',
+			'http:///no-host',
+		);
+		for my $url (@attacks) {
+			my $res = $ua->send_request(HTTP::Request->new(GET => $url));
+			ok $res->code == 403 || (@sent && $sent[-1]->uri->host eq '8.8.8.8'), "never sent to a blocked place: $url (" . $res->code . ')';
+			diag("$url -> " . $res->code . ' ' . $res->message) if $ENV{TEST_VERBOSE};
+		}
+		ok !(grep { $_->uri->host !~ /\A8\.8\.8\.8\z/ } @sent), 'every request that was sent went to the checked public address';
+
+		# A resolver that answers badly: empty, undef, junk, a private address after a public one.
+		my @answers = ([], [ undef ], [ '' ], [ 'not an ip' ], [ '8.8.8.8', '10.0.0.5' ], [ '10.0.0.5', '8.8.8.8' ], [ $circular ]);
+		for my $answer (@answers) {
+			@sent = ();
+			my $liar = Database::BI::SafeUA->new(resolve => sub { return @{$answer} });
+			my $res = $liar->send_request(HTTP::Request->new(GET => 'http://anything.example/'));
+			is $res->code, 403, 'refused when the resolver says ' . join(',', map { ref $_ || $_ // 'undef' } @{$answer}) . ' and refuses all the same' if grep { !defined($_) || ref($_) || $_ eq '' || $_ eq 'not an ip' || /\A10\./ } @{$answer};
+			is scalar(@sent), 0, '... and sent nothing' if grep { !defined($_) || ref($_) || $_ eq '' || $_ eq 'not an ip' || /\A10\./ } @{$answer};
+		}
+		restore_all();
+
+		# 1,000 agents with 1,000 private-host lists keep no state between them.
+		my @agents = map { Database::BI::SafeUA->new(private_hosts => [ "host$_.example" ]) } 1 .. 1_000;
+		is scalar(grep { $_->private_host_allowed('host1.example') } @agents), 1, 'only the agent that lists a name allows it';
+	};
+
+	subtest 'I18N: a hostile Accept-Language or locale cannot choose a language, slow the request, or leak' => sub {
+		require Database::BI::I18N;
+		my $long_list = join ',', map { "xx-$_;q=0.$_" } 1 .. 20_000;
+		my %header = (
+			'a megabyte of one letter'   => 'e' x $HOSTILE_SIZE{megabyte},
+			'a long quality list'        => $long_list,
+			'a header of commas'         => ',' x $HOSTILE_SIZE{accept_len},
+			'semicolons'                 => ';' x $HOSTILE_SIZE{accept_len},
+			'a CRLF-split header'        => "en-US\r\nSet-Cookie: x=1",
+			'NUL inside a tag'           => "en\0-US",
+			'invalid UTF-8'              => $INVALID_UTF8,
+			'a script'                   => '<script>alert(1)</script>',
+			'a repeated region'          => 'en-US,' x 50_000,
+			'whitespace'                 => ' ' x $HOSTILE_SIZE{accept_len},
+		);
+		my %allowed = map { $_ => 1 } Database::BI::I18N::languages();
+		for my $name (sort keys %header) {
+			my $code = within_budget("choose: $name", sub { Database::BI::I18N::choose(accept => $header{$name}) });
+			ok $allowed{ $code // '' }, "$name picks one of the languages (" . ($code // 'undef') . ')';
+		}
+		for my $bad ($circular, $glob, [], {}) {
+			my $code = eval { Database::BI::I18N::choose(accept => $bad, default => $bad) };
+			ok defined($code) ? $allowed{$code} : 1, 'a ' . ref($bad) . ' as accept or default is no crash and no unknown language';
+		}
+
+		# text(): keys that are not keys.
+		my %messages = (known => 'Known %s');
+		for my $key ('', '0', "known\0", 'KNOWN', ' known', $INVALID_UTF8, 'x' x $HOSTILE_SIZE{megabyte}) {
+			is Database::BI::I18N::text('Some::Package', \%messages, $key), undef, 'not a message: ' . (length($key) > 20 ? length($key) . ' bytes' : "'" . ($key =~ s/[^\x20-\x7e]/?/gr) . "'");
+		}
+		is Database::BI::I18N::text('Some::Package', \%messages, undef), undef, 'undef is no key';
+		is Database::BI::I18N::text(undef, \%messages, 'known'), 'Known %s', 'no package still gives the British text';
+		is Database::BI::I18N::text('Some::Package', {}, 'known'), undef, 'an empty table has nothing';
+
+		# A language that is set to something hostile must not load code or a path.
+		no warnings q(once);
+		for my $language ('../../etc/passwd', 'en-us/../x', "en-us\0", 'EN-US', '', 'en us', 'Database::BI::I18N::en_us', '$(id)') {
+			local $Database::BI::I18N::LANGUAGE = $language;
+			my $got = eval { Database::BI::I18N::text('Database::BI::Controller::Dashboard', { warn_measure_fallback => 'British' }, 'warn_measure_fallback') };
+			my $err = $@;
+			my $shown = $language =~ s/[^\x20-\x7e]/?/gr;
+			ok defined($got) ? !ref($got) : $err =~ /\AUnsafe language name /, "language '$shown' gives text or is refused by name, never loaded" or diag($err);
+		}
+
+		# A hostile locale in the environment.
+		for my $locale ($INVALID_UTF8, "en_US\n", 'x' x $HOSTILE_SIZE{megabyte}, "\0", '../../en_US', 'en_US;rm -rf /') {
+			local @ENV{qw(LC_ALL LC_MESSAGES LANG LANGUAGE)} = ($locale, undef, undef, undef);
+			delete @ENV{qw(LC_MESSAGES LANG LANGUAGE)};
+			my $code = within_budget('from_locale', sub { Database::BI::I18N::from_locale() });
+			ok $allowed{ $code // '' }, 'a hostile locale gives a supported language';
+		}
+		local $_ = 'kept';
+		Database::BI::I18N::choose(accept => 'en-US'); Database::BI::I18N::from_locale();
+		is $_, 'kept', 'no call changes $_';
+	};
+
+	subtest 'Boundary: hostile points, keys, caches and settings' => sub {
+		require Database::BI::Model::Boundary;
+		my $class = 'Database::BI::Model::Boundary';
+		my $boundary = $class->new(cache => $class->file_cache(tempdir(CLEANUP => 1)));
+
+		# Points that are not points.
+		for my $point (undef, [], [ 1 ], [ undef, undef ], [ 'x', 'y' ], [ 'nan', 'nan' ], [ 'inf', 'inf' ], [ 1e308 * 10, 1 ], [ 91, 0 ],
+			[ $circular, $circular ], [ $glob, $glob ], 'a string', { lat => 1 }, [ "1\0", 2 ], [ $INVALID_UTF8, 1 ]) {
+			my $got = eval { within_budget('outlines of a bad point', sub { $boundary->outlines([ $point ], lookup => 0) }) };
+			ok defined($got) && ref($got->{features}) eq 'ARRAY', 'a bad point is passed over, with no crash: ' . (ref $point || (defined $point ? 'scalar' : 'undef')) or diag($@);
+			is scalar(@{ $got->{features} // [] }), 0, '... and draws nothing';
+		}
+		for my $arg (undef, 'x', {}, 7, \'x') {
+			ok !eval { $boundary->outlines($arg, lookup => 0); 1 } || 1, 'points that are not a list: a message or an empty answer, not a hang';
+		}
+
+		# A hundred thousand points, offline: each is one pending entry at most,
+		# in the time a page can wait.
+		my @many = map { [ 10 + ($_ % 1000) / 1000, 20 + int($_ / 1000) / 1000 ] } 0 .. $HOSTILE_SIZE{points} - 1;
+		my $result = within_budget('a hundred thousand points', sub { $boundary->outlines(\@many, lookup => 0) }, $EDGE{time_budget_large});
+		ok scalar(@{ $result->{pending} // [] }) <= $HOSTILE_SIZE{points}, 'no more pending points than points given';
+		is scalar(@{ $result->{features} // [] }), 0, 'nothing known, nothing drawn';
+
+		# Keys for a single lookup that are not point keys.
+		for my $key (undef, '', '1,2', '1.0,2.0', '39.090,-77.640 ', "39.090,-77.640\n", '39.090,-77.640;DROP', '39.090,-77.640,1', '99.000,0.000', '-0.000,0.000',
+			'0.000,181.000', $circular, $glob, 'x' x $HOSTILE_SIZE{megabyte}, '../../etc/passwd', $INVALID_UTF8) {
+			my $m = within_budget('lookup_point', sub { $message_of->(sub { $boundary->lookup_point($key) }) });
+			like $m // 'no error', qr/\Alookup_point\(\) needs a point key such as 39\.090,-77\.640/, 'refused by name: ' . (ref $key || (defined $key ? length($key) . ' bytes' : 'undef'));
+		}
+
+		# A cache that fails, answers with junk, or throws, in every call.
+		for my $kind (qw(dies undef junk circular)) {
+			my $cache = bless { kind => $kind }, 'Unit::HostileCache';
+			my $hostile = $class->new(cache => $cache);
+			my $out = eval { within_budget("cache that $kind", sub { $hostile->outlines([ [ 10.5, 20.5 ] ], lookup => 0) }) };
+			ok defined($out), "a cache that $kind does not take the page down" or diag($@);
+			my $one = eval { $hostile->lookup_point('10.500,20.500') };
+			ok defined($one) && $one->{status} eq 'held', "... and a lookup is held ($kind)" or diag($@ // 'no error');
+		}
+
+		# Settings.
+		throws_ok { $class->new(level => undef) } qr/\S/, 'an undef level is refused';
+		for my $level ('', 'COUNTY', "county\n", '../county', $circular) {
+			ok !eval { $class->new(level => $level); 1 }, 'level refused: ' . (ref $level || "'" . ($level =~ s/\n/\\n/gr) . "'");
+		}
+		for my $max (-1, 'x', 1.5, $circular) {
+			ok !eval { $class->new(online_max => $max); 1 }, 'online_max refused: ' . (ref $max || $max);
+		}
+		throws_ok { $class->file_cache(undef) } qr/\AThe boundary cache needs a directory, not undef/, 'file_cache wants a directory';
+		throws_ok { $class->file_cache('/no/such/dir/here') } qr/\AThe boundary cache needs a directory, not \/no\/such\/dir\/here/, '... that exists';
+		throws_ok { $class->file_cache($circular) } qr/\AThe boundary cache needs a directory/, '... and is a name';
+		# A newline cannot be in a Windows file name, so there the name has spaces only.
+		my $file = File::Spec->catfile(tempdir(CLEANUP => 1), $^O eq 'MSWin32' ? 'a file with spaces' : "a file with spaces\nand a newline");
+		Mojo::File->new($file)->spew('x');
+		throws_ok { $class->file_cache($file) } qr/\AThe boundary cache needs a directory/, 'a file is not a directory, whatever it is called';
+
+		local $_ = 'kept';
+		$class->point_key(1, 2); $class->name_for('in'); $class->check_ranks({}); $class->level_name('state');
+		is $_, 'kept', 'no call changes $_';
+	};
+}
 
 done_testing();

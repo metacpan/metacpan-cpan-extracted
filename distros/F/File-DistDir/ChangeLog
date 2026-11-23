@@ -1,0 +1,42 @@
+Sat Nov 21 17:14:37  Rob Lauer  rclauer@gmail.com
+
+	[1.0.0]:
+
+	* .gitignore: new
+	* .includes/add-plugin.mk: new
+	* .includes/bash-completion.mk: new
+	* .includes/bootstrap.mk: new
+	* .includes/build-init.mk: new
+	* .includes/builder.mk: new
+	* .includes/git.mk: new
+	* .includes/help.mk: new
+	* .includes/local.mk: new
+	* .includes/modulino.mk: new
+	* .includes/perl.mk: new
+	* .includes/test.mk: new
+	* .includes/update.mk: new
+	* .includes/upgrade.mk: new
+	* .includes/version.mk: new
+	* ChangeLog: new
+	* Makefile: new
+	* README.md: new
+	* VERSION: new
+	* bin/dist-dir.in: new
+	* builder.env: new
+	* builder: new
+	* buildspec.yml: new
+	* config.mk: new
+	* cpanfile: new
+	* deps.mk: new
+	* lib/File/DistDir.pm.in: new
+	* lib/File/DistDir/CLI.pm.in: new
+	* recommends: new
+	* requires: new
+	* resources: new
+	* suggests: new
+	* t/00-file-distdir.t: new
+	* t/01-distdir-api.t: new
+	* test-requires.cpanfile: new
+	* test-requires: new
+	* .roles/CPAN-Maker-Bootstrapper-Role-PAUSEUpload/role.mk: new
+	* .roles/CPAN-Maker-Bootstrapper-Role-PAUSEUpload/role.yml: new

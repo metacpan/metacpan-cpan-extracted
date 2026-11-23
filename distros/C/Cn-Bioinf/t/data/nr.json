@@ -1,0 +1,105 @@
+{
+"BlastOutput2": [
+{
+    "report": {
+      "program": "blastp",
+      "version": "BLASTP 2.17.0+",
+      "reference": "Stephen F. Altschul, Thomas L. Madden, Alejandro A. Sch&auml;ffer, Jinghui Zhang, Zheng Zhang, Webb Miller, and David J. Lipman (1997), \"Gapped BLAST and PSI-BLAST: a new generation of protein database search programs\", Nucleic Acids Res. 25:3389-3402.",
+      "search_target": {
+        "db": "nr.db"
+      },
+      "params": {
+        "matrix": "BLOSUM62",
+        "expect": 10,
+        "gap_open": 11,
+        "gap_extend": 1,
+        "filter": "F",
+        "cbs": 2
+      },
+      "results": {
+        "search": {
+          "query_id": "Query_1",
+          "query_title": "q",
+          "query_len": 52,
+          "hits": [
+            {
+              "num": 1,
+              "description": [
+                {
+                  "id": "sp|P11111.1|",
+                  "accession": "P11111",
+                  "title": "protein A [Org one]"
+                },
+                {
+                  "id": "sp|P22222.1|",
+                  "accession": "P22222",
+                  "title": "protein A [Org two]"
+                }
+              ],
+              "len": 77,
+              "hsps": [
+                {
+                  "num": 1,
+                  "bit_score": 104.76,
+                  "score": 260,
+                  "evalue": 5.62954e-37,
+                  "identity": 52,
+                  "positive": 52,
+                  "query_from": 1,
+                  "query_to": 52,
+                  "hit_from": 1,
+                  "hit_to": 52,
+                  "align_len": 52,
+                  "gaps": 0,
+                  "qseq": "MKVLAAGIVGLLLAQSAFAQEEKKTEVLNVGSTPYESFKKAAEGAGIDFHVF",
+                  "hseq": "MKVLAAGIVGLLLAQSAFAQEEKKTEVLNVGSTPYESFKKAAEGAGIDFHVF",
+                  "midline": "MKVLAAGIVGLLLAQSAFAQEEKKTEVLNVGSTPYESFKKAAEGAGIDFHVF"
+                }
+              ]
+            },
+            {
+              "num": 2,
+              "description": [
+                {
+                  "id": "sp|P33333.1|",
+                  "accession": "P33333",
+                  "title": "protein B"
+                }
+              ],
+              "len": 73,
+              "hsps": [
+                {
+                  "num": 1,
+                  "bit_score": 95.5153,
+                  "score": 236,
+                  "evalue": 2.26721e-33,
+                  "identity": 47,
+                  "positive": 47,
+                  "query_from": 6,
+                  "query_to": 52,
+                  "hit_from": 1,
+                  "hit_to": 47,
+                  "align_len": 47,
+                  "gaps": 0,
+                  "qseq": "AGIVGLLLAQSAFAQEEKKTEVLNVGSTPYESFKKAAEGAGIDFHVF",
+                  "hseq": "AGIVGLLLAQSAFAQEEKKTEVLNVGSTPYESFKKAAEGAGIDFHVF",
+                  "midline": "AGIVGLLLAQSAFAQEEKKTEVLNVGSTPYESFKKAAEGAGIDFHVF"
+                }
+              ]
+            }
+          ],
+          "stat": {
+            "db_num": 2,
+            "db_len": 150,
+            "hsp_len": 8,
+            "eff_space": 5896,
+            "kappa": 0.041,
+            "lambda": 0.267,
+            "entropy": 0.14
+          }
+        }
+      }
+    }
+  }
+]
+}

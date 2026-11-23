@@ -8,7 +8,7 @@ require Exporter;
 our @EXPORT = qw(dd ddx);
 our @EXPORT_OK = qw(dump pp dumpf quote);
 
-our $VERSION = "1.26";
+our $VERSION = "1.27";
 our $DEBUG = 0;
 
 use overload ();

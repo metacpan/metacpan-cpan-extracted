@@ -33,8 +33,13 @@ for my $dir (@ssl_search_dirs) {
   }
 }
 
-my $is_win32     = $^O eq 'MSWin32';
-my $proxy_target = $is_win32 ? 'bin/gcloud-auth.ps1' : 'bin/gcloud-auth';
+my $is_win32  = $^O eq 'MSWin32';
+my @exe_files = ('bin/gcloud-auth');
+my %pl_files;
+if ($is_win32) {
+  $pl_files{'bin/gcloud-auth.PL'} = 'bin/gcloud-auth.ps1';
+  push @exe_files, 'bin/gcloud-auth.ps1';
+}
 
 WriteMakefile(
   NAME               => 'Google::Auth',
@@ -42,7 +47,7 @@ WriteMakefile(
   VERSION_FROM       => 'lib/Google/Auth.pm',
   ABSTRACT_FROM      => 'lib/Google/Auth.pm',
   LICENSE            => 'apache_2_0',
-  PL_FILES           => {'bin/gcloud-auth.PL' => $proxy_target},
+  PL_FILES           => \%pl_files,
   LIBS               => [$libs_flags],
   INC                => $inc_flags,
   OBJECT             => '$(O_FILES)',
@@ -53,21 +58,40 @@ WriteMakefile(
   TEST_REQUIRES => {
     'Test::Exception'      => '0',
     'Test::LWP::UserAgent' => '0',
+    'Test::MockModule'     => '0',
     'Test::More'           => '0',
     'Test::Perl::Critic'   => '0',
   },
   PREREQ_PM => {
-    'Capture::Tiny' => '0.48',
-    'Future'        => '0',
-    'JSON::MaybeXS' => '0',
-    'Log::Any'      => '0',
-    'Moo'           => '0',
-    'URI'           => '0',
+    'Capture::Tiny'                          => '0.48',
+    'Future'                                 => '0',
+    'Google::Api::Common'                    => '0.05',
+    'Google::Cloud::Transport::Adapter::LWP' => '0',
+    'JSON::MaybeXS'                          => '0',
+    'Log::Any'                               => '0',
+    'Moo'                                    => '0',
+    'URI'                                    => '0',
   },
-  EXE_FILES => ['bin/gcloud-auth.pl', $proxy_target],
-  dist      => {COMPRESS => 'gzip -9f', SUFFIX => 'gz',},
-  clean     => {
-    FILES => 'Google-Auth-Library-Perl-* bin/gcloud-auth bin/gcloud-auth.ps1'
+  EXE_FILES  => \@exe_files,
+  META_MERGE => {
+    'meta-spec' => {version => 2},
+    resources   => {
+      repository => {
+        type => 'git',
+        url  =>
+          'https://github.com/GoogleCloudPlatform/google-auth-library-perl.git',
+        web =>
+          'https://github.com/GoogleCloudPlatform/google-auth-library-perl',
+      },
+      bugtracker => {
+        web =>
+'https://github.com/GoogleCloudPlatform/google-auth-library-perl/issues',
+      },
+    },
+  },
+  dist  => {COMPRESS => 'gzip -9f', SUFFIX => 'gz',},
+  clean => {
+    FILES => 'Google-Auth-Library-Perl-* bin/gcloud-auth.ps1'
   },
 );
 

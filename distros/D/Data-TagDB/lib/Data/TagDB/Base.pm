@@ -13,7 +13,7 @@ use warnings;
 use Carp;
 use List::Util qw(any);
 
-our $VERSION = v0.16;
+our $VERSION = v0.17;
 
 my %_plugin_attr_pkg_map = (
     'Data::TagDB'           => 'db_attributes',
@@ -168,7 +168,7 @@ Data::TagDB::Base - Work with Tag databases
 
 =head1 VERSION
 
-version v0.16
+version v0.17
 
 =head1 SYNOPSIS
 

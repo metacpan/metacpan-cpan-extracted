@@ -228,3 +228,71 @@ sub fetch_access_token {
 }
 
 1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Auth::ServiceAccountCredentials - OAuth 2.0 JWT credentials for Google Cloud service account JSON keys
+
+=head1 SYNOPSIS
+
+    use Google::Auth::ServiceAccountCredentials;
+
+    my $creds = Google::Auth::ServiceAccountCredentials->new(
+        json_key_io => '/path/to/service-account.json',
+        scope       => ['https://www.googleapis.com/auth/cloud-platform'],
+    );
+    my $token = $creds->get_token();
+
+=head1 DESCRIPTION
+
+Authenticates using a Google Cloud service account private key (RS256 JWT assertion signed via OpenSSL XS) and exchanges it for OAuth 2.0 access tokens.
+
+=head1 METHODS AND ATTRIBUTES
+
+=over 4
+
+=item * B<json_key>
+
+=item * B<private_key_id>
+
+=item * B<private_key>
+
+=item * B<client_email>
+
+=item * B<client_id>
+
+=item * B<auth_uri>
+
+=item * B<token_uri>
+
+=item * B<auth_provider_x509_cert_url>
+
+=item * B<client_x509_cert_url>
+
+=item * B<scope>
+
+=item * B<ua>
+
+=item * B<fetch_access_token>
+
+=back
+
+=head1 SEE ALSO
+
+L<Google::Auth>, L<Google::Auth::Credentials>
+
+=head1 AUTHOR
+
+C.J. Collier E<lt>cjac@google.comE<gt>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2026 Google LLC and contributors.
+
+Licensed under the Apache License, Version 2.0.
+
+=cut

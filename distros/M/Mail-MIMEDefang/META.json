@@ -40,8 +40,6 @@
       },
       "develop" : {
          "requires" : {
-            "Test::Class" : "0",
-            "Test::Most" : "0",
             "Test::Perl::Critic" : "0"
          }
       },
@@ -50,16 +48,20 @@
             "AnyEvent" : "0",
             "AnyEvent::DNS" : "0",
             "AnyEvent::Socket" : "0",
+            "Archive::Zip" : "0",
             "Crypt::OpenSSL::X509" : "0",
+            "HTML::FormatText" : "0",
             "HTML::Parser" : "0",
+            "HTML::TreeBuilder" : "0",
+            "HTTP::Request" : "0",
             "IO::Socket::SSL" : "0",
             "JSON" : "0",
+            "JSON::PP" : "0",
             "LWP::UserAgent" : "0",
             "Mail::BIMI" : "3",
             "Mail::DKIM" : "0",
             "Mail::SPF" : "0",
             "Mail::SpamAssassin" : "0",
-            "Sys::Syslog" : "0",
             "Unix::Syslog" : "0"
          },
          "requires" : {
@@ -73,10 +75,19 @@
             "MIME::Parser" : "0",
             "MIME::Tools" : "5.412",
             "MIME::Words" : "0",
+            "Net::DNS" : "0",
             "Socket" : "0",
             "Sys::Hostname" : "0",
+            "Sys::Syslog" : "0",
             "Time::Local" : "0",
             "perl" : "5.008009"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "JSON::PP" : "0",
+            "Test::Class" : "0",
+            "Test::Most" : "0"
          }
       }
    },
@@ -91,6 +102,6 @@
          "web" : "https://mimedefang.org"
       }
    },
-   "version" : "v3.8.0",
+   "version" : "v3.8.1",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

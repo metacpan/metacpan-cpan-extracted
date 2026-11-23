@@ -1,0 +1,97 @@
+{
+   "abstract" : "FASTA I/O in XS, BLAST hit ranking, and alignment plots and tables",
+   "author" : [
+      "David E. Condon <dcondon@uidaho.edu>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.040, CPAN::Meta::Converter version 2.150015",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Cn-Bioinf",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Config" : "0",
+            "ExtUtils::MakeMaker" : "6.48",
+            "File::ShareDir::Install" : "0.06",
+            "File::Spec" : "0",
+            "File::Temp" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Alien::Bioinf" : "0",
+            "IO::Socket::SSL" : "1.968",
+            "Net::SSLeay" : "1.49"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "Digest::SHA" : "0",
+            "Exporter" : "5.57",
+            "File::Path" : "0",
+            "File::ShareDir" : "1.00",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "FindBin" : "0",
+            "HTTP::Tiny" : "0.056",
+            "IO::Uncompress::Bunzip2" : "0",
+            "IO::Uncompress::Gunzip" : "0",
+            "JSON::MaybeXS" : "0",
+            "MIME::Base64" : "0",
+            "Scalar::Util" : "0",
+            "Symbol" : "0",
+            "Sys::Hostname" : "0",
+            "XSLoader" : "0",
+            "perl" : "5.012"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Cwd" : "0",
+            "Digest::SHA" : "0",
+            "File::Copy" : "0",
+            "File::Spec" : "0",
+            "File::Spec::Functions" : "0",
+            "File::Temp" : "0",
+            "FindBin" : "0",
+            "IO::Compress::Bzip2" : "0",
+            "IO::Compress::Gzip" : "0",
+            "Storable" : "0",
+            "Sys::Hostname" : "0",
+            "Test::More" : "0.88"
+         },
+         "suggests" : {
+            "Stats::LikeR" : "0",
+            "Test::LeakTrace" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Cn::Bioinf" : {
+         "file" : "lib/Cn/Bioinf.pm",
+         "version" : "0.031"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hhg7/Bioinf-Basic/issues"
+      },
+      "homepage" : "https://metacpan.org/dist/Cn-Bioinf",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/hhg7/Bioinf-Basic.git",
+         "web" : "https://github.com/hhg7/Bioinf-Basic"
+      }
+   },
+   "version" : "0.031",
+   "x_generated_by_perl" : "v5.44.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.82",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

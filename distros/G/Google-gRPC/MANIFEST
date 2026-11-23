@@ -1,6 +1,5 @@
 Changes
 cpanfile
-gRPC.bs
 lib/Google/gRPC.pm
 lib/Google/gRPC/Channel.pm
 lib/Google/gRPC/ChannelPool.pm
@@ -14,8 +13,6 @@ lib/Google/gRPC/Status.pm
 lib/Google/gRPC/Stream.pm
 Makefile.PL
 MANIFEST			This list of files
-NGHTTP2.c
-NGHTTP2.o
 NGHTTP2.xs
 project/plan/001-engine-architecture.md
 README.md
@@ -31,25 +28,6 @@ t/07-deadlines.t
 t/08-retries.t
 t/09-keepalive.t
 t/99-pod-coverage.t
-tmp/arbitrary.sh
-tmp/check_env.sh
-tmp/cpanm_final.log
-tmp/cpanm_full.log
-tmp/cpanm_install.log
-tmp/cpanm_install_final.log
-tmp/cpanm_tail.txt
-tmp/cpanm_verb.log
-tmp/demo_spanner.pl
-tmp/install_deps.sh
-tmp/make_init.log
-tmp/proto_api.txt
-tmp/proto_check.txt
-tmp/proto_check2.txt
-tmp/proto_installed.txt
-tmp/proto_src.txt
-tmp/proto_test.txt
-tmp/proto_ver.txt
 typemap
-xs/NGHTTP2.xs
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

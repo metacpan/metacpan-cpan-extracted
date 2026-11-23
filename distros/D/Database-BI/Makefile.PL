@@ -27,12 +27,13 @@ WriteMakefile(
 		'Getopt::Long'	=> 0,		# Core; the scripts' options
 		'Hash::Util'	=> 0,		# Core; locked rows
 		'Time::HiRes'	=> 0,		# Core
+		'XML::Simple'	=> 0,		# DMARC-style XML documents (DataSource::_xml_table); D::A reads XML with it too
 		'Cwd'		=> 0,		# For realpath() in the data_dir guard (Dashboard.pm)
 		'CHI'			=> 0,
 		'CGI::Info'	=> 0,
 		'CGI::Lingua'		=> '0.88',	# 0.88 reads the locale (LC_ALL, then LC_MESSAGES, then LANG), which the scripts' messages follow
-		'Database::Abstraction'	=> '0.56',	# 0.56 reads "" inside a quoted field as one quote; 0.55 requires the CSV and XML readers it loads (DBD::CSV, Text::xSV::Slurp, XML::Simple); 0.54 reads a table named data (Export > SQLite); 0.50 added redis_key + standalone-key support; 0.49 added aggregate(); 0.48 added limit/offset support in selectall_arrayref
-		'Database::Join' => '0.011.1',	# 0.011.1: a driver failure always has a message; 0.011.0 added Database::Join::Catalog, through which every table list, column list and SQLite write goes; 0.009.0 added aggregate(), limit/offset/sort_by, dbi_source(); 0.004.0 added backend=>'auto' SQLite spill
+		'Database::Abstraction'	=> '0.57',	# 0.56 reads "" inside a quoted field as one quote; 0.55 requires the CSV and XML readers it loads (DBD::CSV, Text::xSV::Slurp, XML::Simple); 0.54 reads a table named data (Export > SQLite); 0.50 added redis_key + standalone-key support; 0.49 added aggregate(); 0.48 added limit/offset support in selectall_arrayref
+		'Database::Join' => '0.011.4',	# 0.011.1: a driver failure always has a message; 0.011.0 added Database::Join::Catalog, through which every table list, column list and SQLite write goes; 0.009.0 added aggregate(), limit/offset/sort_by, dbi_source(); 0.004.0 added backend=>'auto' SQLite spill
 		'Net::SFTP::Foreign' => 0,
 		'Object::Configure'	=> '0.25',	# cache_dir for each object that keeps a cache (Database::BI::CacheDir); 0.25: configure($class, \%params), and logger => [] keeps a syslog universal.yml from opening
 		'File::Path'	=> '2.07',	# For remove_tree in Dashboard.pm at runtime
@@ -86,7 +87,6 @@ WriteMakefile(
 		'Test::Returns' => 0.005,
 		'Test::Without::Module' => 0,
 		'Text::xSV::Slurp' => 0,
-		'XML::Simple' => 0,
 	}, dist => $dist,
 	clean	=> { FILES => 'Database-BI-*' },
 	META_MERGE => {

@@ -3,7 +3,7 @@ package Google::Dataflow::V1beta3::Jobs;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -2502,14 +2502,14 @@ Type: Bool
 
 =cut
 
-# === Service Client: Google::Dataflow::V1beta3::Jobs::JobsV1beta3Client ===
-package Google::Dataflow::V1beta3::Jobs::JobsV1beta3Client;
+# === Service Client: Google::Dataflow::V1beta3::Jobs::JobsV1Beta3Client ===
+package Google::Dataflow::V1beta3::Jobs::JobsV1Beta3Client;
 
 =pod
 
 =head1 NAME
 
-Google::Dataflow::V1beta3::Jobs::JobsV1beta3Client - Client stub representing the remote JobsV1Beta3 service
+Google::Dataflow::V1beta3::Jobs::JobsV1Beta3Client - Client stub representing the remote JobsV1Beta3 service
 
 =head1 DESCRIPTION
 

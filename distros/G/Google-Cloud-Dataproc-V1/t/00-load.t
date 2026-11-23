@@ -4,9 +4,10 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 8;
+plan tests => 9;
 
 BEGIN {
+    use_ok( 'Google::Cloud::Dataproc::V1' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Dataproc::V1::AutoscalingPolicyServiceClient' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Dataproc::V1::BatchControllerClient' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Dataproc::V1::ClusterControllerClient' ) || print "Bail out!\n";
@@ -17,4 +18,4 @@ BEGIN {
     use_ok( 'Google::Cloud::Dataproc::V1::WorkflowTemplateServiceClient' ) || print "Bail out!\n";
 }
 
-diag( "Testing Google::Cloud::Dataproc::V1::AutoscalingPolicyServiceClient $Google::Cloud::Dataproc::V1::AutoscalingPolicyServiceClient::VERSION, Perl $], $^X" );
+diag( "Testing Google::Cloud::Dataproc::V1 $Google::Cloud::Dataproc::V1::VERSION, Perl $], $^X" );

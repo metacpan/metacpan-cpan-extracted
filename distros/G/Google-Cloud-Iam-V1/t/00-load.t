@@ -4,10 +4,11 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 1;
+plan tests => 2;
 
 BEGIN {
-    use_ok( 'Google::Cloud::Iam::V1::IamPolicyClient' ) || print "Bail out!\n";
+    use_ok( 'Google::Cloud::Iam::V1' ) || print "Bail out!\n";
+    use_ok( 'Google::Cloud::Iam::V1::IAMPolicyClient' ) || print "Bail out!\n";
 }
 
-diag( "Testing Google::Cloud::Iam::V1::IamPolicyClient $Google::Cloud::Iam::V1::IamPolicyClient::VERSION, Perl $], $^X" );
+diag( "Testing Google::Cloud::Iam::V1 $Google::Cloud::Iam::V1::VERSION, Perl $], $^X" );

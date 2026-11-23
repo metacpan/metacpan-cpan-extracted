@@ -24,43 +24,75 @@ use Google::Auth::ComputeEngine;
 use Google::Auth::Exceptions;
 use XSLoader;
 
-our $VERSION = '0.13';
+our $VERSION = '0.15';
 XSLoader::load('Google::Auth', $VERSION);
 
 =head1 NAME
 
-Application default credentials.
-
-Google::Auth - Implements application default credentials and project ID detection.
-
+Google::Auth - Google Cloud ADC and OAuth 2.0 authentication for Perl
 
 =head1 VERSION
 
-Version 0.13
-
-=cut
+Version 0.15
 
 =head1 SYNOPSIS
 
-Quick summary of what the module does.
-
-Perhaps a little code snippet.
-
     use Google::Auth;
 
-    my $gauth = Google::Auth->new();
-    ...
+    # Load Application Default Credentials (ADC)
+    my $creds = Google::Auth->default(
+        ['https://www.googleapis.com/auth/cloud-platform']
+    );
 
-=head1 EXPORT
+    # Fetch a Bearer access token (cached and refreshed automatically)
+    my $access_token = $creds->get_token();
 
-A list of functions that can be exported.  You can delete this section
-if you don't export anything, such as for a purely object-oriented module.
+    # Use with a Google Cloud client library
+    use Google::Cloud::Spanner::V1::SpannerClient;
+    my $client = Google::Cloud::Spanner::V1::SpannerClient->new(
+        credentials => $creds,
+    );
 
-=head1 SUBROUTINES/METHODS
+=head1 DESCRIPTION
+
+C<Google::Auth> implements Google Cloud Application Default Credentials (ADC)
+and OAuth 2.0 authentication for Perl. It automatically discovers credentials
+from the environment in the standard Google Cloud order:
+
+=over 4
+
+=item 1. The C<GOOGLE_APPLICATION_CREDENTIALS> environment variable (service account JSON, authorized user JSON, impersonated service account, or Workload Identity Federation external account config).
+
+=item 2. The well-known Google Cloud CLI ADC path (C<~/.config/gcloud/application_default_credentials.json>).
+
+=item 3. The system default path.
+
+=item 4. The Compute Engine / GKE / Cloud Run metadata server when running on GCP.
+
+=back
+
+It also provides OpenSSL-backed cryptographic helpers (JWT signing and ID token
+verification), Workload Identity Federation (AWS EC2 IMDSv2 / ECS Task Roles,
+Pluggable/URL/File-sourced credentials), service account impersonation, OAuth
+2.0 web/installed-app authorizers, and the C<gcloud-auth> CLI utility.
+
+=head1 METHODS
 
 =head2 default( $scopes, $options )
 
-Gets the default credentials for the current environment.
+    my $creds = Google::Auth->default();
+    my $creds = Google::Auth->default(
+        ['https://www.googleapis.com/auth/cloud-platform'],
+        { universe_domain => 'googleapis.com' },
+    );
+
+Resolves and returns a credentials object (subclass of
+L<Google::Auth::Credentials>) for the current environment. C<$scopes> may be a
+single scope string or an ArrayRef of OAuth 2.0 scope URLs. C<$options> is an
+optional HashRef of additional parameters forwarded to the credential loader.
+
+Throws C<Google::Auth::DefaultCredentialsError> (defined in
+C<Google::Auth::Exceptions>) if no credentials can be found.
 
 =cut
 
@@ -97,15 +129,32 @@ sub default {
 
 =over 4
 
-=item GOOGLE_EXTERNAL_ACCOUNT_ALLOW_EXECUTABLES
+=item C<GOOGLE_APPLICATION_CREDENTIALS>
 
-Set to '1' to allow Pluggable Credentials to execute external commands. Default is '0' (disabled).
+Path to a JSON credentials file (service account, authorized user, impersonated
+service account, or external account / WIF configuration).
 
-=item GOOGLE_EXTERNAL_ACCOUNT_ALLOW_CUSTOM_UNIVERSES
+=item C<GOOGLE_CLOUD_QUOTA_PROJECT>
 
-Set to '1' to allow custom universes in credentials files loaded from JSON. Default is '0' (disabled).
+Optional Google Cloud project ID used for quota and billing attribution.
+
+=item C<GOOGLE_EXTERNAL_ACCOUNT_ALLOW_EXECUTABLES>
+
+Set to C<1> to allow Pluggable Credentials to execute external commands. Default is C<0> (disabled).
+
+=item C<GOOGLE_EXTERNAL_ACCOUNT_ALLOW_CUSTOM_UNIVERSES>
+
+Set to C<1> to allow custom universes in credentials files loaded from JSON. Default is C<0> (disabled).
 
 =back
+
+=head1 SEE ALSO
+
+L<Google::Auth::DefaultCredentials>, L<Google::Auth::ServiceAccountCredentials>,
+L<Google::Auth::ComputeEngine>, L<Google::Auth::UserRefreshCredentials>,
+L<Google::Auth::ImpersonatedServiceAccountCredentials>,
+L<Google::Auth::ExternalAccountCredentials>,
+L<Google::Auth::IDTokens::Verifier>, L<Google::Auth::WebUserAuthorizer>
 
 =head1 AUTHOR
 
@@ -135,16 +184,11 @@ L<https://metacpan.org/release/Google-Auth>
 
 =back
 
-
-=head1 ACKNOWLEDGEMENTS
-
-
 =head1 LICENSE AND COPYRIGHT
 
 Copyright 2020 Google LLC and contributors
 
 This program is released under the following license: Apache 2.0
-
 
 =cut
 

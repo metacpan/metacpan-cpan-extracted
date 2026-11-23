@@ -4,7 +4,7 @@ App::Test::Generator - Fuzz Testing, Mutation Testing, LCSAJ Metrics and Test Da
 
 ## Version
 
-Version 0.51
+Version 0.52
 
 ## Synopsis
 
@@ -376,6 +376,44 @@ output:
   type: number
 ```
 
+A routine can take positional arguments followed by named options, as
+`sub publish { my ($message, %opts) = @_ }` does.  Give the leading
+arguments their positions and mark every trailing option `named: 1`:
+
+```perl
+input:
+  message:
+    type: string
+    position: 0
+  priority:
+    type: integer
+    optional: 1
+    named: 1
+
+# publish($message, priority => $priority)
+```
+
+A parameter in a schema that declares positions must say which it is: a
+missing position on a parameter without `named: 1` is an error, not a
+second call shape.
+
+A numeric parameter can document a range whose top end this harness cannot
+afford to reach: a count of hashing rounds costs time in proportion to the
+value, so one call at the documented maximum can take minutes.  `sample_max`
+limits the valid data that is generated while `max` stays the documented
+bound, so a value above `max` is still probed (and refused cheaply):
+
+```
+input:
+  rounds:
+    type: integer
+    named: 1
+    optional: 1
+    min: 10_000
+    max: 100_000_000
+    sample_max: 200_000
+```
+
 The keyword `undef` is used to indicate that the `function` takes no arguments.
 
 #### `%Output` - Output Param Types for [Return::Set](https://metacpan.org/pod/Return%3A%3ASet) Checking
@@ -658,6 +696,17 @@ function: my_function
 new:
 ```
 
+#### `$Invocant`
+
+The word `class` when the routine is a class method: the harness calls
+`Module->routine(...)` instead of `Module::routine(...)`.  With `new`
+set the routine is called on the object `new` builds, and without an
+`invocant` it is called as a plain function.
+
+```
+invocant: class
+```
+
 #### `%Cases`
 
 An optional Perl static corpus, when the output is a simple string (expected => \[ args... \]).
@@ -787,6 +836,13 @@ input:
 - `base64` - Base64-encoded strings
 - `md5` - MD5 hashes (32 hex chars)
 - `sha256` - SHA-256 hashes (64 hex chars)
+- `bytes` - Byte strings (arbitrary octets, not text)
+
+    The property test draws octets rather than characters.  A byte string holds
+    data, not a document, so no text-oriented case applies to it;
+    [App::Test::Generator::SchemaExtractor](https://metacpan.org/pod/App%3A%3ATest%3A%3AGenerator%3A%3ASchemaExtractor) sets this for a parameter that is a
+    file's contents (\`$bytes\`, \`blob\`, "raw bytes").
+
 - `directory` - The path of an existing, writable directory
 
     The harness creates a temporary directory and passes its path, because no

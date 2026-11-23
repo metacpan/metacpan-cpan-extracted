@@ -1397,6 +1397,7 @@ subtest 'DataSource: XLSX and Berkeley DB are read by Database::Abstraction' => 
 	SKIP: {
 		skip 'DB_File is needed', 4 unless eval { require DB_File; require Fcntl; 1 };
 		my %bdb;
+		no warnings 'once';
 		tie(%bdb, 'DB_File', "$dir/kv.db", Fcntl::O_CREAT() | Fcntl::O_RDWR(), 0644, $DB_File::DB_HASH)
 			or skip "cannot create a Berkeley DB file: $!", 4;
 		%bdb = (b => 2, a => 1, c => 3);
@@ -8040,6 +8041,7 @@ sub croak_rethrow {
 		{
 			no warnings 'redefine';
 			local $^O = 'MSWin32';
+			no warnings 'once';
 			local *Database::BI::Controller::Dashboard::realpath = sub {
 				my $abs = File::Spec->rel2abs($_[0]);
 				my @parts = File::Spec->splitdir($abs);
@@ -8532,7 +8534,7 @@ sub croak_rethrow {
 		is scalar(() = $html =~ /<td>/g), 4, 'no more rows than the limit';
 		like $html, qr{and 21 more: <a href="/open\?path=x&amp;f=a">show all 25 in the table</a>}, 'the rest are counted and linked, the link escaped';
 		like $F{_map_popup}->('P', \@many, [ 'n' ], 4, undef), qr{and 21 more</div>\z}, 'without a link, only counted';
-		is scalar(() = $F{_map_popup}->('P', \@many, [ 'n' ], $_, '') =~ /<td>/g), 10, "a limit of '$_' is the default"
+		is scalar(() = $F{_map_popup}->('P', \@many, [ 'n' ], $_, '') =~ /<td>/g), 10, 'a limit of ' . (defined($_) ? "'$_'" : 'undef') . ' is the default'
 			for ('', 0, -3, 'lots', undef);
 
 		$html = $F{_map_popup}->('P', [ { n => '<b>', x => [ 1 ] }, 'not a row', undef, { n => '&' } ], [ 'n', 'x', undef, [ 'y' ] ], 10, '');
@@ -10481,14 +10483,14 @@ sub croak_rethrow {
 		my ($tm) = $fixture_app->();
 		my $c = dash_controller($tm->app, '/');
 		my $sig = $c->_geo_lookup_sig('Ramsgate');
-		like $sig, qr/\A[0-9a-f]{40}\z/, 'a hex HMAC';
+		like $sig, qr/\A[0-9a-f]{64}\z/, 'a hex HMAC';
 		is $c->_geo_lookup_sig('Ramsgate'), $sig, 'the same place, the same signature';
 		isnt $c->_geo_lookup_sig('Ramsgate '), $sig, 'a different place, a different one';
 		isnt $c->_geo_lookup_sig("\x{10D}"), $c->_geo_lookup_sig("\xC4\x8D"), 'characters are signed as UTF-8, not confused with their bytes';
 		my $other = isolated_app();
 		isnt dash_controller($other->app, '/')->_geo_lookup_sig('Ramsgate'), $sig, 'another start has another secret';
 		$tm->app->secrets([ 'fixed' ]);
-		is $c->_geo_lookup_sig('x'), Mojo::Util::hmac_sha1_sum("geo-lookup\0x", 'fixed'), 'keyed by the first secret';
+		is $c->_geo_lookup_sig('x'), Digest::SHA::hmac_sha256_hex("geo-lookup\0x", 'fixed'), 'keyed by the first secret';
 	};
 
 	subtest 'Dashboard::_map_geocoder -- built from the configuration' => sub {
@@ -11062,5 +11064,642 @@ subtest 'DataSource::_best_id_column -- the column that drops fewest rows' => su
 	keeps_globals_ok('_best_id_column', sub { $pick->("1,a\n", qw(id name)) });
 };
 
-done_testing();
+# ============================================================================
+# PART N: helpers that had no white-box test of their own
+#
+# Strategy for every block below: state the rule the helper exists to keep,
+# prove it once on the good path, then spend the effort on hostile input --
+# values a config file, a web service, a cache file or a stranger could supply.
+# ============================================================================
 
+# ----------------------------------------------------------------------------
+# Database::BI::Password
+# ----------------------------------------------------------------------------
+{
+	require Database::BI::Password;
+	my $P = 'Database::BI::Password';
+
+	Readonly my $MIN_ROUNDS   => 10_000;
+	Readonly my $MAX_ROUNDS   => 100_000_000;
+	Readonly my $SALT_BYTES   => 16;
+	Readonly my $HOSTILE_SECS => 5;	# a hostile hash must be refused, not computed
+	Readonly my $SALT         => 'S' x $SALT_BYTES;
+
+	my $pbkdf2 = \&Database::BI::Password::_pbkdf2;
+	my $b64    = \&Database::BI::Password::_b64;
+	my $unb64  = \&Database::BI::Password::_unb64;
+	my $octets = \&Database::BI::Password::_octets;
+
+	# Published PBKDF2-HMAC-SHA256 answers (RFC 7914 section 11 and the widely
+	# used c=1, c=2 vectors): the only proof the arithmetic is the standard one,
+	# so a stored hash from another tool would verify here.
+	subtest 'Password::_pbkdf2 -- known answers, block joining and truncation' => sub {
+		is unpack('H*', $pbkdf2->('password', 'salt', 1, 32)),
+			'120fb6cffcf8b32c43e7225256c4f837a86548c92ccc35480805987cb70be17b', 'one round';
+		is unpack('H*', $pbkdf2->('password', 'salt', 2, 32)),
+			'ae4d0c95af6b46d32d0adff928f06dd02a303f8ef3c251dfd6e2d85a95474c43', 'two rounds (the loop runs)';
+		my $long = unpack 'H*', $pbkdf2->('passwd', 'salt', 1, 64);
+		is $long, '55ac046e56e3089fec1691c22544b605f94185216dde0465e68b9d57c20dacbc'
+			. '49ca9cccf179b645991664b39d77ef317c71b845b1e30bd509112041d3a19783', 'two blocks are joined';
+		is unpack('H*', $pbkdf2->('passwd', 'salt', 1, 20)), substr($long, 0, 40), 'a short key is a prefix, not a rehash';
+		is length($pbkdf2->('p', 's', 1, 33)), 33, 'a length that is not a block multiple is cut exactly';
+		keeps_globals_ok('_pbkdf2', sub { $pbkdf2->('p', 's', 1, 32) });
+	};
+
+	subtest 'Password::_b64 / _unb64 -- round trip, no padding, junk tolerated' => sub {
+		for my $len (0 .. 40) {
+			my $raw = join '', map { chr(($_ * 37 + $len) % 256) } 1 .. $len;
+			my $enc = $b64->($raw);
+			unlike $enc, qr/[=\s]/, "length $len: no padding or newline in the stored form";
+			is $unb64->($enc), $raw, "length $len: decodes to what went in";
+		}
+		lives_ok { $unb64->("!!!!\0\n  ") } 'characters outside the alphabet do not crash the decoder';
+		is $unb64->(''), '', 'empty in, empty out';
+	};
+
+	subtest 'Password::_octets -- a password is hashed as UTF-8 bytes, and the caller keeps its copy' => sub {
+		my $wide = "caf\x{e9}\x{263A}";
+		my $copy = $wide;
+		is $octets->($wide), "caf\xC3\xA9\xE2\x98\xBA", 'wide characters become UTF-8';
+		is $wide, $copy, 'the argument is not changed';
+		is $octets->("caf\xE9"), "caf\xE9", 'a byte string is left as bytes';
+	};
+
+	subtest 'Password::hash_password -- refuses every input that would weaken the hash' => sub {
+		throws_ok { Database::BI::Password::hash_password(undef) } qr/\Ahash_password: a password is required/, 'undef password';
+		throws_ok { Database::BI::Password::hash_password('') }    qr/\Ahash_password: a password is required/, 'empty password';
+		my $rounds_msg = qr/\Ahash_password: rounds must be a whole number from $MIN_ROUNDS to $MAX_ROUNDS/;
+		for my $bad (0, $MIN_ROUNDS - 1, $MAX_ROUNDS + 1, -$MIN_ROUNDS, '1e5', '10_000', "$MIN_ROUNDS\n",
+				' 10000', '10000.5', '', 'many', [ $MIN_ROUNDS ]) {
+			throws_ok { Database::BI::Password::hash_password('pw', rounds => $bad, salt => $SALT) }
+				$rounds_msg, 'rounds ' . (ref $bad ? 'ARRAY' : "'" . ($bad =~ s/\n/\\n/gr) . "'") . ' refused';
+		}
+		for my $bad_salt ('', 'short', 'S' x ($SALT_BYTES - 1), 'S' x ($SALT_BYTES + 1)) {
+			throws_ok { Database::BI::Password::hash_password('pw', rounds => $MIN_ROUNDS, salt => $bad_salt) }
+				qr/\Ahash_password: a salt is $SALT_BYTES bytes/, 'salt of ' . length($bad_salt) . ' bytes refused';
+		}
+	};
+
+	subtest 'Password::hash_password -- the generator must give every byte' => sub {
+		require Crypt::URandom;
+		for my $short (0, $SALT_BYTES - 1) {
+			Test::Mockingbird::mock('Crypt::URandom::urandom', sub { return 'x' x $short });
+			throws_ok { Database::BI::Password::hash_password('pw', rounds => $MIN_ROUNDS) }
+				qr/\Ahash_password: Crypt::URandom gave $short random bytes, not $SALT_BYTES/,
+				"a generator that gave $short bytes is not trusted";
+			Test::Mockingbird::restore_all();
+		}
+		Test::Mockingbird::mock('Crypt::URandom::urandom', sub { return undef });
+		throws_ok { Database::BI::Password::hash_password('pw', rounds => $MIN_ROUNDS) }
+			qr/gave 0 random bytes/, 'undef is a short answer too';
+		Test::Mockingbird::restore_all();
+	};
+
+	subtest 'Password -- hash, check and verify agree' => sub {
+		my $hash = Database::BI::Password::hash_password('s3cret', rounds => $MIN_ROUNDS, salt => $SALT);
+		ok Database::BI::Password::is_password_hash($hash), 'what it makes, it recognises';
+		is $hash, Database::BI::Password::hash_password('s3cret', rounds => $MIN_ROUNDS, salt => $SALT), 'same salt, same hash';
+		isnt $hash, Database::BI::Password::hash_password('s3cret', rounds => $MIN_ROUNDS, salt => 'T' x $SALT_BYTES), 'another salt, another hash';
+		isnt $hash, Database::BI::Password::hash_password('s3cret!', rounds => $MIN_ROUNDS, salt => $SALT), 'another password, another hash';
+		is Database::BI::Password::verify_password('s3cret', $hash), 1, 'the right password';
+		is Database::BI::Password::verify_password("s3cret\x{263A}", Database::BI::Password::hash_password("s3cret\x{263A}", rounds => $MIN_ROUNDS, salt => $SALT)), 1,
+			'a password with wide characters round-trips';
+		memory_cycle_ok(\$hash, 'a hash holds no cycle');
+		returns_is $hash, { type => 'string', matches => qr/\Apbkdf2-sha256\$\d+\$[A-Za-z0-9+\/]{22}\$[A-Za-z0-9+\/]{43}\z/ }, 'hash_password returns the stored form';
+	};
+
+	subtest 'Password::verify_password -- every wrong or hostile input is a plain 0' => sub {
+		my $hash = Database::BI::Password::hash_password('s3cret', rounds => $MIN_ROUNDS, salt => $SALT);
+		for my $case (
+			[ 'wrong password'        => 'S3cret',  $hash ],
+			[ 'trailing newline'      => "s3cret\n", $hash ],
+			[ 'empty password'        => '',        $hash ],
+			[ 'undef password'        => undef,     $hash ],
+			[ 'undef hash'            => 's3cret',  undef ],
+			[ 'empty hash'            => 's3cret',  '' ],
+			[ 'a plain-text "hash"'   => 's3cret',  's3cret' ],
+			[ 'a reference as hash'   => 's3cret',  [ $hash ] ],
+		) {
+			my ($name, $pw, $h) = @{$case};
+			is Database::BI::Password::verify_password($pw, $h), 0, $name;
+		}
+		(my $flipped = $hash) =~ s/(.)\z/$1 eq 'A' ? 'B' : 'A'/e;
+		is Database::BI::Password::verify_password('s3cret', $flipped), 0, 'one changed character in the key';
+		(my $salty = $hash) =~ s/(\$)([A-Za-z0-9+\/])/$1 . ($2 eq 'A' ? 'B' : 'A')/e;
+		is Database::BI::Password::verify_password('s3cret', $salty), 0, 'one changed character in the salt';
+		is Database::BI::Password::verify_password('s3cret', "$hash\n"), 0, 'a newline after the hash';
+		is Database::BI::Password::verify_password('s3cret', " $hash"), 0, 'a space before it';
+
+		# A hash with a 9-digit round count would keep the server busy for hours
+		# if it were computed.  It must be refused before any hashing.
+		(my $huge = $hash) =~ s/\$$MIN_ROUNDS\$/\$999999999\$/;
+		my $answer = eval {
+			local $SIG{ALRM} = sub { die "TOO SLOW\n" };
+			alarm $HOSTILE_SECS;
+			my $r = Database::BI::Password::verify_password('s3cret', $huge);
+			alarm 0;
+			$r;
+		};
+		is $answer, 0, 'a round count past the limit is refused at once' or diag $@;
+		(my $few = $hash) =~ s/\$$MIN_ROUNDS\$/\$10001\$/;
+		is Database::BI::Password::verify_password('s3cret', $few), 0, 'a count that was not the one hashed with fails the check';
+		(my $weak = $hash) =~ s/\$$MIN_ROUNDS\$/\$9999\$/;
+		is Database::BI::Password::verify_password('s3cret', $weak), 0, 'a count under the minimum is refused';
+		keeps_globals_ok('verify_password', sub { Database::BI::Password::verify_password('s3cret', $hash) });
+	};
+
+	subtest 'Password::is_password_hash -- exactly the stored form, nothing near it' => sub {
+		my $good = Database::BI::Password::hash_password('pw', rounds => $MIN_ROUNDS, salt => $SALT);
+		is Database::BI::Password::is_password_hash($good), 1, 'a real one';
+		my ($scheme, $rounds, $salt, $key) = split /\$/, $good;
+		my %variants = (
+			'undef'               => undef,
+			'empty'               => '',
+			'a reference'         => {},
+			'scheme in capitals'  => join('$', uc $scheme, $rounds, $salt, $key),
+			'another scheme'      => join('$', 'pbkdf2-sha1', $rounds, $salt, $key),
+			'rounds under limit'  => join('$', $scheme, $MIN_ROUNDS - 1, $salt, $key),
+			'rounds over limit'   => join('$', $scheme, $MAX_ROUNDS + 1, $salt, $key),
+			'four-digit rounds'   => join('$', $scheme, '9999', $salt, $key),
+			'ten-digit rounds'    => join('$', $scheme, '1000000000', $salt, $key),
+			'rounds with a sign'  => join('$', $scheme, "+$rounds", $salt, $key),
+			'short salt'          => join('$', $scheme, $rounds, substr($salt, 1), $key),
+			'long key'            => join('$', $scheme, $rounds, $salt, "${key}A"),
+			'padded key'          => join('$', $scheme, $rounds, $salt, "$key="),
+			'a fifth field'       => "$good\$x",
+			'trailing newline'    => "$good\n",
+			'leading space'       => " $good",
+			'non-ASCII in the key'=> join('$', $scheme, $rounds, $salt, substr($key, 1) . "\x{e9}"),
+		);
+		for my $name (sort keys %variants) {
+			is Database::BI::Password::is_password_hash($variants{$name}), 0, "$name is not a hash";
+		}
+		is Database::BI::Password::is_password_hash(join('$', $scheme, $MAX_ROUNDS, $salt, $key)), 1, 'the upper limit itself is allowed';
+	};
+}
+
+# ----------------------------------------------------------------------------
+# Database::BI::Model::Boundary: ranks, names, keys and geometry
+# ----------------------------------------------------------------------------
+{
+	require Database::BI::Model::Boundary;
+	my $B = 'Database::BI::Model::Boundary';
+	my @OUTSIDE_CASES;
+
+	subtest 'Boundary->point_key -- one key per point, nothing for a value that is not a point' => sub {
+		is $B->point_key('51.5074', '-0.1278'), '51.507,-0.128', 'rounded to three decimals';
+		is $B->point_key(51, 0), '51.000,0.000', 'whole numbers get their decimals';
+		is $B->point_key(90, 180), '90.000,180.000', 'the limits are points';
+		is $B->point_key(-90, -180), '-90.000,-180.000', 'so are the negative ones';
+		is $B->point_key('-0.0001', '-0.0004'), '0.000,0.000', 'a point just under zero has no "-0.000" twin';
+		is $B->point_key('51.5074', '-0.1278'), $B->point_key('51.50741', '-0.12779'), 'points a metre apart share a key';
+		for my $case (
+			[ undef, 1 ], [ 1, undef ], [ '', 1 ], [ 'abc', 1 ], [ 1, 'abc' ],
+			[ 90.001, 0 ], [ -90.001, 0 ], [ 0, 180.001 ], [ 0, -180.001 ],
+			[ '1e2', 1 ], [ "5\n", 1 ], [ '+5', 1 ], [ '5.', 1 ], [ '.5', 1 ], [ '1,5', 1 ],
+			[ "1' OR '1'='1", 1 ], [ [ 1 ], 1 ], [ 'NaN', 1 ], [ 'Inf', 1 ],
+		) {
+			my @got = $B->point_key(@{$case});
+			is_deeply \@got, [], 'refused: ' . join(',', map { !defined $_ ? 'undef' : ref $_ ? 'ref' : ($_ =~ s/\n/\\n/gr) } @{$case});
+		}
+	};
+
+	subtest 'Boundary->check_ranks -- a config the code cannot honour stops at startup' => sub {
+		my $ok = $B->check_ranks({ GB => 10, fr => '12', De => 8 });
+		is_deeply $ok, { gb => 10, fr => 12, de => 8 }, 'lower-cased codes, numeric ranks';
+		memory_cycle_ok($ok, 'the checked hash has no cycle');
+		is_deeply $B->check_ranks({}), {}, 'nothing configured is fine';
+
+		my $must = qr/the rank for '%s' must be one of 8, 10, 12/;
+		throws_ok { $B->check_ranks(undef) }        qr/\ABoundary ranks must be a hash of country codes to place ranks/, 'undef';
+		throws_ok { $B->check_ranks([ gb => 10 ]) } qr/\ABoundary ranks must be a hash/, 'a list';
+		throws_ok { $B->check_ranks('gb') }         qr/\ABoundary ranks must be a hash/, 'a string';
+		for my $code ('', 'g', 'gbr', 'g1', 'g b', "gb\n", 'g.', '../') {
+			throws_ok { $B->check_ranks({ $code => 10 }) } qr/\A'\Q$code\E' is not a two-letter country code/,
+				'code ' . ($code =~ s/\n/\\n/gr) . ' refused';
+		}
+		for my $rank (undef, '', 0, 7, 11, 13, -8, '8.0', '1e1', "10\n", '10 ', 'ten', [ 10 ], {}) {
+			throws_ok { $B->check_ranks({ gb => $rank }) } qr/\Athe rank for 'gb' must be one of 8, 10, 12/,
+				'rank ' . (!defined $rank ? 'undef' : ref $rank ? ref $rank : "'" . ($rank =~ s/\n/\\n/gr) . "'") . ' refused';
+		}
+		throws_ok { $B->check_ranks({ gb => 10, GB => 12 }) } qr/\A'(?:gb|GB)' is given twice/, 'the same country in two spellings';
+	};
+
+	subtest 'Boundary->name_for / level_name -- what a place is called' => sub {
+		is $B->name_for('in'), 'district', 'India has districts';
+		is $B->name_for('IN'), 'district', 'whatever the case';
+		is $B->name_for('fr'), 'department', 'France has departments';
+		is $B->name_for('us'), 'county', 'an unlisted country gets the level default';
+		for my $odd (undef, '', [ 'in' ], {}) {
+			is $B->name_for($odd), 'county', 'no usable country: ' . (ref $odd || (defined $odd ? 'empty' : 'undef'));
+		}
+		my $state = $B->new(level => 'state');
+		is $state->name_for('ca'), 'province', 'an instance names by its own level';
+		is $state->name_for('xx'), 'state', 'and falls back to it';
+
+		is $B->level_name('country'), 'country', 'a level names itself';
+		is $B->level_name('neighbourhood'), 'neighbourhood', 'every level does';
+		for my $bad (undef, '', 'nope', 'County', ' county', "county\n", [ 'county' ], {}) {
+			my @got = $B->level_name($bad);
+			is_deeply \@got, [], 'no name for ' . (ref $bad || (defined $bad ? "'" . ($bad =~ s/\n/\\n/gr) . "'" : 'undef'));
+		}
+	};
+
+	subtest 'Boundary->rank_for -- the rank a country is read at' => sub {
+		my $county = $B->new;
+		is $county->rank_for('us'), 12, 'the default county rank';
+		is $county->rank_for('in'), 10, 'a country the table knows';
+		is $county->rank_for('IN'), 10, 'whatever the case';
+		is $county->rank_for(undef), 12, 'no country: the default';
+		is $county->rank_for([ 'in' ]), 12, 'a reference is not a country';
+		is $B->new(ranks => { fr => 10 })->rank_for('fr'), 10, 'a configured rank beats the default';
+		is $B->new(ranks => { in => 12 })->rank_for('in'), 12, 'and the built-in one';
+		throws_ok { $B->new(ranks => { fr => 11 }) } qr/the rank for 'fr' must be one of/, 'a bad rank stops the object being built';
+		throws_ok { $B->new(level => 'galaxy') } qr/\AUnknown boundary level 'galaxy'/, 'an unknown level stops it too';
+		like $B->new(level => 'city')->rank_for('gb'), qr/\A\d+\z/, 'a level with plans answers with a rank';
+		memory_cycle_ok($county, 'a Boundary object has no cycle');
+	};
+
+	# Rings are [lon, lat] pairs, as in GeoJSON.
+	my $SQUARE = [ [ 0, 0 ], [ 10, 0 ], [ 10, 10 ], [ 0, 10 ], [ 0, 0 ] ];
+	my $HOLE   = [ [ 4, 4 ], [ 6, 4 ], [ 6, 6 ], [ 4, 6 ], [ 4, 4 ] ];
+	my $FAR    = [ [ 20, 0 ], [ 30, 0 ], [ 30, 10 ], [ 20, 10 ], [ 20, 0 ] ];
+	my $ring   = \&Database::BI::Model::Boundary::_in_ring;
+	my $within = \&Database::BI::Model::Boundary::_contains;
+	my $polys  = \&Database::BI::Model::Boundary::_polygons;
+
+	subtest 'Boundary::_in_ring -- inside, outside, and a ring that is damaged' => sub {
+		is $ring->($SQUARE, 5, 5), 1, 'inside';
+		is $ring->($SQUARE, 15, 5), 0, 'right of it';
+		is $ring->($SQUARE, -1, 5), 0, 'left of it';
+		is $ring->($SQUARE, 5, 15), 0, 'above it';
+		is $ring->($SQUARE, 5, -1), 0, 'below it';
+		my $L = [ [ 0, 0 ], [ 10, 0 ], [ 10, 3 ], [ 3, 3 ], [ 3, 10 ], [ 0, 10 ] ];
+		is $ring->($L, 1, 8), 1, 'in the arm of a concave ring';
+		is $ring->($L, 8, 8), 0, 'in the notch of a concave ring';
+
+		# A damaged ring holds no point: a corrupt cache entry must not turn a
+		# map request into a 500.
+		my @warned;
+		local $SIG{__WARN__} = sub { push @warned, @_ };
+		my %damaged = (
+			'undef'                 => undef,
+			'a string'              => 'ring',
+			'a hash'                => {},
+			'no points'             => [],
+			'two points'            => [ [ 0, 0 ], [ 1, 1 ] ],
+			'a scalar position'     => [ [ 0, 0 ], 'x', [ 1, 1 ], [ 0, 1 ] ],
+			'an undef position'     => [ [ 0, 0 ], undef, [ 1, 1 ], [ 0, 1 ] ],
+			'a one-number position' => [ [ 0, 0 ], [ 5 ], [ 1, 1 ], [ 0, 1 ] ],
+			'a reference coordinate'=> [ [ 0, 0 ], [ [ 1 ], 0 ], [ 1, 1 ], [ 0, 1 ] ],
+			'an undef coordinate'   => [ [ 0, 0 ], [ undef, 0 ], [ 1, 1 ], [ 0, 1 ] ],
+			'a bad last position'   => [ [ 0, 0 ], [ 1, 0 ], [ 1, 1 ], 'end' ],
+		);
+		for my $name (sort keys %damaged) {
+			my $got = eval { $ring->($damaged{$name}, 0.5, 0.5) };
+			is $@, '', "$name: does not die";
+			is $got, 0, "$name: holds no point";
+		}
+		is scalar(@warned), 0, 'and says nothing' or diag @warned;
+		keeps_globals_ok('_in_ring', sub { $ring->($SQUARE, 5, 5) });
+	};
+
+	subtest 'Boundary::_contains / _polygons -- holes, several polygons, and geometry that is not one' => sub {
+		my $polygon = { type => 'Polygon', coordinates => [ $SQUARE, $HOLE ] };
+		is $within->($polygon, 2, 2), 1, 'inside the polygon, outside its hole';
+		is $within->($polygon, 5, 5), 0, 'inside the hole is outside the polygon';
+		is $within->($polygon, 50, 50), 0, 'nowhere near';
+		my $multi = { type => 'MultiPolygon', coordinates => [ [ $SQUARE ], [ $FAR ] ] };
+		is $within->($multi, 5, 5), 1, 'in the first of two';
+		is $within->($multi, 5, 25), 1, 'in the second (latitude 5, longitude 25)';
+		is $within->($multi, 5, 15), 0, 'between them';
+		# A hole of one polygon does not exclude a point that sits in another.
+		my $nested = { type => 'MultiPolygon', coordinates => [ [ $SQUARE, $HOLE ], [ $HOLE ] ] };
+		is $within->($nested, 5, 5), 1, 'inside the hole of one polygon but inside another';
+
+		is_deeply [ $polys->($polygon) ], [ $polygon->{coordinates} ], 'a Polygon is one polygon';
+		is scalar(() = $polys->($multi)), 2, 'a MultiPolygon is its list';
+
+		my @warned;
+		local $SIG{__WARN__} = sub { push @warned, @_ };
+		my %not_geometry = (
+			'undef'              => undef,
+			'a string'           => 'Polygon',
+			'a list'             => [ $SQUARE ],
+			'a point'            => { type => 'Point', coordinates => [ 1, 1 ] },
+			'no type'            => { coordinates => [ $SQUARE ] },
+			'no coordinates'     => { type => 'Polygon' },
+			'coordinates a string'=> { type => 'Polygon', coordinates => 'x' },
+			'coordinates a hash' => { type => 'MultiPolygon', coordinates => {} },
+			'an empty polygon'   => { type => 'Polygon', coordinates => [] },
+			'a polygon of strings'=> { type => 'Polygon', coordinates => [ 'x', 'y' ] },
+			'a multi of scalars' => { type => 'MultiPolygon', coordinates => [ 1, 2, 3 ] },
+			'a multi of rings'   => { type => 'MultiPolygon', coordinates => [ $SQUARE ] },
+		);
+		for my $name (sort keys %not_geometry) {
+			my $got = eval { $within->($not_geometry{$name}, 5, 5) };
+			is $@, '', "$name: does not die";
+			is $got, 0, "$name: contains nothing";
+		}
+		is scalar(@warned), 0, 'and says nothing' or diag @warned;
+		memory_cycle_ok($multi, 'geometry has no cycle');
+	};
+}
+
+# ----------------------------------------------------------------------------
+# DataSource::_refuse_xml_entities
+# ----------------------------------------------------------------------------
+subtest 'DataSource::_refuse_xml_entities -- an entity is never handed to a parser' => sub {
+	my $refuse = \&Database::BI::Model::DataSource::_refuse_xml_entities;
+	my $dir    = tempdir(CLEANUP => 1);
+	my $write  = sub {
+		my ($name, $bytes) = @_;
+		my $path = File::Spec->catfile($dir, $name);
+		# Mojo::File, not open(): an earlier "no autodie 'open'" in this file
+		# leaves a stub main::open that shadows the builtin from there on.
+		Mojo::File->new($path)->spew($bytes);
+		return $path;
+	};
+	my $refused = sub { my $path = shift; qr/\ADataSource: "\Q$path\E" declares XML entities/ };
+
+	my $plain = $write->('plain.xml', qq{<?xml version="1.0"?>\n<rows><row><a>1</a></row></rows>\n});
+	lives_ok { $refuse->($plain) } 'an ordinary file passes';
+	is scalar($refuse->($plain)), undef, 'and nothing is returned for it';
+
+	# Each of these is one way to make a parser read what it was not given.
+	my $wide = "\xFF\xFE" . join '', map { "$_\0" } split //, '<rows/>';
+	my %hostile = (
+		'external entity'   => qq{<!DOCTYPE r [<!ENTITY x SYSTEM "file:///etc/passwd">]><r/>},
+		'remote entity'     => qq{<!DOCTYPE r [<!ENTITY x SYSTEM "http://127.0.0.1:1/">]><r/>},
+		'parameter entity'  => qq{<!DOCTYPE r [<!ENTITY % p SYSTEM "file:///etc/passwd">%p;]><r/>},
+		'internal entity'   => qq{<!DOCTYPE r [<!ENTITY y "lol">]><r>&y;</r>},
+		'entity far down'   => ('<!-- pad -->' x 5_000) . qq{<!DOCTYPE r [<!ENTITY y "z">]><r/>},
+		'inside a comment'  => qq{<!-- <!ENTITY y "z"> --><r/>},
+		'UTF-16 LE'         => $wide,
+		'UTF-16 BE'         => "\xFE\xFF" . join('', map { "\0$_" } split //, '<rows/>'),
+		'a NUL byte'        => "<rows>\0</rows>",
+		'a NUL after text'  => ('<a/>' x 100) . "\0",
+	);
+	for my $name (sort keys %hostile) {
+		my $path = $write->("h-" . ($name =~ s/\W+/_/gr) . '.xml', $hostile{$name});
+		throws_ok { $refuse->($path) } $refused->($path), "$name: refused, naming the file";
+	}
+
+	# Lower case is not an entity declaration in XML, which is case-sensitive;
+	# a parser rejects it, so refusing it too would only hide the parser's reason.
+	lives_ok { $refuse->($write->('lower.xml', '<!entity x><r/>')) } 'lower case is not the token';
+
+	# A file that is not there is the reader's to report, not this guard's.
+	lives_ok { $refuse->(File::Spec->catfile($dir, 'absent.xml')) } 'a missing file is left to the reader';
+
+	# The guard must leave the caller's state alone, whichever way it ends.
+	{
+		local $@ = 'kept';
+		local $! = 0;
+		local $/ = 'sep';
+		$refuse->($plain);
+		is $@, 'kept', '$@ survives a pass';
+		is $/, 'sep', '$/ survives a pass';
+		eval { $refuse->($write->('e.xml', '<!ENTITY a "b">')) };
+		is $/, 'sep', '$/ survives a refusal';
+	}
+	keeps_globals_ok('_refuse_xml_entities', sub { $refuse->($plain) });
+
+	# Resource use: a large clean file is read once and passes in a blink.
+	my $big = $write->('big.xml', '<rows>' . ('<row><a>x</a></row>' x 200_000) . '</rows>');
+	my $ok  = eval { local $SIG{ALRM} = sub { die "SLOW\n" }; alarm 10; $refuse->($big); alarm 0; 1 };
+	ok $ok, 'a 4 MB clean file is checked quickly' or diag $@;
+};
+
+# ----------------------------------------------------------------------------
+# I18N::_load -- no string eval, and a name that is not a language is refused
+# ----------------------------------------------------------------------------
+subtest 'I18N::_load -- loads a language module by name only' => sub {
+	require Database::BI::I18N;
+	my $load = \&Database::BI::I18N::_load;
+	my $table = $load->('en-us');
+	is ref $table, 'HASH', 'a known language gives its table';
+	ok scalar(keys %{$table}), 'which has messages in it';
+	is_deeply $load->('xx'), {}, 'a language with no module is an empty table (British messages)';
+	is_deeply $load->('fr-be'), {}, 'so is a regional one with no module';
+	is_deeply $load->('en_us'), $table, 'the underscore spelling is the same language';
+
+	# These would be code (or another file) if the name reached eval or require
+	# unchecked; each must stop at the name check, before any loading.
+	for my $name ('en-us; die "pwned"', '../../etc/passwd', 'en/../x', "en-us\n", 'EN', 'e', 'english',
+			'en-', '-us', 'en-us-x', 'en us', 'en::us', '') {
+		throws_ok { $load->($name) } qr/\AUnsafe language name '\Q$name\E'/, 'refused: ' . ($name =~ s/\n/\\n/gr);
+	}
+	{
+		local $@ = 'kept';
+		local $! = 7;
+		$load->('xx');
+		is $@, 'kept', '$@ is not disturbed by a failed load';
+		is $!+0, 7, '$! is not disturbed either';
+	}
+	keeps_globals_ok('I18N::_load', sub { $load->('xx') });
+};
+
+# ----------------------------------------------------------------------------
+# Database::BI: the header policies and the startup checks that guard them
+# ----------------------------------------------------------------------------
+{
+	my %F = map { $_ => \&{"Database::BI::$_"} } qw(
+		_check_permissions_policy _permissions_policy
+		_check_cross_origin_opener_policy _cross_origin_opener_policy
+		_check_strict_transport_security _strict_transport_security
+		_require_export_dirs_with_password
+	);
+
+	# Why: these values go straight into a response header.  A CR or LF in one
+	# would split the reply, so each guard must refuse it at startup and each
+	# reader must drop it rather than send it.
+	my @SPLITTERS = ("a\r\nX-Injected: 1", "a\nX-Injected: 1", "a\rb", "caf\x{e9}", "\x7f", "tab\there", "\0");
+	my $show = sub { ref $_[0] ? ref $_[0] : (defined $_[0] ? ($_[0] =~ s/[\r\n\t\0\x7f]/?/gr) : 'undef') };
+
+	subtest 'Database::BI::_check_permissions_policy / _permissions_policy' => sub {
+		for my $ok (undef, '', '0', 'camera=()', 'camera=(), geolocation=(self)') {
+			lives_ok { $F{_check_permissions_policy}->($ok) } 'accepted: ' . $show->($ok);
+		}
+		for my $bad (@SPLITTERS, {}, [ 'camera=()' ], \'x') {
+			throws_ok { $F{_check_permissions_policy}->($bad) } qr/\Apermissions_policy must be a header value/,
+				'refused: ' . $show->($bad);
+		}
+		my $default = $F{_permissions_policy}->({});
+		like $default, qr/\S/, 'the default is a real policy';
+		is $F{_permissions_policy}->({ permissions_policy => 'camera=()' }), 'camera=()', 'a configured value is used';
+		for my $none ('', '0', {}, [ 'x' ]) {
+			is scalar($F{_permissions_policy}->({ permissions_policy => $none })), undef, 'no header for ' . $show->($none);
+		}
+		for my $bad (@SPLITTERS) {
+			is scalar($F{_permissions_policy}->({ permissions_policy => $bad })), undef, 'never sent: ' . $show->($bad);
+		}
+		is $F{_permissions_policy}->(undef), $default, 'no config at all gets the default';
+	};
+
+	subtest 'Database::BI::_check_cross_origin_opener_policy / _cross_origin_opener_policy' => sub {
+		for my $ok (undef, '', '0', qw(same-origin same-origin-allow-popups noopener-allow-popups unsafe-none)) {
+			lives_ok { $F{_check_cross_origin_opener_policy}->($ok) } 'accepted: ' . $show->($ok);
+		}
+		my $list = 'noopener-allow-popups, same-origin, same-origin-allow-popups, unsafe-none';
+		for my $bad ('same-site', 'SAME-ORIGIN', ' same-origin', "same-origin\n", "same-origin\r\nX: 1", 'same-origin; x', 'none') {
+			throws_ok { $F{_check_cross_origin_opener_policy}->($bad) }
+				qr/\Across_origin_opener_policy: '\Q$bad\E' is not one of \Q$list\E, or 0 for none/,
+				'refused: ' . $show->($bad);
+		}
+		throws_ok { $F{_check_cross_origin_opener_policy}->({}) } qr/'HASH' is not one of/, 'a hash is named by its type';
+		throws_ok { $F{_check_cross_origin_opener_policy}->([]) } qr/'ARRAY' is not one of/, 'and a list';
+
+		like $F{_cross_origin_opener_policy}->({}), qr/\A[a-z-]+\z/, 'the default is one of the values';
+		is $F{_cross_origin_opener_policy}->({ cross_origin_opener_policy => 'unsafe-none' }), 'unsafe-none', 'a configured value is used';
+		for my $none ('', '0', {}) {
+			is scalar($F{_cross_origin_opener_policy}->({ cross_origin_opener_policy => $none })), undef, 'no header for ' . $show->($none);
+		}
+		for my $bad ('evil', "same-origin\r\nX: 1", 'SAME-ORIGIN') {
+			is scalar($F{_cross_origin_opener_policy}->({ cross_origin_opener_policy => $bad })), undef, 'never sent: ' . $show->($bad);
+		}
+	};
+
+	subtest 'Database::BI::_check_strict_transport_security' => sub {
+		for my $ok (undef, '', '0', 'max-age=0', 'max-age=31536000', 'max-age=1; includeSubDomains',
+				'max-age=1;includeSubDomains;preload', 'max-age=1; preload', 'MAX-AGE=5') {
+			lives_ok { $F{_check_strict_transport_security}->($ok) } 'accepted: ' . $show->($ok);
+		}
+		for my $bad ('max-age=', 'max-age=-1', 'max-age=12345678901', 'max-age=5;', 'max-age=5; includeSubDomains;',
+				'max-age=5; preload; includeSubDomains', 'includeSubDomains', 'max-age=5 preload',
+				"max-age=5\n", "max-age=5\r\nX: 1", ' max-age=5', 'max-age=5; evil', 'max-age=5; includeSubDomains; includeSubDomains') {
+			throws_ok { $F{_check_strict_transport_security}->($bad) }
+				qr/\Astrict_transport_security: '\Q$bad\E' is not a header value such as 'max-age=31536000'/,
+				'refused: ' . $show->($bad);
+		}
+		throws_ok { $F{_check_strict_transport_security}->({}) } qr/'HASH' is not a header value/, 'a hash is named by its type';
+	};
+
+	# A stand-in for the controller: only what _strict_transport_security reads.
+	{
+		package Local::Host;   sub new { bless { host => $_[1] }, $_[0] }  sub host { $_[0]{host} }  sub to_abs { $_[0] }
+		package Local::Url;    sub new { bless { host => $_[1] }, $_[0] }  sub url { Local::Host->new($_[0]{host}) }
+		package Local::Req;    sub new { bless { host => $_[1], secure => $_[2] }, $_[0] }
+		                       sub is_secure { $_[0]{secure} }  sub url { Local::Host->new($_[0]{host}) }
+		package Local::App;    sub new { bless { cfg => $_[1] }, $_[0] }  sub config { $_[0]{cfg}{ $_[1] } }
+		package Local::Ctl;    sub new { bless { req => $_[1], app => $_[2] }, $_[0] }
+		                       sub req { $_[0]{req} }  sub app { $_[0]{app} }
+	}
+	my $hsts = sub {
+		my ($host, $secure, $config) = @_;
+		return scalar $F{_strict_transport_security}->(
+			Local::Ctl->new(Local::Req->new($host, $secure), Local::App->new($config // {})));
+	};
+
+	subtest 'Database::BI::_strict_transport_security -- only where it cannot lock out a local server' => sub {
+		is $hsts->('example.com', 1), 'max-age=31536000', 'a named host over https gets the default';
+		is $hsts->('EXAMPLE.com', 1), 'max-age=31536000', 'whatever the case';
+		is $hsts->('1.2.3.4.example.com', 1), 'max-age=31536000', 'a name that merely starts like an address';
+		for my $host ('localhost', 'LOCALHOST', 'app.localhost', 'a.b.localhost', '127.0.0.1', '10.1.2.3', '::1', '[::1]', 'fe80::1', '') {
+			is $hsts->($host, 1), undef, "never to '$host': HSTS is host-wide and would pin every port on it";
+		}
+		is $hsts->('example.com', 0), undef, 'never over plain http (a browser ignores it, and it misleads)';
+		is $hsts->('example.com', 1, { strict_transport_security => 'max-age=60; includeSubDomains' }), 'max-age=60; includeSubDomains', 'a configured value';
+		for my $none ('', '0', {}) {
+			is $hsts->('example.com', 1, { strict_transport_security => $none }), undef, 'configured off: ' . $show->($none);
+		}
+		for my $bad ("max-age=5\r\nX: 1", 'max-age=', 'evil') {
+			is $hsts->('example.com', 1, { strict_transport_security => $bad }), undef, 'a bad value is dropped, never sent: ' . $show->($bad);
+		}
+	};
+
+	subtest 'Database::BI::_require_export_dirs_with_password -- a shared server needs folders of its own' => sub {
+		my $needs = qr/\Aexport_dirs: with password_hash set, other people can save exports, so keep them to folders of their own/;
+		for my $no_password (undef, '', {}, [ 'x' ]) {
+			lives_ok { $F{_require_export_dirs_with_password}->($no_password, undef) } 'no password to protect: ' . $show->($no_password);
+		}
+		lives_ok { $F{_require_export_dirs_with_password}->('hash', [ '/srv/x' ]) } 'a password and a folder';
+		lives_ok { $F{_require_export_dirs_with_password}->('hash', [ '/a', '/b' ]) } 'and several';
+		for my $bad (undef, [], '', '/srv/x', {}, 0) {
+			throws_ok { $F{_require_export_dirs_with_password}->('hash', $bad) } $needs, 'a password and export_dirs ' . $show->($bad);
+		}
+	};
+}
+
+# ----------------------------------------------------------------------------
+# Dashboard::_gen_analysis_id and _filter_date_key
+# ----------------------------------------------------------------------------
+subtest 'Dashboard::_gen_analysis_id -- ids come from the system generator, whole' => sub {
+	my $c = dash_controller($t->app, '/');
+	my %seen;
+	for (1 .. 300) {
+		my $id = $c->_gen_analysis_id;
+		like $id, qr/\A[A-Za-z0-9]{10}\z/, 'ten URL-safe characters' or last;
+		$seen{$id}++;
+	}
+	is scalar(keys %seen), 300, 'and no repeats in 300 draws';
+
+	require Crypt::URandom;
+	# Known bytes in, known id out: proves the bytes (not perl's rand) choose
+	# the characters, and that the mapping wraps instead of running off the end.
+	Test::Mockingbird::mock('Crypt::URandom::urandom', sub { return pack 'C*', 0 .. 9 });
+	is $c->_gen_analysis_id, 'abcdefghij', 'byte n picks character n';
+	Test::Mockingbird::restore_all();
+	Test::Mockingbird::mock('Crypt::URandom::urandom', sub { return pack 'C*', (62, 63, 255, 254) x 2, 0, 1 });
+	is $c->_gen_analysis_id, 'abhg' . 'abhg' . 'ab', 'a byte past 61 wraps to a valid character';
+	Test::Mockingbird::restore_all();
+
+	# A generator that gives too little must stop the save, not name a canvas '' .
+	for my $short ('', 'abc', 'abcdefghi') {
+		Test::Mockingbird::mock('Crypt::URandom::urandom', sub { return $short });
+		throws_ok { $c->_gen_analysis_id } qr/\AThe system random generator gave too few bytes for an id/,
+			'a generator that gave ' . length($short) . ' bytes is not used';
+		Test::Mockingbird::restore_all();
+	}
+	Test::Mockingbird::mock('Crypt::URandom::urandom', sub { return undef });
+	throws_ok { $c->_gen_analysis_id } qr/too few bytes/, 'undef is too few';
+	Test::Mockingbird::restore_all();
+	keeps_globals_ok('_gen_analysis_id', sub { $c->_gen_analysis_id });
+};
+
+subtest 'Dashboard::_filter_date_key -- the key a date filter compares by' => sub {
+	my $key = \&Database::BI::Controller::Dashboard::_filter_date_key;
+	Readonly my $DAY    => 10;
+	Readonly my $SECOND => 19;
+	is $key->('2026-01-05', $DAY), '2026-01-05', 'a day';
+	is $key->('2026-01-05T09:15:07', $SECOND), '2026-01-05T09:15:07', 'a timestamp at second precision';
+	is $key->('2026-01-05 09:15', $SECOND), '2026-01-05T09:15:00', 'missing seconds are zero';
+	is $key->('2026-01-05T09:15:07.9+05:30', $DAY), '2026-01-05', 'a zone and fraction are set aside; the day is as written';
+	is $key->('2026-01-05', $SECOND), '2026-01-05T00:00:00', 'a day at second precision is its start';
+	is $key->('1/5/2026', $DAY), '2026-01-05', 'M/D/YYYY is rewritten';
+	is $key->('01/05/2026', $DAY), '2026-01-05', 'with leading zeros too';
+	for my $text ('', 'x', '1/5/26', '1/5/20266', '1/5/2026 ', '2026-01-05 junk', "2026-01-05\n", '5/1', '--', 'NaN') {
+		is $key->($text, $DAY), $text, 'not a date, so its own key: ' . ($text =~ s/\n/\\n/gr);
+	}
+	my @warned;
+	local $SIG{__WARN__} = sub { push @warned, @_ };
+	is $key->(undef, $DAY), undef, 'undef stays undef';
+	my $ref = [ 1 ];
+	is $key->($ref, $DAY), $ref, 'a reference is returned untouched, never read as text';
+	is scalar(@warned), 0, 'and neither warns' or diag @warned;
+	keeps_globals_ok('_filter_date_key', sub { $key->('2026-01-05', $DAY) });
+};
+
+# ----------------------------------------------------------------------------
+# Util::parse_number's plain-decimal fast path must keep the full path's answers
+# ----------------------------------------------------------------------------
+subtest 'Util::parse_number -- plain decimals take a short cut that must agree with the long way' => sub {
+	my $number = \&Database::BI::Util::parse_number;
+	Readonly my $EDGE => 300;	# the longest integer part the short cut takes
+	is $number->('0'), 0, 'zero';
+	is $number->('-12.50'), -12.5, 'negative with decimals';
+	is $number->('007'), 7, 'leading zeros';
+	ok defined $number->('1' x $EDGE), 'at the edge';
+	ok defined $number->('1' x ($EDGE + 1)), 'one past the edge, by the long way';
+	is $number->('9' x 400), undef, 'past a double: not a number, whichever way';
+	for my $text ('1.', '.5', '1..2', '--1', '1e', '0x10', "\x{FF11}", 'NaN', 'Inf', '-', '.', '1/2') {
+		is $number->($text), undef, 'not a number: ' . ($text =~ s/[^\x20-\x7e]/?/gr);
+	}
+	is $number->("1\n"), 1, 'a trailing newline is stripped as it always was';
+	is $number->('1 000'), 1000, 'a space is a thousands separator';
+	is $number->("1\x{a0}000"), 1000, 'so is a non-breaking space';
+	is $number->('(5)'), -5, 'accounting negatives are still read';
+	is $number->('$1,000'), 1000, 'currency and separators are still read';
+};
+
+done_testing();

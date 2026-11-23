@@ -1,5 +1,11 @@
 Revision history for Perl extension App-mdee
 
+1.26 2026-11-22T16:02:51Z
+
+    - Fix --refill with a table that has a <br> in a cell, or spaces
+      at the end of a row: the paragraphs below the table were not
+      folded, and mdee could die with "Invalid type '-' in unpack"
+
 1.25 2026-11-22T07:04:02Z
 
     - A table cell has no space at its right in the lattice style

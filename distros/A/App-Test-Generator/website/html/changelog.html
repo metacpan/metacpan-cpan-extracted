@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Changes — App::Test::Generator</title>
-<meta name="description" content="Release history for App::Test::Generator 0.50: files with a helper package extracted, constructors that need live objects skipped, required flags in Input specs honoured, and from 0.49 mutation survivors fed back into harness generation, documented constraints checked against behaviour, element schemas, deterministic regex generation.">
+<meta name="description" content="Release history for App::Test::Generator 0.52: a sample_max key for expensive bounds, positional-plus-named call shapes, class-method invocants, much fuller POD reading and fewer guessed types, and from 0.51 mutants compiled against the project&#39;s own lib/ with compile failures reported.">
 <link rel="canonical" href="changelog.html">
 <meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#12161b" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="App::Test::Generator">
 <meta property="og:title" content="Changes — App::Test::Generator">
-<meta property="og:description" content="What changed in 0.50 and 0.49, and where to find the rest.">
+<meta property="og:description" content="What changed in 0.52 and 0.51, and where to find the rest.">
 <meta name="twitter:card" content="summary">
 <link rel="stylesheet" href="../css/site.css">
 </head>
@@ -47,109 +47,118 @@
 		distribution's <code>Changes</code> file is the authoritative record.
 	</p>
 
-	<h2 id="v0-50">0.50 — 17 November 2026</h2>
+	<h2 id="v0-52">0.52 — 22 November 2026</h2>
+	<p>
+		Almost every change in this release came from fuzzing real
+		distributions with <code>t/all-fuzz.t</code>: schemas that read the
+		documentation more fully, types that are no longer guessed from
+		incidental syntax, and harnesses that expect only what a routine
+		actually promises.
+	</p>
 
 	<h3>Enhancements</h3>
 	<ul>
-		<li><strong>Files with a helper package are extracted.</strong>
-		<code>extract-schemas</code> used to die on a file that declares a second
-		package, such as a small error class. It now analyses the first package,
-		ignores routines owned by later ones, and marks every schema from the file
-		<code>skip</code> so harnesses are not run against it, printing a note
-		that says so.</li>
+		<li><strong>A <code>sample_max</code> schema key.</strong> When a
+		documented range is far wider than its default
+		(<code>10_000 to 100_000_000 (default 200_000)</code>), the default is
+		recorded as <code>sample_max</code>: valid values are generated only up
+		to it, while <code>max</code> stays the bound a value is checked
+		against. A work factor such as a PBKDF2 round count is fuzzed at its
+		default instead of at a value that takes minutes per call. The harness,
+		<code>CoverageGuidedFuzzer</code> and <code>BenchmarkGenerator</code>
+		all honour it; an ordinary bounded option such as a port is still
+		generated across its whole range.</li>
+		<li><strong>Positional arguments followed by named options.</strong> A
+		routine declared as <code>my ($password, %opts) = @_</code> is called in
+		that shape: the leading arguments keep their <code>position</code>, the
+		rest are marked <code>named: 1</code> and passed after them.</li>
+		<li><strong>Class methods.</strong> An Input section that documents a
+		<code>$class</code> invocant sets the new <code>invocant: class</code>
+		key, and the harness calls <code>Module-&gt;routine(...)</code> instead
+		of shifting every argument by one.</li>
+		<li><strong>More classes can be built.</strong> A constructor that takes
+		a directory is given a temporary one, and a constructor that takes a
+		documented list of objects is given a stand-in built from the POD, so
+		their instance methods are fuzzed rather than skipped.</li>
+		<li><strong>Byte strings.</strong> A parameter documented as a file's
+		contents gets the new <code>bytes</code> semantic and is fuzzed with
+		octets rather than text.</li>
+		<li><strong><code>bin/run-all-fuzz</code></strong> runs every
+		<code>t/all-fuzz.t</code> in the surrounding workspace against the
+		working tree and keeps the logs of any suite that fails.</li>
 	</ul>
 
 	<h3>Bug fixes</h3>
 	<ul>
-		<li><strong>Constructors that need live objects are skipped.</strong> A
-		constructor that rejects an empty arrayref, or calls methods on its
-		elements, cannot be given a YAML fixture. Its schema now carries a
-		<code>skip</code> reason and its instance methods get
-		<code>new: ~</code>.</li>
-		<li><strong><code>required =&gt; 1</code> is honoured</strong> in a
-		formal Input spec, including a bare list with no outer braces, so POD
-		stays authoritative over a validator that calls the same parameter
-		optional. An explicit <code>optional</code> wins, and a flag inside a
-		nested <code>properties</code> map applies only to that property.</li>
+		<li><strong>More of the POD is read.</strong> Input sections written as
+		a table (<code>name : type</code>, <code>$name SCALAR</code>,
+		<code>\@list =&gt; ...</code>), as the Perl hash they describe, with
+		several parameters on one row, or with quoted types are all
+		understood, as is POD that sits in a later block headed with the
+		routine's name. Ranges written with words or <code>..</code>, "one or
+		more", "a readable file", "an existing directory" and documented
+		element shapes ("arrayref of {col, op, val} hashrefs") become
+		constraints. Output shapes such as "Always an arrayref of hashrefs" are
+		read as the container.</li>
+		<li><strong>Types are not guessed from incidental syntax.</strong> A
+		<code>/</code> or <code>%</code> in a regex, a hyphen in a string, a
+		<code>sprintf</code> format, <code>//</code>, <code>-&gt;</code> and
+		<code>-e</code> are no longer read as arithmetic, and an operator in the
+		body no longer overrides a documented type. <code>return \%hash</code>
+		is a hashref, a return of <code>sprintf</code> or <code>join</code> is a
+		string, <code>localtime</code> is a nine-element list, and a guarded
+		<code>return undef</code> is the error return rather than the success
+		type. An argument the body only calls methods on is an object.</li>
+		<li><strong>Patterns.</strong> A regex held in a variable, or built from
+		the routine's own lexicals, is no longer emitted as a
+		<code>matches</code> constraint (the harness did not compile). Every
+		pattern a parameter is accepted by is joined into one domain, and only a
+		regex that spells out a date is taken for ISO 8601.</li>
+		<li><strong>The harness expects only what is promised.</strong> A
+		wrong-typed number must die only when the routine's own validator checks
+		it. A routine that reports bad input by returning undef passes a
+		must-die case; a blessed exception counts as an error; a documented
+		boolean is a truth value, not literally 0 or 1; an environment variable
+		set to undef is unset; and an argument the routine refuses when empty
+		gets an expect-to-die empty-string case. Semantic cases were all being
+		generated as though every semantic type were a Unix timestamp.</li>
+		<li><strong>Untestable routines are skipped as a family.</strong> A
+		constructor that needs an object it calls methods on, a live database
+		server, or a hashref of a specific documented shape is reported as
+		skipped, and its instance methods with it. A constructor that stores one
+		field is no longer mistaken for an accessor.</li>
+		<li><strong>File descriptors.</strong> The leak check is turned off only
+		for a call documented to hold a database handle on purpose, not for any
+		routine that mentions the cache.</li>
+		<li><strong>Comments are not code.</strong> A signature-like example in a
+		comment (<code># my ($password, %opts) = @_;</code>) is no longer read as
+		the routine's parameters.</li>
+		<li><strong><code>BenchmarkGenerator</code></strong> passes a parameter
+		with no position as a <code>name =&gt; value</code> pair after the
+		positional ones, instead of dropping it.</li>
 	</ul>
 
-	<h2 id="v0-49">0.49 — November 2026</h2>
+	<h2 id="v0-51">0.51 — 18 November 2026</h2>
 
 	<h3>Enhancements</h3>
 	<ul>
-		<li><strong>Surviving mutants feed harness generation.</strong>
-		<code>fuzz-harness-generator --mutation-results</code> (or
-		<code>mutation_results</code> to <code>generate()</code>) reads
-		<code>test-generator-mutate</code>'s JSON report. Each surviving
-		numeric-boundary mutant is traced to the comparison it mutated and
-		becomes a <code>min</code> or <code>max</code> on the matching input
-		field. Existing constraints are never replaced, and survivors that need
-		a hand-written test are listed.
-		<a href="mutation.html#mutation-results">Details</a>.</li>
-		<li><strong>Documented constraints are checked, not assumed.</strong> A
-		bound, member list or pattern that came only from POD is probed from
-		outside. A routine that contradicts its documentation is reported at
-		the end of the run, and
-		<code>fuzz-harness-generator --strict-documented</code> turns each
-		finding into a failing test for CI.</li>
-		<li><strong>Element schemas.</strong> An arrayref or hashref parameter
-		can describe its elements with a nested <code>schema</code>, which can
-		nest again and build objects from <code>isa</code> or <code>can</code>.
-		<a href="schema.html#elements">Details</a>.</li>
-		<li><strong>Transforms can have their own input fields.</strong> One
-		hand-written schema can cover two call shapes, such as
-		<code>NameCase([...])</code> and <code>NameCase('A', 'B')</code>.</li>
-		<li><strong>Regex-based strings are deterministic and bounded.</strong>
-		The schema's <code>seed</code> drives them, generation is limited by the
-		new <code>regex_timeout</code> config key (default 5 seconds), and a
-		pattern that hangs or cannot be satisfied falls back or skips its cases
-		instead of failing the run. A failing case names the seed and the input
-		that was sent.</li>
-		<li><strong>An <code>existing_file</code> semantic.</strong> A routine
-		that only tests that a path exists (<code>-e</code>/<code>-f</code>) is
-		no longer skipped: the harness creates a temporary file for it. Only
-		routines that read the file's contents stay skipped.</li>
-		<li><strong>Portable, repeatable schema YAML.</strong> A
-		<code>matches</code> pattern is written as a plain string rather than a
-		<code>!!perl/regexp</code> object, and maps and analysis notes are
-		sorted, so repeated runs are byte-identical.</li>
-		<li><strong>One provenance marker.</strong> Each parameter carries a
-		single <code>_source</code> value, replacing
-		<code>_type_checked</code>, <code>_bounds_unverified</code> and
-		<code>_from_input_spec</code>; provenance is also tracked per
-		constraint. The allowed values live in
-		<code>App::Test::Generator::Provenance</code>.</li>
-		<li><strong><code>demo_extractor</code> is no longer installed.</strong>
-		It ships as <code>examples/demo_extractor</code>. The bug tracker in the
-		distribution metadata is now GitHub issues.</li>
+		<li><strong>Mutants that do not compile are reported.</strong> They are
+		still not run or scored, but <code>test-generator-mutate</code> prints
+		<code>Skipped (compile): N</code> and its <code>--json</code> report has
+		a <code>compile_skipped</code> count per file.
+		<code>test-generator-index</code> shows the count in the mutation
+		summary, as <code>(+N not compiled)</code> in each file's Skipped cell,
+		and on the file's mutation page. A file whose mutants all failed to
+		compile now gets a row instead of being left out.</li>
 	</ul>
 
 	<h3>Bug fixes</h3>
 	<ul>
-		<li><strong>Generated values stay inside declared bounds.</strong> Random
-		integers, numbers and strings respect a maximum, pattern-generated
-		strings honour <code>min</code>/<code>max</code> length, and a
-		pattern-constrained field is never given the fixed whitespace, newline
-		or BOM samples its own pattern excludes.</li>
-		<li><strong>Length guards are read correctly.</strong>
-		<code>croak ... if length &lt; 5</code> used to be read as
-		<code>max: 4</code>; it now gives <code>min: 5</code>, the same as
-		<code>croak ... unless length &gt;= 5</code>. A formal Input spec's
-		bounds are compared with the inferred ones, so an impossible range is
-		reported instead of emitted.</li>
-		<li><strong><code>import</code></strong> is called as a class method,
-		<code>Module-&gt;import(...)</code>, the way <code>use</code> invokes
-		it.</li>
-		<li><strong>Extraction</strong> reads a single documented parameter as
-		the first positional argument when the routine reads no hash of
-		arguments, keeps the value list from <code>=item</code> prose for a
-		parameter named only by a formal spec, and drops a reference used as a
-		parameter name instead of emitting <code>HASH(0x...)</code>.</li>
-		<li><strong>File descriptors.</strong> An object that opens a file on
-		first use and keeps it, such as a logger, is no longer reported as a
-		leak; a descriptor is reported when the same target is opened again.</li>
-		<li><strong><code>generate()</code></strong> is documented as returning
-		1, which is what it has always returned.</li>
+		<li><strong>Mutants compile against the project's own
+		<code>lib/</code>.</strong> They were checked against whatever copies of
+		the project's modules were installed, so a module that used a newer or
+		uninstalled sibling had every mutant silently skipped and scored a
+		vacuous 100% with Total: 0.</li>
 	</ul>
 
 	<h2 id="earlier">Earlier releases</h2>
@@ -159,6 +168,8 @@
 				<tr><th>Version</th><th>Date</th><th>Highlights</th></tr>
 			</thead>
 			<tbody>
+				<tr><td>0.50</td><td>17 November 2026</td><td>Files with a helper package are extracted (schemas marked <code>skip</code>); constructors that need live objects are skipped; <code>required =&gt; 1</code> in a formal Input spec is honoured.</td></tr>
+				<tr><td>0.49</td><td>16 November 2026</td><td>Surviving mutants feed harness generation, documented constraints are checked against behaviour, element schemas, per-transform input fields, deterministic bounded regex generation, the <code>existing_file</code> semantic.</td></tr>
 				<tr><td>0.48</td><td>11 November 2026</td><td>Harnesses check what a call leaves behind (globals, files, file descriptors) and whether accessors damage their object; unbuildable classes are skipped; coverage-guided fuzzing reads real coverage counters.</td></tr>
 				<tr><td>0.47</td><td>7 October 2026</td><td><code>extract-schemas --function NAME</code> for isolating one routine, a self-fuzz summary that lists every routine and why it was skipped, and <code>$pkg</code>, <code>$proto</code> and <code>$klass</code> recognised as invocants.</td></tr>
 				<tr><td>0.46</td><td>18 August 2026</td><td>Duplication drill-down pages, sortable and reorderable dashboard tables with saved state, and the domain, path, data-flow and transaction test suites.</td></tr>
@@ -184,7 +195,7 @@
 <pre><code>cpanm App::Test::Generator
 </code></pre>
 	<p>
-		Schemas are compatible across releases: a schema that works with 0.50 has
+		Schemas are compatible across releases: a schema that works with 0.52 has
 		worked since the transform syntax settled. Generated harnesses are
 		regenerated by tooling, so a stale one is replaced rather than migrated.
 		If you keep generated <code>.t</code> files in version control, regenerate
@@ -201,7 +212,7 @@
 
 <footer class="site-footer">
 	<div class="wrap">
-		<p>App::Test::Generator 0.51 — Copyright 2025&ndash;2026 Nigel Horne. Released under the GNU General Public License, version 2.</p>
+		<p>App::Test::Generator 0.52 — Copyright 2025&ndash;2026 Nigel Horne. Released under the GNU General Public License, version 2.</p>
 		<p>
 			<a href="https://metacpan.org/dist/App-Test-Generator">MetaCPAN</a> ·
 			<a href="https://github.com/nigelhorne/App-Test-Generator">Source</a> ·

@@ -5,7 +5,7 @@ use warnings;
 
 use Exporter qw(import);
 
-our $VERSION = '0.51';
+our $VERSION = '0.52';
 
 our @EXPORT_OK = qw(
 	SOURCE_VALIDATOR SOURCE_INPUT_SPEC SOURCE_POD
@@ -20,7 +20,7 @@ App::Test::Generator::Provenance - The allowed values of a schema parameter's C<
 
 =head1 VERSION
 
-Version 0.51
+Version 0.52
 
 =head1 SYNOPSIS
 

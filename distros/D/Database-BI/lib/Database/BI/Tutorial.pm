@@ -3,7 +3,7 @@ package Database::BI::Tutorial;
 use strict;
 use warnings;
 
-our $VERSION = '0.023.1';
+our $VERSION = '0.024.0';
 
 # ---------------------------------------------------------------------------
 # The tutorial that the application shows at GET /tutorial.
@@ -89,8 +89,13 @@ my @CHAPTERS = (
 			'To see a file as soon as the program starts, name it when you start the program: script/database-bi data/store.db.',
 			'The home address then shows that file. Click Home in the breadcrumb to see the usual list.',
 			'You can name only one file this way. To bring files together, open one and use Merge or Combine.',
+			'A JSON Lines file, ending .jsonl or .ndjson, has one JSON object on each line. Each line is one row.',
+			'Set json_flatten in the settings to show a nested object as columns such as address.city.',
+			'To open several files as one table, tick them in the list. Use Select all for a whole folder, or hold Shift to tick a range.',
+			'Click Combine selected. The rows of each file are stacked in one table.',
+			'The last column, source_file, names the file each row came from.',
 		],
-		tip   => 'A dropped file is a copy. Changes in the view do not change your original file.',
+		tip   => 'A folder of reports in the same format, such as a DMARC archive, needs only Select all and Combine selected.',
 		routes => [ '/browse', '/open', '/tables' ],
 	},
 	{
@@ -139,6 +144,7 @@ my @CHAPTERS = (
 			'Beside them, the page says where you are, for example Page 2 of 7.',
 			'Choose 25, 50, 100, 200 or All in Rows per page to change how many rows each page shows.',
 			'The first row you were looking at stays on screen. All puts every row on one page, which can be slow for a big file.',
+			'The number you choose stays when you merge or combine more data.',
 			'To change the number for every table, use the Preferences page.',
 			'Click Totals to add a row of sums at the bottom.',
 			'Click the box at the start of a row to select it. Click Delete selected to remove it from the view.',
@@ -161,9 +167,11 @@ my @CHAPTERS = (
 			'To keep just a recent window instead, pick a Time range such as the last 30 days.',
 			'Time range is shown only when the table has a date or time column.',
 			'Choose the column that window applies to, then click Apply range.',
+			'Today and the other windows follow the time zone the maintainer set, if there is one.',
 			'Press Enter or click Apply filter.',
 			'Each active filter is shown as a small label in the toolbar. Click the x on a label to remove it.',
 			'For more rules, click Merge / Filter... and use the Filter results section.',
+			'To compare two columns, use Delta... instead. It is explained in its own chapter.',
 			'A link whose filter names a column the table does not have shows an error that lists the columns.',
 		],
 		tip   => 'A filter does not change your file. It only changes what you see and what you export. A time range is worked out from today every time.',
@@ -221,10 +229,27 @@ my @CHAPTERS = (
 			'Click Combine data...',
 			'Choose the second table or type its path.',
 			'Click Combine.',
+			'To combine many files at once, tick them in Browse your files and click Combine selected.',
+			'A source_file column then names the file each row came from.',
 			'You can merge a table and then combine another, in either order. The table keeps both, and so do its charts.',
 		],
 		tip   => 'The files do not need the same columns. A missing value is left blank.',
 		routes => [ '/combine' ],
+	},
+	{
+		id    => 'delta',
+		part  => 'Work with a table',
+		title => 'Keep only the rows where two columns differ',
+		lead  => 'Delta removes every row where two columns are identical.',
+		steps => [
+			'Open the table.',
+			'Click Delta..., to the right of Combine data.',
+			'Choose the first column and the second column.',
+			'Click Apply. Only the rows where the two columns hold different values are left.',
+			'To see all the rows again, remove the filter chip above the table.',
+		],
+		tip   => 'Identical means the same text. Ann and ann differ, and so do 10 and 10.0. Two empty cells are identical, so that row is removed.',
+		routes => [ '/open' ],
 	},
 	{
 		id    => 'calc',
@@ -370,6 +395,7 @@ my @CHAPTERS = (
 			'Choose a category column and a number column.',
 			'Click Plot.',
 			'Use Export SVG, Export PNG or Export PDF to save the chart. Use Copy link to share the page.',
+			'Chrome and Edge ask where to save. Choose the folder and type the file name you want, then click Save.',
 		],
 		tip   => 'If the chart is empty, check that you chose a number column for the value.',
 		routes => [],
@@ -410,6 +436,7 @@ my @CHAPTERS = (
 			'Choose the date or timestamp column for the category or X axis.',
 			'Set Time bucket to the period you want, such as 1 hour or 1 month.',
 			'Click Plot.',
+			'A time that ends in Z or an offset, such as +01:00, lands in the day and hour of the time zone that was set.',
 		],
 		tip   => 'The bucket is a new column, so the chart still has the original timestamp beside it. Use the pivot table to bucket a row group the same way.',
 		routes => [],
@@ -777,7 +804,7 @@ my @CHAPTERS = (
 			'The ending of the name chooses the format: .csv, .sql or .json.',
 			'Click Save. The program writes a new file. Your source file is not changed.',
 		],
-		tip   => 'Export includes your joins, filters and duplicate setting.',
+		tip   => 'Export includes your joins, filters and duplicate setting. It saves only the columns you can see, in the order you see them. A column that you deleted is not saved.',
 		routes => [ '/export' ],
 	},
 	{
@@ -838,7 +865,7 @@ my @CHAPTERS = (
 				{ do => 'Click Edit cross-row in a card header and click one of its columns.', see => 'The chip puts its column, function and name back in the fields, ready to change.' },
 				{ do => 'Click Bookmarks, type a name and click Save.', see => 'A link to this exact view appears under the button.' },
 				{ do => 'Click Print.', see => 'The browser print window opens with the canvas ready for paper or PDF.' },
-				{ do => 'To save just one chart, use the SVG, PNG or PDF button in its card header.', see => 'The chart downloads as a file named after the card.' },
+				{ do => 'To save just one chart, use the SVG, PNG or PDF button in its card header.', see => 'Chrome and Edge ask where to save it, with a file name based on the card. Other browsers save it in the downloads folder.' },
 			],
 			result => 'You filtered and arranged one dashboard, and saved a named view without changing any data file.',
 		},
@@ -1035,6 +1062,8 @@ my @CHAPTERS = (
 			'model_dir holds the saved canvases and settings. It must not be inside data_dir.',
 			'Set page_cache_dir to keep a copy of the Catalog and Tutorial pages on disc. page_cache_duration says for how long.',
 			'cache_dir is where the places found for maps, the extracts and the page cache are kept. CACHEDIR or CACHE_DIR in the environment wins over it.',
+			'Set time_zone to UTC, local or an offset such as +05:30. A time that ends in Z or +01:00 is then read on that clock. Names such as Europe/London are not read.',
+			'Set json_flatten to 1 to split nested JSON objects into columns, named by their path, such as address.city. Both settings apply to the whole server, not to one file.',
 			'Set ai_api_key to show the Ask button and the AI choice on the insights page.',
 			'Restart the program after you change the file.',
 		],
@@ -1065,12 +1094,28 @@ my @FAQ = (
 		answer   => 'Put the file in the data folder, or open it from Browse your files. The program only lists files that it can read.',
 	},
 	{
+		question => 'A JSON file shows address as text, not columns.',
+		answer   => 'A nested object is shown as JSON text unless the maintainer sets json_flatten to 1. Then each value is its own column, such as address.city. A list is always shown as text.',
+	},
+	{
+		question => 'Can I open a file with one JSON object on each line?',
+		answer   => 'Yes. A file ending .jsonl or .ndjson is a JSON Lines file, and each line is a row. A large one is read a line at a time, so it does not fill the memory.',
+	},
+	{
+		question => 'A time near midnight falls on the wrong day.',
+		answer   => 'A time that ends in Z or an offset, such as +01:00, names one moment. If the maintainer set time_zone, it is moved to that clock before filters, ranges and buckets read it. Without it, the time is read as written. A time with no zone is always read as written, and the table shows every cell as it was written.',
+	},
+	{
 		question => 'The home address shows one file, not the list.',
 		answer   => 'The program was started with the name of that file. Click Home in the breadcrumb to see the list. To stop this, start the program without a file name.',
 	},
 	{
 		question => 'The program says that only one database can be opened.',
-		answer   => 'You named more than one file when you started the program. Name one, then use Merge or Combine on its page to add the others.',
+		answer   => 'You named more than one file when you started the program. Name one, then use Merge or Combine on its page to add the others. To open a whole folder as one table, tick its files in Browse your files and click Combine selected.',
+	},
+	{
+		question => 'Can I open all the files in a folder as one table?',
+		answer   => 'Yes, if they are in the same format. Open the folder in Browse your files, click Select all, then click Combine selected. A source_file column names the file each row came from.',
 	},
 	{
 		question => 'The table says its extract is stale.',
@@ -1079,6 +1124,14 @@ my @FAQ = (
 	{
 		question => 'An extracted column says (unparseable).',
 		answer   => 'The pattern did not match the value in that row. Those rows are kept and grouped together, so you can see how many there are.',
+	},
+	{
+		question => 'Delta shows no rows.',
+		answer   => 'The two columns hold the same value in every row, so Delta removed them all. Remove the filter label above the table to see the rows again.',
+	},
+	{
+		question => 'Export left out a column, or put the columns in a new order.',
+		answer   => 'Export saves the columns that the table shows now, in the order that it shows them. A column that you deleted is not saved. Reload the page to get it back.',
 	},
 	{
 		question => 'New columns appeared that are not in my file.',
@@ -1215,18 +1268,21 @@ my @GLOSSARY = (
 	{ term => 'Cross-row column', meaning => 'A column worked out from several rows, for example a running total.' },
 	{ term => 'CSV',         meaning => 'A text file with values separated by commas.' },
 	{ term => 'Data file',   meaning => 'A file with rows and columns that the program can read.' },
+	{ term => 'Delta',       meaning => 'Keep only the rows where two columns hold different values.' },
 	{ term => 'Duplicate',   meaning => 'A row that is exactly the same as another row.' },
 	{ term => 'Export',      meaning => 'Write the rows that you see to a new file.' },
 	{ term => 'Expression',  meaning => 'A small formula, for example revenue - cost.' },
 	{ term => 'Filter',      meaning => 'A rule that hides rows which do not match.' },
 	{ term => 'Geocode',     meaning => 'Change a place name into a latitude and a longitude.' },
 	{ term => 'Join',        meaning => 'Add columns from a second table by matching a shared value.' },
+	{ term => 'JSON Lines', meaning => 'A text file with one JSON object on each line.' },
 	{ term => 'Pivot table', meaning => 'A grid that summarises rows and columns.' },
 	{ term => 'PSV',         meaning => 'A text file with values separated by pipe characters.' },
 	{ term => 'Row',         meaning => 'One record in a table.' },
 	{ term => 'Server',      meaning => 'The program on a computer that sends pages to your browser.' },
 	{ term => 'SQLite',      meaning => 'A database file that can hold more than one table.' },
 	{ term => 'Time bucket', meaning => 'One group for each hour, day, month or other period.' },
+	{ term => 'Time zone',   meaning => 'The clock that times are read on, set by the maintainer.' },
 	{ term => 'Time range',  meaning => 'A recent window, such as the last 30 days, worked out from today.' },
 	{ term => 'TSV',         meaning => 'A text file with values separated by tab characters.' },
 	{ term => 'URL',         meaning => 'The address of a web page, shown in the address bar.' },

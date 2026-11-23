@@ -73,7 +73,7 @@ Parameters:
 
 sub iso8601_string {
 	my ($self, $timestamp) = @_;
-	croak unless $timestamp =~ /T.*Z/;
+	croak unless $timestamp =~ /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?$/;
 	return $timestamp;
 }
 
@@ -241,6 +241,52 @@ sub datetime_parser {
 	use DateTime::Format::Strptime;
 	my $parser = DateTime::Format::Strptime->new(pattern => '%Y-%m-%d');
 	return $parser->parse_datetime($date_str);
+}
+
+=head2 zone_spec($spec)
+
+Parameters:
+  $spec - string, a zone name or offset
+
+=cut
+
+sub zone_spec {
+	my ($self, $spec) = @_;
+	return 'utc' if $spec =~ /\A(?:utc|gmt|z)\z/i;
+	return 'local' if $spec =~ /\Alocal\z/i;
+	return 'offset' if $spec =~ /\A([+-])([0-9]{2})(?::?([0-9]{2}))?\z/;
+	croak "time_zone: '$spec' is not UTC, local, or an offset such as +05:30";
+}
+
+=head2 quoted_wrap($s)
+
+Parameters:
+  $s - string, the string to quote
+
+=cut
+
+sub quoted_wrap {
+	my ($self, $s) = @_;
+	croak('quoted_wrap: argument must be a plain string, not a reference') if ref($s);
+	for my $pair (['(', ')'], ['[', ']']) {
+		my ($l, $r) = @{$pair};
+		return "q$l$s$r" unless $s =~ /\Q$l\E|\Q$r\E/;
+	}
+	return "'$s'";
+}
+
+=head2 unless_wrap($s)
+
+Parameters:
+  $s - string, the string to wrap
+
+=cut
+
+sub unless_wrap {
+	my ($self, $s) = @_;
+	croak('unless_wrap: argument must be a plain string, not a reference') if ref($s);
+	return qq{q{$s}} unless $s =~ /\A[a-z]+\z/;
+	return "'$s'";
 }
 
 sub _private_advanced {
@@ -486,6 +532,42 @@ subtest 'datetime_parser method' => sub {
 
 		is($date_str_param->{semantic}, 'datetime_parseable', 'semantic type is datetime_parseable');
 	}
+};
+
+# Every pattern that accepts the value is part of its domain
+subtest 'zone_spec method' => sub {
+	my $schema = $schemas->{zone_spec};
+	ok($schema, 'zone_spec schema exists');
+
+	my $spec_param = $schema->{input}{spec};
+	ok($spec_param, 'spec parameter detected');
+	is($spec_param->{_source}, 'validator', 'the patterns are the parameter\'s validator');
+	like($spec_param->{matches}, qr/utc/, 'the UTC form is accepted');
+	like($spec_param->{matches}, qr/local/, 'the local form is accepted');
+	like($spec_param->{matches}, qr/\[\+-\]/, 'the offset form is accepted');
+};
+
+# A pattern that interpolates loop variables constrains nothing: the harness
+# cannot compile it, and the value it compares against is not in the schema
+subtest 'quoted_wrap method' => sub {
+	my $schema = $schemas->{quoted_wrap};
+	ok($schema, 'quoted_wrap schema exists');
+
+	my $s_param = $schema->{input}{s};
+	ok($s_param, 's parameter detected');
+	ok(!defined($s_param->{matches}), 'a pattern interpolating loop variables is not recorded');
+};
+
+# `return X unless match` returns for every value that does not match, so the
+# pattern names a rejection: the value it rejects is the accepted one, and the
+# pattern is not the parameter's domain
+subtest 'unless_wrap method' => sub {
+	my $schema = $schemas->{unless_wrap};
+	ok($schema, 'unless_wrap schema exists');
+
+	my $s_param = $schema->{input}{s};
+	ok($s_param, 's parameter detected');
+	ok(!defined($s_param->{matches}), 'a pattern behind unless is not recorded as the domain');
 };
 
 # private methods excluded

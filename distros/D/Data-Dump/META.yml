@@ -26,5 +26,5 @@ resources:
   bugtracker: https://github.com/garu/data-dump/issues/
   license: http://dev.perl.org/licenses/
   repository: http://github.com/garu/data-dump
-version: '1.26'
+version: '1.27'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

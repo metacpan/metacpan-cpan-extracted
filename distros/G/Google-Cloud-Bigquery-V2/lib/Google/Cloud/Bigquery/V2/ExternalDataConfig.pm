@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::V2::ExternalDataConfig;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.12';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;

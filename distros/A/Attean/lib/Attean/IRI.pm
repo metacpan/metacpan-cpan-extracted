@@ -7,7 +7,7 @@ Attean::IRI - RDF Internationalized Resource Identifiers (IRIs)
 
 =head1 VERSION
 
-This document describes Attean::IRI version 0.040
+This document describes Attean::IRI version 0.041
 
 =head1 SYNOPSIS
 
@@ -28,7 +28,7 @@ and extends the L<IRI> class.
 
 =cut
 
-package Attean::IRI 0.040 {
+package Attean::IRI 0.041 {
 	use Moo;
 	use Types::Standard qw(Str);
 	use IRI 0.005;
@@ -37,6 +37,7 @@ package Attean::IRI 0.040 {
 	extends 'IRI';
 	
 	has 'ntriples_string'	=> (is => 'ro', isa => Str, lazy => 1, builder => '_ntriples_string');
+	has 'string'			=> (is => 'ro', lazy => 1, builder => '_as_string', reader => 'as_string');
 
 =item C<< equals ( $iri ) >>
 
@@ -84,7 +85,7 @@ Returns the IRI value.
 
 =cut
 
-	sub as_string {
+	sub _as_string {
 		my $self	= shift;
 		return $self->abs;
 	}

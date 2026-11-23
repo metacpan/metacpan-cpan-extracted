@@ -77,9 +77,10 @@ use Params::Get			();
 use Params::Validate::Strict	qw(validate_strict);
 use Readonly;
 use Scalar::Util		qw(blessed);
+use Storable			qw(dclone);
 use URI				();
 
-our $VERSION = '0.023.1';
+our $VERSION = '0.024.0';
 
 # The place rank an answer must have at each level: rank for a country not
 # listed, countries for those that differ, by ISO 3166-1 alpha-2 code.  Checked
@@ -206,7 +207,7 @@ Database::BI::Model::Boundary - The outline of the area around each map marker
 
 =head1 VERSION
 
-0.023.1
+0.024.0
 
 =head1 SYNOPSIS
 
@@ -335,8 +336,9 @@ sub new {
 		input => $raw,
 	);
 
-	my $level = $LEVELS{ $args->{level} }
-		or croak "Unknown boundary level '$args->{level}'";
+	my $level_name = $args->{level} // '';
+	my $level = $LEVELS{$level_name}
+		or croak "Unknown boundary level '$level_name'";
 	croak 'The boundary cache needs get() and set()'
 		if defined($args->{cache}) && !($args->{cache}->can('get') && $args->{cache}->can('set'));
 
@@ -356,6 +358,8 @@ sub new {
 =head4 INPUT
 
   ranks : hashref of { country code => place rank }
+          Domains: a code is exactly two ASCII letters (any case); a rank is
+          8, 10 or 12 as a whole number (7, 9, 11, 13, '08' and '8 ' are not)
 
 =head4 OUTPUT
 
@@ -375,7 +379,7 @@ sub check_ranks {
 		my $rank = $ranks->{$code};
 		croak "'$code' is not a two-letter country code" unless $code =~ /\A[A-Za-z]{2}\z/;
 		croak "the rank for '$code' must be one of " . join(', ', sort { $a <=> $b } keys %ZOOM_FOR_RANK)
-			unless defined($rank) && !ref($rank) && $rank =~ /\A\d+\z/ && $ZOOM_FOR_RANK{$rank};
+			unless defined($rank) && !ref($rank) && $rank =~ /\A[0-9]+\z/ && $ZOOM_FOR_RANK{$rank};
 		croak "'$code' is given twice" if exists $checked{ lc $code };
 		$checked{ lc $code } = $rank + 0;
 	}
@@ -498,6 +502,12 @@ sub levels {
   lat : number  -90 .. 90
   lon : number  -180 .. 180
 
+  Domains: each is a plain decimal, an optional minus and ASCII digits with an
+  optional fraction (1, -1.5, 12.345678).  A plus sign, a bare point (.5, 5.),
+  an exponent, spaces, a newline, a comma, NaN, Inf and non-ASCII digits are
+  not numbers here.  The edges -90, 90, -180 and 180 are in; anything past
+  them, however slightly (90.0001), is out, even if it would round to an edge.
+
 =head4 OUTPUT
 
 The point rounded to three decimal places, as C<"lat,lon">: what the cache is
@@ -509,7 +519,7 @@ sub point_key {
 	my (undef, $lat, $lon) = @_;
 
 	return unless defined($lat) && defined($lon)
-		&& $lat =~ /\A-?\d+(?:\.\d+)?\z/ && $lon =~ /\A-?\d+(?:\.\d+)?\z/
+		&& $lat =~ /\A-?[0-9]+(?:\.[0-9]+)?\z/ && $lon =~ /\A-?[0-9]+(?:\.[0-9]+)?\z/
 		&& abs($lat) <= 90 && abs($lon) <= 180;
 
 	my @parts = map {
@@ -601,7 +611,10 @@ sub outlines {
 			type       => 'Feature',
 			properties => { name => $outline->{name}, osm => $osm,
 				called => $self->name_for($outline->{country}) },
-			geometry   => $outline->{geometry},
+			# A copy: the cache may hand out the one it holds (an in-memory
+			# layer does), and a caller that changes its result must not change
+			# what the next one is given.
+			geometry   => (ref($outline->{geometry}) ? dclone($outline->{geometry}) : $outline->{geometry}),
 		};
 	}
 	$counts{drawn} = scalar @features;
@@ -644,7 +657,7 @@ sub lookup_point {
 
 	croak 'lookup_point() needs a point key such as 39.090,-77.640'
 		unless defined($key) && !ref($key)
-		&& $key =~ /\A(-?\d{1,2}\.\d{$DECIMALS}),(-?\d{1,3}\.\d{$DECIMALS})\z/
+		&& $key =~ /\A(-?[0-9]{1,2}\.[0-9]{$DECIMALS}),(-?[0-9]{1,3}\.[0-9]{$DECIMALS})\z/
 		&& defined($self->point_key($1, $2)) && $self->point_key($1, $2) eq $key;
 
 	local ($@, $!);
@@ -818,6 +831,8 @@ sub _known {
 
 	my ($lat, $lon) = split /,/, $key;
 	for my $entry (@{$index}) {
+		# A damaged index entry (not five defined values) knows no outline.
+		next unless ref($entry) eq 'ARRAY' && 5 == grep { defined && !ref } @{$entry}[0 .. 4];
 		my ($osm, $south, $west, $north, $east) = @{$entry};
 		next if $lat < $south || $lat > $north || $lon < $west || $lon > $east;
 		my $outline = $self->_get($self->_outline_key($osm));
@@ -947,8 +962,8 @@ sub _outline_id {
 	my $rank     = $reply->{place_rank};
 	my $category = $reply->{category} // '';
 	my $osm_type = $reply->{osm_type} // '';
-	return unless defined($reply->{osm_id}) && $reply->{osm_id} =~ /\A\d+\z/
-		&& defined($rank) && !ref($rank) && $rank =~ /\A\d+\z/
+	return unless defined($reply->{osm_id}) && $reply->{osm_id} =~ /\A[0-9]+\z/
+		&& defined($rank) && !ref($rank) && $rank =~ /\A[0-9]+\z/
 		&& $rank >= $try->{ranks}[0] && $rank <= $try->{ranks}[1]
 		&& ref($geometry) eq 'HASH'
 		&& ($geometry->{type} // '') =~ /\A(?:Multi)?Polygon\z/
@@ -1019,6 +1034,10 @@ sub _bounds {
 sub _contains {
 	my ($geometry, $lat, $lon) = @_;
 	for my $polygon (_polygons($geometry)) {
+		# Premise 1: the geometry came from a web service and a cache file.
+		# Premise 2: a damaged entry must not turn a map into a 500.
+		# Conclusion: what is not a polygon holds no point.
+		next unless ref($polygon) eq 'ARRAY';
 		my ($outer, @holes) = @{$polygon};
 		next unless _in_ring($outer, $lon, $lat);
 		return 1 unless grep { _in_ring($_, $lon, $lat) } @holes;
@@ -1026,12 +1045,25 @@ sub _contains {
 	return 0;
 }
 
+# _is_position($value) -> 1 | 0
+#
+# A GeoJSON position is a list of at least two defined numbers.  Anything else
+# in a ring means the ring is damaged, and a damaged ring holds no point.
+sub _is_position {
+	my ($position) = @_;
+	return 0 unless ref($position) eq 'ARRAY' && @{$position} >= 2;
+	return (defined $position->[0] && defined $position->[1]
+		&& !ref($position->[0]) && !ref($position->[1])) ? 1 : 0;
+}
+
 sub _in_ring {
 	my ($ring, $x, $y) = @_;
 	return 0 unless ref($ring) eq 'ARRAY' && @{$ring} >= 3;
 	my $inside = 0;
+	return 0 unless _is_position($ring->[-1]);
 	my ($px, $py) = @{ $ring->[-1] };
 	for my $position (@{$ring}) {
+		return 0 unless _is_position($position);
 		my ($qx, $qy) = @{$position};
 		if ((($qy > $y) != ($py > $y))
 				&& ($x < ($px - $qx) * ($y - $qy) / ($py - $qy) + $qx)) {

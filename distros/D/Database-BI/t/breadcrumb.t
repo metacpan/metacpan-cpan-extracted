@@ -175,4 +175,43 @@ subtest 'Preferences leads back to the page it was opened from' => sub {
 		["\x{2190} Home", 'Preferences'], 'a back= to another site is not followed');
 };
 
+# Every page a person can land on has the one breadcrumb, with Home first and
+# the page itself last.  A new page template that forgets it fails here.
+subtest 'every page route carries a breadcrumb' => sub {
+	my $q = 'l=table:sales';
+	my @pages = (
+		'/tutorial', '/preferences', '/catalog', '/canvases', '/browse',
+		'/view/sales', "/tables?$q", "/pivot?$q&rows=region&m=amount:sum:total",
+		"/stats?$q", "/insights?$q", "/join?$q", "/combine?$q",
+		"/bar?$q&cat=region&val=amount", "/pie?$q&cat=region&val=amount",
+		"/graph?$q&x=code&y=amount", "/line?$q&x=code&y=amount",
+		"/heatmap?$q&x=region&y=code", "/scatter?$q&x=amount&y=amount",
+		"/stacked?$q&cat=region&series=code&val=amount", "/combo?$q&cat=region&bar_val=amount&line_val=amount",
+		"/treemap?$q&cat=region&val=amount", "/histogram?$q&col=amount",
+		"/wordcloud?$q&col=region", "/folder?$q&col=code", "/map?$q&loc=region",
+	);
+	for my $url (@pages) {
+		my $c = crumbs($url);
+		next unless @$c;
+		is($c->[0][0], "\x{2190} Home", "$url starts at Home");
+		ok(@$c > 1, "$url names itself after Home");
+		ok(!defined $c->[-1][1] || $url =~ m{\A/folder}, "$url ends on the current page");
+	}
+};
+
+subtest 'the login page has a breadcrumb' => sub {
+	require Database::BI::Password;
+	my $hash = Database::BI::Password::hash_password('secret', rounds => 10_000);
+	my $app = Test::Mojo->new('Database::BI', {
+		data_dir      => $data_dir->to_string,
+		model_dir     => $model_dir,
+		password_hash => $hash,
+		export_dirs   => [ File::Temp::tempdir(CLEANUP => 1) ],
+	});
+	my $dom = Mojo::DOM->new($app->get_ok('/login')->status_is(200)->tx->res->body);
+	my $nav = $dom->at('nav[aria-label="Breadcrumb"]');
+	ok($nav, 'the nav is there') or return;
+	is($nav->at('.crumbs')->all_text =~ s/\s+/ /gr, "\x{2190} Home \x{203A} Log in", 'Home > Log in');
+};
+
 done_testing();

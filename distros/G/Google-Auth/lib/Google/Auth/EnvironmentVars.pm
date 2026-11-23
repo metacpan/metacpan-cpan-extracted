@@ -26,13 +26,22 @@ Google::Auth::EnvironmentVars - Environment variables used by Google::Auth
 
 =head1 VERSION
 
-Version 0.09
-
-=cut
+Version 0.15
 
 =head1 SYNOPSIS
 
-Canonical package for reading environment variables used with Google::Auth
+    use Google::Auth::EnvironmentVars;
+
+    my $env = Google::Auth::EnvironmentVars->new();
+    my $project     = $env->PROJECT;
+    my $creds_path  = $env->CREDENTIALS;
+
+=head1 DESCRIPTION
+
+C<Google::Auth::EnvironmentVars> provides a canonical Moo-based accessor
+class for reading the standard Google Cloud authentication and project
+environment variables (such as C<GOOGLE_APPLICATION_CREDENTIALS>,
+C<GOOGLE_CLOUD_PROJECT>, and C<CLOUDSDK_CONFIG>) used by L<Google::Auth>.
 
 =head1 METHODS
 

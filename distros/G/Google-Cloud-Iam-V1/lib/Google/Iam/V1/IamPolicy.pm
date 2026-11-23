@@ -3,7 +3,7 @@ package Google::Iam::V1::IamPolicy;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -282,14 +282,14 @@ Type: String
 
 =cut
 
-# === Service Client: Google::Iam::V1::IamPolicy::IamPolicyClient ===
-package Google::Iam::V1::IamPolicy::IamPolicyClient;
+# === Service Client: Google::Iam::V1::IamPolicy::IAMPolicyClient ===
+package Google::Iam::V1::IamPolicy::IAMPolicyClient;
 
 =pod
 
 =head1 NAME
 
-Google::Iam::V1::IamPolicy::IamPolicyClient - Client stub representing the remote IAMPolicy service
+Google::Iam::V1::IamPolicy::IAMPolicyClient - Client stub representing the remote IAMPolicy service
 
 =head1 DESCRIPTION
 

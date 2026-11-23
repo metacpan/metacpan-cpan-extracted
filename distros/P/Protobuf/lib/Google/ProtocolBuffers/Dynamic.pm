@@ -7,7 +7,7 @@ use Protobuf::DescriptorPool;
 use File::Basename qw(dirname basename);
 use File::Temp qw(tempfile);
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 sub new {
     my ($class, %opts) = @_;
@@ -187,8 +187,60 @@ Google::ProtocolBuffers::Dynamic - Dynamic Protocol Buffers binding layer compat
 
 =head1 DESCRIPTION
 
-C<Google::ProtocolBuffers::Dynamic> provides a high-performance compatibility layer mapping
-dynamically parsed C<.proto> files directly into Perl classes via the UPB engine.
+C<Google::ProtocolBuffers::Dynamic> provides a compatibility layer modeled on
+the CPAN C<Google::ProtocolBuffers::Dynamic> API, compiling C<.proto> schemas
+on demand via C<protoc> into L<Protobuf::DescriptorPool> and generating Perl
+message classes backed by the L<Protobuf> C<upb> / Pure-Perl engine.
+
+=head1 METHODS
+
+=head2 new(%opts)
+
+    my $dynamic = Google::ProtocolBuffers::Dynamic->new(
+        include_path => ['protos/', '/usr/include'],
+    );
+
+Creates a new dynamic loader instance. Accepts an optional C<include_path>
+arrayref passed to C<protoc -I>.
+
+=head2 load_file($path)
+
+Compiles C<$path> with C<protoc>, registers its C<FileDescriptorSet> in
+L<Protobuf::DescriptorPool/generated_pool>, and generates Perl message classes.
+
+=head2 load_string($proto_source)
+
+Writes C<$proto_source> to a temporary C<.proto> file and loads it via
+L</load_file>.
+
+=head2 map_package($proto_package, $perl_package)
+
+Maps a Protobuf package name (e.g. C<foo.bar>) to a Perl namespace prefix
+(e.g. C<My::Perl::Package>) and generates message classes for any matching
+loaded files.
+
+=head2 map_message($proto_message, $perl_class)
+
+Maps a specific fully qualified Protobuf message name to a Perl class name.
+
+=head2 resolve_references()
+
+Compatibility no-op returning C<1>; references are resolved automatically
+during L</load_file>.
+
+=head2 encode($type, $data) / decode($type, $bytes)
+
+Serializes a Perl hashref or message object of C<$type> to binary Protobuf
+wire format, or decodes binary wire bytes into a message object.
+
+=head2 encode_json($type, $data) / decode_json($type, $json)
+
+Serializes a message of C<$type> to Proto3 canonical JSON, or parses JSON into
+a message object.
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::DescriptorPool>, L<Protobuf::ClassGenerator>
 
 =head1 SUPPORT AND BUG TRACKING
 

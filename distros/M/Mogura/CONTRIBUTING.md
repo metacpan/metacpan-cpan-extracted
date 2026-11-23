@@ -6,7 +6,8 @@ For a pull request, describe the problem, the change, and its impact. Include th
 
 ## Develop
 
-Run from the repository root with mise and `build-essential` installed.
+Run from the repository root on x86_64 or aarch64 Linux with 64-bit Perl, mise, and `build-essential` installed.
+`Makefile.PL` stops on unsupported platforms with the `OS unsupported` diagnostic recognized by CPAN Testers as NA. Test failures on supported Linux builds are bugs to investigate and fix.
 
 ```sh
 mise trust
@@ -46,7 +47,7 @@ Set `MOGURA_TEST_SYFT` to a Syft executable to exercise exclusion rules on tempo
 Install the archive in an empty prefix and start it outside the checkout. Use the version you just built.
 
 ```sh
-archive="$PWD/Mogura-0.01.tar.gz"
+archive="$PWD/Mogura-0.02.tar.gz"
 stage=$(mktemp -d)
 cd "$stage"
 env -u PERL5LIB -u PERL5OPT cpanm --local-lib-contained "$stage/prefix" "$archive"

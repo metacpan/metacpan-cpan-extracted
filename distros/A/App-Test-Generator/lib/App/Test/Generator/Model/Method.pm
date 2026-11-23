@@ -17,7 +17,7 @@ Readonly my %VALID_SIGNALS    => map { $_ => 1 } qw(
 	has_side_effect no_side_effect
 );
 
-our $VERSION = '0.51';
+our $VERSION = '0.52';
 
 =head1 NAME
 
@@ -25,7 +25,7 @@ App::Test::Generator::Model::Method - Evidence-based model of a single method un
 
 =head1 VERSION
 
-Version 0.51
+Version 0.52
 
 =head1 DESCRIPTION
 

@@ -71,7 +71,7 @@
    "provides" : {
       "Redis::Fast" : {
          "file" : "lib/Redis/Fast.pm",
-         "version" : "0.40"
+         "version" : "0.41"
       },
       "Redis::Fast::Hash" : {
          "file" : "lib/Redis/Fast/Hash.pm"
@@ -95,7 +95,7 @@
          "web" : "https://github.com/shogo82148/Redis-Fast"
       }
    },
-   "version" : "0.40",
+   "version" : "0.41",
    "x_contributors" : [
       "Aaron Crane <arc@aaroncrane.co.uk>",
       "Aaron Crane <arc@cpan.org>",

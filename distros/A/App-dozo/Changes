@@ -1,5 +1,32 @@
 Revision history for Perl extension App-dozo
 
+1.03 2026-11-22T16:23:08Z
+
+    - add --with (-F) to run an image with features added: pieces of
+      Dockerfile in ~/.config/dozo/features, built once as derived
+      images and reused; NAME/ARG passes an argument to a feature
+    - bundle share/features/locale, a feature which makes UTF-8
+      locales on Debian and Ubuntu based images and does nothing
+      elsewhere
+    - add -A (--auto-pull) to pull a newer image before running
+    - add -S (--status) to show what -L would do here, the live
+      containers and derived images, and the commands to clean up
+    - -L and -K without -I use the container of the directory, found
+      by its label; an image in .dozorc is a default for it
+    - -L tells when the existing container is made from another
+      image, or is not changed by -A or --with
+    - -L with a command creates the container in the background and
+      runs the command in it, so that it keeps running after the
+      command
+    - list options (-E, -V, --with, ...) are split at commas only;
+      -P and -O also at spaces, but not at a space escaped with a
+      backslash
+    - backslashes in the values of list options are kept
+    - an option and its argument in different .dozorc files are no
+      longer taken together, and a .dozorc with only "--" no longer
+      makes the options of the later ones the command
+    - require Getopt::Long::Bash 1.4.0
+
 1.02 2026-10-27T09:57:53Z
 
     - pass piped input to the command with -B (batch mode); -B now only

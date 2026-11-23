@@ -3,7 +3,7 @@ use v5.24;
 use warnings;
 use experimental qw< signatures >;
 use English;
-{ our $VERSION = '0.001' }
+{ our $VERSION = '0.002' }
 
 use Crypt::Age;
 use Crypt::PRNG qw(random_bytes);

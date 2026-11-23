@@ -1,5 +1,29 @@
 Revision history for Getopt-Long-Bash
 
+1.5.0 2026-11-23T01:29:03Z
+
+    - Security fix: the value given to an option with a regex
+      validation (=(...)) was evaluated by the shell, so a command
+      substitution in the value was executed, and such a value could
+      pass the validation.  All the versions up to 1.4.0 are
+      affected.  =i and =f are not (#5)
+    - The pattern of a regex validation is not evaluated by the shell
+      either: quotes and $ in the pattern are regex characters
+    - The return value of a callback function is ignored, as
+      documented.  A callback returning non-zero made the script die
+      with "callback function ... is not defined"
+    - A callback registered with two or more additional arguments was
+      silently not registered
+    - getoptlong command shows the library version with --version
+    - getoptlong with no subcommand gives a proper error under set -u,
+      and the default usage line works with a script path containing
+      spaces
+
+1.4.0 2026-11-22T16:12:28Z
+
+    - Backslashes in the value of a list (@) or hash (%) option are
+      kept as is.  They were taken as escapes and removed (#4)
+
 1.3.0 2026-11-17T01:41:41Z
 
     - An option which takes an optional argument (?) can have an

@@ -3,7 +3,7 @@ package Google::Dataflow::V1beta3::Messages;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -502,14 +502,14 @@ Type: Message (.google.dataflow.v1beta3.AutoscalingEvent)
 
 =cut
 
-# === Service Client: Google::Dataflow::V1beta3::Messages::MessagesV1beta3Client ===
-package Google::Dataflow::V1beta3::Messages::MessagesV1beta3Client;
+# === Service Client: Google::Dataflow::V1beta3::Messages::MessagesV1Beta3Client ===
+package Google::Dataflow::V1beta3::Messages::MessagesV1Beta3Client;
 
 =pod
 
 =head1 NAME
 
-Google::Dataflow::V1beta3::Messages::MessagesV1beta3Client - Client stub representing the remote MessagesV1Beta3 service
+Google::Dataflow::V1beta3::Messages::MessagesV1Beta3Client - Client stub representing the remote MessagesV1Beta3 service
 
 =head1 DESCRIPTION
 

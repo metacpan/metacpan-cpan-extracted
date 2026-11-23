@@ -4,10 +4,11 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 1;
+plan tests => 2;
 
 BEGIN {
-    use_ok( 'Google::Cloud::Datafusion::V1::DatafusionClient' ) || print "Bail out!\n";
+    use_ok( 'Google::Cloud::Datafusion::V1' ) || print "Bail out!\n";
+    use_ok( 'Google::Cloud::Datafusion::V1::DataFusionClient' ) || print "Bail out!\n";
 }
 
-diag( "Testing Google::Cloud::Datafusion::V1::DatafusionClient $Google::Cloud::Datafusion::V1::DatafusionClient::VERSION, Perl $], $^X" );
+diag( "Testing Google::Cloud::Datafusion::V1 $Google::Cloud::Datafusion::V1::VERSION, Perl $], $^X" );

@@ -17,12 +17,12 @@ new:
     config_file:
       _note: Existing file
       _source: input_spec
-      optional: 1
+      optional: 0
       semantic: existing_file
       type: string
     directory:
       _source: input_spec
-      optional: 1
+      optional: 0
       type: string
     logger:
       _source: input_spec
@@ -32,6 +32,7 @@ new:
   output:
     isa: Genealogy::Wills
     type: object
+  skip: constructor needs a live 'logger' object, which a fixture cannot provide
 search:
   config:
     close_stdin: 1
@@ -50,11 +51,20 @@ search:
     last:
       _source: pod
       optional: 0
-      type: number
+      type: string
     middle:
       _source: pod
       optional: 1
       type: string
+    schema:
+      _constraint_source:
+        max: input_spec
+        min: input_spec
+      _source: input_spec
+      max: 100
+      min: 1
+      optional: 1
+      type: integer
     town:
       _source: pod
       optional: 1
@@ -64,7 +74,7 @@ search:
       optional: 1
       type: integer
   module: Genealogy::Wills
-  new: {}
+  new: ~
   output:
     _context_aware: 1
     type: array

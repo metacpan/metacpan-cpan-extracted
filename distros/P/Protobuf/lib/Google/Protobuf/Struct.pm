@@ -3,7 +3,7 @@ package Google::Protobuf::Struct;
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -105,32 +105,6 @@ EOF
     # Fields for Struct
     # Field: fields Type: 11 (.google.protobuf.Struct.FieldsEntry)
 
-=pod
-
-=head1 NAME
-
-Google::Protobuf::Struct::Struct - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Protobuf::Struct;
-
-    my $msg = Google::Protobuf::Struct::Struct->new(
-        fields => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<fields>
-
-Type: Message (.google.protobuf.Struct.FieldsEntry)
-
-=back
-
-=cut
-
 # === Message: Google::Protobuf::Struct::Value ===
     # Fields for Value
     # Field: null_value Type: 14 (.google.protobuf.NullValue)
@@ -140,93 +114,147 @@ Type: Message (.google.protobuf.Struct.FieldsEntry)
     # Field: struct_value Type: 11 (.google.protobuf.Struct)
     # Field: list_value Type: 11 (.google.protobuf.ListValue)
 
-=pod
-
-=head1 NAME
-
-Google::Protobuf::Struct::Value - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Protobuf::Struct;
-
-    my $msg = Google::Protobuf::Struct::Value->new(
-        null_value => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<null_value>
-
-Type: Enum (.google.protobuf.NullValue)
-
-=item * B<number_value>
-
-Type: Double
-
-=item * B<string_value>
-
-Type: String
-
-=item * B<bool_value>
-
-Type: Bool
-
-=item * B<struct_value>
-
-Type: Message (.google.protobuf.Struct)
-
-=item * B<list_value>
-
-Type: Message (.google.protobuf.ListValue)
-
-=back
-
-=cut
-
 # === Message: Google::Protobuf::Struct::ListValue ===
     # Fields for ListValue
     # Field: values Type: 11 (.google.protobuf.Value)
-
-=pod
-
-=head1 NAME
-
-Google::Protobuf::Struct::ListValue - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Protobuf::Struct;
-
-    my $msg = Google::Protobuf::Struct::ListValue->new(
-        values => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<values>
-
-Type: Message (.google.protobuf.Value)
-
-=back
-
-=cut
 
 1;
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Protobuf::Struct - Protocol Buffers schema definition
+Google::Protobuf::Struct - Compiled Protocol Buffers messages for google/protobuf/struct.proto
+
+=head1 SYNOPSIS
+
+    use Google::Protobuf::Struct;
+
+    my $msg = Google::Protobuf::Struct::Struct->new({
+        fields => $fields,
+    });
+
+    # Read or update a field
+    my $val = $msg->fields();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Protobuf::Struct::Struct->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/protobuf/struct.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Protobuf::Struct::Struct
+
+`Struct` represents a structured data value, consisting of fields
+which map to dynamically typed values. In some languages, `Struct`
+might be supported by a native representation. For example, in
+scripting languages like JS a struct is represented as an
+object. The details of that representation are described together
+with the proto support for the language.
+
+The JSON representation for `Struct` is JSON object.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->fields() >> / C<< $msg->fields($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Struct::FieldsEntry>)
+
+Unordered map of dynamically typed values.
+
+=back
+
+=head2 Google::Protobuf::Struct::Value
+
+`Value` represents a dynamically typed value which can be either
+null, a number, a string, a boolean, a recursive struct value, or a
+list of values. A producer of value is expected to set one of these
+variants. Absence of any variant indicates an error.
+
+The JSON representation for `Value` is JSON value.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->null_value() >> / C<< $msg->null_value($value) >>
+
+Type: C<Enum> (L<Google::Protobuf::NullValue>)
+
+Represents a null value.
+
+=item * C<< $msg->number_value() >> / C<< $msg->number_value($value) >>
+
+Type: C<Double>
+
+Represents a double value.
+
+=item * C<< $msg->string_value() >> / C<< $msg->string_value($value) >>
+
+Type: C<String>
+
+Represents a string value.
+
+=item * C<< $msg->bool_value() >> / C<< $msg->bool_value($value) >>
+
+Type: C<Bool>
+
+Represents a boolean value.
+
+=item * C<< $msg->struct_value() >> / C<< $msg->struct_value($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Struct>)
+
+Represents a structured value.
+
+=item * C<< $msg->list_value() >> / C<< $msg->list_value($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::ListValue>)
+
+Represents a repeated `Value`.
+
+=back
+
+=head2 Google::Protobuf::Struct::ListValue
+
+`ListValue` is a wrapper around a repeated field of values.
+
+The JSON representation for `ListValue` is JSON array.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->values() >> / C<< $msg->values($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Value>)
+
+Repeated field of dynamically typed values.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Protobuf::Struct::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

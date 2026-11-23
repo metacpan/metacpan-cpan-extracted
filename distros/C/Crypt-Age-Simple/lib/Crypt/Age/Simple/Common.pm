@@ -3,7 +3,7 @@ use v5.24;
 use warnings;
 use experimental qw< signatures >;
 use English;
-{ our $VERSION = '0.001' }
+{ our $VERSION = '0.002' }
 
 use Crypt::Age::Primitives;
 use Crypt::Age::Stanza;
@@ -76,7 +76,7 @@ sub age_primitives_make_nonce ($counter, $is_final) {
 sub age_scrypt_decrypter ($password) {
    return Crypt::Age::Simple::Decrypt->new(
       identity => { scrypt => $password },
-      max_header_length => 150,
+      max_header_size => 150,
    );
 }
 
@@ -107,7 +107,7 @@ sub age_scrypt_wrap_key ($password, $salt, $Nlog2) {
 sub age_x25519_decrypter ($id) {
    return Crypt::Age::Simple::Decrypt->new(
       identity => { x25519 => $id },
-      max_header_length => CHUNK_SIZE, # should be pretty generous
+      max_header_size => CHUNK_SIZE, # should be pretty generous
    );
 }
 

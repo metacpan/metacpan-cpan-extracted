@@ -6,6 +6,45 @@ Home page:    <https://metacpan.org/release/Attean/>
 Bug tracker:  <https://github.com/kasei/attean/issues>
 Maintainer:   Gregory Todd Williams <mailto:gwilliams@cpan.org>
 
+0.041  2026-11-XX
+
+ - (Addition) Add Attean->get_functions, Attean->get_functional_forms, and
+   Attean->get_aggregates class methods.
+ - (Addition) Add Attean->parse_store_args.
+ - (Addition) Add Attean::API::BooleanLiteral->boolean_value method.
+ - (Addition) Add Attean::API::Model->type_hierarchy method.
+ - (Addition) Add Attean::QueryPlanner->suppress_dataset flag to allow
+   protocol-supplied dataset to override query.
+ - (Addition) Add canonical_iri class method to serializers.
+ - (Update) Add --default_graph=GRAPH CLI argument to attean_query.
+ - (Update) Add support for W3C developer tests: Service Description,
+   Protocol, Graph Store Protocol.
+ - (Update) Add validation to literal construction in parser code.
+ - (Update) Cache the as_string value of Attean::IRI.
+ - (Update) Fix Test::Attean::TestSimpleQueryEvaluator for recursive
+   federation to use mock endpoints.
+ - (Update) Fix broken and add missing POD.
+ - (Update) Fix bug in AtteanX::Store::Memory2::SPOGIndex trie walk code.
+ - (Update) Fix bugs in SPARQL (XPath F&O) string functions.
+ - (Update) Fix recursive term mapping of CDT types.
+ - (Update) Improve Attean::Plan::Load handling in cases where response
+   does not provide a media type.
+ - (Update) Improve W3C developer testing framework.
+ - (Update) Improve error message in Attean::SPARQLClient.
+ - (Update) Minor improvements to SPARQL lexer and serializer.
+ - (Update) Performance improvements to Attean::API::Binding classes.
+ - (Update) Performance improvements to NTuples parser.
+ - (Update) Re-organize developer tests.
+ - (Update) Re-use datatype IRIs in Attean::Literal constructors.
+ - (Update) Update RDF in meta/changes.ttl.
+ - (Update) Update TextTable serializer to consume
+   Attean::API::AbbreviatingSerializer.
+ - (Update) Update bin/attean_query to allow specifying a store config
+   using new parse_store_args() format.
+ - (Update) Update media type of TriG parser.
+ - (Update) Update required version of Moo and add Devel::STDERR::Indent
+   requirement.
+
 0.040  2026-10-26
 
  - (Addition) Add new trie-based Memory2 store implementation.

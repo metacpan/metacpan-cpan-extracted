@@ -6,7 +6,7 @@ use 5.026;
 use warnings;
 use utf8;
 
-our $VERSION = "1.25";
+our $VERSION = "1.26";
 
 =encoding utf-8
 
@@ -1431,8 +1431,8 @@ sub begin {
 # does not format after all (in a code block, say) is taken out there.
 sub mark_line_breaks {
     s{(^ {0,3}\|.+\|\h*\n){3,}}{
-        $& =~ s{$CODE(*SKIP)(*FAIL)|(?<!\\)<br\h*/?>\K(?!\h*\|)}{\x{2028}}gir
-    }mge;
+        ${^MATCH} =~ s{$CODE(*SKIP)(*FAIL)|(?<!\\)<br\h*/?>\K(?!\h*\|)}{\x{2028}}gir
+    }mgep;
 }
 
 sub format_table {
@@ -1448,13 +1448,16 @@ sub format_table {
     # are allowed in the block and removed, so that every row ends in
     # the same column for ansicolumn.
     s{(^ {0,3}\|.+\|\h*\n){3,}}{
-        my $block = $& =~ s/\h+$//mgr;
+        # The line of the table and the number of its lines, taken
+        # before any other match is made: one made below would give
+        # its own ${^MATCH} and $-[0].
+        my $line  = 1 + (substr($_, 0, $-[0]) =~ tr/\n//);
+        my $lines = ${^MATCH} =~ tr/\n//;
+        my $block = ${^MATCH} =~ s/\h+$//mgr;
         # a <br> which breaks a cell (see mark_line_breaks) has the
         # color of br_mark, which the nomark theme makes empty
-        $block =~ s{<br\h*/?>(?=\x{2028})}{mark_color('br', $&)}gie
+        $block =~ s{<br\h*/?>(?=\x{2028})}{mark_color('br', ${^MATCH})}giep
             if $config->{colorize};
-        my $line  = 1 + (substr($_, 0, $-[0]) =~ tr/\n//);
-        my $lines = $& =~ tr/\n//;
         my($right, $center) = parse_separator(\$block);
         my @sep_opt;
         # An escaped pipe (\|) is not a column separator (GFM).  It is
@@ -1512,7 +1515,7 @@ sub format_table {
                 my($rule) = $table =~ /^([\x{2500} ]+)$/m;
                 $table .= "$rule\n" if defined $rule;
             }
-            $table =~ s{^[\x{2500} ]+$}{ $& =~ tr/\x{2500}/-/r }mge unless $config->{rule};
+            $table =~ s{^[\x{2500} ]+$}{ ${^MATCH} =~ tr/\x{2500}/-/r }mgep unless $config->{rule};
         }
         # A table is kept intact: its lines joined into one by UNIT
         # SEPARATOR, the last newline kept, for ansicolumn --intact,
@@ -1521,7 +1524,7 @@ sub format_table {
         $table =~ s/\n(?=.)/$INTACT_SEP/gs if intact('table');
         push @table_shift, [ $line, ($table =~ tr/\n//) - $lines ];
         $table;
-    }mge;
+    }mgep;
     # the separators of mark_line_breaks() left out of the tables
     s{<br\h*/?>\K\x{2028}}{}gi;
 }

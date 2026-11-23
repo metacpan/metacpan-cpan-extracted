@@ -1,3 +1,107 @@
+Mon Nov 23 01:14:02 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.3.0]:
+	* VERSION: bump
+	* README.md: generated
+	* requires
+	- -CLI::Simple::Constants, -CLI::Simple::Utils (redundant sub-module pins)
+	* cpanfile
+	- -CLI::Simple::Constants, -CLI::Simple::Utils
+	- +Bedrock::XML 0 suggests
+	* lib/Data/NestedKey.pm.in
+	(delete)
+	- rewrite traversal to support bare leading array subscripts against array-rooted structures
+	- support negative subscripts in intermediate and final segments
+	- ignore out-of-range and nonexistent paths without modifying structure
+	- skip empty-parent pruning when an array index was traversed
+	(exists_key)
+	- rewrite traversal to support bare leading array subscripts against array-rooted structures
+	- support negative subscripts; return 0 for out-of-range or undef slots
+	- return first result in scalar context
+	- remove _walk helper (inlined into callers)
+	* lib/Data/NestedKey/CLI.pm.in
+	- add --replace/-r option; previously only --backup triggered in-place write
+	- add --output-format/-o option to serialize set output in a different format than input
+	- default get key to '.' (entire document) when no key argument is supplied
+	(_write_file)
+	- rewrite to write to a tempfile in the same directory, then rename, preserving original permissions
+	- require an input filename; die if infile is absent or stdin
+	- restore backup on failure; refuse to overwrite an existing backup file
+	(_fetch_data)
+	- add format auto-detection: .xml extension and Bedrock XML markup recognized before JSON/YAML fallback
+	- require top-level document to be a hash or array; die with accumulated parse errors otherwise
+	- store resolved input_format for use by _serialize
+	(_xml_data): new; lazy-loads Bedrock::XML and parses Bedrock XML input via newFromString/devolve
+	(_serialize): new; resolves output format from --output-format, input_format, or 'json' default; lazy-loads Bedrock::XML for XML output; uses local $Data::NestedKey::FORMAT to avoid global mutation
+	(cmd_set): trigger _write_file when --replace or --backup is set; output via _serialize instead of as_string
+	(init): validate both --format and --output-format; drop setting of global $Data::NestedKey::FORMAT here
+	(main): add replace|r and output-format|o to option_specs
+	* .gitignore
+	- add *.bak, *.checked, *.log, *.pod, *.raw, *.tmp, *.reconciled, *.rendered, build-config.mk, cpanfile.*, deps.mk, extra-files.mk, local/**, release-* artifacts, test-requires.cpanfile, test-requires.scan
+	* Makefile
+	- require GNU Make 4.3 (grouped-target feature check)
+	- add PACKAGE_VERSION, lc macro, GIT_SHA, GIT_DIRTY, GIT_USER template variables
+	- replace sed-based variable substitution with bootstrapper resolve-vars throughout
+	- replace monolithic scan-deps/filter_requires with grouped requires.raw/recommends.raw/suggests.raw rule producing all three tiers in a single scandeps-static.pl pass
+	- add reconcile-deps grouping for requires/recommends/suggests/test-requires via bootstrapper reconcile-deps
+	- add recommends and suggests as explicit DEPS and dependency targets
+	- split cpanfile generation into cpanfile.requires, cpanfile.suggests, cpanfile.recommends intermediates
+	- add real-quick target (disables SCAN, LINT, PODCHECKER, SYNTAX_CHECKING)
+	- add package target (clean + LINT=on SCAN=on)
+	- add extra-files and extra-files.mk targets for share-directory tracking
+	- add bootstrap guard (BOOTSTRAP_BUILD) deferring includes until build-config.mk exists
+	- add DARKPAN_REQUIRES/DARKPAN_URL support for darkpan cpanfile generation
+	- add clean-local extensible hook; expand CLEANFILES with *.raw, *.reconciled, *.rendered, cpanfile.*, build-config.mk, extra-files.mk
+	- remove workflow, build-ci, modulino targets
+	* .includes/perl.mk
+	- replace per-file sentinel rules with grouped &: rules for tidy and critic batches, delegating to bootstrapper perltidy/perlcritic --file-list
+	- add PERLCRITIC_SEVERITY and PERLCRITIC_THEME variables (defaults: 5, pbp)
+	- add %.pm.checked and %.pl.checked sentinel rules running syntax check and POD check
+	- add check-syntax phony target gating PERL_CHECKED_FILES and PERL_BIN_CHECKED_FILES
+	- introduce gen-vars-file macro for writing template variable files without shell quoting hazards
+	- replace sed-based .pm.in rendering with grouped bootstrapper resolve-vars --file-list pass producing .rendered intermediates
+	- add POD handling as static pattern rules (extract/remove/copy) from .rendered source
+	- remove PERL, PERLTIDY, PERLCRITIC, PERLTIDYRC, PERLCRITICRC shell-time derivations (now caller-supplied or absent)
+	- include deps.mk with rule to regenerate from SOURCE_FILES_IN via bootstrapper create-deps
+	* .includes/git.mk
+	- expand RECOMMENDED_ARTIFACTS to include suggests, recommends, builder, cpanfile, builder.env, config.mk, project.mk, share/, t/
+	- prune local/ directory from initial ChangeLog file inventory
+	- add NO_COMMIT=1 guard around git commit in git target
+	- add repo target for creating GitHub repositories via GITHUB_ACTIONS
+	* .includes/help.mk
+	- buffer help output to a tempfile and page through $PAGER (less/more/cat fallback)
+	- add SCAN, LINT, SYNTAX_CHECKING, SKIP_TESTS variable descriptions; remove MODULINO_NAME
+	* .includes/update.mk
+	- replace MANAGED_FILES list with MANAGED_MK_FILES (discovered from bootstrapper dist dir) and MANAGED_SOURCE_FILES
+	- add pre-update extensible hook
+	- post-update merges new .gitignore entries rather than replacing; copies Makefile from dist
+	- update-available delegates version-check to bootstrapper update-available and drift-check to md5sum against cmb_md5sums.txt; respects CMB_UPDATE_CHECK and CMB_VERSION_DRIFT settings
+	* .includes/version.mk
+	- run clean before release/minor/major version bumps
+	- add next-release target: bumps patch version on main, creates a release branch, prepopulates ChangeLog header, and commits
+	* .includes/release-notes.mk: deleted
+	* .includes/add-plugin.mk: new
+	* .includes/bash-completion.mk: new
+	* .includes/bootstrap.mk: new
+	* .includes/build-init.mk: new
+	* .includes/builder.mk: new
+	* .includes/local.mk: new
+	* .includes/modulino.mk: new
+	* .includes/test.mk: new
+	* .roles/CPAN-Maker-Bootstrapper-Role-LLM/role.mk: new
+	* .roles/CPAN-Maker-Bootstrapper-Role-LLM/role.yml: new
+	* config.mk: new
+	* project.mk: new
+	* recommends: new
+	* suggests: new
+	* t/02-cli.t: new
+	* t/03-cli-formats.t: new
+	* t/03-path-regressions.t: new
+	* .prompts/release-notes.prompt: new
+	* .prompts/change-log.prompt: new
+	* .roles/CPAN-Maker-Bootstrapper-Role-PAUSEUpload/role.mk: new
+	* .roles/CPAN-Maker-Bootstrapper-Role-PAUSEUpload/role.yml: new
+
 Wed Jul 15 07:03:43 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[1.2.2]:

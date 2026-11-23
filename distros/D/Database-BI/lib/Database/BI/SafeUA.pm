@@ -3,7 +3,7 @@ package Database::BI::SafeUA;
 use strict;
 use warnings;
 
-our $VERSION = '0.023.1';
+our $VERSION = '0.024.0';
 
 use parent 'LWP::UserAgent';
 
@@ -86,6 +86,12 @@ sub blocked_address {
 		return undef;
 	}
 
+	# Premise: only a full dotted quad names one address on every platform;
+	# Windows' inet_pton also reads 1.2.3 as 1.2.0.3.  Conclusion: anything
+	# else is not an address here (numeric_host spells the short forms out).
+	# A leading zero (10.0.0.01) is octal to some libraries and decimal to
+	# others, so it names no one address either: refused, not guessed.
+	return 'not an address' unless $bare =~ /\A(?:0|[1-9][0-9]{0,2})(?:\.(?:0|[1-9][0-9]{0,2})){3}\z/;
 	my $packed = inet_pton(AF_INET, $bare) // return 'not an address';
 	for my $net (@V4_BLOCKED) {
 		return $net->[2] if _in_net($packed, inet_pton(AF_INET, $net->[0]), $net->[1]);
@@ -125,7 +131,8 @@ sub _numeric_v4 {
 		} elsif ($part =~ /\A0([0-7]*)\z/) {
 			my $oct = $1 =~ s/\A0+//r;
 			return undef if length($oct) > 11;
-			$n = length $oct ? oct $oct : 0;
+			# Eleven octal digits can pass 32 bits: perl warns, and the range check below refuses it.
+			{ no warnings 'portable'; $n = length $oct ? oct $oct : 0; }
 		} elsif ($part =~ /\A[1-9][0-9]{0,9}\z/) {
 			$n = $part + 0;
 		} else {
@@ -146,8 +153,10 @@ sub _numeric_v4 {
 sub resolve_host {
 	my ($host) = @_;
 	local ($@, $!);
-	my ($err, @res) = getaddrinfo($host, undef, { socktype => SOCK_STREAM });
-	return () if $err;
+	# A host the resolver will not even take as text (a wide character)
+	# does not resolve, which the POD states as an empty list.
+	my ($err, @res) = eval { getaddrinfo($host, undef, { socktype => SOCK_STREAM }) };
+	return () if $@ || !defined($err) || $err;
 	my (%seen, @ips);
 	for my $r (@res) {
 		my ($e, $ip) = getnameinfo($r->{addr}, NI_NUMERICHOST, NIx_NOSERV);
@@ -205,7 +214,8 @@ sub send_request {
 	unless (!defined $literal && $self->private_host_allowed($name)) {
 		for my $ip (@addrs) {
 			my $why = blocked_address($ip) // next;
-			return _refuse($request, $ip eq $name ? "$name is $why" : "$name is $ip, which is $why");
+			my $shown = $ip // '';
+			return _refuse($request, $shown eq $name ? "$name is $why" : "$name is $shown, which is $why");
 		}
 	}
 
@@ -236,7 +246,7 @@ Database::BI::SafeUA - Fetch a URL only if it leads to the public internet
 
 =head1 VERSION
 
-0.023.1
+0.024.0
 
 =head1 SYNOPSIS
 

@@ -46,7 +46,7 @@ BEGIN {
 package main;
 use Google::Ai::Generativelanguage::V1::ModelServiceClient;
 
-my $client = Google::Ai::Generativelanguage::V1::ModelServiceClient->new( credentials => 'dummy' );
+my $client = Google::Ai::Generativelanguage::V1::ModelServiceClient->new();
 ok($client, 'Instantiated generated client');
 isa_ok($client->transport, 'Google::gRPC::Client', 'Client transport');
 

@@ -31,6 +31,7 @@ no_index:
 requires:
   Algorithm::Combinatorics: 0
   DateTime::Format::W3CDTF: 0
+  Devel::STDERR::Indent: 0
   Exporter::Tiny: 1
   File::Slurp: 0
   HTTP::Negotiate: 0
@@ -40,7 +41,7 @@ requires:
   List::Util: '1.56'
   Math::Cartesian::Product: 1.008
   Module::Pluggable: 0
-  Moo: 2.000002
+  Moo: 2.005005
   MooX::Log::Any: 0
   PerlIO::Layers: 0
   Role::Tiny: 2.000003
@@ -67,4 +68,4 @@ resources:
   homepage: https://metacpan.org/release/Attean
   license: http://dev.perl.org/licenses/
   repository: https://github.com/kasei/attean/
-version: '0.040'
+version: '0.041'

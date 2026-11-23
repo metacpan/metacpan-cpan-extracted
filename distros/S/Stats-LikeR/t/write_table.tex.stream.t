@@ -15,10 +15,12 @@
 # What the change does alter, and what this file therefore pins on purpose:
 #  - a table with no columns is refused before the file is opened, so an
 #    existing file survives (unchanged);
-#  - a croak from the data after the header (a tied cell whose FETCH dies) now
-#    leaves the file as far as it got, as csv and .xlsx have always done; it
-#    used to leave an existing file alone, because nothing was written until
-#    every record had been read.
+#  - a croak from the data after the header (a tied cell whose FETCH dies)
+#    leaves no partial file: since 0.3428 every format writes to a temporary
+#    file and renames it on success (see below);
+#  - a cell that is not valid UTF-8 is read as Latin-1 and written as UTF-8
+#    ("caf\xe9" comes out as C3 A9), the rule every other format follows; up to
+#    0.3427 the single byte E9 was written, which is no UTF-8 at all.
 
 require 5.010;
 use strict;
@@ -51,7 +53,7 @@ sub body { my $t = slurp(shift); $t =~ s/\A%written by [^\n]*\n//; return $t }
 my @cases = (
 	['HoA, undef, UTF-8 and escapes',
 		{ a => [1, 2.5, undef], b => ["\x{3b1}", "caf\x{e9}", "x_y&z"] }, [],
-		"\\begin{tabular}{|c|c|} \\hline\n\\textbf{a} & \\textbf{b} \\\\ \\hline\n\\textbf{1} & \\textalpha{}\\\\\n\\textbf{2.5} & caf\xe9\\\\\n\\textbf{} & x\\_y\\&z\\\\\n\\hline \\end{tabular}\n"],
+		"\\begin{tabular}{|c|c|} \\hline\n\\textbf{a} & \\textbf{b} \\\\ \\hline\n\\textbf{1} & \\textalpha{}\\\\\n\\textbf{2.5} & caf\xc3\xa9\\\\\n\\textbf{} & x\\_y\\&z\\\\\n\\hline \\end{tabular}\n"],
 	['HoA, tex_format, tex_bold_1st_col, tex_size',
 		{ a => [1, 2.123456789, undef], b => ["50%", "\$5", "{x}"] },
 		[tex_format => 1, tex_bold_1st_col => 1, tex_size => '\small'],
@@ -79,8 +81,9 @@ for my $empty ([], {}, [{}]) {
 	is(slurp($f), "KEEP\n", '... and the existing file is left alone');
 }
 
-# a croak from the data once the header is out: the file holds what was
-# written, as csv's does (opened before its first record too)
+# a croak from the data once the header is out leaves an existing file as it
+# was, and makes none where there was none (0.3428: written beside it and
+# renamed on success)
 {
 	package DieAt3;
 	require Tie::Array;
@@ -92,9 +95,13 @@ for my $ext (qw(csv tex)) {
 	tie my @t, 'DieAt3'; @t = (1 .. 6);
 	ok(!eval { write_table({ a => \@t, b => [1 .. 6] }, $f, quiet => 1); 1 }, "$ext: a dying FETCH croaks");
 	is($@, "boom\n", "$ext: the croak is the FETCH's own");
-	my $got = slurp($f);
-	like($got, $ext eq 'csv' ? qr/\Aa,b\n1,1\n2,2\n3,3\n\z/ : qr/\\textbf\{3\} & 3\\\\\n\z/,
-		"$ext: the file holds the rows written before the croak");
+	ok(!-e $f, "$ext: no file was left");
+	open my $o, '>', $f or die; print $o "KEEP\n"; close $o;
+	tie my @u, 'DieAt3'; @u = (1 .. 6);
+	ok(!eval { write_table({ a => \@u, b => [1 .. 6] }, $f, quiet => 1); 1 }, "$ext: and again over an existing file");
+	is(slurp($f), "KEEP\n", "$ext: the existing file is untouched");
+	my @left = grep { /\.tmp\z/ } glob("$dir/*");
+	is(scalar @left, 0, "$ext: and no temporary file is left");
 }
 
 done_testing;

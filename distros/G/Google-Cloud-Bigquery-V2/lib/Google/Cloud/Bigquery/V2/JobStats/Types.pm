@@ -292,6 +292,24 @@ coerce 'RepeatedJobStatistics2',
 declare 'MapStringJobStatistics2',
     as HashRef[JobStatistics2()];
 
+declare 'ObjectStorageStats',
+    as InstanceOf['Google::Cloud::Bigquery::V2::JobStats::ObjectStorageStats'];
+
+coerce 'ObjectStorageStats',
+    from HashRef, via { 'Google::Cloud::Bigquery::V2::JobStats::ObjectStorageStats'->new($_) };
+
+declare 'RepeatedObjectStorageStats',
+    as ArrayRef[ObjectStorageStats()];
+
+coerce 'RepeatedObjectStorageStats',
+    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Bigquery::V2::JobStats::ObjectStorageStats'->new($_) } @$_ ] };
+
+declare 'MapStringObjectStorageStats',
+    as HashRef[ObjectStorageStats()];
+
+declare 'CloudProvider',
+    as (Int | Str);
+
 declare 'JobStatistics3',
     as InstanceOf['Google::Cloud::Bigquery::V2::JobStats::JobStatistics3'];
 

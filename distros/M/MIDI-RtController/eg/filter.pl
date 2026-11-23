@@ -12,12 +12,12 @@ use Time::HiRes qw(usleep);
 
 # nb: The input device is not actually used for this example,
 # but is required by the module, nonetheless.
-my $in  = shift || 'pad'; # Synido TempoPAD Z-1
+my $in = shift || 'pad'; # Synido TempoPAD Z-1
 # output MIDI device
 my $out = shift || 'usb'; # USB MIDI Interface
-
-my $channel = 0;
-my $control = 1;
+# the control to modulate
+my $control = shift || 1;
+my $channel = shift || 0;
 
 # set-up the controllers
 my $rtc = MIDI::RtController->new(

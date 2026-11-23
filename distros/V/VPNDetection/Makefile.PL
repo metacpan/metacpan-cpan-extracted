@@ -14,8 +14,11 @@ WriteMakefile(
         # The whole HTTP stack, the JSON codec, the event loop and the promises,
         # from one distribution with no non-core dependencies of its own. Every body
         # is decoded by Mojo::JSON, which a deeply nested one could exhaust before
-        # 9.47 (CVE-2026-14803).
-        'Mojolicious' => '9.47',
+        # 9.47 (CVE-2026-14803). 9.48 fixes two advisories in the CSRF helpers
+        # (CPANSA-Mojolicious-2026-15747, -2026-77568), which this client never
+        # calls; the floor still moves past them, as cpanm keeps any installed
+        # copy that satisfies it.
+        'Mojolicious' => '9.48',
         # Mojolicious makes TLS optional; the API is HTTPS only, so we do not.
         'IO::Socket::SSL' => '2.009',
         # The PKCE verifier's random bytes, which core perl has no secure source

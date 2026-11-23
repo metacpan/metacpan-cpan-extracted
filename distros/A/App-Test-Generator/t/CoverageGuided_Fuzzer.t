@@ -355,6 +355,34 @@ subtest '_input_is_valid() validates hash-style input' => sub {
 # ==================================================================
 # _mutate_int
 # ==================================================================
+subtest 'numeric mutations stay out of the band below the documented maximum' => sub {
+	my $spec = { type => 'integer', min => 10_000, max => 100_000_000, sample_max => 200_000 };
+	my $f = _fuzzer(schema => { input => $spec });
+
+	my $in_band = sub { $_[0] > 200_000 && $_[0] <= 100_000_000 };
+
+	my $value = 200_000;
+	my @chain = map { $value = $f->_mutate_int($value, $spec) } 1 .. 200;
+	is(scalar(grep { $in_band->($_) } @chain), 0,
+		'chained doublings never creep into (sample_max, max]');
+	ok(scalar(grep { $_ > 100_000_000 } @chain),
+		'a value pushed past the sampling ceiling lands above the documented maximum');
+
+	my @direct = map { $f->_mutate_int(150_000, $spec) } 1 .. 200;
+	is(scalar(grep { $in_band->($_) } @direct), 0,
+		'a mutation that would overshoot sample_max is moved above max');
+
+	my @numbers = map { $f->_mutate_num(190_000, $spec) } 1 .. 200;
+	is(scalar(grep { $in_band->($_) } @numbers), 0, 'the same holds for numbers');
+
+	my @dispatched = map { $f->_mutate(190_000, $spec) } 1 .. 200;
+	is(scalar(grep { $in_band->($_) } @dispatched), 0, 'and for scalar dispatch through _mutate');
+
+	my @hashes = map { $f->_mutate_hash({ rounds => 190_000 }, { properties => { rounds => $spec } }) } 1 .. 200;
+	is(scalar(grep { $in_band->($_->{rounds}) } @hashes), 0,
+		'and for a value mutated inside a hashref');
+};
+
 subtest '_mutate_int() returns a defined scalar' => sub {
 	my $f = _fuzzer();
 	for my $n (0, 1, -1, 42, -100) {
@@ -709,6 +737,61 @@ subtest '_run_with_cover caches the "after" snapshot for reuse as next "before"'
 	$f->_run_with_cover('x', \$result, \$error);
 	ok(exists $f->{_last_cover_snapshot}, 'snapshot cached after _run_with_cover call');
 	is(ref($f->{_last_cover_snapshot}), 'HASH', 'cached snapshot is a hashref');
+};
+
+# ==================================================================
+# sample_max — generated data stops at the documented default, max stays
+# the bound a value is validated against
+# ==================================================================
+subtest '_rand_int() caps generated integers at sample_max' => sub {
+	my $spec = { type => 'integer', min => 10_000, max => 100_000_000, sample_max => 200_000 };
+	my $f = _fuzzer(schema => { input => $spec });
+
+	my @capped = map { $f->_rand_int($spec) } 1 .. 500;
+	is(scalar(grep { $_ > 200_000 } @capped), 0, 'no generated integer is above sample_max');
+
+	my @uncapped = map { $f->_rand_int({ %{$spec}, sample_max => undef }) } 1 .. 500;
+	ok(scalar(grep { defined($_) && $_ > 200_000 } @uncapped),
+		'without sample_max the same spec still generates above the default');
+};
+
+subtest '_rand_num() caps generated numbers at sample_max' => sub {
+	my $spec = { type => 'number', min => 0, max => 100_000_000, sample_max => 200_000 };
+	my $f = _fuzzer(schema => { input => $spec });
+
+	my @capped = map { $f->_rand_num($spec) } 1 .. 500;
+	is(scalar(grep { $_ > 200_000 } @capped), 0, 'no generated number is above sample_max');
+};
+
+subtest '_validate_value() keeps max as the bound above sample_max' => sub {
+	my $spec = { type => 'integer', min => 10_000, max => 100_000_000, sample_max => 200_000 };
+	my $f = _fuzzer(schema => { input => $spec });
+
+	ok($f->_validate_value(250_000, $spec), 'a value between sample_max and max is valid');
+	ok(!$f->_validate_value(100_000_001, $spec), 'a value above max is not');
+};
+
+# ==================================================================
+# Mixed-call schemas — one positional argument, never a hash of options
+# ==================================================================
+subtest 'a mixed-call schema is called with one positional argument' => sub {
+	my @calls;
+	my $f = App::Test::Generator::CoverageGuidedFuzzer->new(
+		schema => { input => {
+			password => { type => 'string', position => 0 },
+			rounds   => { type => 'integer', named => 1, min => 10_000, max => 100_000_000, sample_max => 200_000 },
+		} },
+		target_sub => sub { push @calls, [ @_ ]; return 1 },
+		iterations => 10,
+		seed       => 11,
+		timeout    => 0,
+	);
+	$f->run();
+
+	ok(scalar(@calls), 'the target was called');
+	is(scalar(grep { scalar(@$_) != 1 } @calls), 0, 'every call passes exactly one argument');
+	is(scalar(grep { ref($_->[0]) } @calls), 0,
+		'and it is the positional scalar, not a hash of named options');
 };
 
 done_testing();

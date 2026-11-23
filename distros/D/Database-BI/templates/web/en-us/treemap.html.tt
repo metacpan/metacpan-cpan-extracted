@@ -185,11 +185,7 @@ then press Enter or Space to open the matching rows in the table.</p>
     biBrandSvg(clone);
     var src = '<?xml version="1.0" encoding="UTF-8"?>\n'
             + new XMLSerializer().serializeToString(clone);
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([src], { type: 'image/svg+xml;charset=utf-8' }));
-    a.download = 'treemap.svg';
-    a.click();
-    URL.revokeObjectURL(a.href);
+    biSaveFile(new Blob([src], { type: 'image/svg+xml;charset=utf-8' }), 'treemap.svg');
   }
   function drawExportCanvas(scale, done) {
     var svg = document.getElementById('treemap');
@@ -225,10 +221,7 @@ then press Enter or Space to open the matching rows in the table.</p>
   }
   function biTreemapExportPNG() {
     drawExportCanvas(1, function (canvas) {
-      var a = document.createElement('a');
-      a.href = biBrandCanvas(canvas, 1).toDataURL('image/png');
-      a.download = 'treemap.png';
-      a.click();
+      biSavePNG(biBrandCanvas(canvas, 1), 'treemap.png');
     });
   }
   function biTreemapExportPDF() {

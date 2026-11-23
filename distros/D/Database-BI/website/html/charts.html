@@ -316,6 +316,10 @@
 </p>
 <p>
 	Each chart page carries Copy link and Export SVG, Export PNG and Export PDF.
+	In Chrome, Edge and other browsers with the File System Access API, each
+	export opens the system's Save As box, so you choose the folder and the file
+	name; other browsers download it under the chart's name. Cancelling saves
+	nothing.
 	The PDF is a one-page document the size of the chart, holding a
 	high-resolution picture, so it needs no PDF library on the server. Saved
 	files carry "Database::BI" at the bottom right, and use the light colours even

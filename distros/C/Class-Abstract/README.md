@@ -4,7 +4,7 @@ Class::Abstract - Stop code from making objects of a class that is only a templa
 
 ## Version
 
-Version 0.03
+Version 0.04
 
 ## Synopsis
 
@@ -249,6 +249,9 @@ It does **nothing** in these cases:
 
 - `'Class::Abstract'` is already in that `@ISA`.  So writing
 `use Class::Abstract;` twice is safe.
+- `import()` was reached through a subclass, for example
+`use Animal;` where `Animal` is abstract.  Subclasses inherit
+`import()`, and only `use Class::Abstract;` may make a package abstract.
 - The calling package is `Class::Abstract` itself.  A class cannot
 be its own parent.
 - Perl cannot tell which package is calling (this can happen in

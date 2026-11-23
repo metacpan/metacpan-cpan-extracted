@@ -10,23 +10,23 @@ use Carp qw(croak);
 
 use Protobuf;
 use Google::Api::Common;
-use Google::Cloud::Networkservices::V1::RouteView;
 use Google::Cloud::Networkservices::V1::Common;
+use Google::Cloud::Networkservices::V1::TlsRoute;
+use Google::Cloud::Networkservices::V1::RouteView;
+use Google::Cloud::Networkservices::V1::AgentGateway;
 use Google::Cloud::Networkservices::V1::TcpRoute;
+use Google::Cloud::Networkservices::V1::GrpcRoute;
+use Google::Cloud::Networkservices::V1::Extensibility;
+use Google::Cloud::Networkservices::V1::ServiceLbPolicy;
 use Google::Cloud::Networkservices::V1::ServiceBinding;
 use Google::Cloud::Networkservices::V1::HttpRoute;
-use Google::Cloud::Networkservices::V1::ServiceLbPolicy;
-use Google::Cloud::Networkservices::V1::Extensibility;
-use Google::Cloud::Networkservices::V1::TlsRoute;
-use Google::Cloud::Networkservices::V1::GrpcRoute;
-use Google::Cloud::Networkservices::V1::AgentGateway;
 use Google::Cloud::Networkservices::V1::EndpointPolicy;
-use Google::Cloud::Networkservices::V1::Gateway;
 use Google::Cloud::Networkservices::V1::Mesh;
 use Google::Cloud::Networkservices::V1::Dep;
-use Google::Cloud::Networkservices::V1::Networkservices;
+use Google::Cloud::Networkservices::V1::Gateway;
+use Google::Cloud::Networkservices::V1::NetworkServices;
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -34,14 +34,15 @@ has transport   => ( is => 'rw' );
 sub BUILD {
     my ($self) = @_;
 
-    # Resolve credentials: use passed credentials object if it implements get_token, or default to ADC
     my $auth = $self->credentials;
-    if (!$auth || !eval { $auth->can('get_token') }) {
+    if (!defined $auth) {
         $auth = Google::Auth->default();
+    } elsif (!eval { $auth->can('get_token') }) {
+        croak 'Invalid credentials object: must implement get_token()';
     }
     my $token = $auth->get_token();
 
-    my $target = 'localhost:50051';
+    my $target = 'networkservices.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -53,7 +54,6 @@ sub BUILD {
         );
         $self->transport($client);
     } else {
-        # Default high-performance HTTP/2 gRPC client
         my $client = Google::gRPC::Client->new(
             target     => $target,
             auth_token => $token,
@@ -66,9 +66,26 @@ sub list_lb_traffic_extensions {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Networkservices::V1::Dep::ListLbTrafficExtensionsRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Networkservices::V1::Dep::ListLbTrafficExtensionsResponse';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.networkservices.v1.DepService/ListLbTrafficExtensions',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.networkservices.v1.DepService',
         method         => 'ListLbTrafficExtensions',
@@ -120,35 +137,35 @@ Generated from the following Protocol Buffers schemas:
 
 =over 4
 
-=item * C<google/cloud/networkservices/v1/http_route.proto>
+=item * C<googleapis/google/cloud/networkservices/v1/agent_gateway.proto>
 
-=item * C<google/cloud/networkservices/v1/tcp_route.proto>
+=item * C<googleapis/google/cloud/networkservices/v1/common.proto>
 
-=item * C<google/cloud/networkservices/v1/common.proto>
+=item * C<googleapis/google/cloud/networkservices/v1/dep.proto>
 
-=item * C<google/cloud/networkservices/v1/mesh.proto>
+=item * C<googleapis/google/cloud/networkservices/v1/endpoint_policy.proto>
 
-=item * C<google/cloud/networkservices/v1/network_services.proto>
+=item * C<googleapis/google/cloud/networkservices/v1/extensibility.proto>
 
-=item * C<google/cloud/networkservices/v1/service_binding.proto>
+=item * C<googleapis/google/cloud/networkservices/v1/gateway.proto>
 
-=item * C<google/cloud/networkservices/v1/tls_route.proto>
+=item * C<googleapis/google/cloud/networkservices/v1/grpc_route.proto>
 
-=item * C<google/cloud/networkservices/v1/dep.proto>
+=item * C<googleapis/google/cloud/networkservices/v1/http_route.proto>
 
-=item * C<google/cloud/networkservices/v1/route_view.proto>
+=item * C<googleapis/google/cloud/networkservices/v1/mesh.proto>
 
-=item * C<google/cloud/networkservices/v1/service_lb_policy.proto>
+=item * C<googleapis/google/cloud/networkservices/v1/network_services.proto>
 
-=item * C<google/cloud/networkservices/v1/endpoint_policy.proto>
+=item * C<googleapis/google/cloud/networkservices/v1/route_view.proto>
 
-=item * C<google/cloud/networkservices/v1/gateway.proto>
+=item * C<googleapis/google/cloud/networkservices/v1/service_binding.proto>
 
-=item * C<google/cloud/networkservices/v1/grpc_route.proto>
+=item * C<googleapis/google/cloud/networkservices/v1/service_lb_policy.proto>
 
-=item * C<google/cloud/networkservices/v1/extensibility.proto>
+=item * C<googleapis/google/cloud/networkservices/v1/tcp_route.proto>
 
-=item * C<google/cloud/networkservices/v1/agent_gateway.proto>
+=item * C<googleapis/google/cloud/networkservices/v1/tls_route.proto>
 
 
 

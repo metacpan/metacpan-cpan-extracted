@@ -68,11 +68,7 @@
     biBrandSvg(clone);
     var src = '<?xml version="1.0" encoding="UTF-8"?>\n'
             + new XMLSerializer().serializeToString(clone);
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([src], { type: 'image/svg+xml;charset=utf-8' }));
-    a.download = 'heatmap.svg';
-    a.click();
-    URL.revokeObjectURL(a.href);
+    biSaveFile(new Blob([src], { type: 'image/svg+xml;charset=utf-8' }), 'heatmap.svg');
   }
   function drawExportCanvas(scale, done) {
     var svg = document.getElementById('heatmap');
@@ -108,10 +104,7 @@
   }
   function biHeatmapExportPNG() {
     drawExportCanvas(1, function (canvas) {
-      var a = document.createElement('a');
-      a.href = biBrandCanvas(canvas, 1).toDataURL('image/png');
-      a.download = 'heatmap.png';
-      a.click();
+      biSavePNG(biBrandCanvas(canvas, 1), 'heatmap.png');
     });
   }
   function biHeatmapExportPDF() {

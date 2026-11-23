@@ -13,5 +13,8 @@ t/01-as_string.t
 t/01-basic.t
 t/01-subscript.t
 t/02-array.t
+t/02-cli.t
+t/03-cli-formats.t
+t/03-path-regressions.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

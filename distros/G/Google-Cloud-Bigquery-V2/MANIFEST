@@ -1,6 +1,7 @@
 Changes
-ignore.txt
 lib/Google/Cloud/Bigquery/V2.pm
+lib/Google/Cloud/Bigquery/V2/Arrow.pm
+lib/Google/Cloud/Bigquery/V2/Arrow/Types.pm
 lib/Google/Cloud/Bigquery/V2/BiglakeConfig.pm
 lib/Google/Cloud/Bigquery/V2/BiglakeConfig/Types.pm
 lib/Google/Cloud/Bigquery/V2/Clustering.pm
@@ -108,6 +109,7 @@ README
 SECURITY.md
 t/00-load.t
 t/01-service-DatasetService.t
+t/01-service-Default.t
 t/01-service-JobService.t
 t/01-service-ModelService.t
 t/01-service-ProjectService.t
@@ -115,6 +117,7 @@ t/01-service-RoutineService.t
 t/01-service-RowAccessPolicyService.t
 t/01-service-TableService.t
 t/02-rest-transport-DatasetService.t
+t/02-rest-transport-Default.t
 t/02-rest-transport-JobService.t
 t/02-rest-transport-ModelService.t
 t/02-rest-transport-ProjectService.t
@@ -125,6 +128,5 @@ t/manifest.t
 t/pod-coverage.t
 t/pod.t
 xt/00_perl-critic.t
-xt/boilerplate.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

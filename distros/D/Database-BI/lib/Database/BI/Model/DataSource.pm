@@ -13,7 +13,7 @@ use Sub::Protected;
 use Params::Validate::Strict qw(validate_strict);
 use Params::Get		();
 
-our $VERSION = '0.023.1';
+our $VERSION = '0.024.0';
 
 =head1 NAME
 
@@ -21,7 +21,7 @@ Database::BI::Model::DataSource - Table-agnostic adapter around Database::Abstra
 
 =head1 VERSION
 
-0.023.1
+0.024.0
 
 =head1 SYNOPSIS
 
@@ -285,6 +285,7 @@ Readonly our %MESSAGES => (
 	error_mariadb_no_driver		=> 'DataSource: DBD::MariaDB or DBD::mysql must be installed to open MariaDB server "%s"',
 	error_mariadb_connect		=> 'DataSource: cannot connect to MariaDB server "%s": %s',
 	error_mariadb_table		=> 'DataSource: cannot read table "%s" on MariaDB server "%s": %s',
+	error_xml_entities		=> 'DataSource: "%s" declares XML entities, which are not read: an entity can pull in another file or address',
 	error_json_invalid		=> 'DataSource: "%s" is not valid JSON: %s',
 	error_json_no_rows		=> 'DataSource: "%s" holds no table: it needs a list of objects, an object of objects, or an object holding one list of objects',
 	error_json_list_not_found	=> 'DataSource: JSON file "%s" has no list of objects called "%s"',
@@ -294,6 +295,8 @@ Readonly our %MESSAGES => (
 
 # A table name is a bare SQL-safe identifier: starts with a letter or
 # underscore, followed by zero or more alphanumeric/underscore characters.
+Readonly my $XML_SCAN_BLOCK     => 65_536;
+Readonly my $XML_MARKER_OVERLAP => 7;	# one byte less than '<!ENTITY'
 Readonly my $TABLE_NAME_RE => qr/\A[A-Za-z_][A-Za-z0-9_]*\z/;
 
 # What may go into a MariaDB DSN.  A ';' would start another DSN attribute.
@@ -314,7 +317,14 @@ Readonly my $COUNT_MEMO_MAX => 256;
 
 # The extensions D::A looks for before .json; a file with one of them is the
 # table, and a .json beside it is not read.
+# JSON Lines: one JSON object a line.  Read after .json, as a stream.
+Readonly my @JSON_LINES_EXT => qw(jsonl ndjson);
 Readonly my @NON_JSON_EXT => qw(sql sqlite sqlite3 db psv tsv xls xlsx csv xml);
+# A .json file over this many bytes that is a list of objects is read as a
+# stream, one row at a time, instead of as one string and one parsed tree; a
+# JSON Lines file always is.  The chunk is how much is read at a time.
+Readonly my $JSON_STREAM_BYTES => 16 * 1_048_576;
+Readonly my $JSON_CHUNK_BYTES  => 1_048_576;
 # The sort columns D::A accepts; it ignores any other, with a warning.
 Readonly my $DA_SORTABLE_RE => qr/\A[a-zA-Z_][a-zA-Z0-9_.]*\z/;
 
@@ -404,6 +414,7 @@ Creates and returns a new C<Database::BI::Model::DataSource> instance.
 	    file_ext       => 'string',   # optional; extension hint when remote file has non-standard suffix (e.g. "log")
 	    internal_table => 'string',   # optional; a SQLite file's table, or a JSON file's list, to open
 	    column_order   => \@names,    # optional; the order columns() gives, when the backend has none
+	    json_flatten   => 1,          # optional; JSON: an object is a column for each value, not text
 	    cache          => 'object',   # optional; CHI cache object for result caching
 	    cache_ttl_url  => 'string',   # optional; CHI TTL string for URL-backed tables (default "15 min")
 	    mariadb        => \%settings, # optional; a mariadb_servers entry; needs server and table
@@ -427,6 +438,23 @@ them.  A C<.csv> (or any other format's file) beside it with the same name is
 the one read.  Not JSON croaks C<error_json_invalid>; JSON with no table in
 it, C<error_json_no_rows>; a list it does not have, C<error_json_list_not_found>.
 
+A C<.jsonl> or C<.ndjson> file (JSON Lines: one object a line, blank lines
+skipped, C<\r\n> and a BOM allowed) is a table with a row for each line,
+read like a C<.json> list of objects.  It is read as a stream: one pass finds
+the columns and a second writes the copy, so memory holds a row, not the file.
+A C<.json> list of objects over 16 MiB is streamed the same way.  A line that
+is not JSON croaks C<error_json_invalid>, naming the line; one that is not an
+object, C<error_json_no_rows>; a list name (C<internal_table>), 
+C<error_json_list_not_found>, because there are none.  A C<.json> beside it,
+or any other format, is the one read.
+
+With C<json_flatten> a nested object is not its JSON text but a column for
+each of its values, named by the path to it (C<address.city>,
+C<address.geo.lat>), in the order the file names them.  A list stays JSON text,
+an empty object is a cell (C<{}>), and a name that is taken (a key written
+C<a.b> beside an object C<a> holding C<b>) gets C<_> added, so no value is lost.
+It is off by default.
+
 C<column_order> is for a caller that knows the columns' order better than the
 backend does.  A SQLite backend lists its columns alphabetically, so an
 extract of an accelerated dataset passes the order its file had.  It is used
@@ -446,9 +474,9 @@ destruction.
 When C<file_ext> is provided together with C<host>, it is used as the first
 candidate extension when probing the remote host for the file.  If the
 downloaded file does not have a standard extension (one of C<csv>, C<tsv>,
-C<psv>, C<xlsx>, C<xls>, C<sql>, C<sqlite>, C<sqlite3>, C<db>, C<xml>, C<json>),
-the file content is sniffed (SQLite magic bytes, XML preamble, a leading
-C<[> or C<{> for JSON, or first-line
+C<psv>, C<xlsx>, C<xls>, C<sql>, C<sqlite>, C<sqlite3>, C<db>, C<xml>, C<json>,
+C<jsonl>, C<ndjson>), the file content is sniffed (SQLite magic bytes, XML preamble, a leading
+C<[> or C<{> for JSON, or C<{> with whole objects on the first lines for JSON Lines, or first-line
 field separator) and the file is renamed to the correct standard extension
 before further processing.
 
@@ -495,6 +523,8 @@ Returns C<$self> (a blessed hashref). Croaks on invalid arguments.
                                  has illegal characters; says what else to open and
                                  how to rename it
   error_no_usable_tables      -- every table in a SQLite file has such a name
+  error_xml_entities          -- an .xml file declares an entity (<!ENTITY), or is
+                                 not in a form that can be checked for one
   error_json_invalid          -- a .json file is not valid JSON
   error_json_no_rows          -- a .json file holds no list of objects, object of
                                  objects or object holding such a list
@@ -541,6 +571,7 @@ sub new {
 			file_ext       => { type => 'string', optional => 1, default => undef },
 			internal_table => { type => 'string', optional => 1, default => undef },
 			column_order   => { type => 'arrayref', optional => 1, default => undef },
+			json_flatten   => { type => 'boolean', optional => 1, default => 0 },
 			i18n           => { type => 'object', optional => 1, default => undef, can => 'maketext' },
 			cache          => { type => 'object', optional => 1, default => undef },
 			cache_ttl_url  => { type => 'string', optional => 1, default => '15 min' },
@@ -581,6 +612,7 @@ sub new {
 		_file_ext       => $args->{file_ext},
 		_internal_table => $args->{internal_table},
 		_column_order   => $args->{column_order},
+		_json_flatten   => $args->{json_flatten} ? 1 : 0,
 		_i18n           => $args->{i18n},
 		_cache          => $args->{cache},
 		_cache_ttl_url  => $args->{cache_ttl_url},
@@ -938,7 +970,7 @@ sub _best_id_column {
 # Returns an empty hashref for non-CSV/TSV/PSV/XLSX/SQLite formats (XML, etc.).
 # For SQLite/.db files that can be opened, returns { sqlite_tables => [...] }.
 sub _detect_file_info :Protected {
-	my ($dir, $table, $want) = @_;
+	my ($dir, $table, $want, $flatten) = @_;
 
 	# XLSX: D::A reads the rows.  This parse is for what D::A cannot say: an
 	# empty workbook makes it croak, and its columns() is alphabetical, not the
@@ -1174,7 +1206,7 @@ sub _detect_file_info :Protected {
 				# DB_File warns "untie while N inner references" if the object
 				# reference count is > 0 when untie fires.
 				my $db_obj = tie %bdb, 'DB_File', $non_sqlite_db,
-					Fcntl::O_RDONLY(), 0644, $DB_File::DB_HASH;
+					Fcntl::O_RDONLY(), 0644, do { no warnings "once"; $DB_File::DB_HASH };
 				return 0 unless $db_obj;
 				undef $db_obj;
 				untie %bdb;
@@ -1193,24 +1225,212 @@ sub _detect_file_info :Protected {
 		}
 	}
 
-	# JSON comes last, as it does in D::A's own search: a table.csv beside
-	# table.json is the file D::A opens.
+	# XML that is a document, not a list of rows (a DMARC report: a few
+	# one-off elements and a repeating <record>): D::A reads one repeating
+	# element of a flat document and croaks on the rest, so write the rows as
+	# a flat JSON copy, as for a .json file.  A file D::A can read is left to it.
 	{
-		my $path = File::Spec->catfile($dir, "$table.json");
-		if (-r $path && !grep { -f File::Spec->catfile($dir, "$table.$_") } @NON_JSON_EXT) {
-			my $json = _json_table($path, $want);
-			return { _file_is_empty => 1, file_size => -s $path, _json_lists => $json->{lists} }
-				unless @{ $json->{rows} };
-			my ($safe_id) = grep { $_ =~ $TABLE_NAME_RE } @{ $json->{columns} };
-			return {
-				columns     => $json->{columns},
-				id          => $safe_id // 'entry',
-				_json       => $json,
-				_json_lists => $json->{lists},
-			};
+		my $path = File::Spec->catfile($dir, "$table.xml");
+		if (-r $path && !grep { -f File::Spec->catfile($dir, "$table.$_") } grep { $_ ne 'xml' } @NON_JSON_EXT) {
+			# Before either reader: D::A's own XML::Simple would resolve an
+			# external entity just as _xml_table's does.
+			_refuse_xml_entities($path);
+			my $xml = _xml_table($path);
+			if ($xml) {
+				my ($safe_id) = grep { $_ =~ $TABLE_NAME_RE } @{ $xml->{columns} };
+				return {
+					columns => $xml->{columns},
+					id      => $safe_id // 'entry',
+					_json   => $xml,
+				};
+			}
 		}
 	}
+
+	# JSON comes last, as it does in D::A's own search: a table.csv beside
+	# table.json is the file D::A opens.  JSON Lines is read the same way, after
+	# .json.
+	for my $ext ('json', @JSON_LINES_EXT) {
+		my $path = File::Spec->catfile($dir, "$table.$ext");
+		next unless -r $path && !grep { -f File::Spec->catfile($dir, "$table.$_") } (@NON_JSON_EXT, $ext eq 'json' ? () : ('json'));
+		my $json = $ext eq 'json'
+			? _json_table($path, $want, $flatten)
+			: _jsonl_table($path, $want, $flatten);
+		return { _file_is_empty => 1, file_size => -s $path, _json_lists => $json->{lists} }
+			unless $json->{count};
+		my ($safe_id) = grep { $_ =~ $TABLE_NAME_RE } @{ $json->{columns} };
+		return {
+			columns     => $json->{columns},
+			id          => $safe_id // 'entry',
+			_json       => $json,
+			_json_lists => $json->{lists},
+		};
+	}
 	return {};
+}
+
+# _refuse_xml_entities( $path ) -> () | croaks error_xml_entities
+#
+# Purpose: Stop an XML file from making the parser read something it was not
+#          given.  <!ENTITY x SYSTEM "file:///etc/passwd"> in the prolog, then
+#          &x; in a cell, puts that file in the table (and bypasses file_roots,
+#          because the parser, not this code, opens it); a SYSTEM "http://..."
+#          one makes the server fetch an address.
+# Premise 1: an entity can only be declared with the token "<!ENTITY".
+# Premise 2: a flat data file has no use for one.
+# Premise 3: a UTF-16 file spells that token with NUL bytes, which the match
+#            would miss, and a document with a NUL in it is not text XML.
+# Conclusion: a file holding the token, a NUL or a UTF-16 byte-order mark is
+#             refused before any parser sees it.
+# Entry:   $path is a readable .xml file.
+sub _refuse_xml_entities {
+	my ($path) = @_;
+	local ($@, $!);
+	# Premise 1: only a plain file can be read to its end; a named pipe blocks
+	# the open until something writes to it.  Conclusion: leave anything else
+	# to the reader, which reports it.
+	return unless defined $path && -f $path;
+	# A file that cannot be read is the reader's to report; autodie would throw here.
+	my $fh;
+	{ no autodie 'open'; open $fh, '<:raw', $path or return; }
+	# Read in blocks, not the whole file: a gigabyte of XML must not be held to
+	# look for eight bytes.  The last bytes of one block are kept in front of
+	# the next, so a marker cut by a block boundary is still found.
+	my ($tail, $bom_checked) = ('', 0);
+	my $found = 0;
+	while (read($fh, my $block, $XML_SCAN_BLOCK)) {
+		my $window = $tail . $block;
+		$found = 1, last if $window =~ /<!ENTITY|\0/ || (!$bom_checked && $window =~ /\A(?:\xFF\xFE|\xFE\xFF)/);
+		$bom_checked = 1;
+		$tail = substr($window, -$XML_MARKER_OVERLAP);
+	}
+	close $fh;
+	croak _fmt('error_xml_entities', $path) if $found;
+	return;
+}
+
+# _xml_table( $path ) -> { rows, columns, list } | undef
+#
+# Purpose: Read an XML document that holds more than one kind of top-level
+#          element (a DMARC report: report_metadata, policy_published, a
+#          repeating record) as a table.
+# Entry:   $path is a readable .xml file.
+# Exit:    undef when the file is not such a document (it does not parse, or
+#          has fewer than two kinds of child element under the root, or none
+#          repeats as hashes): D::A reads it as it always did.  Otherwise
+#          rows: flat hashes, columns: in the order the file first names them.
+# Notes:   The row element is the child element that occurs most often, the
+#          one with the most values on a tie, then the first by name.  Each
+#          row has its own values (a child's name is the column, nested ones
+#          joined by "_": row_source_ip) and every other top-level value
+#          (report_metadata_org_name, version), repeated on every row, so a
+#          report's rows still say whose report they came from.  A repeated
+#          element inside a row becomes a list in one cell, "a, b", or its
+#          JSON text when its members are not plain values.  Attributes
+#          are columns beside the child elements.  KeyAttr is empty so that
+#          XML::Simple does not fold name/id/key elements (see the POD).
+sub _xml_table {
+	my ($path) = @_;
+	local ($@, $!);
+	local $/ = "\n";
+	require XML::Simple;
+	open my $fh, '<:raw', $path or return undef;
+	my $text = do { local $/; <$fh> };
+	close $fh;
+	return undef unless defined $text && length $text;
+
+	my $doc = eval {
+		XML::Simple::XMLin(\$text, ForceArray => 1, KeyAttr => [], SuppressEmpty => '');
+	};
+	return undef unless ref $doc eq 'HASH';
+
+	my @kinds = grep { ref $doc->{$_} eq 'ARRAY' } keys %{$doc};
+	return undef if @kinds < 2;
+
+	# The row element: repeated, and every occurrence an element with parts.
+	my ($row_key, @best);
+	for my $k (sort @kinds) {
+		my $list = $doc->{$k};
+		next if grep { ref $_ ne 'HASH' } @{$list};
+		my $values = 0;
+		for my $one (@{$list}) {
+			my %flat;
+			_xml_flat($one, '', \%flat);
+			$values += keys %flat;
+		}
+		my @score = (scalar @{$list}, $values);
+		if (!defined $row_key || $score[0] > $best[0] || ($score[0] == $best[0] && $score[1] > $best[1])) {
+			($row_key, @best) = ($k, @score);
+		}
+	}
+	return undef unless defined $row_key;
+
+	my %context;
+	for my $k (keys %{$doc}) {
+		next if $k eq $row_key;
+		_xml_flat($doc->{$k}, $k, \%context);
+	}
+	my @rows;
+	for my $one (@{ $doc->{$row_key} }) {
+		my %row;
+		_xml_flat($one, '', \%row);
+		push @rows, { %context, %row };
+	}
+
+	# Column order: where each name first appears in the text.  The parse
+	# keeps none.  A tag's path below the root names its column, without the
+	# row element's own name.
+	(my $scan = $text) =~ s/<!--.*?-->|<!\[CDATA\[.*?\]\]>|<\?.*?\?>|<!DOCTYPE[^>\[]*(?:\[.*?\])?>//gs;
+	my (@stack, @columns, %seen);
+	while ($scan =~ /<(\/?)([^\s\/>!?]+)[^>]*?(\/?)>/g) {
+		my ($close, $name, $self_close) = ($1, $2, $3);
+		if ($close) {
+			pop @stack;
+			next;
+		}
+		push @stack, $name;
+		my @parts = @stack[ 1 .. $#stack ];
+		shift @parts if @parts && $parts[0] eq $row_key;
+		my $col = join '_', @parts;
+		if (length $col && !$seen{$col}++) {
+			push @columns, $col;
+		}
+		pop @stack if $self_close;
+	}
+	my %known = map { $_ => 1 } map { keys %{$_} } @rows;
+	@columns = grep { $known{$_} } @columns;
+	my %placed = map { $_ => 1 } @columns;
+	push @columns, grep { !$placed{$_} } sort keys %known;
+
+	for my $row (@rows) {
+		$row->{$_} //= '' for @columns;
+	}
+	return { rows => \@rows, columns => \@columns, list => undef };
+}
+
+# _xml_flat( $node, $name, \%out )
+#
+# Purpose: Flatten one node of an XML::Simple (ForceArray) tree into cells.
+# Entry:   $name is the column so far ('' at the top of a row).
+sub _xml_flat {
+	my ($node, $name, $out) = @_;
+	if (ref $node eq 'ARRAY') {
+		if (@{$node} == 1) {
+			_xml_flat($node->[0], $name, $out);
+		} elsif (!grep { ref $_ } @{$node}) {
+			$out->{$name} = join ', ', @{$node};
+		} else {
+			require Mojo::JSON;
+			$out->{$name} = Mojo::JSON::to_json($node);
+		}
+	} elsif (ref $node eq 'HASH') {
+		for my $k (sort keys %{$node}) {
+			_xml_flat($node->{$k}, length $name ? "${name}_$k" : $k, $out);
+		}
+	} elsif (length $name) {
+		$out->{$name} = $node;
+	}
+	return;
 }
 
 # _json_read( $path ) -> ($text, $data)
@@ -1262,8 +1482,8 @@ sub _json_list_keys {
 # Purpose: The columns of rows read from a JSON text, in the order the text
 #          first names them, then any it did not (sorted).
 sub _json_columns {
-	my ($text, $rows, $depth, $list) = @_;
-	my @columns = @{ _json_key_order($text, $depth, $list) };
+	my ($text, $rows, $depth, $list, $flatten) = @_;
+	my @columns = @{ _json_key_order($text, $depth, $list, $flatten) };
 	my %named   = map { $_ => 1 } @columns;
 	push @columns, sort grep { !$named{$_}++ } map { keys %{$_} } @{$rows};
 	return \@columns;
@@ -1292,11 +1512,19 @@ sub _json_columns {
 #          true and false the words, null an empty cell.  The column order is
 #          read from the text: a parsed object has no order.
 sub _json_table {
-	my ($path, $want) = @_;
+	my ($path, $want, $flatten) = @_;
+
+	# A big list of objects is read a row at a time (_json_stream), not as one
+	# string and one tree.  Only that shape: the others need the whole document
+	# to find their lists.
+	if (!defined $want && (-s $path // 0) > $JSON_STREAM_BYTES && _json_starts_with($path, '[')) {
+		return _json_stream($path, 'array', $flatten);
+	}
+
 	my ($text, $data) = _json_read($path);
 	unless (length $text) {
 		croak _fmt('error_json_list_not_found', $path, $want) if defined $want;
-		return { rows => [], columns => [], list => undef, lists => [] };
+		return { rows => [], columns => [], list => undef, lists => [], count => 0 };
 	}
 
 	my @lists = _json_list_keys($text, $data);
@@ -1322,23 +1550,189 @@ sub _json_table {
 		croak _fmt('error_json_no_rows', $path);
 	}
 
-	my $columns = _json_columns($text, $rows, $depth, $list);
+	my @flat = map { _json_cells($_, $flatten) } @{$rows};
+	my $columns = _json_columns($text, \@flat, $depth, $list, $flatten);
 	@{$columns} = ($key_col, grep { $_ ne $key_col } @{$columns}) if defined $key_col;
 
-	my @flat;
-	for my $row (@{$rows}) {
-		my %cells;
-		while (my ($k, $v) = each %{$row}) {
-			if (blessed($v) && $v->isa('JSON::PP::Boolean')) {
-				$v = $v ? 'true' : 'false';
-			} elsif (ref $v) {
-				$v = Mojo::JSON::to_json($v);
-			}
-			$cells{$k} = $v;
+	return { rows => \@flat, columns => $columns, list => $list, lists => \@lists, count => scalar @flat };
+}
+
+# _json_cells( $row, $flatten ) -> \%cells
+#
+# Purpose: One JSON object as one flat row of cells.
+# Notes:   A value that is an object or a list becomes its compact JSON text,
+#          true and false the words, null an empty cell.  With $flatten an
+#          object is not text but a cell for each of its own values, named by
+#          the path to it (address.city); only a list is still text.  A name
+#          that is taken (a key written "a.b" beside the object "a" holding
+#          "b") gets "_" added, so no cell is lost.
+sub _json_cells {
+	my ($row, $flatten) = @_;
+	my %cells;
+	_json_cells_into(\%cells, $row, '', $flatten);
+	return \%cells;
+}
+
+sub _json_cells_into {
+	my ($cells, $node, $prefix, $flatten) = @_;
+	for my $k (sort keys %{$node}) {
+		my $v    = $node->{$k};
+		my $name = length $prefix ? "$prefix.$k" : $k;
+		if ($flatten && ref $v eq 'HASH' && %{$v}) {
+			_json_cells_into($cells, $v, $name, $flatten);
+			next;
 		}
-		push @flat, \%cells;
+		if (blessed($v) && $v->isa('JSON::PP::Boolean')) {
+			$v = $v ? 'true' : 'false';
+		} elsif (ref $v) {
+			$v = Mojo::JSON::to_json($v);
+		}
+		$name .= '_' while exists $cells->{$name};
+		$cells->{$name} = $v;
 	}
-	return { rows => \@flat, columns => $columns, list => $list, lists => \@lists };
+	return;
+}
+
+# _json_starts_with( $path, $char ) -> bool
+#
+# Whether the first character of the file that is not white space (or a BOM)
+# is $char.
+sub _json_starts_with {
+	my ($path, $char) = @_;
+	local ($@, $!);
+	open my $fh, '<:raw', $path or return 0;
+	read $fh, my $head, 4_096;
+	close $fh;
+	return 0 unless defined $head;
+	$head =~ s/\A\xEF\xBB\xBF//;
+	return $head =~ /\A\s*\Q$char\E/ ? 1 : 0;
+}
+
+# _jsonl_table( $path, $want, $flatten ) -> { rows|stream, columns, count, ... }
+#
+# Purpose: A JSON Lines file (one object a line) as a table.  Read as a stream.
+# Croaks:  error_json_invalid (a line that is not JSON, with its number),
+#          error_json_no_rows (a line that is not an object),
+#          error_json_list_not_found ($want names a list: there are none).
+sub _jsonl_table {
+	my ($path, $want, $flatten) = @_;
+	croak _fmt('error_json_list_not_found', $path, $want) if defined $want;
+	return _json_stream($path, 'lines', $flatten);
+}
+
+# _json_each_row( $path, $kind, $code ) -> $count
+#
+# Purpose: Call $code->($row_text, $row_hash) for each object in a file, one at
+#          a time, so memory holds one row and a chunk, not the file.
+# Entry:   $kind is 'lines' (JSON Lines: one object a line, blank lines
+#          skipped) or 'array' (a JSON list of objects).
+sub _json_each_row {
+	my ($path, $kind, $code) = @_;
+	local ($@, $!);
+	require Mojo::JSON;
+	my $count = 0;
+	my $row   = sub {
+		my ($text, $where) = @_;
+		my $data;
+		unless (eval { $data = Mojo::JSON::decode_json($text); 1 }) {
+			(my $why = $@ // '') =~ s/\s+at \S+ line \d+\.?\s*\z//;
+			croak _fmt('error_json_invalid', $path, "$where: $why");
+		}
+		croak _fmt('error_json_no_rows', $path) unless ref $data eq 'HASH';
+		$count++;
+		$code->($text, $data);
+	};
+
+	open my $fh, '<:raw', $path;
+	if ($kind eq 'lines') {
+		my $n = 0;
+		while (defined(my $line = <$fh>)) {
+			$n++;
+			$line =~ s/\A\xEF\xBB\xBF// if $n == 1;
+			next unless $line =~ /\S/;
+			$row->($line, "line $n");
+		}
+		close $fh;
+		return $count;
+	}
+
+	# A list of objects: cut each top-level element out of the text by counting
+	# brackets (strings skipped), and hand it on.  A string or an element that
+	# runs past the end of a chunk is kept and scanned again with the next one.
+	my ($buf, $opened, $closed, $eof) = ('', 0, 0, 0);
+	until ($eof) {
+		my $more;
+		my $got = read $fh, $more, $JSON_CHUNK_BYTES;
+		$eof = $got ? 0 : 1;
+		$buf .= $more if $got;
+		$buf =~ s/\A\xEF\xBB\xBF// unless $opened;
+		my ($depth, $from) = (0, undef);
+		pos($buf) = 0;
+		while ($buf =~ /\G(?:("(?:[^"\\]|\\.)*")|([{}\[\]])|([^"{}\[\]]+))/gc) {
+			if (defined $2) {
+				my $c = $2;
+				if ($depth) {
+					if ($c eq '{' || $c eq '[') {
+						$depth++;
+					} elsif (!--$depth) {
+						$row->(substr($buf, $from, pos($buf) - $from), 'item ' . ($count + 1));
+						$from = undef;
+					}
+				} elsif (!$opened) {
+					croak _fmt('error_json_no_rows', $path) unless $c eq '[';
+					$opened = 1;
+				} elsif ($c eq '{') {
+					($depth, $from) = (1, pos($buf) - 1);
+				} elsif ($c eq ']') {
+					$closed = 1;
+					last;
+				} else {
+					croak _fmt('error_json_no_rows', $path);
+				}
+			} elsif (defined $3 && !$depth && $3 =~ /[^\s,]/) {
+				croak _fmt('error_json_no_rows', $path);
+			}
+		}
+		last if $closed;
+		$buf = defined $from ? substr($buf, $from) : substr($buf, pos($buf) // 0);
+	}
+	close $fh;
+	croak _fmt('error_json_invalid', $path, 'the list is not closed')
+		if $opened && !$closed;
+	return $count;
+}
+
+# _json_stream( $path, $kind, $flatten ) -> \%table
+#
+# Purpose: The table of a JSON Lines file, or of a big list of objects, without
+#          holding its rows: one pass finds the columns (in the order the text
+#          first names them) and the count, and the flat copy D::A reads is
+#          written by a second pass (the table's "emit").
+sub _json_stream {
+	my ($path, $kind, $flatten) = @_;
+	my (@columns, %seen);
+	my $count = _json_each_row($path, $kind, sub {
+		my ($text, $data) = @_;
+		my $cells = _json_cells($data, $flatten);
+		# The order of keys in the text is read only when this row has a name not
+		# seen yet: a parsed object has no order.
+		return unless grep { !$seen{$_} } keys %{$cells};
+		for my $name (@{ _json_key_order($text, 1, undef, $flatten) }, sort keys %{$cells}) {
+			push @columns, $name if exists $cells->{$name} && !$seen{$name}++;
+		}
+	});
+	my $emit = sub {
+		my ($fh) = @_;
+		print {$fh} '[';
+		my $first = 1;
+		_json_each_row($path, $kind, sub {
+			print {$fh} ($first ? '' : ','), Mojo::JSON::encode_json(_json_cells($_[1], $flatten));
+			$first = 0;
+		});
+		print {$fh} ']';
+		return;
+	};
+	return { emit => $emit, columns => \@columns, list => undef, lists => [], count => $count };
 }
 
 # _json_key_order( $text, $depth, $under ) -> \@keys
@@ -1351,15 +1745,26 @@ sub _json_table {
 #          keeps only what is under that top-level key.
 # Exit:    The keys, each once, decoded.
 sub _json_key_order {
-	my ($text, $depth, $under) = @_;
-	my (@stack, @order, %seen, $top);
+	my ($text, $depth, $under, $flatten) = @_;
+	my (@stack, @order, %seen, %parent, $top);
 	while ($text =~ /\G\s*(?:("(?:[^"\\]|\\.)*")|([{}\[\]:,])|[^\s{}\[\]:,"]+)/gcs) {
 		if (defined $1) {
 			my $frame = $stack[-1];
 			next unless $frame && $frame->{object} && $frame->{want_key};
 			$frame->{want_key} = 0;
 			my $key = Mojo::JSON::decode_json("[$1]")->[0];
+			$frame->{key} = $key;
 			$top = $key if @stack == 1;
+			if ($flatten && @stack > $depth && !grep { !$_->{object} } @stack[ $depth - 1 .. $#stack ]) {
+				# A key inside an object inside a row: its path is a column, and
+				# the object's own path is not (it is what holds these).
+				next if defined $under && !(defined $top && $top eq $under);
+				my @path = ((map { $_->{key} } @stack[ $depth - 1 .. $#stack - 1 ]), $key);
+				$parent{ join '.', @path[ 0 .. $#path - 1 ] } = 1;
+				my $name = join '.', @path;
+				push @order, $name unless $seen{$name}++;
+				next;
+			}
 			next unless @stack == $depth;
 			next if defined $under && !(defined $top && $top eq $under);
 			push @order, $key unless $seen{$key}++;
@@ -1376,6 +1781,7 @@ sub _json_key_order {
 			}
 		}
 	}
+	return [ grep { !$parent{$_} } @order ] if %parent;
 	return \@order;
 }
 
@@ -1392,7 +1798,8 @@ sub _json_key_order {
 # Detection order:
 #   1. SQLite magic bytes ("SQLite format 3") -> 'db'
 #   2. XML preamble ("<?xml" or "<" as first non-space character) -> 'xml'
-#   2a. "[" or "{" as first non-space character -> 'json'
+#   2a. "[" or "{" as first non-space character -> 'json'; a "{" whose
+#       first lines are each one whole object -> 'jsonl'
 #   3. First data line contains tabs -> 'tsv'
 #   4. First data line contains pipes -> 'psv'
 #   5. Fallback -> 'csv'
@@ -1405,7 +1812,15 @@ sub _sniff_data_ext {
 	return 'db'  if $header =~ /\ASQLite format/;
 	return 'xml' if $header =~ /\A\s*<\?xml/i;
 	return 'xml' if $header =~ /\A\s*</;
-	return 'json' if $header =~ /\A\s*[\[{]/;
+	if ($header =~ /\A\s*\{/) {
+		# One object a line, and another after it: JSON Lines, not one document.
+		open(my $jh, '<:raw', $path) or return 'json';
+		my @lines = grep { /\S/ } map { scalar <$jh> // () } 1 .. 3;
+		close $jh;
+		return 'jsonl' if @lines > 1 && !grep { !/\A\s*\{.*\}\s*\z/ } @lines;
+		return 'json';
+	}
+	return 'json' if $header =~ /\A\s*\[/;
 	open(my $lh, '<', $path) or return 'csv';
 	my $line = <$lh>;
 	close $lh;
@@ -1635,7 +2050,7 @@ sub _init_backend :Protected {
 		my ($user, $host) = $self->{_host} =~ /\A([^@]+)\@(.+)\z/
 			? ($1, $2) : (undef, $self->{_host});
 		my $tmpdir = File::Temp->newdir(CLEANUP => 1);
-		my @remote_exts = qw(csv tsv psv xlsx xls sql sqlite sqlite3 db xml json);
+		my @remote_exts = qw(csv tsv psv xlsx xls sql sqlite sqlite3 db xml json jsonl ndjson);
 		# Try the caller-supplied extension first (e.g. .log), then fall back.
 		if (defined $self->{_file_ext}) {
 			my $hint = lc $self->{_file_ext};
@@ -1668,7 +2083,7 @@ sub _init_backend :Protected {
 		# it to one that _detect_file_info and D::A can discover automatically.
 		# We do this by sniffing the first bytes/line for format signatures.
 		my %KNOWN_EXT = map { $_ => 1 }
-			qw(csv tsv psv xlsx xls sql sqlite sqlite3 db xml json);
+			qw(csv tsv psv xlsx xls sql sqlite sqlite3 db xml json jsonl ndjson);
 		unless ($KNOWN_EXT{lc $fetched_ext}) {
 			my $orig_file = File::Spec->catfile("$tmpdir", "$raw_table.$fetched_ext");
 			my $std_ext   = _sniff_data_ext($orig_file);
@@ -1691,11 +2106,11 @@ sub _init_backend :Protected {
 			unless $pkg->isa('Database::Abstraction');
 	}
 
-	my $info   = _detect_file_info($dir, $raw_table, $self->{_internal_table});
+	my $info   = _detect_file_info($dir, $raw_table, $self->{_internal_table}, $self->{_json_flatten});
 
 	# Probe for the actual file on disk so _cache_key can compute its mtime.
 	# This runs before the early-return paths so even empty files get a path.
-	for my $e (qw(csv tsv psv sql sqlite sqlite3 xml db xlsx xls json)) {
+	for my $e (qw(csv tsv psv sql sqlite sqlite3 xml db xlsx xls json jsonl ndjson)) {
 		my $p = File::Spec->catfile($dir, "$raw_table.$e");
 		if (-f $p) {
 			$self->{_file_path} = File::Spec->rel2abs($p);
@@ -1762,7 +2177,11 @@ sub _init_backend :Protected {
 		my $tmp  = File::Temp->newdir(CLEANUP => 1);
 		my $copy = File::Spec->catfile("$tmp", "$raw_table.json");
 		open my $ofh, '>:raw', $copy;
-		print {$ofh} Mojo::JSON::encode_json($json->{rows});
+		if ($json->{emit}) {
+			$json->{emit}->($ofh);
+		} else {
+			print {$ofh} Mojo::JSON::encode_json($json->{rows});
+		}
 		close $ofh;
 		$self->{_json_tmpdir} = $tmp;	# prevents cleanup until $self is destroyed
 		$self->{_json_list}   = $json->{list};
@@ -1797,7 +2216,7 @@ sub _init_backend :Protected {
 	my $da_dir = $dir;
 	if ($raw_table ne $table) {
 		my $safe_ext;
-		for my $e (qw(xlsx xls db sql sqlite sqlite3 xml csv tsv psv json)) {
+		for my $e (qw(xlsx xls db sql sqlite sqlite3 xml csv tsv psv json jsonl ndjson)) {
 			$safe_ext = $e, last
 				if -f File::Spec->catfile($dir, "$raw_table.$e");
 		}
@@ -2039,7 +2458,9 @@ None.
 sub split_path {
 	my ($path) = @_;
 	return ('', undef) unless defined $path;
-	return ($path, undef) if -e $path;
+	# A NUL or a newline cannot be in a Windows file name, and stat on one warns
+	# there ("Invalid \0 character in pathname", "filename containing newline").
+	return ($path, undef) if CORE::index($path, "\0") < 0 && do { no warnings 'newline'; -e $path };
 	return ($1, $2) if $path =~ /\A(.+)#([^#\n]+)\z/s;
 	return ($path, undef);
 }
@@ -3010,7 +3431,7 @@ C<|S|> means the cardinality (size) of set or sequence S.
 
   new == [directory : PATH; table : NAME;
           host? : HOST_STRING; file_ext? : EXT_STRING;
-          internal_table? : STRING; column_order? : seq NAME;
+          internal_table? : STRING; column_order? : seq NAME; json_flatten? : BOOL;
           cache? : CHI_OBJECT; cache_ttl_url? : TTL_STRING;
           i18n? : I18N_OBJECT]
          pre  (host = undef => is_dir directory)

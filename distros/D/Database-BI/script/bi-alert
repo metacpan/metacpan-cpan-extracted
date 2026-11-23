@@ -209,7 +209,7 @@ for my $id (@analysis_ids) {
 	if ($spec =~ /\Atable:(.+)\z/) {
 		my $table = $1;
 		($table, $internal) = ($1, $2) if $table =~ m{\A([^/]+)/(.+)\z};
-		for my $ext (qw(csv tsv psv xlsx xml sql sqlite sqlite3 db json)) {
+		for my $ext (qw(csv tsv psv xlsx xml sql sqlite sqlite3 db json jsonl ndjson)) {
 			my $p = File::Spec->catfile($data_dir, "$table.$ext");
 			if (-f $p) { $file_path = $p; last }
 		}

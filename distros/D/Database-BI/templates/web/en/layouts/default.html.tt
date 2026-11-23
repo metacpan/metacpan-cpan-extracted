@@ -427,6 +427,15 @@
       margin-bottom: 1rem;
     }
 
+    /* Delta has two fields and no "or", so it is a plain row; the page's
+       script gives both menus the width of the longest column name. */
+    .join-fields.delta-fields {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+    .delta-fields .join-field select { width: auto; max-width: 100%; }
+
     @media (max-width: 680px) {
       .join-fields { grid-template-columns: 1fr; }
       .join-or { display: none; }
@@ -1413,6 +1422,14 @@
 
     .browser-dir  { color: var(--accent-text, #2c3e7a); }
     .browser-file { color: var(--body-color, #1a3a2a); }
+    .browser-file-row { display: flex; align-items: center; gap: 0.25rem; }
+    .browser-file-row .browser-entry { flex: 1; min-width: 0; }
+    .browser-pick { flex-shrink: 0; margin-left: 0.5rem; width: 1.1rem; height: 1.1rem; }
+    .browser-pick-bar {
+      display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+      padding: 0.4rem 0.75rem; font-size: 0.9rem;
+    }
+    .browser-pick-count { color: var(--muted, #666); }
 
     .browser-icon { font-size: 1.1rem; flex-shrink: 0; }
 

@@ -63,7 +63,7 @@
    "provides" : {
       "Redis::Namespace" : {
          "file" : "lib/Redis/Namespace.pm",
-         "version" : "0.16"
+         "version" : "0.17"
       }
    },
    "release_status" : "stable",
@@ -78,13 +78,14 @@
          "web" : "https://github.com/shogo82148/Redis-Namespace"
       }
    },
-   "version" : "0.16",
+   "version" : "0.17",
    "x_contributors" : [
       "Dan Book <grinnz@gmail.com>",
       "Konstantin S. Uvarin <khedin@gmail.com>",
       "Mihyaeru <mihyaeru21@gmail.com>",
       "dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
-      "karupanerura <karupa@cpan.org>"
+      "karupanerura <karupa@cpan.org>",
+      "shogo82148-slim[bot] <90079370+shogo82148-slim[bot]@users.noreply.github.com>"
    ],
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1

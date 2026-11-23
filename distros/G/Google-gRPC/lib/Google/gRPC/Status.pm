@@ -111,17 +111,55 @@ sub from_trailer {
 }
 
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::gRPC::Status - gRPC Status Codes and Details
+Google::gRPC::Status - Rich gRPC status and C<grpc-status-details-bin> trailer decoder
 
 =head1 SYNOPSIS
 
     use Google::gRPC::Status;
 
+    my $status = Google::gRPC::Status->from_trailer($grpc_status_details_bin);
+    print $status->code(), ': ', $status->message(), "\n";
+    for my $detail (@{ $status->details() }) {
+        print $detail->{type_url}, "\n";
+    }
+
 =head1 DESCRIPTION
 
-This module provides grpc status codes and details functionality for the Google gRPC Perl client SDK.
+C<Google::gRPC::Status> decodes binary (or Base64-encoded)
+C<google.rpc.Status> payloads carried in the HTTP/2 C<grpc-status-details-bin>
+trailer into structured C<code>, C<message>, and C<details> (ArrayRef of
+C<{ type_url => ..., value => ... }> entries).
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item * B<code> - Numeric gRPC status code (defaults to C<0> / OK).
+
+=item * B<message> - Human-readable error message.
+
+=item * B<details> - ArrayRef of decoded C<google.protobuf.Any> detail hashes.
+
+=back
+
+=head1 METHODS
+
+=head2 from_trailer( $raw )
+
+Class method that decodes a C<grpc-status-details-bin> header value (Base64 or
+raw binary) and returns a C<Google::gRPC::Status> instance.
+
+=head2 parse_status_details( $raw )
+
+Underlying wire decoder called by C<from_trailer()>.
+
+=head1 SEE ALSO
+
+L<Google::gRPC>, L<Google::gRPC::Framing>, L<Google::gRPC::Client>
 
 =head1 AUTHOR
 

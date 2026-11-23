@@ -10,25 +10,27 @@ use Carp qw(croak);
 
 use Protobuf;
 use Google::Api::Common;
-use Google::Cloud::Sql::V1::CloudSqlResources;
-use Google::Cloud::Sql::V1::CloudSqlRegions;
-use Google::Cloud::Sql::V1::CloudSqlEvents;
-use Google::Cloud::Sql::V1::CloudSqlInstanceNames;
-use Google::Cloud::Sql::V1::CloudSqlFeatureEligibility;
-use Google::Cloud::Sql::V1::CloudSqlTiers;
 use Google::Cloud::Sql::V1::CloudSqlIamPolicies;
+use Google::Cloud::Sql::V1::CloudSqlFeatureEligibility;
+use Google::Cloud::Sql::V1::CloudSqlRegions;
+use Google::Cloud::Sql::V1::CloudSqlInstanceNames;
+use Google::Cloud::Sql::V1::CloudSqlEvents;
+use Google::Cloud::Sql::V1::CloudSqlTiers;
 use Google::Cloud::Sql::V1::CloudSqlAvailableDatabaseVersions;
-use Google::Cloud::Sql::V1::CloudSqlUsers;
-use Google::Cloud::Sql::V1::CloudSqlOperations;
+use Google::Cloud::Sql::V1::CloudSqlResources;
+use Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures;
 use Google::Cloud::Sql::V1::CloudSqlBackupRuns;
-use Google::Cloud::Sql::V1::CloudSqlFlags;
 use Google::Cloud::Sql::V1::CloudSqlConnect;
-use Google::Cloud::Sql::V1::CloudSqlDatabases;
+use Google::Cloud::Sql::V1::CloudSqlOperations;
 use Google::Cloud::Sql::V1::CloudSqlSslCerts;
+use Google::Cloud::Sql::V1::CloudSqlUsers;
+use Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments;
+use Google::Cloud::Sql::V1::CloudSqlDatabases;
 use Google::Cloud::Sql::V1::CloudSqlInstances;
+use Google::Cloud::Sql::V1::CloudSqlFlags;
 use Google::Cloud::Sql::V1::CloudSqlBackups;
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -36,14 +38,15 @@ has transport   => ( is => 'rw' );
 sub BUILD {
     my ($self) = @_;
 
-    # Resolve credentials: use passed credentials object if it implements get_token, or default to ADC
     my $auth = $self->credentials;
-    if (!$auth || !eval { $auth->can('get_token') }) {
+    if (!defined $auth) {
         $auth = Google::Auth->default();
+    } elsif (!eval { $auth->can('get_token') }) {
+        croak 'Invalid credentials object: must implement get_token()';
     }
     my $token = $auth->get_token();
 
-    my $target = 'localhost:50051';
+    my $target = 'sqladmin.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -55,7 +58,6 @@ sub BUILD {
         );
         $self->transport($client);
     } else {
-        # Default high-performance HTTP/2 gRPC client
         my $client = Google::gRPC::Client->new(
             target     => $target,
             auth_token => $token,
@@ -68,9 +70,26 @@ sub add_server_ca {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesAddServerCaRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlResources::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/AddServerCa',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'AddServerCa',
@@ -85,9 +104,26 @@ sub add_server_certificate {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesAddServerCertificateRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlResources::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/AddServerCertificate',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'AddServerCertificate',
@@ -102,9 +138,26 @@ sub add_entra_id_certificate {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesAddEntraIdCertificateRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlResources::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/AddEntraIdCertificate',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'AddEntraIdCertificate',
@@ -119,9 +172,26 @@ sub clone {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesCloneRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlResources::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/Clone',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'Clone',
@@ -136,9 +206,26 @@ sub delete {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesDeleteRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlResources::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/Delete',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'Delete',
@@ -153,9 +240,26 @@ sub demote_master {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesDemoteMasterRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlResources::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/DemoteMaster',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'DemoteMaster',
@@ -170,9 +274,26 @@ sub demote {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesDemoteRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlResources::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/Demote',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'Demote',
@@ -187,9 +308,26 @@ sub export {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesExportRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlResources::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/Export',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'Export',
@@ -204,9 +342,26 @@ sub failover {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesFailoverRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlResources::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/Failover',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'Failover',
@@ -221,9 +376,26 @@ sub reencrypt {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesReencryptRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlResources::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/Reencrypt',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'Reencrypt',
@@ -238,9 +410,26 @@ sub get {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesGetRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::DatabaseInstance';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/Get',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'Get',
@@ -251,13 +440,30 @@ sub get {
     return $response;
 }
 
-sub import_instances {
+sub import {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesImportRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlResources::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/Import',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'Import',
@@ -272,9 +478,26 @@ sub insert {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesInsertRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlResources::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/Insert',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'Insert',
@@ -289,9 +512,26 @@ sub list {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesListRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::InstancesListResponse';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/List',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'List',
@@ -306,9 +546,26 @@ sub list_server_cas {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesListServerCasRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::InstancesListServerCasResponse';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/ListServerCas',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'ListServerCas',
@@ -323,9 +580,26 @@ sub list_server_certificates {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesListServerCertificatesRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::InstancesListServerCertificatesResponse';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/ListServerCertificates',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'ListServerCertificates',
@@ -340,9 +614,26 @@ sub list_entra_id_certificates {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesListEntraIdCertificatesRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::InstancesListEntraIdCertificatesResponse';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/ListEntraIdCertificates',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'ListEntraIdCertificates',
@@ -357,9 +648,26 @@ sub patch {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesPatchRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlResources::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/Patch',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'Patch',
@@ -374,9 +682,26 @@ sub promote_replica {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesPromoteReplicaRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlResources::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/PromoteReplica',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'PromoteReplica',
@@ -391,9 +716,26 @@ sub switchover {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesSwitchoverRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlResources::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/Switchover',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'Switchover',
@@ -408,9 +750,26 @@ sub reset_ssl_config {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesResetSslConfigRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlResources::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/ResetSslConfig',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'ResetSslConfig',
@@ -425,12 +784,97 @@ sub restart {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesRestartRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlResources::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/Restart',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'Restart',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+
+sub start {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesStartRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Cloud::Sql::V1::CloudSqlResources::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/Start',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.cloud.sql.v1.SqlInstancesService',
+        method         => 'Start',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+
+sub stop {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesStopRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Cloud::Sql::V1::CloudSqlResources::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/Stop',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.cloud.sql.v1.SqlInstancesService',
+        method         => 'Stop',
         request        => $request,
         response_class => $response_class,
     });
@@ -442,9 +886,26 @@ sub restore_backup {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesRestoreBackupRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlResources::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/RestoreBackup',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'RestoreBackup',
@@ -459,9 +920,26 @@ sub rotate_server_ca {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesRotateServerCaRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlResources::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/RotateServerCa',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'RotateServerCa',
@@ -476,9 +954,26 @@ sub rotate_server_certificate {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesRotateServerCertificateRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlResources::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/RotateServerCertificate',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'RotateServerCertificate',
@@ -493,9 +988,26 @@ sub rotate_entra_id_certificate {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesRotateEntraIdCertificateRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlResources::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/RotateEntraIdCertificate',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'RotateEntraIdCertificate',
@@ -510,9 +1022,26 @@ sub start_replica {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesStartReplicaRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlResources::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/StartReplica',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'StartReplica',
@@ -527,9 +1056,26 @@ sub stop_replica {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesStopReplicaRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlResources::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/StopReplica',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'StopReplica',
@@ -544,9 +1090,26 @@ sub truncate_log {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesTruncateLogRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlResources::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/TruncateLog',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'TruncateLog',
@@ -561,9 +1124,26 @@ sub update {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesUpdateRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlResources::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/Update',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'Update',
@@ -578,9 +1158,26 @@ sub create_ephemeral {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesCreateEphemeralCertRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlResources::SslCert';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/CreateEphemeral',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'CreateEphemeral',
@@ -595,9 +1192,26 @@ sub reschedule_maintenance {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesRescheduleMaintenanceRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlResources::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/RescheduleMaintenance',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'RescheduleMaintenance',
@@ -612,9 +1226,26 @@ sub verify_external_sync_settings {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesVerifyExternalSyncSettingsRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesVerifyExternalSyncSettingsResponse';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/VerifyExternalSyncSettings',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'VerifyExternalSyncSettings',
@@ -629,9 +1260,26 @@ sub start_external_sync {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesStartExternalSyncRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlResources::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/StartExternalSync',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'StartExternalSync',
@@ -646,9 +1294,26 @@ sub perform_disk_shrink {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesPerformDiskShrinkRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlResources::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/PerformDiskShrink',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'PerformDiskShrink',
@@ -663,9 +1328,26 @@ sub get_disk_shrink_config {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesGetDiskShrinkConfigRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesGetDiskShrinkConfigResponse';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/GetDiskShrinkConfig',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'GetDiskShrinkConfig',
@@ -680,9 +1362,26 @@ sub reset_replica_size {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesResetReplicaSizeRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlResources::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/ResetReplicaSize',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'ResetReplicaSize',
@@ -697,12 +1396,63 @@ sub get_latest_recovery_time {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesGetLatestRecoveryTimeRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesGetLatestRecoveryTimeResponse';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/GetLatestRecoveryTime',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'GetLatestRecoveryTime',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+
+sub execute_sql_read_only {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesExecuteSqlReadOnlyRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesExecuteSqlReadOnlyResponse';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/ExecuteSqlReadOnly',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.cloud.sql.v1.SqlInstancesService',
+        method         => 'ExecuteSqlReadOnly',
         request        => $request,
         response_class => $response_class,
     });
@@ -714,9 +1464,26 @@ sub execute_sql {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesExecuteSqlRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesExecuteSqlResponse';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/ExecuteSql',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'ExecuteSql',
@@ -731,9 +1498,26 @@ sub acquire_ssrs_lease {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesAcquireSsrsLeaseRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesAcquireSsrsLeaseResponse';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/AcquireSsrsLease',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'AcquireSsrsLease',
@@ -748,9 +1532,26 @@ sub release_ssrs_lease {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesReleaseSsrsLeaseRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesReleaseSsrsLeaseResponse';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/ReleaseSsrsLease',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'ReleaseSsrsLease',
@@ -765,9 +1566,26 @@ sub pre_check_major_version_upgrade {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesPreCheckMajorVersionUpgradeRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlResources::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/PreCheckMajorVersionUpgrade',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'PreCheckMajorVersionUpgrade',
@@ -782,12 +1600,63 @@ sub point_in_time_restore {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesPointInTimeRestoreRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlResources::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/PointInTimeRestore',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlInstancesService',
         method         => 'PointInTimeRestore',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+
+sub reconcile_networking {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesReconcileNetworkingRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Cloud::Sql::V1::CloudSqlResources::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlInstancesService/ReconcileNetworking',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.cloud.sql.v1.SqlInstancesService',
+        method         => 'ReconcileNetworking',
         request        => $request,
         response_class => $response_class,
     });
@@ -836,39 +1705,43 @@ Generated from the following Protocol Buffers schemas:
 
 =over 4
 
-=item * C<google/cloud/sql/v1/cloud_sql_feature_eligibility.proto>
+=item * C<googleapis/google/cloud/sql/v1/cloud_sql_available_database_versions.proto>
 
-=item * C<google/cloud/sql/v1/cloud_sql_iam_policies.proto>
+=item * C<googleapis/google/cloud/sql/v1/cloud_sql_backup_runs.proto>
 
-=item * C<google/cloud/sql/v1/cloud_sql_backup_runs.proto>
+=item * C<googleapis/google/cloud/sql/v1/cloud_sql_backups.proto>
 
-=item * C<google/cloud/sql/v1/cloud_sql_available_database_versions.proto>
+=item * C<googleapis/google/cloud/sql/v1/cloud_sql_blue_green_deployments.proto>
 
-=item * C<google/cloud/sql/v1/cloud_sql_databases.proto>
+=item * C<googleapis/google/cloud/sql/v1/cloud_sql_connect.proto>
 
-=item * C<google/cloud/sql/v1/cloud_sql_tiers.proto>
+=item * C<googleapis/google/cloud/sql/v1/cloud_sql_databases.proto>
 
-=item * C<google/cloud/sql/v1/cloud_sql_regions.proto>
+=item * C<googleapis/google/cloud/sql/v1/cloud_sql_events.proto>
 
-=item * C<google/cloud/sql/v1/cloud_sql_ssl_certs.proto>
+=item * C<googleapis/google/cloud/sql/v1/cloud_sql_feature_eligibility.proto>
 
-=item * C<google/cloud/sql/v1/cloud_sql_resources.proto>
+=item * C<googleapis/google/cloud/sql/v1/cloud_sql_flags.proto>
 
-=item * C<google/cloud/sql/v1/cloud_sql_instance_names.proto>
+=item * C<googleapis/google/cloud/sql/v1/cloud_sql_iam_policies.proto>
 
-=item * C<google/cloud/sql/v1/cloud_sql_instances.proto>
+=item * C<googleapis/google/cloud/sql/v1/cloud_sql_instance_names.proto>
 
-=item * C<google/cloud/sql/v1/cloud_sql_operations.proto>
+=item * C<googleapis/google/cloud/sql/v1/cloud_sql_instances.proto>
 
-=item * C<google/cloud/sql/v1/cloud_sql_users.proto>
+=item * C<googleapis/google/cloud/sql/v1/cloud_sql_operations.proto>
 
-=item * C<google/cloud/sql/v1/cloud_sql_flags.proto>
+=item * C<googleapis/google/cloud/sql/v1/cloud_sql_regions.proto>
 
-=item * C<google/cloud/sql/v1/cloud_sql_backups.proto>
+=item * C<googleapis/google/cloud/sql/v1/cloud_sql_resources.proto>
 
-=item * C<google/cloud/sql/v1/cloud_sql_connect.proto>
+=item * C<googleapis/google/cloud/sql/v1/cloud_sql_ssl_certs.proto>
 
-=item * C<google/cloud/sql/v1/cloud_sql_events.proto>
+=item * C<googleapis/google/cloud/sql/v1/cloud_sql_tiers.proto>
+
+=item * C<googleapis/google/cloud/sql/v1/cloud_sql_users.proto>
+
+=item * C<googleapis/google/cloud/sql/v1/cloud_sql_workload_captures.proto>
 
 
 
@@ -989,6 +1862,14 @@ Calls the RPC method C<ResetSslConfig> on the service. Takes a hash of parameter
 
 Calls the RPC method C<Restart> on the service. Takes a hash of parameters representing the request.
 
+=item * B<start>
+
+Calls the RPC method C<Start> on the service. Takes a hash of parameters representing the request.
+
+=item * B<stop>
+
+Calls the RPC method C<Stop> on the service. Takes a hash of parameters representing the request.
+
 =item * B<restore_backup>
 
 Calls the RPC method C<RestoreBackup> on the service. Takes a hash of parameters representing the request.
@@ -1053,6 +1934,10 @@ Calls the RPC method C<ResetReplicaSize> on the service. Takes a hash of paramet
 
 Calls the RPC method C<GetLatestRecoveryTime> on the service. Takes a hash of parameters representing the request.
 
+=item * B<execute_sql_read_only>
+
+Calls the RPC method C<ExecuteSqlReadOnly> on the service. Takes a hash of parameters representing the request.
+
 =item * B<execute_sql>
 
 Calls the RPC method C<ExecuteSql> on the service. Takes a hash of parameters representing the request.
@@ -1072,6 +1957,10 @@ Calls the RPC method C<PreCheckMajorVersionUpgrade> on the service. Takes a hash
 =item * B<point_in_time_restore>
 
 Calls the RPC method C<PointInTimeRestore> on the service. Takes a hash of parameters representing the request.
+
+=item * B<reconcile_networking>
+
+Calls the RPC method C<ReconcileNetworking> on the service. Takes a hash of parameters representing the request.
 
 =back
 

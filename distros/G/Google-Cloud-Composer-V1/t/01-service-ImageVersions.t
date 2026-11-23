@@ -46,7 +46,7 @@ BEGIN {
 package main;
 use Google::Cloud::Composer::V1::ImageVersionsClient;
 
-my $client = Google::Cloud::Composer::V1::ImageVersionsClient->new( credentials => 'dummy' );
+my $client = Google::Cloud::Composer::V1::ImageVersionsClient->new();
 ok($client, 'Instantiated generated client');
 isa_ok($client->transport, 'Google::gRPC::Client', 'Client transport');
 

@@ -251,3 +251,67 @@ sub _validate_url {
 }
 
 1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Auth::Credentials - Base class for all Google::Auth credential implementations
+
+=head1 SYNOPSIS
+
+    # Subclasses implement fetch_access_token(); callers use:
+    my $token = $creds->get_token();
+    my $hdrs  = $creds->apply({});
+
+=head1 DESCRIPTION
+
+Base Moo class providing token caching, expiry tracking, pluggable transport integration, URL validation, and Authorization header injection for all Google::Auth credential classes.
+
+=head1 METHODS AND ATTRIBUTES
+
+=over 4
+
+=item * B<access_token>
+
+=item * B<expires_at>
+
+=item * B<universe_domain>
+
+=item * B<quota_project_id>
+
+=item * B<project_id>
+
+=item * B<clock_skew>
+
+=item * B<is_refreshing>
+
+=item * B<transport>
+
+=item * B<fetch_access_token>
+
+=item * B<is_expired>
+
+=item * B<get_token>
+
+=item * B<apply>
+
+=back
+
+=head1 SEE ALSO
+
+L<Google::Auth>, L<Google::Auth::Credentials>
+
+=head1 AUTHOR
+
+C.J. Collier E<lt>cjac@google.comE<gt>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2026 Google LLC and contributors.
+
+Licensed under the Apache License, Version 2.0.
+
+=cut

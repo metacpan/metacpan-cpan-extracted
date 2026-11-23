@@ -5,7 +5,7 @@ use warnings;
 use Carp qw(croak);
 use XSLoader;
 
-our $VERSION = '0.06';
+our $VERSION = '0.09';
 
 eval {
     XSLoader::load('Google::gRPC', $VERSION);
@@ -56,15 +56,79 @@ sub submit_request {
 
 =head1 NAME
 
-Google::gRPC::Engine::NGHTTP2 - gRPC C/XS nghttp2 Transport Engine
+Google::gRPC::Engine::NGHTTP2 - C/XS nghttp2 HTTP/2 transport engine for Google::gRPC
 
 =head1 SYNOPSIS
 
     use Google::gRPC::Engine::NGHTTP2;
 
+    my $engine = Google::gRPC::Engine::NGHTTP2->new(
+        on_headers      => sub { my ($stream_id, $headers) = @_; ... },
+        on_data         => sub { my ($stream_id, $chunk)   = @_; ... },
+        on_trailers     => sub { my ($stream_id, $trailers) = @_; ... },
+        on_stream_close => sub { my ($stream_id, $code)    = @_; ... },
+    );
+
+    my $stream_id = $engine->submit_request({
+        headers    => [ ':method' => 'POST', ':path' => '/pkg.Svc/Call', ... ],
+        data       => $framed_bytes,
+        end_stream => 1,
+    });
+
 =head1 DESCRIPTION
 
-This module provides grpc c/xs nghttp2 transport engine functionality for the Google gRPC Perl client SDK.
+C<Google::gRPC::Engine::NGHTTP2> is the high-performance C/XS HTTP/2 framing
+engine for L<Google::gRPC>, backed by C<libnghttp2>. It is selected
+automatically by L<Google::gRPC::Engine> when compiled XS bindings are
+available on the host system, falling back to L<Google::gRPC::Engine::PP>
+otherwise.
+
+=head1 METHODS
+
+=head2 new(%callbacks)
+
+    my $engine = Google::gRPC::Engine::NGHTTP2->new(
+        on_headers      => \&on_headers,
+        on_data         => \&on_data,
+        on_trailers     => \&on_trailers,
+        on_stream_close => \&on_stream_close,
+    );
+
+Creates a new C<nghttp2> client session and registers the HTTP/2 frame
+callbacks. Croaks if the C/XS C<nghttp2> bindings were not compiled.
+
+=head2 set_callbacks(%callbacks)
+
+    $engine->set_callbacks(
+        on_headers      => \&on_headers,
+        on_data         => \&on_data,
+        on_trailers     => \&on_trailers,
+        on_stream_close => \&on_stream_close,
+    );
+
+Replaces the registered HTTP/2 event callbacks on an existing session.
+
+=head2 submit_request(\%args)
+
+    my $stream_id = $engine->submit_request({
+        headers    => \@headers,
+        data       => $bytes,
+        end_stream => 1,
+    });
+
+Submits an HTTP/2 request with the given flat header arrayref (required),
+optional framed request body C<data>, and boolean C<end_stream> flag. Returns
+the assigned HTTP/2 stream ID.
+
+=head2 send_ping($cb)
+
+    $engine->send_ping(sub { ... });
+
+Queues an HTTP/2 C<PING> frame on the connection for keepalive probing.
+
+=head1 SEE ALSO
+
+L<Google::gRPC>, L<Google::gRPC::Engine>, L<Google::gRPC::Engine::PP>
 
 =head1 AUTHOR
 

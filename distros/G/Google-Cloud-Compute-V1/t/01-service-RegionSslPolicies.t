@@ -33,7 +33,7 @@ sub call {
 
 # C. Fallback Mocks for External Response Classes
 BEGIN {
-    for my $pkg (qw( Google::Cloud::Compute::V1::Compute::Operation Google::Cloud::Compute::V1::Compute::SslPoliciesList Google::Cloud::Compute::V1::Compute::SslPoliciesListAvailableFeaturesResponse Google::Cloud::Compute::V1::Compute::SslPolicy )) {
+    for my $pkg (qw( Google::Cloud::Compute::V1::Compute::Operation Google::Cloud::Compute::V1::Compute::Policy Google::Cloud::Compute::V1::Compute::SslPoliciesList Google::Cloud::Compute::V1::Compute::SslPoliciesListAvailableFeaturesResponse Google::Cloud::Compute::V1::Compute::SslPolicy Google::Cloud::Compute::V1::Compute::TestPermissionsResponse )) {
         unless ($pkg->can('new')) {
             no strict 'refs';
             *{"${pkg}::new"} = sub { bless {}, $_[0] };
@@ -46,7 +46,7 @@ BEGIN {
 package main;
 use Google::Cloud::Compute::V1::RegionSslPoliciesClient;
 
-my $client = Google::Cloud::Compute::V1::RegionSslPoliciesClient->new( credentials => 'dummy' );
+my $client = Google::Cloud::Compute::V1::RegionSslPoliciesClient->new();
 ok($client, 'Instantiated generated client');
 isa_ok($client->transport, 'Google::gRPC::Client', 'Client transport');
 
@@ -81,6 +81,23 @@ subtest 'get method' => sub {
     my $res = $client->get();
     ok($res, 'Method returned a response');
     isa_ok($res, 'Google::Cloud::Compute::V1::Compute::SslPolicy', 'Response object class');
+    done_testing();
+};
+
+subtest 'get_iam_policy method' => sub {
+    $client->transport->{mock_call} = sub {
+        my ($args) = @_;
+        is($args->{service}, 'google.cloud.compute.v1.RegionSslPolicies', 'Correct service path');
+        is($args->{method}, 'GetIamPolicy', 'Correct RPC method');
+        isa_ok($args->{request}, 'Google::Cloud::Compute::V1::Compute::GetIamPolicyRegionSslPolicyRequest', 'Request object');
+        
+        my $response = 'Google::Cloud::Compute::V1::Compute::Policy'->new();
+        return $response;
+    };
+    
+    my $res = $client->get_iam_policy();
+    ok($res, 'Method returned a response');
+    isa_ok($res, 'Google::Cloud::Compute::V1::Compute::Policy', 'Response object class');
     done_testing();
 };
 
@@ -149,6 +166,40 @@ subtest 'patch method' => sub {
     my $res = $client->patch();
     ok($res, 'Method returned a response');
     isa_ok($res, 'Google::Cloud::Compute::V1::Compute::Operation', 'Response object class');
+    done_testing();
+};
+
+subtest 'set_iam_policy method' => sub {
+    $client->transport->{mock_call} = sub {
+        my ($args) = @_;
+        is($args->{service}, 'google.cloud.compute.v1.RegionSslPolicies', 'Correct service path');
+        is($args->{method}, 'SetIamPolicy', 'Correct RPC method');
+        isa_ok($args->{request}, 'Google::Cloud::Compute::V1::Compute::SetIamPolicyRegionSslPolicyRequest', 'Request object');
+        
+        my $response = 'Google::Cloud::Compute::V1::Compute::Policy'->new();
+        return $response;
+    };
+    
+    my $res = $client->set_iam_policy();
+    ok($res, 'Method returned a response');
+    isa_ok($res, 'Google::Cloud::Compute::V1::Compute::Policy', 'Response object class');
+    done_testing();
+};
+
+subtest 'test_iam_permissions method' => sub {
+    $client->transport->{mock_call} = sub {
+        my ($args) = @_;
+        is($args->{service}, 'google.cloud.compute.v1.RegionSslPolicies', 'Correct service path');
+        is($args->{method}, 'TestIamPermissions', 'Correct RPC method');
+        isa_ok($args->{request}, 'Google::Cloud::Compute::V1::Compute::TestIamPermissionsRegionSslPolicyRequest', 'Request object');
+        
+        my $response = 'Google::Cloud::Compute::V1::Compute::TestPermissionsResponse'->new();
+        return $response;
+    };
+    
+    my $res = $client->test_iam_permissions();
+    ok($res, 'Method returned a response');
+    isa_ok($res, 'Google::Cloud::Compute::V1::Compute::TestPermissionsResponse', 'Response object class');
     done_testing();
 };
 

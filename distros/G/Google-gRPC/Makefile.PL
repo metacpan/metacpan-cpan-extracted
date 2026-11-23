@@ -55,9 +55,9 @@ else {
 WriteMakefile(
     NAME             => 'Google::gRPC',
     AUTHOR           => q{C.J. Collier <cjac@google.com>},
-    VERSION_FROM     => 'lib/Google/gRPC/Client.pm',
+    VERSION_FROM     => 'lib/Google/gRPC.pm',
     ABSTRACT         => 'Generic, high-performance gRPC client transport over HTTP/2',
-    LICENSE          => 'Apache 2.0',
+    LICENSE          => 'apache_2_0',
     PL_FILES         => {},
     MIN_PERL_VERSION => '5.006',
     CONFIGURE_REQUIRES => {
@@ -71,6 +71,19 @@ WriteMakefile(
         'Protocol::HTTP2' => '0.13',
         'Protobuf'        => '0.01',
         'Log::Any'        => '0',
+    },
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        resources => {
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/GoogleCloudPlatform/google-auth-library-perl.git',
+                web  => 'https://github.com/GoogleCloudPlatform/google-auth-library-perl',
+            },
+            bugtracker => {
+                web => 'https://github.com/GoogleCloudPlatform/google-auth-library-perl/issues',
+            },
+        },
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Google-gRPC-* xs/*.o xs/*.c *.o NGHTTP2.c' },

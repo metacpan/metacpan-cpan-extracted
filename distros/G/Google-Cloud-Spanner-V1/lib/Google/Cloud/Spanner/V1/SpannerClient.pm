@@ -10,18 +10,18 @@ use Carp qw(croak);
 
 use Protobuf;
 use Google::Api::Common;
-use Google::Spanner::V1::ResultSet;
-use Google::Spanner::V1::QueryPlan;
-use Google::Spanner::V1::Spanner;
-use Google::Spanner::V1::Mutation;
-use Google::Spanner::V1::Type;
-use Google::Spanner::V1::Transaction;
-use Google::Spanner::V1::ChangeStream;
-use Google::Spanner::V1::CommitResponse;
-use Google::Spanner::V1::Location;
 use Google::Spanner::V1::Keys;
+use Google::Spanner::V1::Type;
+use Google::Spanner::V1::QueryPlan;
+use Google::Spanner::V1::Mutation;
+use Google::Spanner::V1::Location;
+use Google::Spanner::V1::ChangeStream;
+use Google::Spanner::V1::Transaction;
+use Google::Spanner::V1::CommitResponse;
+use Google::Spanner::V1::ResultSet;
+use Google::Spanner::V1::Spanner;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -29,14 +29,15 @@ has transport   => ( is => 'rw' );
 sub BUILD {
     my ($self) = @_;
 
-    # Resolve credentials: use passed credentials object if it implements get_token, or default to ADC
     my $auth = $self->credentials;
-    if (!$auth || !eval { $auth->can('get_token') }) {
+    if (!defined $auth) {
         $auth = Google::Auth->default();
+    } elsif (!eval { $auth->can('get_token') }) {
+        croak 'Invalid credentials object: must implement get_token()';
     }
     my $token = $auth->get_token();
 
-    my $target = 'localhost:50051';
+    my $target = 'spanner.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -48,7 +49,6 @@ sub BUILD {
         );
         $self->transport($client);
     } else {
-        # Default high-performance HTTP/2 gRPC client
         my $client = Google::gRPC::Client->new(
             target     => $target,
             auth_token => $token,
@@ -61,9 +61,26 @@ sub create_session {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Spanner::V1::Spanner::CreateSessionRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Spanner::V1::Spanner::Session';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.spanner.v1.Spanner/CreateSession',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.spanner.v1.Spanner',
         method         => 'CreateSession',
@@ -115,25 +132,25 @@ Generated from the following Protocol Buffers schemas:
 
 =over 4
 
-=item * C<googleapis/google/spanner/v1/result_set.proto>
-
-=item * C<googleapis/google/spanner/v1/query_plan.proto>
-
-=item * C<googleapis/google/spanner/v1/spanner.proto>
-
-=item * C<googleapis/google/spanner/v1/mutation.proto>
-
-=item * C<googleapis/google/spanner/v1/type.proto>
-
-=item * C<googleapis/google/spanner/v1/transaction.proto>
-
 =item * C<googleapis/google/spanner/v1/change_stream.proto>
 
 =item * C<googleapis/google/spanner/v1/commit_response.proto>
 
+=item * C<googleapis/google/spanner/v1/keys.proto>
+
 =item * C<googleapis/google/spanner/v1/location.proto>
 
-=item * C<googleapis/google/spanner/v1/keys.proto>
+=item * C<googleapis/google/spanner/v1/mutation.proto>
+
+=item * C<googleapis/google/spanner/v1/query_plan.proto>
+
+=item * C<googleapis/google/spanner/v1/result_set.proto>
+
+=item * C<googleapis/google/spanner/v1/spanner.proto>
+
+=item * C<googleapis/google/spanner/v1/transaction.proto>
+
+=item * C<googleapis/google/spanner/v1/type.proto>
 
 
 

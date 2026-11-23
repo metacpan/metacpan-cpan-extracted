@@ -14,7 +14,7 @@ use Carp;
 
 use parent qw(Data::TagDB::WeakBaseObject Data::Identifier::Interface::Known);
 
-our $VERSION = v0.16;
+our $VERSION = v0.17;
 
 my %wk_ise = (
     # Hints as taken from tagdb-cgi-import;
@@ -88,6 +88,7 @@ my %wk_ise = (
     proto_file                  => '52a516d0-25d8-47c7-a6ba-80983e576c54',
     earth                       => '3c2c155f-a4a0-49f3-bdaf-7f61d25c6b8c',
     language_tag_identifier     => 'd0a4c6e2-ce2f-4d4c-b079-60065ac681f1', # sid=8
+    ietf_language               => 'de633015-62c7-4393-b372-b33ffc401ad7',
     text_fragment               => '6085f87e-4797-4bb2-b23d-85ff7edc1da0', # sid=19
 
 
@@ -309,7 +310,7 @@ Data::TagDB::WellKnown - Work with Tag databases
 
 =head1 VERSION
 
-version v0.16
+version v0.17
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 .perltidyrc
-bin/gcloud-auth.pl
+bin/gcloud-auth
 bin/gcloud-auth.PL
 Changes
 CONTRIBUTING.md

@@ -3,7 +3,7 @@ package Google::Protobuf::SourceContext;
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -66,43 +66,65 @@ EOF
     # Fields for SourceContext
     # Field: file_name Type: 9 ()
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Protobuf::SourceContext::SourceContext - Compiled Protocol Buffers message class
+Google::Protobuf::SourceContext - Compiled Protocol Buffers messages for google/protobuf/source_context.proto
 
 =head1 SYNOPSIS
 
     use Google::Protobuf::SourceContext;
 
-    my $msg = Google::Protobuf::SourceContext::SourceContext->new(
-        file_name => $value,
-    );
+    my $msg = Google::Protobuf::SourceContext::SourceContext->new({
+        file_name => $file_name,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->file_name();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Protobuf::SourceContext::SourceContext->parse($bytes);
 
-=item * B<file_name>
-
-Type: String
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Protobuf::SourceContext - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/protobuf/source_context.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Protobuf::SourceContext::SourceContext
+
+`SourceContext` represents information about the source of a
+protobuf element, like the file in which it is defined.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->file_name() >> / C<< $msg->file_name($value) >>
+
+Type: C<String>
+
+The path-qualified name of the .proto file that contained the associated
+protobuf element.  For example: `"google/protobuf/source_context.proto"`.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Protobuf::SourceContext::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

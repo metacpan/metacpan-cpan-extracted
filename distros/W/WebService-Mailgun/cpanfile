@@ -5,12 +5,12 @@ requires 'JSON';
 requires 'URI';
 requires 'Try::Tiny';
 requires 'HTTP::Request::Common';
-requires 'File::Temp';
 requires 'Scalar::Util';
 requires 'perl', '5.020000';
 
 on 'test' => sub {
     requires 'Test::More', '0.98';
+    requires 'File::Temp';
     requires 'Test::Exception';
     requires 'Time::Piece';
     requires 'Time::Seconds';

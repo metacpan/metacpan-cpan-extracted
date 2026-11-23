@@ -96,3 +96,41 @@ sub THAW {
 }
 
 1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Protobuf::Engine::XS - High-performance C/XS upb execution engine for Protobuf
+
+=head1 VERSION
+
+version 0.14
+
+=head1 SYNOPSIS
+
+    use Protobuf;
+    # Used automatically by default when XS bindings are compiled:
+    my $msg = My::Message->new(name => 'Alice');
+
+=head1 DESCRIPTION
+
+C<Protobuf::Engine::XS> implements the L<Protobuf::Engine> interface by
+delegating message allocation, field access, binary wire serialization,
+Proto3 JSON conversion, and text format output to the compiled C<upb> C/XS
+extension. Repeated and map fields are lazily wrapped in tied Perl proxies
+(L<Protobuf::Internal::Repeated> and L<Protobuf::Internal::Map>).
+
+=head1 METHODS
+
+Implements all L<Protobuf::Engine> methods (C<create_message>, C<get>, C<set>,
+C<has>, C<clear>, C<parse>, C<serialize>, C<merge>, C<copy>, C<to_json>,
+C<from_json>, C<to_perl>, C<to_text>).
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Engine>, L<Protobuf::Engine::PurePerl>
+
+=cut

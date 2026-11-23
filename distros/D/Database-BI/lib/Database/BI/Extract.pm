@@ -3,7 +3,7 @@ package Database::BI::Extract;
 use strict;
 use warnings;
 
-our $VERSION = '0.023.1';
+our $VERSION = '0.024.0';
 
 use Carp		qw(croak carp);
 use Digest::MD5		qw(md5_hex);
@@ -124,8 +124,17 @@ sub put {
 	}
 
 	my $p = $self->path($spec, $mtime, $size);
-	eval { Mojo::File->new($p)->spurt($bytes) };
-	croak "Cannot write extract '$p': $@" if $@;
+	# Premise 1: get() trusts any plain file at $p.  Premise 2: a write that
+	# fails half way (disk full, a killed process) leaves a short file where it
+	# wrote.  Conclusion: write beside it and rename, so $p is the whole extract
+	# or what it was before, and a failure removes its own temporary file.
+	my $temp = "$p.$$.tmp";
+	my $ok = eval { Mojo::File->new($temp)->spurt($bytes); rename $temp, $p or die "$!\n"; 1 };
+	my $why = $@;
+	unless ($ok) {
+		unlink $temp;
+		croak "Cannot write extract '$p': $why";
+	}
 
 	return $p;
 }
@@ -152,6 +161,8 @@ sub evict {
 			$count++;
 		}
 	}
+	# A temporary file left by a process that was killed mid-write.
+	unlink grep { /\.tmp\z/ } @{ Mojo::File->new($dir)->list->map('to_string') };
 	return $count;
 }
 

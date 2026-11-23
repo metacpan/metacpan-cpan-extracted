@@ -13,7 +13,7 @@ use Google::Api::Common;
 use Google::Pubsub::V1::Schema;
 use Google::Pubsub::V1::Pubsub;
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -21,14 +21,15 @@ has transport   => ( is => 'rw' );
 sub BUILD {
     my ($self) = @_;
 
-    # Resolve credentials: use passed credentials object if it implements get_token, or default to ADC
     my $auth = $self->credentials;
-    if (!$auth || !eval { $auth->can('get_token') }) {
+    if (!defined $auth) {
         $auth = Google::Auth->default();
+    } elsif (!eval { $auth->can('get_token') }) {
+        croak 'Invalid credentials object: must implement get_token()';
     }
     my $token = $auth->get_token();
 
-    my $target = 'localhost:50051';
+    my $target = 'pubsub.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -40,7 +41,6 @@ sub BUILD {
         );
         $self->transport($client);
     } else {
-        # Default high-performance HTTP/2 gRPC client
         my $client = Google::gRPC::Client->new(
             target     => $target,
             auth_token => $token,
@@ -53,9 +53,26 @@ sub create_schema {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Pubsub::V1::Schema::CreateSchemaRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Pubsub::V1::Schema::Schema';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.pubsub.v1.SchemaService/CreateSchema',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.pubsub.v1.SchemaService',
         method         => 'CreateSchema',
@@ -70,9 +87,26 @@ sub validate_schema {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Pubsub::V1::Schema::ValidateSchemaRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Pubsub::V1::Schema::ValidateSchemaResponse';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.pubsub.v1.SchemaService/ValidateSchema',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.pubsub.v1.SchemaService',
         method         => 'ValidateSchema',
@@ -87,9 +121,26 @@ sub validate_message {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Pubsub::V1::Schema::ValidateMessageRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Pubsub::V1::Schema::ValidateMessageResponse';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.pubsub.v1.SchemaService/ValidateMessage',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.pubsub.v1.SchemaService',
         method         => 'ValidateMessage',
@@ -141,9 +192,9 @@ Generated from the following Protocol Buffers schemas:
 
 =over 4
 
-=item * C<google/pubsub/v1/schema.proto>
+=item * C<googleapis/google/pubsub/v1/pubsub.proto>
 
-=item * C<google/pubsub/v1/pubsub.proto>
+=item * C<googleapis/google/pubsub/v1/schema.proto>
 
 
 

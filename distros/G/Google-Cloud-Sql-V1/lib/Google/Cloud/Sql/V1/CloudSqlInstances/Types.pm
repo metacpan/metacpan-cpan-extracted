@@ -334,6 +334,36 @@ coerce 'RepeatedSqlInstancesRestartRequest',
 declare 'MapStringSqlInstancesRestartRequest',
     as HashRef[SqlInstancesRestartRequest()];
 
+declare 'SqlInstancesStartRequest',
+    as InstanceOf['Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesStartRequest'];
+
+coerce 'SqlInstancesStartRequest',
+    from HashRef, via { 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesStartRequest'->new($_) };
+
+declare 'RepeatedSqlInstancesStartRequest',
+    as ArrayRef[SqlInstancesStartRequest()];
+
+coerce 'RepeatedSqlInstancesStartRequest',
+    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesStartRequest'->new($_) } @$_ ] };
+
+declare 'MapStringSqlInstancesStartRequest',
+    as HashRef[SqlInstancesStartRequest()];
+
+declare 'SqlInstancesStopRequest',
+    as InstanceOf['Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesStopRequest'];
+
+coerce 'SqlInstancesStopRequest',
+    from HashRef, via { 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesStopRequest'->new($_) };
+
+declare 'RepeatedSqlInstancesStopRequest',
+    as ArrayRef[SqlInstancesStopRequest()];
+
+coerce 'RepeatedSqlInstancesStopRequest',
+    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesStopRequest'->new($_) } @$_ ] };
+
+declare 'MapStringSqlInstancesStopRequest',
+    as HashRef[SqlInstancesStopRequest()];
+
 declare 'SqlInstancesRestoreBackupRequest',
     as InstanceOf['Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesRestoreBackupRequest'];
 
@@ -1039,6 +1069,9 @@ declare 'SqlInstanceState',
 declare 'SqlNetworkArchitecture',
     as (Int | Str);
 
+declare 'DatabaseCenterIntegration',
+    as (Int | Str);
+
 declare 'SqlFailoverReplica',
     as InstanceOf['Google::Cloud::Sql::V1::CloudSqlInstances::DatabaseInstance::SqlFailoverReplica'];
 
@@ -1116,6 +1149,96 @@ coerce 'RepeatedTagsEntry',
 
 declare 'MapStringTagsEntry',
     as HashRef[TagsEntry()];
+
+declare 'BlueGreenDeploymentInfo',
+    as InstanceOf['Google::Cloud::Sql::V1::CloudSqlInstances::BlueGreenDeploymentInfo'];
+
+coerce 'BlueGreenDeploymentInfo',
+    from HashRef, via { 'Google::Cloud::Sql::V1::CloudSqlInstances::BlueGreenDeploymentInfo'->new($_) };
+
+declare 'RepeatedBlueGreenDeploymentInfo',
+    as ArrayRef[BlueGreenDeploymentInfo()];
+
+coerce 'RepeatedBlueGreenDeploymentInfo',
+    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Sql::V1::CloudSqlInstances::BlueGreenDeploymentInfo'->new($_) } @$_ ] };
+
+declare 'MapStringBlueGreenDeploymentInfo',
+    as HashRef[BlueGreenDeploymentInfo()];
+
+declare 'State',
+    as (Int | Str);
+
+declare 'SourceRole',
+    as InstanceOf['Google::Cloud::Sql::V1::CloudSqlInstances::BlueGreenDeploymentInfo::SourceRole'];
+
+coerce 'SourceRole',
+    from HashRef, via { 'Google::Cloud::Sql::V1::CloudSqlInstances::BlueGreenDeploymentInfo::SourceRole'->new($_) };
+
+declare 'RepeatedSourceRole',
+    as ArrayRef[SourceRole()];
+
+coerce 'RepeatedSourceRole',
+    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Sql::V1::CloudSqlInstances::BlueGreenDeploymentInfo::SourceRole'->new($_) } @$_ ] };
+
+declare 'MapStringSourceRole',
+    as HashRef[SourceRole()];
+
+declare 'TargetRole',
+    as InstanceOf['Google::Cloud::Sql::V1::CloudSqlInstances::BlueGreenDeploymentInfo::TargetRole'];
+
+coerce 'TargetRole',
+    from HashRef, via { 'Google::Cloud::Sql::V1::CloudSqlInstances::BlueGreenDeploymentInfo::TargetRole'->new($_) };
+
+declare 'RepeatedTargetRole',
+    as ArrayRef[TargetRole()];
+
+coerce 'RepeatedTargetRole',
+    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Sql::V1::CloudSqlInstances::BlueGreenDeploymentInfo::TargetRole'->new($_) } @$_ ] };
+
+declare 'MapStringTargetRole',
+    as HashRef[TargetRole()];
+
+declare 'WorkloadReplayConfig',
+    as InstanceOf['Google::Cloud::Sql::V1::CloudSqlInstances::WorkloadReplayConfig'];
+
+coerce 'WorkloadReplayConfig',
+    from HashRef, via { 'Google::Cloud::Sql::V1::CloudSqlInstances::WorkloadReplayConfig'->new($_) };
+
+declare 'RepeatedWorkloadReplayConfig',
+    as ArrayRef[WorkloadReplayConfig()];
+
+coerce 'RepeatedWorkloadReplayConfig',
+    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Sql::V1::CloudSqlInstances::WorkloadReplayConfig'->new($_) } @$_ ] };
+
+declare 'MapStringWorkloadReplayConfig',
+    as HashRef[WorkloadReplayConfig()];
+
+declare 'ReplayMode',
+    as (Int | Str);
+
+declare 'State',
+    as (Int | Str);
+
+declare 'WorkloadCaptureConfig',
+    as InstanceOf['Google::Cloud::Sql::V1::CloudSqlInstances::WorkloadCaptureConfig'];
+
+coerce 'WorkloadCaptureConfig',
+    from HashRef, via { 'Google::Cloud::Sql::V1::CloudSqlInstances::WorkloadCaptureConfig'->new($_) };
+
+declare 'RepeatedWorkloadCaptureConfig',
+    as ArrayRef[WorkloadCaptureConfig()];
+
+coerce 'RepeatedWorkloadCaptureConfig',
+    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Sql::V1::CloudSqlInstances::WorkloadCaptureConfig'->new($_) } @$_ ] };
+
+declare 'MapStringWorkloadCaptureConfig',
+    as HashRef[WorkloadCaptureConfig()];
+
+declare 'CaptureMode',
+    as (Int | Str);
+
+declare 'State',
+    as (Int | Str);
 
 declare 'GeminiInstanceConfig',
     as InstanceOf['Google::Cloud::Sql::V1::CloudSqlInstances::GeminiInstanceConfig'];
@@ -1381,6 +1504,21 @@ coerce 'RepeatedReplicaConfiguration',
 declare 'MapStringReplicaConfiguration',
     as HashRef[ReplicaConfiguration()];
 
+declare 'SqlInstancesExecuteSqlReadOnlyRequest',
+    as InstanceOf['Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesExecuteSqlReadOnlyRequest'];
+
+coerce 'SqlInstancesExecuteSqlReadOnlyRequest',
+    from HashRef, via { 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesExecuteSqlReadOnlyRequest'->new($_) };
+
+declare 'RepeatedSqlInstancesExecuteSqlReadOnlyRequest',
+    as ArrayRef[SqlInstancesExecuteSqlReadOnlyRequest()];
+
+coerce 'RepeatedSqlInstancesExecuteSqlReadOnlyRequest',
+    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesExecuteSqlReadOnlyRequest'->new($_) } @$_ ] };
+
+declare 'MapStringSqlInstancesExecuteSqlReadOnlyRequest',
+    as HashRef[SqlInstancesExecuteSqlReadOnlyRequest()];
+
 declare 'SqlInstancesExecuteSqlRequest',
     as InstanceOf['Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesExecuteSqlRequest'];
 
@@ -1395,6 +1533,21 @@ coerce 'RepeatedSqlInstancesExecuteSqlRequest',
 
 declare 'MapStringSqlInstancesExecuteSqlRequest',
     as HashRef[SqlInstancesExecuteSqlRequest()];
+
+declare 'ExecuteSqlReadOnlyPayload',
+    as InstanceOf['Google::Cloud::Sql::V1::CloudSqlInstances::ExecuteSqlReadOnlyPayload'];
+
+coerce 'ExecuteSqlReadOnlyPayload',
+    from HashRef, via { 'Google::Cloud::Sql::V1::CloudSqlInstances::ExecuteSqlReadOnlyPayload'->new($_) };
+
+declare 'RepeatedExecuteSqlReadOnlyPayload',
+    as ArrayRef[ExecuteSqlReadOnlyPayload()];
+
+coerce 'RepeatedExecuteSqlReadOnlyPayload',
+    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Sql::V1::CloudSqlInstances::ExecuteSqlReadOnlyPayload'->new($_) } @$_ ] };
+
+declare 'MapStringExecuteSqlReadOnlyPayload',
+    as HashRef[ExecuteSqlReadOnlyPayload()];
 
 declare 'ExecuteSqlPayload',
     as InstanceOf['Google::Cloud::Sql::V1::CloudSqlInstances::ExecuteSqlPayload'];
@@ -1413,6 +1566,21 @@ declare 'MapStringExecuteSqlPayload',
 
 declare 'PartialResultMode',
     as (Int | Str);
+
+declare 'SqlInstancesExecuteSqlReadOnlyResponse',
+    as InstanceOf['Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesExecuteSqlReadOnlyResponse'];
+
+coerce 'SqlInstancesExecuteSqlReadOnlyResponse',
+    from HashRef, via { 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesExecuteSqlReadOnlyResponse'->new($_) };
+
+declare 'RepeatedSqlInstancesExecuteSqlReadOnlyResponse',
+    as ArrayRef[SqlInstancesExecuteSqlReadOnlyResponse()];
+
+coerce 'RepeatedSqlInstancesExecuteSqlReadOnlyResponse',
+    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesExecuteSqlReadOnlyResponse'->new($_) } @$_ ] };
+
+declare 'MapStringSqlInstancesExecuteSqlReadOnlyResponse',
+    as HashRef[SqlInstancesExecuteSqlReadOnlyResponse()];
 
 declare 'SqlInstancesExecuteSqlResponse',
     as InstanceOf['Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesExecuteSqlResponse'];
@@ -1593,6 +1761,36 @@ coerce 'RepeatedSqlInstancesPointInTimeRestoreRequest',
 
 declare 'MapStringSqlInstancesPointInTimeRestoreRequest',
     as HashRef[SqlInstancesPointInTimeRestoreRequest()];
+
+declare 'SqlInstancesReconcileNetworkingRequest',
+    as InstanceOf['Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesReconcileNetworkingRequest'];
+
+coerce 'SqlInstancesReconcileNetworkingRequest',
+    from HashRef, via { 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesReconcileNetworkingRequest'->new($_) };
+
+declare 'RepeatedSqlInstancesReconcileNetworkingRequest',
+    as ArrayRef[SqlInstancesReconcileNetworkingRequest()];
+
+coerce 'RepeatedSqlInstancesReconcileNetworkingRequest',
+    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesReconcileNetworkingRequest'->new($_) } @$_ ] };
+
+declare 'MapStringSqlInstancesReconcileNetworkingRequest',
+    as HashRef[SqlInstancesReconcileNetworkingRequest()];
+
+declare 'PscDnsReconcileNetworkingRequest',
+    as InstanceOf['Google::Cloud::Sql::V1::CloudSqlInstances::PscDnsReconcileNetworkingRequest'];
+
+coerce 'PscDnsReconcileNetworkingRequest',
+    from HashRef, via { 'Google::Cloud::Sql::V1::CloudSqlInstances::PscDnsReconcileNetworkingRequest'->new($_) };
+
+declare 'RepeatedPscDnsReconcileNetworkingRequest',
+    as ArrayRef[PscDnsReconcileNetworkingRequest()];
+
+coerce 'RepeatedPscDnsReconcileNetworkingRequest',
+    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Sql::V1::CloudSqlInstances::PscDnsReconcileNetworkingRequest'->new($_) } @$_ ] };
+
+declare 'MapStringPscDnsReconcileNetworkingRequest',
+    as HashRef[PscDnsReconcileNetworkingRequest()];
 
 1;
 

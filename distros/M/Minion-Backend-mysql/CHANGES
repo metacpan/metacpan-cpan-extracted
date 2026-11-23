@@ -1,6 +1,17 @@
 Revision history for Perl extension Minion::Backend::mysql.
 
-1.008     2026-06-14 20:35:21-05:00 America/Chicago
+1.009     2026-11-22 10:57:28-06:00 America/Chicago
+
+  [Fixed]
+
+  - Fixed installing on servers that require every table to have a primary
+    key (sql_require_primary_key, and Percona XtraDB Cluster with
+    pxc_strict_mode=ENFORCING, where it is on by default in 8.4): minion_jobs
+    is now created with its primary key. Migration 14 adds it only where an
+    earlier install left it out, and no longer asks for LOCK=NONE, which
+    Galera refuses for this change.
+
+1.008    2026-06-14 20:35:21-05:00 America/Chicago
 
   [Added]
 

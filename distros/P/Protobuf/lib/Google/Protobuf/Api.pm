@@ -3,7 +3,7 @@ package Google::Protobuf::Api;
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -190,56 +190,6 @@ EOF
     # Field: mixins Type: 11 (.google.protobuf.Mixin)
     # Field: syntax Type: 14 (.google.protobuf.Syntax)
 
-=pod
-
-=head1 NAME
-
-Google::Protobuf::Api::Api - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Protobuf::Api;
-
-    my $msg = Google::Protobuf::Api::Api->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<methods>
-
-Type: Message (.google.protobuf.Method)
-
-=item * B<options>
-
-Type: Message (.google.protobuf.Option)
-
-=item * B<version>
-
-Type: String
-
-=item * B<source_context>
-
-Type: Message (.google.protobuf.SourceContext)
-
-=item * B<mixins>
-
-Type: Message (.google.protobuf.Mixin)
-
-=item * B<syntax>
-
-Type: Enum (.google.protobuf.Syntax)
-
-=back
-
-=cut
-
 # === Message: Google::Protobuf::Api::Method ===
     # Fields for Method
     # Field: name Type: 9 ()
@@ -250,102 +200,293 @@ Type: Enum (.google.protobuf.Syntax)
     # Field: options Type: 11 (.google.protobuf.Option)
     # Field: syntax Type: 14 (.google.protobuf.Syntax)
 
-=pod
-
-=head1 NAME
-
-Google::Protobuf::Api::Method - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Protobuf::Api;
-
-    my $msg = Google::Protobuf::Api::Method->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<request_type_url>
-
-Type: String
-
-=item * B<request_streaming>
-
-Type: Bool
-
-=item * B<response_type_url>
-
-Type: String
-
-=item * B<response_streaming>
-
-Type: Bool
-
-=item * B<options>
-
-Type: Message (.google.protobuf.Option)
-
-=item * B<syntax>
-
-Type: Enum (.google.protobuf.Syntax)
-
-=back
-
-=cut
-
 # === Message: Google::Protobuf::Api::Mixin ===
     # Fields for Mixin
     # Field: name Type: 9 ()
     # Field: root Type: 9 ()
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Protobuf::Api::Mixin - Compiled Protocol Buffers message class
+Google::Protobuf::Api - Compiled Protocol Buffers messages for google/protobuf/api.proto
 
 =head1 SYNOPSIS
 
     use Google::Protobuf::Api;
 
-    my $msg = Google::Protobuf::Api::Mixin->new(
-        name => $value,
-    );
+    my $msg = Google::Protobuf::Api::Api->new({
+        name => $name,
+        methods => $methods,
+        options => $options,
+        version => $version,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->name();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Protobuf::Api::Api->parse($bytes);
 
-=item * B<name>
-
-Type: String
-
-=item * B<root>
-
-Type: String
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Protobuf::Api - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/protobuf/api.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Protobuf::Api::Api
+
+Api is a light-weight descriptor for an API Interface.
+
+Interfaces are also described as "protocol buffer services" in some contexts,
+such as by the "service" keyword in a .proto file, but they are different
+from API Services, which represent a concrete implementation of an interface
+as opposed to simply a description of methods and bindings. They are also
+sometimes simply referred to as "APIs" in other contexts, such as the name of
+this message itself. See https://cloud.google.com/apis/design/glossary for
+detailed terminology.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+The fully qualified name of this interface, including package name
+followed by the interface's simple name.
+
+=item * C<< $msg->methods() >> / C<< $msg->methods($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Api::Method>)
+
+The methods of this interface, in unspecified order.
+
+=item * C<< $msg->options() >> / C<< $msg->options($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Type::Option>)
+
+Any metadata attached to the interface.
+
+=item * C<< $msg->version() >> / C<< $msg->version($value) >>
+
+Type: C<String>
+
+A version string for this interface. If specified, must have the form
+`major-version.minor-version`, as in `1.10`. If the minor version is
+omitted, it defaults to zero. If the entire version field is empty, the
+major version is derived from the package name, as outlined below. If the
+field is not empty, the version in the package name will be verified to be
+consistent with what is provided here.
+
+The versioning schema uses [semantic
+versioning](http://semver.org) where the major version number
+indicates a breaking change and the minor version an additive,
+non-breaking change. Both version numbers are signals to users
+what to expect from different versions, and should be carefully
+chosen based on the product plan.
+
+The major version is also reflected in the package name of the
+interface, which must end in `v<major-version>`, as in
+`google.feature.v1`. For major versions 0 and 1, the suffix can
+be omitted. Zero major versions must only be used for
+experimental, non-GA interfaces.
+
+
+
+=item * C<< $msg->source_context() >> / C<< $msg->source_context($value) >>
+
+Type: C<Message> (L<Google::Protobuf::SourceContext::SourceContext>)
+
+Source context for the protocol buffer service represented by this
+message.
+
+=item * C<< $msg->mixins() >> / C<< $msg->mixins($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Api::Mixin>)
+
+Included interfaces. See [Mixin][].
+
+=item * C<< $msg->syntax() >> / C<< $msg->syntax($value) >>
+
+Type: C<Enum> (L<Google::Protobuf::Syntax>)
+
+The source syntax of the service.
+
+=back
+
+=head2 Google::Protobuf::Api::Method
+
+Method represents a method of an API interface.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+The simple name of this method.
+
+=item * C<< $msg->request_type_url() >> / C<< $msg->request_type_url($value) >>
+
+Type: C<String>
+
+A URL of the input message type.
+
+=item * C<< $msg->request_streaming() >> / C<< $msg->request_streaming($value) >>
+
+Type: C<Bool>
+
+If true, the request is streamed.
+
+=item * C<< $msg->response_type_url() >> / C<< $msg->response_type_url($value) >>
+
+Type: C<String>
+
+The URL of the output message type.
+
+=item * C<< $msg->response_streaming() >> / C<< $msg->response_streaming($value) >>
+
+Type: C<Bool>
+
+If true, the response is streamed.
+
+=item * C<< $msg->options() >> / C<< $msg->options($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Type::Option>)
+
+Any metadata attached to the method.
+
+=item * C<< $msg->syntax() >> / C<< $msg->syntax($value) >>
+
+Type: C<Enum> (L<Google::Protobuf::Syntax>)
+
+The source syntax of this method.
+
+=back
+
+=head2 Google::Protobuf::Api::Mixin
+
+Declares an API Interface to be included in this interface. The including
+interface must redeclare all the methods from the included interface, but
+documentation and options are inherited as follows:
+
+- If after comment and whitespace stripping, the documentation
+  string of the redeclared method is empty, it will be inherited
+  from the original method.
+
+- Each annotation belonging to the service config (http,
+  visibility) which is not set in the redeclared method will be
+  inherited.
+
+- If an http annotation is inherited, the path pattern will be
+  modified as follows. Any version prefix will be replaced by the
+  version of the including interface plus the [root][] path if
+  specified.
+
+Example of a simple mixin:
+
+    package google.acl.v1;
+    service AccessControl {
+      // Get the underlying ACL object.
+      rpc GetAcl(GetAclRequest) returns (Acl) {
+        option (google.api.http).get = "/v1/{resource=**}:getAcl";
+      }
+    }
+
+    package google.storage.v2;
+    service Storage {
+      rpc GetAcl(GetAclRequest) returns (Acl);
+
+      // Get a data record.
+      rpc GetData(GetDataRequest) returns (Data) {
+        option (google.api.http).get = "/v2/{resource=**}";
+      }
+    }
+
+Example of a mixin configuration:
+
+    apis:
+    - name: google.storage.v2.Storage
+      mixins:
+      - name: google.acl.v1.AccessControl
+
+The mixin construct implies that all methods in `AccessControl` are
+also declared with same name and request/response types in
+`Storage`. A documentation generator or annotation processor will
+see the effective `Storage.GetAcl` method after inheriting
+documentation and annotations as follows:
+
+    service Storage {
+      // Get the underlying ACL object.
+      rpc GetAcl(GetAclRequest) returns (Acl) {
+        option (google.api.http).get = "/v2/{resource=**}:getAcl";
+      }
+      ...
+    }
+
+Note how the version in the path pattern changed from `v1` to `v2`.
+
+If the `root` field in the mixin is specified, it should be a
+relative path under which inherited HTTP paths are placed. Example:
+
+    apis:
+    - name: google.storage.v2.Storage
+      mixins:
+      - name: google.acl.v1.AccessControl
+        root: acls
+
+This implies the following inherited HTTP annotation:
+
+    service Storage {
+      // Get the underlying ACL object.
+      rpc GetAcl(GetAclRequest) returns (Acl) {
+        option (google.api.http).get = "/v2/acls/{resource=**}:getAcl";
+      }
+      ...
+    }
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+The fully qualified name of the interface which is included.
+
+=item * C<< $msg->root() >> / C<< $msg->root($value) >>
+
+Type: C<String>
+
+If non-empty specifies a path under which inherited HTTP paths
+are rooted.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Protobuf::Api::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

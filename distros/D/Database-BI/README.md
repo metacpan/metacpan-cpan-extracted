@@ -4,7 +4,7 @@ Database::BI - Web-based Business Intelligence viewer for data files
 
 ## Version
 
-0.023.1
+0.024.0
 
 ## Description
 
@@ -31,6 +31,11 @@ every supported file.  Recently opened filesystem files appear in a
 "Recently opened" section powered by `localStorage`.
 - **Filesystem browser** -- `/browse` lets the user navigate the entire
 filesystem and open any supported data file, not just files in `data_dir`.
+A folder with two or more data files has a checkbox beside each (and Select
+all; shift-click ticks a range), and Combine selected opens the ticked files
+as one table, as the Combine data panel does.  A folder of reports of one
+format, such as a DMARC archive, is one click, and the table has a
+`source_file` column that names the file each row came from.
 - **Column sort and reorder** -- clicking a header sorts the table; headers
 are draggable to reorder.  Both settings are persisted in `localStorage`
 by column name and survive page reloads.  A table too long for one page is
@@ -50,7 +55,8 @@ applies the filter.  Each active filter chip has an individual remove (x)
 button so conditions can be dropped one at a time.  Operators: `eq`,
 `ne`, `contains`, `starts`, `lt`, `le`, `gt`, `ge`, `between`, `empty`,
 `notempty`; and `in`, which a link can carry but the bar does not offer: any
-value of a JSON list, as in `f=place:in:["Paris","Rome"]`.  Filters are
+value of a JSON list, as in `f=place:in:["Paris","Rome"]`, and `differ`,
+which the Delta button adds (see below).  Filters are
 applied server-side after all joins.  `lt`, `le`,
 `gt` and `ge` compare numbers, reading `$1,234.56` and `(1,234.56)` as
 numbers too; a blank or a word in the cell matches none of them.
@@ -62,6 +68,14 @@ the exception: one on a column its dataset no longer has is ignored.
 - **Combine (UNION ALL)** -- the "Combine data" panel stacks rows from a
 second (or further) file beneath the current rows, using a unified column
 set and leaving blanks where a source file lacks a column.
+- **Delta** -- the "Delta" button, to the right of Combine data, asks for two
+columns and removes every row where they are identical, so only the rows
+where they differ are left.  It adds the filter `f=first:differ:second` to the
+view, so the table, charts, pivot, export and print all show the same rows,
+and the chip can be removed like any other filter.  "Identical" means the same
+text: `Ann` and `ann`, or `10` and `10.0`, differ.  An empty cell
+is identical to another empty cell, so a row where both are empty is removed.  Both columns must be in the view, or the request
+is a `400`.  The names of the two columns must not contain a colon.
 - **Charts** -- nine [HTML::D3](https://metacpan.org/pod/HTML%3A%3AD3) D3.js v7 chart types are accessible from
 the toolbar: line chart (brush-to-zoom, reference lines for min/avg/max and a trend line,
 multi-series interactive legend), pie chart (click-a-slice to filter,
@@ -74,6 +88,12 @@ by dragging the bottom-right corner grip, or from the keyboard: the grip
 takes focus, the arrow keys resize the chart (Shift takes bigger steps,
 Home and End go to the narrowest and widest it can be) and the size is announced
 as it changes.  All chart pages include Copy-link and Export SVG/PNG/PDF buttons.
+In a browser with the File System Access API (Chrome, Edge and other Chromium
+browsers, on this machine or over https) each export opens the Save As box, so
+the reader chooses the folder and the file name; the chart's own name is
+suggested, and cancelling saves nothing.  Other browsers download the file under
+that name into their usual downloads folder.  (The Export panel on a table is
+different: it saves on the server, in `export_dirs`.)
 - **Maps** -- `GET /map` plots the filtered view on an OpenStreetMap map, either
 from latitude and longitude columns or from a place column geocoded by a
 [Geo::Coder::List](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AList) chain: [Geo::Coder::Free](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AFree)'s local data first, then
@@ -143,7 +163,10 @@ onto the application.  The file is opened immediately; when the "Combine
 data" panel is open the dropped file populates the right-table path field.
 - **Export** -- the toolbar export panel writes the current logical view
 (after joins, filters, and dedup) to a chosen filesystem path as CSV
-(`.csv`), SQLite (`.sql`), or JSON (`.json`).
+(`.csv`), SQLite (`.sql`), or JSON (`.json`).  Only the columns the table
+still shows are saved, in the table's order: a column you deleted is left out,
+and a column you dragged to a new place is written there (JSON keys follow the
+same order).
 - **Print** -- the Print button, to the right of Refresh, prints the header row
 and every row of the current view, not just the page on screen: the rows the
 Export panel would save (after joins, filters, calculated and cross-row
@@ -310,7 +333,9 @@ perl Makefile.PL
 
     A long table is shown a page at a time: `?page=` is the page, and
     `?per_page=` its size (else the reader's preference, else 200; up to 2000;
-    `0` is every row on one page, and then `page=` is ignored).  The page says
+    `0` is every row on one page, and then `page=` is ignored; a number below 1
+    is 1, and anything that is not a whole number written with the digits 0-9 is
+    taken as if it were not given).  The page says
     "Page 2 of 7", and its Rows per page list (25, 50, 100, 200, All) changes the
     size, keeping the first row on screen.  A pivot pages its row groups the same
     way.
@@ -330,7 +355,11 @@ perl Makefile.PL
 - `GET /browse`
 
     Filesystem navigator.  Accepts `?path=` to set the starting directory
-    (defaults to `$HOME`).
+    (defaults to `$HOME`).  When the folder holds two or more data files the
+    page can tick several and send them to `/combine` (the first as `l=`, the
+    others as `c=`, with `srccol=source_file`).  A very long list makes a long
+    URL, so the request line may be up to 256 KiB (`MOJO_MAX_LINE_SIZE`, which
+    is set to that at startup unless it is already set).
 
 - `GET /open`
 
@@ -347,6 +376,7 @@ perl Makefile.PL
     l=<spec>               left table spec (see below)
     j=<spec>|<lk>|<rk>    join step (repeatable): right-spec, left key, right key
     c=<spec>               table to stack after the joins (repeatable; see /combine)
+    srccol=<name>          with c=, a column naming each row's source file (see /combine)
     f=<col>:<op>:<val>     result filter (repeatable)
     range=<name>           relative time range, with rcol=<column> (see below)
     ```
@@ -381,6 +411,10 @@ perl Makefile.PL
     ```
     format=csv      (default) - RFC 4180 CSV; UTF-8; CRLF line endings
     format=sqlite   - SQLite 3 database with a single table named "data"
+    format=json     - JSON array of row objects; keys follow the column order
+    xcol=<name>     - (repeatable) keep only these columns, in this order;
+                      names the view lacks are ignored, and none left means
+                      every column
     ```
 
     The download filename is derived from the left table label with
@@ -389,9 +423,10 @@ perl Makefile.PL
 - `POST /export`
 
     Writes the current logical view to a chosen filesystem path.
-    Body params: `l=`, `j=`, `f=` (same as GET), plus
+    Body params: `l=`, `j=`, `f=`, `xcol=` (same as GET), plus
     `dir=` (target directory) and `filename=` (name including extension;
-    extension determines format: `.csv` or `.sql`).
+    extension determines format: `.csv`, `.sql` or `.json`).  The Export panel
+    sends one `xcol=` for each column its table still shows.
     Returns JSON `{ saved: "/abs/path" }` or `{ error: "..." }`.
 
 - `GET /api/dirs`
@@ -443,6 +478,12 @@ perl Makefile.PL
     j=<spec>|<lk>|<rk>    join step applied to the left table first (repeatable)
     c=<spec>               additional table to stack (repeatable)
     f=<col>:<op>:<val>     result filter applied after combining (repeatable)
+    srccol=<name>          add a last column, <name>, holding the file or table
+                           each row came from (a letter or underscore, then
+                           letters, digits or underscores, at most 64; a name a
+                           source already uses gets an underscore added).  The
+                           file browser's Combine selected passes source_file.
+                           The panels, Export and Print carry it on.
     ```
 
 - `GET /graph`
@@ -1716,6 +1757,26 @@ server other machines reach should be behind https.  Ten wrong passwords from
 one address within 15 minutes lock that address out for the rest of the 15
 minutes (`429`); each server process counts its own.
 
+### Time Zones
+
+A timestamp that names its zone (`2026-11-06T23:30:00Z`, `...+01:00`) is read
+as written unless `time_zone` is set.  With it, such a value is moved to that
+zone's clock first, so the day and hour a filter, the Time range, a formula
+(`hour`, `minute`) and the `span=` buckets see are the ones on that clock,
+and "today", "this month" and the other Time range presets are that zone's too.
+A value with no zone written is taken to be on that clock already, and a table
+still shows each cell as it was written.
+
+```perl
+{
+    time_zone => 'UTC',        # or '-05:00', '+05:30', or 'local'
+}
+```
+
+`local` is the server's own zone, daylight saving included (set `TZ` to
+change it).  Named zones such as `America/New_York` are not read: use `local`
+with `TZ`, or an offset.  Anything else stops the start.
+
 ### MariaDB and MySQL Servers
 
 A server is opened by name.  Each entry of `mariadb_servers` is one database:
@@ -2249,10 +2310,10 @@ the same and shows that database, with a command word it runs that command, and 
     American spelling it does not list.  The tutorial's text is still in British
     English.
 
-- **Supported data file extensions are: csv, db, sql, sqlite, sqlite3, xml, psv, tsv, xlsx, json**
+- **Supported data file extensions are: csv, db, sql, sqlite, sqlite3, xml, psv, tsv, xlsx, json, jsonl, ndjson**
 
     The application recognises `.csv`, `.db`, `.sql`, `.sqlite`, `.sqlite3`,
-    `.xml`, `.psv`, `.tsv`, `.xlsx` and `.json` files.  All three SQLite extensions
+    `.xml`, `.psv`, `.tsv`, `.xlsx`, `.json`, `.jsonl` and `.ndjson` files.  All three SQLite extensions
     (`.sql`, `.sqlite`, `.sqlite3`) are treated identically -- `inventory.sqlite`
     and `inventory.sqlite3` are both opened as SQLite databases without renaming.
     Excel `.xlsx` files are read by [Database::Abstraction](https://metacpan.org/pod/Database%3A%3AAbstraction), using
@@ -2268,6 +2329,15 @@ the same and shows that database, with a command word it runs that command, and 
     or a list shows as its JSON text, `true` and `false` as words and `null` as
     an empty cell, and the columns are in the order the file first names them.  A
     file of another format with the same name in the same folder is the one read.
+
+    A `.jsonl` or `.ndjson` file (JSON Lines, one object a line, as logs and API
+    exports write it) is a table with a row for each line.  It is read as a stream,
+    and so is a `.json` list of objects over 16 MiB, so a large file does not
+    need memory for its text and its parse as well.  Set `json_flatten` to 1 in
+    `database_bi.conf` and a nested object becomes a column for each of its
+    values, named by its path (`address.city`), instead of one cell of JSON text;
+    lists stay text.  It is off by default, and applies to `.json` and JSON Lines
+    alike.
 
     URLs will work.
     For example enter

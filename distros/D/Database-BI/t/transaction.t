@@ -1827,6 +1827,7 @@ subtest 'Transaction 29 -- Berkeley DB file open lifecycle' => sub {
 		# Phase 1: create a Berkeley DB file with known key-value pairs.
 		{
 			my %bdb;
+			no warnings 'once';
 			tie(%bdb, 'DB_File', $path, DB_File::O_CREAT()|DB_File::O_RDWR(), 0644, $DB_File::DB_HASH)
 				or skip "Cannot create Berkeley DB file: $!", 7;
 			$bdb{apple}  = 'red fruit';
@@ -2654,6 +2655,7 @@ subtest 'Transaction 42 -- import_url drill-down breadcrumb lifecycle' => sub {
 	         . '</table>';
 
 	no warnings 'redefine';
+	no warnings 'once';
 	local *LWP::UserAgent::get = sub {
 		my ($self, $url) = @_;
 		return HTTP::Response->new(200, 'OK', [], $html);
@@ -2884,5 +2886,234 @@ subtest 'Transaction 44 -- Multi-table SQLite schema browser lifecycle' => sub {
 		  ->status_is(404, 'Phase 8: /tables with invalid spec returns 404');
 	}
 };
+
+# ======================================================================
+# TRANSACTIONS 45-51: stores that outlive a request -- canvases (analyses.json)
+# and saved model entries (models.json).  Lifecycle: absent -> created ->
+# changed -> exported -> imported -> deleted -> absent.  Each request is read,
+# change, write: it must be all-or-nothing, repeatable, and safe against another
+# process doing the same (flock).
+# ======================================================================
+{
+	use Fcntl qw(:flock);
+	use Time::HiRes ();
+	use Test::Permissions qw(can_revoke_create with_revoked);
+	use Test::Mockingbird qw(mock restore_all);
+
+	Readonly my %TX => (
+		wait_child  => 20,
+		child_wait  => 6,	# seconds the parent gives the rival to finish alone
+		poll        => 0.1,
+		spec        => 'table:orders',
+		lock_tries  => 100,
+	);
+
+	my $data_dir  = Mojo::File->new(tempdir(CLEANUP => 1))->to_string;
+	my $model_dir = Mojo::File->new(tempdir(CLEANUP => 1))->to_string;
+	Mojo::File->new($data_dir)->child('orders.csv')->spew(join("\n", 'id,region,amount', '1,North,10', '2,South,20') . "\n");
+	my $tx_app = Test::Mojo->new('Database::BI', { data_dir => $data_dir, model_dir => $model_dir });
+	my $models_file   = Mojo::File->new($model_dir)->child('models.json');
+	my $analyses_file = Mojo::File->new($model_dir)->child('analyses.json');
+	my @warnings;
+	$tx_app->app->log->level('warn');
+	$tx_app->app->log->on(message => sub { my ($log, $level, @lines) = @_; push @warnings, "$level: @lines" if $level =~ /\A(?:warn|error)\z/ });
+
+	my $stored = sub { my ($file) = @_; return -f $file ? decode_json($file->slurp) : undef };
+	my $stray  = sub { return scalar grep { /\A\.bi-store-/ || /\.tmp\z/ } map { $_->basename } @{ Mojo::File->new($model_dir)->list({ hidden => 1 })->to_array } };
+	my $canvas = sub { return { name => 'Report', datasets => [ { spec => $TX{spec} } ], visuals => [ { kind => 'bar', encode => { cat => 'region', value => 'amount' } } ] } };
+	my $fields = sub { $tx_app->get_ok('/calc/list?l=' . url_escape($TX{spec}))->status_is(200); return $tx_app->tx->res->json->{fields} };
+	my $save   = sub { my ($name, $expr) = @_; return $tx_app->post_ok('/calc/save' => form => { l => $TX{spec}, name => $name, expr => $expr }) };
+	my $unsave = sub { $tx_app->post_ok('/calc/delete' => form => { l => $TX{spec}, name => $_ })->status_is(200) for @_ };
+
+	subtest 'Transaction 45: canvas create -> read -> add card -> rename -> export -> import -> delete -> gone' => sub {
+		$tx_app->post_ok('/api/analyses' => json => $canvas->())->status_is(201);
+		my $id = $tx_app->tx->res->json->{id};
+		ok $id, 'created: an id comes back';
+		ok exists $stored->($analyses_file)->{$id}, 'and the store holds it';
+
+		$tx_app->get_ok("/api/analyses/$id")->status_is(200)->json_is('/name', 'Report');
+		is scalar(@{ $tx_app->tx->res->json->{visuals} }), 1, 'read: one card';
+
+		$tx_app->post_ok("/api/analyses/$id/visuals" => json => { kind => 'text', options => { text => 'Note' } })->status_is(201);
+		$tx_app->get_ok("/api/analyses/$id")->status_is(200);
+		is scalar(@{ $tx_app->tx->res->json->{visuals} }), 2, 'a card added: two cards';
+
+		$tx_app->patch_ok("/api/analyses/$id" => json => { name => 'Renamed' })->status_is(200);
+		$tx_app->get_ok("/api/analyses/$id")->json_is('/name', 'Renamed');
+		is scalar(@{ $tx_app->tx->res->json->{visuals} }), 2, 'renamed, and the cards are untouched';
+
+		$tx_app->get_ok("/api/analyses/$id/export")->status_is(200);
+		my $exported = $tx_app->tx->res->body;
+		$tx_app->post_ok('/api/analyses/import' => { 'Content-Type' => 'application/json' } => $exported)->status_is(201);
+		my $copy = $tx_app->tx->res->json->{id};
+		isnt $copy, $id, 'imported: a new id, not the old one';
+		$tx_app->get_ok("/api/analyses/$copy")->json_is('/name', 'Renamed');
+		is scalar(@{ $tx_app->tx->res->json->{visuals} }), 2, 'the copy has the cards';
+
+		$tx_app->delete_ok("/api/analyses/$id")->status_is(200);
+		$tx_app->get_ok("/api/analyses/$id")->status_is(404);
+		ok exists $stored->($analyses_file)->{$copy}, 'deleting the original leaves the copy in the store';
+
+		my $snapshot = $analyses_file->slurp;
+		$tx_app->delete_ok("/api/analyses/$id")->status_is(404);
+		is $analyses_file->slurp, $snapshot, 'deleting it again changes nothing on disk';
+		$tx_app->delete_ok("/api/analyses/$copy")->status_is(200);
+		is $stray->(), 0, 'no temporary file is left behind';
+	};
+
+	subtest 'Transaction 46: the same document imported twice gives distinct canvases that do not disturb each other' => sub {
+		$tx_app->post_ok('/api/analyses' => json => $canvas->())->status_is(201);
+		my $id = $tx_app->tx->res->json->{id};
+		$tx_app->get_ok("/api/analyses/$id/export")->status_is(200);
+		my $doc = $tx_app->tx->res->body;
+		my @ids;
+		for (1 .. 2) {
+			$tx_app->post_ok('/api/analyses/import' => { 'Content-Type' => 'application/json' } => $doc)->status_is(201);
+			push @ids, $tx_app->tx->res->json->{id};
+		}
+		is scalar(keys %{{ map { $_ => 1 } @ids, $id }}), 3, 'three distinct ids: no duplicate-key clash';
+		$tx_app->delete_ok("/api/analyses/$ids[0]")->status_is(200);
+		$tx_app->get_ok("/api/analyses/$ids[1]")->status_is(200);
+		$tx_app->get_ok("/api/analyses/$id")->status_is(200);
+		$tx_app->delete_ok("/api/analyses/$_")->status_is(200) for $id, $ids[1];
+	};
+
+	subtest 'Transaction 47: a model save is repeatable; delete is final and repeatable' => sub {
+		is_deeply $fields->(), {}, 'nothing saved to begin with';
+		$save->('tax', 'amount * 0.2')->status_is(200)->json_is('/ok', 1);
+		my $first = $models_file->slurp;
+		$save->('tax', 'amount * 0.2')->status_is(200);
+		is $models_file->slurp, $first, 'saving the same field again changes nothing';
+		$save->('net', 'amount - tax')->status_is(200);
+		$save->('tax', 'amount * 0.25')->status_is(200);
+		is_deeply $fields->(), { tax => 'amount * 0.25', net => 'amount - tax' }, 'a change replaces the entry and leaves the others';
+
+		my $good = $models_file->slurp;
+		$save->('1bad', 'x')->status_is(400);
+		$save->('ok_name', '')->status_is(400);
+		is $models_file->slurp, $good, 'refused saves wrote nothing';
+
+		$unsave->('tax');
+		is_deeply $fields->(), { net => 'amount - tax' }, 'deleted';
+		my $after = $models_file->slurp;
+		$unsave->('tax');
+		is $models_file->slurp, $after, 'deleting it again changes nothing';
+		$unsave->('net');
+		is_deeply $fields->(), {}, 'empty again';
+		is $stray->(), 0, 'no temporary file is left behind';
+	};
+
+	subtest 'Transaction 48: a disk that fills mid-write leaves the old store and no temporary file' => sub {
+		plan skip_all => 'no /dev/full here' unless -w '/dev/full';
+		$save->('kept', 'amount + 1')->status_is(200);
+		my $before = $models_file->slurp;
+		@warnings = ();
+		my $full = sub {
+			open my $fh, '>', '/dev/full' or die "cannot open /dev/full: $!";
+			return ($fh, File::Spec->catfile($model_dir, '.bi-store-never-made'));
+		};
+		mock 'Database::BI::Controller::Dashboard::tempfile' => $full;
+		$save->('lost', 'amount + 2')->status_is(200);
+		restore_all();
+		is $models_file->slurp, $before, 'the store on disk is exactly as it was';
+		is_deeply $fields->(), { kept => 'amount + 1' }, 'a reader sees only the saved field';
+		ok scalar(grep { /Cannot write .*models\.json/ } @warnings), 'the failure was logged, naming the file';
+		is $stray->(), 0, 'no temporary file is left behind';
+
+		$save->('after', 'amount + 3')->status_is(200);
+		is_deeply $fields->(), { kept => 'amount + 1', after => 'amount + 3' }, 'the next save goes through';
+
+		$tx_app->post_ok('/api/analyses' => json => $canvas->())->status_is(201);
+		my $id = $tx_app->tx->res->json->{id};
+		my $canvases = $analyses_file->slurp;
+		mock 'Database::BI::Controller::Dashboard::tempfile' => $full;
+		$tx_app->patch_ok("/api/analyses/$id" => json => { name => 'Never saved' })->status_is(503);
+		restore_all();
+		is $analyses_file->slurp, $canvases, 'a canvas change that could not be written is not half-applied';
+		$tx_app->get_ok("/api/analyses/$id")->json_is('/name', 'Report');
+		$tx_app->delete_ok("/api/analyses/$id")->status_is(200);
+		$unsave->(qw(kept after));
+	};
+
+	subtest 'Transaction 49: a competing save in another process is not lost (flock around read-change-write)' => sub {
+		plan skip_all => 'needs fork and exec' if $^O eq 'MSWin32';
+		my $script = <<'PERL';
+use strict; use warnings; use Test::Mojo;
+my ($model_dir, $data_dir, $name) = @ARGV;
+my $t = Test::Mojo->new('Database::BI', { model_dir => $model_dir, data_dir => $data_dir });
+my $tx = $t->ua->post('/calc/save' => form => { l => 'table:orders', name => $name, expr => 'amount + 9' });
+exit($tx->res->code == 200 ? 0 : 1);
+PERL
+		my $original = \&Database::BI::Controller::Dashboard::_write_models;
+		my ($pid, $fired);
+		mock 'Database::BI::Controller::Dashboard::_write_models' => sub {
+			unless ($fired++) {
+				# The parent is between its read and its write: start the rival and give it
+				# time to finish its whole save if nothing stops it.
+				$pid = fork;
+				die "fork: $!" unless defined $pid;
+				exec($^X, '-Ilib', '-e', $script, $model_dir, $data_dir, 'from_child') unless $pid;
+				# Wait until the rival's save is in the store (it can only be there if
+				# nothing made it wait), or the allowance ends (it was held by the lock).
+				for (1 .. int($TX{child_wait} / $TX{poll})) {
+					last if -f $models_file && $models_file->slurp =~ /from_child/;
+					Time::HiRes::sleep($TX{poll});
+				}
+			}
+			return $original->(@_);
+		};
+		$save->('from_parent', 'amount + 1')->status_is(200);
+		restore_all();
+		ok $pid, 'the competing process was started mid-transaction';
+		my $done = do {
+			local $SIG{ALRM} = sub { kill 'KILL', $pid; die "child took too long\n" };
+			alarm $TX{wait_child};
+			my $got = waitpid($pid, 0);
+			alarm 0;
+			$got;
+		};
+		is $done, $pid, 'the rival finished (it waited for the lock; it did not hang)';
+		is $? >> 8, 0, 'and its save succeeded';
+		is_deeply $fields->(), { from_parent => 'amount + 1', from_child => 'amount + 9' }, 'both saves are in the store: neither erased the other';
+		is $stray->(), 0, 'no temporary file is left behind';
+		$unsave->(qw(from_parent from_child));
+	};
+
+	subtest 'Transaction 50: the lock is released on failure; a lock never released is given up on' => sub {
+		my $lock_file = "$models_file.lock";
+		mock 'Database::BI::Controller::Dashboard::_write_models' => sub { die "disk exploded\n" };
+		$save->('doomed', 'amount + 1');
+		restore_all();
+		ok -e $lock_file, 'the lock file exists';
+		open my $probe, '>>', $lock_file or die "cannot open $lock_file: $!";
+		ok flock($probe, LOCK_EX | LOCK_NB), 'but nothing holds it after the failed request';
+		my $slept = 0;
+		mock 'Time::HiRes::sleep' => sub { $slept++; return };
+		@warnings = ();
+		$save->('through', 'amount + 5')->status_is(200);
+		restore_all();
+		is $slept, $TX{lock_tries}, 'it waited its whole allowance (no real time passed)';
+		ok scalar(grep { /gave up/ } @warnings), 'and logged that it gave up on the lock';
+		is_deeply $fields->(), { through => 'amount + 5' }, 'the save still happened';
+		flock($probe, LOCK_UN);
+		close $probe;
+		$unsave->('through');
+	};
+
+	subtest 'Transaction 51: a store folder that refuses new files: the save fails cleanly and recovers' => sub {
+		plan skip_all => 'cannot revoke create here' unless can_revoke_create($model_dir);
+		$save->('present', 'amount + 1')->status_is(200);
+		my $before = $models_file->slurp;
+		with_revoked('create', $model_dir, sub {
+			$save->('refused', 'amount + 2')->status_is(200);
+		});
+		is $models_file->slurp, $before, 'nothing was written while the folder refused';
+		is_deeply $fields->(), { present => 'amount + 1' }, 'a reader sees the earlier state';
+		$save->('recovered', 'amount + 3')->status_is(200);
+		is_deeply $fields->(), { present => 'amount + 1', recovered => 'amount + 3' }, 'with access back the same app saves again';
+		is $stray->(), 0, 'no temporary file is left behind';
+		$unsave->(qw(present recovered));
+	};
+}
 
 done_testing();

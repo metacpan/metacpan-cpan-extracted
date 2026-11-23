@@ -4,7 +4,7 @@ AtteanX::Serializer::SPARQLCSV - SPARQL Results CSV Serializer
 
 =head1 VERSION
 
-This document describes AtteanX::Serializer::SPARQLCSV version 0.040
+This document describes AtteanX::Serializer::SPARQLCSV version 0.041
 
 =head1 SYNOPSIS
 
@@ -30,12 +30,16 @@ This document describes AtteanX::Serializer::SPARQLCSV version 0.040
 
 =over 4
 
+=item C<< canonical_iri >>
+
+Returns the canonical IRI of this format.
+
 =cut
 
 use v5.14;
 use warnings;
 
-package AtteanX::Serializer::SPARQLCSV 0.040 {
+package AtteanX::Serializer::SPARQLCSV 0.041 {
 	use Moo;
 	use Types::Standard qw(Str ArrayRef);
 	use Encode qw(encode);
@@ -45,6 +49,7 @@ package AtteanX::Serializer::SPARQLCSV 0.040 {
 	use Text::CSV;
 	use namespace::clean;
 
+	sub canonical_iri { return 'http://www.w3.org/ns/formats/SPARQL_Results_CSV' }
 	has 'canonical_media_type' => (is => 'ro', isa => Str, init_arg => undef, default => 'text/csv');
 
 =item C<< media_types >>

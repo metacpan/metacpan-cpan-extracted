@@ -46,7 +46,7 @@ BEGIN {
 package main;
 use Google::Cloud::Networksecurity::V1::DnsThreatDetectorServiceClient;
 
-my $client = Google::Cloud::Networksecurity::V1::DnsThreatDetectorServiceClient->new( credentials => 'dummy' );
+my $client = Google::Cloud::Networksecurity::V1::DnsThreatDetectorServiceClient->new();
 ok($client, 'Instantiated generated client');
 isa_ok($client->transport, 'Google::gRPC::Client', 'Client transport');
 

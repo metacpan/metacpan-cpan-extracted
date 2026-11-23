@@ -182,3 +182,70 @@ sub fetch_access_token {
 }
 
 1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Auth::UserRefreshCredentials - OAuth 2.0 user refresh-token credentials (authorized_user ADC)
+
+=head1 SYNOPSIS
+
+    use Google::Auth::UserRefreshCredentials;
+
+    my $creds = Google::Auth::UserRefreshCredentials->new(
+        client_id     => $client_id,
+        client_secret => $client_secret,
+        refresh_token => $refresh_token,
+    );
+    my $token = $creds->get_token();
+
+=head1 DESCRIPTION
+
+Exchanges stored OAuth 2.0 user refresh tokens (such as those created by gcloud-auth application-default login) for fresh Bearer access tokens.
+
+=head1 METHODS AND ATTRIBUTES
+
+=over 4
+
+=item * B<json_key>
+
+=item * B<client_id>
+
+=item * B<client_secret>
+
+=item * B<refresh_token>
+
+=item * B<code>
+
+=item * B<redirect_uri>
+
+=item * B<token_uri>
+
+=item * B<code_verifier>
+
+=item * B<scope>
+
+=item * B<ua>
+
+=item * B<fetch_access_token>
+
+=back
+
+=head1 SEE ALSO
+
+L<Google::Auth>, L<Google::Auth::Credentials>
+
+=head1 AUTHOR
+
+C.J. Collier E<lt>cjac@google.comE<gt>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2026 Google LLC and contributors.
+
+Licensed under the Apache License, Version 2.0.
+
+=cut

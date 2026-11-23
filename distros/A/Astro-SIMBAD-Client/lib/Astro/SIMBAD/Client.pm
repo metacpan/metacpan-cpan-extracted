@@ -12,9 +12,19 @@ Astro::SIMBAD::Client - Fetch astronomical data from SIMBAD 4.
 
 As of release 0.027_01 the SOAP interface is deprecated. The University
 of Strasbourg has announced at
-L<https://cds.u-strasbg.fr/resources.gml?id=soap> that this
+C<https://cds.unistra.fr/resources.gml?id=soap> that this
 interface will not be maintained after April 1 2014, and that 
 B<this interface will be stopped on December 31 2018>.
+
+As of November 155 2026 the SOAP stuff is still non-functional, and even
+the above documentation link is 404. Since the queries do not work
+anyway I will make them fatal in the first release after May 15 2027,
+and remove all SOAP code six months after that. The C<query()> interface
+and friends B<may> remain simply because I find the interface more
+convenient.
+
+The following text under this heading is retained to give the history of
+this issue.
 
 Because the SOAP interface is still sort of functional (except for
 VO-format queries) as of June 4 2014, I have revised the transition plan
@@ -47,7 +57,7 @@ otherwise SOAP will become unsupported.
 
 This package implements several query interfaces to version 4 of the
 SIMBAD on-line astronomical database, as documented at
-L<http://simbad.u-strasbg.fr/simbad4.htx>. B<This package will not work
+L<https://simbad.unistra.fr/simbad4.htx>. B<This package will not work
 with SIMBAD version 3.> Its primary purpose is to obtain SIMBAD data,
 though some rudimentary parsing functionality also exists.
 
@@ -102,6 +112,7 @@ use URI::Escape ();
 # use XML::DoubleEncodedEntities;
 # use Astro::SIMBAD::Client::WSQueryInterfaceService;
 
+use constant DEFAULT_SERVER	=> 'simbad.unistra.fr';
 use constant HAVE_DOUBLE_ENCODED	=> do {
     local $@ = undef;
     eval {	## no critic (RequireCheckingReturnValueOfEval)
@@ -127,7 +138,7 @@ BEGIN {
 	|| sub { return $_[0] };
 }
 
-our $VERSION = '0.050';
+our $VERSION = '0.051';
 
 our @CARP_NOT = qw{Astro::SIMBAD::Client::WSQueryInterfaceService};
 
@@ -210,13 +221,17 @@ my %static = (
     post => 1,
     # lc(...) per https://tools.ietf.org/html/rfc3986#section-3.1
     scheme => lc( $ENV{ASTRO_SIMBAD_CLIENT_SCHEME} || 'https' ),
-##    server => 'simbad.u-strasbg.fr',
-    server => $ENV{ASTRO_SIMBAD_CLIENT_SERVER} || 'simbad.u-strasbg.fr',
+##    server => 'simbad.unistra.fr',
+    server => $ENV{ASTRO_SIMBAD_CLIENT_SERVER} || DEFAULT_SERVER,
     timeout => LWP::UserAgent->new()->timeout(),
     type => 'txt',
     url_args => {},
     verbatim => 0,
 );
+
+if ( $static{server} eq 'random' ) {
+    __random_server( $static{server}, DEFAULT_SERVER );
+}
 
 if ( my $msg = _is_scheme_valid(
 	$static{scheme},
@@ -961,8 +976,11 @@ it sets the default value of the attribute.
     );
 
     my %server_map = (
-	harvard	=> 'simbad.cfa.harvard.edu',
-	strasbourg	=> 'simbad.u-strasbg.fr',
+	harvard		=> 'simbad.cfa.harvard.edu',
+	strasbourg	=> 'simbad.unistra.fr',
+	unistra		=> 'simbad.unistra.fr',
+	idia		=> 'simbad.idia.ac.za',
+	sa		=> 'simbad.idia.ac.za',
     );
 
     my %transform = (
@@ -995,8 +1013,16 @@ it sets the default value of the attribute.
 	server	=> sub {
 ##	    my ( $self, $name, $val, $key ) = @_;
 	    my ( undef, undef, $val ) = @_;	# Invocant name and key unused
-	    return ( defined( $val ) && exists $server_map{$val} ) ?
-		$server_map{$val} : $val;
+	    defined $val
+		or return $val;
+	    defined $server_map{$val}
+		and $val = $server_map{$val};
+	    $val eq 'random'
+		or return $val;
+	    my $resp = __random_server( $val );
+	    $resp->is_success()
+		or croak 'Error - No responsive server found';
+	    return $val;
 	}
     );
 
@@ -1067,7 +1093,7 @@ is one of:
  sam = query by criteria.
 
 The arguments depend on on the type, and are documented at
-L<http://simbad.u-strasbg.fr/guide/sim-url.htx>. They are
+L<https://simbad.unistra.fr/guide/sim-url.htx>. They are
 specified as name => value. For example:
 
  $simbad->url_query (id =>
@@ -1406,6 +1432,51 @@ eod
     return wantarray ? ($pkg, $code) : $pkg;
 }
 
+#	my $resp = __random_server( $server, $default );
+#
+#	Select a random server, which must be responsive. The return is
+#	an HTTP::Response object. If it represents a successful
+#	response, header 'x-simbad-server' will be set to the selected
+#	server.
+#
+#	The arguments are optional.
+#
+#	$server must be an lvalue, which will be assigned the selected
+#	server if one is found.
+#
+#	If $default is specified, $server will be assigned $default if
+#	no responsive server is found.
+#
+#	We **MUST** use $_[0] rather than an unpacked version, because
+#	@_ is aliased to the actual arguments, and we want to modify the
+#	first one.
+
+sub __random_server {	## no critic (RequireArgUnpacking)
+    my $ua = LWP::UserAgent->new(
+	timeout	=> 10,
+    );
+    my $smb = __PACKAGE__->new();
+    my @known_servers = qw{
+	simbad.unistra.fr
+	simbad.cfa.harvard.edu
+	simbad.idia.ac.za
+    };
+    my $resp;
+    while ( @known_servers ) {
+	my $inx = int rand scalar @known_servers;
+	my $server = splice @known_servers, $inx, 1;
+	$smb->set( server => $server );
+	$resp = $ua->head( $smb->__build_url( 'simbad/' ) );
+	$resp->is_success()
+	    or next;
+	$resp->header( 'x-simbad-server', $server );
+	$_[0] = $server if @_;
+	return $resp;
+    }
+    $_[0] = $_[1] if @_ > 1;
+    return $resp;
+}
+
 #	my $resp = $self->_retrieve( $fragment, \%args );
 #
 #	Build a URL from the contents of the 'scheme' and 'server'
@@ -1558,7 +1629,7 @@ Strasbourg shuts down its SOAP server.
 
 This attribute holds the default format for a given query()
 output type. It is specified as a reference to a hash. See
-L<http://simbad.u-strasbg.fr/guide/sim-fscript.htx> for how to specify
+L<https://simbad.unistra.fr/guide/sim-fscript.htx> for how to specify
 formats for each output type. Output type 'script' is used to specify a
 format for the script() method.
 
@@ -1644,13 +1715,15 @@ attribute itself will be retracted.
 
 =item server
 
-This string attribute specifies the server to be used. As of March 10
-2010, either C<'simbad.u-strasbg.fr'> or C<'simbad.cfa.harvard.edu'> is
-valid. As a convenience, you can specify C<'strasbourg'> or C<harvard>,
-which will be expanded appropriately.
+This string attribute specifies the server to be used. As of November 14
+2026, any of C<'simbad.unistra.fr'>, C<'simbad.cfa.harvard.edu'>, or
+C<'simbad.idia.ac.za'> is valid. As a convenience, you can specify
+C<'strasbourg'>, C<'unistra'>, C<harvard>, C<idia>, or C<sa>, which will
+be expanded appropriately. You can also specify C<random>, which selects
+a random responsive server.
 
 The default is the value of environment variable
-ASTRO_SIMBAD_CLIENT_SERVER, or C<'simbad.u-strasbg.fr'> if the
+ASTRO_SIMBAD_CLIENT_SERVER, or C<'simbad.unistra.fr'> if the
 environment variable is not set.
 
 =item type

@@ -3,7 +3,7 @@ package Protobuf_test_messages::Proto2::TestMessagesProto2;
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;

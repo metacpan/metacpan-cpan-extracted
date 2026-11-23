@@ -4,9 +4,10 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 123;
+plan tests => 130;
 
 BEGIN {
+    use_ok( 'Google::Cloud::Compute::V1' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Compute::V1::AcceleratorTypesClient' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Compute::V1::AddressesClient' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Compute::V1::AdviceClient' ) || print "Bail out!\n";
@@ -23,13 +24,16 @@ BEGIN {
     use_ok( 'Google::Cloud::Compute::V1::FutureReservationsClient' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Compute::V1::GlobalAddressesClient' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Compute::V1::GlobalForwardingRulesClient' ) || print "Bail out!\n";
+    use_ok( 'Google::Cloud::Compute::V1::GlobalFrontendSettingsServiceClient' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Compute::V1::GlobalNetworkEndpointGroupsClient' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Compute::V1::GlobalOperationsClient' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Compute::V1::GlobalOrganizationOperationsClient' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Compute::V1::GlobalPublicDelegatedPrefixesClient' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Compute::V1::GlobalVmExtensionPoliciesClient' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Compute::V1::HealthChecksClient' ) || print "Bail out!\n";
+    use_ok( 'Google::Cloud::Compute::V1::HostsClient' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Compute::V1::ImageFamilyViewsClient' ) || print "Bail out!\n";
+    use_ok( 'Google::Cloud::Compute::V1::ImageViewsClient' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Compute::V1::ImagesClient' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Compute::V1::InstanceGroupManagerResizeRequestsClient' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Compute::V1::InstanceGroupManagersClient' ) || print "Bail out!\n";
@@ -49,6 +53,7 @@ BEGIN {
     use_ok( 'Google::Cloud::Compute::V1::LicensesClient' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Compute::V1::MachineImagesClient' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Compute::V1::MachineTypesClient' ) || print "Bail out!\n";
+    use_ok( 'Google::Cloud::Compute::V1::ManagedRulesetsClient' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Compute::V1::NetworkAttachmentsClient' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Compute::V1::NetworkEdgeSecurityServicesClient' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Compute::V1::NetworkEndpointGroupsClient' ) || print "Bail out!\n";
@@ -61,6 +66,7 @@ BEGIN {
     use_ok( 'Google::Cloud::Compute::V1::OrganizationSecurityPoliciesClient' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Compute::V1::PacketMirroringsClient' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Compute::V1::PreviewFeaturesClient' ) || print "Bail out!\n";
+    use_ok( 'Google::Cloud::Compute::V1::ProjectViewsClient' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Compute::V1::ProjectsClient' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Compute::V1::PublicAdvertisedPrefixesClient' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Compute::V1::PublicDelegatedPrefixesClient' ) || print "Bail out!\n";
@@ -97,6 +103,7 @@ BEGIN {
     use_ok( 'Google::Cloud::Compute::V1::RegionUrlMapsClient' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Compute::V1::RegionZonesClient' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Compute::V1::RegionsClient' ) || print "Bail out!\n";
+    use_ok( 'Google::Cloud::Compute::V1::ReliabilityRisksClient' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Compute::V1::ReservationBlocksClient' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Compute::V1::ReservationSlotsClient' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Compute::V1::ReservationSubBlocksClient' ) || print "Bail out!\n";
@@ -132,4 +139,4 @@ BEGIN {
     use_ok( 'Google::Cloud::Compute::V1::ZonesClient' ) || print "Bail out!\n";
 }
 
-diag( "Testing Google::Cloud::Compute::V1::AcceleratorTypesClient $Google::Cloud::Compute::V1::AcceleratorTypesClient::VERSION, Perl $], $^X" );
+diag( "Testing Google::Cloud::Compute::V1 $Google::Cloud::Compute::V1::VERSION, Perl $], $^X" );

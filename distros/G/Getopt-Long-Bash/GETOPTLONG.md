@@ -197,7 +197,7 @@ declare -A OPTS=(
 Next, source the `getoptlong.sh` file from within your script using the `source` command (or the `.` command). This makes the `getoptlong` function and its subcommands available.
 
 ```bash
-. $(dirname $0)/getoptlong.sh - # Replace with the actual path to getoptlong.sh
+. "$(dirname "$0")"/getoptlong.sh - # Replace with the actual path to getoptlong.sh
 # Or, if getoptlong.sh is in your execution path:
 # . getoptlong.sh -
 ```
@@ -212,7 +212,7 @@ Pass the defined option array to the `getoptlong init` command to initialize the
 getoptlong init OPTS
 ```
 
-During initialization, you can also specify various configurationp parameters that control option parsing behavior. See Section "7.1. `getoptlong init ...`" for details.
+During initialization, you can also specify various configuration parameters that control option parsing behavior. See Section "7.1. `getoptlong init ...`" for details.
 
 Example: Store non-option arguments in the `ARGS` array and prevent the script from exiting on a parse error.
 

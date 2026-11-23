@@ -4,10 +4,11 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 1;
+plan tests => 2;
 
 BEGIN {
+    use_ok( 'Google::Cloud::Privateca::V1' ) || print "Bail out!\n";
     use_ok( 'Google::Cloud::Privateca::V1::CertificateAuthorityServiceClient' ) || print "Bail out!\n";
 }
 
-diag( "Testing Google::Cloud::Privateca::V1::CertificateAuthorityServiceClient $Google::Cloud::Privateca::V1::CertificateAuthorityServiceClient::VERSION, Perl $], $^X" );
+diag( "Testing Google::Cloud::Privateca::V1 $Google::Cloud::Privateca::V1::VERSION, Perl $], $^X" );

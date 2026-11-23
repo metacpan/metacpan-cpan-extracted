@@ -61,12 +61,11 @@ is_deeply [ map { $_->{id} } @$events ], [qw(a b)], 'the events of every page';
 is_deeply $client->{urls}, [ with_key("$base?event=stored"), with_key("$base/page-2") ],
     'paging.next is followed until a page has no items';
 isa_ok $next, 'URI';
-is "$next", with_key("$base/page-3"),
-    'the second value is paging.next of the empty page, with the API key';
+is "$next", "$base/page-3",
+    'the second value is paging.next of the empty page, without the API key';
 
-subtest 'event($next) fetches the URL it is given' => sub {
+subtest 'event($next) fetches the URL it is given, with the API key' => sub {
     @{ $client->{urls} } = ();
-    $next->userinfo(undef);
     $mailgun->event($next);
     is $client->{urls}[0], with_key("$base/page-3");
     is "$next", "$base/page-3", 'the URI passed in is left as it is';
@@ -75,8 +74,15 @@ subtest 'event($next) fetches the URL it is given' => sub {
 subtest 'when a page fails, the second value is the URL of that page' => sub {
     my ($events, $retry) = $mailgun->event({ event => 'failing' });
     is_deeply [ map { $_->{id} } @$events ], ['c'], 'the events fetched before it';
-    is "$retry", with_key("$base/fails");
+    is "$retry", "$base/fails", 'without the API key';
     is $mailgun->error, 'failed', 'error is set';
+};
+
+subtest 'the second value of lists() and list_members() has no API key either' => sub {
+    my (undef, $lists_next)   = $mailgun->lists();
+    my (undef, $members_next) = $mailgun->list_members('l@example.com');
+    is $lists_next->userinfo,   undef;
+    is $members_next->userinfo, undef;
 };
 
 subtest 'a URL given as a string gets the API key' => sub {
@@ -98,6 +104,12 @@ subtest 'the API key goes only to the API host over https' => sub {
             "'$url' is refused";
         is scalar @{ $client->{urls} }, 0, 'nothing is requested';
     }
+};
+
+subtest 'the API key in a refused URL is not in the message' => sub {
+    eval { $mailgun->event('https://api:secret-key@evil.example.com/v3/example.com/events/next') };
+    like $@, qr/not 'https:\/\/evil\.example\.com\//;
+    unlike $@, qr/secret-key/;
 };
 
 done_testing;

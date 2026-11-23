@@ -6,7 +6,7 @@ Protobuf::DescriptorPool - Manages a collection of Protocol Buffer descriptors
 
 =head1 VERSION
 
-version 0.11
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -41,7 +41,7 @@ Descriptors loaded into a pool are used to understand the structure of serialize
 
 =head1 METHODS
 
-== Class Methods
+=head2 Class Methods
 
 =head2 generated_pool()
 
@@ -49,7 +49,7 @@ Descriptors loaded into a pool are used to understand the structure of serialize
 
 Returns a singleton instance of the descriptor pool that contains all the message, enum, and file descriptors that were compiled into your Perl application, typically from C<.proto> files processed by C<protoc-gen-perl-pb> at build time.
 
-== Instance Methods
+=head2 Instance Methods
 
 =head2 new()
 
@@ -139,7 +139,7 @@ use warnings;
 use Carp qw(croak);
 use Log::Any qw($log);
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use Protobuf::Descriptor::File;
 use Protobuf::Descriptor::MessageDef;

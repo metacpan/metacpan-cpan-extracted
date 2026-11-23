@@ -2,7 +2,14 @@
 # Output getoptlong.sh initialization script
 # Usage: eval "$(getoptlong OPTS)"
 
+set -eu
+
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+if [[ ${1:-} == --version ]]; then
+    . "$script_dir/getoptlong.sh" - && getoptlong version
+    exit
+fi
 
 if [[ $# -eq 0 ]]; then
     echo "Usage: eval \"\$(getoptlong OPTS)\"" >&2
@@ -72,7 +79,7 @@ B<Or:>
 
 =head1 VERSION
 
-1.3.0
+1.5.0
 
 =head1 DESCRIPTION
 
@@ -463,6 +470,10 @@ Display help message. Optional C<SYNOPSIS> overrides C<&USAGE>/C<USAGE>.
 Display the library version.
 
     getoptlong version
+
+The B<getoptlong> command also shows it with C<--version>.
+
+    $ getoptlong --version
 
 =head1 CONFIGURATION
 

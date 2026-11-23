@@ -22,6 +22,7 @@ t/00-load.t
 t/01-x25519-string.t
 t/02-x25519-file.t
 t/03-x25519-fh.t
+t/04-big-first-pump.t
 t/05-x25519-keystuff.t
 t/11-scrypt.t
 t/21-password2key.t

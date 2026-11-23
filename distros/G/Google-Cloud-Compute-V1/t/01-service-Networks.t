@@ -46,7 +46,7 @@ BEGIN {
 package main;
 use Google::Cloud::Compute::V1::NetworksClient;
 
-my $client = Google::Cloud::Compute::V1::NetworksClient->new( credentials => 'dummy' );
+my $client = Google::Cloud::Compute::V1::NetworksClient->new();
 ok($client, 'Instantiated generated client');
 isa_ok($client->transport, 'Google::gRPC::Client', 'Client transport');
 

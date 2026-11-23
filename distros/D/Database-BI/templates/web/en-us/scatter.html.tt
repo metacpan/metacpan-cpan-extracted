@@ -67,11 +67,7 @@
     biBrandSvg(clone);
     var src = '<?xml version="1.0" encoding="UTF-8"?>\n'
             + new XMLSerializer().serializeToString(clone);
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([src], { type: 'image/svg+xml;charset=utf-8' }));
-    a.download = 'scatter_chart.svg';
-    a.click();
-    URL.revokeObjectURL(a.href);
+    biSaveFile(new Blob([src], { type: 'image/svg+xml;charset=utf-8' }), 'scatter_chart.svg');
   }
   function drawExportCanvas(scale, done) {
     var svg = document.getElementById('scatter_chart');
@@ -107,10 +103,7 @@
   }
   function biScatterExportPNG() {
     drawExportCanvas(1, function (canvas) {
-      var a = document.createElement('a');
-      a.href = biBrandCanvas(canvas, 1).toDataURL('image/png');
-      a.download = 'scatter_chart.png';
-      a.click();
+      biSavePNG(biBrandCanvas(canvas, 1), 'scatter_chart.png');
     });
   }
   function biScatterExportPDF() {

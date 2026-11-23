@@ -31,7 +31,11 @@ for my $module (@modules) {
     note("Skipping POD coverage for $module (no POD present)");
     next;
   }
-  pod_coverage_ok($module, {also_private => [qr!^[a-z_]!]});
+  pod_coverage_ok(
+    $module,
+    {
+      also_private =>
+        [qr!^[a-z_]!, qr/^(?:BUILD|BUILDARGS|DEMOLISH|CLONE_SKIP)$/]});
   push @tested, $module;
 }
 

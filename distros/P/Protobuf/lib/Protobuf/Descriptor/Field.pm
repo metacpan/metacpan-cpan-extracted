@@ -6,7 +6,7 @@ Protobuf::Descriptor::Field - Descriptor for a field in a Protocol Buffer messag
 
 =head1 VERSION
 
-version 0.11
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -99,7 +99,7 @@ use strict;
 require Protobuf;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 
 sub name {

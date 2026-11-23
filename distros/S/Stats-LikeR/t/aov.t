@@ -185,7 +185,7 @@ throws_ok { aov({ y => [1, 2], x => [3, 4] }, 'y x') } qr/missing '~'/, 'formula
 throws_ok { aov([1, 2, 3], 'y~x') } qr/HashRefs/, 'AoH of non-hashrefs croaks';
 throws_ok { aov({ a => 1 }) } qr/ArrayRefs/, 'no-formula non-HoA croaks';
 throws_ok { aov({ y => [1, undef, undef], g => [qw(A B C)] }, 'y~g') }
-	qr/aov: fewer than 2 complete observations/, 'one complete row croaks';
+	qr/aov: contrasts can be applied only to factors with 2 or more levels/, 'one complete row croaks: its factor has one level, as in R';
 throws_ok { aov({ y => [1, 2] }, \'y~g') } qr/aov: error: formula must be a string/, 'formula reference croaks';
 {	# an error in the call prints the help screen, then the error on the last line
 	my $screen = Stats::LikeR::_usage_text('aov');

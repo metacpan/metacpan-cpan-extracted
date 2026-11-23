@@ -12,7 +12,7 @@ _build_aggregate_sql:
   input:
     dbh:
       _source: code
-      optional: 0
+      optional: 1
       position: 3
       type: hashref
     join_clause:
@@ -22,7 +22,7 @@ _build_aggregate_sql:
       type: string
     spec:
       _source: code
-      optional: 0
+      optional: 1
       position: 0
       type: hashref
     table:
@@ -48,12 +48,12 @@ _build_having_fragment:
   input:
     alias_to_sql:
       _source: code
-      optional: 0
+      optional: 1
       position: 1
       type: hashref
     having:
       _source: code
-      optional: 0
+      optional: 1
       position: 0
       type: hashref
   module: Database::Abstraction
@@ -78,7 +78,8 @@ _build_joins:
       type: arrayref
   module: Database::Abstraction
   new: ~
-  output: {}
+  output:
+    type: string
 _build_where:
   config:
     close_stdin: 1
@@ -112,7 +113,7 @@ _build_where_conditions:
   input:
     params:
       _source: code
-      optional: 0
+      optional: 1
       position: 0
       type: hashref
   module: Database::Abstraction
@@ -170,6 +171,7 @@ count:
     type: string
 dbi_source:
   config:
+    check_fds: 0
     close_stdin: 1
     dedup: 1
     test_empty: 1
@@ -202,7 +204,7 @@ each_row:
     callback:
       _note: CODE reference - provide sub { } in tests
       _source: code
-      optional: 0
+      optional: 1
       position: 0
       type: coderef
     entry:
@@ -229,7 +231,7 @@ execute:
       _source: code
       optional: 1
       position: 0
-      type: number
+      type: string
   module: Database::Abstraction
   new: ~
   output:
@@ -407,7 +409,16 @@ selectall_hash:
   module: Database::Abstraction
   new: ~
   output:
-    type: string
+    _context_aware: 1
+    _error_handling:
+      empty_list: 1
+      type: string
+    _error_return: empty_list
+    _list_context:
+      type: array
+    _scalar_context:
+      type: scalar
+    type: array
 selectall_hashref:
   config:
     close_stdin: 1
@@ -418,10 +429,17 @@ selectall_hashref:
     test_security: 0
     test_undef: 0
   function: selectall_hashref
+  input:
+    entry:
+      _source: code
+      optional: 0
+      position: 0
+      type: string
   module: Database::Abstraction
   new: ~
   output:
-    type: string
+    _list_return: 2
+    type: array
 set_logger:
   accessor:
     param: logger

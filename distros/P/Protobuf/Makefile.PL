@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 BEGIN {
     $ENV{PACKAGE_STASH_IMPLEMENTATION} ||= 'PP';
     $ENV{MOO_XS_DISABLE} ||= '1';
@@ -833,8 +833,11 @@ WriteMakefile(
     MYEXTLIB          => "libprotobufperl.$extlib_ext",
     CCFLAGS           => "-g $Config{ccflags} -fPIC $sanitizer_flags",
     LIBS              => ['-L$(CURDIR) -lprotobufperl' . $mac_libs],
-    LDDLFLAGS         => "$Config{lddlflags} $sanitizer_flags$extra_ldflags$mac_libs",
-    LDFLAGS           => "$Config{ldflags} $sanitizer_flags$extra_ldflags$mac_libs",
+    LDDLFLAGS         => "$Config{lddlflags} $sanitizer_flags$extra_ldflags$mac_libs" . ($ENV{LDFLAGS} ? " $ENV{LDFLAGS}" : ''),
+    LDFLAGS           => "$Config{ldflags} $sanitizer_flags$extra_ldflags$mac_libs" . ($ENV{LDFLAGS} ? " $ENV{LDFLAGS}" : ''),
+    MAN1PODS          => {
+        'pod/protoc-gen-perl-pb.pod' => '$(INST_MAN1DIR)/protoc-gen-perl-pb.$(MAN1EXT)',
+    },
 
     # Clean the generated object files and the static library
     clean             => { FILES => join(' ', sort @clean_files) },

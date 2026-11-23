@@ -60,6 +60,9 @@ L<Crypt::Age::Simple::Encrypt> constructor aimed at scrypt.
 
    my $file_key = age_scrypt_unwrap_file_key($stanza, $password);
 
+Note: it is up to the caller to check that the C<$stanza>'s work factor
+is less than, or equal to, an acceptable upper limit.
+
 =item C<< age_scrypt_wrap_key >>
 
    my $key = age_scrypt_wrap_key($password, $salt, $Nlog2);

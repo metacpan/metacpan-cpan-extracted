@@ -84,11 +84,11 @@ App::Test::Generator::SchemaExtractor - Extract test schemas from Perl modules
 
 =head1 VERSION
 
-Version 0.51
+Version 0.52
 
 =cut
 
-our $VERSION = '0.51';
+our $VERSION = '0.52';
 
 =head1 SYNOPSIS
 
@@ -951,7 +951,7 @@ B<Example:>
 
     # Extracts:
     # $file: position 0, required
-    # %options: position 1, optional, slurpy hash
+    # %options: named: 1, optional, slurpy hash
 
 =head3 Type Constraints in Signatures (Perl 5.36+)
 
@@ -1520,7 +1520,18 @@ sub extract_all {
 	# Enrichable: new: {} (no-arg ctor) or new: {hash} (with args).
 	# Unenrichable (coderef/object params): leave new: as the package-name string
 	# so _write_schema still emits new: ~ and self-fuzz.t keeps skipping those.
+	# An arrayref of live objects can be stood in for when the constructor's
+	# POD names the class the elements must be: see _constructor_object_stubs().
+	my $object_stubs = {};
 	if (exists $schemas{new}) {
+		my ($new_method) = grep { $_->{name} eq 'new' } @{$methods};
+		$object_stubs = _constructor_object_stubs(
+			$schemas{new},
+			$new_method ? $new_method->{pod} : undef,
+			$ctor_body,
+		);
+		$self->_log('  STUB: stood in for ' . join(', ', sort keys %{$object_stubs})) if %{$object_stubs};
+
 		my $ctor_args = $self->_ctor_representative_args($schemas{new});
 		if (defined $ctor_args) {
 			for my $method_name (keys %schemas) {
@@ -1541,8 +1552,26 @@ sub extract_all {
 	# instance methods new: ~ as well.
 	if($ctor_body && $schemas{new}
 	   && (my $reason = _constructor_requires_live_objects($ctor_body, $schemas{new}))) {
-		$schemas{new}{skip} = $reason;
-		$self->_log("  UNBUILDABLE: new: $reason");
+		$schemas{new}{skip} = $reason unless %{$object_stubs};
+		$self->_log("  UNBUILDABLE: new: $reason") unless %{$object_stubs};
+	}
+
+	# A constructor whose input includes an object it will call methods on,
+	# with no can/isa saying how to stand one in, cannot be built from YAML
+	# either.  Database::BI::Model::Boundary takes a cache and a user agent,
+	# Geocode a geocoder and a cache, DataSource a cache and translations:
+	# a generated string is not an object, and the constructors rightly
+	# refuse one.  The same applies to a data directory they read files
+	# from.  Reporting the precondition on new() also makes every instance
+	# method new: ~ below, so the fuzzer skips the whole family rather than
+	# failing the object construction at every call.
+	if($ctor_body && $schemas{new}
+	   && (my $reason = _constructor_needs_live_dependencies($schemas{new}))) {
+		# A stand-in for the documented object list makes the constructor
+		# buildable: the objects it cannot stand in for are optional, so a
+		# call that omits them is valid.
+		$schemas{new}{skip} //= $reason unless %{$object_stubs};
+		$self->_log("  UNBUILDABLE: new: $reason") unless %{$object_stubs};
 	}
 
 	# A constructor can refuse to build the package itself: an abstract base
@@ -1574,7 +1603,46 @@ sub extract_all {
 	foreach my $method (@{$methods}) {
 		my $schema = $schemas{$method->{name}};
 		next unless($schema && ref($schema->{output}) eq 'HASH');
-		my $body = $method->{body} // '';
+		# A comment is prose, not code: an example signature written in one
+		# must not change how the routine is called.
+		my $body = _strip_comments($method->{body} // '', $method->{node});
+
+		# A routine that takes a variadic list or an argument hash receives its
+		# documentation as named arguments: a table row's order is not a call
+		# order for it.  Database::Join::aggregate forwards @args to get_params,
+		# and calling it positionally tested the argument count instead of the
+		# documented keys.  Scalar arguments before the slurpy are positional
+		# (`my ($password, %opts) = @_`), and the documentation after them
+		# describes the named options passed after those arguments, as
+		# Database::BI::Password::hash_password does.
+		# A plain positional signature has no slurpy and keeps every
+		# position: only the arguments left over after a slurpy are named.
+		if($body =~ /\bmy\s*(?:\(([^)]*)\)|(%\w+))\s*=\s*\@_/s) {
+			my $declared = $1;
+			if(!defined($declared) || ($declared =~ /[\@%]\w+/)) {
+				my @prefix;
+				for my $decl (split(/\s*,\s*/, $declared // '')) {
+					last if($decl =~ /^\s*[\@%]/);
+					push @prefix, $1 if($decl =~ /^\s*\$(?!self\b|class\b)(\w+)/);
+				}
+
+				# Keep the leading scalars positional (by name where the merge
+				# found one, by position otherwise) and say that every remaining
+				# documented name is a named option after them.
+				my %keep = map { $prefix[$_] => $_ } 0 .. $#prefix;
+				for my $param (keys %{ $schema->{input} // {} }) {
+					my $spec = $schema->{input}{$param};
+					my $pos = exists($keep{$param}) ? delete($keep{$param}) : $spec->{position};
+					if(defined($pos) && ($pos < @prefix)) {
+						$spec->{position} = $pos;
+						delete $spec->{named};
+					} else {
+						delete $spec->{position};
+						$spec->{named} = 1 if @prefix;
+					}
+				}
+			}
+		}
 
 		if($body =~ /\bcroak\b[^;\n]*must be implemented by subclass/) {
 			$schema->{output}{_STATUS} = 'DIES';
@@ -1594,8 +1662,43 @@ sub extract_all {
 			delete $schema->{output}{type};
 		}
 
+		# A routine that only croaks is unsupported by design: every call is
+		# an error, so the harness expects a death for each one.  Database::Join
+			# documents query(), group_by() and execute() that way.
+		if(_always_croaks($body)) {
+			$schema->{output} = { _STATUS => 'DIES' };
+		}
+
+		# A routine that hands a database handle back to its caller, or leaves
+		# it on the object's SQLite cache for the next call, holds a
+		# descriptor on purpose, so the check that nothing leaked does not
+		# apply (the harness reads config 'check_fds').
+		if(_keeps_database_handle($body, $method->{pod} // '')) {
+			$schema->{_analysis}{side_effects}{keeps_fd} = 1;
+		}
+
 		if(my $skip = _requires_input_file($body, $schema->{input})) {
 			$schema->{skip} = $skip;
+		}
+
+		# A hashref whose POD gives the whole value a shape it must have
+		# ("hashref of { country code => place rank }", "the existing model
+		# store") is a precondition, not just a type: a generated hash has
+		# arbitrary keys, so check_ranks rejects the invented country code
+		# and the model-store routines are handed a string where their
+		# documented store has a hash.  A hashref option that merely
+		# describes what some entries mean (resolve_values' cache) is not
+		# this: arbitrary keys are legal there, so it is still fuzzed.
+		if((my $pod = $method->{pod} // '') =~ /(?:HASHREF|hashref)\s+of\s*\{|(?:HASHREF|hashref)[^\n]*\bmodel store\b/i) {
+			$schema->{skip} //= 'needs a hashref in the shape its POD documents; a generated hash has arbitrary keys';
+		}
+
+		# Settings that name a database, a user and a password describe a
+		# live server, not a value a fixture can carry: there is no database
+		# here to connect to, and the routine croaks when it cannot.
+		# DataSource::mariadb_tables documents exactly that settings hash.
+		if((my $pod = $method->{pod} // '') =~ /HASHREF[^\n]*\{[^}]*\bdatabase\b[^}]*\b(?:username|password)\b/i) {
+			$schema->{skip} //= 'needs a live database connection, which a fuzzer cannot provide';
 		}
 
 		# A method that reads required keys out of a constructor hashref cannot
@@ -1637,16 +1740,77 @@ sub extract_all {
 				}
 			}
 
-			# A routine that checks the value against a pattern and croaks is a
-			# validator for that parameter: values outside the pattern are
-			# documented to die, so the pattern belongs in the schema.
+			# A routine that accepts a value by matching it against patterns and
+			# croaks when none of them match is a validator for that parameter:
+			# the union of the patterns is the accepted domain, so a value
+			# outside it is expected to die.  parse_zone's UTC, local and
+			# offset alternatives are three such patterns.
+			my @accepted;
+			my @subjects = (
+				qr/\$$p\b/,
+				qr/\$args\{\s*['"]?$p['"]?\s*\}/,
+			);
+			foreach my $subject (@subjects) {
+				while($body =~ /$subject\s*=~\s*\/([^\/\n]+)\//g) {
+					my $pattern = $1;
+					my $at = $-[0];
+					my $from = rindex($body, ';', $at);
+					$from = 0 if($from < 0);
+					my $prefix = substr($body, $from, $at - $from);
+					# Only a pattern that guards a returned value (or a croak
+					# unless it matches) says the value is accepted.  A test
+					# used for anything else, such as deciding whether to append
+					# a word, describes no domain.  `return X unless match`
+					# returns for every value that does NOT match, so there the
+					# pattern names a rejection, not an accepted domain.
+					my $accepts = $prefix =~ /\breturn\b[^;]*\bunless\b/
+						? 0
+						: ($prefix =~ /\breturn\b/ || $prefix =~ /\b(?:croak|die|confess)\b[^;]*\bunless\b/);
+					if(!$accepts && ($prefix =~ /\bif\s*\([^;{}]*$/)) {
+						# A block opened by an if whose condition is the match,
+						# e.g. `if (my ($s, $h) = $spec =~ /.../) { return ... }`.
+						my $brace = index($body, '{', $+[0]);
+						if($brace >= 0) {
+							my $close = index($body, "\n\t}", $brace);
+							my $block = substr($body, $brace,
+								(($close >= 0) ? $close - $brace : 400));
+							$accepts = ($block =~ /\breturn\b/) ? 1 : 0;
+						}
+					}
+					next unless($accepts);
+					# A pattern in a croak's own condition names a rejected
+					# value, not an accepted one.
+					next if($prefix =~ /\b(?:croak|die|confess)\b[^;]*\bif\b/);
+					if(!_pattern_is_self_contained($pattern)) {
+						$self->_log("  CODE: $param_name matches '$pattern', which depends on run-time variables; not recorded");
+						next;
+					}
+					push @accepted, $pattern;
+				}
+			}
+
+			my $croaks_about_param = 0;
+			foreach my $subject (@subjects) {
+				next unless($body =~ /\b(?:croak|die|confess)\b[^;]*$subject/s);
+				$croaks_about_param = 1;
+				last;
+			}
+
 			my $pattern;
 			if($body =~ /\$args\{\s*['"]?$p['"]?\s*\}\s*=~\s*\/([^\/\n]+)\//) {
 				$pattern = $1;
 			} elsif($body =~ /\$$p\b\s*=~\s*\/([^\/\n]+)\//) {
 				$pattern = $1;
 			}
-			if(defined($pattern) && ($body =~ /\bcroak\b[^;\n]*(?:not a valid|invalid)/i)) {
+			if(@accepted && $croaks_about_param) {
+				my %seen;
+				@accepted = grep { !$seen{$_}++ } @accepted;
+				$spec->{matches} = (@accepted == 1)
+					? $accepted[0]
+					: join('|', map { "(?:$_)" } @accepted);
+				$spec->{_source} = SOURCE_VALIDATOR;
+			} elsif(defined($pattern) && _pattern_is_self_contained($pattern)
+				&& ($body =~ /\bcroak\b[^;\n]*(?:not a valid|invalid)/i)) {
 				$spec->{matches} = $pattern;
 				$spec->{_source} = SOURCE_VALIDATOR;
 			}
@@ -1674,11 +1838,21 @@ sub extract_all {
 		my $target = $delegates{$method_name};
 		next if $method_name eq $target;
 		my $target_schema = $schemas{$target};
-		next unless $target_schema && ref($target_schema->{input}) eq 'HASH'
-			&& scalar(keys %{$target_schema->{input}});
+		next unless $target_schema;
 
 		my $schema = $schemas{$method_name};
 		next unless $schema;
+
+		# The forwarded call's result is this routine's result, so the
+		# documented output type is the target's too (selectall_hashref is a
+		# deprecated alias of selectall_arrayref), whether or not the target
+		# takes arguments.
+		if(ref($target_schema->{output}) eq 'HASH' && %{$target_schema->{output}}) {
+			$schema->{output} = { %{$target_schema->{output}} };
+		}
+
+		next unless ref($target_schema->{input}) eq 'HASH'
+			&& scalar(keys %{$target_schema->{input}});
 		next if ref($schema->{input}) eq 'HASH' && scalar(keys %{$schema->{input}});
 
 		$schema->{input} = {
@@ -1742,7 +1916,9 @@ sub _delegated_method {
 	(my $body = $code) =~ s/\A\s*sub\s+\w+\s*//;
 	$body =~ s/\s+/ /g;
 
-	return $body =~ /\A\{ (?:my \$self = shift; )?return \$self->(\w+)\(\s*\\\@_\s*\); \}\z/ ? $1 : undef;
+	# A deprecated alias warns first, then forwards; the warning does not
+	# change what the routine returns (Database::Join::selectall_hashref).
+	return $body =~ /\A\{ (?:my \$self = shift; )?(?:carp\s+(?:'[^']*'|"[^"]*")\s*; )?return \$self->(\w+)\(\s*\\?\@_\s*\); \}\z/ ? $1 : undef;
 }
 
 # --------------------------------------------------
@@ -2136,7 +2312,79 @@ sub _extract_pod_before {
 		$pod = $section;
 	}
 
+	# A helper documented in its own later block rather than above its sub
+	# (`=head2 Date normalisation (standalone helper)` followed by
+	# `date_normalise($value, $pattern) -> ...`) is documented just the same.
+	if(defined($name) && $pod !~ /^=head[1-6]\s+\Q$name\E\b/m) {
+		my $named = $self->_pod_section_naming_routine($sub, $name);
+		$pod = $named if defined($named) && length($named);
+	}
+
 	return $pod;
+}
+
+# --------------------------------------------------
+# _pod_section_naming_routine
+#
+# Purpose:    Find a POD section that documents
+#             a routine in its own text rather than
+#             in its heading.
+#
+# Entry:      $sub  - the PPI statement for the routine.
+#             $name - the routine's name.
+#
+# Exit:       Returns the section text, from its heading
+#             to the next heading at the same or a higher
+#             level, or undef when no section names the
+#             routine.
+#
+# Side effects: None.
+#
+# Notes:      A section counts when a line starts with
+#             the routine name and its argument list, which
+#             is how these helper blocks show the call.
+# --------------------------------------------------
+sub _pod_section_naming_routine {
+	my ($self, $sub, $name) = @_;
+
+	my $doc = eval { $sub->document } or return undef;
+	my $tokens = $doc->find('PPI::Token::Pod') or return undef;
+
+	my $text = join('', map { $_->content . "\n" } @$tokens);
+
+	# Every heading with its offset, so a section runs to the next heading
+	# at the same or a higher level.
+	my @heads;
+	while($text =~ /^=head([1-6])\s+(.+?)\s*$/mg) {
+		push @heads, [ $-[0], $1 + 0, $2 ];
+	}
+
+	for my $i (0 .. $#heads) {
+		my ($start, $level) = @{ $heads[$i] };
+		my $end = length($text);
+		for my $j ($i + 1 .. $#heads) {
+			next unless $heads[$j][1] <= $level;
+			$end = $heads[$j][0];
+			last;
+		}
+		my $section = substr($text, $start, $end - $start);
+
+		# The routine's call stands at the top of its section, before any
+		# subsection; a passing mention deeper in another section's examples
+		# does not make that section its documentation.
+		# A section headed with the routine's own name documents it (modules
+		# that keep every method's POD in one block after the subs have no
+		# room for a synopsis line); otherwise the call line must stand at
+		# the top of the section.
+		my ($synopsis) = $section =~ /\A(.*?)(?=^=head[3-6]\b|\z)/ms;
+		next unless (($heads[$i][2] // '') =~ /\A\Q$name\E\b/)
+			|| (defined($synopsis) && $synopsis =~ /^\s*\Q$name\E\s*\(/m);
+
+		$section =~ s/\s+\z//;
+		return $section;
+	}
+
+	return undef;
 }
 
 # --------------------------------------------------
@@ -2237,8 +2485,13 @@ sub _analyze_method {
 	};
 
 	# Analyze different sources
-	my $pod_params = $self->_analyze_pod($pod);
+	my $pod_params = $self->_analyze_pod($pod, $method->{name});
 	my $code_params = $self->_analyze_code($code, $method);
+
+	# A POD INPUT section that documents $class describes a class method, so
+	# the harness has to pass the class as the invocant rather than as an
+	# ordinary first argument.
+	$schema->{invocant} = 'class' if $self->_pod_documents_class_invocant($pod);
 
 	# Neither analysis may hand a reference string to the schema as a parameter.
 	$self->_sanitize_parameter_names($pod_params, 'POD analysis');
@@ -2299,6 +2552,9 @@ sub _analyze_method {
 			$schema->{input}{$name}{type}      = $pod_p->{type}      if defined $pod_p->{type};
 			$schema->{input}{$name}{min}       = $pod_p->{min}       if defined $pod_p->{min};
 			$schema->{input}{$name}{max}       = $pod_p->{max}       if defined $pod_p->{max};
+			# A documented element or value shape is structural, not a
+			# constraint the validator states.
+			$schema->{input}{$name}{schema}    = $pod_p->{schema}    if ref($pod_p->{schema}) eq 'HASH';
 
 			# These constraints are documented, even though the field's
 			# _source stays the type-checking marker (SOURCE_VALIDATOR).
@@ -2614,6 +2870,15 @@ sub _numeric_boundary_values {
 # --------------------------------------------------
 sub _detect_accessor_methods {
 	my ($self, $method, $schema) = @_;
+
+	# A constructor is not an accessor, even when it stores one field: the
+	# harness may call new() with no arguments and let the defaults apply,
+	# and its argument types come from the validator, not from the one
+	# assignment the body happens to make.  Geocode::new stores only
+	# _geocoder on the conditional path, and the accessor reading typed its
+	# whole parameter list as a single string, so instance methods were
+	# built with new(geocoder => 'test') and the constructor rightly refused.
+	return if(($method->{name} // '') eq 'new');
 
 	my $body = $method->{body};
 
@@ -4009,7 +4274,7 @@ sub _build_schema_from_meta {
 #             are merged in last.
 # --------------------------------------------------
 sub _analyze_pod {
-	my ($self, $pod) = @_;
+	my ($self, $pod, $routine) = @_;
 
 	return {} unless $pod;
 
@@ -4388,6 +4653,12 @@ sub _analyze_pod {
 			delete $params{$_}{position} for keys %params;
 		}
 
+		# A human-readable table names each parameter once, as
+		# `lat : number  -90 .. 90` or `$path SCALAR  a readable .json file`.
+		# It is a formal specification like the structures above, so the type
+		# it gives is documented rather than a check the code was seen to make.
+					$self->_apply_pod_input_table($block, \%params, $routine);
+
 		# Some input specs are a bare list of `name => { ... }` entries with no
 		# outer braces, as Database::Join's new() has.  Parsing the whole bare
 		# list would read unrelated examples in the block, so only the
@@ -4404,6 +4675,13 @@ sub _analyze_pod {
 				next if $own =~ /\boptional\s*=>\s*(?:0|1)/i;
 				$params{$bare_name} //= { _source => SOURCE_INPUT_SPEC };
 				$params{$bare_name}{optional} = 1 - ($1 + 0);
+
+				# The comment lines under the entry describe its shape.
+				my ($desc) = $block =~ /(?:^|\n)[ \t]*\Q$bare_name\E\s*=>[^\n]*(?:\n[ \t]+[^\n#][^\n]*)*\n((?:[ \t]*#[^\n]*(?:\n|\z))+)/;
+				my ($bare_type) = $own =~ /\btype\s*=>\s*'?(\w+)/;
+				if(my $shape = _pod_nested_input_shape($bare_type // '', $desc)) {
+					$params{$bare_name}{schema} = $shape;
+				}
 			}
 		}
 	}
@@ -4481,6 +4759,574 @@ sub _map_formal_input_type {
 		return $map{$t} if exists $map{$t};
 	}
 	return undef;
+}
+
+# --------------------------------------------------
+# _apply_pod_input_table
+#
+# Purpose:    Read a =head3|4 Input section written as a table, one
+#             `name : type ...` (or `$name SCALAR ...`) line per parameter,
+#             and record the type each one documents.
+#
+# Entry:      $block  - text of the Input section.
+#             $params - parameters found so far; updated in place.
+#
+# Exit:       Returns the number of parameters the table describes.
+#
+# Notes:      The table is a formal input specification, so its type is
+#             documented: the harness builds valid data from it instead of
+#             expecting a wrong-typed value to die.  A range in the entry,
+#             such as `-90 .. 90`, is a documented bound, and "optional" or
+#             "default" makes the parameter optional.
+# --------------------------------------------------
+# --------------------------------------------------
+# _pod_documents_class_invocant
+#
+# Purpose:    Say whether a method's POD INPUT section documents a $class
+#             invocant, which makes the routine a class method.
+#
+# Entry:      $pod - the method's POD text.
+#
+# Exit:       Returns 1 when the INPUT section names $class, 0 otherwise.
+# --------------------------------------------------
+sub _pod_documents_class_invocant {
+	my ($self, $pod) = @_;
+
+	return 0 unless defined($pod) && length($pod);
+	return 0 unless $pod =~ /=head[34]\s+Input\b(.*?)(?==head|\z)/si;
+
+	# `$class   SCALAR   the class (called as a class method)` and
+	# `class : SCALAR` are both written this way.
+	return (($1 =~ /^\s*\$?class\b/mi) ? 1 : 0);
+}
+
+# --------------------------------------------------
+# _strip_literals
+#
+# Purpose:    Remove quoted strings and regex literals from a code fragment
+#             before looking for arithmetic operators in it.  A '-' in
+#             'Period-over-period', a '%' in sprintf '%04d', or a '/' in
+#             /[0-9%]/ is text, not arithmetic, and reading it as an operator
+#             typed string arguments and string-returning routines as numbers.
+#
+# Entry:      $code - source fragment (a parameter body or a return value).
+#
+# Exit:       The fragment with each quoted string and regex literal body
+#             emptied.  Undef is treated as an empty fragment.
+# --------------------------------------------------
+sub _strip_literals {
+	my ($code) = @_;
+
+	return '' unless defined($code);
+
+	$code =~ s/'(?:\\.|[^'\\])*'/''/g;
+	$code =~ s/"(?:\\.|[^"\\])*"/""/g;
+
+	# m{...}, qr{...} and s{...}{...}, which a '/' pattern would miss.
+	$code =~ s{\b(?:qr|m|s|tr|y)\s*\{(?:\\.|[^{}\\]|\{[^{}]*\})*\}
+		(?:\s*[a-z]*\s*\{(?:\\.|[^{}\\]|\{[^{}]*\})*\})?}{''}gx;
+	$code =~ s{\b(?:qr|m|s|tr|y)\s*/(?:\\.|[^/\\])*/}{''}g;
+	$code =~ s{([=!]~\s*)/(?:\\.|[^/\\])*/}{"$1"}g;
+
+	return $code;
+}
+
+# --------------------------------------------------
+# _strip_comments
+#
+# Purpose:    Remove Perl comments from a code fragment before it is scanned
+#             for parameters.  A comment may quote an example signature;
+#             reading it as code invents parameters the routine does not take
+#             (an example in extract_all() once added $password to its schema).
+#
+# Entry:      $code - source fragment (a method body).
+#             $node - optional PPI node for the same code.  When given, its
+#                     token stream is used, so a '#' inside a quoted string
+#                     is kept.
+#
+# Exit:       The fragment with each comment removed.  Undef is treated as an
+#             empty fragment.
+# --------------------------------------------------
+sub _strip_comments {
+	my ($code, $node) = @_;
+
+	return '' unless defined($code);
+
+	if($node && $node->can('tokens')) {
+		return join '', map {
+			$_->isa('PPI::Token::Comment') ? '' : $_->content
+		} $node->tokens;
+	}
+
+	# No PPI node (a synthesized class method): fall back to line comments.
+	$code =~ s/[ \t]*\#[^\n]*//g;
+	return $code;
+}
+
+# --------------------------------------------------
+# _pod_input_prose_type
+#
+# Purpose:    Name the type a one-line description of an input value gives,
+#             for the `$value # string` form of an Input table.
+#
+# Entry:      $text - the description after the '#'.
+#
+# Exit:       Canonical type string, or undef when it names none.
+# --------------------------------------------------
+sub _pod_input_prose_type {
+	my ($text) = @_;
+
+	return undef unless defined($text);
+	return 'arrayref' if $text =~ /\barrayref\b|\barray\s+of\b|\blist\s+of\b/i;
+	return 'hashref'  if $text =~ /\bhashref\b|\bhash\s+of\b/i;
+	return 'boolean'  if $text =~ /\bboolean\b|\bbool\b/i;
+	return 'integer'  if $text =~ /\binteger\b|\bint\b/i;
+	return 'number'   if $text =~ /\bnumber\b|\bfloat\b/i;
+	return 'string'   if $text =~ /\bstring\b|\btext\b/i;
+	return undef;
+}
+
+# --------------------------------------------------
+# _pod_input_hash_dump
+#
+# Purpose:    Read an Input section written as the Perl
+#             hash it documents, one outer key per
+#             parameter:
+#
+#                 {
+#                     name     => { type => 'string', optional => 1 },
+#                     strategy => { type => HASHREF, optional => 0 },
+#                 }
+#
+#             Only the outer keys are parameters; an inner
+#             key describes its parameter.  Lines outside
+#             those hashes ("Valid and invalid input, by
+#             partition:") are prose.
+#
+# Entry:      $block - the Input section's text.
+#
+# Exit:       A list of [ $name, \%fields ] in document
+#             order, or an empty list when the section is
+#             not a hash dump.
+# --------------------------------------------------
+sub _pod_input_hash_dump {
+	my ($block) = @_;
+
+	my @rows;
+	my ($name, $body, $depth) = (undef, '', 0);
+
+	for my $line (split(/\n/, $block)) {
+		my $added;
+		if(!defined($name)) {
+			next unless $line =~ /^\s*(\w+)\s*=>\s*\{(.*)$/;
+			($name, $body, $depth) = ($1, '', 1);
+			$added = $2;
+		} else {
+			$added = $line;
+		}
+
+		$body .= ' ' . $added;
+		$depth += ($added =~ tr/{//) - ($added =~ tr/}//);
+		next if $depth > 0;
+
+		push @rows, [ $name, _pod_input_hash_fields($body) ] if $depth == 0;
+		undef $name;
+		$body = '';
+		$depth = 0;
+	}
+
+	return @rows;
+}
+
+sub _pod_input_hash_fields {
+	my ($body) = @_;
+
+	my %fields;
+	# Keys are often quoted ('type' => 'boolean'), so the quote before =>
+	# belongs to the key.
+	while($body =~ /'?(\w+)'?\s*=>\s*'?([A-Za-z0-9_:.]+)'?/g) {
+		$fields{$1} = $2;
+	}
+	# An enum names the documented values; the bare-word scan above cannot
+	# read the list, so record it separately.
+	if($body =~ /\benum\s*=>\s*\[([^\]]*)\]/) {
+		my @values = $1 =~ /['"]([^'"]+)['"]/g;
+		$fields{enum} = \@values if(@values);
+	}
+
+	return \%fields;
+}
+
+# The shape of a documented nested argument, read from the comment lines
+# under its Input entry: "Arrayref of {col, op, val} predicate hashrefs" is
+# an array of hashes with those keys, and "index => criteria hashref" is a
+# hash whose values are hashes.  A type-less element spec maps key names to
+# their specs, which is how the harness builds a fixed-key hash.
+sub _pod_nested_input_shape {
+	my ($type, $desc) = @_;
+
+	return undef unless(defined($type) && length($type));
+	return undef unless(defined($desc) && !ref($desc) && length($desc));
+
+	if(($type eq 'arrayref') && $desc =~ /\bof\s+\{([^}]+)\}/i) {
+		my %element;
+		for my $key ($1 =~ /(\w+)/g) {
+			my %spec = (type => 'string');
+			# "op -- one of: eq, ne, ..." is the documented domain.
+			if($desc =~ /\b\Q$key\E\s*--\s*one\s+of:\s*([^\n]+)/i) {
+				my @values = map { s/\A\s+|\s+\z//gr } split /,/, $1;
+				$spec{memberof} = \@values if(@values);
+			}
+			$element{$key} = \%spec;
+		}
+		return { %element } if(%element);
+	}
+
+	# "Arrayref of insight hashrefs" (Database::BI::Summary's insights) holds
+	# hashes, not the strings a bare arrayref would otherwise be given.
+	if(($type eq 'arrayref') && $desc =~ /\bhashrefs?\b/i) {
+		return { type => 'hashref' };
+	}
+
+	return { type => 'hashref' }
+		if(($type eq 'hashref') && $desc =~ /=>\s*\w+\s+hashref\b/i);
+
+	return undef;
+}
+
+# `10_000` is the number 10000 written for a reader, not a string with
+# underscores in it.
+sub _undigitised {
+	my ($number) = @_;
+
+	return undef unless defined($number);
+	$number =~ s/_//g;
+	return $number + 0;
+}
+
+sub _apply_pod_input_table {
+	my ($self, $block, $params, $routine) = @_;
+
+	my %types = (
+		scalar    => 'string',
+		str       => 'string',
+		string    => 'string',
+		int       => 'integer',
+		integer   => 'integer',
+		num       => 'number',
+		number    => 'number',
+		float     => 'number',
+		bool      => 'boolean',
+		boolean   => 'boolean',
+		array     => 'arrayref',
+		arrayref  => 'arrayref',
+		hash      => 'hashref',
+		hashref   => 'hashref',
+		object    => 'object',
+		coderef   => 'coderef',
+		code      => 'coderef',
+		any       => 'any',
+	);
+
+	# The section may document the interface as the Perl hash it is:
+	#
+	#     {
+	#         name     => { type => 'string', optional => 1 },
+	#         strategy => { type => HASHREF, optional => 0 },
+	#     }
+	#
+	# Its outer keys are the parameters, in order, and their type and
+	# optionality are stated rather than inferred.  Prose elsewhere in the
+	# section is not a row.
+	if(my @dump = _pod_input_hash_dump($block)) {
+		my $count = 0;
+		for my $row (@dump) {
+			my ($name, $fields) = @{$row};
+			next if $name =~ /^(?:self|class|pkg|proto|klass|returns?)$/i;
+
+			# A hash documents named arguments, not call order: whether the
+			# routine takes them positionally is the code's business, so the
+			# call positions (if any) come from its signature.
+			my $p = $params->{$name} //= {};
+
+			if(defined($fields->{type})) {
+				my $type = $types{lc($fields->{type})};
+				$p->{type} = $type if defined($type);
+			}
+			# A parameter the hash documents is required unless it says
+			# otherwise, as the table parser treats a bare row.
+			$p->{optional} = ($fields->{optional} ? 1 : 0);
+			$p->{isa} = $fields->{isa}
+				if defined($fields->{isa}) && $fields->{isa} !~ /\Aundef\z/i;
+			# The documented values are the domain: a generated string outside
+			# them is an error the routine promises to reject.
+			$p->{memberof} = $fields->{enum}
+				if ref($fields->{enum}) eq 'ARRAY' && @{$fields->{enum}};
+			$p->{min} = $fields->{min} + 0
+				if defined($fields->{min}) && $fields->{min} =~ /\A-?\d/;
+			$p->{max} = $fields->{max} + 0
+				if defined($fields->{max}) && $fields->{max} =~ /\A-?\d/;
+			$p->{_source} = SOURCE_INPUT_SPEC;
+
+			# The comment lines under the row describe the documented shape.
+			# "Arrayref of {col, op, val} predicate hashrefs" fixes the element
+			# keys (Database::Join::new's mandatory_filters), and a hashref
+			# documented as "index => criteria hashref" holds hashrefs rather
+			# than the strings a bare hashref would otherwise be given.
+			my ($desc) = $block =~ /(?:^|\n)[ \t]*\Q$name\E\s*=>[^\n]*\n((?:[ \t]*#[^\n]*(?:\n|\z))+)/;
+			if(my $shape = _pod_nested_input_shape($p->{type}, $desc)) {
+				$p->{schema} = $shape;
+			}
+
+			$self->_log('  POD: ' . $name . ' type '
+				. (defined($p->{type}) ? "'$p->{type}'" : '(none)')
+				. ' from the Input hash');
+			$count++;
+		}
+
+		return $count if $count;
+	}
+
+	my @found;
+	my %row_text;
+
+	# The table lists the arguments in call order, so it gives their positions.
+	my $position = 0;
+	my $row_routine;
+
+	# A row can name several parameters at once: `$spec, $mtime, $size   # as
+	# for path`.  Each is an argument of the routine, in this order, described
+	# by the rest of the row, so the row is read once per name.
+	my @lines;
+	for my $line (split(/\n/, $block)) {
+		if($line =~ /^(\s{0,8})(\\?[\$\@%]\w+\s*,\s*(?:\\?[\$\@%]\w+\s*,\s*)*\\?[\$\@%]\w+)\s*(.*)$/) {
+			my ($indent, $names, $rest) = ($1, $2, $3);
+			push @lines, map { $indent . $_ . " $rest" } ($names =~ /\\?([\$\@%]\w+)/g);
+		} else {
+			push @lines, $line;
+		}
+	}
+
+	for my $line (@lines) {
+		my ($name, $spec, $prose);
+
+		# One block can document several helpers, each row prefixed with the
+		# routine it belongs to: `compile_pattern: $pattern   # string`.
+		if($line =~ /^\s{0,8}(\w+)\s*:\s*\\?[\$\@%](\w+)\s+#\s*(\S.*)$/) {
+			($row_routine, $name, $spec, $prose) = ($1, $2, $3, 1);
+		# The section's own indentation is stripped from its first line, so no
+		# leading space is required.  `$name : type`, `$name => type`, and the
+		# sigil forms `\@rows arrayref ...` / `\%models => hashref ...` all
+		# name a parameter and give its type; the sigil rows were previously
+		# skipped, leaving those parameters to the inferred code types.
+		} elsif($line =~ /^\s{0,8}\\?[\$\@%]?(\w+)\s*(?::|=>)\s*(\S.*)$/) {
+			($name, $spec) = ($1, $2);
+			# A prose line can look like a row ("Effect: on the array
+			# backend ..."); only a value that begins with a documented type
+			# declares an argument.  A type can be written quoted
+			# ("'string',") or with a sigil first.
+			(my $first = $spec) =~ s/\A['"]//;
+			($first) = $first =~ /\A([A-Za-z]+)/;
+			next unless(defined($first) && exists($types{lc($first)}));
+		} elsif($line =~ /^\s{0,8}\\?[\$\@%](\w+)\s+(SCALAR|ARRAYREF|HASHREF|CODEREF|CODE|OBJECT|GLOB)\b\s*,?\s*(.*)$/i) {
+			($name, $spec) = ($1, "$2 $3");
+		} elsif($line =~ /^\s*\\?[\$\@%](\w+)\s+#\s*(\S.*)$/) {
+			# `\t$value   # string`, or a wider indent under a routine's
+			# first row: the comment describes the value.
+			($name, $spec, $prose) = ($1, $2, 1);
+		} elsif($line =~ /^\s{0,8}\\?[\$\@%](\w+)\s+(\S.*)$/) {
+			# `\@rows    arrayref of hashrefs   # required; ...`: the type
+			# follows the parameter, in lower case.
+			($name, $spec, $prose) = ($1, $2, 1);
+		} else {
+			next;
+		}
+
+		# Another routine's rows are not this routine's arguments.
+		next if defined($routine) && defined($row_routine) && $row_routine ne $routine;
+
+		next if $name =~ /^(?:self|class|pkg|proto|klass|returns?)$/i;
+
+		# A quoted type ('arrayref',) is written the same way as a bare one:
+		# the quote belongs to the value, not to the type's name.
+		(my $typed_spec = $spec) =~ s/\A['"]//;
+		my ($type_word) = $typed_spec =~ /\A([A-Za-z]+)/;
+		my $type;
+		if($prose) {
+			# In a comment the first word is prose, not a type: `$spec # any
+			# spec string, or undef` documents a string, though its first word
+			# is "any".  The type is the one the description names.
+			$type = _pod_input_prose_type($spec);
+			$type = $types{lc($type_word)} if(!defined($type) && defined($type_word));
+		} else {
+			$type = defined($type_word) ? $types{lc($type_word)} : undef;
+			$type = _pod_input_prose_type($spec) if(!defined($type) && $prose);
+		}
+
+		# The row documents the argument, so it exists and has this call
+		# position even when the description names no type the extractor
+		# recognises; the code's type then stands rather than the row
+		# claiming a constraint it does not state.
+		my $p = $params->{$name} //= {};
+		$p->{position} = $position++ unless defined $p->{position};
+		$p->{type} = $type if defined($type);
+		$p->{_source} = SOURCE_INPUT_SPEC;
+		$row_text{$name} = $spec;
+
+		# The row's own comment describes the documented shape: an arrayref
+		# of "insight hashrefs" holds hashes rather than strings.
+		if(my $shape = _pod_nested_input_shape($type, $spec)) {
+			$p->{schema} = $shape;
+		}
+
+		if($spec =~ /\boptional\b/i || $spec =~ /\bdefault\b/i) {
+			$p->{optional} = 1;
+		} elsif($spec =~ /\b(?:required|mandatory)\b/i) {
+			$p->{optional} = 0;
+		}
+
+		# `one or more` is a size floor, not a spelling: an empty list is
+		# the documented error, so say so rather than letting the harness
+		# treat [] as a legal value.
+		if(defined($type) && $type eq 'arrayref' && $spec =~ /\b(?:one\s+or\s+more|non-empty)\b/i) {
+			$p->{min} = 1;
+		}
+
+		# "a readable .json file" is a precondition on the path: the harness
+		# has to supply an existing file, not a generated string.
+		if(defined($type) && $type eq 'string' && $spec =~ /\b(?:readable|existing)\b[^;:]*\bfile\b/i) {
+			$p->{semantic} = 'existing_file';
+		}
+
+		# "an existing directory" is the same kind of precondition, for the
+		# cache factories that stat the directory they are given.  The
+		# harness makes a temporary directory rather than guessing at a path.
+		if(defined($type) && $type eq 'string' && $spec =~ /\bdir(?:ectory)?\b/i
+		   && $spec =~ /\b(?:existing|readable|writable)\b/i) {
+			$p->{semantic} = 'directory';
+		}
+
+		# "the SQLite file's contents" is a byte string: a wide character is
+		# not something a byte-oriented write accepts, so the harness passes
+		# bytes rather than text (and no BOM probe, which is text).
+		if($name =~ /\A(?:bytes|blob)\z/i
+		   || $spec =~ /\braw\s+bytes\b|file'?s\s+contents|\bbinary\s+(?:data|contents)\b/i) {
+			$p->{semantic} = 'bytes';
+			$p->{type} //= 'string';
+		}
+
+		# A documented range, e.g. `lat : number  -90 .. 90`
+		if($spec =~ /(-?\d+(?:\.\d+)?)\s*\.\.\s*(-?\d+(?:\.\d+)?)/) {
+			$p->{min} = $1 + 0;
+			$p->{max} = $2 + 0;
+		# Or with words, as Database::BI::Password documents `rounds`:
+		# `10_000 to 100_000_000 (default 200_000)`.  An underscore is a
+		# digit separator, not part of the value.
+		} elsif($spec =~ /(-?\d[\d_]*)\s+to\s+(-?\d[\d_]*)/) {
+			$p->{min} = _undigitised($1);
+			$p->{max} = _undigitised($2);
+		}
+
+		# The documented default is the value the routine is meant to run
+		# with, so a maximum far above it is a work factor: a PBKDF2 round
+		# count near the documented maximum can take minutes per call, which
+		# no fuzz run can afford.  Only then does the default cap the valid
+		# data; an ordinary bounded option (a port, 1 to 65535 with default
+		# 8080) must still be generated across its whole range, so the cap
+		# needs the maximum to be at least ten times the default (and a
+		# positive default, so a flag whose default is 0 is not pinned at 0).
+		# max stays the documented bound either way, so a value above it is
+		# still probed.
+		if(defined($type) && ($type =~ /\A(?:integer|number)\z/)
+		   && $spec =~ /\bdefault\b\s*\(?\s*(-?\d[\d_]*)/i) {
+			my $default = _undigitised($1);
+			$p->{default} = $default;
+			$p->{sample_max} = $default
+				if defined($p->{max}) && ($default > 0)
+					&& ($p->{max} >= 10 * $default)
+					&& (!defined($p->{min}) || ($default >= $p->{min}));
+		}
+
+		if(my $values = $self->_prose_memberof($spec)) {
+			$p->{memberof} = $values;
+		}
+
+		$self->_log('  POD: ' . $name . ' type ' . (defined($type) ? "'$type'" : '(none)')
+			. ' from the Input table');
+		push @found, $name;
+	}
+
+	# A nested "Measure hashref keys:" block documents the shape of the
+	# hashrefs an arrayref argument holds.  Without it the harness invents a
+	# string element, which the routine rightly rejects; with it the
+	# documented keys, their allowed values and their patterns are what the
+	# harness builds.
+	if($block =~ /^(\w+)\s+hashref\s+keys\s*:\s*\n(.*?)(?=\n\s*\n|\z)/msi) {
+		my ($kind, $rows) = ($1, $2);
+		my (%element, %alternation);
+		for my $line (split /\n/, $rows) {
+			next unless($line =~ /^\s{0,8}(\w+)\s*=>\s*(\S.*)$/);
+			my ($key, $text) = ($1, $2);
+			# A key another key's description makes conditional on the
+			# function ("required for all functions except bare count") is
+			# left out: the element is built for the function that needs no
+			# further column.
+			next if($text =~ /\brequired\b[^;]*\bexcept\b/i);
+			my %spec = (type => 'string');
+			if($text =~ /\(([^)]*\|[^)]*)\)/) {
+				my @values = map { s/\A\s+|\s+\z//gr } split /\|/, $1;
+				$spec{memberof} = \@values if(@values);
+				$alternation{$key} = \@values;
+			}
+			if($text =~ /match(?:es)?\s+C?<\s*\/(.*?)\/\s*>/) {
+				$spec{matches} = $1;
+			}
+			$element{$key} = \%spec;
+		}
+
+		# The description says which listed function needs no further key;
+		# build the element for that one.
+		if(my ($except) = $rows =~ /\bexcept\s+(?:bare\s+)?(\w+)/i) {
+			for my $key (keys %alternation) {
+				next unless(grep { $_ eq $except } @{$alternation{$key}});
+				$element{$key}{memberof} = [ $except ];
+			}
+		}
+
+		if(%element) {
+			for my $name (keys %{$params}) {
+				my $p = $params->{$name};
+				next unless(($p->{_source} // '') eq SOURCE_INPUT_SPEC);
+				next unless((($p->{type} // '') =~ /^array/));
+				next unless(defined($row_text{$name})
+					&& $row_text{$name} =~ /arrayref\s+of\s+\Q$kind\E\s+hashrefs/i);
+				$p->{schema} = { %element };
+			}
+		}
+	}
+
+	# A section documenting "Reserved keys extracted before the rest is treated
+	# as WHERE criteria" describes a variadic named API (Database::Join's
+	# aggregate): only the key it marks required is required, and an optional
+	# reference it gives no element shape for cannot be built validly, so it
+	# is left out rather than fuzzed with invented contents.
+	if($block =~ /\bReserved keys\b/i) {
+		for my $name (keys %{$params}) {
+			my $p = $params->{$name};
+			next unless(($p->{_source} // '') eq SOURCE_INPUT_SPEC);
+
+			$p->{optional} = 1 unless(defined($p->{optional}) && !$p->{optional});
+
+			my $type = $p->{type} // '';
+			next unless(($type eq 'arrayref') || ($type eq 'array') || ($type eq 'hashref'));
+			next if(ref($p->{schema}) eq 'HASH');
+			next if(ref($p->{memberof}) eq 'ARRAY' && @{$p->{memberof}});
+
+			delete $params->{$name} if($p->{optional});
+		}
+	}
+
+	return scalar @found;
 }
 
 # --------------------------------------------------
@@ -4592,7 +5438,21 @@ sub _analyze_output_from_pod {
 				} elsif($block =~ /\bisa\s*=>/) {
 					$output->{type} = 'object';
 					$self->_log("  OUTPUT: type 'object' from =head4 Output isa spec");
+				} elsif($block =~ /^\{[^}]*\}/ && $block =~ /=>/) {
+					# A record such as
+					# `{ n => 'integer', unit => 'string' } | undef`
+					# documents a hashref return.
+					$output->{type} = 'hashref';
+					$self->_log("  OUTPUT: type 'hashref' from =head4 Output record notation");
 				}
+			} elsif($block =~ /\A(?:(?:Always|Usually)\s+)?(?:An?\s+)?(Hashref|Hash|Arrayref|Array|List)(?=\s*(?:of\b|:|\(|\[|\.|;|,|\z))/i) {
+				# A documented shape such as "Hashref: column_name => {...}",
+				# "Arrayref of hashrefs" or "Always an arrayref of hashrefs"
+				# names the container first.  "The hash string." names a
+				# string, so an article alone does not make it a container.
+				my $word = lc($1);
+				$output->{type} = ($word =~ /^array|^list/) ? 'arrayref' : 'hashref';
+				$self->_log("  OUTPUT: type '$output->{type}' from =head4 Output shape");
 			}
 		}
 
@@ -4878,8 +5738,15 @@ sub _analyze_output_from_code
 				$return_types{$output->{'type'}} += 3;	# Add weighting to what's already been found
 			}
 			my $min;
+			my $time_list;
 			foreach my $ret (@return_statements) {
 				$ret =~ s/^\s+|\s+$//g;
+
+				# Arithmetic operators inside a regex literal or a quoted
+				# string are not arithmetic.  SafeUA::numeric_host returns a
+				# dotted quad and sprintf('%04d-...') returns a date: neither
+				# is a number, though /:/ has a '/' and '%04d' a '%'.
+				my $ops_ret = _strip_literals($ret);
 
 				# Literal values
 				if ($ret eq '1' || $ret eq '0') {
@@ -4890,18 +5757,39 @@ sub _analyze_output_from_code
 					$return_types{integer}++;
 				} elsif ($ret =~ /^-?\d+\.\d+$/) {
 					$return_types{number}++;
-				} elsif ($ret eq 'undef') {
+				} elsif ($ret =~ /\A(?:sprintf|join|lc|uc|lcfirst|ucfirst|quotemeta)\b/) {
+					# A formatting or case call returns text, whatever arithmetic
+					# its arguments contain: sprintf '%02d:%02d', $h, $m is a
+					# timestamp string, not a number.
+					$return_types{string} += 2;
+				} elsif ($ret =~ /\Aundef\b/) {
+					# `return undef unless $id` is an undef return with a guard,
+					# the same error return as a bare `return undef`.
 					$return_types{undef}++;
+				} elsif ($self->_returns_time_list($ret)) {
+					# localtime and gmtime give the nine-element time list in
+					# list context; the arithmetic in their argument does not
+					# make the return a number.
+					$return_types{array} += 2;
+					$time_list = 1;
 				} elsif ($ret =~ /^\[/) {
 				# Data structures
 					$return_types{arrayref}++;
 				} elsif ($ret =~ /^\{/) {
 					$return_types{hashref}++;
-				} elsif ($ret =~ m{
-					# Numeric expressions (heuristic, medium confidence)
-					# Don't match ->
+				} elsif ($ret =~ /^\\\%/) {
+					# `return \%checked`: a reference to a lexical hash has no
+					# $ sigil, so before this it fell through every branch and
+					# the routine was left with no output type at all.
+					$return_types{hashref}++;
+				} elsif ($ret =~ /^\\\@/) {
+					$return_types{arrayref}++;
+				} elsif ($ops_ret =~ m{
+					# Numeric expressions (heuristic, medium confidence).
+					# `->` is a method call, `//` a defined-or, and `-e` a file
+					# test, not operators.
 				    (?:
-					\+ | -\b | \* | / | %
+					\+ | -(?!>|[A-Za-z]\b) | \* | (?<!\/)\/(?!\/) | (?<!\\)%
 				      | \+\+ | --
 				    )
 				}x) {
@@ -4924,14 +5812,14 @@ sub _analyze_output_from_code
 					$min = -1;
 				} elsif($ret =~ /^ord[\s\(]/) {
 					$return_types{integer}++;
-				} elsif ($ret =~ /=/ && $ret =~ /\$\w+/) {
+				} elsif ($ops_ret =~ /=/ && $ops_ret =~ /\$\w+/) {
 					# Assignment returning a value (e.g. $self->{status} = $status)
 					# If assignment involves a numeric literal or variable, assume numeric intent.
 					# $1, $2 and friends are regex captures - strings, not numeric
 					# literals - so drop them before looking for digits. CGI::Info::script_dir
 					# returns "$self->{script_path} =~ $dir_regex ? $1 : ..." and the
 					# "1" in $1 was being read as a numeric literal.
-					(my $numeric_ret = $ret) =~ s/\$\d+//g;
+					(my $numeric_ret = $ops_ret) =~ s/\$\d+//g;
 					if ($numeric_ret =~ /\b\d+\b/) {
 						$return_types{integer} += 2;
 						$self->_log("  OUTPUT: Assignment with numeric value detected");
@@ -4964,7 +5852,17 @@ sub _analyze_output_from_code
 
 			# Determine most common return type
 			if (keys %return_types) {
-				my ($most_common) = sort { $return_types{$b} <=> $return_types{$a} } keys %return_types;
+				# The undef paths are the documented error return
+				# (_error_return), not the type of a successful value: a
+				# routine returning a record or undef returns a record when
+				# it succeeds, however many guards send it back undef.
+				my %value_types = %return_types;
+				delete $value_types{undef} if(keys(%value_types) > 1);
+				# A tie is broken by name so the same code always yields the
+				# same schema: hash order is randomised per process, and
+				# Geo::Coder::Free::geocode_many alternated between string and
+				# hashref in successive runs.
+				my ($most_common) = sort { $value_types{$b} <=> $value_types{$a} || $a cmp $b } keys %value_types;
 				# Prefer integer over scalar if numeric returns dominate
 				if ($return_types{integer} && (!$return_types{string})) {
 					if (!$output->{type} || $output->{type} eq 'scalar') {
@@ -4988,6 +5886,13 @@ sub _analyze_output_from_code
 					}
 
 					$self->_log("  OUTPUT: Inferred type from code: $most_common");
+				}
+
+				if($time_list && ($output->{type} // '') eq 'array') {
+					# 'number': a time field can be negative (a fixed offset
+					# before the epoch), and Params::Validate::Strict reads
+					# the '-' of an integer element as a non-digit.
+					$output->{element_type} = 'number';
 				}
 			}
 
@@ -5197,6 +6102,30 @@ sub _detect_list_context {
 			}
 		}
 	}
+}
+
+# --------------------------------------------------
+# _returns_time_list
+#
+# Purpose:    Decide whether a return expression
+#             gives the nine-element list built by
+#             localtime or gmtime, rather than a
+#             scalar derived from one.
+#
+# Entry:      $ret - a return expression.
+#
+# Exit:       Returns true when the whole
+#             expression, or the arm of a ternary
+#             that ends it, is a localtime/gmtime
+#             call.
+# --------------------------------------------------
+sub _returns_time_list {
+	my ($self, $ret) = @_;
+
+	return 0 unless defined($ret);
+	return 0 unless $ret =~ /(?:\A|[?:])\s*\(*\s*(?:localtime|gmtime)\s*\(/;
+
+	return $ret =~ /(?:localtime|gmtime)\s*\([^()]*\)\s*\)*\s*\z/ ? 1 : 0;
 }
 
 # --------------------------------------------------
@@ -5808,6 +6737,10 @@ sub _parse_constraints {
 sub _analyze_code {
 	my ($self, $code, $method) = @_;
 
+	# A comment is prose, not code.  A signature shown in an example comment
+	# (extract_all's # my ($password, %opts) = @_) must not become a parameter.
+	$code = _strip_comments($code, $method->{node});
+
 	my %params;
 
 	# Safety check - limit parameter analysis to prevent runaway processing
@@ -5884,7 +6817,7 @@ sub _analyze_code {
 			# e.g. $var //= 5; or $var ||= 5;
 			$$p->{optional} = 1;
 			$self->_log("  CODE: $param is optional (default value assigned in code)");
-		} elsif ($code =~ /\s*\$$param\s*(?:[\+\-\*\%]|\/(?!\/)|(?:\+\+)|(?:--)|(?:[\+\-\*\%]=|\/(?!\/)=)|\+\$|\$[+-])/ ) {
+		} elsif ($code =~ /\s*\$$param\s*(?!->)(?:[\+\-\*\%]|\/(?!\/)|(?:\+\+)|(?:--)|(?:[\+\-\*\%]=|\/(?!\/)=)|\+\$|\$[+-])/ ) {
 			# Covers arithmetic usage:
 			# $x + $param, $param++, $param--, $x += $param, $x -= $param, etc.
 			$$p->{optional} = 0;
@@ -5986,6 +6919,20 @@ sub _analyze_parameter_type {
 		}
 	}
 
+	# An argument used only as `$param->method` is an object the caller
+	# supplies (a controller, a cache, a database handle).  The harness
+	# cannot build one, so it is an object rather than a guessed scalar.
+	# `$param->{...}` and `$param->[...]` are hash and array access, which
+	# the check above has already typed.
+	if (!$p->{type} && $code =~ /\$$param\s*->\s*[A-Za-z_]\w*/) {
+		$p->{type} = 'object';
+		# A method call on undef is an error, so the argument cannot be
+		# omitted unless the body guards the call (a truthiness test in
+		# _analyze_parameter_validation makes it optional again).
+		$p->{optional} = 0;
+		$self->_log("  CODE: $param is an object (called as a method holder)");
+	}
+
 	# Infer type from the default value if type is unknown
 	if (!$p->{type} && exists $p->{_default}) {
 		my $default = $p->{_default};
@@ -6002,6 +6949,9 @@ sub _analyze_parameter_type {
 	# Heuristic numeric inference (low confidence)
 	# ------------------------------------------------------------
 	if (!$p->{type}) {
+		# A '-' or '%' in 'Period-over-period' or "%04d" is text, not
+		# arithmetic, so the operators are looked for outside the literals.
+		my $ops_code = _strip_literals($code);
 		# An explicit looks_like_number($param) check is a direct
 		# numeric-type assertion by the author, stronger evidence than
 		# incidental arithmetic adjacency (e.g. $param is only ever
@@ -6015,11 +6965,13 @@ sub _analyze_parameter_type {
 		}
 		# Numeric operators: + - * / % **
 		# Use \/(?!\/) to exclude // (defined-or) from matching as division.
+		# `$c->req` is a method call, not $c minus something, so '-' before
+		# '>' does not count as an operator.
 		elsif (
-			$code =~ /\$$param\s*(?:[\+\-\*\%]|\/(?!\/))/ ||
-			$code =~ /(?:[\+\-\*\%]|\/(?!\/))\s*\$$param/ ||
-			$code =~ /\bint\s*\(\s*\$$param\s*\)/ ||
-			$code =~ /\babs\s*\(\s*\$$param\s*\)/
+			$ops_code =~ /\$$param\s*(?:[\+\*\%]|-(?!>|[A-Za-z]\b)|(?<!\/)\/(?!\/))/ ||
+			$ops_code =~ /(?:[\+\*\%]|-(?!>|[A-Za-z]\b)|(?<!\/)\/(?!\/))\s*\$$param/ ||
+			$ops_code =~ /\bint\s*\(\s*\$$param\s*\)/ ||
+			$ops_code =~ /\babs\s*\(\s*\$$param\s*\)/
 		) {
 			$p->{type} = 'number';
 			$p->{_type_confidence} = 'heuristic';
@@ -6027,8 +6979,8 @@ sub _analyze_parameter_type {
 		}
 		# Numeric comparison
 		elsif (
-			$code =~ /\$$param\s*(?:==|!=|<=|>=|<|>)/ ||
-			$code =~ /(?:==|!=|<=|>=|<|>)\s*\$$param/
+			$ops_code =~ /\$$param\s*(?:==|!=|<=|>=|<|>)/ ||
+			$ops_code =~ /(?:==|!=|<=|>=|<|>)\s*\$$param/
 		) {
 			$p->{type} = 'number';
 			$p->{_type_confidence} = 'heuristic';
@@ -6137,21 +7089,25 @@ sub _detect_datetime_type {
 		return;
 	}
 
+	# ISO 8601 date pattern.  Checked before the looser date-string match
+	# below, which would otherwise claim a full datetime first.
+	if ($code =~ /\$$param\s*=~\s*\/([^\/]+)\//) {
+		my $regex = $1;
+		if ($self->_looks_like_iso8601_regex($regex)) {
+			$p->{type} = 'string';
+			$p->{semantic} = 'iso8601_string';
+			$p->{matches} = '/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?$/';
+			$self->_log("  ADVANCED: $param validated as ISO 8601 datetime");
+			return;
+		}
+	}
+
 	# String date/time patterns via regex matching
 	if ($code =~ /\$$param\s*=~\s*\/.*?\\d\{4\}.*?\\d\{2\}.*?\\d\{2\}/) {
 		$p->{type} = 'string';
 		$p->{semantic} = 'date_string';
 		$p->{format} = 'YYYY-MM-DD or similar';
 		$self->_log("  ADVANCED: $param validated as date string pattern");
-		return;
-	}
-
-	# ISO 8601 date pattern
-	if ($code =~ /\$$param\s*=~\s*\/.*?[Tt].*?[Zz].*?\//) {
-		$p->{type} = 'string';
-		$p->{semantic} = 'iso8601_string';
-		$p->{matches} = '/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?$/';
-		$self->_log("  ADVANCED: $param validated as ISO 8601 datetime");
 		return;
 	}
 
@@ -6174,6 +7130,34 @@ sub _detect_datetime_type {
 		$self->_log("  ADVANCED: $param is parsed as datetime");
 		return;
 	}
+}
+
+# --------------------------------------------------
+# _looks_like_iso8601_regex
+#
+# Purpose:    Decide whether a regex body names an
+#             ISO 8601 datetime rather than merely
+#             containing the letters t and z, which
+#             a timezone alternation such as
+#             /\A(?:utc|gmt|z)\z/i also does.
+#
+# Entry:      $regex - regex body without its
+#                      delimiters.
+#
+# Exit:       Returns true when the body spells out
+#             a year, month and day before the time
+#             separator.
+# --------------------------------------------------
+sub _looks_like_iso8601_regex {
+	my ($self, $regex) = @_;
+
+	return 0 unless defined $regex && $regex =~ /[Tt]/ && $regex =~ /[Zz]/;
+
+	my $digit = qr/(?:\\d|\[0-9\])/;
+	my $year  = qr/(?:$digit\s*\{\s*4\s*\}|$digit$digit$digit$digit)/;
+	my $short = qr/(?:$digit\s*\{\s*[12]\s*\}|$digit$digit)/;
+
+	return $regex =~ /$year[^A-Za-z]{0,3}$short[^A-Za-z]{0,3}$short/ ? 1 : 0;
 }
 
 # --------------------------------------------------
@@ -6202,8 +7186,10 @@ sub _detect_filehandle_type {
 
 	return unless defined $param && $param =~ /^\w+$/;
 
-	# File handle operations
-	if ($code =~ /(?:open|close|read|print|say|sysread|syswrite)\s*\(?\s*\$$param/) {
+	# File handle operations.  The builtin has to be a name of its own: an
+	# underscore before it means a call such as _json_read($path), whose
+	# argument is a path, not a handle.
+	if ($code =~ /(?<![\w:])(?:open|close|read|print|say|sysread|syswrite)\s*\(?\s*\$$param/) {
 		$p->{type} = 'object';
 		$p->{isa} = 'IO::Handle';
 		$p->{semantic} = 'filehandle';
@@ -7599,18 +8585,51 @@ sub _analyze_parameter_constraints {
 	}
 
 	# Regex pattern matching with better capture
-	if ($code =~ /\$$param\s*=~\s*((?:qr?\/[^\/]+\/|\$[\w:]+|\$\{\w+\}))/) {
-		my $pattern = $1;
+	if($code =~ /\$$param\s*=~\s*(?:qr?\/([^\/]+)\/|(\$[\w:]+|\$\{\w+\}))/ ) {
+		my ($body, $variable) = ($1, $2);
 		$p->{type} ||= 'string';
 
-		# Clean up the pattern if it's a straightforward regex
-		if ($pattern =~ /^qr?\/([^\/]+)\/$/) {
-			$p->{matches} = "/$1/";
+		if(defined($variable)) {
+			# The pattern lives in a variable whose value is not in the
+			# schema, and the harness would emit that name as a regex.
+			$self->_log("  CODE: $param matches $variable, a pattern held in a variable; not recorded");
+		} elsif(!_pattern_is_self_contained($body)) {
+			$self->_log("  CODE: $param matches '$body', which depends on run-time variables; not recorded");
 		} else {
-			$p->{matches} = $pattern;
+			$p->{matches} = "/$body/";
+			$self->_log("  CODE: $param matches pattern: $p->{matches}");
 		}
-		$self->_log("  CODE: $param matches pattern: $p->{matches}");
 	}
+}
+
+# --------------------------------------------------
+# _pattern_is_self_contained
+#
+# Purpose:    Decide whether a regex taken from the
+#             source text still means the same thing
+#             once the harness compiles it from a
+#             string.
+#
+# Entry:      $pattern - regex body as written in the
+#                        source.
+#
+# Exit:       Returns true when the pattern stands
+#             alone.  \Q and \E are handled by the
+#             regex lexer, so they quote nothing when
+#             the pattern arrives as an interpolated
+#             string; a pattern interpolating a
+#             variable depends on a value no schema
+#             carries (q_wrap's delimiter loop uses
+#             /\Q$l\E|\Q$r\E/).
+# --------------------------------------------------
+sub _pattern_is_self_contained {
+	my ($pattern) = @_;
+
+	return 0 unless defined($pattern) && length($pattern);
+	return 0 if $pattern =~ /\\[QE]/;
+	return 0 if $pattern =~ /(?<!\\)[\$\@]\w/;
+
+	return 1;
 }
 
 # --------------------------------------------------
@@ -7647,6 +8666,15 @@ sub _analyze_parameter_validation {
 	# Die/croak if not defined
 	if ($code =~ /(?:die|croak|confess)\s+[^;]*unless\s+(?:defined\s+)?\$$param/s) {
 		$is_required = 1;
+	}
+
+	# A routine that refuses an empty value ("croak ... unless defined $x &&
+	# length $x") does not accept one, so the harness's empty-string case is
+	# an error rather than a survival case.
+	if($code =~ /(?:croak|die|confess)\b[^;]*\bunless\b[^;]*?(?:length\s*\(?\s*\$$param\b|defined\s+\$$param\b[^;]*?\blength\b)/s) {
+		$is_required = 1;
+		$p->{_not_empty} = 1;
+		$self->_log("  CODE: $param must not be empty (the code rejects it)");
 	}
 
 	# Extract default values with the new method
@@ -7870,6 +8898,27 @@ sub _merge_parameter_analyses {
 	$self->_sanitize_parameter_names($_, 'parameter merge')
 		for grep { ref($_) eq 'HASH' } ($pod, $code, $sig);
 
+	# A routine's POD may name a positional argument differently from the
+	# variable the body assigns it to (`$value` documented, `$val` in code).
+	# Calls are positional and the POD is the specification, so the code
+	# analysis of that slot belongs to the documented parameter instead of
+	# inventing a second argument.
+	if(ref($pod) eq 'HASH' && ref($code) eq 'HASH') {
+		for my $code_name (keys %$code) {
+			next if exists $pod->{$code_name};
+			my $pos = $code->{$code_name}{position};
+			next unless defined($pos);
+			my ($pod_name) = grep {
+				!exists($code->{$_})
+					&& defined($pod->{$_}{position})
+					&& ($pod->{$_}{position} == $pos)
+			} sort keys %$pod;
+			next unless defined($pod_name);
+			$code->{$pod_name} = delete $code->{$code_name};
+			$self->_log("  MERGE: code parameter \$$code_name is the documented \$$pod_name");
+		}
+	}
+
 	my %merged;
 
 	my @constraint_keys = qw(min max memberof matches nomatch notmemberof);
@@ -7914,16 +8963,19 @@ sub _merge_parameter_analyses {
 			foreach my $key (keys %{$code->{$param}}) {
 				next if $key eq '_source';
 				next if $key eq 'position';
-				# Formal input-spec declared this param without a type — author
-				# intentionally left it unconstrained; don't let code heuristics
-				# silently fill in a type that would cause wrong-type die tests.
-				next if $key eq 'type' && $pod->{$param} && ($pod->{$param}{_source} // '') eq SOURCE_INPUT_SPEC && !defined $pod->{$param}{type};
+				# A formal input-spec row that names no type says the argument
+				# exists and in which position, not that it has none: the
+				# code's evidence still supplies the type.
 
 				# Only override if POD didn't provide this info or it's a stronger signal
 				my $from_pod = exists $pod->{$param};
+				# A documented type is the specification; only a type the code
+				# shows outright replaces it, not one a pattern in the body
+				# was guessed to imply (qr/$pattern/ is not division).
+				my $heuristic_type = (($code->{$param}{_type_confidence} // '') eq 'heuristic');
 				if (!exists $p->{$key} ||
 				   ($key eq 'type' && $from_pod && $p->{type} eq 'string' &&
-				   $code->{$param}{$key} ne 'string')) {
+				   $code->{$param}{$key} ne 'string' && !$heuristic_type)) {
 					$p->{$key} = $code->{$param}{$key};
 					$p->{_constraint_source}{$key} = SOURCE_CODE if $is_constraint{$key};
 				}
@@ -8962,10 +10014,18 @@ sub _write_schema {
 	if($schema->{_analysis}{side_effects}{writes_file}) {
 		$output->{config}{check_files} = 0;
 	}
+	# A routine that returns a database handle keeps a descriptor open by
+	# design; the harness is told not to call that a leak.
+	if($schema->{_analysis}{side_effects}{keeps_fd}) {
+		$output->{config}{check_fds} = 0;
+	}
 
 	# The routine has a precondition no generated value can meet, so there is
 	# nothing meaningful to fuzz; the harness and all-fuzz report it skipped.
 	$output->{skip} = $schema->{skip} if($schema->{skip});
+
+	# A class method is called as Module->routine(...), not Module::routine(...).
+	$output->{invocant} = $schema->{invocant} if($schema->{invocant});
 
 	# Process input parameters with advanced type handling
 	if($schema->{'input'}) {
@@ -8985,14 +10045,16 @@ sub _write_schema {
 				$output->{'input'}{$param_name} = $cleaned_param;
 			}
 
-			# If some params have positions and others don't, treat the whole
-			# input as a named (hash) API and strip all positions.  Mixed
-			# position state arises when a named-API method also happens to
-			# have a Params::Get positional-key call alongside =head4 Input
-			# named-block params that carry no position.
+			# If some params have positions and others neither a position nor
+			# named: 1, treat the whole input as a named (hash) API and strip
+			# all positions.  Such mixed state arises when a named-API method
+			# also happens to have a Params::Get positional-key call alongside
+			# =head4 Input named-block params that carry no position.  A param
+			# marked named: 1 is deliberate: it is an option after the
+			# positional arguments, and the two kinds are fuzzed together.
 			my @with_pos    = grep { defined $output->{input}{$_}{position} } sort keys %{$output->{input}};
 			my @without_pos = grep { !defined $output->{input}{$_}{position} } sort keys %{$output->{input}};
-			if (@with_pos && @without_pos) {
+			if (@with_pos && grep { !$output->{input}{$_}{named} } @without_pos) {
 				delete $output->{input}{$_}{position} for @with_pos;
 			}
 		} else {
@@ -9226,7 +10288,7 @@ sub _serialize_parameter_for_yaml {
 	my %cleaned;
 
 	# Copy basic fields that App::Test::Generator expects
-	foreach my $field (qw(type position optional min max matches default)) {
+	foreach my $field (qw(type position named optional min max sample_max matches default _not_empty)) {
 		$cleaned{$field} = $param->{$field} if defined $param->{$field};
 	}
 
@@ -9260,6 +10322,11 @@ sub _serialize_parameter_for_yaml {
 			$cleaned{type} = 'string';
 			$cleaned{matches} ||= '/^\d{4}-\d{2}-\d{2}$/';
 			$cleaned{_example} = '2024-12-12';
+		} elsif ($semantic eq 'bytes') {
+			# A byte string is not text: the harness passes bytes and makes no
+			# wide-character (BOM) probe, which a byte-oriented write rejects.
+			$cleaned{semantic} = 'bytes';
+			$cleaned{type} //= 'string';
 		} elsif ($semantic eq 'iso8601_string') {
 			$cleaned{type} = 'string';
 			$cleaned{matches} ||= '/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?$/';
@@ -9319,6 +10386,17 @@ sub _serialize_parameter_for_yaml {
 		}
 	}
 
+	# The harness injected this value itself (a stub's advertised column), so
+	# it is a fixture rather than a documented domain: no outside value is
+	# expected to be an error.
+	$cleaned{_fixture} = 1 if($param->{_fixture});
+
+	# The element shape of an arrayref of hashrefs, read from the POD's nested
+	# key block: a YAML scalar cannot describe it.
+	if(ref($param->{schema}) eq 'HASH') {
+		$cleaned{schema} = $param->{schema};
+	}
+
 	# Handle memberof even if not marked with semantic.
 	# enum and memberof are mutually exclusive — only set memberof when enum
 	# is not already being output (avoids the "has both" validation error).
@@ -9365,10 +10443,16 @@ sub _serialize_parameter_for_yaml {
 		}
 	}
 
+	# A stand-in for an arrayref of live objects: the harness has to build
+	# one, and a YAML scalar cannot describe it.
+	if(ref($param->{_stub_elements}) eq 'HASH') {
+		$cleaned{_stub_elements} = $param->{_stub_elements};
+	}
+
 	# Remove internal fields.  The directory and existing-file semantics are
 	# kept: the harness needs them to supply a path that exists.
 	delete $cleaned{semantic}
-		unless(($cleaned{semantic} // '') =~ /^(?:directory|existing_file)$/);
+		unless(($cleaned{semantic} // '') =~ /^(?:directory|existing_file|bytes)$/);
 
 	return \%cleaned;
 }
@@ -9544,16 +10628,49 @@ sub _top_level_hash_entries
 # Database::Join->new is the motivating case: its databases parameter must
 # hold one or more Database::Abstraction instances, and the constructor calls
 # columns() on each one to build its routing table.
-sub _constructor_requires_live_objects
+# True when a constructor takes an object it will call methods on and the
+# schema gives no can/isa for standing one in, or an existing directory whose
+# files it reads.  A YAML fixture can hold neither, so new() is reported as
+# skipped and the instance methods that need its result are not fuzzed.
+sub _constructor_needs_live_dependencies
 {
-	my ($body, $ctor_schema) = @_;
-
-	my $content = ref($body) ? eval { $body->content } : $body;
-	return undef unless(defined($content) && length($content));
+	my ($ctor_schema) = @_;
 
 	my $input = $ctor_schema->{input};
 	return undef unless(ref($input) eq 'HASH');
 
+	for my $param (sort keys %$input) {
+		my $spec = $input->{$param};
+		next unless(ref($spec) eq 'HASH');
+
+		my $type = $spec->{type} // '';
+		if(($type =~ /\bobject\b/) && !defined($spec->{can}) && !defined($spec->{isa})) {
+			return "constructor needs a live '$param' object, which a fixture cannot provide";
+		}
+		if(($spec->{semantic} // '') eq 'directory') {
+			return "constructor needs an existing '$param' directory, which a fixture cannot provide";
+		}
+	}
+
+	return undef;
+}
+
+# The required arrayref constructor parameters whose elements are live
+# objects, with the reason each one is: the constructor rejects an empty
+# list, calls a method on an element, or checks that an element is blessed.
+# The names matter as well as the reasons, because a stand-in can be supplied
+# for every such parameter when the POD says what the elements are.
+sub _constructor_live_object_param_reasons
+{
+	my ($body, $ctor_schema) = @_;
+
+	my $content = ref($body) ? eval { $body->content } : $body;
+	return () unless(defined($content) && length($content));
+
+	my $input = $ctor_schema->{input};
+	return () unless(ref($input) eq 'HASH');
+
+	my %reasons;
 	for my $param (sort keys %$input) {
 		my $spec = $input->{$param};
 		next unless(ref($spec) eq 'HASH');
@@ -9575,12 +10692,173 @@ sub _constructor_requires_live_objects
 
 		next unless($empty_guard || $elements_are_objects);
 
-		return $empty_guard
+		$reasons{$param} = $empty_guard
 			? "needs a non-empty arrayref of live objects in '$param'"
 			: "needs live objects in '$param'";
 	}
 
+	return %reasons;
+}
+
+sub _constructor_requires_live_objects
+{
+	my ($body, $ctor_schema) = @_;
+
+	my %reasons = _constructor_live_object_param_reasons($body, $ctor_schema);
+	return undef unless(%reasons);
+
+	my ($param) = sort keys %reasons;
+	return $reasons{$param};
+}
+
+# The class the POD says a constructor's object elements must be, e.g.
+# "Each element of C<databases> must be an already-instantiated subclass of
+# C<Database::Abstraction>".  Reading it from the documentation keeps the
+# stand-in the harness builds tied to what the constructor promises rather
+# than to a class name guessed from the code.
+sub _pod_constructor_element_class
+{
+	my ($pod) = @_;
+
+	return undef unless(defined($pod) && length($pod));
+
+	return $1 if($pod =~ /\bsubclass(?:es)?\s+of\s+(?:C<)?([A-Z]\w*(?:::\w+)+)/);
+	return $1 if($pod =~ /\bisa\s*\(\s*['\"]?([A-Z]\w*(?:::\w+)+)/);
+	return $1 if($pod =~ /\binstances?\s+of\s+(?:C<)?([A-Z]\w*(?:::\w+)+)/);
+
 	return undef;
+}
+
+# Teach the harness to stand an object in for a constructor argument that
+# YAML cannot hold.  Database::Join->new requires a non-empty list of live
+# Database::Abstraction objects: nothing a generated file can name gives it
+# one, so every instance method used to be skipped.  The POD names the base
+# class, and the documented join_column default names the column the
+# constructor checks for, so a stub that answers the DA methods the
+# constructor calls can be built: it is blessed into a package inheriting
+# from the documented class and answers columns(), schema() and
+# selectall_arrayref().
+#
+# Only the Database::Abstraction interface is stubbed: those are the methods
+# the canned answers describe.  Anything else keeps the skip.
+sub _constructor_object_stubs
+{
+	my ($ctor_schema, $pod, $body) = @_;
+
+	my %reasons = _constructor_live_object_param_reasons($body, $ctor_schema);
+	return {} unless(%reasons);
+
+	my $base = _pod_constructor_element_class($pod);
+	return {} unless(defined($base) && ($base eq 'Database::Abstraction'));
+
+	my $input = $ctor_schema->{input} // {};
+	my $join_column = (ref($input->{join_column}) eq 'HASH')
+		? $input->{join_column}{default} : undef;
+	return {} unless(defined($join_column) && !ref($join_column) && length($join_column));
+
+	my %stubs;
+	for my $param (sort keys %reasons) {
+		# The constructor's own `croak ... unless @{ $p->{$param} }` documents
+		# that the list must not be empty.
+		$input->{$param}{min} = 1;
+		my $stub = {
+			isa => $base,
+			methods => {
+				columns => [ $join_column ],
+				schema => {},
+				selectall_arrayref => [],
+			},
+		};
+		$input->{$param}{_stub_elements} = $stub;
+		$stubs{$param} = $stub;
+	}
+
+	# The stand-in advertises only the join column, so that is the only value
+	# its columns() reports and the only one the constructor's check accepts.
+	# The list is a harness fixture, not a documented domain: every other
+	# string is absent from every stub database and rightly croaks, so only
+	# the fixture value is exercised.
+	if(ref($input->{join_column}) eq 'HASH') {
+		$input->{join_column}{memberof} = [ $join_column ];
+		$input->{join_column}{_constraint_source}{memberof} = 'fixture';
+		$input->{join_column}{_fixture} = 1;
+	}
+
+	# A documented predicate's column must exist in the merged view too, and
+	# the only column the stand-in publishes is the join column
+	# (Database::Join::new's mandatory_filters).
+	for my $param (keys %$input) {
+		my $element = $input->{$param}{schema};
+		next unless(ref($element) eq 'HASH' && ref($element->{col}) eq 'HASH');
+		next if(ref($element->{col}{memberof}) eq 'ARRAY' && @{$element->{col}{memberof}});
+		$element->{col}{memberof} = [ $join_column ];
+		$element->{col}{_constraint_source}{memberof} = 'fixture';
+		$element->{col}{_fixture} = 1;
+	}
+
+	return \%stubs;
+}
+
+# --------------------------------------------------
+# _keeps_database_handle
+#
+# Purpose:    Decide whether a call keeps a database handle open on purpose,
+#             so the harness's "no file descriptors leaked" check can be off.
+#
+# Entry:      $body - the subroutine source text.
+#             $pod  - the routine's POD text ('' when it has none).
+#
+# Exit:       Returns 1 when the call holds a descriptor rather than leaking
+#             one, 0 otherwise.
+#
+# Notes:      Three documented shapes, each narrow.  A handle returned to the
+#             caller needs the POD to document C<dbh> (Database::Join's
+#             dbi_source).  A routine that queries the documented SQLite
+#             cache goes through the cache path, whose first call builds the
+#             cache and keeps the handle on the object (count and aggregate
+#             document "the cached join tables" / "the existing SQLite
+#             cache").  Storing the handle on the object is retention in
+#             itself, so it needs no inference (the cache builder).
+#             Invalidation is not retention: Database::Join::add_database
+#             deletes and disconnects the cache and documents no cache, so
+#             its calls stay checked.
+#
+# Side effects: None.
+# --------------------------------------------------
+sub _keeps_database_handle
+{
+	my ($body, $pod) = @_;
+
+	return 0 unless defined($body);
+
+	# A handle handed to the caller, as the POD's output documents it.
+	return 1 if(($body =~ /\breturn\s*\{[^}]*\bdbh\s*=>/s) && ($pod =~ /\bdbh\b/));
+
+	# The cache builder stores the handle on the object for the next call.
+	return 1 if(($body =~ /\$self\s*->\s*\{_sqlite_cache\}\s*=\s*\{/s)
+		&& ($body =~ /\bdbh\s*=>/));
+
+	# A routine that queries the documented SQLite cache reaches it through
+	# the cache path, whose first call builds it and keeps the handle.
+	return 1 if(($pod =~ /\b(?:SQLite\s+)?cache/i)
+		&& ($body =~ /\$self\s*->\s*(?:_build_sqlite_cache|_sqlite_join|_sqlite_aggregate)\s*\(/));
+
+	return 0;
+}
+
+# True when the routine's whole body is a croak, with nothing but simple
+# assignments before it: such a method exists only to report that the
+# operation is unsupported, and every call is expected to die.
+sub _always_croaks
+{
+	my ($body) = @_;
+
+	my $code = $body // '';
+	$code =~ s/#[^\n]*//g;
+	$code =~ s/\A\s*sub\s+\w+\s*\{//;
+	$code =~ s/\}\s*\z//;
+
+	return ($code =~ /\A\s*(?:my\s+[^;]+;\s*)*croak\b[^;]*;\s*\z/s) ? 1 : 0;
 }
 
 # True when the constructor refuses to build the package itself.  Two idioms
@@ -9624,13 +10902,24 @@ sub _ctor_representative_args {
 	for my $param_name (keys %$input) {
 		my $spec = $input->{$param_name} // {};
 		next if $spec->{optional};
-		# File-path params require a real file to exist, and object/coderef params
-		# cannot be represented as plain YAML scalars.  Such a constructor cannot
-		# be built by the harness: calling new() with no arguments leaves a
-		# required parameter missing, so the harness must skip the routine
-		# rather than fail on a call it could never have made correctly.
-		if ($param_name =~ /(?:file|path|dir|filename)/i) {
+		# A constructor that reads a *file* argument is often not buildable
+		# from an arbitrary one: the file has to be a module, live under the
+		# class's lib_dir, or be parseable (Mutator, SchemaExtractor).  Leave
+		# it unbuilt, as before, rather than failing every method of the
+		# class.  A directory is a fixture the harness can make without
+		# knowing what is in it.
+		if ($param_name =~ /(?:file|filename)/i) {
 			return undef;
+		}
+		if ($param_name =~ /(?:dir|path)/i) {
+			$args{$param_name} = { '_path' => 'directory' };
+			next;
+		}
+		# A list of live objects the POD describes: the harness builds a
+		# stand-in for each element instead of an empty arrayref.
+		if (ref($spec->{_stub_elements}) eq 'HASH') {
+			$args{$param_name} = [ { '_stub' => $spec->{_stub_elements} } ];
+			next;
 		}
 		my $type = $spec->{type} // 'string';
 		unless (exists $REP{$type}) {

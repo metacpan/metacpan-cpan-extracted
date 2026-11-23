@@ -5,12 +5,11 @@ use warnings;
 
 use Carp;
 use CLI::Simple::Constants qw(:booleans :chars);
-use CLI::Simple::Utils qw(slurp slurp_json choose);
-use Cwd qw(realpath);
-use Data::Dumper;
+use CLI::Simple::Utils qw(slurp);
 use Data::NestedKey;
 use English qw(no_match_vars);
-use File::Basename qw(fileparse);
+use File::Basename qw(fileparse dirname);
+use File::Temp qw(tempfile);
 use JSON;
 use List::Util qw(none pairs);
 use YAML::XS;
@@ -24,35 +23,61 @@ sub _write_file {
 ########################################################################
   my ( $self, $dnk ) = @_;
 
-  my $backup = $self->get_backup;
-
   my $infile = $self->get_infile;
 
-  # make a backup of the original file
-  if ( $infile && $infile ne $DASH && $backup ) {
-    my ( $name, $path, $ext ) = fileparse( $infile, qr/[.][^.]+$/xsm );
-    $path = realpath($path);
+  die "ERROR: --replace and --backup require an input filename\n"
+    if !defined $infile || $infile eq $DASH;
 
-    rename $infile, sprintf '%s/%s.%s', $path, $name, $backup;
-  }
+  my $content = $self->_serialize($dnk);
+  my $dir     = dirname($infile);
 
-  eval {
-    open my $fh, '>', $infile
-      or die sprintf "ERROR: could not open %s for writing\n%s", $infile, $OS_ERROR;
+  # Create the replacement next to the original so rename stays on the
+  # same filesystem.  Do not disturb the input if serialization fails.
+  my ( $fh, $temporary ) = tempfile( '.dnk-XXXXXX', DIR => $dir, UNLINK => 0 );
+  my $backup_file;
+  my @original_stat = stat($infile);
 
-    print {$fh} $dnk->as_string;
+  die sprintf "ERROR: could not stat %s: %s\n", $infile, $OS_ERROR
+    if !@original_stat;
 
-    close $fh;
-  };
+  my $ok = eval {
+    print {$fh} $content
+      or die sprintf "ERROR: could not write %s: %s\n", $temporary, $OS_ERROR;
 
-  if ($EVAL_ERROR) {
-    my $err = $EVAL_ERROR;
+    close $fh
+      or die sprintf "ERROR: could not close %s: %s\n", $temporary, $OS_ERROR;
 
-    if ($backup) {
-      rename $backup, $infile;
+    chmod( $original_stat[2] & oct('07777'), $temporary )
+      or die sprintf "ERROR: could not preserve permissions on %s: %s\n", $temporary, $OS_ERROR;
+
+    if ( my $backup = $self->get_backup ) {
+      my ( $name, $path ) = fileparse( $infile, qr/[.][^.]+$/xsm );
+      $backup_file = sprintf '%s%s.%s', $path, $name, $backup;
+
+      die sprintf "ERROR: backup already exists: %s\n", $backup_file
+        if -e $backup_file || -l $backup_file;
+
+      rename $infile, $backup_file
+        or die sprintf "ERROR: could not create backup %s: %s\n", $backup_file, $OS_ERROR;
     }
 
-    die $err;
+    rename $temporary, $infile
+      or die sprintf "ERROR: could not replace %s: %s\n", $infile, $OS_ERROR;
+
+    return 1;
+  };
+
+  if ( !$ok ) {
+    my $error = $EVAL_ERROR;
+    close $fh         if defined fileno($fh);
+    unlink $temporary if -e $temporary;
+
+    if ( defined $backup_file && -e $backup_file && !-e $infile ) {
+      rename $backup_file, $infile
+        or die sprintf "ERROR: %s; could not restore backup %s: %s\n", $error, $backup_file, $OS_ERROR;
+    }
+
+    die $error;
   }
 
   return;
@@ -78,10 +103,13 @@ sub init {
 
   my $format = $self->get_format;
 
-  die sprintf "ERROR: not a valid format - %s (must be one of: xml, json, yml)\n", $format
-    if $format && none { $_ eq lc $format } qw(xml json yaml);
+  die sprintf "ERROR: not a valid input format - %s (must be json, yaml, yml, or xml)\n", $format
+    if $format && none { $_ eq lc $format } qw(json yaml yml xml);
 
-  $Data::NestedKey::FORMAT = uc( $format // q{} );
+  my $output_format = $self->get_output_format;
+
+  die sprintf "ERROR: not a valid output format - %s (must be json, yaml, yml, or xml)\n", $output_format
+    if $output_format && none { $_ eq lc $output_format } qw(json yaml yml xml);
 
   my $infile = $self->get_infile;
 
@@ -104,41 +132,80 @@ sub init {
 }
 
 ########################################################################
+sub _xml_data {
+########################################################################
+  my ( $self, $data ) = @_;
+
+  eval { require Bedrock::XML; 1 }
+    or die "ERROR: XML support requires the optional Bedrock::XML module: $EVAL_ERROR";
+
+  my $xml = Bedrock::XML->newFromString($data);
+
+  die "ERROR: unable to parse Bedrock XML input\n"
+    if !$xml;
+
+  return $xml->devolve;
+}
+
+########################################################################
+sub _serialize {
+########################################################################
+  my ( $self, $dnk ) = @_;
+
+  my $format = lc( $self->get_output_format // $self->{input_format} // 'json' );
+  $format = 'yaml' if $format eq 'yml';
+
+  if ( $format eq 'xml' ) {
+    eval { require Bedrock::XML; 1 }
+      or die "ERROR: XML output requires the optional Bedrock::XML module: $EVAL_ERROR";
+
+    return Bedrock::XML::writeXML( $self->get_data );
+  }
+
+  local $Data::NestedKey::FORMAT = uc $format;
+  return $dnk->as_string;
+}
+
+########################################################################
 sub _fetch_data {
 ########################################################################
   my ($self) = @_;
 
-  my $data = slurp( $self->get_fh );
+  my $data   = slurp( $self->get_fh );
+  my $format = $self->get_format;
+  my $infile = $self->get_infile;
 
-  my %decoders = (
-    xml  => sub { die "ERROR: not implemented\n" },
-    json => sub { decode_json(shift) },
-    yaml => sub { YAML::XS::Load(shift) },
-    yml  => sub { YAML::XS::Load(shift) },
-  );
+  # File extensions and recognizable Bedrock XML markup select XML first.
+  # Otherwise, prefer JSON to YAML (JSON is also valid YAML).
+  my $looks_xml = ( defined $infile && $infile =~ /[.]xml\z/ixsm )
+    || $data =~ /\A\s*(?:<\?xml[^>]*>\s*)?<(?:object|array)\b/xsm;
 
-  if ( my $format = $self->get_format ) {
-    foreach my $f ( keys %decoders ) {
-      next if uc $format eq uc $f;
+  my @formats = $format ? ( lc $format ) : $looks_xml ? qw(xml) : qw(json yaml);
+  my @errors;
 
-      delete $decoders{$f};
+  foreach my $candidate (@formats) {
+    my $obj = eval {
+      return decode_json($data)      if $candidate eq 'json';
+      return $self->_xml_data($data) if $candidate eq 'xml';
+      return YAML::XS::Load($data);
+    };
+
+    if ($EVAL_ERROR) {
+      push @errors, sprintf '%s: %s', $candidate, $EVAL_ERROR;
+      next;
     }
-  }
 
-  foreach my $f ( keys %decoders ) {
-    my $obj = eval { $decoders{$f}->($data); };
-    next if $EVAL_ERROR;
+    die sprintf "ERROR: %s input must contain a hash or array\n", $candidate
+      if ref($obj) ne 'HASH' && ref($obj) ne 'ARRAY';
 
-    $Data::NestedKey::FORMAT = uc $f;
-
+    $self->{input_format} = $candidate eq 'yml' ? 'yaml' : $candidate;
+    $Data::NestedKey::FORMAT = uc $self->{input_format};
     $self->set_data($obj);
 
-    my $dnk = Data::NestedKey->new($obj);
-
-    return $dnk;
+    return Data::NestedKey->new($obj);
   }
 
-  return;
+  die sprintf "ERROR: unable to deserialize input\n%s", join( q{}, @errors );
 }
 
 ########################################################################
@@ -157,11 +224,11 @@ sub cmd_set {
     $dnk->set( @{$p} );
   }
 
-  if ( $self->get_backup ) {
+  if ( $self->get_replace || $self->get_backup ) {
     $self->_write_file($dnk);
   }
   else {
-    print {*STDOUT} $dnk->as_string;
+    print {*STDOUT} $self->_serialize($dnk);
   }
 
   return $SUCCESS;
@@ -173,6 +240,7 @@ sub cmd_get {
   my ($self) = @_;
 
   my ($filter) = $self->get_args;
+  $filter //= $PERIOD;
 
   my $dnk = $self->_fetch_data;
 
@@ -203,8 +271,10 @@ sub main {
   my @option_specs = qw(
     help|h
     backup|b=s
+    replace|r
     infile|i=s
     format|f=s
+    output-format|o=s
     error_on_undefined|u
   );
 
@@ -231,50 +301,148 @@ __END__
 
 =pod
 
+=head1 NAME
+
+dnk - inspect and modify nested JSON, YAML, and optional Bedrock XML documents
+
 =head1 SYNOPSIS
 
-  dnk [options] get key
-  dnk [options] set key value key value ...
+  dnk [options] get [key]
+  dnk [options] set key value [key value ...]
 
-  Set or get values from a structured data object.
+  # Read a nested value from a file
+  dnk -i config.json get database.host
 
-   # set a value in a JSON file (output to STDOUT)
-   dnk -i my-config.json set config.password foo
+  # Read a value from standard input
+  cat response.json | dnk get .Listeners[0].ListenerArn
 
-   # set a value in a JSON file (in replace file) 
-   dnk -b bak -i my-config.json set config.password foo
+  # Print an updated document without modifying the input file
+  dnk -i config.json set database.host localhost
 
-   # pretty print a JSON file
-   cat policy.json | dnk get .
+  # Replace the input document
+  dnk -i config.json --replace set database.host localhost
 
-   # retrieve a value from a JSON file
-   cat alb-listener-rule.json | dnk get .ListenerArn
+  # Replace the input and retain a backup
+  dnk -i config.json --backup bak set database.host localhost
+
+  # Update a Bedrock XML configuration (requires Bedrock::XML)
+  dnk -r -i /path/to/config/tagx.xml set BEDROCK_SESSION_MANAGER UserSession
+
+  # Convert JSON to YAML while modifying a value
+  dnk -i config.json --output-format yaml set database.host localhost
+
+=head1 DESCRIPTION
+
+C<dnk> provides command-line access to nested JSON and YAML data using
+C<Data::NestedKey>. Keys are expressed as dot-separated paths; array
+subscripts such as C<items[0].name> and C<[0].name> are supported by
+C<get>. The C<set> command uses the key syntax supported by
+C<Data::NestedKey::set>, which does not accept array subscripts.
+
+Input is read from C<--infile> or standard input. Without an explicit
+C<--format>, C<dnk> recognizes C<.xml> files and Bedrock XML markup;
+otherwise it attempts JSON decoding first, followed by YAML. The
+optional L<Bedrock::XML> module is loaded only when XML is used.
+The top-level document must be a hash or array.
+
+=head1 COMMANDS
+
+=head2 get [key]
+
+Print the value at C<key>. If omitted, C<key> defaults to C<.>, meaning
+the entire document. A leading dot may also be used for a nested key.
+
+Scalar values are printed directly. Hashes and arrays are printed as
+pretty-printed JSON, including when the input was YAML. An undefined
+or missing value produces empty output by default; C<--error-on-undefined>
+turns it into an error.
+
+=head2 set key value [key value ...]
+
+Apply one or more key/value updates. C<Data::NestedKey::set> supports
+plain dot-separated paths as well as C<+> and C<-> prefixes for its
+append/merge and removal operations. Array subscripts are not supported
+by C<set>.
+
+By default, C<set> prints the modified document to standard output in
+the input format. C<--output-format> selects a different output format.
+For XML input, the default output is Bedrock XML.
+Use C<--format xml> to select Bedrock XML explicitly when necessary.
+
+C<set> does not modify its input file unless replacement is requested. Use C<--replace> to write it back, or
+C<--backup EXT> to save the original before replacing it. Replacement
+requires an input filename; standard input cannot be replaced in place.
 
 =head1 OPTIONS
 
- --help, -h                this help message
- --error-on-undefined, -u  throws an exception if the result of the expression is undefined 
- --infile, -i              input file
- --format, -f              xml, json, yml (default: input format)
- --replace, -r             replace file
- --backup, -b              backup extension, make a backup of the file before replacing
+=over 4
 
-=head2 Notes
+=item B<-i, --infile FILE>
 
-=over 5
+Read from C<FILE>. If omitted, or if C<FILE> is C<->, read from standard
+input.
 
-=item 1. Input format is determined by trying various deserializers (json, yml)
+=item B<-f, --format FORMAT>
 
-=item 2. You can set multiple values on the command line
+Decode using C<json>, C<yaml>, C<yml>, or C<xml>. Without this option,
+C<.xml> files and Bedrock XML input are recognized; otherwise JSON is
+tried before YAML. XML requires L<Bedrock::XML>, an optional dependency.
 
-=item 3. C<--backup> implies C<--replace>
+=item B<-o, --output-format FORMAT>
+
+Serialize C<set> output as C<json>, C<yaml>, C<yml>, or C<xml>. If omitted,
+preserve the decoded input format. XML output requires L<Bedrock::XML>.
+Use C<--output-format> to convert between JSON and YAML independently of
+C<--format>. In-place format conversion replaces the original file's
+contents but does not rename its extension.
+
+=item B<-r, --replace>
+
+With C<set>, replace the input file rather than printing the modified
+document. Requires C<--infile> with a filename.
+
+=item B<-b, --backup EXT>
+
+With C<set>, retain the original input under a filename with extension
+C<EXT> and replace the input file. Implies C<--replace>. Existing backup
+files are not overwritten.
+
+=item B<-u, --error-on-undefined>
+
+Make C<get> fail when the requested key is undefined or missing, rather
+than printing an empty value.
+
+=item B<-h, --help>
+
+Display command-line help.
 
 =back
 
-=head2 Example:
+=head1 EXAMPLES
 
- dnk -i infile.json set foo.bar buz foo.buz bar
+  # Inspect a nested value
+  dnk -i config.json get database.host
 
- dnk -i infile.json -b bak set foo.bar buz
+  # Print an updated document to STDOUT
+  dnk -i config.json set database.host localhost
+
+  # Update the original document
+  dnk -i config.json -r set database.host localhost
+
+  # Preserve a backup while updating the original
+  dnk -i config.json -b bak set database.host localhost
+
+  # Output the entire document (formatted as JSON)
+  cat policy.yaml | dnk get .
+
+  # Replace a Bedrock XML configuration value
+  dnk -r -i "$BEDROCK_WEB_DIR/config/tagx.xml" set BEDROCK_SESSION_MANAGER UserSession
+
+  # Change a JSON configuration and emit YAML instead
+  dnk -i config.json -o yaml set database.host localhost
+
+=head1 SEE ALSO
+
+L<Data::NestedKey>, L<JSON>, L<YAML::XS>, L<Bedrock::XML> (optional)
 
 =cut

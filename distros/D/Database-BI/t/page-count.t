@@ -55,12 +55,12 @@ subtest 'SQLite paged on the server is counted too' => sub {
 	my $h = DBI->connect("dbi:SQLite:dbname=$db", '', '', { RaiseError => 1, PrintError => 0 });
 	$h->do('INSERT INTO items VALUES (?, ?, ?)', undef, "s$_", 'Red', $_) for 26 .. 31;
 	$h->disconnect;
-	utime undef, time + 5, $db;	# a new mtime even within the same second
+	utime time + 5, time + 5, $db;	# a new mtime even within the same second
 	like info('/view/items?per_page=10'), qr/\APage 1 of 4\b/, 'after six more rows: page 1 of 4';
 };
 
 subtest 'a count that fails costs only the "of"' => sub {
-	no warnings 'redefine';
+	no warnings qw(redefine once);
 	local *Database::BI::Model::DataSource::count = sub { Carp::croak('no count here') };
 	like info('/view/items?per_page=10&page=2'), qr/\APage 2\s*\x{2014}/, 'the page alone';
 	unlike info('/view/items?per_page=10&page=2'), qr/ of /, 'with no count';

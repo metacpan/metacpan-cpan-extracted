@@ -14,7 +14,7 @@ use Carp;
 use URI;
 use List::Util qw(any all);
 
-our $VERSION = v0.16;
+our $VERSION = v0.17;
 
 use parent qw(Data::Identifier::Interface::Simple Data::TagDB::Base);
 
@@ -345,21 +345,42 @@ sub cloudlet {
             indirect => [
                 $wk->specialises,
             ],
+            indirect_inverse => [
+                $wk->generalises,
+            ],
         );
+
+        if (defined(my $wd_P279 = eval {$self->db->tag_by_id(uuid => '15ffad2d-c2e2-5f8e-9bd3-ee4d09cd9a6b')})) {
+            push(@{$opts{indirect}}, $wd_P279);
+        }
 
         if ($which eq 'roles') {
             $opts{direct} = [
                 $wk->has_type,
                 $wk->also_has_role,
             ];
+
+            if (defined(my $wd_P31 = eval {$self->db->tag_by_id(uuid => '582173cf-f340-5438-9abc-fbad5c43ccfc')})) {
+                push(@{$opts{direct}}, $wd_P31);
+            }
         } elsif ($which eq 'flags') {
             $opts{direct} = [
                 $wk->flagged_as,
             ];
         } elsif ($which eq 'specialises') {
-            $opts{direct} = [
-                $wk->specialises,
-            ];
+            $opts{direct} = $opts{indirect};
+            $opts{direct_inverse} = $opts{indirect_inverse};
+        } elsif ($which eq 'generalises') {
+            # Inverse and set direct/direct_inverse:
+            my $forward = $opts{indirect_inverse};
+            my $backward = $opts{indirect};
+            %opts = (
+                tag => $self,
+                direct => $forward,
+                indirect => $forward,
+                direct_inverse => $backward,
+                indirect_inverse => $backward,
+            );
         } else {
             croak 'Unknown cloudlet';
         }
@@ -542,7 +563,7 @@ Data::TagDB::Tag - Work with Tag databases
 
 =head1 VERSION
 
-version v0.16
+version v0.17
 
 =head1 SYNOPSIS
 

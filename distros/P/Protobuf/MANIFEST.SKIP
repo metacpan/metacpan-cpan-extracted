@@ -3,6 +3,7 @@
 ^tmp/
 ^t/generated/
 ^protoc-gen-perl-pb$
+^bin/protoc-gen-perl-pb(?:\.exe)?$
 ^tmp_gen/
 ^tmp_debug/
 ^debug$

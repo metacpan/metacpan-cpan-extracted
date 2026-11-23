@@ -10,25 +10,27 @@ use Carp qw(croak);
 
 use Protobuf;
 use Google::Api::Common;
+use Google::Cloud::Sql::V1::CloudSqlResources;
 use Google::Cloud::Sql::V1::CloudSqlTiers;
-use Google::Cloud::Sql::V1::CloudSqlIamPolicies;
+use Google::Cloud::Sql::V1::CloudSqlAvailableDatabaseVersions;
 use Google::Cloud::Sql::V1::CloudSqlEvents;
+use Google::Cloud::Sql::V1::CloudSqlFeatureEligibility;
 use Google::Cloud::Sql::V1::CloudSqlRegions;
 use Google::Cloud::Sql::V1::CloudSqlInstanceNames;
-use Google::Cloud::Sql::V1::CloudSqlFeatureEligibility;
-use Google::Cloud::Sql::V1::CloudSqlResources;
-use Google::Cloud::Sql::V1::CloudSqlAvailableDatabaseVersions;
-use Google::Cloud::Sql::V1::CloudSqlOperations;
-use Google::Cloud::Sql::V1::CloudSqlBackupRuns;
-use Google::Cloud::Sql::V1::CloudSqlUsers;
+use Google::Cloud::Sql::V1::CloudSqlIamPolicies;
 use Google::Cloud::Sql::V1::CloudSqlDatabases;
-use Google::Cloud::Sql::V1::CloudSqlConnect;
+use Google::Cloud::Sql::V1::CloudSqlInstances;
 use Google::Cloud::Sql::V1::CloudSqlFlags;
 use Google::Cloud::Sql::V1::CloudSqlSslCerts;
-use Google::Cloud::Sql::V1::CloudSqlInstances;
+use Google::Cloud::Sql::V1::CloudSqlUsers;
+use Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments;
+use Google::Cloud::Sql::V1::CloudSqlConnect;
+use Google::Cloud::Sql::V1::CloudSqlOperations;
+use Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures;
+use Google::Cloud::Sql::V1::CloudSqlBackupRuns;
 use Google::Cloud::Sql::V1::CloudSqlBackups;
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -36,14 +38,15 @@ has transport   => ( is => 'rw' );
 sub BUILD {
     my ($self) = @_;
 
-    # Resolve credentials: use passed credentials object if it implements get_token, or default to ADC
     my $auth = $self->credentials;
-    if (!$auth || !eval { $auth->can('get_token') }) {
+    if (!defined $auth) {
         $auth = Google::Auth->default();
+    } elsif (!eval { $auth->can('get_token') }) {
+        croak 'Invalid credentials object: must implement get_token()';
     }
     my $token = $auth->get_token();
 
-    my $target = 'localhost:50051';
+    my $target = 'sqladmin.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -55,7 +58,6 @@ sub BUILD {
         );
         $self->transport($client);
     } else {
-        # Default high-performance HTTP/2 gRPC client
         my $client = Google::gRPC::Client->new(
             target     => $target,
             auth_token => $token,
@@ -68,9 +70,26 @@ sub list {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlFlags::SqlFlagsListRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Sql::V1::CloudSqlFlags::FlagsListResponse';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.sql.v1.SqlFlagsService/List',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.sql.v1.SqlFlagsService',
         method         => 'List',
@@ -122,39 +141,43 @@ Generated from the following Protocol Buffers schemas:
 
 =over 4
 
-=item * C<google/cloud/sql/v1/cloud_sql_feature_eligibility.proto>
+=item * C<googleapis/google/cloud/sql/v1/cloud_sql_available_database_versions.proto>
 
-=item * C<google/cloud/sql/v1/cloud_sql_iam_policies.proto>
+=item * C<googleapis/google/cloud/sql/v1/cloud_sql_backup_runs.proto>
 
-=item * C<google/cloud/sql/v1/cloud_sql_backup_runs.proto>
+=item * C<googleapis/google/cloud/sql/v1/cloud_sql_backups.proto>
 
-=item * C<google/cloud/sql/v1/cloud_sql_available_database_versions.proto>
+=item * C<googleapis/google/cloud/sql/v1/cloud_sql_blue_green_deployments.proto>
 
-=item * C<google/cloud/sql/v1/cloud_sql_databases.proto>
+=item * C<googleapis/google/cloud/sql/v1/cloud_sql_connect.proto>
 
-=item * C<google/cloud/sql/v1/cloud_sql_tiers.proto>
+=item * C<googleapis/google/cloud/sql/v1/cloud_sql_databases.proto>
 
-=item * C<google/cloud/sql/v1/cloud_sql_regions.proto>
+=item * C<googleapis/google/cloud/sql/v1/cloud_sql_events.proto>
 
-=item * C<google/cloud/sql/v1/cloud_sql_ssl_certs.proto>
+=item * C<googleapis/google/cloud/sql/v1/cloud_sql_feature_eligibility.proto>
 
-=item * C<google/cloud/sql/v1/cloud_sql_resources.proto>
+=item * C<googleapis/google/cloud/sql/v1/cloud_sql_flags.proto>
 
-=item * C<google/cloud/sql/v1/cloud_sql_instance_names.proto>
+=item * C<googleapis/google/cloud/sql/v1/cloud_sql_iam_policies.proto>
 
-=item * C<google/cloud/sql/v1/cloud_sql_instances.proto>
+=item * C<googleapis/google/cloud/sql/v1/cloud_sql_instance_names.proto>
 
-=item * C<google/cloud/sql/v1/cloud_sql_operations.proto>
+=item * C<googleapis/google/cloud/sql/v1/cloud_sql_instances.proto>
 
-=item * C<google/cloud/sql/v1/cloud_sql_users.proto>
+=item * C<googleapis/google/cloud/sql/v1/cloud_sql_operations.proto>
 
-=item * C<google/cloud/sql/v1/cloud_sql_flags.proto>
+=item * C<googleapis/google/cloud/sql/v1/cloud_sql_regions.proto>
 
-=item * C<google/cloud/sql/v1/cloud_sql_backups.proto>
+=item * C<googleapis/google/cloud/sql/v1/cloud_sql_resources.proto>
 
-=item * C<google/cloud/sql/v1/cloud_sql_connect.proto>
+=item * C<googleapis/google/cloud/sql/v1/cloud_sql_ssl_certs.proto>
 
-=item * C<google/cloud/sql/v1/cloud_sql_events.proto>
+=item * C<googleapis/google/cloud/sql/v1/cloud_sql_tiers.proto>
+
+=item * C<googleapis/google/cloud/sql/v1/cloud_sql_users.proto>
+
+=item * C<googleapis/google/cloud/sql/v1/cloud_sql_workload_captures.proto>
 
 
 

@@ -30,7 +30,7 @@ Use a dedicated Linux VM with automount disabled. Attach only independent copies
 sudo apt install perl cpanminus build-essential libssl-dev curl ca-certificates util-linux mount xfsprogs
 sudo install -d -m 0755 -o root -g root /opt/mogura-perl /etc/mogura
 sudo install -m 0600 -o root -g root ./lab-a.token /etc/mogura/scanner-token
-sudo /usr/bin/cpanm --local-lib-contained /opt/mogura-perl --exclude-vendor ./Mogura-0.01.tar.gz
+sudo /usr/bin/cpanm --local-lib-contained /opt/mogura-perl --exclude-vendor ./Mogura-0.02.tar.gz
 ```
 
 Install from a trusted archive. Use the system Perl and a dedicated root-owned prefix whose ancestors, modules, native libraries and executables deny group and other writes. Keep the prefix free of symlinks. Install the tools below, then copy and edit the bundled example. With this prefix, it is installed alongside the scanner modules.

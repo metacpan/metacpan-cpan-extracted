@@ -232,3 +232,72 @@ sub _generate_code_challenge {
 
 1;
 
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Auth::UserAuthorizer - OAuth 2.0 installed-application / CLI user authorization flow
+
+=head1 SYNOPSIS
+
+    use Google::Auth::UserAuthorizer;
+
+    my $authorizer = Google::Auth::UserAuthorizer->new(
+        client_id    => $client_id,
+        scope        => ['https://www.googleapis.com/auth/cloud-platform'],
+        token_store  => $token_store,
+        callback_uri => 'http://127.0.0.1:8080/',
+    );
+    my $url = $authorizer->get_authorization_url(state => $state);
+
+=head1 DESCRIPTION
+
+Handles OAuth 2.0 authorization URL generation (with optional PKCE) and authorization-code-to-credential exchange for CLI and desktop applications.
+
+=head1 METHODS AND ATTRIBUTES
+
+=over 4
+
+=item * B<client_id>
+
+=item * B<scope>
+
+=item * B<token_store>
+
+=item * B<callback_uri>
+
+=item * B<code_verifier>
+
+=item * B<auth_endpoint>
+
+=item * B<token_uri>
+
+=item * B<get_authorization_url>
+
+=item * B<get_credentials>
+
+=item * B<get_credentials_from_code>
+
+=item * B<get_and_store_credentials_from_code>
+
+=item * B<store_credentials>
+
+=back
+
+=head1 SEE ALSO
+
+L<Google::Auth>, L<Google::Auth::Credentials>
+
+=head1 AUTHOR
+
+C.J. Collier E<lt>cjac@google.comE<gt>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2026 Google LLC and contributors.
+
+Licensed under the Apache License, Version 2.0.
+
+=cut

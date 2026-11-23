@@ -13,6 +13,15 @@
     right of a saved chart, in a strip of its own below everything else, so it
     cannot land on an axis label.  The PDF's copy is a link.
 
+    biSaveFile, biSavePNG: every saved chart (SVG, PNG, PDF) goes through
+    these.  Where the browser has the File System Access API (Chrome, Edge and
+    other Chromium browsers, on this machine or over https) the reader gets
+    the system's Save As box and chooses the folder and the file name, with
+    the chart's own name suggested.  Elsewhere, or if the box cannot be
+    opened, the file is downloaded under that name as before, into wherever
+    the browser keeps downloads (a browser's own "ask where to save" setting
+    still applies).  Cancelling the box saves nothing.
+
     The export buttons name their function in data-export (biBarExportPNG,
     say) rather than in an onclick attribute, which the Content-Security-Policy
     would not run.  Only a name of that shape is called, so markup that reached
@@ -150,12 +159,57 @@
 
   window.biSaveChartPDF = function (drawCanvas, filename) {
     drawCanvas(PDF_SCALE, function (canvas) {
-      var a = document.createElement('a');
-      a.href = URL.createObjectURL(buildPDF(window.biBrandCanvas(canvas, PDF_SCALE)));
-      a.download = filename;
-      a.click();
-      URL.revokeObjectURL(a.href);
+      window.biSaveFile(buildPDF(window.biBrandCanvas(canvas, PDF_SCALE)), filename);
     });
+  };
+}());
+</script>
+<script nonce="[% csp_nonce | html %]">
+(function () {
+  var KINDS = {
+    svg: { type: 'image/svg+xml', what: 'SVG image' },
+    png: { type: 'image/png',     what: 'PNG image' },
+    pdf: { type: 'application/pdf', what: 'PDF document' }
+  };
+
+  function download(blob, filename) {
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  // Save a Blob as filename.  Asks where, if the browser can; else downloads.
+  window.biSaveFile = function (blob, filename) {
+    var m    = /\.([A-Za-z0-9]+)$/.exec(filename);
+    var kind = m && KINDS[m[1].toLowerCase()];
+    if (!kind || typeof window.showSaveFilePicker !== 'function') return download(blob, filename);
+    var accept = {};
+    accept[kind.type] = ['.' + m[1].toLowerCase()];
+    var asked;
+    try {
+      asked = window.showSaveFilePicker({
+        suggestedName: filename,
+        types: [{ description: kind.what, accept: accept }]
+      });
+    } catch (e) { return download(blob, filename); }
+    asked.then(function (handle) {
+      return handle.createWritable().then(function (out) {
+        return out.write(blob).then(function () { return out.close(); });
+      });
+    }).catch(function (err) {
+      // Cancelling the box is an answer, not a fault.
+      if (err && err.name === 'AbortError') return;
+      download(blob, filename);
+    });
+  };
+
+  // Save a canvas as a PNG file.
+  window.biSavePNG = function (canvas, filename) {
+    canvas.toBlob(function (blob) {
+      if (blob) window.biSaveFile(blob, filename);
+    }, 'image/png');
   };
 }());
 </script>

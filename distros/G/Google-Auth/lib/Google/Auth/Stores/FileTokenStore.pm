@@ -96,3 +96,55 @@ sub delete {
 }
 
 1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Auth::Stores::FileTokenStore - Filesystem-backed OAuth 2.0 credential token store
+
+=head1 SYNOPSIS
+
+    use Google::Auth::Stores::FileTokenStore;
+
+    my $store = Google::Auth::Stores::FileTokenStore->new(
+        store_dir => "$ENV{HOME}/.config/gcloud-auth-perl",
+    );
+    $store->store('default', $json_payload);
+    my $json = $store->load('default');
+
+=head1 DESCRIPTION
+
+Persists, loads, and deletes serialized OAuth 2.0 user credentials in a local directory.
+
+=head1 METHODS AND ATTRIBUTES
+
+=over 4
+
+=item * B<store_dir>
+
+=item * B<load>
+
+=item * B<store>
+
+=item * B<delete>
+
+=back
+
+=head1 SEE ALSO
+
+L<Google::Auth>, L<Google::Auth::Credentials>
+
+=head1 AUTHOR
+
+C.J. Collier E<lt>cjac@google.comE<gt>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2026 Google LLC and contributors.
+
+Licensed under the Apache License, Version 2.0.
+
+=cut

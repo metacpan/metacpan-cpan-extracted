@@ -73,6 +73,7 @@ t/Misc.t
 t/nested-comment-boundary.t
 t/obfuscated-zip.t
 t/param-comments.t
+t/param-leftover-cost.t
 t/ParamVal.t
 t/Parser.t
 t/ParserEncoded.t

@@ -3,6 +3,7 @@ use warnings;
 use Test::Most;
 use Test::Mockingbird	qw(mock restore_all);
 use Readonly;
+use JSON::PP ();
 use File::Spec		();
 use File::Temp		qw(tempdir);
 use Mojo::File		();
@@ -1053,5 +1054,337 @@ subtest 'HTTP export path-D: url: spec with private IP -> blocked -> 404' => sub
 	my $url = url_escape('url:http://10.0.0.1/evil.csv');
 	$t->get_ok("/export?l=$url")->status_is(404);
 };
+
+
+{
+	package Unit::PathUA;
+	sub get { my $self = shift; return $self->{code}->(@_) }
+	package Unit::PathReply;
+	sub is_success { $_[0]{ok} }
+	sub decoded_content { $_[0]{body} }
+	package Unit::NoSuccess;
+	package Unit::ForgetfulCache;
+	# Keeps everything except outlines, which it silently drops.
+	sub get { my ($self, $key) = @_; return $self->{store}{$key} }
+	sub set { my ($self, $key, $value) = @_; $self->{store}{$key} = $value unless !$self->{keep_outlines} && $key =~ /\Aoutline:/; return 1 }
+}
+
+# ======================================================================
+# PATHS: Password, SafeUA, I18N, Extract and Boundary
+#
+# Found by running the suite under Devel::Cover and listing every branch and
+# condition with an arm never taken.  Each subtest names the function and the
+# path (the arm) it forces; a path that ends in a refusal is asserted with its
+# exact message.  Control-flow graph in words, per function, in the comments.
+# ======================================================================
+{
+	use lib 't/lib';
+	use Test::Permissions qw(can_revoke_create with_revoked);
+	# Where caches go is chosen from these, which the invoking shell may set.
+	delete local @ENV{qw(CACHEDIR CACHE_DIR Database__BI__cache_dir Database__BI__Extract__cache_dir Database__BI__Model__Geocode__cache_dir)};
+	require Database::BI::Password;
+	require Database::BI::SafeUA;
+	require Database::BI::I18N;
+	require Database::BI::Extract;
+	require Database::BI::Model::Boundary;
+	require HTTP::Request;
+	require HTTP::Response;
+
+	Readonly my %PATH => (
+		rounds   => 10_000,
+		salt     => 'S' x 16,
+		zoom_ok  => 8,
+		rank_ok  => 12,
+	);
+	my $err_of = sub { my ($code) = @_; local $@; return eval { $code->(); 1 } ? undef : ($@ =~ s/ at \S+ line \d+\.?\n?\z//r) };
+
+	# hash_password: password guard -> rounds (given | default) -> salt (given | random).
+	subtest 'hash_password path: both defaults taken (no rounds, no salt)' => sub {
+		my $hash = Database::BI::Password::hash_password('pw');
+		like $hash, qr/\Apbkdf2-sha256\$200000\$/, 'rounds defaulted to 200000';
+		my ($salt) = (split /\$/, $hash)[2];
+		isnt $salt, (split /\$/, Database::BI::Password::hash_password('pw'))[2], 'the salt was random: two calls differ';
+	};
+
+	# is_password_hash: not a string -> not matching the shape -> rounds below | inside | above.
+	subtest 'is_password_hash path: the rounds range test, each of its three arms' => sub {
+		my $made = Database::BI::Password::hash_password('pw', rounds => $PATH{rounds}, salt => $PATH{salt});
+		my $with = sub { my ($n) = @_; return $made =~ s/\$$PATH{rounds}\$/\$$n\$/r };
+		is Database::BI::Password::is_password_hash($with->($PATH{rounds} - 1)), 0, 'below the minimum: 0';
+		is Database::BI::Password::is_password_hash($with->($PATH{rounds})), 1, 'at the minimum: 1';
+		is Database::BI::Password::is_password_hash($with->(100_000_000)), 1, 'at the maximum: 1';
+		is Database::BI::Password::is_password_hash($with->(100_000_001)), 0, 'above the maximum: 0';
+	};
+
+	# _pbkdf2 loop: for production callers (bytes = 32 = one SHA-256 block) it runs once;
+	# a longer key runs it again.  Both are paths of the function.
+	subtest '_pbkdf2 path: one block (the production call) and two blocks (the RFC vectors)' => sub {
+		my $pbkdf2 = \&Database::BI::Password::_pbkdf2;
+		my $one = $pbkdf2->('password', 'salt', 1, 32);
+		my $two = $pbkdf2->('password', 'salt', 1, 64);
+		is length($one), 32, 'one block gives 32 bytes';
+		is length($two), 64, 'two blocks give 64 bytes';
+		is substr($two, 0, 32), $one, 'and the first block is the same either way';
+		is length($pbkdf2->('password', 'salt', 1, 20)), 20, 'a short key is the block cut down (the truncation path)';
+	};
+
+	# numeric_host / _numeric_v4: the long-octal arm (more than 11 digits is out of range).
+	subtest '_numeric_v4 path: an octal part too long to be an address' => sub {
+		my $numeric = \&Database::BI::SafeUA::numeric_host;
+		is $numeric->('0' . '7' x 12), undef, 'twelve octal digits: not an address (the length arm)';
+		is $numeric->('0' . '7' x 11), undef, 'eleven octal digits past 32 bits: refused by the range check, without a warning';
+		is $numeric->('0' . '7' x 3), '0.0.1.255', 'a short octal reads (the other arm)';
+		is $numeric->('0x' . 'f' x 9), undef, 'nine hex digits: not an address';
+	};
+
+	# resolve_host: getaddrinfo dies | gives an error | gives addresses (dup, bad name-info).
+	subtest 'resolve_host path: each way getaddrinfo can end' => sub {
+		my $addr = 'packed';
+		mock 'Database::BI::SafeUA::getaddrinfo' => sub { die "boom\n" };
+		is_deeply [ Database::BI::SafeUA::resolve_host('x.example') ], [], 'it dies: no addresses';
+		mock 'Database::BI::SafeUA::getaddrinfo' => sub { return () };
+		is_deeply [ Database::BI::SafeUA::resolve_host('x.example') ], [], 'it gives nothing (err undef): no addresses';
+		mock 'Database::BI::SafeUA::getaddrinfo' => sub { return ('Name or service not known') };
+		is_deeply [ Database::BI::SafeUA::resolve_host('x.example') ], [], 'it gives an error: no addresses';
+		my @names = ('8.8.8.8', '8.8.8.8', undef, '1.1.1.1');
+		mock 'Database::BI::SafeUA::getaddrinfo' => sub { return ('', map { { addr => $_ // 'none' } } 1 .. 4) };
+		my $n = 0;
+		mock 'Database::BI::SafeUA::getnameinfo' => sub { my $name = $names[$n++]; return (defined $name ? ('', $name) : ('error', undef)) };
+		is_deeply [ Database::BI::SafeUA::resolve_host('x.example') ], [ '8.8.8.8', '1.1.1.1' ], 'duplicates and failed name lookups are dropped';
+		restore_all();
+	};
+
+	# send_request: scheme ok? -> host ok? -> literal or resolved -> blocked? -> pin -> https options.
+	subtest 'send_request path: no scheme, no host, and the https options with and without ssl_opts' => sub {
+		my $ua = Database::BI::SafeUA->new(resolve => sub { '8.8.8.8' });
+		my @seen;
+		mock 'LWP::UserAgent::send_request' => sub { push @seen, { ssl => $_[0]{ssl_opts}, uri => $_[1]->uri->as_string }; HTTP::Response->new(200) };
+		is $ua->send_request(HTTP::Request->new(GET => '/just/a/path'))->code, 403, 'no scheme at all: refused';
+		like $ua->send_request(HTTP::Request->new(GET => '/just/a/path'))->message, qr/\ARefused: only http and https/, '... for its scheme';
+		like $ua->send_request(HTTP::Request->new(GET => 'http:relative'))->message, qr/\ARefused: the address names no host/, 'a scheme with no host: refused for that';
+		is scalar(@seen), 0, 'neither was sent';
+
+		is $ua->send_request(HTTP::Request->new(GET => 'https://public.example/'))->code, 200, 'https with no ssl_opts: sent';
+		is_deeply $seen[-1]{ssl}, { verify_hostname => 1, SSL_hostname => 'public.example', SSL_verifycn_name => 'public.example' }, '... with LWP\'s default and the name for SNI and the certificate check';
+		my $with = Database::BI::SafeUA->new(resolve => sub { '8.8.8.8' }, ssl_opts => { verify_hostname => 1 });
+		$with->send_request(HTTP::Request->new(GET => 'https://public.example/'));
+		is_deeply $seen[-1]{ssl}, { verify_hostname => 1, SSL_hostname => 'public.example', SSL_verifycn_name => 'public.example' }, 'with ssl_opts: kept, and the name added';
+		$with->send_request(HTTP::Request->new(GET => 'http://public.example/'));
+		is_deeply $seen[-1]{ssl}, { verify_hostname => 1 }, 'plain http: ssl_opts are left as they were';
+		restore_all();
+		is_deeply $with->{ssl_opts}, { verify_hostname => 1 }, 'and put back afterwards (the local)';
+	};
+
+	# I18N::choose: no accept | accept -> lingua_choice (defined | undef) -> default.
+	subtest 'I18N paths: choose, _lingua, language, from_locale and text' => sub {
+		is Database::BI::I18N::choose(accept => 'fr', default => 'en-us'), 'en-us', 'choose: lingua picks nothing, so the default (the // arm)';
+		is Database::BI::I18N::choose(accept => 'en-GB'), 'en', 'choose: lingua picks en';
+		is Database::BI::I18N::lingua_choice('en-US', [ 'en' ]), 'en', '_lingua: a region the list does not offer: the language alone';
+		is Database::BI::I18N::lingua_choice('en', [ 'en', 'en-us' ]), 'en', '_lingua: no region named: the language';
+		{
+			local $Database::BI::I18N::LANGUAGE;
+			is Database::BI::I18N::language(), 'en', 'language: unset is the base';
+			local $Database::BI::I18N::LANGUAGE = 'en-us';
+			is Database::BI::I18N::language(), 'en-us', 'language: set is what was set';
+		}
+		{
+			local @ENV{qw(LC_ALL LC_MESSAGES LANG)} = ('zz_ZZ.UTF-8', undef, undef);
+			delete @ENV{qw(LC_MESSAGES LANG)};
+			is Database::BI::I18N::from_locale(), 'en', 'from_locale: a locale lingua cannot read: the base (the // arm)';
+			is Database::BI::I18N::from_locale(), 'en', '... and again from the memo';
+		}
+		# text(): no key | British language | other language with own entry | without package | without key.
+		my %messages = (known => 'British', other => 'only British');
+		is Database::BI::I18N::text('P', \%messages, undef), undef, 'text: no key';
+		{
+			local $Database::BI::I18N::LANGUAGE = 'en';
+			is Database::BI::I18N::text('P', \%messages, 'known'), 'British', 'text: the base language';
+		}
+		local $Database::BI::I18N::LANGUAGE = 'en-us';
+		my $pkg = 'Database::BI::Controller::Dashboard';
+		like Database::BI::I18N::text($pkg, { warn_measure_fallback => 'x' }, 'warn_measure_fallback'), qr/totaled/, 'text: the language has its own entry';
+		is Database::BI::I18N::text($pkg, { error_nothing => 'British only' }, 'error_nothing'), 'British only', 'text: the package has no entry for the key';
+		is Database::BI::I18N::text('No::Such::Package', \%messages, 'known'), 'British', 'text: the package has no entry at all';
+		is Database::BI::I18N::text('No::Such::Package', \%messages, 'absent'), undef, 'text: neither has the key';
+	};
+
+	# Extract::new: dir given | cache_dir resolved | model_dir | none (croak).
+	subtest 'Extract::new paths: dir, empty dir, model_dir and the refusal' => sub {
+		my $dir = tempdir(CLEANUP => 1);
+		is(Database::BI::Extract->new(dir => $dir)->_extract_dir, $dir, 'dir names the folder outright');
+		my $from_model = Database::BI::Extract->new(dir => '', model_dir => $dir, config => {}, home => $dir);
+		like $from_model->_extract_dir, qr/\Q$dir\E/, 'an empty dir falls through to model_dir';
+		throws_ok { Database::BI::Extract->new(dir => undef, config => {}, home => $dir) } qr/\Amodel_dir is required/, 'no dir and no model_dir: the exact refusal';
+		throws_ok { Database::BI::Extract->new(model_dir => '', config => {}, home => $dir) } qr/\Amodel_dir is required/, 'an empty model_dir is as missing';
+		my $cached = Database::BI::Extract->new(cache_dir => $dir, model_dir => $dir, config => {}, home => $dir);
+		like $cached->_extract_dir, qr/\Q$dir\E.*database-bi-extracts/, 'a cache_dir wins: the extracts go under it';
+	};
+
+	# Extract::evict: no dir | dir (unlink ok | unlink fails) .
+	subtest 'Extract::evict paths: nothing there, files removed, and a file that cannot be removed' => sub {
+		my $dir = tempdir(CLEANUP => 1);
+		my $extract = Database::BI::Extract->new(dir => File::Spec->catdir($dir, 'absent'));
+		is $extract->evict('x'), 0, 'no folder: 0';
+		my $real = Database::BI::Extract->new(dir => $dir);
+		Mojo::File->new($dir, "a$_.db")->spew('x') for 1 .. 3;
+		Mojo::File->new($dir, 'keep.txt')->spew('x');
+		is $real->evict('x'), 3, 'three .db files removed and counted';
+		ok -e File::Spec->catfile($dir, 'keep.txt'), 'other files are left';
+		Mojo::File->new($dir, 'stuck.db')->spew('x');
+		SKIP: {
+			skip 'cannot revoke create here', 2 unless can_revoke_create($dir);
+			with_revoked('create', $dir, sub {
+				is $real->evict('x'), 0, 'a file that cannot be removed is not counted';
+			});
+			ok -e File::Spec->catfile($dir, 'stuck.db'), '... and is still there';
+		}
+	};
+
+	# Boundary::_outline_id: every gate in its order, then boundary | place | neither.
+	subtest 'Boundary::_outline_id paths: each gate refuses, then the three ways to accept' => sub {
+		my $id  = \&Database::BI::Model::Boundary::_outline_id;
+		my $try = { ranks => [ 10, 12 ] };
+		my $places = { ranks => [ 10, 18 ], places => 1 };
+		my $good = sub { return { osm_id => 5, place_rank => 12, category => 'boundary', type => 'administrative', osm_type => 'relation',
+			geojson => { type => 'Polygon', coordinates => [] }, @_ } };
+		is $id->($good->(), $try), 'R5', 'an administrative relation: R<id>';
+		my %refused = (
+			'no osm_id'            => $good->(osm_id => undef),
+			'osm_id not numeric'   => $good->(osm_id => 'x5'),
+			'no rank'              => $good->(place_rank => undef),
+			'rank a reference'     => $good->(place_rank => [ 12 ]),
+			'rank not numeric'     => $good->(place_rank => 'twelve'),
+			'rank below the range' => $good->(place_rank => 9),
+			'rank above the range' => $good->(place_rank => 13),
+			'geometry not a hash'  => $good->(geojson => 'x'),
+			'geometry has no type' => $good->(geojson => { coordinates => [] }),
+			'a Point'              => $good->(geojson => { type => 'Point', coordinates => [] }),
+			'no coordinates list'  => $good->(geojson => { type => 'Polygon', coordinates => 'x' }),
+			'a boundary, not admin'=> $good->(type => 'ceremonial'),
+			'no type at all'       => $good->(type => undef),
+			'a boundary way'       => $good->(osm_type => 'way'),
+			'no category'          => $good->(category => undef),
+			'no osm_type'          => $good->(osm_type => undef),
+		);
+		is $id->($refused{$_}, $try), undef, "refused: $_" for sort keys %refused;
+		is $id->($good->(category => 'place', type => 'city', osm_type => 'relation', place_rank => 16), $places), 'R5', 'a place relation, when the try takes places';
+		is $id->($good->(category => 'place', type => 'suburb', osm_type => 'way', place_rank => 16), $places), 'W5', 'a place way: W<id>';
+		is $id->($good->(category => 'place', type => 'suburb', osm_type => 'node', place_rank => 16), $places), undef, 'a place node (a point): not an outline';
+		is $id->($good->(category => 'place', type => 'city', osm_type => 'relation', place_rank => 12), $try), undef, 'a place, when the try does not take places';
+	};
+
+	# Boundary::_reverse: the user agent dies | answers badly | answers JSON of the wrong kind | answers.
+	subtest 'Boundary::_reverse paths: every way the reply can fail before a hash comes back' => sub {
+		my $b = Database::BI::Model::Boundary->new;
+		my $reverse = sub { my ($ua) = @_; $b->{ua} = $ua; return $b->_reverse(10, 20, $PATH{zoom_ok}) };
+		my $answer = sub { my ($ok, $body) = @_; bless { ok => $ok, body => $body }, 'Unit::PathReply' };
+		is $reverse->(bless { code => sub { die "down\n" } }, 'Unit::PathUA'), undef, 'the agent dies';
+		is $reverse->(bless { code => sub { 'a string' } }, 'Unit::PathUA'), undef, 'the answer is not an object';
+		is $reverse->(bless { code => sub { bless {}, 'Unit::NoSuccess' } }, 'Unit::PathUA'), undef, 'the object has no is_success';
+		is $reverse->(bless { code => sub { $answer->(0, '{}') } }, 'Unit::PathUA'), undef, 'an HTTP error';
+		is $reverse->(bless { code => sub { $answer->(1, undef) } }, 'Unit::PathUA'), undef, 'no body (decoded_content undef)';
+		is $reverse->(bless { code => sub { $answer->(1, 'not json') } }, 'Unit::PathUA'), undef, 'a body that is not JSON';
+		is $reverse->(bless { code => sub { $answer->(1, '[1]') } }, 'Unit::PathUA'), undef, 'JSON that is a list';
+		is_deeply $reverse->(bless { code => sub { $answer->(1, '{"a":1}') } }, 'Unit::PathUA'), { a => 1 }, 'JSON that is an object: returned';
+		# With no agent given, the shared Nominatim one is asked.
+		delete $b->{ua};
+		mock 'Database::BI::Model::Geocode::nominatim_ua' => sub { bless { code => sub { $answer->(1, '{"shared":1}') } }, 'Unit::PathUA' };
+		is_deeply $b->_reverse(10, 20, $PATH{zoom_ok}), { shared => 1 }, 'no ua given: Geocode::nominatim_ua is used';
+		restore_all();
+	};
+
+	# Boundary::_bounds: no polygon | empty outer ring | points that move each of the four extremes.
+	subtest 'Boundary::_bounds paths: nothing, an empty ring, and every extreme taken from both sides' => sub {
+		my $bounds = \&Database::BI::Model::Boundary::_bounds;
+		is $bounds->(undef), undef, 'no geometry';
+		is $bounds->({ type => 'Polygon', coordinates => [] }), undef, 'a polygon with no rings';
+		is $bounds->({ type => 'Polygon', coordinates => [ [] ] }), undef, 'a polygon whose outer ring is empty';
+		is_deeply $bounds->({ type => 'Polygon', coordinates => [ [ [ 5, 6 ] ] ] }), [ 6, 5, 6, 5 ], 'one point: all four extremes';
+		# Each later point lowers or raises one extreme, and one leaves all four alone.
+		my $ring = [ [ 5, 6 ], [ 4, 7 ], [ 6, 5 ], [ 5, 6 ], [ 3, 8 ], [ 7, 4 ] ];
+		is_deeply $bounds->({ type => 'Polygon', coordinates => [ $ring ] }), [ 4, 3, 8, 7 ], 'south, west, north, east each both set and left alone';
+		is_deeply $bounds->({ type => 'MultiPolygon', coordinates => [ [ [ [ 1, 1 ] ] ], [ [ [ 9, 9 ] ] ] ] }), [ 1, 1, 9, 9 ], 'a MultiPolygon spans its polygons';
+	};
+
+	# Boundary::_plan: country (undef | reference | code) x level (county rank | plans | tries).
+	subtest 'Boundary::_plan paths: country normalising and the three kinds of plan' => sub {
+		my $county = Database::BI::Model::Boundary->new(ranks => { lk => 10 });
+		is_deeply $county->_plan(undef), [ { zoom => 8, ranks => [ 12, 12 ] } ], 'county, no country: the default rank';
+		is_deeply $county->_plan([ 'lk' ]), $county->_plan(undef), 'a reference is no country';
+		is_deeply $county->_plan('LK'), [ { zoom => 6, ranks => [ 10, 10 ] } ], 'a country with its own rank, in any case';
+		my $city = Database::BI::Model::Boundary->new(level => 'city');
+		is_deeply $city->_plan('xx'), $city->_plan(undef), 'city, a country with no plan of its own: the level tries';
+		isnt $city->_plan('nz'), $city->_plan(undef), 'city, a country with its own plan (New Zealand)';
+	};
+
+	# Boundary::_current: not a hash | no rank | no/other detail | detail ok.
+	subtest 'Boundary::_current paths: each reason an outline is not current' => sub {
+		my $b = Database::BI::Model::Boundary->new;
+		my $detail = $b->_detail;
+		is $b->_current(undef), 0, 'undef';
+		is $b->_current('x'), 0, 'not a hash';
+		is $b->_current({ detail => $detail }), 0, 'no rank';
+		is $b->_current({ rank => 12 }), 0, 'no detail (the // arm)';
+		is $b->_current({ rank => 12, detail => 'other' }), 0, 'another detail';
+		is $b->_current({ rank => 12, detail => $detail }), 1, 'rank and detail as now: current';
+		is $b->_current({ rank => 8, detail => $detail }), 0, 'a rank the plan no longer takes';
+	};
+
+	# Boundary::_can_ask and _ask: no agent | a later try that fails | a nameless reply | a shape with no points.
+	subtest 'Boundary paths: _can_ask without an agent, and the rarer ends of _ask' => sub {
+		my $class = 'Database::BI::Model::Boundary';
+		mock 'Database::BI::Model::Geocode::nominatim_ua' => sub { undef };
+		my $none = $class->new(online => 1, cache => bless({ store => {} }, 'Unit::ForgetfulCache'));
+		is $none->lookup_point('10.500,20.500')->{asked}, 0, 'online but no agent to ask with: not asked (_can_ask false)';
+		is $none->lookup_point('10.500,20.500')->{status}, 'held', '... so the point is held';
+		restore_all();
+
+		# An agent that answers by script: one reply per call, then the last again.
+		my $scripted = sub {
+			my @replies = @_;
+			my $n = 0;
+			return bless { code => sub { my $r = $replies[ $n < @replies ? $n++ : $#replies ]; $r } }, 'Unit::PathUA';
+		};
+		my $json = sub { my ($data) = @_; return bless { ok => 1, body => JSON::PP->new->canonical->encode($data) }, 'Unit::PathReply' };
+		my $failure = bless { ok => 0, body => '' }, 'Unit::PathReply';
+		my $polygon = { type => 'Polygon', coordinates => [ [ [ 20, 10 ], [ 21, 10 ], [ 21, 11 ], [ 20, 11 ], [ 20, 10 ] ] ] };
+		my $area = sub { return { osm_id => 7, osm_type => 'relation', category => 'boundary', type => 'administrative', place_rank => 12,
+			geojson => $polygon, address => { country_code => 'xx' }, name => 'Seven', display_name => 'Seven, Somewhere', @_ } };
+
+		# The first reply names a country whose plan starts at another zoom: the second ask fails.
+		my $us_then_fail = $class->new(online => 1, ranks => { xx => 10 }, cache => bless({ store => {} }, 'Unit::ForgetfulCache'), ua => $scripted->($json->($area->(place_rank => 4)), $failure));
+		is $us_then_fail->lookup_point('10.500,20.500')->{status}, 'held', 'a later reverse lookup that fails: the point is held, not decided';
+
+		my $nameless = $class->new(online => 1, cache => bless({ store => {} }, 'Unit::ForgetfulCache'), ua => $scripted->($json->($area->(name => '', display_name => 'Seven, Somewhere'))));
+		is $nameless->lookup_point('10.500,20.500')->{status}, 'found', 'a reply with no name is still an outline';
+		my %cache;
+		my $recording = bless { store => \%cache, keep_outlines => 1 }, 'Unit::ForgetfulCache';
+		my $named = $class->new(online => 1, cache => $recording, ua => $scripted->($json->($area->(name => '', display_name => 'Seven, Somewhere'))));
+		$named->lookup_point('10.500,20.500');
+		is $cache{'outline:R7:' . $named->_detail}{name} // $cache{'outline:R7'}{name}, 'Seven, Somewhere', 'its name is the display name (the fallback arm)';
+
+		my $empty_ring = $area->(geojson => { type => 'Polygon', coordinates => [ [] ] });
+		my %cache2;
+		my $no_box = $class->new(online => 1, cache => bless({ store => \%cache2, keep_outlines => 1 }, 'Unit::ForgetfulCache'), ua => $scripted->($json->($empty_ring)));
+		is $no_box->lookup_point('10.500,20.500')->{status}, 'found', 'a shape with no points is accepted';
+		is_deeply $no_box->_index, [], '... but adds nothing to the index (no bounding box)';
+	};
+
+	# lookup_point / outlines: an outline the cache will not give back.
+	subtest 'Boundary paths: a cache that forgets outlines' => sub {
+		require BI::Test::Boundary;
+		my $ua = BI::Test::Boundary->new(areas => [ { name => 'Ten', id => 1, box => [ 9, 19, 11, 21 ] } ]);
+		my %store;
+		my $cache = bless { store => \%store }, 'Unit::ForgetfulCache';
+		BI::Test::Boundary::with_ua($ua, sub {
+			my $b = Database::BI::Model::Boundary->new(online => 1, cache => $cache);
+			my $answer = $b->lookup_point('10.500,20.500');
+			is $answer->{status}, 'found', 'a found point, though its outline was not kept';
+			is $answer->{name}, undef, '... has no name to give (the no-outline arm)';
+			my $drawn = $b->outlines([ [ 10.5, 20.5 ] ], lookup => 0);
+			is scalar(@{ $drawn->{features} }), 0, 'outlines: the missing outline is skipped, not fatal (the next arm)';
+		});
+	};
+}
 
 done_testing;

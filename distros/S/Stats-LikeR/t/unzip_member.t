@@ -48,6 +48,9 @@ require IO::Uncompress::Unzip;
 my $dir = tempdir(CLEANUP => 1);
 my $seq = 0;
 
+# The message a block dies with, or undef when it does not.
+sub dies { my ($c) = @_; eval { $c->(); 1 } ? undef : $@ }
+
 # One archive from a list of [ name, content, %member_options ]. newStream()
 # keeps it a single archive with one central directory covering every member,
 # which is what a real writer produces.
@@ -219,27 +222,33 @@ my $noise = pack('C*', map { ($_ * 37 + 11) % 256 } 1 .. 5000);
 	unchanged($p, 'two.xml', 'concatenated archives, second member');
 }
 
-# Things that are not archives at all. What matters is that _unzip_member still
-# answers what it answered before, which is not the same as "no content":
-# IO::Uncompress defaults to `Transparent => 1', so a file that is not an
-# archive comes back as its own raw bytes rather than failing. _parse_xlsx_sheet
-# then finds no <sheetData> in them and read_table comes back empty. That has
-# been the behaviour all along; the fast path declines these and changes none
-# of it.
+# Things that are not archives at all, or not whole ones. Up to 0.3427 the fast
+# path declined these and IO::Uncompress::Unzip, whose default is
+# `Transparent => 1', handed a file that is not an archive back as its own raw
+# bytes, so a text file named x.xlsx read as an empty table and a truncated
+# archive as one with no rows. They die now, naming the file; pandas raises
+# (zipfile.BadZipFile) on the same files.
 {
 	my $plain = "$dir/plain.txt";
 	open my $fh, '>', $plain or die "cannot write $plain: $!";
 	binmode $fh;
 	print {$fh} $text or die "cannot write $plain: $!";
 	close $fh or die "cannot write $plain: $!";
-	unchanged($plain, 'any', 'a file that is not an archive');
+	like( dies(sub { Stats::LikeR::_unzip_member($plain, 'any') }),
+		qr/\Aread_table: '\Q$plain\E' is not a readable \.xlsx workbook: it has no zip end-of-central-directory record/,
+		'a file that is not an archive dies, naming the file' );
 
-	unchanged("$dir/no.such.file", 'any', 'a file that does not exist');
+	my $absent = "$dir/no.such.file";
+	like( dies(sub { Stats::LikeR::_unzip_member($absent, 'any') }),
+		qr/\Aread_table: cannot open '\Q$absent\E': /,
+		'a file that does not exist dies' );
 
 	my $nil = "$dir/nil.zip";
 	open my $n, '>', $nil or die "cannot write $nil: $!";
 	close $n or die "cannot write $nil: $!";
-	unchanged($nil, 'any', 'an empty file');
+	like( dies(sub { Stats::LikeR::_unzip_member($nil, 'any') }),
+		qr/is not a readable \.xlsx workbook: it is too short/,
+		'an empty file dies' );
 
 	# a real archive with its last 40 bytes cut off, so the
 	# end-of-central-directory record is gone
@@ -254,7 +263,9 @@ my $noise = pack('C*', map { ($_ * 37 + 11) % 256 } 1 .. 5000);
 	print {$out} substr($bytes, 0, length($bytes) - 40)
 		or die "cannot write $cut: $!";
 	close $out or die "cannot write $cut: $!";
-	unchanged($cut, 't.xml', 'a truncated archive');
+	like( dies(sub { Stats::LikeR::_unzip_member($cut, 't.xml') }),
+		qr/it has no zip end-of-central-directory record/,
+		'a truncated archive dies' );
 }
 
 # End to end: read_table over a workbook whose central directory is intact, so

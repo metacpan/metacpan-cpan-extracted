@@ -6,7 +6,7 @@ Protobuf::Internal::Map - Internal XS implementation for map fields
 
 =head1 VERSION
 
-version 0.11
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -15,7 +15,27 @@ version 0.11
 
 =head1 DESCRIPTION
 
-This module provides the internal XS implementation for Protobuf map fields. It uses L<Tie::Hash> to provide a hash-like interface to the underlying C<upb_Map> data structure.
+C<Protobuf::Internal::Map> provides the internal tied-hash implementation for
+Protocol Buffers C<mapE<lt>K, VE<gt>> fields backed by the C<upb_Map> C
+structure. Standard hash operations (C<FETCH>, C<STORE>, C<DELETE>, C<EXISTS>,
+C<CLEAR>, C<SCALAR>) are implemented in XS, while iteration (C<FIRSTKEY>,
+C<NEXTKEY>) and bulk conversion helpers (C<as_hash>, C<copy_from>) are
+implemented in Perl.
+
+=head1 METHODS
+
+=head2 as_hash()
+
+Returns a plain Perl hashref copy of all key-value pairs currently in the map.
+
+=head2 copy_from($other)
+
+Clears the map and copies all entries from C<$other> (another map field or
+plain hashref).
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Protobuf::Internal::Repeated>
 
 =cut
 
@@ -25,7 +45,7 @@ use strict;
 require Protobuf;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 
 use Protobuf::Internal::MapIterator;

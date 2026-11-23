@@ -674,6 +674,17 @@ subtest '_validate_input_positions' => sub {
 		})
 	} 'valid contiguous positions';
 
+	# A parameter after the positional arguments is a named option, and
+	# says so with named: 1 (sub f { my ($x, %opts) = @_ }).
+	lives_ok {
+		$fn->({
+			input => {
+				a => { type => 'string', position => 0 },
+				b => { type => 'string', named   => 1 },
+			}
+		})
+	} 'a trailing named option lives';
+
 	# Duplicate position numbers always croak
 	throws_ok {
 		$fn->({
@@ -684,7 +695,8 @@ subtest '_validate_input_positions' => sub {
 		})
 	} qr/Duplicate position/, 'duplicate positions croak';
 
-	# If any param has a position, all must have one — missing one croaks
+	# A parameter with neither a position nor named: 1 is a forgotten one —
+	# calling it by name would test nothing.
 	throws_ok {
 		$fn->({
 			input => {
@@ -885,7 +897,7 @@ subtest '_get_semantic_generators' => sub {
 	my @expected = qw(
 		email url uuid phone_us phone_e164 ipv4 ipv6
 		username slug hex_color iso_date iso_datetime
-		semver jwt json base64 md5 sha256 unix_timestamp
+		semver jwt json base64 md5 sha256 unix_timestamp bytes
 	);
 	for my $type (@expected) {
 		ok(exists $generators->{$type}, "$type generator present");

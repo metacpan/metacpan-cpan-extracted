@@ -46,7 +46,7 @@ BEGIN {
 package main;
 use Google::Cloud::Dataplex::V1::DataScanServiceClient;
 
-my $client = Google::Cloud::Dataplex::V1::DataScanServiceClient->new( credentials => 'dummy' );
+my $client = Google::Cloud::Dataplex::V1::DataScanServiceClient->new();
 ok($client, 'Instantiated generated client');
 isa_ok($client->transport, 'Google::gRPC::Client', 'Client transport');
 

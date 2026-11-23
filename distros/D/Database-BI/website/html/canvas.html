@@ -251,7 +251,8 @@
 
 <h2>Exporting from a canvas</h2>
 <p>
-	Each card can save itself whole &mdash; SVG, PNG or a one-page PDF &mdash; including
+	Each card (like each chart page) asks where to save and what to call the file,
+	in browsers that can, and otherwise downloads it. Each card can save itself whole &mdash; SVG, PNG or a one-page PDF &mdash; including
 	the parts that hang outside the viewBox, such as rotated axis labels. A pie's
 	HTML legend is drawn into the saved copy, and a map or table card keeps the
 	image buttons hidden because there is no chart to save. A card's data can

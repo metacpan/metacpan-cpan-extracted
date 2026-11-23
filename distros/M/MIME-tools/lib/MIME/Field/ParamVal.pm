@@ -80,7 +80,7 @@ use MIME::Tools qw(:config :msgs);
 #------------------------------
 
 # The package version, both in 1.23 style *and* usable by MakeMaker:
-$VERSION = "5.522";
+$VERSION = "5.523";
 
 
 #------------------------------
@@ -254,7 +254,7 @@ sub parse_params {
 	$raw =~ m/\G([^;]*)(\;$SPCZ)+/ogc or last;             # skip leading separator
 	my $leftover = $1;
 	# a comment still open at this ";" hides it from other readers
-	$params{'@unparsed_parameters'} = 1 if $leftover =~ /\([^)]*\z/;
+	$params{'@unparsed_parameters'} = 1 if rindex($leftover, '(') > rindex($leftover, ')');
 	# an odd '"' here makes readers that count quotes split elsewhere
 	$params{'@unparsed_parameters'} = 1 if ($leftover =~ tr/"//) % 2;
 	$saw_semicolon = 1;

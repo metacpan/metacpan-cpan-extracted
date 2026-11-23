@@ -235,11 +235,7 @@ has focus, then press Enter or Space to toggle it.</p>
     biBrandSvg(clone);
     var src = '<?xml version="1.0" encoding="UTF-8"?>\n'
             + new XMLSerializer().serializeToString(clone);
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([src], { type: 'image/svg+xml;charset=utf-8' }));
-    a.download = 'chart.svg';
-    a.click();
-    URL.revokeObjectURL(a.href);
+    biSaveFile(new Blob([src], { type: 'image/svg+xml;charset=utf-8' }), 'chart.svg');
   }
   function drawExportCanvas(scale, done) {
     var svg = document.getElementById('chart');
@@ -282,10 +278,7 @@ has focus, then press Enter or Space to toggle it.</p>
   }
   function biExportPNG() {
     drawExportCanvas(1, function (canvas) {
-      var a = document.createElement('a');
-      a.href = biBrandCanvas(canvas, 1).toDataURL('image/png');
-      a.download = 'chart.png';
-      a.click();
+      biSavePNG(biBrandCanvas(canvas, 1), 'chart.png');
     });
   }
   function biExportPDF() {

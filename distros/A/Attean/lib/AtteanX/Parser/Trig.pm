@@ -10,7 +10,7 @@ AtteanX::Parser::Trig - Trig RDF Parser
 
 =head1 VERSION
 
-This document describes AtteanX::Parser::Trig version 0.040
+This document describes AtteanX::Parser::Trig version 0.041
 
 =head1 SYNOPSIS
 
@@ -57,7 +57,7 @@ A boolean indicating whether term values should be canonicalized during parsing.
 
 =cut
 
-package AtteanX::Parser::Trig 0.040 {
+package AtteanX::Parser::Trig 0.041 {
 	use Moo;
 	use Types::Standard qw(Bool ArrayRef HashRef Str Maybe InstanceOf);
 	use Types::Namespace qw( NamespaceMap );
@@ -75,10 +75,10 @@ package AtteanX::Parser::Trig 0.040 {
 	
 	extends 'AtteanX::Parser::Turtle';
 
-	sub canonical_media_type { return "text/trig" }
+	sub canonical_media_type { return "application/trig" }
 
 	sub media_types {
-		return [qw(text/trig)];
+		return [qw(text/trig application/trig)];
 	}
 
 	sub file_extensions { return [qw(trig)] }

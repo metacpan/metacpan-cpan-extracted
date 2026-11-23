@@ -17,9 +17,10 @@ use HTTP::Message::PSGI;
 use Data::Dumper;
 use Encode qw(encode encode_utf8);
 use Getopt::Long;
+use Module::Load::Conditional qw(can_load);
 use Regexp::Common qw /URI/;
 use Scalar::Util qw(blessed reftype);
-use List::Util qw(all);
+use List::Util qw(all any);
 use Test::More;
 use Text::CSV;
 use Try::Tiny;
@@ -31,74 +32,87 @@ require XML::Simple;
 my $XSD		= 'http://www.w3.org/2001/XMLSchema#';
 my $RDF		= 'http://www.w3.org/1999/02/22-rdf-syntax-ns#';
 my $RDFS	= 'http://www.w3.org/2000/01/rdf-schema#';
+my $RDFT	= 'http://www.w3.org/ns/rdftest#';
 my $RS		= 'http://www.w3.org/2001/sw/DataAccess/tests/result-set#';
 my $MF		= 'http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#';
 my $UT		= 'http://www.w3.org/2009/sparql/tests/test-update#';
 my $RQ		= 'http://www.w3.org/2001/sw/DataAccess/tests/test-query#';
 my $DAWGT	= 'http://www.w3.org/2001/sw/DataAccess/tests/test-dawg#';
+my $FORMATS	= 'http://www.w3.org/ns/formats/';
+
+my $direct			= iri('http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#DirectGraphIdentification');
+my $indirect		= iri('http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#IndirectGraphIdentification');
+my $post_creation	= iri('http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#POSTGraphCreation');
 
 with 'Test::Attean::W3CManifestTestSuite';
 
 sub manifest_paths {
 	my $self	= shift;
-
 	my $dir		= $self->tests_dir;
 	unless (defined($dir)) {
 		plan skip_all => "No manifest directory given";
 		exit(0);
 	}
 	
-	my $manifest	= File::Spec->catfile($dir, 'manifest.ttl');
-	if (-r $manifest) {
-		return ($manifest);
-	} else {
-		die "Manifest is not readable: $manifest\n";
+	unless (-d $dir and -r $dir) {
+		plan skip_all => "Manifest directory not readable: $dir";
+		exit(1);
 	}
+	
+	my $manifest	= File::Spec->catfile($dir, 'manifest.ttl');
+	my $manifestall	= File::Spec->catfile($dir, 'manifest-all.ttl');
+	my @manifests	= grep { -r $_ } ($manifest, $manifestall);
+	unless (scalar(@manifests)) {
+		die "No readable manifest: $dir\n";
+	}
+	return @manifests;
 }
 
-sub recursively_find_manifest_files {
+# Look up the test in the model, and determine:
+# 
+# * the test type (eval, syntax, prot, gsp, or sd)
+# * whether the test is a query test
+# * whether the test is an update test
+# * whether the test is a negative test (implies a syntax test)
+#
+# If the test is not a recognized type, this method dies. Calling code is responsible
+# for catching that error and properly recording a test failure.
+sub query_test_type {
 	my $self		= shift;
-	my $manifest	= shift;
-
-	my $model		= $self->memory_model();
-	my $class		= Attean->get_parser("turtle") || die "Failed to load parser for 'turtle'";
-
-	my %loaded;
+	my $model		= shift;
+	my $test		= shift;
 	
-	my %manifests;
-	my %manifest_files	= ($manifest => 1);
-	my @load	= map { iri("file://" . File::Spec->rel2abs($_)) } ($manifest);
-	while (scalar(@load)) {
-		foreach my $iri (@load) {
-# 			warn "Loading " . $iri->value . "\n" if ($self->debug);
-			$loaded{ $iri->value }++;
-		}
-		$model->load_urls_into_graph($self->default_graph, @load);
-		@load	= ();
+	my %types		= map { $_->value => $_ } $model->type_hierarchy( $test );
+# 	warn $test->value . ' has types: ' . join(', ', keys %types);
 
-		my $subjects = $model->subjects( iri("${RDF}type"), iri("${MF}Manifest") );
-		my @manifest_matches	= $subjects->elements;
-		foreach my $m (@manifest_matches) {
-			if (not exists $manifests{ $m->value }) {
-				$manifests{ $m->value }	= $m;
-				my @list_heads	= $model->objects( $m, iri("${MF}include") )->elements;
-				my @elements	= map { $model->get_list(undef, $_)->elements() } @list_heads;
-				my @new			= grep { not exists($loaded{$_->value}) } @elements;
-				push(@load, @new);
-				foreach my $n (@new) {
-					my $url	= $n->value;
-					$url	=~ s{file://}{};
-					$manifest_files{ $url }++;
-				}
-			}
-		}
+	my $is_eval		= $types{ "${MF}TestEval" };
+	my $is_syntax	= $types{ "${MF}TestSyntax" };
+	my $is_prot		= $types{ "${MF}ProtocolTest" };
+	my $is_gsp		= $types{ "${MF}GraphStoreProtocolTest" };
+	my $is_sd		= $types{ "${MF}ServiceDescriptionTest" };
+	
+	my $is_query	= any { $types{ "${MF}$_" } or $types{ "${UT}$_" } } qw(QueryEvaluationTest PositiveSyntaxTest PositiveSyntaxTest11 NegativeSyntaxTest NegativeSyntaxTest11 CSVResultFormatTest);
+	my $is_update	= any { $types{ "${MF}$_" } or $types{ "${UT}$_" } } qw(UpdateEvaluationTest PositiveUpdateSyntaxTest PositiveUpdateSyntaxTest11 NegativeUpdateSyntaxTest NegativeUpdateSyntaxTest11);
+	
+	my $is_neg		= any { /Negative/ } keys %types;
+	$is_syntax++	if ($is_neg); # to avoid having to do multiple subClassOf hops on these tests to find rdft:TextSyntax
+	
+	my $type;
+	$type	= 'eval' if ($is_eval);
+	$type	= 'syntax' if ($is_syntax);
+	$type	= 'prot' if ($is_prot);
+	$type	= 'gsp' if ($is_gsp);
+	$type	= 'sd' if ($is_sd);
+
+	unless (defined($type)) {
+		my $types	= join(',', keys %types);
+		die "Unhandled type for " . $test->value . " ; types=$types";
 	}
 	
-	return keys %manifest_files;
+	return ($type, $is_query, $is_update, $is_neg);
 }
 
 ###############################################################################
-
 
 Test::Roo::top_test 'SPARQL tests' => sub {
 	my $self		= shift;
@@ -118,70 +132,74 @@ Test::Roo::top_test 'SPARQL tests' => sub {
 			}
 		}
 		my ($list)		= $model->objects( $m, iri("${MF}entries") )->elements;
-# 		unless (blessed($list)) {
-# 			warn "No mf:entries found for manifest " . $m->as_string . "\n" if ($self->debug);
-# 		}
 		my @tests	= $model->get_list( $self->default_graph, $list )->elements;
 		foreach my $test (@tests) {
-			unless ($test->value =~ /$PATTERN/) {
-				next;
-			}
-# 			if ($LIST_TESTS) {
-# 				say $test->value;
-# 			}
-			if ($self->run_query_tests) {
-				{
-					# Evaluation Tests
-					my $et	= $model->count_quads($test, iri("${RDF}type"), iri("${MF}QueryEvaluationTest"));
-					my $ct	= $model->count_quads($test, iri("${RDF}type"), iri("${MF}CSVResultFormatTest"));
-					if ($et + $ct) {
-						my ($name)	= $model->objects( $test, iri("${MF}name") )->elements;
-						warn "### query eval test: " . $test->as_string . " >>> " . $name->value . "\n" if ($self->debug);
-						$self->query_eval_test( $model, $test, specVersion => $specVersion );
-					}
+			SKIP: {
+				unless ($test->value =~ /$PATTERN/) {
+					next;
 				}
-				
-				{
-					# Syntax Tests
-					my $total	= 0;
-					foreach my $type (qw(PositiveSyntaxTest PositiveSyntaxTest11 NegativeSyntaxTest NegativeSyntaxTest11)) {
-						$total	+= $model->count_quads($test, iri("${RDF}type"), iri("${MF}$type"));
-					}
-
-					if ($total) {
-						my ($name)	= $model->objects( $test, iri("${MF}name") )->elements;
-						warn "### query syntax test: " . $test->as_string . " >>> " . $name->value . "\n" if ($self->debug);
-						$self->sparql_syntax_test( 'query', $model, $test, specVersion => $specVersion );
-					}
-				}
-			}
-			
-			if ($self->run_update_tests) {
-				{
-					# Evaluation Tests
-					if ($model->count_quads($test, iri("${RDF}type"), iri("${UT}UpdateEvaluationTest")) or $model->count_quads($test, iri("${RDF}type"), iri("${MF}UpdateEvaluationTest"))) {
-						my ($name)	= $model->objects( $test, iri("${MF}name") )->elements;
-						unless ($test->value =~ /$PATTERN/) {
-							next;
+	
+				my ($test_type, $is_query_test, $is_update_test, $is_neg)	= $self->query_test_type($model, $test);
+				if ($is_query_test) {
+					my ($name)	= $model->objects( $test, iri("${MF}name") )->elements;
+					if ($self->run_query_tests) {
+						if ($test_type eq 'eval') {
+							# Evaluation Tests
+							warn "### query eval test: " . $test->as_string . " >>> " . $name->value . "\n" if ($self->debug);
+							$self->query_eval_test( $model, $test, specVersion => $specVersion );
+						} elsif ($test_type eq 'syntax') {
+							# Syntax Tests
+							warn "### query syntax test: " . $test->as_string . " >>> " . $name->value . "\n" if ($self->debug);
+							$self->sparql_syntax_test( 'query', $model, $test, specVersion => $specVersion );
 						}
-						warn "### update eval test: " . $test->as_string . " >>> " . $name->value . "\n" if ($self->debug);
-						$self->update_eval_test( $model, $test, specVersion => $specVersion );
 					}
+					next;
+				} elsif ($is_update_test) {
+					my ($name)	= $model->objects( $test, iri("${MF}name") )->elements;
+					if ($self->run_update_tests) {
+						if ($test_type eq 'eval') {
+							# Evaluation Tests
+							warn "### update eval test: " . $test->as_string . " >>> " . $name->value . "\n" if ($self->debug);
+							$self->update_eval_test( $model, $test, specVersion => $specVersion );
+						} elsif ($test_type eq 'syntax') {
+							# Syntax Tests
+							warn "### query syntax test: " . $test->as_string . " >>> " . $name->value . "\n" if ($self->debug);
+							$self->sparql_syntax_test( 'update', $model, $test, specVersion => $specVersion );
+						}
+					}
+					next;
+				} elsif ($test_type eq 'prot' or $test_type eq 'gsp' or $test_type eq 'sd') {
+					unless (can_load( modules => { 'AtteanX::Endpoint' => 0, 'LWP::Protocol::PSGI' => 0 })) {
+						$self->record_result('unhandled', 0, $test->as_string);
+						my $type	= ($test_type eq 'prot') ? 'Protocol' : 'GSP';
+						skip("${type} test is not handled (cannot load necessary modules; ensure AtteanX::Endpoint and LWP::Protocol::PSGI are available)");
+						next;
+					}
+					
+					if ($test_type eq 'sd') {
+# 						$self->record_result('unhandled', 0, $test->as_string);
+# 						skip("Service Description test is not handled");
+						$self->sparql_service_description_test($model, $test, specVersion => $specVersion);
+					} else {
+						if ($test_type eq 'gsp') {
+							my (@requirements)		= $model->objects($test, iri("${MF}requires"))->elements;
+							foreach my $r (@requirements) {
+								skip("Not configured to run GSP direct-identification tests") if ($direct->equals($r) and not($self->run_gsp_direct));
+								skip("Not configured to run GSP indirect-identification tests") if ($indirect->equals($r) and not($self->run_gsp_indirect));
+								skip("Not configured to run GSP tests requiring POST to create fresh graph names") if ($post_creation->equals($r) and not($self->run_gsp_postcreate));
+							}
+						
+						}
+						
+						subtest $test->value => sub {
+							$self->sparql_protocol_test($test_type, $model, $test, specVersion => $specVersion);
+						};
+					}
+					next;
 				}
-				
-				{
-					# Syntax Tests
-					my $total	= 0;
-					foreach my $type (qw(PositiveUpdateSyntaxTest PositiveUpdateSyntaxTest11 NegativeUpdateSyntaxTest NegativeUpdateSyntaxTest11)) {
-						$total	+= $model->count_quads($test, iri("${RDF}type"), iri("${MF}$type"));
-					}
-
-					if ($total) {
-						my ($name)	= $model->objects( $test, iri("${MF}name") )->elements;
-						warn "### query syntax test: " . $test->as_string . " >>> " . $name->value . "\n" if ($self->debug);
-						$self->sparql_syntax_test( 'update', $model, $test, specVersion => $specVersion );
-					}
-				}
+	
+				diag("Test is not handled: " . $test->value);
+				$self->record_result('unhandled', 0, $test->as_string);
 			}
 		}
 	}

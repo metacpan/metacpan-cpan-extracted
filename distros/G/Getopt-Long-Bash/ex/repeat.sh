@@ -12,7 +12,7 @@ declare -A OPTS=(
 )
 trace() { [[ $2 ]] && set -x || set +x ; }
 
-. "$(dirname $0)"/getoptlong.sh OPTS "$@"
+. "$(dirname "$0")"/getoptlong.sh OPTS "$@"
 
 column=$(command -v column) || column=cat
 (( debug >= 3 )) && dumpopt=(--all) filter=$column

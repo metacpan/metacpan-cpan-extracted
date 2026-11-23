@@ -7,6 +7,21 @@ Versions up to 0.17 were released from `Changes`, before this file existed.
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-11-22
+
+- Fix the methods that take a mailing list address, a member address or a template name: the value went into the URL path as it was, so one with `?`, `#`, `/` or `%` (all allowed in an e-mail address) sent the request to another URL. Such characters are now percent-encoded; `@`, `+` and the others a path segment can hold go out as before. Pass the address as it is: one already percent-encoded is encoded again. A missing (undefined or empty) address or name now dies instead of asking for another URL, such as `list(undef)` for every list (#34)
+- Fix the methods dying without `RaiseError` on a response they did not expect: a failure whose body was JSON but not an object, a success whose body was not a JSON object, and a page of `lists()` / `list_members()` / `event()` without its list of items or without `paging.next`. Each of the first three is now a failure like any other (`error` and `error_status` are set, and it dies only with `RaiseError`), and a page without items gives its URL as the second value, as a failed request does. A page without `paging.next` is taken as the last one, and the second value is its own URL (never `undef`, which `event()` would take as a query for every event). A `paging.next` that points back to a page already fetched stops there as a failure, instead of going round for ever. A success with an empty body (`204 No Content`) returns an empty hash reference (#35)
+- `message()` takes several values of a key in an array reference, such as `to => ['a@example.com', 'b@example.com']` or `'o:tag' => [...]`, and sends the key once for each. It used to die, taking the array reference for a file and opening a file named after the first address. Under `attachment` and `inline`, an array reference is still a file, and an array reference of those is several files. An empty array reference dies instead of leaving the key out (#36)
+- Add the AU region: `region => 'au'` sends the requests to `api.au.mailgun.net` (#37)
+- **Breaking:** The second value of `event()`, `lists()` and `list_members()` no longer carries the API key, so that it can be kept (for Event Polling) or logged without the key. Passing it back to `event()` works as before: `event()` sets the key. Code that took the key out of that URL, or fetched it with another client, has to set the key itself. A `paging.next` that is not an https URL on the API's host is now a failure rather than a URL the key is sent to, as for `event($url)`, and the message of `event($url)` refusing a URL no longer shows its API key (#38)
+- `mime()` no longer changes the hash reference it is given, so the same one can be passed again; the second call used to send a broken message (`message`) or none (`file`). A MIME message given as a string goes in the request from memory, with no temporary file. Like `message()`, it takes several values of a key in an array reference (`to => [...]`). Giving both `message` and `file` dies, instead of sending the path of `file` as a field (#39)
+- `message()` and `mime()` send a decoded string (one with the UTF-8 flag) encoded in UTF-8. One with a character above `0xFF` used to die in HTTP::Request::Common, and one with only characters below `0x100` went out in Latin-1. A string of bytes is sent as it is (#39)
+- Add `timeout` to `new()`: the seconds a request may take, given to Furl (its default is 10), for large attachments over a slow connection (#40)
+- `lists()` and `list_members()` take an optional hash reference of the query, such as `limit`, and `subscribed` for the members. A key of the query that `paging.next` leaves out is put back on the later pages, so that they are filtered the same way. Anything but a hash reference there now dies; it used to be ignored (#41)
+- `get_message_from_event()` sends the API key only to an https URL on `mailgun.net` or a host under it, as `event($url)` does for the API's host; any other `storage.url` (of an event kept and read back, say) dies. It takes any event that has `storage.url`, not only a `stored` one. The message it dies with for an event without `storage.url` changes to "invalid event! this method needs an event with storage.url ..." (#42)
+- Add `error_response`: the response (a Furl::Response) of the last request that failed, for its headers, such as `X-RateLimit-Reset` of a `429 Too Many Requests`. It does not keep the request, whose URL carries the API key. The documentation has a section on rate limits; the module still does not try again by itself (#43)
+- Do not list the bots that commit to the repository (github-actions for the release pull requests, Dependabot) as contributors in the distribution metadata (`x_contributors`); 1.0.0 listed github-actions
+
 ## [1.0.0] - 2026-11-09
 
 - Version numbers have three parts from 1.0.0 on (`1.0.1`, `1.1.0`), and the change log moves from `Changes` to `CHANGELOG.md` (#16)
@@ -98,6 +113,7 @@ Versions up to 0.17 were released from `Changes`, before this file existed.
 
 - Original version
 
+[1.1.0]: https://github.com/kan/p5-web-service-mailgun/releases/tag/v1.1.0
 [1.0.0]: https://github.com/kan/p5-web-service-mailgun/releases/tag/v1.0.0
 [0.17]: https://metacpan.org/release/MIKIHOSHI/WebService-Mailgun-0.17
 [0.16]: https://metacpan.org/release/MIKIHOSHI/WebService-Mailgun-0.16

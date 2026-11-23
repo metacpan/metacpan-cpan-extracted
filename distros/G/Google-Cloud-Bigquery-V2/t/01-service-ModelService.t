@@ -46,7 +46,7 @@ BEGIN {
 package main;
 use Google::Cloud::Bigquery::V2::ModelServiceClient;
 
-my $client = Google::Cloud::Bigquery::V2::ModelServiceClient->new( credentials => 'dummy' );
+my $client = Google::Cloud::Bigquery::V2::ModelServiceClient->new();
 ok($client, 'Instantiated generated client');
 isa_ok($client->transport, 'Google::gRPC::Client', 'Client transport');
 

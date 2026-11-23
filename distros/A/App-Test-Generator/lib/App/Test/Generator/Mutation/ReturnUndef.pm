@@ -7,7 +7,7 @@ use parent 'App::Test::Generator::Mutation::Base';
 use App::Test::Generator::Mutant;
 use PPI;
 
-our $VERSION = '0.51';
+our $VERSION = '0.52';
 
 =head1 NAME
 
@@ -16,7 +16,7 @@ with undef to expose missing undef-return checks in the test suite
 
 =head1 VERSION
 
-Version 0.51
+Version 0.52
 
 =head1 METHODS
 

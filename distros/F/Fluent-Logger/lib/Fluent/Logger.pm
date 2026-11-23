@@ -4,7 +4,7 @@ package Fluent::Logger;
 use strict;
 use warnings;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 use IO::Select;
 use IO::Socket::INET;
@@ -201,8 +201,11 @@ sub _post {
 
     $tag = join('.', $self->tag_prefix, $tag) if $self->tag_prefix;
     my $p = $self->packer;
+    # tag must always be packed as a str (not an integer by prefer_integer,
+    # nor a bin by utf8 => 0). fluentd drops events whose tag is an integer.
+    my $tp = $self->{_tag_packer} ||= Data::MessagePack->new->utf8(1);
     $self->_send(
-        $p->pack($tag),
+        $tp->pack("$tag"),
         $self->_pack_time($time),
         $p->pack($msg),
     );

@@ -102,5 +102,5 @@ resources:
   bugtracker: https://github.com/nigelhorne/App-Test-Generator/issues
   homepage: https://metacpan.org/pod/App::Test::Generator
   repository: git://github.com/nigelhorne/App-Test-Generator.git
-version: '0.51'
+version: '0.52'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

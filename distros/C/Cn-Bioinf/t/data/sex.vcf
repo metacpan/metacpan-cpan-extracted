@@ -1,0 +1,28 @@
+##fileformat=VCFv4.2
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Read depth">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	F	M	H	N
+chr1	100	.	A	G	.	PASS	.	GT:DP	0/1:30	0/1:30	0/1:30	./.:30
+chrX	60001	.	A	G	.	PASS	.	GT:DP	0/1:30	0/1:30	0/1:30	0/1:30
+chrX	2781479	.	C	T	.	PASS	.	GT:DP	0/1:30	0/1:30	1:30	0/1:30
+chrX	2781480	.	G	A	.	PASS	.	GT:DP	0/1:30	1/1:30	1:30	./.:30
+chrX	3000000	.	T	C	.	PASS	.	GT:DP	0|1:12	1|1:12	0:12	.:12
+chrX	3000100	.	AT	A	.	PASS	.	GT:DP	0/1:30	1/1:30	1:30	./.:30
+chrX	3000200	.	A	C,G	.	PASS	.	GT:DP	1/2:30	1/1:30	1:30	./.:30
+chrX	3000300	.	C	.	.	PASS	.	GT:DP	0/0:30	0/0:30	0:30	./.:30
+chrX	3000400	.	G	T	.	PASS	.	GT:DP	0/1:5	1/1:6	1:7	./.:2
+chrX	3000500	.	A	G	.	PASS	.	GT:DP	0/1:.	0/1:.	1:.	./.:.
+X	3000600	.	C	T	.	PASS	.	GT	1/1	0/1	1	./1
+23	3000700	.	G	C	.	PASS	.	GT:DP	0/1	1/1	0/0	.
+chrX	3000800	.	T	G	.	PASS	.	DP:GT	30:0/1	30:1/1	30:1	30:./.
+chrX	3000900	.	A	T	.	PASS	.	DP	30	30	30	30
+chrX	3001000	.	A	G	.	PASS	.	GT:DP	0/1/1:30	1/1:30	1:30	./.:30
+chrX	3001100	.	A	G	.	PASS	.	GT:DP	0/2:30	1/1:30	1:30	./.:30
+chrX	154931044	.	G	A	.	PASS	.	GT:DP	0/1:30	0/1:30	0/1:30	0/1:30
+chrX	156030896	.	c	t	.	PASS	.	GT:DP	1/1:30	1/1:30	1:30	./.:30
+chrY	10001	.	A	G	.	PASS	.	GT:DP	0/1:30	1:30	1:30	./.:30
+chrY	2781480	.	A	G	.	PASS	.	GT:DP	./.:30	1:30	1:30	./.:30
+24	3000000	.	C	T	.	PASS	.	GT:DP	0/0:30	0:30	1:30	0/1:5
+chrY	4000000	.	AT	A	.	PASS	.	GT:DP	0/1:30	1:30	1:30	1:30
+Y	57000000	.	A	G	.	PASS	.	GT:DP	1/1:30	1:30	1:30	1:30
+chrY	59100000	.	A	G	.	PASS	.	GT:DP	1/1:30	1:30	1:30	1:30

@@ -380,3 +380,67 @@ sub fetch_access_token {
 }
 
 1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Auth::ExternalAccountCredentials - Workload Identity Federation (WIF) external account credentials
+
+=head1 SYNOPSIS
+
+    use Google::Auth::ExternalAccountCredentials;
+
+    my $creds = Google::Auth::ExternalAccountCredentials->new(
+        json_key => $wif_config_hashref,
+        scope    => ['https://www.googleapis.com/auth/cloud-platform'],
+    );
+    my $token = $creds->get_token();
+
+=head1 DESCRIPTION
+
+Exchanges external identity tokens (file, URL, AWS IMDSv2/ECS, or pluggable executable) via Google Security Token Service (STS) for Google Cloud access tokens.
+
+=head1 METHODS AND ATTRIBUTES
+
+=over 4
+
+=item * B<audience>
+
+=item * B<subject_token_type>
+
+=item * B<token_url>
+
+=item * B<credential_source>
+
+=item * B<service_account_impersonation_url>
+
+=item * B<scope>
+
+=item * B<ua>
+
+=item * B<make_creds>
+
+=item * B<retrieve_subject_token>
+
+=item * B<fetch_access_token>
+
+=back
+
+=head1 SEE ALSO
+
+L<Google::Auth>, L<Google::Auth::Credentials>
+
+=head1 AUTHOR
+
+C.J. Collier E<lt>cjac@google.comE<gt>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2026 Google LLC and contributors.
+
+Licensed under the Apache License, Version 2.0.
+
+=cut

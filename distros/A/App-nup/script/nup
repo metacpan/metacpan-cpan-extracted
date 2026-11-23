@@ -60,7 +60,7 @@ nup - n-up, multi-column paged output for commands and files
 
 =head1 VERSION
 
-Version 1.22
+Version 1.23
 
 =cut
 
@@ -481,8 +481,8 @@ screen and a C<less> older than 710, they are:
     l . right     right-scroll        one page to the right
     H g < K       no-scroll           the left end of the row
     L G > J       end-scroll          the right end of the row
-    space j down  noaction ESC-) x 3  the panes on the screen to the right
-    d ^D return
+    space f j     noaction ESC-) x 3  the panes on the screen to the right
+    down d ^D return
     b k up u ^U   noaction ESC-( x 3  the panes on the screen to the left
 
 The pages have the height of the screen, and there is nothing to
@@ -832,7 +832,7 @@ have it, so C<+Gg> is the default.  Set C<NUP_PAGER> to use it:
 
 C<LESSKEY_CONTENT> is read, which C<-L> uses to put its keys:
 C<h>, C<l>, C<,>, C<.>, the arrow keys, ESC-( and ESC-), C<H>, C<L>, C<g>, C<G>,
-C<E<lt>>, C<E<gt>>, space, C<b>, C<j>, C<k>, C<d>, C<u>, C<^D>, C<^U>,
+C<E<lt>>, C<E<gt>>, space, C<f>, C<b>, C<j>, C<k>, C<d>, C<u>, C<^D>, C<^U>,
 the return key, C<J> and C<K>.
 Without C<-L>, the keys are C<j>, C<k>, the down and up arrows, C<d>,
 C<u>, C<^D>, C<^U>, the return key, C<J> and C<K>.

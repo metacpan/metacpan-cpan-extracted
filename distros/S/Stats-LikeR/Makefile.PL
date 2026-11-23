@@ -89,9 +89,9 @@ my $ld = "#include <math.h>\n"
 . "int main(void) { int e; long double x = 1.0L;\n"
 . "  volatile long double r = lgammal(x) + sqrtl(x) + logl(x) + log1pl(x) + expm1l(x)\n"
 . "    + log2l(x) + log10l(x) + expl(x) + powl(x, x) + floorl(x) + ceill(x) + roundl(x)\n"
-. "    + rintl(x) + truncl(x) + fmaxl(x, x) + erfcl(x) + asinl(x) + sinhl(x) + coshl(x)\n"
+. "    + rintl(x) + truncl(x) + fmaxl(x, x) + erfcl(x) + asinl(x)\n"
 . "    + tanhl(x) + fabsl(x) + ldexpl(x, 2) + frexpl(x, &e)\n"
-. "    + acosl(x) + cosl(x) + sinl(x);\n"
+. "    + acosl(x) + cosl(x) + sinl(x) + fmal(x, x, x);\n"
 . "  return (int)r * 0; }\n";
 my $dir = File::Temp::tempdir(CLEANUP => 1);
 my $src = File::Spec->catfile($dir, 'ldmath.c');
@@ -137,7 +137,7 @@ my %WriteMakefileArgs = (
     "Test::LeakTrace" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.3427",
+  "VERSION" => "0.3428",
   "test" => {
     "TESTS" => "t/*.t"
   }

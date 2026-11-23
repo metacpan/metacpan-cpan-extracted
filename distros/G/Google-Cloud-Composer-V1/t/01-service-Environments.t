@@ -46,7 +46,7 @@ BEGIN {
 package main;
 use Google::Cloud::Composer::V1::EnvironmentsClient;
 
-my $client = Google::Cloud::Composer::V1::EnvironmentsClient->new( credentials => 'dummy' );
+my $client = Google::Cloud::Composer::V1::EnvironmentsClient->new();
 ok($client, 'Instantiated generated client');
 isa_ok($client->transport, 'Google::gRPC::Client', 'Client transport');
 

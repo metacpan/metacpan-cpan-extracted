@@ -10,32 +10,32 @@ use Carp qw(croak);
 
 use Protobuf;
 use Google::Api::Common;
-use Google::Cloud::Networksecurity::V1::SecurityProfileGroupUrlfiltering;
-use Google::Cloud::Networksecurity::V1::SecurityProfileGroupThreatprevention;
-use Google::Cloud::Networksecurity::V1::Tls;
-use Google::Cloud::Networksecurity::V1::Common;
 use Google::Cloud::Networksecurity::V1::SecurityProfileGroupMirroring;
-use Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy;
-use Google::Cloud::Networksecurity::V1::AuthzPolicy;
-use Google::Cloud::Networksecurity::V1::GatewaySecurityPolicyRule;
-use Google::Cloud::Networksecurity::V1::TlsInspectionPolicy;
-use Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig;
 use Google::Cloud::Networksecurity::V1::UrlList;
-use Google::Cloud::Networksecurity::V1::AuthorizationPolicy;
+use Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy;
 use Google::Cloud::Networksecurity::V1::SecurityProfileGroupIntercept;
+use Google::Cloud::Networksecurity::V1::GatewaySecurityPolicyRule;
+use Google::Cloud::Networksecurity::V1::SecurityProfileGroupThreatprevention;
+use Google::Cloud::Networksecurity::V1::SecurityProfileGroupUrlfiltering;
+use Google::Cloud::Networksecurity::V1::Tls;
+use Google::Cloud::Networksecurity::V1::AuthzPolicy;
+use Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig;
+use Google::Cloud::Networksecurity::V1::AuthorizationPolicy;
+use Google::Cloud::Networksecurity::V1::TlsInspectionPolicy;
+use Google::Cloud::Networksecurity::V1::Common;
 use Google::Cloud::Networksecurity::V1::DnsThreatDetector;
-use Google::Cloud::Networksecurity::V1::ClientTlsPolicy;
-use Google::Cloud::Networksecurity::V1::ServerTlsPolicy;
-use Google::Cloud::Networksecurity::V1::AddressGroup;
-use Google::Cloud::Networksecurity::V1::Intercept;
-use Google::Cloud::Networksecurity::V1::Mirroring;
-use Google::Cloud::Networksecurity::V1::FirewallActivation;
-use Google::Cloud::Networksecurity::V1::SseRealm;
 use Google::Cloud::Networksecurity::V1::SecurityProfileGroup;
-use Google::Cloud::Networksecurity::V1::Networksecurity;
+use Google::Cloud::Networksecurity::V1::ServerTlsPolicy;
+use Google::Cloud::Networksecurity::V1::ClientTlsPolicy;
+use Google::Cloud::Networksecurity::V1::SseRealm;
+use Google::Cloud::Networksecurity::V1::Mirroring;
+use Google::Cloud::Networksecurity::V1::Intercept;
+use Google::Cloud::Networksecurity::V1::AddressGroup;
+use Google::Cloud::Networksecurity::V1::FirewallActivation;
 use Google::Cloud::Networksecurity::V1::SecurityProfileGroupService;
+use Google::Cloud::Networksecurity::V1::NetworkSecurity;
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -43,14 +43,15 @@ has transport   => ( is => 'rw' );
 sub BUILD {
     my ($self) = @_;
 
-    # Resolve credentials: use passed credentials object if it implements get_token, or default to ADC
     my $auth = $self->credentials;
-    if (!$auth || !eval { $auth->can('get_token') }) {
+    if (!defined $auth) {
         $auth = Google::Auth->default();
+    } elsif (!eval { $auth->can('get_token') }) {
+        croak 'Invalid credentials object: must implement get_token()';
     }
     my $token = $auth->get_token();
 
-    my $target = 'localhost:50051';
+    my $target = 'networksecurity.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -62,7 +63,6 @@ sub BUILD {
         );
         $self->transport($client);
     } else {
-        # Default high-performance HTTP/2 gRPC client
         my $client = Google::gRPC::Client->new(
             target     => $target,
             auth_token => $token,
@@ -75,9 +75,26 @@ sub list_firewall_endpoints {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Networksecurity::V1::FirewallActivation::ListFirewallEndpointsRequest';
-    my $request = eval { $request_class->new(\%params) } || eval { $request_class->new(%params) } || ($request_class->can('encode') ? $request_class->encode(\%params) : \%params);
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
 
     my $response_class = 'Google::Cloud::Networksecurity::V1::FirewallActivation::ListFirewallEndpointsResponse';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.networksecurity.v1.FirewallActivation/ListFirewallEndpoints',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
     my $response = $self->transport->call({
         service        => 'google.cloud.networksecurity.v1.FirewallActivation',
         method         => 'ListFirewallEndpoints',
@@ -129,53 +146,53 @@ Generated from the following Protocol Buffers schemas:
 
 =over 4
 
-=item * C<google/cloud/networksecurity/v1/tls_inspection_policy.proto>
+=item * C<googleapis/google/cloud/networksecurity/v1/address_group.proto>
 
-=item * C<google/cloud/networksecurity/v1/common.proto>
+=item * C<googleapis/google/cloud/networksecurity/v1/authorization_policy.proto>
 
-=item * C<google/cloud/networksecurity/v1/security_profile_group_mirroring.proto>
+=item * C<googleapis/google/cloud/networksecurity/v1/authz_policy.proto>
 
-=item * C<google/cloud/networksecurity/v1/address_group.proto>
+=item * C<googleapis/google/cloud/networksecurity/v1/backend_authentication_config.proto>
 
-=item * C<google/cloud/networksecurity/v1/backend_authentication_config.proto>
+=item * C<googleapis/google/cloud/networksecurity/v1/client_tls_policy.proto>
 
-=item * C<google/cloud/networksecurity/v1/tls.proto>
+=item * C<googleapis/google/cloud/networksecurity/v1/common.proto>
 
-=item * C<google/cloud/networksecurity/v1/network_security.proto>
+=item * C<googleapis/google/cloud/networksecurity/v1/dns_threat_detector.proto>
 
-=item * C<google/cloud/networksecurity/v1/security_profile_group_service.proto>
+=item * C<googleapis/google/cloud/networksecurity/v1/firewall_activation.proto>
 
-=item * C<google/cloud/networksecurity/v1/gateway_security_policy.proto>
+=item * C<googleapis/google/cloud/networksecurity/v1/gateway_security_policy.proto>
 
-=item * C<google/cloud/networksecurity/v1/firewall_activation.proto>
+=item * C<googleapis/google/cloud/networksecurity/v1/gateway_security_policy_rule.proto>
 
-=item * C<google/cloud/networksecurity/v1/dns_threat_detector.proto>
+=item * C<googleapis/google/cloud/networksecurity/v1/intercept.proto>
 
-=item * C<google/cloud/networksecurity/v1/mirroring.proto>
+=item * C<googleapis/google/cloud/networksecurity/v1/mirroring.proto>
 
-=item * C<google/cloud/networksecurity/v1/authz_policy.proto>
+=item * C<googleapis/google/cloud/networksecurity/v1/network_security.proto>
 
-=item * C<google/cloud/networksecurity/v1/security_profile_group.proto>
+=item * C<googleapis/google/cloud/networksecurity/v1/security_profile_group_intercept.proto>
 
-=item * C<google/cloud/networksecurity/v1/security_profile_group_intercept.proto>
+=item * C<googleapis/google/cloud/networksecurity/v1/security_profile_group_mirroring.proto>
 
-=item * C<google/cloud/networksecurity/v1/authorization_policy.proto>
+=item * C<googleapis/google/cloud/networksecurity/v1/security_profile_group.proto>
 
-=item * C<google/cloud/networksecurity/v1/client_tls_policy.proto>
+=item * C<googleapis/google/cloud/networksecurity/v1/security_profile_group_service.proto>
 
-=item * C<google/cloud/networksecurity/v1/url_list.proto>
+=item * C<googleapis/google/cloud/networksecurity/v1/security_profile_group_threatprevention.proto>
 
-=item * C<google/cloud/networksecurity/v1/security_profile_group_urlfiltering.proto>
+=item * C<googleapis/google/cloud/networksecurity/v1/security_profile_group_urlfiltering.proto>
 
-=item * C<google/cloud/networksecurity/v1/server_tls_policy.proto>
+=item * C<googleapis/google/cloud/networksecurity/v1/server_tls_policy.proto>
 
-=item * C<google/cloud/networksecurity/v1/gateway_security_policy_rule.proto>
+=item * C<googleapis/google/cloud/networksecurity/v1/sse_realm.proto>
 
-=item * C<google/cloud/networksecurity/v1/intercept.proto>
+=item * C<googleapis/google/cloud/networksecurity/v1/tls_inspection_policy.proto>
 
-=item * C<google/cloud/networksecurity/v1/sse_realm.proto>
+=item * C<googleapis/google/cloud/networksecurity/v1/tls.proto>
 
-=item * C<google/cloud/networksecurity/v1/security_profile_group_threatprevention.proto>
+=item * C<googleapis/google/cloud/networksecurity/v1/url_list.proto>
 
 
 

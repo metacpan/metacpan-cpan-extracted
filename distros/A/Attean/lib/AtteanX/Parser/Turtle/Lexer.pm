@@ -7,7 +7,7 @@ AtteanX::Parser::Turtle::Lexer - Tokenizer for parsing Turtle, TriG, and N-Tripl
 
 =head1 VERSION
 
-This document describes AtteanX::Parser::Turtle::Lexer version 0.040
+This document describes AtteanX::Parser::Turtle::Lexer version 0.041
 
 =head1 SYNOPSIS
 
@@ -23,7 +23,7 @@ This document describes AtteanX::Parser::Turtle::Lexer version 0.040
 
 =cut
 
-package AtteanX::Parser::Turtle::Lexer 0.040 {
+package AtteanX::Parser::Turtle::Lexer 0.041 {
 	use AtteanX::Parser::Turtle::Constants;
 	use v5.14;
 	use strict;
@@ -267,11 +267,11 @@ Returns the next token present in the input.
 				} elsif ($esc eq 'U') {
 					my $codepoint	= $self->read_length(8);
 					$self->_throw_error("Bad unicode escape codepoint '$codepoint'") unless ($codepoint =~ /^[0-9A-Fa-f]+$/o);
-					$iri .= $self->unescape_hex($codepoint);
+					$iri .= $self->_unescape_hex($codepoint);
 				} elsif ($esc eq 'u') {
 					my $codepoint	= $self->read_length(4);
 					$self->_throw_error("Bad unicode escape codepoint '$codepoint'") unless ($codepoint =~ /^[0-9A-Fa-f]+$/o);
-					my $char	= $self->unescape_hex($codepoint);
+					my $char	= $self->_unescape_hex($codepoint);
 					if ($char =~ /[<>" {}|\\^`]/o) {
 						$self->_throw_error(sprintf("Bad IRI character: '%s' (0x%x)", $char, ord($char)));
 					}
@@ -292,7 +292,7 @@ Returns the next token present in the input.
 		return $self->new_token(IRI, $self->start_line, $self->start_column, $iri);
 	}
 
-	sub unescape_hex {
+	sub _unescape_hex {
 		my $self		= shift;
 		my $codepoint	= shift;
 		my $cp			= hex($codepoint);
@@ -469,11 +469,11 @@ Returns the next token present in the input.
 		elsif ($esc eq 'U') {
 			my $codepoint	= $self->read_length(8);
 			$self->_throw_error("Bad unicode escape codepoint '$codepoint'") unless ($codepoint =~ /^[0-9A-Fa-f]+$/o);
-			return $self->unescape_hex($codepoint);
+			return $self->_unescape_hex($codepoint);
 		} elsif ($esc eq 'u'){
 			my $codepoint	= $self->read_length(4);
 			$self->_throw_error("Bad unicode escape codepoint '$codepoint'") unless ($codepoint =~ /^[0-9A-Fa-f]+$/o);
-			return $self->unescape_hex($codepoint);
+			return $self->_unescape_hex($codepoint);
 		}
 		$self->_throw_error("Unrecognized string escape '$esc'");
 	}

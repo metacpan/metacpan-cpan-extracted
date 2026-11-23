@@ -3,7 +3,7 @@
 require 5.010001;
 use strict;
 package Stats::LikeR;
-our $VERSION = '0.3427';	# quoted: a bare version ending in 0, such as 0.320, is the number 0.32, which the dist would be named
+our $VERSION = '0.3428';	# quoted: a bare version ending in 0, such as 0.320, is the number 0.32, which the dist would be named
 require XSLoader;
 use warnings FATAL => 'all';
 use Exporter 'import';
@@ -2334,10 +2334,10 @@ sub dropna {
 		if ($have_rows) {						# delete indices
 			my %drop = map { $_ => 1 } @$sel;
 			my @keep = grep { !$drop{$_} } 0 .. $n - 1;
-			return { map { $_ => [ @{ $df->{$_} }[@keep] ] } keys %$df };
+			return { map { $_ => _dropna_col_copy($_, $df->{$_}, \@keep) } keys %$df };
 		}
 		my @cols = @$sel;
-		return { map { $_ => [ @{ $df->{$_} } ] } keys %$df } unless @cols;
+		return { map { $_ => _dropna_col_copy($_, $df->{$_}, undef, $n) } keys %$df } unless @cols;
 		for my $c (@cols) {
 			die "dropna: column '$c' not found\n" unless exists $df->{$c};
 		}
@@ -2345,6 +2345,17 @@ sub dropna {
 	}
 
 	_usage_error('dropna', 'data frame must be an arrayref (AoH) or hashref (HoA/HoH)');
+}
+
+# One HoA column of dropna()'s result, the cells at @$keep.  An undef column is
+# all undef, as the XS reads it for cols => [...]; it is neither autovivified
+# in the caller's frame nor fatal.  Anything else that is not an array ref dies
+# naming the column, as the XS does.
+sub _dropna_col_copy {
+	my ($name, $col, $keep, $n) = @_; # $keep undef: every cell, an undef column $n of them
+	return [ (undef) x ($keep ? @$keep : $n) ] unless defined $col;
+	die "dropna: column '$name' is not an ARRAY reference\n" unless ref $col eq 'ARRAY';
+	return $keep ? [ @{$col}[@$keep] ] : [ @$col ];
 }
 
 # drop_duplicates($df, subset => $col | \@cols, keep => 'first' | 'last' | 0)
@@ -2593,17 +2604,23 @@ sub qcut {
 	# does the column contain any NA?  undef and NaN both are, as NaN is to
 	# pandas: up to 0.3413 a NaN was binned as a number, and every edge it
 	# touched came back NaN (qcut([1, 2, 3, 4, NaN], 4) gave 1 2 3 NaN NaN).
-	my $is_na = sub { my $x = shift; no warnings 'numeric'; return !defined($x) || $x != $x };
+	# The test is written out in each loop: a closure call per element was 0.10
+	# s of the 0.173 s this took on 1e6 values (0.106 s inlined, fastest of 5
+	# fresh processes).
 	my $has_na = 0;
-	for my $x (@$data) { if ($is_na->($x)) { $has_na = 1; last } }
+	{
+		no warnings 'numeric';
+		for my $x (@$data) { if (!defined($x) || $x != $x) { $has_na = 1; last } }
+	}
 
 	my ($codes, $edges, @pos);
 	if ($want_codes && $has_na) {
 		# strip NA, remember positions, scatter codes back afterwards
 		my @vals;
+		no warnings 'numeric';
 		for my $i (0 .. $#$data) {
 			my $x = $data->[$i];
-			next if $is_na->($x);
+			next if !defined($x) || $x != $x;
 			push @vals, $x + 0;
 			push @pos,  $i;
 		}
@@ -2611,7 +2628,11 @@ sub qcut {
 		($codes, $edges) = _qcut_core(\@vals, $probs, $drop, 1);
 	} elsif ($has_na) {
 		# edges only: drop NA so cutpoints ignore them, positions don't matter
-		my @vals = grep { !$is_na->($_) } @$data;
+		my @vals;
+		{
+			no warnings 'numeric';
+			@vals = grep { defined($_) && $_ == $_ } @$data;
+		}
 		die "qcut: no non-missing values\n" unless @vals;
 		($codes, $edges) = _qcut_core(\@vals, $probs, $drop, 0);
 	} else {
@@ -2755,10 +2776,11 @@ sub summary {
 	# and then filtered in perl; _numeric_cells (LikeR.xs) hands back only the
 	# numbers, as copies.
 	my @colnames = ('# values', 'Min.', '1st Qu.', 'Median', 'Mean', '3rd Qu.', 'Max.');
-	my @raw;
+	my (@raw, $any_nan);
 	for my $src (@srcs) {
-		my $numeric = $src ? _numeric_cells(@$src) : [];
-		if (!@$numeric) { push @raw, [ 0, (undef) x 6 ]; next }	# empty -> na stats
+		my ($numeric, $n_nan) = $src ? _numeric_cells(@$src) : ([], 0);
+		$any_nan ||= $n_nan;
+		if (!@$numeric) { push @raw, [ 0, (undef) x 6, $n_nan ]; next }	# empty -> na stats
 		my $q = quantile($numeric, probs => [0.25, 0.75]);
 		# format as %.4g strings; they still look numeric, so _render_grid
 		# right-aligns and colours them as numbers.
@@ -2767,8 +2789,14 @@ sub summary {
 			sprintf('%.4g', min($numeric)),    sprintf('%.4g', $q->{'25%'}),
 			sprintf('%.4g', median($numeric)), sprintf('%.4g', mean($numeric)),
 			sprintf('%.4g', $q->{'75%'}),      sprintf('%.4g', max($numeric)),
+			$n_nan,
 		];
 	}
+	# R's summary() adds an "NA's" column to a variable that has NA; a NaN is the
+	# NA here (an undef or non-numeric cell is ignored, as documented), so the
+	# column appears only when a NaN was dropped
+	if ($any_nan) { push @colnames, "NA's" }
+	else          { pop @$_ for @raw }
 
 	# The display options go on as they were given; _render_grid() checks them.
 	return _render_grid('summary', $total, \@colnames, \@labels, \@raw, $lab_header,
@@ -2786,7 +2814,9 @@ sub summary {
 # concatenated.
 
 # The decompressed bytes of a named archive member as a SCALAR REFERENCE, or
-# undef if the member is absent.
+# undef if the member is absent. $zip is the directory _zip_open() returns, or
+# a file name. A file that is not a zip archive, or one whose member is damaged,
+# dies naming the file; it used to read as an empty or partial table.
 #
 # The reference is the point.  Returning the string itself costs a full copy of
 # it -- perl cannot hand back the pad slot of a lexical, so `return $content'
@@ -2812,28 +2842,150 @@ sub summary {
 # part against 0.174 s for the default. (The 2.08 s this comment used to quote
 # does not reproduce here, but its conclusion does.)
 sub _unzip_member {
-	my ($file, $member) = @_;
-	my ($handled, $ref) = _unzip_member_fast($file, $member);
+	my ($zip, $member) = @_;
+	$zip = _zip_open($zip) unless ref $zip;
+	my ($handled, $ref) = _unzip_member_fast($zip, $member);
 	return $ref if $handled;
+	my $file = $zip->{file};
 	require IO::Uncompress::Unzip;
-	my $z = IO::Uncompress::Unzip->new($file, Name => $member)
-		or return undef;
+	# Transparent => 0: by default a file that is not a zip archive is handed
+	# back as the member, raw, which is how a text file named x.xlsx used to
+	# read as an empty table. Strict => 1 checks the member's CRC and sizes,
+	# which Unzip.pm computes anyway and otherwise never compares; it is tried
+	# first, and again without it because it cannot scan past the end of one
+	# archive into a second written after it (see t/unzip_member.t), which this
+	# path is here for. A member that cannot be found fails the open
+	# ("Truncated file", the end of the archive reached without it), as it
+	# always has, and reads as absent.
+	my ($z, $strict);
+	for my $try (1, 0) {
+		$strict = $try;
+		$z = IO::Uncompress::Unzip->new($file, Name => $member,
+			Transparent => 0, Strict => $try) and last;
+	}
+	return undef unless $z;
 	my $content = '';
 	my ($off, $n) = (0, 0);
 	while (($n = $z->read($content, 1 << 20, $off)) > 0) { $off += $n }
+	# a negative return is an error, not the end of the member
+	if ($n < 0) {
+		my $why = $z->error;
+		$z->close;
+		_zip_bad($file, "member '$member' is damaged ($why)");
+	}
+	if (!$strict) {
+		# what Strict would have compared, where the local header carries it
+		# (a streamed member's header holds zeros: its sizes and CRC follow)
+		my $h = $z->getHeaderInfo;
+		# the length is a U64 object on the older IO-Compress of perl 5.10.1: not compared there
+		my $ul = $h->{UncompressedLength};
+		$ul = undef if ref $ul;
+		_zip_bad($file, "member '$member' is " . length($content) . ' bytes, not the '
+			. "$ul its header gives")
+			if $ul && $ul != length $content;
+		_zip_bad($file, "member '$member' fails its CRC-32 check")
+			if $h->{CRC32} && $h->{CRC32} != _crc32_xs($content);
+	}
 	$z->close;
 	return \$content;
 }
+
+# The message for an archive that is not a readable one.
+sub _zip_bad {
+	my ($file, $why) = @_;
+	die "read_table: '$file' is not a readable .xlsx workbook: $why\n";
+}
+
+# The central directory of $file, read once: { file => $file, entries =>
+# { $name => [$flags, $method, $csize, $usize, $local_header_offset, $crc] } },
+# the first entry of a name winning, as a sequential scan's first match would.
+# read_table opens the archive once per call and hands the result on, so that
+# looking up a member no longer re-reads and re-walks the directory: a workbook
+# of 5,000 worksheets read in 6.8 s when each of its 5,000 lookups did.
+#
+# Dies for a file that cannot be opened, or that has no end-of-central-directory
+# record at all (not a zip archive, or one cut short: the record is the last
+# thing written). Returns { file => $file, decline => 1 } for an archive it
+# does not follow -- split, zip64, or a directory that disagrees with the file,
+# as two archives written end to end do -- and _unzip_member then lets
+# IO::Uncompress::Unzip scan it; see _unzip_member_fast().
+sub _zip_open {
+	my ($file) = @_;
+	my $decline = { file => $file, decline => 1 };
+	my $fh;
+	open $fh, '<', $file or die "read_table: cannot open '$file': $!\n";
+	binmode $fh;
+	my $size = -s $fh;
+	_zip_bad($file, 'it is too short to be a zip archive')
+		unless defined $size && $size >= 22;
+
+	# The EOCD is 22 bytes plus a comment of up to 65535, so it begins no
+	# earlier than 65557 from the end. Its signature can also occur inside the
+	# comment (or inside compressed data, for an archive with no comment), so
+	# a candidate counts only when the record it starts ends exactly at the end
+	# of the file.
+	my $want = $size < 65557 ? $size : 65557;
+	seek $fh, $size - $want, 0 or die "read_table: cannot read '$file': $!\n";
+	my $tail = '';
+	read($fh, $tail, $want) == $want or die "read_table: cannot read '$file': $!\n";
+	my ($ncd, $cdsz, $cdoff);
+	my $at = length($tail) - 22;
+	while ($at >= 0) {
+		$at = rindex($tail, "PK\5\6", $at);
+		last if $at < 0;
+		my ($d1, $d2, $nd, $nt, $sz, $off, $cmt)
+			= unpack('x' . ($at + 4) . ' v v v v V V v', $tail);
+		if ($at + 22 + $cmt == length $tail) {
+			# a split archive has its directory somewhere this cannot reach
+			return $decline if $d1 || $d2 || $nd != $nt;
+			# the zip64 sentinels: the real values are in a record this does
+			# not read, so hand the whole archive back
+			return $decline
+				if $nt == 0xFFFF || $sz == 0xFFFFFFFF || $off == 0xFFFFFFFF;
+			($ncd, $cdsz, $cdoff) = ($nt, $sz, $off);
+			last;
+		}
+		$at--;
+	}
+	_zip_bad($file, 'it has no zip end-of-central-directory record '
+		. '(it is not a zip archive, or it is truncated)') unless defined $cdoff;
+	return $decline if $cdoff + $cdsz > $size;
+	seek $fh, $cdoff, 0 or return $decline;
+	my $cd = '';
+	return $decline unless read($fh, $cd, $cdsz) == $cdsz;
+	close $fh;
+
+	my %entries;
+	my $p = 0;
+	for (my $i = 0; $i < $ncd; $i++) {
+		return $decline if $p + 46 > $cdsz;
+		return $decline unless substr($cd, $p, 4) eq "PK\1\2";
+		my ($g, $m, $crc, $cs, $us, $nl, $el, $cl, $lo)
+			= unpack('x' . ($p + 8) . ' v v x4 V V V v v v x8 V', $cd);
+		return $decline if $p + 46 + $nl + $el + $cl > $cdsz;
+		$entries{ substr($cd, $p + 46, $nl) } //= [$g, $m, $cs, $us, $lo, $crc];
+		$p += 46 + $nl + $el + $cl;
+	}
+	return { file => $file, entries => \%entries };
+}
+
 
 # The same member, read straight out of the archive with Compress::Raw::Zlib
 # instead of through IO::Uncompress::Unzip.
 #
 # Returns a two-element list: (1, \$bytes) for a member it read, (1, undef) for
 # an archive it understood that does not hold the member, and (0, undef) for
-# anything it declines -- at which point _unzip_member falls back and the old
-# path decides. Declining is never an error: this reads the central directory
-# and one deflate stream and nothing else, and hands everything beyond that to
-# the module that has been ported to all of it.
+# an archive or member it does not follow (zip64, encryption, a method other
+# than stored or deflate, a directory that disagrees with the file) -- at which
+# point _unzip_member falls back and IO::Uncompress::Unzip decides. $zip is the
+# directory from _zip_open(), or a file name, which is opened here.
+#
+# Declining is not a verdict on the file; damage is. A member that is cut
+# short, whose deflate stream is bad, whose inflated size is not the directory's
+# or whose CRC-32 is wrong dies naming the file and the member: it used to
+# decline and the fallback read it again, so an archive that lied about a size
+# was inflated twice (a 537 MB member, 2.2 s against 0.4 s), and then went on
+# to read whatever came out.
 #
 # Why bother: with the worksheet parser in XS since 0.316, decompression is what
 # a read of an .xlsx now spends its time on -- 0.239 s of the 0.413 s a
@@ -2846,12 +2998,14 @@ sub _unzip_member {
 # unconditionally ("unzip always needs crc32"), so every byte is run through
 # Compress::Raw::Zlib::crc32() -- 0.076 s on this part, more than the inflate
 # itself -- and then the comparison against the stored CRC happens only under
-# `Strict', which defaults to 0. The check is paid for and not made. This path
-# does not compute it either, which is the same answer for the same money;
-# asking Inflate for -CRC32 => 1 costs the identical 0.076 s (it is the same
-# per-chunk call), so turning it on here would want `Strict'-like behaviour --
-# a croak on mismatch -- to be worth anything, and that is a change in what
-# read_table does with a damaged file rather than a speed decision.
+# `Strict', which defaults to 0. Up to 0.3427 this path did not compute the CRC
+# either, so a damaged member that still inflated to the right length was read
+# as it came. It is checked now, as Python's zipfile checks it, with the
+# slice-by-8 xlsx_crc32() of the writer through _crc32_xs() rather than
+# Compress::Raw::Zlib's: 0.0132 s for the 35 MB worksheet of a real 7.8 MB
+# workbook, 3.7% of the 0.359 s read_table takes on it, and 0.0725 s for the
+# 197 MB worksheet of a 200,000-row inline-string one, 6.9% of 1.05 s (best of
+# five, 2026-11-22, perl 5.44.0, double NV).
 #
 # Bufsize 1<<16: 0.052 s against 0.063 s at the 4 KB default on that part, and
 # flat from there (1<<18 through 1<<22 all measure 0.052 s).
@@ -2860,66 +3014,14 @@ sub _unzip_member {
 # section 4.3.16 for the end-of-central-directory record, 4.3.12 for a central
 # directory entry, 4.3.7 for a local file header.
 sub _unzip_member_fast {
-	my ($file, $member) = @_;
+	my ($zip, $member) = @_;
+	$zip = _zip_open($zip) unless ref $zip;
+	return (0, undef) if $zip->{decline};
+	my $file = $zip->{file};
+	my $e = $zip->{entries}{$member};
+	return (1, undef) unless $e;	# the archive has no such member
+	my ($gp, $method, $csz, $usz, $lho, $crc) = @$e;
 	require Compress::Raw::Zlib;
-	my $fh;
-	open $fh, '<', $file or return (0, undef);
-	binmode $fh;
-	my $size = -s $fh;
-	return (0, undef) unless defined $size && $size >= 22;
-
-	# The EOCD is 22 bytes plus a comment of up to 65535, so it begins no
-	# earlier than 65557 from the end. Its signature can also occur inside the
-	# comment (or inside compressed data, for an archive with no comment), so
-	# a candidate counts only when the record it starts ends exactly at the end
-	# of the file.
-	my $want = $size < 65557 ? $size : 65557;
-	seek $fh, $size - $want, 0 or return (0, undef);
-	my $tail = '';
-	return (0, undef) unless read($fh, $tail, $want) == $want;
-	my ($ncd, $cdsz, $cdoff);
-	my $at = length($tail) - 22;
-	while ($at >= 0) {
-		$at = rindex($tail, "PK\5\6", $at);
-		last if $at < 0;
-		my ($d1, $d2, $nd, $nt, $sz, $off, $cmt)
-			= unpack('x' . ($at + 4) . ' v v v v V V v', $tail);
-		if ($at + 22 + $cmt == length $tail) {
-			# a split archive has its directory somewhere this cannot reach
-			return (0, undef) if $d1 || $d2 || $nd != $nt;
-			# the zip64 sentinels: the real values are in a record this does
-			# not read, so hand the whole archive back
-			return (0, undef)
-				if $nt == 0xFFFF || $sz == 0xFFFFFFFF || $off == 0xFFFFFFFF;
-			($ncd, $cdsz, $cdoff) = ($nt, $sz, $off);
-			last;
-		}
-		$at--;
-	}
-	return (0, undef) unless defined $cdoff;
-	return (0, undef) if $cdoff + $cdsz > $size;
-	seek $fh, $cdoff, 0 or return (0, undef);
-	my $cd = '';
-	return (0, undef) unless read($fh, $cd, $cdsz) == $cdsz;
-
-	# Walk the directory to the member. Entries are in the order the local
-	# headers are, so stopping at the first match is what Unzip.pm's own
-	# sequential scan would have found.
-	my ($gp, $method, $csz, $usz, $lho);
-	my $p = 0;
-	for (my $i = 0; $i < $ncd; $i++) {
-		return (0, undef) if $p + 46 > $cdsz;
-		return (0, undef) unless substr($cd, $p, 4) eq "PK\1\2";
-		my ($g, $m, $cs, $us, $nl, $el, $cl, $lo)
-			= unpack('x' . ($p + 8) . ' v v x8 V V v v v x8 V', $cd);
-		return (0, undef) if $p + 46 + $nl + $el + $cl > $cdsz;
-		if (substr($cd, $p + 46, $nl) eq $member) {
-			($gp, $method, $csz, $usz, $lho) = ($g, $m, $cs, $us, $lo);
-			last;
-		}
-		$p += 46 + $nl + $el + $cl;
-	}
-	return (1, undef) unless defined $lho;	# the archive has no such member
 
 	# bit 0 is encryption and bit 6 strong encryption; bit 3 only moves the
 	# sizes into a trailing descriptor, and the directory's copies (which is
@@ -2928,6 +3030,11 @@ sub _unzip_member_fast {
 	return (0, undef) if $method != 0 && $method != 8;	# 0 stored, 8 deflate
 	return (0, undef) if $csz == 0xFFFFFFFF || $usz == 0xFFFFFFFF
 	                  || $lho == 0xFFFFFFFF;		# zip64 again
+
+	my $fh;
+	open $fh, '<', $file or die "read_table: cannot open '$file': $!\n";
+	binmode $fh;
+	my $size = -s $fh;
 	return (0, undef) if $lho + 30 > $size;
 
 	# The local header repeats the name and carries its own extra field, which
@@ -2939,26 +3046,36 @@ sub _unzip_member_fast {
 	return (0, undef) unless substr($lh, 0, 4) eq "PK\3\4";
 	my ($lnl, $lel) = unpack('x26 v v', $lh);
 	my $data = $lho + 30 + $lnl + $lel;
-	return (0, undef) if $data + $csz > $size;
+	_zip_bad($file, "member '$member' runs past the end of the file")
+		if $data + $csz > $size;
 	seek $fh, $data, 0 or return (0, undef);
 	my $comp = '';
-	return (0, undef) unless read($fh, $comp, $csz) == $csz;
-	close $fh or return (0, undef);
+	read($fh, $comp, $csz) == $csz
+		or _zip_bad($file, "member '$member' is cut short");
+	close $fh;
 
+	my $out;
 	if ($method == 0) {
-		return (0, undef) unless length($comp) == $usz;
-		return (1, \$comp);
+		$out = $comp;
+	} else {
+		my ($inf, $st) = Compress::Raw::Zlib::Inflate->new(
+			-WindowBits => -Compress::Raw::Zlib::MAX_WBITS(),
+			-Bufsize    => 1 << 16);
+		return (0, undef) unless $inf;
+		$out = '';
+		# inflate() eats $comp as it goes, so the two are never both whole
+		$st = $inf->inflate($comp, $out);
+		# Z_OK here means the input ran out before the stream ended
+		_zip_bad($file, "member '$member' is damaged or cut short ("
+			. ($st == Compress::Raw::Zlib::Z_OK() ? 'its deflate stream does not end' : "$st") . ')')
+			unless $st == Compress::Raw::Zlib::Z_STREAM_END();
 	}
-	my ($inf, $st) = Compress::Raw::Zlib::Inflate->new(
-		-WindowBits => -Compress::Raw::Zlib::MAX_WBITS(),
-		-Bufsize    => 1 << 16);
-	return (0, undef) unless $inf;
-	my $out = '';
-	# inflate() eats $comp as it goes, so the two are never both whole
-	$st = $inf->inflate($comp, $out);
-	return (0, undef) unless $st == Compress::Raw::Zlib::Z_STREAM_END()
-	                      || $st == Compress::Raw::Zlib::Z_OK();
-	return (0, undef) unless length($out) == $usz;
+	# A size that disagrees with the directory is corruption, and is reported
+	# here, once: declining would make the fallback inflate it all over again.
+	_zip_bad($file, "member '$member' is " . length($out) . " bytes, not the $usz "
+		. 'its directory entry gives') unless length($out) == $usz;
+	_zip_bad($file, "member '$member' fails its CRC-32 check")
+		unless _crc32_xs($out) == $crc;
 	return (1, \$out);
 }
 
@@ -3063,7 +3180,8 @@ sub _xlsx_part_path {
 }
 
 # The relationships of xl/workbook.xml, from xl/_rels/workbook.xml.rels:
-# { target => { $id => $member, ... }, sst => $member or undef }. 'sst' is the
+# { target => { $id => $member, ... }, type => { $id => $relationship_type },
+# sst => $member or undef }. 'sst' is the
 # shared-string part, found by its relationship Type -- the transitional
 # .../officeDocument/2006/relationships/sharedStrings or the strict
 # .../officeDocument/relationships/sharedStrings, both ending in
@@ -3071,9 +3189,9 @@ sub _xlsx_part_path {
 # choice, and up to 0.3213 a workbook that stored the part as
 # xl/SharedStrings.xml read every string cell as empty.
 sub _xlsx_rels {
-	my ($file) = @_;
-	my (%target, $sst);
-	my $rels = _unzip_member($file, 'xl/_rels/workbook.xml.rels');
+	my ($zip) = @_;
+	my (%target, %type, $sst);
+	my $rels = _unzip_member($zip, 'xl/_rels/workbook.xml.rels');
 	if (defined $rels) {
 		for my $at (_xml_start_tags($$rels, 'Relationship')) {
 			my $tg = _xml_attr($at, 'Target');
@@ -3082,10 +3200,11 @@ sub _xlsx_rels {
 			my $id   = _xml_attr($at, 'Id');
 			my $type = _xml_attr($at, 'Type');
 			$target{$id} = $tg if defined $id;
+			$type{$id}   = $type if defined $id && defined $type;
 			$sst = $tg if !defined $sst && defined $type && $type =~ m{/sharedStrings\z};
 		}
 	}
-	return { target => \%target, sst => $sst };
+	return { target => \%target, type => \%type, sst => $sst };
 }
 
 # Shared strings (optional part): each <si> may hold several <t> runs, which
@@ -3095,9 +3214,9 @@ sub _xlsx_rels {
 # where the part is; a workbook whose relationships do not name one is tried at
 # xl/sharedStrings.xml, the name Excel gives it, as it always was.
 sub _xlsx_shared_strings {
-	my ($file, $rels) = @_;
-	$rels ||= _xlsx_rels($file);
-	my $ss = _unzip_member($file, $rels->{sst} // 'xl/sharedStrings.xml');
+	my ($zip, $rels) = @_;
+	$rels ||= _xlsx_rels($zip);
+	my $ss = _unzip_member($zip, $rels->{sst} // 'xl/sharedStrings.xml');
 	return defined $ss ? _xlsx_sst_xs($$ss) : [];
 }
 
@@ -3112,24 +3231,40 @@ sub _xlsx_shared_strings {
 # the prefix bound to the relationships namespace is the writer's choice. See
 # xlsx_ns_prefix() in LikeR.xs for the worksheet side of the same thing.
 sub _xlsx_sheets {
-	my ($file, $rels) = @_;
-	$rels ||= _xlsx_rels($file);
+	my ($zip, $rels) = @_;
+	$rels ||= _xlsx_rels($zip);
 	my $target = $rels->{target};
 	my @sheets;
-	if (defined(my $wb = _unzip_member($file, 'xl/workbook.xml'))) {
+	my $listed = 0;	# <sheet> elements in workbook.xml, chart sheets and all
+	if (defined(my $wb = _unzip_member($zip, 'xl/workbook.xml'))) {
 		for my $at (_xml_start_tags($$wb, 'sheet')) {
+			my $pos  = ++$listed;
 			my $name = _xml_attr($at, 'name');
 			my $rid  = _xml_attr($at, '[\w.-]+:id');
+			# A chart sheet, dialog sheet or macro sheet is no table, and is
+			# not a sheet pandas and openpyxl hand back: only a relationship
+			# of type .../worksheet is one. A sheet with no relationship at
+			# all keeps the positional reading below.
+			my $type = defined $rid ? $rels->{type}{$rid} : undef;
+			next if defined $type && $type !~ m{/worksheet\z};
 			push @sheets, {
 				name => defined $name ? _xlsx_text(_xml_unescape($name)) : undef,
 				path => defined $rid ? $target->{$rid} : undef,
+				pos  => $pos,
 			};
 		}
 	}
-	@sheets = ({ name => undef, path => undef }) unless @sheets;	# no metadata
-	# any sheet still lacking a path falls back to its positional worksheet file
-	$sheets[$_]{path} //= 'xl/worksheets/sheet' . ($_ + 1) . '.xml'
-		for 0 .. $#sheets;
+	# every sheet was a chart: nothing to read, and not "no metadata" either
+	die "read_table: '" . (ref $zip ? $zip->{file} : $zip)
+		. "' has no worksheet, only chart or dialog sheets\n"
+		if $listed && !@sheets;
+	@sheets = ({ name => undef, path => undef, pos => 1 }) unless @sheets;	# no metadata
+	# any sheet still lacking a path falls back to its positional worksheet
+	# file, by its place among all the workbook's sheets
+	for (@sheets) {
+		$_->{path} //= 'xl/worksheets/sheet' . $_->{pos} . '.xml';
+		delete $_->{pos};
+	}
 	return \@sheets;
 }
 
@@ -3169,9 +3304,10 @@ sub _xlsx_choose_sheet {
 # The part is decompressed here and parsed by xlsx_ws_scan() in LikeR.xs, which
 # is also where the reason it is not done in perl any more is written down.
 sub _parse_xlsx_sheet {
-	my ($file, $sst, $path, $callback, $plan) = @_;
-	my $ws = _unzip_member($file, $path);
-	die "read_table: could not read worksheet '$path' in $file\n"
+	my ($zip, $sst, $path, $callback, $plan) = @_;
+	my $ws = _unzip_member($zip, $path);
+	die "read_table: could not read worksheet '$path' in "
+		. (ref $zip ? $zip->{file} : $zip) . "\n"
 		unless defined $ws;
 	_parse_xlsx_sheet_xs($$ws, $sst, $callback, $plan);
 	return;
@@ -3426,7 +3562,7 @@ sub read_table {
 		# private, undocumented: the multi-sheet expansion passes an already
 		# parsed worksheet list / shared-string table to each per-sheet recursion
 		# so a big sharedStrings.xml is not re-decompressed once per worksheet.
-		'_xlsx_sheets', '_sst', '_sheet_ix',
+		'_xlsx_sheets', '_sst', '_sheet_ix', '_zip',
 		# private, for t/read_table.filter.t: keep every row in the perl
 		# closure, which is the reference the parser's filter path is held to
 		'_closure',
@@ -3580,22 +3716,35 @@ sub read_table {
 	# Resolve the worksheet list once and reuse it below (it decompresses and
 	# parses workbook.xml + its rels, so recomputing it in the main xlsx branch
 	# would double that work for every single-sheet / explicit-sheet read).
-	my ($xlsx_sheets, $xlsx_rels);
+	my ($xlsx_sheets, $xlsx_rels, $xlsx_zip);
 	if ($is_xlsx) {
+		# The archive's central directory is read once per read_table call and
+		# handed to every member lookup, and to each sheet of a workbook read
+		# whole; see _zip_open(). A file that is no zip archive dies here.
+		$xlsx_zip = $args{_zip} // _zip_open($file);
 		# Reuse a caller-supplied worksheet list (from the multi-sheet expansion
 		# below) rather than re-parsing workbook.xml + its rels for every sheet.
 		if ($args{_xlsx_sheets}) {
 			$xlsx_sheets = $args{_xlsx_sheets};
 		} else {
-			$xlsx_rels   = _xlsx_rels($file);
-			$xlsx_sheets = _xlsx_sheets($file, $xlsx_rels);
+			$xlsx_rels   = _xlsx_rels($xlsx_zip);
+			$xlsx_sheets = _xlsx_sheets($xlsx_zip, $xlsx_rels);
 		}
 		if (!defined $args{sheet} && !defined $args{_sheet_ix}
 				&& @$xlsx_sheets > 1) {
 			# Decompress + parse the shared-string table once for the whole
 			# workbook and hand it to each per-sheet read, instead of every
 			# recursion re-reading (a potentially large) sharedStrings.xml.
-			my $sst = _xlsx_shared_strings($file, $xlsx_rels);
+			my $sst = _xlsx_shared_strings($xlsx_zip, $xlsx_rels);
+			# Two sheets of one name cannot both be keys of the hash, and the
+			# later used to replace the earlier without a word. Excel itself
+			# refuses such a workbook; a hostile or damaged one can have it.
+			my %seen_name;
+			for my $sh (@$xlsx_sheets) {
+				next unless defined $sh->{name};
+				die "read_table: worksheet name '$sh->{name}' is used by more than "
+				  . "one sheet of $file\n" if $seen_name{ $sh->{name} }++;
+			}
 			# A sheet with no name is keyed "SheetN", N its position -- or the
 			# next N no other sheet is named, since up to 0.3213 an unnamed
 			# first sheet and a sheet called "Sheet1" were both keyed "Sheet1",
@@ -3616,6 +3765,7 @@ sub read_table {
 				$book{$name} = read_table($file, %input_args,
 					_sheet_ix    => $i,
 					_xlsx_sheets => $xlsx_sheets,
+					_zip         => $xlsx_zip,
 					_sst         => $sst);
 			}
 			return \%book;
@@ -4356,8 +4506,8 @@ sub read_table {
 		# shared-string table has been inflated and parsed for nothing
 		my $chosen = defined $args{_sheet_ix} ? $xlsx_sheets->[ $args{_sheet_ix} ]
 		           : _xlsx_choose_sheet($file, $xlsx_sheets, $args{sheet});
-		my $sst    = $args{_sst} // _xlsx_shared_strings($file, $xlsx_rels);
-		_parse_xlsx_sheet($file, $sst, $chosen->{path}, $on_line, $plan);
+		my $sst    = $args{_sst} // _xlsx_shared_strings($xlsx_zip, $xlsx_rels);
+		_parse_xlsx_sheet($xlsx_zip, $sst, $chosen->{path}, $on_line, $plan);
 	} else {
 		my $fh = $codec ? _open_decompressed($file, $codec) : undef;
 		_parse_csv_file($file, $sep_re ? '' : $args{sep} // '',
@@ -5109,6 +5259,10 @@ sub interpolate {
 					unless $x[$i] > $x[$i - 1];
 			}
 		}
+		# pandas' 'linear' ignores the index and spaces the rows equally (only
+		# 'index', 'values' and 'time' use it), as the docs say; the x given was
+		# still validated above
+		return [ 0 .. $#x ] if $method eq 'linear';
 		return \@x;
 	};
 	# The numeric fill (every method, the dense solve, the preserve mask) is
@@ -5230,6 +5384,9 @@ sub table_one {
 	my $by     = $opt{by};
 	my $digits = defined $opt{digits}     ? $opt{digits}     : 2;
 	my $pdig   = defined $opt{pct_digits} ? $opt{pct_digits} : 1;
+	for my $d (['digits', $digits], ['pct_digits', $pdig]) {
+		_usage_error('table_one', "$d->[0] is not a number") unless looks_like_number($d->[1]);
+	}
 	my $nonpar = $opt{nonparametric} ? 1 : 0;
 	my %types  = $opt{types} ? %{ $opt{types} } : ();
 	# anything but 'continuous' took the categorical branch, so a misspelling
@@ -6069,6 +6226,8 @@ sub age_standardize {
 	$rate ||= $opt{rate};
 	my $cl  = defined $opt{conf_level} ? $opt{conf_level} : 0.95;
 	my $per = defined $opt{per} ? $opt{per} : 1;
+	_usage_error('age_standardize', 'conf_level is not a number') unless looks_like_number($cl);
+	_usage_error('age_standardize', 'per is not a number') unless looks_like_number($per);
 	_usage_error('age_standardize', 'conf_level must be between 0 and 1') unless $cl > 0 && $cl < 1;
 	_usage_error('age_standardize', "'pop' and 'stdpop' array refs are required")
 		unless ref $pop eq 'ARRAY' && ref $stdpop eq 'ARRAY';
@@ -6525,7 +6684,7 @@ Stats::LikeR - Get basic statistical functions, like in R, but with Perl using X
 
 =head1 VERSION
 
-version 0.3427
+version 0.3428
 
 =head1 Synopsis
 
@@ -8186,14 +8345,17 @@ You can also pass the counts as C<binom_test([6, 4])> — 6 right, 4 wrong — w
 you have wins and losses instead of wins and a total.
 
 Every count must be a whole number (to within 1e-7, as in R) that is not
-negative. C<NaN>, an infinity, C<undef> or a string croaks, as R's C<binom.test>
+negative. A count held as an integer, or spelled as one in a string, is read
+exactly at any size, so odd counts in [2*I<52, 2>I<53) and counts past 2>I<< 53 are
+neither refused nor rounded on a double perl; only a non-integer number takes
+the floating-point route. C<NaN>, an infinity, C<undef> or a string that is not a number croaks, as R's C<binom.test>
 stops on them. So does a count, or a successes + failures sum, of perl's C<IV_MAX>
 or more: 9223372036854775807 on a 64-bit perl, 2147483647 on a perl with 32-bit
 integers. The width of C's C<long> does not matter, so Windows has the same limit
 as Linux. The two-sided p-value finds the far boundary of R's tail-counting rule
 by binary search rather than by visiting every index up to C<n>, so
 C<binom_test(3, 1e18)> returns at once (R tries to allocate 37 GB there), with the
-same answer as R wherever R can run. Above 2**53 a double cannot name every
+same answer as R wherever R can run. Above 2 >>*53 a double cannot name every
 count, so on a perl whose NV is a double the boundary, and with it the two-sided
 p-value, is good to about 1e-7 relative at C<n> = 1e18; a long double or
 C<__float128> perl is better.
@@ -9748,7 +9910,10 @@ that, and it is silent anyway when the weights do not vary.
 =item * B<< C<n> >> — the number of equally spaced points at which to estimate. Defaults
 to 512. Values above 512 are rounded up to a power of two internally (that
 is what makes the FFT cheap) and the result is interpolated back to exactly
-the C<n> you asked for, so a power of two is the efficient choice.
+the C<n> you asked for, so a power of two is the efficient choice. A
+fractional C<n> is rounded up, as R's C<seq.int(length.out = n)> does: 1.5 is
+two points and 0.5 is one. An C<n> of 0 or less is an error, and so is one
+above 2**26.
 
 =item * B<< C<from>, C<to> >> — the ends of the output grid. The defaults are C<cut>
 bandwidths outside the range of the data.
@@ -10897,7 +11062,11 @@ Pass the four counts (or a C<[a,b,c,d]> / C<[[a,b],[c,d]]> array ref):
  print "@{ $r->{'odds_ratio_ci'} }"; # 0.895 3.285
 
 Options: C<conf_level> (default C<0.95>) and C<correct> (add 0.5 to every cell,
-done automatically when a cell is 0). Every cell must be a finite,
+done automatically when a cell is 0). An exposure group with no subjects
+(C<a + b> or C<c + d> is 0) has no risk, so the odds ratio, risk ratio, risk
+difference and their intervals, C<nnt> and that group's risk are C<NaN>, as
+epitools' C<riskratio()> and C<oddsratio()> give; the +0.5 would otherwise report
+a ratio of exactly 1 for C<[[0,0],[5,5]]>. Every cell must be a finite,
 non-negative number in either call form; anything else is a fatal error that
 names the cell. Result keys: C<odds_ratio>, C<risk_ratio>,
 C<risk_diff> (each with a matching C<*_ci>), C<risk_exposed>, C<risk_unexposed>, and
@@ -12551,6 +12720,11 @@ row axis is positional for AoA/AoH/HoA and string-sorted key order for HoH — t
 same shape and ordering rules as C<ffill>/C<bfill>. Returns a NEW frame; the input
 is never modified.
 
+A column with nothing to fill is returned as it is, whatever the method, as in
+pandas: C<quadratic> or C<cubic> on two complete values is not an error. A
+C<barycentric> or C<krogh> column with a single numeric anchor is filled with that
+constant, as pandas does.
+
 =head3 Methods
 
 =for html <table>
@@ -12658,8 +12832,9 @@ By default rows are equally spaced (C<0, 1, 2, …>). Pass C<x> to interpolate
 against real abscissae — either an arrayref (one coordinate per row) or a column
 name/index whose numeric values are the coordinates. C<x> must be strictly
 increasing, must not contain NaN (pandas refuses a NaN index too, so
-C<interpolate> croaks), and is used by every method except plain C<linear> semantics (use
-C<index>/C<values> for a line on unequal spacing).
+C<interpolate> croaks), and is used by every method except plain C<linear>, which spaces the rows equally
+whatever C<x> says, as pandas' C<linear> ignores the index (use C<index>/C<values>
+for a line on unequal spacing).
 
  # linear fit on unequal spacing
  interpolate({ v => [ 0, undef, undef, 10 ] }, method => 'index', x => [ 0, 1, 3, 4 ]);
@@ -13272,7 +13447,43 @@ changes nothing. Only a C<-> outside parentheses removes, and a term that is
 itself the name of a column is that column, so a column named C<a-b> can still be
 written C<y ~ a-b>.
 
-Three details differ from R deliberately:
+C<offset()> may stand wherever a term may, as in R: C<y ~ x + offset(z)>,
+C<y ~ x + offset(u/2)>, C<y ~ x + offset(-z)>, C<y ~ x*offset(z)>. A term that
+holds an offset (C<offset(z):x>) is dropped from the model, and each distinct
+C<offset()> counts once. C<lm> fits the response less the offset, as
+C<lm.fit(x, y - offset)> does; C<fitted_values> include the offset, C<residuals>
+are the response less the fitted values, and C<r_squared> and the F statistic are
+C<summary.lm>'s, which take the offset out of the fitted values first. The
+expressions are returned in C<offset_terms>.
+
+The intercept markers act in order and the last one wins, as in R: C<y ~ x - 1 + 1>
+and C<y ~ 0 + x + 1> have an intercept, C<y ~ x + 1 - 1> has none. With a
+transformed response C<.> leaves out every variable the response mentions:
+C<log(y) ~ .> omits C<y>, and C<I(y + x) ~ .> omits both C<y> and C<x>.
+
+A formula that R refuses is refused here: an operator with no operand
+(C<y ~ x +>), two operands with no operator between them (C<y ~ x z>), a column
+name that is not in the data (C<object 'q' not found>), and a comparison or logic
+operator inside C<I()> (C<< I(x E<gt> 0) >>, C<I(x == 0)>, C<I(x & z)>, C<I(!x)>), which R
+turns into a logical factor and C<lm> does not evaluate. A sum of any number of
+terms is read in time linear in their number, and a long run of unary signs is
+not a problem.
+
+A categorical column with only one level makes the model an error, as in R
+("contrasts can be applied only to factors with 2 or more levels"); through
+0.3427 it contributed no column. A factor's levels are those of the rows the
+fit keeps, as in R's C<model.frame()>: a level that occurs only in rows dropped
+for a missing value in any variable of the model, the response, C<offset> or
+C<weights> included, is no level. Without an intercept the first factor of two or
+more levels in the first term that has one is coded by indicators for every
+level, as R's C<model.matrix()> does (C<y ~ x + b:x - 1> has columns C<x>, C<x:bu>
+and C<x:bv>, the last aliased). Coefficient, term and level names are perl
+characters when the column or levels were (a column found only through its
+UTF-8 spelling, or a cell with the UTF-8 flag), so with C<use utf8>
+C<< $fit-E<gt>{coefficients}{"café"} >> exists; a script without C<use utf8> keeps
+getting its bytes back.
+
+A few details differ from R deliberately:
 
 =over
 
@@ -13283,20 +13494,22 @@ the two: on C<c("b", "A", "a")> R takes C<a> and C<lm> takes C<A>. Both
 parameterise the same fit — residual sum of squares, rank and fitted values
 agree — but the coefficient names and values differ.
 
-=item * A lone term crossed with itself keeps the product, so C<wt:wt> is C<wt> squared
-and C<y ~ wt*wt> fits C<y ~ wt + I(wt^2)>. R's formula algebra collapses C<a:a>
-to C<a>, making the same formula mean C<y ~ wt> there. Any other product, such
-as C<(a + b)*(a + b)> or C<(a + b)*a>, is R's: the union of the two terms'
-variables.
+=item * A lone I<numeric> term crossed with itself keeps the product, so C<wt:wt> is
+C<wt> squared and C<y ~ wt*wt> fits C<y ~ wt + I(wt^2)>. R's formula algebra
+collapses C<a:a> to C<a>, making the same formula mean C<y ~ wt> there. A
+I<factor> crossed with itself is R's: C<a*a> and C<a:a> are C<a>. Any other
+product, such as C<(a + b)*(a + b)> or C<(a + b)*a>, is R's: the union of the
+two terms' variables.
 
-=item * A categorical column with only one level contributes no column, so
-C<y ~ x + g> fits C<y ~ x>. R refuses the model outright ("contrasts can be
-applied only to factors with 2 or more levels").
+=item * A design of more than about 13,000 columns (9,400 where C<NV> is a long double
+or C<__float128>) is refused with "design too wide", before anything is
+allocated, because C<X'X> and the packed factor of the fit need 1.5 p**2
+numbers; the limit is 2 GiB of them. R fits such a model, with C<NA> for the
+coefficients past the rank.
 
 =item * The intercept markers C<- 1>, C<+ 0>, C<0 +> are read only at the top level of
-the formula. R reads one inside a group, as in C<y ~ (a + 1)*b>, and lets the
-last one win; here it is an error, because the intercept has been decided
-before the groups are expanded.
+the formula. R reads one inside a group, as in C<y ~ (a + 1)*b>; here it is an
+error, because the intercept has been decided before the groups are expanded.
 
 =back
 
@@ -14348,7 +14561,7 @@ omitting it entirely is how you ask for the power.
   <td><code>n</code></td>
   <td>Float</td>
   <td><code>undef</code></td>
-  <td>Number of observations (per group for two-sample, pairs for paired). Must be at least 2.</td>
+  <td>Number of observations (per group for two-sample, pairs for paired). Any positive number, as in R, which floors the degrees of freedom <code>(n - 1) * tsample</code> at 1e-7: below <code>n = 1.001</code> the critical value is infinite and the power is exactly 0.</td>
 </tr>
 <tr>
   <td><code>delta</code></td>
@@ -15260,6 +15473,17 @@ Rank values like R's C<rank()>. Takes flat scalars and/or array refs (like C<min
  my @r = rank([3, 1, 4, 1, 5], 'ties_method' => 'min'); # 3, 1, 4, 1, 5
 
 Ranks are 1-based; C<average> may return half-ranks. C<undef> and NaN are treated as NA.
+
+As in R, the values decide what is ranked. When every non-missing value looks
+like a number (Perl's C<looks_like_number>, so C<"1e1">, C<" 3 "> and C<"Inf">
+do), they are ranked numerically. When any one does not (C<"b">, C<"">, C<"0x10">),
+all the values are ranked as strings, so C<rank("b", "a", "b")> is
+C<2.5, 1, 2.5> and C<rank("abc", 5, 1)> is C<3, 2, 1> (the strings C<"1">, C<"5">,
+C<"abc">), as R's C<rank(c("abc", 5, 1))> is. Strings are compared by codepoint,
+never by locale; R uses the locale's collation, so for non-ASCII text, or mixed
+case outside the C locale, the order can differ from R's. A reference that is
+not an object overloading its numeric value (a hashref, a nested arrayref, a
+coderef) is an error, as ranking a list is in R.
 
 =head3 ties_method
 
@@ -16175,6 +16399,14 @@ Rows are taken in the order the XML gives them, and a row's C<r=> number only
 says how many blank rows lie before it. Up to 0.3425 every row with no value
 was dropped. Tested in C<t/read_table.xlsx.blank_rows.pandas.t>.
 
+B<Damaged files.> A file that is not a zip archive, an archive cut short, and a
+member whose deflate data is damaged, whose size is not the one the archive's
+directory gives, or whose CRC-32 is wrong, are errors that name the file; up to
+0.3427 they read as an empty or partial table. This is what pandas does
+(C<zipfile.BadZipFile>). Chart sheets, dialog sheets and macro sheets are not
+worksheets and are not read, as in pandas and openpyxl. Two sheets with one name
+are an error when the workbook is read whole, since they cannot both be keys.
+
 B<Multiple worksheets.> If the workbook has more than one worksheet and no
 C<sheet> is given, C<read_table> returns a B<hashref keyed by worksheet name>,
 each value being that sheet parsed just as a single table would be (honouring
@@ -16945,7 +17177,7 @@ The AoH/HoH case is the per-column summary R gives for a data frame — so the a
  summary(\@x, color => 1);               # force colour (default: auto on a TTY)
  my $txt = summary(\%hoa, return_only => 1);   # capture instead of printing
 
-Non-numeric and undefined cells are ignored: they never count toward C<# values>, and a variable with no numeric values shows C<0> and C<na>. For example, C<summary> of an AoH:
+Non-numeric and undefined cells are ignored: they never count toward C<# values>, and a variable with no numeric values shows C<0> and C<na>. A NaN is R's C<NA>: it is left out of every statistic and counted in a trailing C<NA's> column, which appears only when some variable has one (C<summary([1, 'NaN', 3, 'Inf'])> gives 3 values, Min 1, Median 3, Mean C<Inf>, C<NA's> 1, as R does). C<Inf> is a value. For example, C<summary> of an AoH:
 
  # summary: 2 rows x 7 cols    (showing 2 rows)
  Column  # values  Min.  1st Qu.  Median  Mean  3rd Qu.  Max.
@@ -18420,6 +18652,15 @@ and C<"café">, which are the same string to perl, are both written C<café>. Th
 is the reading the C<.xlsx> and LaTeX writers give text too. Up to 0.3425 a
 string held as bytes was written as those bytes, and C<"caf\xe9"> came out as a
 single byte E9, which Python's C<csv>, pandas and R read as C<caf\x{FFFD}>.
+
+A file is written to a temporary file beside it and renamed over the name once the
+table is complete, in every format, so a write that dies partway -- a cell over
+Excel's 32,767 characters, a code point above U+10FFFF, a tied cell whose
+C<FETCH> dies -- leaves an existing file as it was and makes none where there was
+none, and the new file keeps the old one's permissions. A name that is not a
+regular file (a pipe, C</dev/null>, a symlink) is written in place, as is a file
+in a directory the process cannot write to. An C<.xlsx> table too wide for Excel
+is refused before the file is opened wherever the shape says how wide it is.
 
 Every cell of delimited output is written whole, including one holding a NUL byte, and a cell of a tied hash or array (such as C<Tie::IxHash>) is read through its C<FETCH>. A number is formatted the way perl formats it, but in a copy, so writing a table does not add a string buffer to every numeric scalar in it. Nor does finding an AoH's or a HoH's columns leave an iterator on every row hash, as walking them with C<keys> would. A row that is a restricted hash (C<Hash::Util::lock_keys>) may lack some of the columns; those cells are written empty, where they used to die with I<Attempt to access disallowed key>.
 

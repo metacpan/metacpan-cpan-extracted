@@ -104,6 +104,7 @@ require Database::BI::Model::DataSource;    # already in %INC; stash intact
 		my ($self, $key, @args) = @_;
 		push @{ $self->{log} }, { key => $key, args => \@args };
 		# Delegate to the built-in message dict so error text is still human-readable.
+		no warnings 'once';
 		my %msgs = %Database::BI::Model::DataSource::MESSAGES;
 		return sprintf($msgs{$key} // $key, @args);
 	}
@@ -192,7 +193,7 @@ subtest 'Upload -> open -> filter end-to-end pipeline' => sub {
 	  ->content_like(qr/Alpha/,   'Alpha is premium -- present in filtered view')
 	  ->content_like(qr/Gamma/,   'Gamma is premium -- present in filtered view')
 	  ->content_unlike(qr/Beta/,  'Beta is standard -- absent from filtered view')
-	  ->content_unlike(qr/Delta/, 'Delta is standard -- absent from filtered view');
+	  ->content_unlike(qr/<td[^>]*>Delta</, 'Delta is standard -- absent from filtered view');
 
 	# Step 4: Open with a gt filter -- only score > 70.
 	$t->get_ok("/open?path=$enc&f=" . url_escape('score:gt:70'))
@@ -200,7 +201,7 @@ subtest 'Upload -> open -> filter end-to-end pipeline' => sub {
 	  ->content_like(qr/Alpha/,   'Alpha score 90 > 70 -- present')
 	  ->content_like(qr/Gamma/,   'Gamma score 80 > 70 -- present')
 	  ->content_unlike(qr/Beta/,  'Beta score 60 not > 70 -- absent')
-	  ->content_unlike(qr/Delta/, 'Delta score 40 not > 70 -- absent');
+	  ->content_unlike(qr/<td[^>]*>Delta</, 'Delta score 40 not > 70 -- absent');
 };
 
 # ===========================================================================
@@ -4373,5 +4374,235 @@ subtest 'A column empty in most rows is not the id' => sub {
 	$tm->get_ok('/open?path=' . url_escape($file) . '&f=' . url_escape('Check:empty:'))->status_is(200);
 	is(scalar(() = $tm->tx->res->body =~ m{<td[^>]*>XX2106</td>}g), 4, 'an empty filter on Check gives the other 4');
 };
+
+
+{
+	# A user agent for the outline tests whose answer is fixed, or computed.
+	package Unit::CannedUA;
+	sub get {
+		my $self = shift;
+		return $self->{code}->(@_) if $self->{code};
+		return $self->{response};
+	}
+}
+
+# ---------------------------------------------------------------------------
+# Outlines: the browser's progress workflow across objects and a shared file
+# cache (Boundary, Geocode's user agent seam, CHI), independent objects, an
+# upstream that fails, a cache directory that refuses writes, and a cache
+# holding damaged shapes.  Nominatim is a stand-in (BI::Test::Boundary); no
+# test reaches the network.
+# ---------------------------------------------------------------------------
+{
+	use lib 't/lib';
+	require BI::Test::Boundary;
+	require Database::BI::Model::Boundary;
+
+	Readonly my $BOUNDARY      => 'Database::BI::Model::Boundary';
+	Readonly my $TEN           => [ 10.5, 20.5 ];	# inside the box of "Ten"
+	Readonly my $THIRTY        => [ 30.5, 40.5 ];	# inside the box of "Thirty"
+	Readonly my $SEA           => [ 0.5, 0.5 ];	# inside no box
+	Readonly my $DEADLINE      => 20;	# seconds: a hang is a failure, not a wait
+	Readonly my $MANY_POINTS   => 12;
+	Readonly my $GIVE_UP_AFTER => 3;	# the documented OUTLINE_FAILURES
+	Readonly my @AREAS => (
+		{ name => 'Ten',    id => 1, box => [ 9, 19, 11, 21 ] },
+		{ name => 'Thirty', id => 2, box => [ 29, 39, 31, 41 ] },
+	);
+
+	my $key = sub { $BOUNDARY->point_key(@{ $_[0] }) };
+	# Every case runs under an alarm so an upstream that hangs fails the test.
+	my $within = sub {
+		my ($code) = @_;
+		local $SIG{ALRM} = sub { die "took more than $DEADLINE seconds\n" };
+		alarm $DEADLINE;
+		my @out = eval { $code->() };
+		my $err = $@;
+		alarm 0;
+		die $err if $err;
+		return wantarray ? @out : $out[0];
+	};
+
+	subtest 'Outlines: the page lists points, each is looked up, and the next request draws them from the cache' => sub {
+		my $dir = tempdir(CLEANUP => 1);
+		my $ua  = BI::Test::Boundary->new(areas => \@AREAS);
+
+		BI::Test::Boundary::with_ua($ua, sub {
+			# Request 1: the browser's page asks nothing, and lists what is unknown.
+			my $page = $BOUNDARY->new(online => 1, cache => $BOUNDARY->file_cache($dir));
+			my $first = $page->outlines([ $TEN, $THIRTY, $SEA ], lookup => 0);
+			is scalar(@{ $first->{features} }), 0, 'nothing is drawn yet';
+			is scalar(@{ $first->{pending} }), 3, 'three points are pending';
+			is scalar($ua->asked), 0, 'and Nominatim was not asked';
+
+			# Requests 2..4: the progress bar looks each one up, each in its own request.
+			my %answer;
+			for my $point ($TEN, $THIRTY, $SEA) {
+				my $lookup = $BOUNDARY->new(online => 1, cache => $BOUNDARY->file_cache($dir));
+				$answer{ $key->($point) } = $lookup->lookup_point($key->($point));
+			}
+			is $answer{ $key->($TEN) }{status}, 'found', 'a point in a county is found';
+			is $answer{ $key->($TEN) }{name}, 'Ten', '... and named';
+			is $answer{ $key->($SEA) }{status}, 'nowhere', 'a point in the sea is nowhere';
+			ok $answer{$_}{asked}, "Nominatim was asked for $_" for keys %answer;
+			my $asked = scalar $ua->asked;
+
+			# Request 5: a fresh object over the same folder draws all of it, asking nothing.
+			my $again = $BOUNDARY->new(online => 1, cache => $BOUNDARY->file_cache($dir));
+			my $done = $again->outlines([ $TEN, $THIRTY, $SEA ], lookup => 0);
+			is_deeply [ map { $_->{properties}{name} } @{ $done->{features} } ], [ 'Ten', 'Thirty' ], 'both outlines come from the cache, in point order';
+			is scalar(@{ $done->{pending} }), 0, 'nothing is pending';
+			is $done->{counts}{nowhere}, 1, 'the sea is counted';
+			is scalar($ua->asked), $asked, 'and not one more request went to Nominatim';
+			is_deeply [ sort keys %{ $done->{inside} } ], [ sort map { $key->($_) } $TEN, $THIRTY ], 'each point drawn is listed inside its outline';
+			diag(join ' ', $ua->asked) if $ENV{TEST_VERBOSE};
+
+			# A repeat lookup is answered from the cache, without asking.
+			my $repeat = $BOUNDARY->new(online => 1, cache => $BOUNDARY->file_cache($dir))->lookup_point($key->($TEN));
+			is $repeat->{asked}, 0, 'a point seen before is not asked again';
+			is $repeat->{status}, 'found', '... and is still found';
+		});
+	};
+
+	subtest 'Outlines: independent objects share nothing unless they share a cache' => sub {
+		my ($dir_a, $dir_b) = map { tempdir(CLEANUP => 1) } 1 .. 2;
+		my $ua = BI::Test::Boundary->new(areas => \@AREAS);
+		BI::Test::Boundary::with_ua($ua, sub {
+			my $one = new_ok($BOUNDARY => [ online => 1, cache => $BOUNDARY->file_cache($dir_a) ]);
+			my $two = new_ok($BOUNDARY => [ online => 1, cache => $BOUNDARY->file_cache($dir_b) ]);
+			my $bystander = new_ok($BOUNDARY => [ online => 0, cache => $BOUNDARY->file_cache($dir_a) ]);
+
+			$one->lookup_point($key->($TEN));
+			is $two->lookup_point($key->($TEN))->{asked}, 1, 'the second object, with its own folder, has to ask';
+			is $bystander->lookup_point($key->($TEN))->{asked}, 0, 'one sharing the first folder does not';
+			is $bystander->lookup_point($key->($TEN))->{status}, 'found', '... and sees what the first learned';
+			is $bystander->lookup_point($key->($THIRTY))->{status}, 'held', 'an offline object holds what it does not know';
+
+			# The same cache at two levels: neither answers for the other.
+			my $state = $BOUNDARY->new(online => 1, level => 'state', cache => $BOUNDARY->file_cache($dir_a));
+			is $state->lookup_point($key->($TEN))->{asked}, 1, 'another level asks for itself';
+			is $one->name_for('in'), 'district', 'and objects keep their own level names';
+			is $state->name_for('in'), 'state', '... apart';
+		});
+	};
+
+	subtest 'Outlines: an upstream that fails is held, fails fast, and is not remembered' => sub {
+		my $dir = tempdir(CLEANUP => 1);
+		my $down = BI::Test::Boundary->new(areas => \@AREAS, fail => 1);
+		my @points = map { [ 10 + $_ / 100, 20 + $_ / 100 ] } 1 .. $MANY_POINTS;
+
+		BI::Test::Boundary::with_ua($down, sub {
+			my $result = $within->(sub {
+				$BOUNDARY->new(online => 1, cache => $BOUNDARY->file_cache($dir))->outlines(\@points);
+			});
+			is scalar(@{ $result->{features} }), 0, 'nothing is drawn';
+			is scalar(@{ $result->{pending} }), $MANY_POINTS, 'every point is pending, none is lost';
+			ok $result->{failed}, 'the failure is reported';
+			ok scalar($down->asked) <= $GIVE_UP_AFTER, 'it gave up after ' . $GIVE_UP_AFTER . ' failures, not one per point';
+			my $held = $BOUNDARY->new(online => 1, cache => $BOUNDARY->file_cache($dir))->lookup_point($key->($TEN));
+			is $held->{status}, 'held', 'a single lookup is held';
+		});
+
+		# The same folder once Nominatim is back: nothing failed was cached.
+		my $up = BI::Test::Boundary->new(areas => \@AREAS);
+		BI::Test::Boundary::with_ua($up, sub {
+			my $back = $BOUNDARY->new(online => 1, cache => $BOUNDARY->file_cache($dir))->lookup_point($key->($TEN));
+			is $back->{status}, 'found', 'when it comes back the point is found';
+			is $back->{asked}, 1, '... by asking again';
+		});
+
+		# Malformed answers: not JSON, JSON of the wrong shape, an HTTP error with a body.
+		my @sabotage = (
+			[ 'text that is not JSON' => HTTP::Response->new(200, 'OK', [ 'Content-Type' => 'application/json' ], 'not json {') ],
+			[ 'an empty body' => HTTP::Response->new(200, 'OK', [ 'Content-Type' => 'application/json' ], '') ],
+			[ 'a JSON list' => HTTP::Response->new(200, 'OK', [ 'Content-Type' => 'application/json' ], '[1,2,3]') ],
+			[ 'a JSON string' => HTTP::Response->new(200, 'OK', [ 'Content-Type' => 'application/json' ], '"hello"') ],
+			[ 'an outline of the wrong shape' => HTTP::Response->new(200, 'OK', [ 'Content-Type' => 'application/json' ],
+				'{"osm_type":"relation","osm_id":9,"place_rank":12,"category":"boundary","type":"administrative","geojson":"nope","name":"Bad"}') ],
+			[ 'a 503' => HTTP::Response->new(503, 'Service Unavailable', [], 'first byte timeout') ],
+			[ 'a client timeout' => HTTP::Response->new(500, 'read timeout', [ 'Client-Warning' => 'Internal response' ], '') ],
+		);
+		for my $case (@sabotage) {
+			my ($what, $response) = @{$case};
+			my $ua = bless { response => $response }, 'Unit::CannedUA';
+			BI::Test::Boundary::with_ua($ua, sub {
+				my $outcome = $within->(sub {
+					$BOUNDARY->new(online => 1, cache => $BOUNDARY->file_cache(tempdir(CLEANUP => 1)))->outlines([ $TEN ]);
+				});
+				is scalar(@{ $outcome->{features} }), 0, "$what: nothing drawn, no crash";
+				is scalar(@{ $outcome->{pending} }) + ($outcome->{counts}{nowhere} // 0), 1, "$what: the point is accounted for";
+			});
+		}
+
+		# An agent that throws or never answers.
+		my $throws = bless { code => sub { die "connection refused\n" } }, 'Unit::CannedUA';
+		BI::Test::Boundary::with_ua($throws, sub {
+			my $outcome = eval { $within->(sub {
+				$BOUNDARY->new(online => 1, cache => $BOUNDARY->file_cache(tempdir(CLEANUP => 1)))->outlines([ $TEN ]);
+			}) };
+			ok defined($outcome) || length($@), 'a user agent that throws is a result or a plain message, never a hang';
+			diag($@ || 'a result') if $ENV{TEST_VERBOSE};
+		});
+	};
+
+	subtest 'Outlines: a cache folder that refuses new files does not take the pipeline down' => sub {
+		my $dir = tempdir(CLEANUP => 1);
+		plan skip_all => 'cannot revoke create here' unless can_revoke_create($dir);
+		my $cache_dir = File::Spec->catdir($dir, 'boundary-cache');
+		my $cache = $BOUNDARY->file_cache($dir);
+		mkdir $cache_dir;	# CHI makes it on first write; revoking needs it there
+		my $ua = BI::Test::Boundary->new(areas => \@AREAS);
+		BI::Test::Boundary::with_ua($ua, sub {
+			my $boundary = $BOUNDARY->new(online => 1, cache => $cache);
+			with_revoked('create', $cache_dir, sub {
+				my $answer = $within->(sub { $boundary->lookup_point($key->($TEN)) });
+				ok $answer->{status} =~ /\A(?:found|held)\z/, 'a lookup still answers (' . $answer->{status} . ')';
+				my $drawn = $within->(sub { $boundary->outlines([ $TEN, $THIRTY ]) });
+				ok ref($drawn->{features}) eq 'ARRAY', 'and a draw returns its features';
+			});
+			my $after = $BOUNDARY->new(online => 1, cache => $BOUNDARY->file_cache($dir))->lookup_point($key->($THIRTY));
+			is $after->{status}, 'found', 'with access back, the same folder works';
+		});
+	};
+
+	subtest 'Outlines: damaged shapes in the cache are skipped, not fatal' => sub {
+		my $dir   = tempdir(CLEANUP => 1);
+		my $cache = $BOUNDARY->file_cache($dir);
+		my $ua    = BI::Test::Boundary->new(areas => \@AREAS);
+		BI::Test::Boundary::with_ua($ua, sub {
+			my $boundary = $BOUNDARY->new(online => 1, cache => $cache);
+			$boundary->lookup_point($key->($TEN));
+			my ($outline_key) = grep { /\Aoutline:/ } $cache->get_keys;
+			ok defined $outline_key, 'an outline was cached (' . ($outline_key // 'none') . ')';
+			my $stored = $cache->get($outline_key);
+			for my $damage ('not a shape', [ [ 'x', 'y' ] ], { type => 'Polygon', coordinates => [ [ [ 'a' ] ] ] }, undef) {
+				$cache->set($outline_key, { %{$stored}, geometry => $damage }, 'never');
+				my $fresh = $BOUNDARY->new(online => 0, cache => $BOUNDARY->file_cache($dir));
+				my $outcome = eval { $within->(sub { $fresh->outlines([ $TEN ], lookup => 0) }) };
+				ok defined($outcome), 'a damaged shape does not die: ' . ($@ || 'a result');
+			}
+		});
+	};
+
+	subtest 'Messages follow the request language through I18N and the message tables' => sub {
+		require Database::BI::I18N;
+		require Database::BI::Controller::Dashboard;
+		my $package = 'Database::BI::Controller::Dashboard';
+		my $key_name = 'warn_measure_fallback';
+		# Two requests, two languages, in one process: neither leaks into the other.
+		my %text;
+		for my $accept ('en-US,en;q=0.8', 'en-GB', 'fr-FR', '') {
+			local $ENV{LANG} = 'en_US.UTF-8';	# the server's own locale must not matter
+			local $Database::BI::I18N::LANGUAGE = Database::BI::I18N::choose(accept => $accept);
+			$text{$accept} = Database::BI::I18N::text($package, { $key_name => 'British' }, $key_name);
+		}
+		like $text{'en-US,en;q=0.8'}, qr/totaled/, 'an American request gets American text';
+		is $text{'en-GB'}, 'British', 'a British request gets the British text';
+		is $text{'fr-FR'}, 'British', 'an unsupported language gets the British text';
+		is $text{''}, 'British', 'no header gets British, though the server locale is American';
+		is $Database::BI::I18N::LANGUAGE, undef, 'and nothing is left set afterwards';
+		is Database::BI::I18N::text($package, { }, 'no_such_key'), undef, 'a key no table has is undef';
+	};
+}
 
 done_testing();

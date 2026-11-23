@@ -112,6 +112,66 @@ coerce 'RepeatedSslCertsListResponse',
 declare 'MapStringSslCertsListResponse',
     as HashRef[SslCertsListResponse()];
 
+declare 'UpdateCustomerManagedCertificateRequest',
+    as InstanceOf['Google::Cloud::Sql::V1::CloudSqlSslCerts::UpdateCustomerManagedCertificateRequest'];
+
+coerce 'UpdateCustomerManagedCertificateRequest',
+    from HashRef, via { 'Google::Cloud::Sql::V1::CloudSqlSslCerts::UpdateCustomerManagedCertificateRequest'->new($_) };
+
+declare 'RepeatedUpdateCustomerManagedCertificateRequest',
+    as ArrayRef[UpdateCustomerManagedCertificateRequest()];
+
+coerce 'RepeatedUpdateCustomerManagedCertificateRequest',
+    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Sql::V1::CloudSqlSslCerts::UpdateCustomerManagedCertificateRequest'->new($_) } @$_ ] };
+
+declare 'MapStringUpdateCustomerManagedCertificateRequest',
+    as HashRef[UpdateCustomerManagedCertificateRequest()];
+
+declare 'DeleteCustomerManagedCertificateRequest',
+    as InstanceOf['Google::Cloud::Sql::V1::CloudSqlSslCerts::DeleteCustomerManagedCertificateRequest'];
+
+coerce 'DeleteCustomerManagedCertificateRequest',
+    from HashRef, via { 'Google::Cloud::Sql::V1::CloudSqlSslCerts::DeleteCustomerManagedCertificateRequest'->new($_) };
+
+declare 'RepeatedDeleteCustomerManagedCertificateRequest',
+    as ArrayRef[DeleteCustomerManagedCertificateRequest()];
+
+coerce 'RepeatedDeleteCustomerManagedCertificateRequest',
+    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Sql::V1::CloudSqlSslCerts::DeleteCustomerManagedCertificateRequest'->new($_) } @$_ ] };
+
+declare 'MapStringDeleteCustomerManagedCertificateRequest',
+    as HashRef[DeleteCustomerManagedCertificateRequest()];
+
+declare 'ListCustomerManagedCertificatesRequest',
+    as InstanceOf['Google::Cloud::Sql::V1::CloudSqlSslCerts::ListCustomerManagedCertificatesRequest'];
+
+coerce 'ListCustomerManagedCertificatesRequest',
+    from HashRef, via { 'Google::Cloud::Sql::V1::CloudSqlSslCerts::ListCustomerManagedCertificatesRequest'->new($_) };
+
+declare 'RepeatedListCustomerManagedCertificatesRequest',
+    as ArrayRef[ListCustomerManagedCertificatesRequest()];
+
+coerce 'RepeatedListCustomerManagedCertificatesRequest',
+    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Sql::V1::CloudSqlSslCerts::ListCustomerManagedCertificatesRequest'->new($_) } @$_ ] };
+
+declare 'MapStringListCustomerManagedCertificatesRequest',
+    as HashRef[ListCustomerManagedCertificatesRequest()];
+
+declare 'ListCustomerManagedCertificatesResponse',
+    as InstanceOf['Google::Cloud::Sql::V1::CloudSqlSslCerts::ListCustomerManagedCertificatesResponse'];
+
+coerce 'ListCustomerManagedCertificatesResponse',
+    from HashRef, via { 'Google::Cloud::Sql::V1::CloudSqlSslCerts::ListCustomerManagedCertificatesResponse'->new($_) };
+
+declare 'RepeatedListCustomerManagedCertificatesResponse',
+    as ArrayRef[ListCustomerManagedCertificatesResponse()];
+
+coerce 'RepeatedListCustomerManagedCertificatesResponse',
+    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Sql::V1::CloudSqlSslCerts::ListCustomerManagedCertificatesResponse'->new($_) } @$_ ] };
+
+declare 'MapStringListCustomerManagedCertificatesResponse',
+    as HashRef[ListCustomerManagedCertificatesResponse()];
+
 1;
 
 __END__

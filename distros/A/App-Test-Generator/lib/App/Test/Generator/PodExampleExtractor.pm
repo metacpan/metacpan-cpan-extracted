@@ -5,7 +5,7 @@ use Carp qw(croak);
 use File::Slurp qw(read_file);
 use Readonly;
 
-our $VERSION = '0.51';
+our $VERSION = '0.52';
 
 Readonly my $ANNOTATION_RE => qr/\#\s*(?:=>|returns?)\s*(.+?)\s*$/;
 Readonly my $VERBATIM_RE   => qr/^[ \t]/;
@@ -18,7 +18,7 @@ App::Test::Generator::PodExampleExtractor - Extract runnable code examples from 
 
 =head1 VERSION
 
-Version 0.51
+Version 0.52
 
 =head1 SYNOPSIS
 

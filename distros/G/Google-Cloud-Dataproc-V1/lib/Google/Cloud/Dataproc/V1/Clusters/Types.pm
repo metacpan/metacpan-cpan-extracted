@@ -199,6 +199,24 @@ coerce 'RepeatedResourceManagerTagsEntry',
 declare 'MapStringResourceManagerTagsEntry',
     as HashRef[ResourceManagerTagsEntry()];
 
+declare 'MultiZoneConfig',
+    as InstanceOf['Google::Cloud::Dataproc::V1::Clusters::MultiZoneConfig'];
+
+coerce 'MultiZoneConfig',
+    from HashRef, via { 'Google::Cloud::Dataproc::V1::Clusters::MultiZoneConfig'->new($_) };
+
+declare 'RepeatedMultiZoneConfig',
+    as ArrayRef[MultiZoneConfig()];
+
+coerce 'RepeatedMultiZoneConfig',
+    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Dataproc::V1::Clusters::MultiZoneConfig'->new($_) } @$_ ] };
+
+declare 'MapStringMultiZoneConfig',
+    as HashRef[MultiZoneConfig()];
+
+declare 'TargetShape',
+    as (Int | Str);
+
 declare 'NodeGroupAffinity',
     as InstanceOf['Google::Cloud::Dataproc::V1::Clusters::NodeGroupAffinity'];
 
@@ -369,6 +387,24 @@ coerce 'RepeatedInstanceSelectionResult',
 
 declare 'MapStringInstanceSelectionResult',
     as HashRef[InstanceSelectionResult()];
+
+declare 'FlexibleInstanceGroupConfig',
+    as InstanceOf['Google::Cloud::Dataproc::V1::Clusters::FlexibleInstanceGroupConfig'];
+
+coerce 'FlexibleInstanceGroupConfig',
+    from HashRef, via { 'Google::Cloud::Dataproc::V1::Clusters::FlexibleInstanceGroupConfig'->new($_) };
+
+declare 'RepeatedFlexibleInstanceGroupConfig',
+    as ArrayRef[FlexibleInstanceGroupConfig()];
+
+coerce 'RepeatedFlexibleInstanceGroupConfig',
+    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Dataproc::V1::Clusters::FlexibleInstanceGroupConfig'->new($_) } @$_ ] };
+
+declare 'MapStringFlexibleInstanceGroupConfig',
+    as HashRef[FlexibleInstanceGroupConfig()];
+
+declare 'HardwareClass',
+    as (Int | Str);
 
 declare 'AcceleratorConfig',
     as InstanceOf['Google::Cloud::Dataproc::V1::Clusters::AcceleratorConfig'];

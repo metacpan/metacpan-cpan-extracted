@@ -39,12 +39,12 @@ Data::NestedKey - Object-oriented handling of deeply nested hash structures.
     print $nk->as_string();
 
     # use the CLI version
-    cat ecr-response.json | dnk 'repositories[0].repositoryUri'
+    cat ecr-response.json | dnk get 'repositories[0].repositoryUri'
 
 # DESCRIPTION
 
 `Data::NestedKey` (and the CLI script `dnk`) provide a lightweight
-way to manipulate deeply nested data structures use dot-separated
+way to manipulate deeply nested data structures using dot-separated
 keys.
 
 `Data::NestedKey` provides an object-oriented approach to this
@@ -79,15 +79,17 @@ values are nested several levels deep. This module enables reading and modifying
 specific elements using intuitive dot-separated keys, making access more
 straightforward.
 
-For example, given a JSON configuration file, a utility could allow:
+For example, the `dnk` command can update a value in a JSON configuration:
 
-    init-config foo.json session_files.dir /some/path
+    dnk -i foo.json --replace set session_files.dir /some/path
 
-Where the command takes the configuration file name followed by key-value pairs
-representing the specific elements to update.
+Without `--replace`, `dnk set` prints the modified document to standard
+output instead of changing the input file.
 
 The class also supports serialization in multiple formats, controlled by
-package variables:
+package variables. These variables are shared by all `Data::NestedKey`
+instances in the process; changing one affects subsequent serialization
+by every instance:
 
 - `$Data::NestedKey::JSON_PRETTY` (default: 1)
 
@@ -168,28 +170,36 @@ returns the first.
 
 ## delete(@key\_paths)
 
-Removes the specified keys from the nested structure. If the final segment
-carries an array subscript, the element is removed with `splice` (the array
-shrinks; no undef hole is left). Empty parent hashes are pruned automatically
-when no array is traversed on the way down.
+Removes the specified keys from the nested structure. Array subscripts may
+be used within a path or as a leading segment for an array-rooted structure.
+Negative subscripts count from the end. If the final segment carries an
+array subscript, the element is removed with `splice` (the array shrinks;
+no undef hole is left).
+
+Nonexistent paths, including out-of-range array indices, are ignored
+without modifying the structure. Empty parent hashes are pruned
+automatically when no array is traversed on the way down.
 
 Returns the object itself.
 
 ## exists\_key(@key\_paths)
 
-Checks whether the given keys exist in the nested structure. Array subscripts
-are honoured: a subscript pointing past the end of an array, or to an undef
-slot, is treated as non-existent.
+Checks whether the given keys exist in the nested structure. Array
+subscripts, including leading subscripts for an array-rooted structure,
+are supported. A subscript pointing past the end of an array, or to an
+undef slot, is treated as non-existent.
 
-Returns a list of boolean values (1 for exists, 0 for does not exist).
+Returns one boolean per requested path in list context (1 for exists,
+0 for does not exist). In scalar context returns the first result.
 
 ## as\_string()
 
 Serializes the nested structure into a string using the specified format.
 
 The `""` operator is overloaded to call this method, so the object may be
-interpolated directly into strings.  Set `$Data::NestedKey::FORMAT` to change
-the default format from JSON.
+interpolated directly into strings. Set `$Data::NestedKey::FORMAT` to change
+the default format from JSON. This is a package variable, not an
+instance-specific setting.
 
 Returns a string representation of the data.
 

@@ -240,7 +240,15 @@ subtest 'the default resolver' => sub {
 	my @ips = Database::BI::SafeUA::resolve_host('localhost');
 	ok @ips, 'localhost resolves' or diag 'no localhost here';
 	ok !(grep { !Database::BI::SafeUA::blocked_address($_) } @ips), 'and every address it gives is refused';
-	is_deeply [ Database::BI::SafeUA::resolve_host('no-such-host.invalid') ], [], '.invalid never resolves';
+	# Some resolvers (an ISP's, a captive portal) answer a name that does not exist with the
+	# address of a search page, so what resolve_host says cannot be judged there.
+	my @invalid = Database::BI::SafeUA::resolve_host('no-such-host.invalid');
+	SKIP: {
+		skip 'this resolver answers names that cannot exist: ' . join(',', @invalid), 1 if @invalid;
+		pass '.invalid never resolves';
+	}
+	is_deeply [ Database::BI::SafeUA::resolve_host("\x{FEFF}") ], [],
+		'a host that is not text for the resolver does not resolve either';
 };
 
 subtest 'the application' => sub {

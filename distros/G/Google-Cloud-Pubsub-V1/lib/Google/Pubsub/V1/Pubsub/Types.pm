@@ -370,6 +370,27 @@ coerce 'RepeatedJavaScriptUDF',
 declare 'MapStringJavaScriptUDF',
     as HashRef[JavaScriptUDF()];
 
+declare 'Compression',
+    as InstanceOf['Google::Pubsub::V1::Pubsub::Compression'];
+
+coerce 'Compression',
+    from HashRef, via { 'Google::Pubsub::V1::Pubsub::Compression'->new($_) };
+
+declare 'RepeatedCompression',
+    as ArrayRef[Compression()];
+
+coerce 'RepeatedCompression',
+    from ArrayRef[HashRef], via { [ map { 'Google::Pubsub::V1::Pubsub::Compression'->new($_) } @$_ ] };
+
+declare 'MapStringCompression',
+    as HashRef[Compression()];
+
+declare 'CompressionAlgorithm',
+    as (Int | Str);
+
+declare 'CompressionMode',
+    as (Int | Str);
+
 declare 'AIInference',
     as InstanceOf['Google::Pubsub::V1::Pubsub::AIInference'];
 
@@ -907,6 +928,51 @@ declare 'MapStringBigtableConfig',
 declare 'State',
     as (Int | Str);
 
+declare 'ColumnFamilyMapping',
+    as InstanceOf['Google::Pubsub::V1::Pubsub::BigtableConfig::ColumnFamilyMapping'];
+
+coerce 'ColumnFamilyMapping',
+    from HashRef, via { 'Google::Pubsub::V1::Pubsub::BigtableConfig::ColumnFamilyMapping'->new($_) };
+
+declare 'RepeatedColumnFamilyMapping',
+    as ArrayRef[ColumnFamilyMapping()];
+
+coerce 'RepeatedColumnFamilyMapping',
+    from ArrayRef[HashRef], via { [ map { 'Google::Pubsub::V1::Pubsub::BigtableConfig::ColumnFamilyMapping'->new($_) } @$_ ] };
+
+declare 'MapStringColumnFamilyMapping',
+    as HashRef[ColumnFamilyMapping()];
+
+declare 'RowKeySchema',
+    as InstanceOf['Google::Pubsub::V1::Pubsub::BigtableConfig::ColumnFamilyMapping::RowKeySchema'];
+
+coerce 'RowKeySchema',
+    from HashRef, via { 'Google::Pubsub::V1::Pubsub::BigtableConfig::ColumnFamilyMapping::RowKeySchema'->new($_) };
+
+declare 'RepeatedRowKeySchema',
+    as ArrayRef[RowKeySchema()];
+
+coerce 'RepeatedRowKeySchema',
+    from ArrayRef[HashRef], via { [ map { 'Google::Pubsub::V1::Pubsub::BigtableConfig::ColumnFamilyMapping::RowKeySchema'->new($_) } @$_ ] };
+
+declare 'MapStringRowKeySchema',
+    as HashRef[RowKeySchema()];
+
+declare 'DelimitedKey',
+    as InstanceOf['Google::Pubsub::V1::Pubsub::BigtableConfig::ColumnFamilyMapping::DelimitedKey'];
+
+coerce 'DelimitedKey',
+    from HashRef, via { 'Google::Pubsub::V1::Pubsub::BigtableConfig::ColumnFamilyMapping::DelimitedKey'->new($_) };
+
+declare 'RepeatedDelimitedKey',
+    as ArrayRef[DelimitedKey()];
+
+coerce 'RepeatedDelimitedKey',
+    from ArrayRef[HashRef], via { [ map { 'Google::Pubsub::V1::Pubsub::BigtableConfig::ColumnFamilyMapping::DelimitedKey'->new($_) } @$_ ] };
+
+declare 'MapStringDelimitedKey',
+    as HashRef[DelimitedKey()];
+
 declare 'CloudStorageConfig',
     as InstanceOf['Google::Pubsub::V1::Pubsub::CloudStorageConfig'];
 
@@ -1374,6 +1440,36 @@ coerce 'RepeatedSeekResponse',
 
 declare 'MapStringSeekResponse',
     as HashRef[SeekResponse()];
+
+declare 'PubsubClientTelemetry',
+    as InstanceOf['Google::Pubsub::V1::Pubsub::PubsubClientTelemetry'];
+
+coerce 'PubsubClientTelemetry',
+    from HashRef, via { 'Google::Pubsub::V1::Pubsub::PubsubClientTelemetry'->new($_) };
+
+declare 'RepeatedPubsubClientTelemetry',
+    as ArrayRef[PubsubClientTelemetry()];
+
+coerce 'RepeatedPubsubClientTelemetry',
+    from ArrayRef[HashRef], via { [ map { 'Google::Pubsub::V1::Pubsub::PubsubClientTelemetry'->new($_) } @$_ ] };
+
+declare 'MapStringPubsubClientTelemetry',
+    as HashRef[PubsubClientTelemetry()];
+
+declare 'PublishOperation',
+    as InstanceOf['Google::Pubsub::V1::Pubsub::PubsubClientTelemetry::PublishOperation'];
+
+coerce 'PublishOperation',
+    from HashRef, via { 'Google::Pubsub::V1::Pubsub::PubsubClientTelemetry::PublishOperation'->new($_) };
+
+declare 'RepeatedPublishOperation',
+    as ArrayRef[PublishOperation()];
+
+coerce 'RepeatedPublishOperation',
+    from ArrayRef[HashRef], via { [ map { 'Google::Pubsub::V1::Pubsub::PubsubClientTelemetry::PublishOperation'->new($_) } @$_ ] };
+
+declare 'MapStringPublishOperation',
+    as HashRef[PublishOperation()];
 
 1;
 

@@ -1,2 +1,8 @@
+0.002  2026-11-22 19:51:10 CET
+   - Add minimal protection against scrypt work factors going too high,
+     still have to find a solution that is more flexible.
+   - Fix bug with providing "lots" of data in first pump() in Buffer.
+   - Fix bugs in Decrypter's constructor.
+
 0.001  2026-10-13 08:34:17 CEST
    - Initial release

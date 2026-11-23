@@ -46,7 +46,7 @@ BEGIN {
 package main;
 use Google::Cloud::Spanner::V1::SpannerClient;
 
-my $client = Google::Cloud::Spanner::V1::SpannerClient->new( credentials => 'dummy' );
+my $client = Google::Cloud::Spanner::V1::SpannerClient->new();
 ok($client, 'Instantiated generated client');
 isa_ok($client->transport, 'Google::gRPC::Client', 'Client transport');
 

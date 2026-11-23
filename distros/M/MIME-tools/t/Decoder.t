@@ -34,9 +34,10 @@ my @encodings = ('base64',
 plan( tests => scalar @encodings);
 
 # Report what tests we may be skipping:
-diag($has_gzip
-	? "Using gzip: $has_gzip"
-	: "No gzip: skipping x-gzip64 test");
+if (!$has_gzip) {
+        diag("No gzip: skipping x-gzip64 test");
+}
+
 
 # Test each encoding in turn:
 my ($e, $eno) = (undef, 0);

@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <cstring>
+#include <map>
 
 #ifdef GOOGLE3
 #include "net/proto2/proto/descriptor.upb.h"
@@ -238,8 +239,102 @@ static std::string FieldTypeToString(int type) {
   }
 }
 
+static std::string FormatProtoCommentForPod(absl::string_view raw) {
+  std::stringstream out;
+  size_t pos = 0;
+  bool any_line = false;
+  while (pos < raw.size()) {
+    size_t nl = raw.find('\n', pos);
+    absl::string_view line =
+        (nl == absl::string_view::npos) ? raw.substr(pos) : raw.substr(pos, nl - pos);
+    pos = (nl == absl::string_view::npos) ? raw.size() : nl + 1;
+
+    // Strip a single leading space (standard protoc comment formatting)
+    if (!line.empty() && line[0] == ' ') {
+      line.remove_prefix(1);
+    }
+    // Convert Markdown **bold** to POD B<bold>
+    std::string converted;
+    size_t lpos = 0;
+    while (lpos < line.size()) {
+      size_t b_start = line.find("**", lpos);
+      if (b_start == absl::string_view::npos) {
+        converted.append(line.data() + lpos, line.size() - lpos);
+        break;
+      }
+      size_t b_end = line.find("**", b_start + 2);
+      if (b_end == absl::string_view::npos || b_end == b_start + 2) {
+        converted.append(line.data() + lpos, line.size() - lpos);
+        break;
+      }
+      converted.append(line.data() + lpos, b_start - lpos);
+      converted.append("B<");
+      converted.append(line.data() + b_start + 2, b_end - (b_start + 2));
+      converted.append(">");
+      lpos = b_end + 2;
+    }
+    // Prevent raw '=' at column 0 from being parsed as a POD directive
+    if (!converted.empty() && converted[0] == '=') {
+      out << " " << converted << "\n";
+    } else {
+      out << converted << "\n";
+    }
+    any_line = true;
+  }
+  return any_line ? out.str() : std::string();
+}
+
+#ifndef GOOGLE3
+#ifndef proto2_SourceCodeInfo
+#define proto2_SourceCodeInfo google_protobuf_SourceCodeInfo
+#define proto2_SourceCodeInfo_Location google_protobuf_SourceCodeInfo_Location
+#define proto2_FileDescriptorProto_source_code_info google_protobuf_FileDescriptorProto_source_code_info
+#define proto2_SourceCodeInfo_location google_protobuf_SourceCodeInfo_location
+#define proto2_SourceCodeInfo_Location_leading_comments google_protobuf_SourceCodeInfo_Location_leading_comments
+#define proto2_SourceCodeInfo_Location_trailing_comments google_protobuf_SourceCodeInfo_Location_trailing_comments
+#define proto2_SourceCodeInfo_Location_path google_protobuf_SourceCodeInfo_Location_path
+#endif
+#endif
+
+static std::map<std::string, std::string> BuildCommentMap(
+    const proto2_FileDescriptorProto* file_proto) {
+  std::map<std::string, std::string> comments;
+  const proto2_SourceCodeInfo* sci =
+      proto2_FileDescriptorProto_source_code_info(file_proto);
+  if (!sci) return comments;
+
+  size_t loc_count = 0;
+  const proto2_SourceCodeInfo_Location* const* locs =
+      proto2_SourceCodeInfo_location(sci, &loc_count);
+  for (size_t i = 0; i < loc_count; i++) {
+    const proto2_SourceCodeInfo_Location* loc = locs[i];
+    upb_StringView lead = proto2_SourceCodeInfo_Location_leading_comments(loc);
+    upb_StringView trail = proto2_SourceCodeInfo_Location_trailing_comments(loc);
+    absl::string_view text = (lead.size > 0)
+                                 ? absl::string_view(lead.data, lead.size)
+                                 : absl::string_view(trail.data, trail.size);
+    if (text.empty()) continue;
+
+    size_t path_len = 0;
+    const int32_t* path = proto2_SourceCodeInfo_Location_path(loc, &path_len);
+    if (path_len == 0) continue;
+
+    std::stringstream key;
+    for (size_t j = 0; j < path_len; j++) {
+      if (j > 0) key << ".";
+      key << path[j];
+    }
+    std::string formatted = FormatProtoCommentForPod(text);
+    if (!formatted.empty()) {
+      comments[key.str()] = formatted;
+    }
+  }
+  return comments;
+}
+
 std::string PerlCodeGenerator::GenerateModule(
     const proto2_FileDescriptorProto* file_proto) {
+  std::map<std::string, std::string> comment_map = BuildCommentMap(file_proto);
   std::stringstream ss;
   ss << "package " << package_name_ << ";\n\n";
   ss << "use strict;\n";
@@ -295,6 +390,10 @@ std::string PerlCodeGenerator::GenerateModule(
 
   ss << "# Message definitions\n\n";
 
+  std::stringstream pod_messages;
+  std::string first_msg_name;
+  std::vector<std::string> first_msg_fields;
+
   size_t message_count;
   const proto2_DescriptorProto* const* messages =
       proto2_FileDescriptorProto_message_type(file_proto, &message_count);
@@ -303,6 +402,10 @@ std::string PerlCodeGenerator::GenerateModule(
     const proto2_DescriptorProto* msg = messages[i];
     upb_StringView msg_name_sv = proto2_DescriptorProto_name(msg);
     absl::string_view msg_name(msg_name_sv.data, msg_name_sv.size);
+
+    if (first_msg_name.empty()) {
+      first_msg_name = std::string(msg_name);
+    }
 
     ss << "# === Message: " << package_name_ << "::" << msg_name << " ===\n";
     ss << "    # Fields for " << msg_name << "\n";
@@ -317,6 +420,10 @@ std::string PerlCodeGenerator::GenerateModule(
       upb_StringView f_type_name_sv = proto2_FieldDescriptorProto_type_name(f);
       int f_type = proto2_FieldDescriptorProto_type(f);
 
+      if (i == 0 && first_msg_fields.size() < 4) {
+        first_msg_fields.emplace_back(f_name_sv.data, f_name_sv.size);
+      }
+
       ss << "    # Field: "
          << absl::string_view(f_name_sv.data, f_name_sv.size);
       ss << " Type: " << f_type << " ("
@@ -325,42 +432,38 @@ std::string PerlCodeGenerator::GenerateModule(
     }
     ss << "\n";
 
-    // Emit formal POD block for the message
-    ss << "=pod\n\n";
-    ss << "=head1 NAME\n\n";
-    ss << package_name_ << "::" << msg_name
-       << " - Compiled Protocol Buffers message class\n\n";
-    ss << "=head1 SYNOPSIS\n\n";
-    ss << "    use " << package_name_ << ";\n\n";
-    ss << "    my $msg = " << package_name_ << "::" << msg_name << "->new(\n";
+    // Accumulate unified POD for this message
+    pod_messages << "=head2 " << package_name_ << "::" << msg_name << "\n\n";
+    auto msg_cit = comment_map.find("4." + std::to_string(i));
+    if (msg_cit != comment_map.end()) {
+      pod_messages << msg_cit->second << "\n";
+    }
+    pod_messages << "Inherits from L<Protobuf::Message>.\n\n";
     if (field_count > 0) {
-      upb_StringView first_f_name_sv =
-          proto2_FieldDescriptorProto_name(fields[0]);
-      ss << "        "
-         << absl::string_view(first_f_name_sv.data, first_f_name_sv.size)
-         << " => $value,\n";
-    }
-    ss << "    );\n\n";
-    ss << "=head1 FIELDS\n\n";
-    ss << "=over 4\n\n";
-    for (size_t j = 0; j < field_count; j++) {
-      const proto2_FieldDescriptorProto* f = fields[j];
-      upb_StringView f_name_sv = proto2_FieldDescriptorProto_name(f);
-      absl::string_view f_name(f_name_sv.data, f_name_sv.size);
-      int f_type = proto2_FieldDescriptorProto_type(f);
-      upb_StringView f_type_name_sv = proto2_FieldDescriptorProto_type_name(f);
+      pod_messages << "=head3 Accessors\n\n=over 4\n\n";
+      for (size_t j = 0; j < field_count; j++) {
+        const proto2_FieldDescriptorProto* f = fields[j];
+        upb_StringView f_name_sv = proto2_FieldDescriptorProto_name(f);
+        absl::string_view f_name(f_name_sv.data, f_name_sv.size);
+        int f_type = proto2_FieldDescriptorProto_type(f);
+        upb_StringView f_type_name_sv = proto2_FieldDescriptorProto_type_name(f);
 
-      ss << "=item * B<" << f_name << ">\n\n";
-      ss << "Type: " << FieldTypeToString(f_type);
-      if (f_type_name_sv.size > 0) {
-        ss << " ("
-           << absl::string_view(f_type_name_sv.data, f_type_name_sv.size)
-           << ")";
+        pod_messages << "=item * C<< $msg->" << f_name << "() >> / C<< $msg->"
+                     << f_name << "($value) >>\n\n";
+        pod_messages << "Type: C<" << FieldTypeToString(f_type) << ">";
+        if (f_type_name_sv.size > 0) {
+          absl::string_view tn(f_type_name_sv.data, f_type_name_sv.size);
+          std::string resolved = ResolvePerlClass(tn);
+          pod_messages << " (L<" << resolved << ">)";
+        }
+        pod_messages << "\n\n";
+        auto f_cit = comment_map.find("4." + std::to_string(i) + ".2." + std::to_string(j));
+        if (f_cit != comment_map.end()) {
+          pod_messages << f_cit->second << "\n";
+        }
       }
-      ss << "\n\n";
+      pod_messages << "=back\n\n";
     }
-    ss << "=back\n\n";
-    ss << "=cut\n\n";
 
     size_t enum_count;
     const proto2_EnumDescriptorProto* const* enums =
@@ -384,20 +487,17 @@ std::string PerlCodeGenerator::GenerateModule(
       }
       ss << "\n";
 
-      // Emit formal POD block for the enum
-      ss << "=pod\n\n";
-      ss << "=head2 Enum: " << msg_name << "::" << e_name << "\n\n";
-      ss << "Values:\n\n";
-      ss << "=over 4\n\n";
+      pod_messages << "=head3 Enum: " << msg_name << "::" << e_name << "\n\n";
+      pod_messages << "=over 4\n\n";
       for (size_t k = 0; k < val_count; k++) {
         const proto2_EnumValueDescriptorProto* ev = values[k];
         upb_StringView ev_name_sv = proto2_EnumValueDescriptorProto_name(ev);
         absl::string_view ev_name(ev_name_sv.data, ev_name_sv.size);
         int ev_num = proto2_EnumValueDescriptorProto_number(ev);
-        ss << "=item * C<" << ev_name << "> => " << ev_num << "\n\n";
+        pod_messages << "=item * C<" << ev_name << "> => C<" << ev_num
+                     << ">\n\n";
       }
-      ss << "=back\n\n";
-      ss << "=cut\n\n";
+      pod_messages << "=back\n\n";
     }
   }
 
@@ -420,22 +520,14 @@ std::string PerlCodeGenerator::GenerateModule(
     ss << "package " << package_name_ << "::" << srv_name << "Client;\n\n";
 
     ss << "=pod\n\n";
-    ss << "=head1 NAME\n\n";
-    ss << package_name_ << "::" << srv_name
-       << "Client - Client stub representing the remote " << srv_name
-       << " service\n\n";
-    ss << "=head1 DESCRIPTION\n\n";
-    ss << "This class acts as a local client stub for the remote gRPC "
-          "service.\n";
-    ss << "It delegates call dispatching to an underlying "
-          "L<Google::gRPC::Client>\n";
-    ss << "instance, ensuring type-safe request parsing and response "
-          "mapping.\n\n";
-    ss << "=head1 CONFIGURATION AND ENVIRONMENT\n\n";
-    ss << "=head2 target\n\n";
+    ss << "=head2 Service Client: " << package_name_ << "::" << srv_name
+       << "Client\n\n";
+    ss << "Client stub representing the remote C<" << srv_name << "> gRPC "
+          "service. Delegates call dispatching to L<Google::gRPC::Client>.\n\n";
+    ss << "=head3 target\n\n";
     ss << "The endpoint target address. Defaults to C<" << default_host
        << ">.\n\n";
-    ss << "=head2 credentials\n\n";
+    ss << "=head3 credentials\n\n";
     ss << "The authentication credentials provider. Defaults to application "
           "default credentials via L<Google::Auth>.\n\n";
     ss << "=cut\n\n";
@@ -495,10 +587,47 @@ std::string PerlCodeGenerator::GenerateModule(
     }
   }
 
-  ss << "1;\n\n__END__\n\n=head1 NAME\n\n"
-     << package_name_
-     << " - Protocol Buffers schema definition\n\n=head1 DESCRIPTION\n\n"
-     << "Auto-generated Protocol Buffers schema definition class.\n\n"
+  upb_StringView proto_file_sv = proto2_FileDescriptorProto_name(file_proto);
+  absl::string_view proto_file_name(proto_file_sv.data, proto_file_sv.size);
+
+  ss << "1;\n\n__END__\n\n=encoding UTF-8\n\n=head1 NAME\n\n"
+     << package_name_ << " - Compiled Protocol Buffers messages for "
+     << proto_file_name << "\n\n";
+
+  if (!first_msg_name.empty()) {
+    std::string full_first = absl::StrCat(package_name_, "::", first_msg_name);
+    ss << "=head1 SYNOPSIS\n\n";
+    ss << "    use " << package_name_ << ";\n\n";
+    ss << "    my $msg = " << full_first << "->new({\n";
+    for (const auto& fn : first_msg_fields) {
+      ss << "        " << fn << " => $" << fn << ",\n";
+    }
+    ss << "    });\n\n";
+    if (!first_msg_fields.empty()) {
+      ss << "    # Read or update a field\n";
+      ss << "    my $val = $msg->" << first_msg_fields[0] << "();\n\n";
+    }
+    ss << "    # Binary wire-format roundtrip\n";
+    ss << "    my $bytes   = $msg->serialize();\n";
+    ss << "    my $decoded = " << full_first << "->parse($bytes);\n\n";
+    ss << "    # Canonical ProtoJSON\n";
+    ss << "    my $json = $msg->to_json();\n\n";
+  }
+
+  ss << "=head1 DESCRIPTION\n\n"
+     << "Auto-generated L<Protobuf> message classes compiled from C<"
+     << proto_file_name << ">. All message classes inherit from\n"
+     << "L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,\n"
+     << "C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.\n\n";
+
+  std::string msgs_pod = pod_messages.str();
+  if (!msgs_pod.empty()) {
+    ss << "=head1 MESSAGES\n\n" << msgs_pod;
+  }
+
+  ss << "=head1 SEE ALSO\n\n"
+     << "L<Protobuf>, L<Protobuf::Message>, L<" << package_name_
+     << "::Types>, L<https://protobuf.dev/>\n\n"
      << "=head1 LICENSE AND COPYRIGHT\n\nCopyright (C) 2026 Google LLC\n\n"
      << "This program is released under the Apache 2.0 license.\n\n=cut\n";
   return ss.str();

@@ -1,3 +1,9 @@
+v0.17  2026-11-22Z
+    - Improved cloudlet calculations significantly
+    - Allow Data::Identifier::Interface::Simple in $factory->create_colour()
+    - Added $factory->create_language()
+    - Added $db->whitelist_plugin(), and $db->blacklist_plugin()
+
 v0.16  2026-11-21Z
     - Improved documentation
     - Added many tests

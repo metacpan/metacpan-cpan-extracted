@@ -1,0 +1,70 @@
+{
+   "abstract" : "File::DistDir - locate and copy installed Perl distribution resources",
+   "author" : [
+      "Rob Lauer <rclauer@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.7901, CPAN::Meta::Converter version 2.150015",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "File-DistDir",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CLI::Simple" : "v2.4.0",
+            "File::ShareDir" : "1.118",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {}
+      }
+   },
+   "provides" : {
+      "File::DistDir" : {
+         "file" : "lib/File/DistDir.pm",
+         "version" : "1.0.0"
+      },
+      "File::DistDir::CLI" : {
+         "file" : "lib/File/DistDir/CLI.pm",
+         "version" : "1.0.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "rclauer@gmail.com",
+         "web" : "https://github.com/rlauer6/File-DistDir/issues"
+      },
+      "homepage" : "https://github.com/rlauer6/File-DistDir",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/rlauer6/File-DistDir"
+      }
+   },
+   "version" : "v1.0.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

@@ -110,15 +110,93 @@ sub get_output {
 
 =head1 NAME
 
-Google::gRPC::Engine::PP - gRPC Pure-Perl Transport Engine
+Google::gRPC::Engine::PP - Pure-Perl HTTP/2 transport engine for Google::gRPC
 
 =head1 SYNOPSIS
 
     use Google::gRPC::Engine::PP;
 
+    my $engine = Google::gRPC::Engine::PP->new(
+        on_headers      => sub { my ($stream_id, $headers)  = @_; ... },
+        on_data         => sub { my ($stream_id, $chunk)    = @_; ... },
+        on_trailers     => sub { my ($stream_id, $trailers) = @_; ... },
+        on_stream_close => sub { my ($stream_id, $code)     = @_; ... },
+    );
+
+    my $stream_id = $engine->submit_request({
+        headers    => [ ':method' => 'POST', ':path' => '/pkg.Svc/Call', ... ],
+        data       => $framed_bytes,
+        end_stream => 1,
+    });
+
+    my $wire_out = $engine->get_output();
+    $engine->feed_input($wire_in);
+
 =head1 DESCRIPTION
 
-This module provides grpc pure-perl transport engine functionality for the Google gRPC Perl client SDK.
+C<Google::gRPC::Engine::PP> is the pure-Perl HTTP/2 transport engine for
+L<Google::gRPC>, built on L<Protocol::HTTP2::Client>. It is used automatically
+by L<Google::gRPC::Engine> when C<libnghttp2> C/XS bindings are unavailable
+or when C<engine_type =E<gt> 'pureperl'> is requested explicitly.
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item C<on_headers> / C<on_data> / C<on_trailers> / C<on_stream_close>
+
+Optional coderef callbacks invoked for incoming HTTP/2 headers, DATA frames,
+trailing headers, and stream completion events.
+
+=item C<client> (read-only, lazy)
+
+Underlying L<Protocol::HTTP2::Client> session instance.
+
+=back
+
+=head1 METHODS
+
+=head2 is_xs()
+
+Returns C<0>, indicating this is the pure-Perl engine.
+
+=head2 submit_request(\%args)
+
+    my $stream_id = $engine->submit_request({
+        headers    => \@headers,
+        data       => $bytes,
+        end_stream => 1,
+    });
+
+Submits an HTTP/2 request using the provided flat C<headers> arrayref
+(separating pseudo-headers such as C<:method>, C<:path>, C<:scheme>, and
+C<:authority> from regular headers) and optional C<data> payload. Returns the
+assigned stream ID.
+
+=head2 feed_input($bytes)
+
+    $engine->feed_input($raw_bytes);
+
+Feeds raw bytes read from the TLS/TCP socket into the HTTP/2 state machine,
+triggering registered callbacks as frames are decoded.
+
+=head2 get_output()
+
+    my $bytes = $engine->get_output();
+
+Drains and returns all pending outbound HTTP/2 frames ready to be written to
+the socket.
+
+=head2 send_ping($cb)
+
+    $engine->send_ping(sub { ... });
+
+Queues an HTTP/2 C<PING> frame if supported by the underlying
+L<Protocol::HTTP2::Client>.
+
+=head1 SEE ALSO
+
+L<Google::gRPC>, L<Google::gRPC::Engine>, L<Google::gRPC::Engine::NGHTTP2>
 
 =head1 AUTHOR
 

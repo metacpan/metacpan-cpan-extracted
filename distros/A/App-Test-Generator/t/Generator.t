@@ -526,6 +526,58 @@ subtest '_validate_input_positions() passes valid positions' => sub {
 	);
 };
 
+subtest '_validate_input_positions() accepts a trailing named option' => sub {
+	lives_ok(
+		sub {
+			_validate_input_positions({
+				input => {
+					message  => { type => 'string',  position => 0 },
+					priority => { type => 'integer', named => 1, optional => 1 },
+				}
+			})
+		},
+		'a parameter after the positional arguments may be named',
+	);
+};
+
+subtest '_validate_input_params() checks the sampling ceiling' => sub {
+	lives_ok(
+		sub {
+			_validate_input_params({
+				input => {
+					rounds => {
+						type       => 'integer',
+						min        => 10_000,
+						max        => 100_000_000,
+						sample_max => 200_000,
+					},
+				}
+			})
+		},
+		'a sample_max inside the documented range lives',
+	);
+
+	throws_ok(
+		sub {
+			_validate_input_params({
+				input => { rounds => { type => 'integer', min => 1, max => 9, sample_max => 10 } }
+			})
+		},
+		qr/above max/,
+		'a sample_max above max croaks',
+	);
+
+	throws_ok(
+		sub {
+			_validate_input_params({
+				input => { rounds => { type => 'integer', min => 1, max => 9, sample_max => 0 } }
+			})
+		},
+		qr/below min/,
+		'a sample_max below min croaks',
+	);
+};
+
 # ------------------------------------------------------------------
 # _normalize_config — normalise boolean strings in config hash
 # ------------------------------------------------------------------
@@ -742,7 +794,7 @@ subtest '_schema_to_lectrotest_generator() returns undef for invalid float range
 subtest '_get_semantic_generators() returns hashref with expected keys' => sub {
 	my $gens = _get_semantic_generators();
 	ok(ref($gens) eq 'HASH', 'returns hashref');
-	for my $key (qw(email url uuid ipv4 username iso_date unix_timestamp)) {
+	for my $key (qw(email url uuid ipv4 username iso_date unix_timestamp bytes)) {
 		ok(exists $gens->{$key}, "$key generator present");
 	}
 };
@@ -848,6 +900,23 @@ subtest '_validate_input_semantics() passes for known semantic type' => sub {
 		},
 		'known semantic type lives',
 	);
+};
+
+subtest '_validate_input_semantics() accepts the bytes semantic type' => sub {
+	my @warnings;
+	local $SIG{__WARN__} = sub { push @warnings, @_ };
+	_validate_input_semantics({
+		input => { contents => { type => 'string', semantic => 'bytes' } }
+	});
+	is(scalar(grep { /Unknown semantic type/ } @warnings), 0,
+		'a byte string is a known semantic type');
+};
+
+subtest '_schema_to_lectrotest_generator() draws octets for bytes' => sub {
+	my $code = _schema_to_lectrotest_generator(
+		'contents', { type => 'string', semantic => 'bytes' });
+	like($code, qr/contents <- Gen \{.*pack\('C'/,
+		'a bytes parameter gets the octet generator');
 };
 
 subtest '_validate_input_semantics() carps for unknown semantic type' => sub {

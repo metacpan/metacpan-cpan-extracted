@@ -1,5 +1,25 @@
 Revision history for App::papersway
 
+4.000     2026-11-22 22:36:01+00:00 Europe/London
+    - New commands 'send-to-workspace', 'send-to-output', 'move-to-output'.
+    - New command 'output back_and_forth'.
+    - Commands 'workspace' and 'move-to-workspace' can take a new argument,
+      'back_and_forth'.  Unlike the WM's 'back_and_forth', these never go
+      to a workspace on another output.
+    - On portrait outputs, treat all columns as wide.
+      'width toggle' now does nothing on portrait outputs.
+    - 'fresh-workspace' and 'bury-column' now work on columns with rows.
+    - When resurrecting a workspace, move it back to its output.
+
+    - 'workspace', 'move-to-workspace' switch to the workspace by name
+      instead of wrapping the WM's 'workspace prev|next_on_output'.
+    - 'move-to-workspace' updates its idea about the contents of the
+      destination workspace before unhiding there, fixing at least one bug.
+    - Add some missing checks for operating on only our workspaces.
+    - Read all lines waiting in the command pipe, not just one.
+    - Exit if we get EOF on the command pipe.
+    - Other robustness improvements.
+
 3.003     2026-10-15 20:37:18+01:00 Europe/London
     - New --version option.
     - Properly handle how i3 tends to reuse container IDs.

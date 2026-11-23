@@ -231,7 +231,7 @@ set the synopsis line.
     #!/usr/bin/env bash
 
     declare -A OPTS=(
-        [ &USAGE ]="Usage: $(basename $0) [options] <files...>"
+        [ &USAGE ]="Usage: $(basename "$0") [options] <files...>"
         [ input   | i :  # Input file to process ]=
         [ output  | o :  # Output file (default: stdout) ]=/dev/stdout
         [ verbose | v    # Enable verbose output ]=

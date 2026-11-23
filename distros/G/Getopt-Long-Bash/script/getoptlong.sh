@@ -4,7 +4,7 @@
 # GetOptLong: Getopt Library for Bash Script
 # Copyright 2025-2026 Office TECOLI, LLC <https://github.com/tecolicom/getoptlong>
 # MIT License: See <https://opensource.org/licenses/MIT>
-: ${GOL_VERSION:=1.3.0}
+: ${GOL_VERSION:=1.5.0}
 ###############################################################################
 # Check bash version (4.4+ for nameref and ${parameter@Q})
 ((BASH_VERSINFO[0] > 4 || (BASH_VERSINFO[0] == 4 && BASH_VERSINFO[1] >= 4))) ||
@@ -91,7 +91,7 @@ _gol_init_entry() { local _entry="$1" _pass= _name _vname _dtype ;
 	|| _gol_die "[$_entry] -- invalid"
     local _names=${_MATCH[1]} _vtype=${_MATCH[2]} _type=${_MATCH[5]} _comment=${_MATCH[8]}
     local _initial="${_opts[$_entry]-}"
-    IFS=$' \t|' read -a _aliases <<< ${_names}
+    IFS=$' \t|' read -ra _aliases <<< ${_names}
     _name=${_aliases[0]}
     _gol_ival $_name "$_initial"
     unset _opts["$_entry"]
@@ -165,10 +165,11 @@ gol_getopts_() { local _non= _optname _val _vtype _vname _name _callback _trigge
     return 0
 }
 _gol_call_hook() {
-    local _call=($1)
-    local exec=("${_call[0]}" "$2" "${_call[@]:1}" "${@:3}")
+    local _call ; read -ra _call <<< "$1"
     declare -F "${_call[0]}" > /dev/null \
-	&& "${exec[@]}" || _gol_die "callback function ${_call[0]}() is not defined"
+	|| _gol_die "callback function ${_call[0]}() is not defined"
+    # the callback handles its own errors: the return value is ignored
+    "${_call[0]}" "$2" "${_call[@]:1}" "${@:3}" || :
 }
 _gol_getopts_long() { local _param ;
     [[ $OPTARG =~ ^(no-)?([-_[:alnum:]]+)(=(.*))? ]] || _gol_die "$OPTARG: unrecognized option"
@@ -209,7 +210,7 @@ _gol_getopts_store() { local _vals _v ;
 	[$_IS_LIST]|[$_IS_HASH])
 	    [[ $_non ]] && { declare -n __target__=$_vname ; __target__=() ; return ; }
 	    [[ $_val =~ $'\n' ]] && readarray -t _vals <<< ${_val%$'\n'} \
-				 || IFS="${_DELIM}" read -a _vals <<< ${_val}
+				 || IFS="${_DELIM}" read -ra _vals <<< ${_val}
 	    for _v in "${_vals[@]}" ; do
 		[[ $_check ]] && _gol_validate "$_check" "$_v"
 		case $_vtype in
@@ -249,8 +250,8 @@ _gol_validate() {
     case $1 in
 	i)   [[ "$2" =~ ^[-+]?[0-9]+$ ]]            || _gol_die "$2: not an integer" ;;
 	f)   [[ "$2" =~ ^[-+]?[0-9]*(\.[0-9]+)?$ ]] || _gol_die "$2: not a number" ;;
-	\(*) declare -a error=([1]="$2: invalid argument" [2]="$1: something wrong")
-	     eval "[[ \"$2\" =~ $1 ]]" || _gol_die "${error[$?]}" ;;
+	\(*) local _regex="$1" error=([1]="$2: invalid argument" [2]="$1: something wrong")
+	     [[ $2 =~ $_regex ]] || _gol_die "${error[$?]}" ;;
 	*)   _gol_die "$1: unknown validation pattern" ;;
     esac
 }
@@ -261,8 +262,8 @@ gol_callback_() {
     while (($# > 0)) ; do
 	local _name=$1 _callback=${2:-$1}
 	[[ $_callback =~ ^[_[:alnum:]] ]] || _callback=$_name
-	local args=($_callback)
-	$_setter "$_name" "${args[0]//-/_} ${args[@]:1}"
+	local args ; read -ra args <<< "$_callback"
+	$_setter "$_name" "${args[0]//-/_} ${args[*]:1}"
 	shift $(( $# >= 2 ? 2 : 1 ))
     done
     return 0
@@ -273,7 +274,7 @@ gol_help_() {
     while (($# > 1)) ; do _gol_help "$1" "$2" ; shift 2 ; done
 }
 _gol_show_help() { local _key _aliases _init= _default= _column _flag _msg ;
-    echo "${1:-${_USAGE:-$(basename $0) [ options ] args}}"
+    echo "${1:-${_USAGE:-$(basename "$0") [ options ] args}}"
     _column=($(command -v column)) && _column+=(-s $'\t' -t) || _column=(cat)
     for _key in "${!_opts[@]}" ; do
 	_aliases="$(_gol_saila "$_key")" || continue
@@ -338,10 +339,10 @@ gol_set_() {
 }
 # Main entry point - dispatch to appropriate subcommand
 getoptlong () {
-    case $1 in
+    case ${1-} in
 	init|parse|set|configure|getopts|callback|dump|help) gol_$1 "${@:2}" ;;
 	version) echo ${GOL_VERSION} ;;
-	*) _gol_die "unknown subcommand -- $1" ;;
+	*) _gol_die "unknown subcommand -- ${1-}" ;;
     esac
 }
 # Auto-initialization if first argument is an associative array, only

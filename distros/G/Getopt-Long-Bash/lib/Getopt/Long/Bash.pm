@@ -1,6 +1,6 @@
 package Getopt::Long::Bash;
 
-our $VERSION = "1.3.0";
+our $VERSION = "1.5.0";
 
 1;
 

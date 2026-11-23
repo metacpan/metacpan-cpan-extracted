@@ -1,12 +1,12 @@
 {
-   "abstract" : "Auto-generated client library for Google Cloud Services",
+   "abstract" : "Client library for Google Cloud Services",
    "author" : [
-      "Google LLC <cjac@google.com>"
+      "C.J. Collier <cjac@google.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "apache_2_0"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -47,20 +47,7 @@
          }
       }
    },
-   "provides" : {
-      "Google::Cloud::Bigquery::V2" : {
-         "file" : "lib/Google/Cloud/Bigquery/V2.pm",
-         "version" : "0.01"
-      }
-   },
    "release_status" : "stable",
-   "resources" : {
-      "repository" : {
-         "type" : "git",
-         "url" : "https://github.com/c9h/google-auth-library-perl.git",
-         "web" : "https://github.com/c9h/google-auth-library-perl"
-      }
-   },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -196,6 +196,29 @@ subtest 'generate() uses quoted string for a string param' => sub {
 # generate() — named (non-positional) params
 # ==================================================================
 
+subtest 'generate() passes named options after positional arguments' => sub {
+	my $bg = App::Test::Generator::BenchmarkGenerator->new(schema => {
+		module   => 'My::Mod',
+		function => 'hash_password',
+		input    => {
+			password => { type => 'string', position => 0 },
+			rounds   => { type => 'integer', named => 1, optional => 1,
+			              min => 10_000, max => 100_000_000, sample_max => 200_000 },
+		},
+	});
+	my $src = $bg->generate();
+	like($src, qr/hash_password\('hello', rounds => 105000\)/,
+		'the positional argument comes first and the named option follows');
+	unlike($src, qr/rounds => 50005000/, 'the work factor is not timed at its documented maximum');
+};
+
+subtest '_representative_value() caps a work factor at sample_max' => sub {
+	my $value = App::Test::Generator::BenchmarkGenerator::_representative_value({
+		type => 'integer', min => 10_000, max => 100_000_000, sample_max => 200_000 });
+	ok(defined($value) && $value >= 10_000 && $value <= 200_000,
+		"representative value $value stays inside the documented default");
+};
+
 subtest 'generate() emits key => value pairs for named params' => sub {
 	my $bg = App::Test::Generator::BenchmarkGenerator->new(schema => {
 		module   => 'My::Mod',

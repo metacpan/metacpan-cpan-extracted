@@ -1,5 +1,4 @@
 Changes
-ignore.txt
 lib/Google/Cloud/Dataplex/V1.pm
 lib/Google/Cloud/Dataplex/V1/Analyze.pm
 lib/Google/Cloud/Dataplex/V1/Analyze/Types.pm
@@ -54,28 +53,10 @@ lib/Google/Cloud/Dataplex/V1/Service.pm
 lib/Google/Cloud/Dataplex/V1/Service/Types.pm
 lib/Google/Cloud/Dataplex/V1/Tasks.pm
 lib/Google/Cloud/Dataplex/V1/Tasks/Types.pm
-make_dataplex_output.txt
 Makefile.PL
-makefile_pl_dataplex_output.txt
 MANIFEST			This list of files
-prove_all_again.txt
-prove_all_capturing_key.txt
-prove_all_local_protobuf.txt
-prove_dataplex_output.txt
-prove_debug_output.txt
-prove_hash_dbg.txt
-prove_insert_log.txt
-prove_insert_log2.txt
-prove_insert_log3.txt
-prove_insert_log4.txt
-prove_pair.txt
-prove_refined_diag.txt
-prove_repro_pair.txt
-prove_repro_pair_logged.txt
-prove_verbose_local_protobuf.txt
-prove_verbose_output.txt
-prove_verbose_output_dataplex.txt
 README
+SECURITY.md
 t/00-load.t
 t/01-service-BusinessGlossaryService.t
 t/01-service-CatalogService.t
@@ -84,6 +65,7 @@ t/01-service-DataplexService.t
 t/01-service-DataProductService.t
 t/01-service-DataScanService.t
 t/01-service-DataTaxonomyService.t
+t/01-service-Default.t
 t/01-service-MetadataService.t
 t/02-rest-transport-BusinessGlossaryService.t
 t/02-rest-transport-CatalogService.t
@@ -92,15 +74,11 @@ t/02-rest-transport-DataplexService.t
 t/02-rest-transport-DataProductService.t
 t/02-rest-transport-DataScanService.t
 t/02-rest-transport-DataTaxonomyService.t
+t/02-rest-transport-Default.t
 t/02-rest-transport-MetadataService.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
-valgrind_CatalogService.txt
-valgrind_output.txt
-valgrind_output_failing_test.txt
-valgrind_output_fixed_inc.txt
 xt/00_perl-critic.t
-xt/boilerplate.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
